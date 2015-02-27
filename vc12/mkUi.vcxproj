@@ -1,0 +1,230 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Console|Win32">
+      <Configuration>Console</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>mkUi</ProjectName>
+    <ProjectGuid>{AF22B9FF-B338-3E7B-BD06-BF4C345325ED}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Console|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Console|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <IncludePath>C:\Program Files\boost\boost_1_57_0;$(SolutionDir);$(SolutionDir)\..\;$(SolutionDir)\..\bullet-2.82\src;$(SolutionDir)\..\Recast\RecastDemo\Include;$(SolutionDir)\..\Recast\Detour\Include;$(SolutionDir)\..\Recast\Recast\Include;$(SolutionDir)\..\glfw\include;$(SolutionDir)\..\nanovg\src\;$(SolutionDir)\..\Ogre\v2-0\RenderSystems\GL\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>$(SolutionDir)\Debug;C:\Program Files\OpenAL 1.1 SDK\libs\Win32\;C:\Program Files\NVIDIA Corporation\Cg\lib;$(SolutionDir)\..\Dependencies\debug;$(SolutionDir)\..\Ogre\ogre\Dependencies\lib\Debug;$(SolutionDir)\..\Ogre\ogre\lib\Debug;$(SolutionDir)\..\OIS 1.2.0\lib;$(SolutionDir)\..\CEGUI-0.7.5\dependencies\lib\static;$(SolutionDir)\..\CEGUI-0.7.5\lib;$(LibraryPath)</LibraryPath>
+    <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>$(SolutionDir)\Release;$(SolutionDir)\..\recast\Detour\Release\;$(SolutionDir)\..\recast\Recast\Release\;$(SolutionDir)\..\Dependencies\release;$(SolutionDir)\..\bullet-2.77\lib;$(LibraryPath)</LibraryPath>
+    <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Console|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>$(SolutionDir)\Release;$(SolutionDir)\..\recast\Detour\Release\;$(SolutionDir)\..\recast\Recast\Release\;$(SolutionDir)..\Dependencies\release;$(SolutionDir)\..\bullet-2.77\lib;C:\Program Files\NVIDIA Corporation\Cg\lib;$(SolutionDir)\..\Ogre\ogre\lib\Release;$(SolutionDir)\..\Ogre\ogre\Dependencies\lib\Release;$(SolutionDir)\..\ois-1.2.0\lib;$(SolutionDir)\..\CEGUI-0.7.7\dependencies\lib\static;$(LibraryPath)</LibraryPath>
+    <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>UI_EXPORT;WIN32;_DEBUG;_WINDOWS;_BIND_TO_CURRENT_VCLIBS_VERSION=1;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+      <ShowIncludes>false</ShowIncludes>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>glfw3.lib;glu32.lib;opengl32.lib;mkObject.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <EntryPointSymbol>
+      </EntryPointSymbol>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>UI_EXPORT;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level1</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>glfw3.lib;glu32.lib;opengl32.lib;mkObject.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Console|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>FRONT_EXPORT;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level1</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>mkUtils.lib;mkCore.lib;mkSound.lib;OIS.lib;cg.lib;OgreTerrain.lib;OgreMain.lib;Plugin_CgProgramManager.lib;RenderSystem_GL.lib;RenderSystem_Direct3D9.lib;OgreRTShaderSystem.lib;CEGUIExpatParser.lib;CEGUIBase.lib;CEGUIOgreRenderer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Nano\mkGlWindow.h" />
+    <ClInclude Include="Nano\mkNanoInk.h" />
+    <ClInclude Include="Nano\mkNanoWindow.h" />
+    <ClInclude Include="Nano\nanovg\fontstash.h" />
+    <ClInclude Include="Nano\nanovg\glew.h" />
+    <ClInclude Include="Nano\nanovg\glxew.h" />
+    <ClInclude Include="Nano\nanovg\nanovg.h" />
+    <ClInclude Include="Nano\nanovg\nanovg_gl.h" />
+    <ClInclude Include="Nano\nanovg\nanovg_gl_utils.h" />
+    <ClInclude Include="Nano\nanovg\stb_image.h" />
+    <ClInclude Include="Nano\nanovg\stb_truetype.h" />
+    <ClInclude Include="Nano\nanovg\wglew.h" />
+    <ClInclude Include="Widget\mkWTextbox.h" />
+    <ClInclude Include="Scheme\mkWRadioButton.h" />
+    <ClInclude Include="Frame\mkDimString.h" />
+    <ClInclude Include="Form\mkRootForm.h" />
+    <ClInclude Include="Scheme\mkList.h" />
+    <ClInclude Include="Scheme\mkScheme.h" />
+    <ClInclude Include="Controller\mkController.h" />
+    <ClInclude Include="Form\mkDropper.h" />
+    <ClInclude Include="Form\mkFValue.h" />
+    <ClInclude Include="Form\mkHook.h" />
+    <ClInclude Include="Scheme\mkCollection.h" />
+    <ClInclude Include="Form\mkButton.h" />
+    <ClInclude Include="mkUiImprints.h" />
+    <ClInclude Include="Scheme\mkWDockspace.h" />
+    <ClInclude Include="Widget\mkWScrollbar.h" />
+    <ClInclude Include="Widget\mkWSlider.h" />
+    <ClInclude Include="mkUiLayout.h" />
+    <ClInclude Include="Scheme\mkWExpandbox.h" />
+    <ClInclude Include="Form\mkWidgets.h" />
+    <ClInclude Include="Form\mkForm.h" />
+    <ClInclude Include="Frame\mkFrame.h" />
+    <ClInclude Include="Frame\mkInk.h" />
+    <ClInclude Include="Frame\mkStripe.h" />
+    <ClInclude Include="Frame\mkUibox.h" />
+    <ClInclude Include="Scheme\mkWDropdown.h" />
+    <ClInclude Include="Widget\mkWCheckbox.h" />
+    <ClInclude Include="Widget\mkSheet.h" />
+    <ClInclude Include="Widget\mkWContextMenu.h" />
+    <ClInclude Include="Scheme\mkWTree.h" />
+    <ClInclude Include="Scheme\mkWTable.h" />
+    <ClInclude Include="Widget\mkWTypeIn.h" />
+    <ClInclude Include="Scheme\mkWWindow.h" />
+    <ClInclude Include="mkRenderWindow.h" />
+    <ClInclude Include="mkUiWindow.h" />
+    <ClInclude Include="Scheme\mkWTabber.h" />
+    <ClInclude Include="mkUiTypes.h" />
+    <ClInclude Include="Input\mkInputDispatcher.h" />
+    <ClInclude Include="Input\mkKeyCode.h" />
+    <ClInclude Include="mkUiForward.h" />
+    <ClInclude Include="mkUiConfig.h" />
+    <ClInclude Include="mkUi.h" />
+    <ClInclude Include="Widget\mkWButton.h" />
+    <ClInclude Include="Widget\mkWidget.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="mkUiExample.cpp" />
+    <ClCompile Include="Nano\mkGlWindow.cpp" />
+    <ClCompile Include="Nano\mkNanoInk.cpp" />
+    <ClCompile Include="Nano\mkNanoWindow.cpp" />
+    <ClCompile Include="Nano\nanovg\glew.c" />
+    <ClCompile Include="Nano\nanovg\nanovg.c" />
+    <ClCompile Include="Widget\mkWTextbox.cpp" />
+    <ClCompile Include="Scheme\mkWRadioButton.cpp" />
+    <ClCompile Include="Form\mkRootForm.cpp" />
+    <ClCompile Include="Scheme\mkList.cpp" />
+    <ClCompile Include="Scheme\mkScheme.cpp" />
+    <ClCompile Include="Controller\mkController.cpp" />
+    <ClCompile Include="Form\mkDropper.cpp" />
+    <ClCompile Include="Form\mkFValue.cpp" />
+    <ClCompile Include="Form\mkHook.cpp" />
+    <ClCompile Include="Scheme\mkCollection.cpp" />
+    <ClCompile Include="Form\mkButton.cpp" />
+    <ClCompile Include="Scheme\mkWDockspace.cpp" />
+    <ClCompile Include="Widget\mkWScrollbar.cpp" />
+    <ClCompile Include="Widget\mkWSlider.cpp" />
+    <ClCompile Include="mkUiLayout.cpp" />
+    <ClCompile Include="Scheme\mkWExpandbox.cpp" />
+    <ClCompile Include="Form\mkWidgets.cpp" />
+    <ClCompile Include="Form\mkForm.cpp" />
+    <ClCompile Include="Frame\mkFrame.cpp" />
+    <ClCompile Include="Frame\mkInk.cpp" />
+    <ClCompile Include="Frame\mkStripe.cpp" />
+    <ClCompile Include="Frame\mkUibox.cpp" />
+    <ClCompile Include="Scheme\mkWDropdown.cpp" />
+    <ClCompile Include="Widget\mkWCheckbox.cpp" />
+    <ClCompile Include="Widget\mkSheet.cpp" />
+    <ClCompile Include="Widget\mkWContextMenu.cpp" />
+    <ClCompile Include="Scheme\mkWTree.cpp" />
+    <ClCompile Include="Scheme\mkWTable.cpp" />
+    <ClCompile Include="Widget\mkWTypeIn.cpp" />
+    <ClCompile Include="Scheme\mkWWindow.cpp" />
+    <ClCompile Include="mkUiWindow.cpp" />
+    <ClCompile Include="Scheme\mkWTabber.cpp" />
+    <ClCompile Include="Widget\mkWButton.cpp" />
+    <ClCompile Include="Widget\mkWidget.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

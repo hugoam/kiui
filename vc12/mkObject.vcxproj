@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Console|Win32">
+      <Configuration>Console</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>mkObject</ProjectName>
+    <ProjectGuid>{4607A4B6-3705-4A98-874D-732C69093C02}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Console|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Console|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Program Files\boost\boost_1_57_0;$(SolutionDir);$(SolutionDir)\..\bullet-2.82\src;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\Dependencies\debug;$(LibraryPath)</LibraryPath>
+    <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\Program Files\boost\boost_1_57_0;$(SolutionDir);$(SolutionDir)\..\bullet-2.82\src;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\Release;$(SolutionDir)\..\dependencies\release;$(LibraryPath)</LibraryPath>
+    <IntDir>$(SolutionDir)\obj\$(ProjectName)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Console|Win32'">
+    <IncludePath>$(SolutionDir);$(SolutionDir)\..\bullet-2.82\src;C:\Program Files\boost\boost_1_47_0;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\Release;$(SolutionDir)\..\dependencies\release;$(LibraryPath)</LibraryPath>
+    <IntDir>$(SolutionDir)\obj\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>OBJECT_EXPORT;WIN32;</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>LinearMath_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>OBJECT_EXPORT;WIN32;</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level1</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>LinearMath.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>MSVCRTD.lib;LIBCMT.lib</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Console|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;UTILS_EXPORT</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level1</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>LinearMath.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>MSVCRTD.lib;</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Image\mkImage.h" />
+    <ClInclude Include="Threading\mkLocklessQueue.h" />
+    <ClInclude Include="Threading\mkScheduler.h" />
+    <ClInclude Include="Util\mkTimeString.h" />
+    <ClInclude Include="Util\mkStatString.h" />
+    <ClInclude Include="Util\mkColour.h" />
+    <ClInclude Include="mkIndexer.h" />
+    <ClInclude Include="mkObjectImprints.h" />
+    <ClInclude Include="mkObjectTypes.h" />
+    <ClInclude Include="mkRef.h" />
+    <ClInclude Include="Util\mkMake.h" />
+    <ClInclude Include="Util\mkPool.h" />
+    <ClInclude Include="Util\mkStat.h" />
+    <ClInclude Include="Util\mkTimer.h" />
+    <ClInclude Include="Store\mkArray.h" />
+    <ClInclude Include="Store\mkCountStore.h" />
+    <ClInclude Include="Store\mkGridStore.h" />
+    <ClInclude Include="Store\mkIndexStore.h" />
+    <ClInclude Include="Store\mkIterable.h" />
+    <ClInclude Include="mkPragma.h" />
+    <ClInclude Include="mkLibrary.h" />
+    <ClInclude Include="Store\mkQuickStore.h" />
+    <ClInclude Include="Store\mkRegistry.h" />
+    <ClInclude Include="Store\mkReverse.h" />
+    <ClInclude Include="Store\mkStore.h" />
+    <ClInclude Include="Store\mkStoreObserver.h" />
+    <ClInclude Include="Util\mkNonCopy.h" />
+    <ClInclude Include="mkTypeUtils.h" />
+    <ClInclude Include="mkTyped.h" />
+    <ClInclude Include="Util\mkDispatch.h" />
+    <ClInclude Include="mkModular.h" />
+    <ClInclude Include="Util\mkUpdatable.h" />
+    <ClInclude Include="mkObjectForward.h" />
+    <ClInclude Include="String\mkStringConvert.h" />
+    <ClInclude Include="String\strtk.hpp" />
+    <ClInclude Include="mkStem.h" />
+    <ClInclude Include="mkObject.h" />
+    <ClInclude Include="String\mkString.h" />
+    <ClInclude Include="mkType.h" />
+    <ClInclude Include="mkObjectConfig.h" />
+    <ClInclude Include="mkId.h" />
+    <ClInclude Include="mkProto.h" />
+    <ClInclude Include="Util\mkGlobalType.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Image\mkImage.cpp" />
+    <ClCompile Include="Threading\mkScheduler.cpp" />
+    <ClCompile Include="Util\mkPool.cpp" />
+    <ClCompile Include="Util\mkColour.cpp" />
+    <ClCompile Include="mkModular.cpp" />
+    <ClCompile Include="mkRef.cpp" />
+    <ClCompile Include="mkStem.cpp" />
+    <ClCompile Include="mkObject.cpp" />
+    <ClCompile Include="Util\mkStat.cpp" />
+    <ClCompile Include="Util\mkTimer.cpp" />
+    <ClCompile Include="Util\mkGlobalType.cpp" />
+    <ClCompile Include="String\mkString.cpp" />
+    <ClCompile Include="mkType.cpp" />
+    <ClCompile Include="mkProto.cpp" />
+    <ClCompile Include="mkTyped.cpp" />
+    <ClCompile Include="Util\mkUpdatable.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
