@@ -26,6 +26,7 @@ namespace mk
 
 	void WScroller::sliderStep(float value, bool ended)
 	{
+		UNUSED(ended);
 		mParent->as<WScrollbar>()->scroll(value);
 	}
 

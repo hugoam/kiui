@@ -103,6 +103,7 @@ namespace mk
 
 	bool WDropdownBox::leftClick(float x, float y)
 	{
+		UNUSED(x); UNUSED(y);
 		mParent->as<WDropdown>()->dropup();
 		return true;
 	}

@@ -255,6 +255,7 @@ namespace mk
 
 	InputReceiver* Widget::propagateMouse(float x, float y)
 	{
+		UNUSED(x); UNUSED(y);
 		return mParent;
 	}
 
@@ -303,6 +304,7 @@ namespace mk
 
 	bool Widget::mouseEntered(float x, float y)
 	{
+		UNUSED(x); UNUSED(y);
 		/*if(mForm)
 			std::cerr << "HOVERED : " << mForm->clas() << " style : " << mFrame->skin()->name() << std::endl;
 		else
@@ -313,6 +315,7 @@ namespace mk
 
 	bool Widget::mouseLeaved(float x, float y)
 	{
+		UNUSED(x); UNUSED(y);
 		this->unhover();
 		return true;
 	}

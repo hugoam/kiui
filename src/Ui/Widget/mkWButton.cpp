@@ -43,7 +43,7 @@ namespace mk
 		mTriggerShift = std::bind(&Button::trigger, form->as<Button>());
 	}
 
-	WButton::WButton(string label, string clas, Trigger trigger, bool container)
+	WButton::WButton(string label, string clas, Trigger trigger)
 		: Widget(clas)
 		, WidgetTrigger(trigger)
 		, mLabel(label)
@@ -51,12 +51,14 @@ namespace mk
 
 	bool WButton::leftPressed(float x, float y)
 	{
+		UNUSED(x); UNUSED(y);
 		updateState(TRIGGERED);
 		return true;
 	}
 
 	bool WButton::leftClick(float x, float y)
 	{
+		UNUSED(x); UNUSED(y);
 		if(uiWindow()->ctrlPressed())
 			this->triggerCtrl();
 		else if(uiWindow()->shiftPressed())
@@ -70,6 +72,7 @@ namespace mk
 
 	bool WButton::rightClick(float x, float y)
 	{
+		UNUSED(x); UNUSED(y);
 		triggerAlt();
 		return true;
 	}
@@ -87,12 +90,14 @@ namespace mk
 
 	bool WWrapButton::leftPressed(float x, float y)
 	{
+		UNUSED(x); UNUSED(y);
 		updateState(TRIGGERED);
 		return true;
 	}
 
 	bool WWrapButton::leftClick(float x, float y)
 	{
+		UNUSED(x); UNUSED(y);
 		if(uiWindow()->ctrlPressed())
 			this->triggerCtrl();
 		else if(uiWindow()->shiftPressed())
@@ -106,6 +111,7 @@ namespace mk
 
 	bool WWrapButton::rightClick(float x, float y)
 	{
+		UNUSED(x); UNUSED(y);
 		triggerAlt();
 		return true;
 	}
@@ -141,6 +147,7 @@ namespace mk
 
 	bool WToggle::leftClick(float x, float y)
 	{
+		UNUSED(x); UNUSED(y);
 		this->toggle();
 		return true;
 	}

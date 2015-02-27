@@ -112,6 +112,8 @@ namespace mk
 
 	bool GridSheet::leftDrag(float xPos, float yPos, float xDif, float yDif)
 	{
+		UNUSED(xPos); UNUSED(yPos);
+
 		if(!mResizing)
 			return true;
 
@@ -133,6 +135,7 @@ namespace mk
 
 	bool GridSheet::leftDragEnd(float xPos, float yPos)
 	{
+		UNUSED(xPos); UNUSED(yPos);
 		return true;
 	}
 
@@ -163,6 +166,7 @@ namespace mk
 
 	void ScrollSheet::nextFrame(size_t tick, size_t delta)
 	{
+		UNUSED(tick); UNUSED(delta);
 		if(mSheet->stripe()->overflow() && !mScrollbar)
 		{
 			mScrollbar = this->makeappend<WScrollbar>(mSheet->stripe());

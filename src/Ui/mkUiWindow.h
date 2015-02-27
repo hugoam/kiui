@@ -150,7 +150,7 @@ namespace mk
 		Clock mClock;
 
 		Clock mTooltipClock;
-		float mTooltipTimer;
+		double mTooltipTimer;
 
 		User* mUser;
 	};

@@ -28,7 +28,7 @@ namespace mk
 		//void move(Form* form, size_t index);
 		//void transfer(Form* form, SortList* list, size_t index);
 
-		virtual void moved(size_t from, size_t to) {}
+		virtual void moved(size_t from, size_t to) { UNUSED(from); UNUSED(to); }
 	};
 }
 

@@ -8,6 +8,8 @@
 #include <string>
 #include <type_traits>
 
+#define UNUSED(x) x
+
 #ifdef MK_STD_PROXIES
 namespace std
 {

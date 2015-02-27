@@ -25,6 +25,7 @@ namespace mk
 
 	bool WTextbox::leftClick(float xPos, float yPos)
 	{
+		UNUSED(xPos); UNUSED(yPos);
 		return true;
 	}
 }

@@ -36,6 +36,7 @@ namespace mk
 
 	void Collection::remove(Object* object, Type* type)
 	{
+		UNUSED(type);
 		mForm->release(mMapping[object]->index());
 		mMapping.erase(object);
 	}
@@ -56,6 +57,7 @@ namespace mk
 
 	void ObjectCollection::binded(Form* form)
 	{
+		UNUSED(form);
 		if(mFill)
 			mStore->viterateobj([this](Object* object, Type* type){ this->handleAdd(object, type); });
 	}
@@ -90,6 +92,7 @@ namespace mk
 
 	void MetaCollection::binded(Form* form)
 	{
+		UNUSED(form);
 		mStore->addObserver(this);
 	}
 

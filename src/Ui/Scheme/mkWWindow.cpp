@@ -99,6 +99,7 @@ namespace mk
 
 	bool WWindow::leftDragStart(float xPos, float yPos)
 	{
+		UNUSED(xPos); UNUSED(yPos);
 		if(mDockable && mDock)
 			this->undock();
 
@@ -109,6 +110,7 @@ namespace mk
 
 	bool WWindow::leftDrag(float xPos, float yPos, float xDif, float yDif)
 	{
+		UNUSED(xPos); UNUSED(yPos);
 		mFrame->setPosition(mFrame->dposition(DIM_X) + xDif, mFrame->dposition(DIM_Y) + yDif);
 
 		return true;
@@ -149,12 +151,14 @@ namespace mk
 
 	bool WWindow::leftClick(float x, float y)
 	{
+		UNUSED(x); UNUSED(y);
 		mFrame->moveToTop();
 		return true;
 	}
 
 	bool WWindow::rightClick(float x, float y)
 	{
+		UNUSED(x); UNUSED(y);
 		mFrame->moveToTop();
 		return true;
 	}

@@ -35,7 +35,7 @@ namespace mk
 		void bind(Form* scheme);
 		Form* form() { return mForm; }
 
-		virtual void binded(Form* form) {}
+		virtual void binded(Form* form) { UNUSED(form); }
 
 		void add(Object* object, Type* type, size_t index);
 		void remove(Object* object, Type* type);

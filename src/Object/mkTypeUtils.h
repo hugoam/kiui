@@ -67,7 +67,7 @@ namespace mk
 	template <class T>
 	struct Copy<std::unique_ptr<T>>
 	{
-		static std::unique_ptr<T> copy(const std::unique_ptr<T>& val) { return std::unique_ptr<T>(); }
+		static std::unique_ptr<T> copy(const std::unique_ptr<T>& val) { UNUSED(val); return std::unique_ptr<T>(); }
 		static std::unique_ptr<T> copy(std::unique_ptr<T>& val) { return std::move(val); }
 	};
 
@@ -117,7 +117,7 @@ namespace mk
 	template <class T>
 	struct RefObject<T, false>
 	{
-		static inline Object* get(T& val) { return nullptr; }
+		static inline Object* get(T& val) { UNUSED(val); return nullptr; }
 	};
 
 	template <class T>

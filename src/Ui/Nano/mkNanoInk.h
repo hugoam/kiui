@@ -26,8 +26,6 @@ namespace mk
 
 		float contentSize(Dimension dim);
 
-		void caption(const string& text);
-
 		void nanodraw();
 
 	protected:

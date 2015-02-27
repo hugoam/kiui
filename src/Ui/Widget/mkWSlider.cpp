@@ -45,6 +45,7 @@ namespace mk
 
 	bool WSlideButton::leftDrag(float xPos, float yPos, float xDif, float yDif)
 	{
+		UNUSED(xDif); UNUSED(yDif);
 		mParent->as<WSlider>()->offsetChange(offset(mDim == DIM_X ? xPos : yPos), false);
 		return true;
 	}
@@ -72,7 +73,7 @@ namespace mk
 
 	void WSlider::offsetChange(float offset, bool ended)
 	{
-		int step = offset / (mFrame->dsize(mDim) - mButton->frame()->dsize(mDim)) * (mNumSteps - 1);
+		int step = int(offset / (mFrame->dsize(mDim) - mButton->frame()->dsize(mDim)) * (mNumSteps - 1.f));
 		if(step != mStep)
 		{
 			mStep = step;
@@ -89,7 +90,7 @@ namespace mk
 		mVal = val;
 		mStepLength = stepLength;
 		mNumSteps = (mMax - mMin) / stepLength + 1;
-		mStep = (mVal - mMin) / mStepLength;
+		mStep = int((mVal - mMin) / mStepLength);
 
 		mKnobLength = knobLength ? knobLength : mStepLength;
 
@@ -131,14 +132,14 @@ namespace mk
 
 	void WIntSlider::updateSlider()
 	{
-		mSlider->resetMetrics(mStat->ref<Stat<int>>().min(), mStat->ref<Stat<int>>().max(), mStat->ref<Stat<int>>().value(), 1.f);
+		mSlider->resetMetrics(float(mStat->ref<Stat<int>>().min()), float(mStat->ref<Stat<int>>().max()), float(mStat->ref<Stat<int>>().value()), 1.f);
 		mSlider->updateKnob();
 		mDisplay->setLabel(mStat->getString());
 	}
 
 	void WIntSlider::updateValue()
 	{
-		mStat->ref<Stat<int>>().setValue(mSlider->val());
+		mStat->ref<Stat<int>>().setValue(int(mSlider->val()));
 		mDisplay->setLabel(mStat->getString());
 	}
 

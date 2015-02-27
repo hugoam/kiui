@@ -43,8 +43,8 @@ namespace mk
 		int mFbWidth;
 		int mFbHeight;
 
-		double mMouseX;
-		double mMouseY;
+		float mMouseX;
+		float mMouseY;
 
 		InputDispatcher* mInput;
 	};

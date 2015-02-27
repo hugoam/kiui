@@ -20,6 +20,7 @@ namespace mk
 
 	InputReceiver* Controller::controlMouse(float x, float y)
 	{
+		UNUSED(x); UNUSED(y);
 		return this;
 	}
 
@@ -57,6 +58,7 @@ namespace mk
 
 	bool Controller::keyUp(KeyCode keyCode, char c)
 	{
+		UNUSED(c);
 		auto it = keyUpHandlers.find(keyCode);
 		if(it != keyUpHandlers.end())
 		{
@@ -68,6 +70,7 @@ namespace mk
 
 	bool Controller::keyDown(KeyCode keyCode, char c)
 	{
+		UNUSED(c);
 		auto it = keyDownHandlers.find(keyCode);
 		if(it != keyDownHandlers.end())
 		{

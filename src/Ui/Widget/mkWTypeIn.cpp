@@ -43,6 +43,7 @@ namespace mk
 
 	bool WTypeIn::leftClick(float xPos, float yPos)
 	{
+		UNUSED(xPos); UNUSED(yPos);
 		this->activate();
 		this->stack(this);
 		mString = "";

@@ -135,7 +135,7 @@ namespace mk
 		}
 
 		T* at(size_t pos) { return mStore[pos]; }
-		size_t index(T* object) { for(size_t i = 0; i < mStore.size(); ++i) if(mStore[i] == object) return i; return -1; }
+		size_t index(T* object) { for(size_t i = 0; i < mStore.size(); ++i) if(mStore[i] == object) return i; return size_t(-1); }
 
 		bool empty() const { return (mStore.size() == 0); }
 

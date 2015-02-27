@@ -33,7 +33,7 @@ namespace mk
 		InkStyle* elementSkin(string clas);
 		LayoutStyle* elementStyle(string clas);
 
-		virtual Sheet* vaddwrapper(Widget* widget) { return nullptr; }
+		virtual Sheet* vaddwrapper(Widget* widget) { UNUSED(widget); return nullptr; }
 		virtual Widget* vappend(std::unique_ptr<Widget> widget) { return append(std::move(widget)); }
 		virtual std::unique_ptr<Widget> vrelease(Widget* widget) { return widget->unbind(); }
 
@@ -80,7 +80,7 @@ namespace mk
 		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
 		bool leftDragEnd(float xPos, float yPos);
 
-		virtual void gridResized(Widget* first, Widget* second) {}
+		virtual void gridResized(Widget* first, Widget* second) { UNUSED(first); UNUSED(second); }
 
 	protected:
 		Dimension mDim;

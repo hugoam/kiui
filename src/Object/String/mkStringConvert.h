@@ -91,15 +91,12 @@ namespace mk
 		auto end = str.end();
 		auto second = std::find(first, end, ',');
 
-		while(true)
+		while(second != end)
 		{
 			second = std::find(first, end, ',');
 			vec.push_back(fromString<typename T::value_type>(str.substr(first - str.begin(), second - first)));
 			
-			if(second != end)
-				first = second + 1;
-			else
-				break;
+			first = second + 1;
 		}
 	}
 
@@ -138,17 +135,13 @@ namespace mk
 		auto second = std::find(first, end, ',');
 
 		size_t i = 0;
-		while(true)
+		while(second != end)
 		{
 			second = std::find(first, end, ',');
-			//vec[i] = strtk::string_to_type_converter<T>(first, second);
 			vec[i] = fromString<T>(str.substr(first - str.begin(), second - first));
 
 			++i;
-			if(second != end)
-				first = second + 1;
-			else
-				break;
+			first = second + 1;
 		}
 	}
 
@@ -176,11 +169,11 @@ namespace mk
 	template <class T>
 	struct AsString<T, true, false>
 	{
-		static inline void to(const T& val, string& str) {}
-		static inline string to(const T& val) { return ""; }
+		static inline void to(const T& val, string& str) { UNUSED(val); UNUSED(str); }
+		static inline string to(const T& val) { UNUSED(val); return ""; }
 
-		static inline void from(const string& str, T& val) {}
-		static inline T from(const string& str) { return T(); }
+		static inline void from(const string& str, T& val) { UNUSED(str); UNUSED(val); }
+		static inline T from(const string& str) { UNUSED(str); return T(); }
 	};
 
 	template <class T>
@@ -189,8 +182,8 @@ namespace mk
 		static inline void to(const std::unique_ptr<T>& val, string& str) { type_to_string(val.get(), str); }
 		static inline string to(const std::unique_ptr<T>& val) { string str; type_to_string(val.get(), str); return str; }
 
-		static inline void from(const string& str, std::unique_ptr<T>& vec) {}
-		static inline std::unique_ptr<T> from(const string& str) { return std::unique_ptr<T>(); }
+		static inline void from(const string& str, std::unique_ptr<T>& vec) { UNUSED(str); UNUSED(vec); }
+		static inline std::unique_ptr<T> from(const string& str) { UNUSED(str); return std::unique_ptr<T>(); }
 	};
 
 	template <class T>
@@ -205,16 +198,16 @@ namespace mk
 
 
 	// IdObject - string conversion
-	template <> inline IdObject* fromString<IdObject*>(const string& str) { return nullptr; }
-	template <> inline void fromString<IdObject*>(const string& str, IdObject*& val) {}
+	template <> inline IdObject* fromString<IdObject*>(const string& str) { UNUSED(str); return nullptr; }
+	template <> inline void fromString<IdObject*>(const string& str, IdObject*& val) { UNUSED(str); UNUSED(val); }
 
 	template <> inline string toString<IdObject*>(IdObject* const& object) { return AsString<Id>::to(object->id()); }
 	template <> inline void toString<IdObject*>(IdObject* const& object, string& str) { AsString<Id>::to(object->id(), str); }
 
 
 	// Part - string conversion
-	template <> inline Part* fromString<Part*>(const string& str) { return nullptr; }
-	template <> inline void fromString<Part*>(const string& str, Part*& val) {}
+	template <> inline Part* fromString<Part*>(const string& str) { UNUSED(str); return nullptr; }
+	template <> inline void fromString<Part*>(const string& str, Part*& val) { UNUSED(str); UNUSED(val); }
 
 	template <> inline string toString<Part*>(Part* const& part) { return AsString<Id>::to(part->stem()->id()); }
 	template <> inline void toString<Part*>(Part* const& part, string& str) { AsString<Id>::to(part->stem()->id(), str); }

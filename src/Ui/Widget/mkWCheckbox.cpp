@@ -41,6 +41,7 @@ namespace mk
 
 	bool WCheckbox::leftClick(float xPos, float yPos)
 	{
+		UNUSED(xPos); UNUSED(yPos);
 		mValue->any<bool>()->ref() = !mValue->get<bool>();
 		this->updateChecked();
 		return true;

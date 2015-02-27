@@ -31,7 +31,7 @@ namespace mk
 
 		virtual Type* sequenceType() const = 0;
 
-		virtual void vadd(T* object) {}
+		virtual void vadd(T*) {}
 	};
 
 	template <>
@@ -47,7 +47,7 @@ namespace mk
 
 		virtual Type* sequenceType() const = 0;
 
-		virtual void vadd(Object* object) {}
+		virtual void vadd(Object* object) { UNUSED(object); }
 	};
 
 	template <class T>

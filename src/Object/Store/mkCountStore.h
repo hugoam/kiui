@@ -62,8 +62,8 @@ namespace mk
 		bool has(Object* object) const	{ return (mStore.find(object) != mStore.end()); }
 		bool empty() const { return (mStore.size() == 0); }
 
-		T* at(size_t pos) { return nullptr; }
-		size_t index(T* object) { return 0; }
+		T* at(size_t pos) { UNUSED(pos); return nullptr; }
+		size_t index(T* object) { UNUSED(object); return 0; }
 
 	protected:
 		StoreContainer mStore;

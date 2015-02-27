@@ -40,7 +40,7 @@ namespace mk
 	protected:
 		Lref mValue;
 		Lref& mLref;
-		int mUpdate;
+		size_t mUpdate;
 		bool mEdit;
 	};
 

@@ -5,6 +5,8 @@
 #ifndef MK_UPDATABLE_H_INCLUDED
 #define MK_UPDATABLE_H_INCLUDED
 
+#include <Object/mkObjectForward.h>
+
 #include <atomic>
 
 namespace mk
@@ -22,7 +24,7 @@ namespace mk
 		virtual ~Executable() {}
 
 		virtual void begin() = 0;
-		virtual void update(size_t tick, double step) {}
+		virtual void update(size_t tick, double step) { UNUSED(tick); UNUSED(step); }
 		virtual void abort() {}
 		
 		void execute() { mDone = false; this->begin(); }

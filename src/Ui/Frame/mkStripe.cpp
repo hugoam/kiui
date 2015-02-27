@@ -206,9 +206,6 @@ namespace mk
 		this->expandDepth();
 		this->expandLength();
 
-		if(d_widget->clas() == "yscroller")
-			int i = 0;
-
 #if 0 // DEBUG
 			Stripe* parent = d_parent;
 			while(parent)
@@ -216,9 +213,6 @@ namespace mk
 				std::cerr << "  ";
 				parent = parent->parent();
 			}
-
-			if(d_widget->clas() == "xslider")
-				int i = 0;
 
 			std::cerr << "Stripe :: relayout " << d_widget->clas() << " name " << d_widget->name() <<  " size " << dsize(DIM_X) << " , " << dsize(DIM_Y) << std::endl;
 #endif
@@ -318,6 +312,7 @@ namespace mk
 
 	void Stripe::flowChanged(Frame* child)
 	{
+		UNUSED(child);
 		this->updateDepth();
 		this->updateLength();
 		d_relayout = true;
@@ -343,10 +338,8 @@ namespace mk
 
 	void Stripe::resized(Dimension dim)
 	{
-		//if(dim == d_length)
+		UNUSED(dim);
 		d_relayout = true;
-		//else
-			//d_adjustDepth = true;
 	}
 
 	Frame* Stripe::pinpoint(float x, float y, bool opaque)

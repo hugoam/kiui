@@ -20,9 +20,9 @@
 #   include <Ui/Nano/nanovg/glew.h>
 #endif
 
-#include "nanovg.h"
+#include <Ui/Nano/nanovg/nanovg.h>
 #define NANOVG_GL2_IMPLEMENTATION
-#include "nanovg_gl.h"
+#include <Ui/Nano/nanovg/nanovg_gl.h>
 
 namespace mk
 {
@@ -89,7 +89,7 @@ namespace mk
 
 	void NanoTarget::moveToTop(NanoLayer* layer)
 	{
-
+		UNUSED(layer);
 	}
 
 	std::unique_ptr<InkLayer> NanoTarget::layer(Frame* frame, size_t z)

@@ -43,31 +43,31 @@ namespace mk
 	class MK_UI_EXPORT InputReceiver
 	{
 	public:
-		virtual InputReceiver* propagateMouse(float x, float y) { return this; }
+		virtual InputReceiver* propagateMouse(float x, float y) { UNUSED(x); UNUSED(y); return this; }
 		virtual InputReceiver* propagateKey() { return this; }
 
-		virtual bool keyUp(KeyCode code, char c) { return false; };
-		virtual bool keyDown(KeyCode code, char c) { return false; };
+		virtual bool keyUp(KeyCode code, char c) { UNUSED(code); UNUSED(c); return false; };
+		virtual bool keyDown(KeyCode code, char c) { UNUSED(code); UNUSED(c); return false; };
 
-		virtual bool mouseEntered(float xPos, float yPos) { return false; };
-		virtual bool mouseLeaved(float xPos, float yPos) { return false; };
+		virtual bool mouseEntered(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
+		virtual bool mouseLeaved(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
 
-		virtual bool mouseMoved(float xPos, float yPos, float xDif, float yDif) { return false; };
-		virtual bool mouseWheel(float xPos, float yPos, float amount) { return false; };
+		virtual bool mouseMoved(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return false; };
+		virtual bool mouseWheel(float xPos, float yPos, float amount) { UNUSED(xPos); UNUSED(yPos); UNUSED(amount); return false; };
 
-		virtual bool leftPressed(float xPos, float yPos) { return false; };
-		virtual bool rightPressed(float xPos, float yPos) { return false; };
+		virtual bool leftPressed(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
+		virtual bool rightPressed(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
 
-		virtual bool leftClick(float xPos, float yPos) { return false; };
-		virtual bool rightClick(float xPos, float yPos) { return false; };
+		virtual bool leftClick(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
+		virtual bool rightClick(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
 
-		virtual bool rightDragStart(float xPos, float yPos) { return false; };
-		virtual bool rightDrag(float xPos, float yPos, float xDif, float yDif) { return false; };
-		virtual bool rightDragEnd(float xPos, float yPos) { return false; };
+		virtual bool rightDragStart(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
+		virtual bool rightDrag(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return false; };
+		virtual bool rightDragEnd(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
 
-		virtual bool leftDragStart(float xPos, float yPos) { return false; };
-		virtual bool leftDrag(float xPos, float yPos, float xDif, float yDif) { return false; };
-		virtual bool leftDragEnd(float xPos, float yPos) { return false; };
+		virtual bool leftDragStart(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
+		virtual bool leftDrag(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return false; };
+		virtual bool leftDragEnd(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
 	};
 }
 

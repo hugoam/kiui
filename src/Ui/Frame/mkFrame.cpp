@@ -298,6 +298,7 @@ namespace mk
 
 	Frame* Frame::pinpoint(float x, float y, bool opaque)
 	{
+		UNUSED(x); UNUSED(y);
 		if(!opaque)
 			return this;
 		else if(this->opaque())

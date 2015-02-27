@@ -38,7 +38,7 @@ namespace mk
 
 		virtual std::unique_ptr<Ref> clone() const { return std::make_unique<Ref>(mObject, mType); };
 
-		virtual void setString(const string& value) {}
+		virtual void setString(const string& value) { UNUSED(value); }
 		virtual string getString() { return ""; }
 
 		template <class T>

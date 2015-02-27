@@ -12,7 +12,7 @@
 
 #include <Ui/Nano/mkNanoWindow.h>
 
-#include <nanovg.h>
+#include <Ui/Nano/nanovg/nanovg.h>
 
 #include <iostream>
 
@@ -167,7 +167,4 @@ namespace mk
 			return;
 
 	}
-
-	void NanoInk::caption(const string& text)
-	{}
 }

@@ -54,7 +54,7 @@ namespace mk
 
 	public:
 		WButton(Form* form);
-		WButton(string label, string clas, Trigger trigger = Trigger(), bool container = false);
+		WButton(string label, string clas, Trigger trigger = Trigger());
 
 		const string& label() { return mLabel; }
 

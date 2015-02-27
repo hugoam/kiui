@@ -75,14 +75,14 @@ namespace mk
 
 	void UiWindow::resize(size_t width, size_t height)
 	{
-		mWidth = width;
-		mHeight = height;
+		mWidth = float(width);
+		mHeight = float(height);
 
 		if(mInputWindow)
 			mInputWindow->resize(width, height);
 
 		if(mRootSheet)
-			mRootSheet->frame()->setSize(width, height);
+			mRootSheet->frame()->setSize(float(width), float(height));
 	}
 
 	void UiWindow::activate(Widget* widget)
@@ -93,6 +93,7 @@ namespace mk
 
 	void UiWindow::deactivate(Widget* widget)
 	{
+		UNUSED(widget);
 		mActiveFrame = mRootSheet;
 	}
 
@@ -335,7 +336,9 @@ namespace mk
 	}
 
 	void UiWindow::bindCursor(Widget* widget)
-	{}
+	{
+		UNUSED(widget);
+	}
 
 	void UiWindow::freeCursor()
 	{}

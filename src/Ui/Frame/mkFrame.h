@@ -116,7 +116,7 @@ namespace mk
 		bool inside(float x, float y);
 
 	public:
-		virtual void resized(Dimension dim) {}
+		virtual void resized(Dimension dim) { UNUSED(dim); }
 
 	protected:
 		Widget* d_widget;

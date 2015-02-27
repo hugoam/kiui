@@ -157,14 +157,14 @@ namespace mk
 
 	void GlWindow::injectMouseMove(double x, double y)
 	{
-		float xDif = x - mMouseX;
-		float yDif = y - mMouseY;
+		float xDif = float(x) - mMouseX;
+		float yDif = float(y) - mMouseY;
 
-		mMouseX = x;
-		mMouseY = y;
+		mMouseX = float(x);
+		mMouseY = float(y);
 
-		double clampedX = std::max(0.0, std::min(double(mWidth), x));
-		double clampedY = std::max(0.0, std::min(double(mHeight), y));
+		float clampedX = std::max(0.f, std::min(float(mWidth), mMouseX));
+		float clampedY = std::max(0.f, std::min(float(mHeight), mMouseY));
 
 		mUiWindow->mouseMoved(clampedX, clampedY, xDif, yDif);
 	}

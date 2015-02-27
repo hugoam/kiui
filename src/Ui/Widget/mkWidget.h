@@ -106,28 +106,28 @@ namespace mk
 		InputReceiver* propagateMouse(float x, float y);
 		InputReceiver* propagateKey();
 
-		bool keyUp(KeyCode code, char c) { return true; };
-		bool keyDown(KeyCode code, char c) { return true; };
+		bool keyUp(KeyCode code, char c) { UNUSED(code); UNUSED(c); return true; };
+		bool keyDown(KeyCode code, char c) { UNUSED(code); UNUSED(c); return true; };
 
 		bool mouseEntered(float x, float y);
 		bool mouseLeaved(float x, float y);
 
-		bool mouseMoved(float xPos, float yPos, float xDif, float yDif) { return true; };
-		bool mouseWheel(float xPos, float yPos, float amount) { return true; };
+		bool mouseMoved(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return true; };
+		bool mouseWheel(float xPos, float yPos, float amount) { UNUSED(xPos); UNUSED(yPos); UNUSED(amount); return true; };
 
-		bool leftPressed(float xPos, float yPos) { return true; };
-		bool rightPressed(float xPos, float yPos) { return true; };
+		bool leftPressed(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
+		bool rightPressed(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
 
-		bool leftClick(float xPos, float yPos) { return true; };
-		bool rightClick(float xPos, float yPos) { return true; };
+		bool leftClick(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
+		bool rightClick(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
 
-		bool rightDragStart(float xPos, float yPos) { return true; };
-		bool rightDrag(float xPos, float yPos, float xDif, float yDif) { return true; };
-		bool rightDragEnd(float xPos, float yPos) { return true; };
+		bool rightDragStart(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
+		bool rightDrag(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return true; };
+		bool rightDragEnd(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
 
-		bool leftDragStart(float xPos, float yPos) { return true; };
-		bool leftDrag(float xPos, float yPos, float xDif, float yDif) { return true; };
-		bool leftDragEnd(float xPos, float yPos) { return true; };
+		bool leftDragStart(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
+		bool leftDrag(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return true; };
+		bool leftDragEnd(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
 
 		typedef std::function<void(Widget*)> Trigger;
 

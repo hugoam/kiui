@@ -51,13 +51,13 @@ namespace mk
 				observer->handleRemove(object);
 		}
 
-		size_t count(T* object) const { return 0; }
+		size_t count(T* object) const { UNUSED(object); return 0; }
 		bool has(T* object) const { return (std::find(mStore.begin(), mStore.end(), object) != mStore.end()); }
 		bool empty() const { return (mStore.size() == 0); }
 		size_t size() const { return mStore.size(); }
 
-		T* at(size_t pos) { return nullptr; }
-		size_t index(T* object) { return 0; }
+		T* at(size_t pos) { UNUSED(pos); return nullptr; }
+		size_t index(T* object) { UNUSED(object); return 0; }
 
 		T* pop()
 		{

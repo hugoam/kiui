@@ -52,7 +52,7 @@ namespace mk
 		
 		void updateKnob();
 
-		virtual void sliderStep(float value, bool ended) { mOnUpdated(this); }
+		virtual void sliderStep(float value, bool ended) { UNUSED(value); UNUSED(ended); mOnUpdated(this); }
 
 	protected:
 		Dimension mDim;
