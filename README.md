@@ -1,7 +1,7 @@
 ## Disclaimer
-This is a very early work-in-progress and is provided with no guarantee whatsoever of usability or even compilability
-Everything, from the namespaces to the class interfaces should be expected to undergo complete modification in the coming weeks
-It is, as of now, completely undocumented apart from the present overview
+This is a very early work-in-progress and is provided with no guarantee whatsoever of usability or even compilability.
+Everything, from the namespaces to the class interfaces should be expected to undergo complete modification in the coming weeks.
+It is, as of now, completely undocumented apart from the present overview.
 
 kiUi
 ====
@@ -51,9 +51,6 @@ kiUi was conceived so that each element can be styled in a way very similar to C
 
 ## License
 The library is licensed under [zlib license](LICENSE.txt)
-
-## Discussions
-[NanoVG mailing list](https://groups.google.com/forum/#!forum/nanovg)
 
 ## Links
 Uses [nanovg](https://github.com/memononen/nanovg) for vector rendering
