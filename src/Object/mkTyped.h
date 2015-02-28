@@ -65,7 +65,6 @@ namespace mk
 		return Typed<T>::cls();
 	}
 
-	template <> inline Type* typecls<Id>() { return Typed<Id>::cls(); }
 	template <> inline Type* typecls<bool>() { return Typed<bool>::cls(); }
 	template <> inline Type* typecls<int>() { return Typed<int>::cls(); }
 	template <> inline Type* typecls<unsigned int>() { return Typed<unsigned int>::cls(); }
@@ -74,7 +73,6 @@ namespace mk
 	template <> inline Type* typecls<string>() { return Typed<string>::cls(); }
 
 #ifndef OBJECT_EXPORT
-	extern template class __declspec(dllimport) Typed<Id>;
 	extern template class __declspec(dllimport) Typed<bool>;
 	extern template class __declspec(dllimport) Typed<int>;
 	extern template class __declspec(dllimport) Typed<unsigned int>;

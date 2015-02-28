@@ -12,7 +12,7 @@
 
 namespace mk
 {
-	typedef uintptr_t Id;
+	typedef unsigned int Id;
 
 	typedef std::vector<Id> IdVector;
 	typedef std::list<Id> IdList;
