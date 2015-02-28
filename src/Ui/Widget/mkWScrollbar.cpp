@@ -46,6 +46,8 @@ namespace mk
 		mUp = this->makeappend<WButton>("", "scrollbutton_up scrollbutton", std::bind(&WScrollbar::scrollup, this));
 		mScroller = this->makeappend<WScroller>();
 		mDown = this->makeappend<WButton>("", "scrollbutton_down scrollbutton", std::bind(&WScrollbar::scrolldown, this));
+
+		mScroller->resetMetrics(0.f, mSheet->sequenceLength() - mSheet->dclipsize(DIM_Y), mSheet->cursor(), 1.f, mSheet->dclipsize(DIM_Y));
 	}
 
 	void WScrollbar::scrollup()
@@ -67,6 +69,6 @@ namespace mk
 	{
 		Widget::nextFrame(tick, delta);
 
-		mScroller->resetMetrics(0.f, mSheet->sequenceLength() - mSheet->dclipsize(DIM_Y), mSheet->cursor(), 1.f, mSheet->dclipsize(DIM_Y));
+		mScroller->updateMetrics(0.f, mSheet->sequenceLength() - mSheet->dclipsize(DIM_Y), mSheet->cursor(), 1.f, mSheet->dclipsize(DIM_Y));
 	}
 }

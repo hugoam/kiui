@@ -45,6 +45,7 @@ namespace mk
 
 		string clas() { return mDim == DIM_X ? "xslider" : "yslider"; }
 
+		void updateMetrics(float min, float max, float val, float stepLength, float knobLength = 0.f);
 		void resetMetrics(float min, float max, float val, float stepLength, float knobLength = 0.f);
 		void resetValue(float val);
 

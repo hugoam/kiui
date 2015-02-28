@@ -83,6 +83,12 @@ namespace mk
 		}
 	}
 
+	void WSlider::updateMetrics(float min, float max, float val, float stepLength, float knobLength)
+	{
+		if(min != mMin || max != mMax || val != mVal || stepLength != mStepLength || (knobLength && knobLength != mKnobLength))
+			this->resetMetrics(min, max, val, stepLength, knobLength);
+	}
+
 	void WSlider::resetMetrics(float min, float max, float val, float stepLength, float knobLength)
 	{
 		mMin = min;
@@ -132,7 +138,7 @@ namespace mk
 
 	void WIntSlider::updateSlider()
 	{
-		mSlider->resetMetrics(float(mStat->ref<Stat<int>>().min()), float(mStat->ref<Stat<int>>().max()), float(mStat->ref<Stat<int>>().value()), 1.f);
+		mSlider->resetMetrics(mStat->ref<Stat<int>>().min(), mStat->ref<Stat<int>>().max(), mStat->ref<Stat<int>>().value(), 1.f);
 		mSlider->updateKnob();
 		mDisplay->setLabel(mStat->getString());
 	}
