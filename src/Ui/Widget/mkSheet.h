@@ -67,7 +67,7 @@ namespace mk
 		bool mOverrides;
 	};
 
-	class GridSheet : public Sheet
+	class MK_UI_EXPORT GridSheet : public Sheet
 	{
 	public:
 		GridSheet(Dimension dim, string clas, Form* form = nullptr);
@@ -88,7 +88,7 @@ namespace mk
 		string mHoverCursor;
 	};
 
-	class ScrollSheet : public Sheet
+	class MK_UI_EXPORT ScrollSheet : public Sheet
 	{
 	public:
 		ScrollSheet(string clas, Form* form = nullptr);

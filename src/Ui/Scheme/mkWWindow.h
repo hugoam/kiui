@@ -24,6 +24,21 @@ namespace mk
 
 		const string& name();
 
+		void setClosable();
+		void setUnclosable();
+
+		void setScrollable();
+		void setUnscrollable();
+
+		void setMovable();
+		void setUnmovable();
+
+		void setResizable();
+		void setUnsizable();
+
+		void showTitlebar();
+		void hideTitlebar();
+
 		bool leftDragStart(float xPos, float yPos);
 		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
 		bool leftDragEnd(float xPos, float yPos);
@@ -47,6 +62,8 @@ namespace mk
 		string mName;
 		bool mClosable;
 		bool mDockable;
+		bool mMovable;
+		bool mSizable;
 		Widget* mContent;
 		Trigger mOnClose;
 		Sheet* mHeader;

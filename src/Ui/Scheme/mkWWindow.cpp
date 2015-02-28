@@ -51,6 +51,54 @@ namespace mk
 		}
 	}
 
+	void WWindow::setClosable()
+	{
+		mCloseButton->frame()->show();
+	}
+
+	void WWindow::setUnclosable()
+	{
+		mCloseButton->frame()->hide();
+	}
+
+	void WWindow::setScrollable()
+	{
+	}
+
+	void WWindow::setUnscrollable()
+	{
+	}
+
+	void WWindow::setMovable()
+	{
+		mMovable = true;
+	}
+
+	void WWindow::setUnmovable()
+	{
+		mMovable = false;
+	}
+
+	void WWindow::setResizable()
+	{
+		mSizable = true;
+	}
+
+	void WWindow::setUnsizable()
+	{
+		mSizable = false;
+	}
+
+	void WWindow::showTitlebar()
+	{
+		mHeader->frame()->show();
+	}
+
+	void WWindow::hideTitlebar()
+	{
+		mHeader->frame()->hide();
+	}
+
 	const string& WWindow::name()
 	{
 		return mContent ? mContent->name() : mName;

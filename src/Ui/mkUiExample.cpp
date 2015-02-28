@@ -13,10 +13,14 @@ namespace mk
 {
 	std::unique_ptr<Window> createTestWindow()
 	{
-		std::unique_ptr<Form> window = make<Form>("scrollpartition");
-		window->setName("kiUi Test");
+		std::unique_ptr<Form> boardpt = make<Form>("scrollpartition");
+		std::unique_ptr<Window> window = make<Window>(std::move(boardpt));
 
-		window->makeappend<Label>("", "kiui says hello.");
+		Form* board = window->contents()->at(0);
+
+		board->setName("kiUi Test");
+
+		board->makeappend<Label>("", "kiui says hello.");
 
 		//for(size_t i = 0; i < 20; ++i)
 		//	window->makeappend<Label>("", "This window is being created by the ShowTestWindow() function. Please refer to the code for programming reference.\n\nUser Guide:");
@@ -24,41 +28,25 @@ namespace mk
 		// @todo Add Styling : Size : 550, 680
 		// @todo Add Styling : Table : 0.65f, 0.35f
 
-		//ImGui::Text("MousePos (%g, %g)", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
-		//ImGui::Text("MouseWheel %d", ImGui::GetIO().MouseWheel);
-		
 		Form* current;
 
-		current = window->makeappend<Expandbox>("Help");
-		current->makeappend<Label>("", "This window is being created by the ShowTestWindow() function. Please refer to the code for programming reference.\n\nUser Guide:");
-		// ImGui::ShowUserGuide();
+		current = board->makeappend<Expandbox>("Help");
+		current->makeappend<Textbox>("", "This window is being created by the ShowTestWindow() function. Please refer to the code for programming reference.\n\nUser Guide:");
 
-		// @todo This should be a TextBox
+		current = board->makeappend<Expandbox>("Window options");
 
-		current = window->makeappend<Expandbox>("Window options");
+		current->makeappend<InputBool>("titlebar", true, [&window](){ window->widget()->as<WWindow>()->showTitlebar(); }, [&window](){ window->widget()->as<WWindow>()->hideTitlebar(); });
+		current->makeappend<InputBool>("movable", true, [&window](){ window->widget()->as<WWindow>()->setMovable(); }, [&window](){ window->widget()->as<WWindow>()->setUnmovable(); });
+		current->makeappend<InputBool>("resizable", true, [&window](){ window->widget()->as<WWindow>()->setResizable(); }, [&window](){ window->widget()->as<WWindow>()->setUnsizable(); });
+		current->makeappend<InputBool>("scrollable", true, [&window](){ window->widget()->as<WWindow>()->setScrollable(); }, [&window](){ window->widget()->as<WWindow>()->setUnscrollable(); });
 
-		current->makeappend<InputBool>("titlebar", true); //, [&window](Button*, bool on){ window->attrs["titlebar"] = on ? "true" : "false"; });
-		current->makeappend<InputBool>("movable", true); // , [&window](Button*, bool on){ window->attrs["movable"] = on ? "true" : "false"; });
-		current->makeappend<InputBool>("resizable", true); // , [&window](Button*, bool on){ window->attrs["resizable"] = on ? "true" : "false"; });
-		current->makeappend<InputBool>("scrollable", true); // , [&window](Button*, bool on){ window->attrs["scrollable"] = on ? "true" : "false"; });
+		current->makeappend<SliderFloat>("fill alpha", Stat<float>(0.f, 0.f, 1.f), [&window](float alpha){ window->widget()->frame()->inkstyle()->mBackgroundColour.setA(alpha); });
 
-		current->makeappend<SliderFloat>("fill alpha", Stat<float>(0.f, 0.f, 1.f)); // callback change window alpha
-
-		current = window->makeappend<Expandbox>("Widgets");
-
-		/*Dropdown* dropdown = current->makeappend<Dropdown>([](Form* form) {});
-
-		for(const char* str : { "aaaa", "bbbb", "cccc", "dddd" })
-			dropdown->makeappend<Label>("", str);
-
-		dropdown->makeappend<Label>("", "aaaa");
-		dropdown->makeappend<Label>("", "bbbb");
-		dropdown->makeappend<Label>("", "cccc");
-		dropdown->makeappend<Label>("", "dddd");*/
-
-		//current->makeappend<Dropdown>([](Form* form) {}, StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }));
+		current = board->makeappend<Expandbox>("Widgets");
 
 		current = current->makeappend<Table>(StringVector({ "input", "label" }), std::vector<float>({ 0.7f, 0.3f }));
+
+		current->makeappend<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {});
 
 		current->makeappend<InputText>("string input", "Hello, world!");
 		current->makeappend<InputInt>("int input", 123);
@@ -80,7 +68,7 @@ namespace mk
 		// window->setTitlebar(true);
 		
 
-		return std::make_unique<Window>(std::move(window));
+		return std::move(window);
 	}
 
 	void exampleApp()
