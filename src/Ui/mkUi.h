@@ -12,7 +12,7 @@
 
 namespace mk
 {
-	MK_UI_EXPORT std::unique_ptr<Window> createTestWindow();
+	MK_UI_EXPORT void createTestWindow(Form* parent);
 }
 
 #endif // MK_UI_H_INCLUDED
