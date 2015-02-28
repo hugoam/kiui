@@ -11,10 +11,15 @@
 
 namespace mk
 {
-	std::unique_ptr<Window> createTestWindow()
+	void createTestWindow(Form* parent)
 	{
 		std::unique_ptr<Form> boardpt = make<Form>("scrollpartition");
-		std::unique_ptr<Window> window = make<Window>(std::move(boardpt));
+
+		Window* window = parent->makeappend<Window>(std::move(boardpt));
+		WWindow* wwindow = window->widget()->as<WWindow>();
+
+		wwindow->setMovable();
+		wwindow->setResizable();
 
 		Form* board = window->contents()->at(0);
 
@@ -35,10 +40,10 @@ namespace mk
 
 		current = board->makeappend<Expandbox>("Window options");
 
-		current->makeappend<InputBool>("titlebar", true, [&window](){ window->widget()->as<WWindow>()->showTitlebar(); }, [&window](){ window->widget()->as<WWindow>()->hideTitlebar(); });
-		current->makeappend<InputBool>("movable", true, [&window](){ window->widget()->as<WWindow>()->setMovable(); }, [&window](){ window->widget()->as<WWindow>()->setUnmovable(); });
-		current->makeappend<InputBool>("resizable", true, [&window](){ window->widget()->as<WWindow>()->setResizable(); }, [&window](){ window->widget()->as<WWindow>()->setUnsizable(); });
-		current->makeappend<InputBool>("scrollable", true, [&window](){ window->widget()->as<WWindow>()->setScrollable(); }, [&window](){ window->widget()->as<WWindow>()->setUnscrollable(); });
+		current->makeappend<InputBool>("titlebar", true, std::bind(&WWindow::showTitlebar, wwindow), std::bind(&WWindow::hideTitlebar, wwindow));
+		current->makeappend<InputBool>("movable", true, std::bind(&WWindow::setMovable, wwindow), std::bind(&WWindow::setUnmovable, wwindow));
+		current->makeappend<InputBool>("resizable", true, std::bind(&WWindow::setResizable, wwindow), std::bind(&WWindow::setUnsizable, wwindow));
+		current->makeappend<InputBool>("scrollable", true, std::bind(&WWindow::setScrollable, wwindow), std::bind(&WWindow::setUnscrollable, wwindow));
 
 		current->makeappend<SliderFloat>("fill alpha", Stat<float>(0.f, 0.f, 1.f), [&window](float alpha){ window->widget()->frame()->inkstyle()->mBackgroundColour.setA(alpha); });
 
@@ -62,13 +67,6 @@ namespace mk
 
 		// current->makeappend<SliderAngle>("angle", 0.f);
 		// current->makeappend<FVector3>("slider float3", 0.0f, 1.0f);
-
-		// window->setMovable(false);
-		// window->setResizable(false);
-		// window->setTitlebar(true);
-		
-
-		return std::move(window);
 	}
 
 	void exampleApp()
@@ -78,7 +76,7 @@ namespace mk
 
 		UiWindow* uiwindow = glwindow->uiWindow();
 		Form* root = uiwindow->rootForm();
-		root->append(createTestWindow());
+		createTestWindow(root);
 
 		bool pursue = true;
 		while(pursue)
