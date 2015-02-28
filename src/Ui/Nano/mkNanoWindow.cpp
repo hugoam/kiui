@@ -44,12 +44,14 @@ namespace mk
 	void NanoLayer::show()
 	{
 		mVisible = true;
+		mFrame->inkbox()->show();
 		//this->moveToTop();
 	}
 
 	void NanoLayer::hide()
 	{
 		mVisible = false;
+		mFrame->inkbox()->hide();
 	}
 
 	void NanoLayer::moveToTop()
