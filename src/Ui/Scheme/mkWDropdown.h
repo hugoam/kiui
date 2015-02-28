@@ -37,7 +37,7 @@ namespace mk
 		void dropup();
 
 		Sheet* vaddwrapper(Widget* widget);
-		std::unique_ptr<Widget> vrelease(Widget* widget);
+		unique_ptr<Widget> vrelease(Widget* widget);
 
 		void selected(WWrapButton* selected);
 

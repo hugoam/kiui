@@ -26,7 +26,7 @@ namespace mk
 	{
 		mType = cls();
 
-		mSheet = std::make_unique<RootSheet>(mWindow, this);
+		mSheet = make_unique<RootSheet>(mWindow, this);
 		mWidget = mSheet.get();
 		mScheme.setSheet(mSheet.get());
 	}

@@ -19,9 +19,9 @@
 namespace mk
 {
 	template <class T_Widget, class T_Form>
-	std::unique_ptr<Widget> createWidget(Form* form)
+	unique_ptr<Widget> createWidget(Form* form)
 	{
-		return std::make_unique<T_Widget>(form->as<T_Form>());
+		return make_unique<T_Widget>(form->as<T_Form>());
 	}
 
 	class MK_UI_EXPORT ModalWidget : public Controller
@@ -105,7 +105,7 @@ namespace mk
 		void modalOn(Widget* widget);
 		void modalOff();
 
-		static std::map<string, std::function<std::unique_ptr<Widget>(Form*)>> sDispatch;
+		static std::map<string, std::function<unique_ptr<Widget>(Form*)>> sDispatch;
 
 	protected:
 		float mWidth;
@@ -115,17 +115,17 @@ namespace mk
 		InkWindow* mInkWindow;
 		InputWindow* mInputWindow;
 
-		std::unique_ptr<UiLayout> mLayout;
-		std::unique_ptr<UiSkinner> mSkinner;
+		unique_ptr<UiLayout> mLayout;
+		unique_ptr<UiSkinner> mSkinner;
 
-		std::unique_ptr<RootForm> mRootForm;
+		unique_ptr<RootForm> mRootForm;
 		RootSheet* mRootSheet;
 
 		Widget* mActiveFrame;
 		Widget* mContextMenu;
 		Widget* mModalFrame;
 
-		std::unique_ptr<ModalWidget> mModalWidget;
+		unique_ptr<ModalWidget> mModalWidget;
 
 		float mLastX;
 		float mLastY;

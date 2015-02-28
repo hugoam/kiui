@@ -38,7 +38,7 @@ namespace mk
 		return button;
 	}
 
-	std::unique_ptr<Widget> WRadioSwitch::vrelease(Widget* widget)
+	unique_ptr<Widget> WRadioSwitch::vrelease(Widget* widget)
 	{
 		return widget->extract();
 	}
@@ -53,7 +53,7 @@ namespace mk
 	}
 
 	RadioSwitch::RadioSwitch(Trigger onSelected, size_t active)
-		: Form("radioswitch", "", [this, active]() { return std::make_unique<WRadioSwitch>(std::bind(&RadioSwitch::onSelected, this, _1), active); })
+		: Form("radioswitch", "", [this, active]() { return make_unique<WRadioSwitch>(std::bind(&RadioSwitch::onSelected, this, _1), active); })
 		, mOnSelected(onSelected)
 	{}
 

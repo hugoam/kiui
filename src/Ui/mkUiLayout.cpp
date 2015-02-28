@@ -35,7 +35,7 @@ namespace mk
 
 	void UiLayout::add(string name)
 	{
-		mLayoutStyles.add(std::make_unique<LayoutStyle>(name, FLOW, FLAT, _OPAQUE, false, DimSizing(SHRINK, SHRINK), DimFloat(0.f, 0.f), DIM_Y));
+		mLayoutStyles.add(make_unique<LayoutStyle>(name, FLOW, FLAT, _OPAQUE, false, DimSizing(SHRINK, SHRINK), DimFloat(0.f, 0.f), DIM_Y));
 	}
 
 	void UiLayout::add(string name, string base)
@@ -95,12 +95,12 @@ namespace mk
 
 	void UiSkinner::add(string name)
 	{
-		mSkins.add(std::make_unique<InkStyle>(name));
+		mSkins.add(make_unique<InkStyle>(name));
 	}
 
 	void UiSkinner::add(string name, Colour colour)
 	{
-		mSkins.add(std::make_unique<InkStyle>(name, colour, Colour(1.f, 1.f, 1.f), Colour(), 0.f));
+		mSkins.add(make_unique<InkStyle>(name, colour, Colour(1.f, 1.f, 1.f), Colour(), 0.f));
 	}
 
 	void UiSkinner::add(string name, string base)

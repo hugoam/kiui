@@ -16,16 +16,16 @@
 
 namespace mk
 {
-	typedef std::function<std::unique_ptr<Form> (Lref&)> FormMapper;
+	typedef std::function<unique_ptr<Form> (Lref&)> FormMapper;
 
 	template <class T_Form>
-	std::unique_ptr<Form> lrefFormMapper(Lref& lref) { return make<T_Form>(lref); }
+	unique_ptr<Form> lrefFormMapper(Lref& lref) { return make_unique<T_Form>(lref); }
 
 	template <class T_Form>
-	std::unique_ptr<Form> objectFormMapper(Lref& lref) { return make<T_Form>(lref->object(), lref->type()); }
+	unique_ptr<Form> objectFormMapper(Lref& lref) { return make_unique<T_Form>(lref->object(), lref->type()); }
 
 	template <class T_Form, class T_Object>
-	std::unique_ptr<Form> typedFormMapper(Lref& lref) { return make<T_Form>(lref->as<T_Object>()); }
+	unique_ptr<Form> typedFormMapper(Lref& lref) { return make_unique<T_Form>(lref->as<T_Object>()); }
 
 	class MK_UI_EXPORT Collection
 	{

@@ -138,7 +138,7 @@ namespace mk
 		this->destroy();
 	}
 
-	Widget* WWindow::vappend(std::unique_ptr<Widget> widget)
+	Widget* WWindow::vappend(unique_ptr<Widget> widget)
 	{
 		mTitle->setLabel(widget->name());
 		mContent = widget.get();
@@ -211,8 +211,8 @@ namespace mk
 		return true;
 	}
 
-	Window::Window(std::unique_ptr<Form> content, bool closable, bool dockable, Form::Trigger onClose)
-		: Form("window", "", [this, closable, dockable]() { return std::make_unique<WWindow>(std::bind(&Window::onClose, this, _1), this->name(), closable, dockable); })
+	Window::Window(unique_ptr<Form> content, bool closable, bool dockable, Form::Trigger onClose)
+		: Form("window", "", [this, closable, dockable]() { return make_unique<WWindow>(std::bind(&Window::onClose, this, _1), this->name(), closable, dockable); })
 		, mOnClose(onClose)
 	{
 		this->append(std::move(content));

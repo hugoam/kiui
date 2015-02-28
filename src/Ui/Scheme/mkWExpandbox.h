@@ -22,8 +22,8 @@ namespace mk
 
 		Sheet* header() { return mHeader; }
 
-		Widget* vappend(std::unique_ptr<Widget> widget);
-		std::unique_ptr<Widget> vrelease(Widget* widget);
+		Widget* vappend(unique_ptr<Widget> widget);
+		unique_ptr<Widget> vrelease(Widget* widget);
 
 		void expand();
 		void collapse();

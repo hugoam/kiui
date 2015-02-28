@@ -67,14 +67,14 @@ namespace mk
 	FInt::FInt(Lref& value, bool edit)
 		: FValue(value, "int", edit)
 	{
-		mScheme.setMapper([this]() { return make<WInt>(this); });
+		mScheme.setMapper([this]() { return make_unique<WInt>(this); });
 		setLabel(this->toString());
 	}
 
 	FInt::FInt(int value)
 		: FValue(lref(value), "int")
 	{
-		mScheme.setMapper([this]() { return make<WInt>(this); });
+		mScheme.setMapper([this]() { return make_unique<WInt>(this); });
 	}
 
 	void FInt::updateValue()
@@ -86,14 +86,14 @@ namespace mk
 	FFloat::FFloat(Lref& value, bool edit)
 		: FValue(value, "float", edit)
 	{
-		mScheme.setMapper([this]() { return make<WFloat>(this); });
+		mScheme.setMapper([this]() { return make_unique<WFloat>(this); });
 		setLabel(this->toString());
 	}
 
 	FFloat::FFloat(float value)
 		: FValue(lref(value), "int")
 	{
-		mScheme.setMapper([this]() { return make<WFloat>(this); });
+		mScheme.setMapper([this]() { return make_unique<WFloat>(this); });
 	}
 
 	void FFloat::updateValue()
@@ -105,51 +105,51 @@ namespace mk
 	FIntStat::FIntStat(Lref& value, bool edit)
 		: FValue(value, "intstat", edit)
 	{
-		mScheme.setMapper([this]() { return make<WIntSlider>(this); });
+		mScheme.setMapper([this]() { return make_unique<WIntSlider>(this); });
 	}
 	
 	FIntStat::FIntStat(Stat<int> value)
 		: FValue(lref(value), "intstat")
 	{
-		mScheme.setMapper([this]() { return make<WIntSlider>(this); });
+		mScheme.setMapper([this]() { return make_unique<WIntSlider>(this); });
 	}
 
 	FFloatStat::FFloatStat(Lref& value, bool edit)
 		: FValue(value, "floatstat", edit)
 	{
-		mScheme.setMapper([this]() { return make<WFloatSlider>(this); });
+		mScheme.setMapper([this]() { return make_unique<WFloatSlider>(this); });
 	}
 
 	FFloatStat::FFloatStat(Stat<float> value)
 		: FValue(lref(value), "floatstat")
 	{
-		mScheme.setMapper([this]() { return make<WFloatSlider>(this); });
+		mScheme.setMapper([this]() { return make_unique<WFloatSlider>(this); });
 	}
 
 	FBool::FBool(Lref& value, bool edit)
 		: FValue(value, "bool", edit)
 	{
-		mScheme.setMapper([this]() { return make<WBool>(this); });
+		mScheme.setMapper([this]() { return make_unique<WBool>(this); });
 		setLabel(this->toString());
 	}
 
 	FBool::FBool(bool value)
 		: FValue(lref(value), "bool")
 	{
-		mScheme.setMapper([this]() { return make<WBool>(this); });
+		mScheme.setMapper([this]() { return make_unique<WBool>(this); });
 	}
 
 	FString::FString(Lref& value, bool edit)
 		: FValue(value, "string", edit)
 	{
-		mScheme.setMapper([this]() { return make<WString>(this); });
+		mScheme.setMapper([this]() { return make_unique<WString>(this); });
 		setLabel(this->toString());
 	}
 	
 	FString::FString(string value)
 		: FValue(lref(value), "string")
 	{
-		mScheme.setMapper([this]() { return make<WString>(this); });
+		mScheme.setMapper([this]() { return make_unique<WString>(this); });
 	}
 
 	InputInt::InputInt(const string& label, int value, std::function<void(int)> callback)
@@ -207,7 +207,7 @@ namespace mk
 		this->makeappend<Label>("", label);
 	}
 
-	//std::unique_ptr<Form> dispatchStoreForm(Form* member, Lref& lref, Stock* store) { return std::make_unique<FStore>(member, member->as<FMember>()->dmember()); }
+	//unique_ptr<Form> dispatchStoreForm(Form* member, Lref& lref, Stock* store) { return make_unique<FStore>(member, member->as<FMember>()->dmember()); }
 
 	template <class T_Val, class T_Form>
 	Form* dispatchValueForm(Form* parent, Lref& lref, T_Val val) { UNUSED(val); return parent->makeappend<T_Form>(lref); }

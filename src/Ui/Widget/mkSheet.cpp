@@ -50,12 +50,12 @@ namespace mk
 			return mParent->elementStyle(clas);
 	}
 
-	Widget* Sheet::append(std::unique_ptr<Widget> unique)
+	Widget* Sheet::append(unique_ptr<Widget> unique)
 	{
 		return this->insert(std::move(unique), mContents.size());
 	}
 
-	Widget* Sheet::insert(std::unique_ptr<Widget> unique, size_t index)
+	Widget* Sheet::insert(unique_ptr<Widget> unique, size_t index)
 	{
 		Widget* widget = unique.get();
 		mContents.insert(std::move(unique), index);
@@ -63,13 +63,13 @@ namespace mk
 		return widget;
 	}
 
-	std::unique_ptr<Widget> Sheet::release(Widget* widget)
+	unique_ptr<Widget> Sheet::release(Widget* widget)
 	{
 		widget->detach();
 		return mContents.release(widget);
 	}
 
-	std::unique_ptr<Widget> Sheet::release(size_t index)
+	unique_ptr<Widget> Sheet::release(size_t index)
 	{
 		mContents.at(index)->detach();
 		return mContents.release(index);
@@ -154,12 +154,12 @@ namespace mk
 		mSheet = mScrollbox->makeappend<Sheet>(mClas, mForm);
 	}
 
-	Widget* ScrollSheet::vappend(std::unique_ptr<Widget> widget)
+	Widget* ScrollSheet::vappend(unique_ptr<Widget> widget)
 	{
 		return mSheet->vappend(std::move(widget));
 	}
 
-	std::unique_ptr<Widget> ScrollSheet::vrelease(Widget* widget)
+	unique_ptr<Widget> ScrollSheet::vrelease(Widget* widget)
 	{
 		return mSheet->vrelease(widget);
 	}
@@ -227,7 +227,7 @@ namespace mk
 		: Sheet("", form)
 		, mWindow(window)
 	{
-		mFrame = std::make_unique<Stripe>(nullptr, this, form->clas());
+		mFrame = make_unique<Stripe>(nullptr, this, form->clas());
 		mFrame->setOpacity(_OPAQUE);
 	}
 

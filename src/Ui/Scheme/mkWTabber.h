@@ -36,8 +36,8 @@ namespace mk
 
 		void select(size_t index);
 
-		Widget* vappend(std::unique_ptr<Widget> widget);
-		std::unique_ptr<Widget> vrelease(Widget* widget);
+		Widget* vappend(unique_ptr<Widget> widget);
+		unique_ptr<Widget> vrelease(Widget* widget);
 
 		void headerClicked(WButton* button);
 

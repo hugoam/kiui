@@ -95,8 +95,8 @@ namespace mk
 		// Calculate pixel ration for hi-dpi devices.
 		float pxRatio = (float)mFbWidth / (float)winWidth;
 
-		mNanoWindow = make<NanoWindow>(mWidth, mHeight, pxRatio);
-		mUiWindow = make<UiWindow>();
+		mNanoWindow = make_unique<NanoWindow>(mWidth, mHeight, pxRatio);
+		mUiWindow = make_unique<UiWindow>();
 		mUiWindow->setup(this, mNanoWindow.get(), nullptr);
 		this->initInput(mUiWindow.get(), 0);
 		this->updateSize();

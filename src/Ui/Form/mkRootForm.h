@@ -55,7 +55,7 @@ namespace mk
 		User* mUser;
 		UiWindow* mWindow;
 		size_t mLastTick;
-		std::unique_ptr<RootSheet> mSheet;
+		unique_ptr<RootSheet> mSheet;
 		std::vector<FormUpdateObserver*> mObservers;
 	};
 }

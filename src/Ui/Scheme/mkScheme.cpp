@@ -22,7 +22,7 @@ namespace mk
 		, mElementMapper(elementMapper)
 	{}
 
-	std::unique_ptr<Widget> Scheme::makeWidget()
+	unique_ptr<Widget> Scheme::makeWidget()
 	{
 		if(mMapper)
 			return mMapper();
@@ -34,16 +34,16 @@ namespace mk
 				return UiWindow::sDispatch[cls](mForm);
 
 		if(mForm->parent()->widget()->elementStyle(mForm->clas())->d_overflow == SCROLL)
-			return make<ScrollSheet>("", mForm);
+			return make_unique<ScrollSheet>("", mForm);
 		else if(mForm->container())
-			return make<Sheet>("", mForm);
+			return make_unique<Sheet>("", mForm);
 		else
-			return make<Widget>("", mForm);
+			return make_unique<Widget>("", mForm);
 	}
 
 	void Scheme::append(Form* form)
 	{
-		std::unique_ptr<Widget> widget = form->scheme()->makeWidget();
+		unique_ptr<Widget> widget = form->scheme()->makeWidget();
 
 		form->setWidget(widget.get());
 		form->scheme()->setSheet(widget->as<Sheet>());

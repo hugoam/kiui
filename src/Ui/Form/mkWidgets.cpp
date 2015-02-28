@@ -19,7 +19,7 @@ namespace mk
 	{}
 
 	Textbox::Textbox(const string& cls, const string& text)
-		: Form(cls + " text", text, [this, text](){ return make<WTextbox>(this, text); })
+		: Form(cls + " text", text, [this, text](){ return make_unique<WTextbox>(this, text); })
 	{}
 
 	Image::Image(const string& cls, const string& image)
@@ -28,7 +28,7 @@ namespace mk
 		this->setImage(image);
 	}
 
-	DynamicImage::DynamicImage(const string& cls, std::unique_ptr<Image256> image)
+	DynamicImage::DynamicImage(const string& cls, unique_ptr<Image256> image)
 		: Form(cls + " dynamicimage")
 		, mImage(std::move(image))
 	{}

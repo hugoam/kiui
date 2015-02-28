@@ -49,7 +49,7 @@ namespace mk
 		mHeaders->frame()->hide();
 	}
 
-	Widget* WTabber::vappend(std::unique_ptr<Widget> widget)
+	Widget* WTabber::vappend(unique_ptr<Widget> widget)
 	{
 		WButton* header = mHeaders->makeappend<WButton>(widget->name(), "tabheader", std::bind(&WTabber::headerClicked, this, _1));
 		WTab* tab = mTabs->makeappend<WTab>(header, mCurrentTab == nullptr);
@@ -62,14 +62,14 @@ namespace mk
 		return tab->append(std::move(widget));
 	}
 
-	std::unique_ptr<Widget> WTabber::vrelease(Widget* widget)
+	unique_ptr<Widget> WTabber::vrelease(Widget* widget)
 	{
 		WTab* tab = widget->parent()->as<WTab>();
 
 		if(tab == mCurrentTab)
 			mCurrentTab = nullptr;
 
-		std::unique_ptr<Widget> unique = widget->unbind();
+		unique_ptr<Widget> unique = widget->unbind();
 		tab->header()->destroy();
 		tab->destroy();
 
@@ -104,6 +104,6 @@ namespace mk
 	}
 
 	Tabber::Tabber()
-		: Form("tabber", "", []() { return std::make_unique<WTabber>("tabber"); })
+		: Form("tabber", "", []() { return make_unique<WTabber>("tabber"); })
 	{}
 }

@@ -71,7 +71,7 @@ namespace mk
 		mParent->mContents.remove(mIndex);
 	}
 
-	Form* Form::insert(std::unique_ptr<Form> pt, size_t index)
+	Form* Form::insert(unique_ptr<Form> pt, size_t index)
 	{
 		Form* form = pt.get();
 
@@ -84,12 +84,12 @@ namespace mk
 		return form;
 	}
 
-	Form* Form::append(std::unique_ptr<Form> form)
+	Form* Form::append(unique_ptr<Form> form)
 	{
 		return this->insert(std::move(form), this->last()); 
 	}
 
-	std::unique_ptr<Form> Form::release(size_t pos)
+	unique_ptr<Form> Form::release(size_t pos)
 	{
 		if(mContents.at(pos)->widget())
 			mContents.at(pos)->widget()->detach();

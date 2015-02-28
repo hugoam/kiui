@@ -70,8 +70,8 @@ namespace mk
 		void bind(Sheet* parent);
 		void rebind(Sheet* parent, bool insert = false, size_t index = 0);
 
-		std::unique_ptr<Widget> unbind();
-		std::unique_ptr<Widget> extract();
+		unique_ptr<Widget> unbind();
+		unique_ptr<Widget> extract();
 
 		void destroy();
 		void detach();
@@ -134,7 +134,7 @@ namespace mk
 	protected:
 		Sheet* mParent;
 		string mClas;
-		std::unique_ptr<Frame> mFrame;
+		unique_ptr<Frame> mFrame;
 		WidgetState mState;
 
 		Form* mForm;

@@ -21,7 +21,7 @@ namespace mk
 		WRadioSwitch(Trigger onSelected, size_t active);
 
 		Sheet* vaddwrapper(Widget* widget);
-		std::unique_ptr<Widget> vrelease(Widget* widget);
+		unique_ptr<Widget> vrelease(Widget* widget);
 
 		WWrapButton* active() { return mActive; }
 

@@ -36,8 +36,8 @@ namespace mk
 		void resize(size_t width, size_t height);
 
 	protected:
-		std::unique_ptr<NanoWindow> mNanoWindow;
-		std::unique_ptr<UiWindow> mUiWindow;
+		unique_ptr<NanoWindow> mNanoWindow;
+		unique_ptr<UiWindow> mUiWindow;
 
 		GLFWwindow* mGlWindow;
 		int mFbWidth;

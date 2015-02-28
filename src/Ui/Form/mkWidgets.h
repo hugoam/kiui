@@ -43,13 +43,13 @@ namespace mk
 	class MK_UI_EXPORT DynamicImage : public Form
 	{
 	public:
-		DynamicImage(const string& cls, std::unique_ptr<Image256> image);
+		DynamicImage(const string& cls, unique_ptr<Image256> image);
 		~DynamicImage();
 
 		Image256* imageData() { return mImage.get(); }
 
 	protected:
-		std::unique_ptr<Image256> mImage;
+		unique_ptr<Image256> mImage;
 	};
 
 	class MK_UI_EXPORT Bar : public Form

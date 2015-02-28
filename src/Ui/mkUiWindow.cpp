@@ -32,7 +32,7 @@
 
 namespace mk
 {
-	std::map<string, std::function<std::unique_ptr<Widget>(Form*)>> UiWindow::sDispatch;
+	std::map<string, std::function<unique_ptr<Widget>(Form*)>> UiWindow::sDispatch;
 
 	UiWindow::UiWindow(User* user)
 		: mShutdownRequested(false)
@@ -41,8 +41,8 @@ namespace mk
 		, mShiftPressed(false)
 		, mCtrlPressed(false)
 		, mDragging(false)
-		, mSkinner(std::make_unique<UiSkinner>())
-		, mLayout(std::make_unique<UiLayout>())
+		, mSkinner(make_unique<UiSkinner>())
+		, mLayout(make_unique<UiLayout>())
 		, mUser(user)
 	{
 		setupUiLayout(mSkinner.get(), mLayout.get());
@@ -59,7 +59,7 @@ namespace mk
 		mInkWindow = inkWindow;
 		mInputWindow = inputWindow;
 
-		mRootForm = std::make_unique<RootForm>(this);
+		mRootForm = make_unique<RootForm>(this);
 		mRootSheet = mRootForm->sheet();
 
 		mRootSheet->frame()->setSize(mWidth, mHeight);
@@ -316,7 +316,7 @@ namespace mk
 	void UiWindow::modalOn(Widget* widget)
 	{
 		mModalFrame = widget;
-		mModalWidget = std::make_unique<ModalWidget>(widget);
+		mModalWidget = make_unique<ModalWidget>(widget);
 	}
 
 	void UiWindow::modalOff()

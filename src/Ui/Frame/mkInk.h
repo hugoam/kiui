@@ -24,7 +24,7 @@ namespace mk
 	class MK_UI_EXPORT InkLayer : public Object, public Typed<InkLayer>
 	{
 	public:
-		virtual std::unique_ptr<Inkbox> inkbox(Frame* frame) = 0;
+		virtual unique_ptr<Inkbox> inkbox(Frame* frame) = 0;
 
 		virtual void show() = 0;
 		virtual void hide() = 0;
@@ -34,7 +34,7 @@ namespace mk
 	class MK_UI_EXPORT InkTarget : public Object, public Typed<InkTarget>
 	{
 	public:
-		virtual std::unique_ptr<InkLayer> layer(Frame* frame, size_t z = 0) = 0;
+		virtual unique_ptr<InkLayer> layer(Frame* frame, size_t z = 0) = 0;
 	};
 
 	class MK_UI_EXPORT _I_ InkStyle : public Struct, public Typed<InkStyle>

@@ -13,7 +13,7 @@
 namespace mk
 {
 	Button::Button(const string& cls, const string& label, const string& image, Trigger trigger)
-		: Form(cls + " button", label, [this]() { return make<WButton>(this); })
+		: Form(cls + " button", label, [this]() { return make_unique<WButton>(this); })
 		, mTrigger(trigger)
 	{
 		if(image != "")

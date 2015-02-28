@@ -251,7 +251,7 @@ namespace mk
 			mDockSpans[dockid] = 1.f;
 	}
 
-	Widget* WDockspace::vappend(std::unique_ptr<Widget> widget)
+	Widget* WDockspace::vappend(unique_ptr<Widget> widget)
 	{
 		string dockid = widget->form()->attrs()["dockid"];
 		WDocksection* section = mMainLine->findOrCreateSection(dockid);
@@ -260,6 +260,6 @@ namespace mk
 	}
 
 	Dockspace::Dockspace(const string& cls)
-		: Form(cls + " dockspace", "", []() { return std::make_unique<WDockspace>(); })
+		: Form(cls + " dockspace", "", []() { return make_unique<WDockspace>(); })
 	{}
 }

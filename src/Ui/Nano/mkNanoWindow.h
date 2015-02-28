@@ -24,7 +24,7 @@ namespace mk
 		size_t index() { return mIndex; }
 		bool visible() { return mVisible; }
 
-		std::unique_ptr<Inkbox> inkbox(Frame* frame);
+		unique_ptr<Inkbox> inkbox(Frame* frame);
 
 		void show();
 		void hide();
@@ -51,7 +51,7 @@ namespace mk
 		NVGcontext* ctx() { return mCtx; }
 		size_t zmax() { return mZMax; }
 
-		std::unique_ptr<InkLayer> layer(Frame* frame, size_t z);
+		unique_ptr<InkLayer> layer(Frame* frame, size_t z);
 
 		void moveToTop(NanoLayer* layer);
 		void nanodraw();
@@ -84,10 +84,10 @@ namespace mk
 		size_t mWidth;
 		size_t mHeight;
 		float mPixelRatio;
-		std::unique_ptr<NanoGl> mNanoGl;
+		unique_ptr<NanoGl> mNanoGl;
 
 		NVGcontext* mCtx;
-		std::unique_ptr<NanoTarget> mScreenTarget;
+		unique_ptr<NanoTarget> mScreenTarget;
 	};
 
 }

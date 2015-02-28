@@ -47,6 +47,6 @@ namespace mk
 	}
 
 	Tree::Tree(string cls)
-		: Form(cls + " tree", "", [this]() { return std::make_unique<WTree>("tree", this); })
+		: Form(cls + " tree", "", [this]() { return make_unique<WTree>("tree", this); })
 	{}
 }

@@ -36,9 +36,9 @@ namespace mk
 	NanoLayer::~NanoLayer()
 	{}
 
-	std::unique_ptr<Inkbox> NanoLayer::inkbox(Frame* frame)
+	unique_ptr<Inkbox> NanoLayer::inkbox(Frame* frame)
 	{
-		return std::make_unique<NanoInk>(frame, this);
+		return make_unique<NanoInk>(frame, this);
 	}
 
 	void NanoLayer::show()
@@ -94,10 +94,10 @@ namespace mk
 		UNUSED(layer);
 	}
 
-	std::unique_ptr<InkLayer> NanoTarget::layer(Frame* frame, size_t z)
+	unique_ptr<InkLayer> NanoTarget::layer(Frame* frame, size_t z)
 	{
 		if(z == 0) z = mZMax++;
-		std::unique_ptr<NanoLayer> layer = std::make_unique<NanoLayer>(frame, this, z);
+		unique_ptr<NanoLayer> layer = make_unique<NanoLayer>(frame, this, z);
 		mLayers[z].push_back(layer.get());
 		return std::move(layer);
 	}
@@ -121,7 +121,7 @@ namespace mk
 			return;
 		}
 
-		mScreenTarget = std::make_unique<NanoTarget>(mCtx);
+		mScreenTarget = make_unique<NanoTarget>(mCtx);
 	}
 
 	NanoWindow::~NanoWindow()

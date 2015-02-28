@@ -57,7 +57,7 @@ namespace mk
 		size_t lastTick() { return mLastTick; }
 
 		Scheme* scheme() { return &mScheme; }
-		void setScheme(std::unique_ptr<Scheme> scheme);
+		void setScheme(unique_ptr<Scheme> scheme);
 		void setWidget(Widget* widget) { mWidget = widget; }
 
 		const string& clas() const { return mCls; }
@@ -95,9 +95,9 @@ namespace mk
 		
 		void remove(size_t index);
 
-		Form* insert(std::unique_ptr<Form> form, size_t index);
-		Form* append(std::unique_ptr<Form> form);
-		std::unique_ptr<Form> release(size_t index);
+		Form* insert(unique_ptr<Form> form, size_t index);
+		Form* append(unique_ptr<Form> form);
+		unique_ptr<Form> release(size_t index);
 
 		// Indexing
 		string concatIndex();
@@ -119,7 +119,7 @@ namespace mk
 		template <class T, class... Args>
 		inline T* makeappend(Args&&... args)
 		{
-			return this->append(make<T>(std::forward<Args>(args)...))->as<T>();
+			return this->append(make_unique<T>(std::forward<Args>(args)...))->as<T>();
 		}
 
 	public:

@@ -54,7 +54,7 @@ namespace mk
 		return button;
 	}
 
-	std::unique_ptr<Widget> WDropdown::vrelease(Widget* widget)
+	unique_ptr<Widget> WDropdown::vrelease(Widget* widget)
 	{
 		return widget->extract();
 	}
@@ -110,7 +110,7 @@ namespace mk
 	}
 
 	Dropdown::Dropdown(Trigger onSelected, std::function<void(string)> onSelectedString)
-		: Form("dropdown", "", [this](){ return std::make_unique<WDropdown>(std::bind(&Dropdown::onSelected, this, _1)); })
+		: Form("dropdown", "", [this](){ return make_unique<WDropdown>(std::bind(&Dropdown::onSelected, this, _1)); })
 		, mOnSelected(onSelected)
 		, mOnSelectedString(onSelectedString)
 	{}

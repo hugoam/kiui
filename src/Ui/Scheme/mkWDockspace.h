@@ -95,8 +95,8 @@ namespace mk
 
 		void addSection(string name);
 
-		Widget* vappend(std::unique_ptr<Widget> widget);
-		//std::unique_ptr<Widget> vrelease(Widget* widget);
+		Widget* vappend(unique_ptr<Widget> widget);
+		//unique_ptr<Widget> vrelease(Widget* widget);
 
 		using Typed<WDockspace>::cls;
 

@@ -53,9 +53,9 @@ namespace mk
 		Stripe* stripe = mParent ? mParent->frame()->as<Stripe>() : nullptr;
 
 		if(this->frameType() == STRIPE)
-			mFrame = std::make_unique<Stripe>(stripe, this, this->clas());
+			mFrame = make_unique<Stripe>(stripe, this, this->clas());
 		else
-			mFrame = std::make_unique<Frame>(stripe, this, this->clas(), this->zorder());
+			mFrame = make_unique<Frame>(stripe, this, this->clas(), this->zorder());
 
 		this->build();
 	}
@@ -75,15 +75,15 @@ namespace mk
 		mFrame->migrate(mParent->frame()->as<Stripe>());
 	}
 
-	std::unique_ptr<Widget> Widget::unbind()
+	unique_ptr<Widget> Widget::unbind()
 	{
 		return mParent->as<Sheet>()->release(this);
 	}
 
-	std::unique_ptr<Widget> Widget::extract()
+	unique_ptr<Widget> Widget::extract()
 	{
 		mFrame->remove();
-		std::unique_ptr<Widget> unique = mParent->as<Sheet>()->release(this);
+		unique_ptr<Widget> unique = mParent->as<Sheet>()->release(this);
 		mParent->destroy();
 		return unique;
 	}

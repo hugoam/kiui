@@ -14,7 +14,7 @@
 
 namespace mk
 {
-	typedef std::function<std::unique_ptr<Widget>()> SchemeMapper;
+	typedef std::function<unique_ptr<Widget>()> SchemeMapper;
 
 	class Scheme
 	{
@@ -23,7 +23,7 @@ namespace mk
 
 		Form* form() { return mForm; }
 
-		std::unique_ptr<Widget> makeWidget();
+		unique_ptr<Widget> makeWidget();
 
 		void append(Form* form);
 		void remove(Form* form);

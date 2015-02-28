@@ -34,14 +34,14 @@ namespace mk
 		mContainer->frame()->hide();
 	}
 
-	Widget* WExpandbox::vappend(std::unique_ptr<Widget> widget)
+	Widget* WExpandbox::vappend(unique_ptr<Widget> widget)
 	{
 		if(!mCollapsed && mContainer->frame()->hidden())
 			mContainer->frame()->show();
 		return mContainer->append(std::move(widget));
 	}
 
-	std::unique_ptr<Widget> WExpandbox::vrelease(Widget* widget)
+	unique_ptr<Widget> WExpandbox::vrelease(Widget* widget)
 	{
 		return mContainer->release(widget);
 	}
@@ -59,7 +59,7 @@ namespace mk
 	}
 
 	Expandbox::Expandbox(string title, bool collapsed)
-		: Form("expandbox", "", [this, collapsed]() { return std::make_unique<WExpandbox>(this->name(), collapsed); })
+		: Form("expandbox", "", [this, collapsed]() { return make_unique<WExpandbox>(this->name(), collapsed); })
 	{
 		if(title != "")
 			this->setName(title);

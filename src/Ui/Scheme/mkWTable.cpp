@@ -46,7 +46,7 @@ namespace mk
 	}
 
 	Table::Table(StringVector columns, std::vector<float> weights)
-		: Form("table", "", [columns, weights]() { return std::make_unique<WTable>(columns, weights); })
+		: Form("table", "", [columns, weights]() { return make_unique<WTable>(columns, weights); })
 	{}
 
 	// @ todo : table->add(Form* form)

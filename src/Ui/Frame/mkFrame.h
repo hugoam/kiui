@@ -132,8 +132,8 @@ namespace mk
 		InkStyle* d_skin;
 		InkStyle* d_inkstyle;
 
-		std::unique_ptr<InkLayer> d_inkLayer;
-		std::unique_ptr<Inkbox> d_inkbox;
+		unique_ptr<InkLayer> d_inkLayer;
+		unique_ptr<Inkbox> d_inkbox;
 	};
 }
 

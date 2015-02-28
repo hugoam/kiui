@@ -50,8 +50,8 @@ namespace mk
 		bool dockable() { return mDockable; }
 		WDocksection* dock() { return mDock; }
 
-		Widget* vappend(std::unique_ptr<Widget> widget);
-		//std::unique_ptr<Widget> vrelease(Widget* widget);
+		Widget* vappend(unique_ptr<Widget> widget);
+		//unique_ptr<Widget> vrelease(Widget* widget);
 
 		void dock(WDocksection* docksection);
 		void undock();
@@ -78,7 +78,7 @@ namespace mk
 	class MK_UI_EXPORT Window : public Form
 	{
 	public:
-		Window(std::unique_ptr<Form> content, bool closable = true, bool dockable = false, Trigger onClose = nullptr);
+		Window(unique_ptr<Form> content, bool closable = true, bool dockable = false, Trigger onClose = nullptr);
 
 		void onClose(Widget* widget);
 
