@@ -13,7 +13,7 @@ namespace mk
 {
 	void createTestWindow(Form* parent)
 	{
-		std::unique_ptr<Form> boardpt = make<Form>("scrollpartition");
+		std::unique_ptr<Form> boardpt = std::make_unique<Form>("scrollpartition");
 
 		Window* window = parent->makeappend<Window>(std::move(boardpt));
 		WWindow* wwindow = window->widget()->as<WWindow>();
