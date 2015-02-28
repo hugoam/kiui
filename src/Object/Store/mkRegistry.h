@@ -76,7 +76,7 @@ namespace mk
 
 		unique_ptr<T> release(T* object)
 		{
-			auto& it = std::find_if(mStore.begin(), mStore.end(), [object](const unique_ptr<T>& p) { return p.get() == object; });
+			auto it = std::find_if(mStore.begin(), mStore.end(), [object](const unique_ptr<T>& p) { return p.get() == object; });
 			return std::move(*it);
 		}
 
