@@ -103,7 +103,7 @@ namespace mk
 	}
 
 	FIntStat::FIntStat(Lref& value, bool edit)
-		: FValue(value, "intstat")
+		: FValue(value, "intstat", edit)
 	{
 		mScheme.setMapper([this]() { return make<WIntSlider>(this); });
 	}
@@ -115,7 +115,7 @@ namespace mk
 	}
 
 	FFloatStat::FFloatStat(Lref& value, bool edit)
-		: FValue(value, "floatstat")
+		: FValue(value, "floatstat", edit)
 	{
 		mScheme.setMapper([this]() { return make<WFloatSlider>(this); });
 	}
@@ -210,7 +210,7 @@ namespace mk
 	//std::unique_ptr<Form> dispatchStoreForm(Form* member, Lref& lref, Stock* store) { return std::make_unique<FStore>(member, member->as<FMember>()->dmember()); }
 
 	template <class T_Val, class T_Form>
-	Form* dispatchValueForm(Form* parent, Lref& lref, T_Val val) { return parent->makeappend<T_Form>(lref); }
+	Form* dispatchValueForm(Form* parent, Lref& lref, T_Val val) { UNUSED(val); return parent->makeappend<T_Form>(lref); }
 
 	//template class Dispatch<ObjectForm, Stock*, dispatchStoreForm>;
 

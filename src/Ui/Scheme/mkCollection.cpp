@@ -27,7 +27,8 @@ namespace mk
 
 	void Collection::add(Object* object, Type* type, size_t index)
 	{
-		std::unique_ptr<Form> form = mMapper(Lref(object, type));
+		Lref ref(object, type);
+		std::unique_ptr<Form> form = mMapper(ref);
 		mMapping[object] = form.get();
 		if(index > mForm->contents()->size())
 			index = mForm->contents()->size(); // @Warning, this should ultimately be removed, it's a kludge for collections with holes in their indexes

@@ -107,6 +107,7 @@ namespace mk
 
 	void GlWindow::initInput(InputDispatcher* input, size_t windowHnd)
 	{
+		UNUSED(windowHnd);
 		mInput = input;
 	}
 
@@ -153,7 +154,9 @@ namespace mk
 	}
 
 	void GlWindow::resize(size_t width, size_t height)
-	{}
+	{
+		UNUSED(width); UNUSED(height);
+	}
 
 	void GlWindow::injectMouseMove(double x, double y)
 	{
@@ -171,6 +174,7 @@ namespace mk
 
 	void GlWindow::injectMouseButton(int button, int action, int mods)
 	{
+		UNUSED(mods);
 		if(action == GLFW_PRESS)
 			mInput->mousePressed(mMouseX, mMouseY, convertGlfwButton(button));
 		else if(action == GLFW_RELEASE)
@@ -179,6 +183,7 @@ namespace mk
 
 	void GlWindow::injectKey(int key, int scancode, int action, int mods)
 	{
+		UNUSED(key); UNUSED(mods);
 		if(action == GLFW_PRESS)
 			mInput->keyPressed((KeyCode) scancode, ' ');
 		else if(action == GLFW_RELEASE)
@@ -187,6 +192,7 @@ namespace mk
 
 	void GlWindow::injectChar(int codepoint, int mods)
 	{
+		UNUSED(codepoint); UNUSED(mods);
 		//if(action == GLFW_PRESS)
 		//	mInput->keyPressed();
 	}
