@@ -40,7 +40,7 @@ namespace mk
 		void setupIndexer(Indexer* indexer) { mIndexer = indexer; }
 		void setupLibrary(AbstractPool* library) { mLibrary = library; }
 
-		void setupImprint(std::unique_ptr<ImprintStub> stub) { mImprint = stub->imprint(); mImprintStub = std::move(stub); }
+		void setupImprint(unique_ptr<ImprintStub> stub) { mImprint = stub->imprint(); mImprintStub = std::move(stub); }
 
 		bool upcast(Type* type);
 
@@ -53,7 +53,7 @@ namespace mk
 
 	protected:
 		Type* mBase;
-		std::unique_ptr<ImprintStub> mImprintStub;
+		unique_ptr<ImprintStub> mImprintStub;
 		Imprint* mImprint;
 		Proto* mProto;
 		Indexer* mIndexer;

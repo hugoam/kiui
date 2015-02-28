@@ -19,7 +19,7 @@ namespace mk
 	struct Copyable { static const bool value = true; };
 
 	template <class T>
-	struct Copyable<std::unique_ptr<T>> { static const bool value = false; };
+	struct Copyable<unique_ptr<T>> { static const bool value = false; };
 
 	template <class T>
 	struct Copyable<std::vector<T>> { static const bool value = Copyable<T>::value; };
@@ -52,7 +52,7 @@ namespace mk
 	struct Pass<T*> { typedef T* ctype; typedef T* type; typedef T* forward; };
 
 	template <class T>
-	struct Pass<std::unique_ptr<T>> { typedef const std::unique_ptr<T>& ctype; typedef std::unique_ptr<T> type; typedef std::unique_ptr<T> forward; };
+	struct Pass<unique_ptr<T>> { typedef const unique_ptr<T>& ctype; typedef unique_ptr<T> type; typedef unique_ptr<T> forward; };
 
 	template <class T>
 	struct Pass<std::vector<T>> { typedef const std::vector<T>& ctype; typedef std::vector<T> type; typedef std::vector<T>& forward; };
@@ -65,10 +65,10 @@ namespace mk
 	};
 
 	template <class T>
-	struct Copy<std::unique_ptr<T>>
+	struct Copy<unique_ptr<T>>
 	{
-		static std::unique_ptr<T> copy(const std::unique_ptr<T>& val) { UNUSED(val); return std::unique_ptr<T>(); }
-		static std::unique_ptr<T> copy(std::unique_ptr<T>& val) { return std::move(val); }
+		static unique_ptr<T> copy(const unique_ptr<T>& val) { UNUSED(val); return unique_ptr<T>(); }
+		static unique_ptr<T> copy(unique_ptr<T>& val) { return std::move(val); }
 	};
 
 	template <class T>
@@ -91,9 +91,9 @@ namespace mk
 	};
 
 	template <class T>
-	struct Assign<std::unique_ptr<T>>
+	struct Assign<unique_ptr<T>>
 	{
-		static inline void set(std::unique_ptr<T>& ref, std::unique_ptr<T> val) { ref = std::move(val); }
+		static inline void set(unique_ptr<T>& ref, unique_ptr<T> val) { ref = std::move(val); }
 	};
 
 	template <class T>

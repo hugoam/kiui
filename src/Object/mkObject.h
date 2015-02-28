@@ -6,6 +6,7 @@
 #define MK_OBJECT_H_INCLUDED
 
 /* mk headers */
+#include <Object/Util/mkMake.h>
 #include <Object/mkId.h>
 #include <Object/mkObjectForward.h>
 

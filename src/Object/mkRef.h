@@ -9,6 +9,7 @@
 #include <Object/mkObjectForward.h>
 #include <Object/mkType.h>
 #include <Object/mkTypeUtils.h>
+#include <Object/Util/mkMake.h>
 
 /* Standard */
 #include <memory>
@@ -36,7 +37,7 @@ namespace mk
 		inline void assign(Object* object) { mObject = object; }
 		inline size_t update() { return mUpdate; }
 
-		virtual std::unique_ptr<Ref> clone() const { return std::make_unique<Ref>(mObject, mType); };
+		virtual unique_ptr<Ref> clone() const { return make_unique<Ref>(mObject, mType); };
 
 		virtual void setString(const string& value) { UNUSED(value); }
 		virtual string getString() { return ""; }
@@ -91,7 +92,7 @@ namespace mk
 		Any(typename Pass<T>::forward value) : Ref(typeof<T>()), mContent() { RefAssign<T>::set(this, std::forward<typename Pass<T>::forward>(value)); mObject = RefObject<T>::get(mContent); }
 		Any() : Ref(typeof<T>()), mContent() { mObject = RefObject<T>::get(mContent); }
 
-		std::unique_ptr<Ref> clone() const { return std::make_unique<Any<T>>(this->copy()); }
+		unique_ptr<Ref> clone() const { return make_unique<Any<T>>(this->copy()); }
 
 		void setString(const string& value) { fromString<T>(value, mContent); }
 		string getString() { return toString<T>(mContent); }
@@ -118,24 +119,24 @@ namespace mk
 	public:
 		Any() : Ref(static_cast<Type*>(nullptr)) {}
 
-		std::unique_ptr<Ref> clone() const { return std::make_unique<Any<None>>(); }
+		unique_ptr<Ref> clone() const { return make_unique<Any<None>>(); }
 	};
 
 	//T* cast() const { return upcast<T>(mObject); }
 
 	template <class T>
-	struct MakeRef { static std::unique_ptr<Ref> make(typename Pass<T>::forward val) { return std::make_unique<Any<T>>(std::forward<typename Pass<T>::forward>(val)); }; };
+	struct MakeRef { static unique_ptr<Ref> make(typename Pass<T>::forward val) { return make_unique<Any<T>>(std::forward<typename Pass<T>::forward>(val)); }; };
 
 	template <class T>
-	struct MakeRef<T*> { static std::unique_ptr<Ref> make(T* obj) { return obj ? std::make_unique<Ref>(obj->as<Object>(), T::cls()) : std::make_unique<Ref>(T::cls()); }; };
+	struct MakeRef<T*> { static unique_ptr<Ref> make(T* obj) { return obj ? make_unique<Ref>(obj->as<Object>(), T::cls()) : make_unique<Ref>(T::cls()); }; };
 
 	class MK_OBJECT_EXPORT Lref
 	{
 	public:
-		Lref(std::unique_ptr<Ref> ref) : mRef(std::move(ref)) {}
-		Lref(TypeObject* object) : mRef(std::make_unique<Ref>(object, object->type())) {}
-		Lref(Object* object, Type* type) : mRef(std::make_unique<Ref>(object, type)) {}
-		Lref() : mRef(std::make_unique<Any<None>>()) {}
+		Lref(unique_ptr<Ref> ref) : mRef(std::move(ref)) {}
+		Lref(TypeObject* object) : mRef(make_unique<Ref>(object, object->type())) {}
+		Lref(Object* object, Type* type) : mRef(make_unique<Ref>(object, type)) {}
+		Lref() : mRef(make_unique<Any<None>>()) {}
 
 		Lref(Lref&& ref) : mRef(std::move(ref.mRef)) {}
 		Lref(const Lref& ref) : mRef(ref.mRef ? ref->clone() : nullptr) {}
@@ -147,7 +148,7 @@ namespace mk
 		const Ref* operator->() const { return mRef.get(); }
 
 	protected:
-		std::unique_ptr<Ref> mRef;
+		unique_ptr<Ref> mRef;
 	};
 
 	template <class T>

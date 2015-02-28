@@ -28,17 +28,17 @@ namespace mk
 	class Pool : public AbstractPool, public Typed<Pool<T>>
 	{
 	public:
-		Pool() : mPool(std::make_unique<boost::object_pool<T>>()) {}
+		Pool() : mPool(make_unique<boost::object_pool<T>>()) {}
 
 		T* alloc()	{ return mPool->malloc(); }
 		void free(T* mem) { mPool->free(mem); }
 		void free(void* mem) { mPool->free((T*) mem); }
-		void reset() { mPool.reset(); mPool = std::make_unique<boost::object_pool<T>>(); }
+		void reset() { mPool.reset(); mPool = make_unique<boost::object_pool<T>>(); }
 
 		using Typed<Pool<T>>::cls;
 
 	protected:
-		std::unique_ptr<boost::object_pool<T>> mPool;
+		unique_ptr<boost::object_pool<T>> mPool;
 	};
 }
 

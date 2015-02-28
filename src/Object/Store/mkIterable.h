@@ -62,7 +62,7 @@ namespace mk
 	{
 	public:
 		//virtual void vremoveobj(Object* object) = 0;
-		//virtual void vaddobj(std::unique_ptr<Object>) = 0;
+		//virtual void vaddobj(unique_ptr<Object>) = 0;
 	};
 }
 

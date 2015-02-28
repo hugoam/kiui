@@ -177,13 +177,13 @@ namespace mk
 	};
 
 	template <class T>
-	struct AsString<std::unique_ptr<T>, false, false>
+	struct AsString<unique_ptr<T>, false, false>
 	{
-		static inline void to(const std::unique_ptr<T>& val, string& str) { type_to_string(val.get(), str); }
-		static inline string to(const std::unique_ptr<T>& val) { string str; type_to_string(val.get(), str); return str; }
+		static inline void to(const unique_ptr<T>& val, string& str) { type_to_string(val.get(), str); }
+		static inline string to(const unique_ptr<T>& val) { string str; type_to_string(val.get(), str); return str; }
 
-		static inline void from(const string& str, std::unique_ptr<T>& vec) { UNUSED(str); UNUSED(vec); }
-		static inline std::unique_ptr<T> from(const string& str) { UNUSED(str); return std::unique_ptr<T>(); }
+		static inline void from(const string& str, unique_ptr<T>& vec) { UNUSED(str); UNUSED(vec); }
+		static inline unique_ptr<T> from(const string& str) { UNUSED(str); return unique_ptr<T>(); }
 	};
 
 	template <class T>

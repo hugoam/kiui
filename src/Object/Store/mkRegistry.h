@@ -20,21 +20,21 @@
 namespace mk
 {
 	template <class T>
-	class Registry : public StoreBase<Registry<T>, T, std::unique_ptr<T>>
+	class Registry : public StoreBase<Registry<T>, T, unique_ptr<T>>
 	{
 	public:
-		typedef std::vector<std::unique_ptr<T>> StoreContainer;
+		typedef std::vector<unique_ptr<T>> StoreContainer;
 
 	public:
 		Registry() {}
 		~Registry() {}
 
-		inline T* deref(const std::unique_ptr<T>& pointer) const { return pointer.get(); }
+		inline T* deref(const unique_ptr<T>& pointer) const { return pointer.get(); }
 
 		inline const StoreContainer& store() const { return mStore; }
 		inline StoreContainer& store() { return mStore; }
 
-		void add(std::unique_ptr<T> pt)
+		void add(unique_ptr<T> pt)
 		{
 			for(auto obs : mObservers)
 				obs->handleAdd(pt.get());
@@ -42,7 +42,7 @@ namespace mk
 			mStore.emplace_back(std::move(pt));
 		}
 
-		void insert(std::unique_ptr<T> pt, size_t index)
+		void insert(unique_ptr<T> pt, size_t index)
 		{
 			for(auto obs : mObservers)
 				obs->handleAdd(pt.get());
@@ -55,7 +55,7 @@ namespace mk
 			for(auto obs : mObservers)
 				obs->handleRemove(object);
 
-			mStore.erase(std::remove_if(mStore.begin(), mStore.end(), [object](const std::unique_ptr<T>& p) { return p.get() == object; }), mStore.end());
+			mStore.erase(std::remove_if(mStore.begin(), mStore.end(), [object](const unique_ptr<T>& p) { return p.get() == object; }), mStore.end());
 		}
 
 		void remove(size_t pos)
@@ -67,43 +67,43 @@ namespace mk
 			mStore.erase(mStore.begin() + pos);
 		}
 
-		std::unique_ptr<T> release(size_t pos)
+		unique_ptr<T> release(size_t pos)
 		{
-			std::unique_ptr<T> pointer = std::move(mStore[pos]);
+			unique_ptr<T> pointer = std::move(mStore[pos]);
 			mStore.erase(mStore.begin() + pos);
 			return pointer;
 		}
 
-		std::unique_ptr<T> release(T* object)
+		unique_ptr<T> release(T* object)
 		{
-			auto it = std::find_if(mStore.begin(), mStore.end(), [object](const std::unique_ptr<T>& p) { return p.get() == object; });
+			auto& it = std::find_if(mStore.begin(), mStore.end(), [object](const unique_ptr<T>& p) { return p.get() == object; });
 			return std::move(*it);
 		}
 
 		void move(size_t from, size_t to)
 		{
-			std::unique_ptr<T> ptr = std::move(mStore[from]);
+			unique_ptr<T> ptr = std::move(mStore[from]);
 			mStore.insert(mStore.begin() + to, std::move(ptr)); // emplace doesn't work, don't know why // orig is "it" here.
 			mStore.erase(from < to ? mStore.begin() + from : mStore.begin() + from + 1);
 		}
 
 		void transfer(T* object, Registry<T>* other)
 		{
-			auto& it = std::find_if(mStore.begin(), mStore.end(), [object](const std::unique_ptr<T>& p) { return p.get() == object; });
+			auto& it = std::find_if(mStore.begin(), mStore.end(), [object](const unique_ptr<T>& p) { return p.get() == object; });
 			other->add(std::move((*it)));
 			mStore.erase(it);
 		}
 
-		std::unique_ptr<T> pop()
+		unique_ptr<T> pop()
 		{
-			std::unique_ptr<T> object(std::move(mStore.back()));
+			unique_ptr<T> object(std::move(mStore.back()));
 			mStore.pop_back();
 			return object;
 		}
 
 		bool has(Object* object) const
 		{
-			return (std::find_if(mStore.begin(), mStore.end(), [object](const std::unique_ptr<T>& p) { return p.get() == object; }) != mStore.end());
+			return (std::find_if(mStore.begin(), mStore.end(), [object](const unique_ptr<T>& p) { return p.get() == object; }) != mStore.end());
 		}
 
 		bool empty() const { return (mStore.size() == 0); }

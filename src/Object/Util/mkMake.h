@@ -10,11 +10,16 @@
 
 namespace mk
 {
+#ifdef MK_STD_NO_MAKE_UNIQUE
 	template<class T, class... Types>
-	inline typename std::enable_if<!std::is_array<T>::value, std::unique_ptr<T>>::type make(Types&&... Args)
+	inline typename std::enable_if<!std::is_array<T>::value, unique_ptr<T>>::type make_unique(Types&&... Args)
 	{
-		return (std::unique_ptr<T>(new T(std::forward<Types>(Args)...)));
+		return (unique_ptr<T>(new T(std::forward<Types>(Args)...)));
 	}
+#endif
+
+	using std::make_unique;
+	using std::unique_ptr;
 }
 
 #endif // MK_MKUNIQUE_H_INCLUDED

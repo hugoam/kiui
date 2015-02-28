@@ -14,12 +14,12 @@ namespace mk
 	class Modular::Plug : public NonCopy
 	{
 	public:
-		Plug(std::unique_ptr<Part> p, Type* t) : part(std::move(p)), type(t) {}
+		Plug(unique_ptr<Part> p, Type* t) : part(std::move(p)), type(t) {}
 		Plug(Plug&& other) : part(std::move(other.part)), type(other.type) {}
 
 		Plug& operator=(Plug&& other) { part = std::move(other.part); type = other.type; return *this; }
 
-		std::unique_ptr<Part> part;
+		unique_ptr<Part> part;
 		Type* type;
 	};
 
@@ -49,7 +49,7 @@ namespace mk
 		return mParts[mProto->partIndex(type)];
 	}
 
-	void Modular::pushPlug(std::unique_ptr<Part> part, Type* type)
+	void Modular::pushPlug(unique_ptr<Part> part, Type* type)
 	{
 		mPlugs.emplace_back(std::move(part), type);
 	}

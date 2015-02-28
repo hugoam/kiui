@@ -7,7 +7,6 @@
 
 #if _MSC_VER
 #	pragma warning (disable : 4251) // members are private, so there's no risk them being accessed by the user
-#	pragma warning (disable : 4275) // @kludge because of Vector3 and Quaternion inheriting from statically linked LinearMath.lib
 #endif
 
 #endif // MK_PRAGMA_H_INCLUDED

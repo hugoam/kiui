@@ -29,7 +29,7 @@ namespace mk
 		bool hasPart(Type* type);
 		Part* part(Type* type);
 
-		void pushPlug(std::unique_ptr<Part> part, Type* type);
+		void pushPlug(unique_ptr<Part> part, Type* type);
 		void removePlug(Type* type);
 		void removePlug(void* plug);
 		Part* plug(Type* type);

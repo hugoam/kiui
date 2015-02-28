@@ -147,32 +147,41 @@ namespace mk
 	class Named : public T_Array
 	{
 	public:
+		typedef typename T_Array::T T;
+
+	public:
 		Named() : T_Array() {}
 
-		typename T_Array::T* findNamed(const string& name) { return find([name](typename T_Array::T* obj){ return obj->name() == name; }); }
+		T* findNamed(const string& name) { return find([name](T* obj){ return obj->name() == name; }); }
 
-		void removeNamed(const string& name) { remove(find([name](typename T_Array::T* obj){ return obj->name() == name; })); }
+		void removeNamed(const string& name) { remove(find([name](T* obj){ return obj->name() == name; })); }
 	};
 
 	template <class T_Array>
 	class TypeIndexed : public T_Array
 	{
 	public:
+		typedef typename T_Array::T T;
+
+	public:
 		TypeIndexed() : T_Array() {}
 
-		typename T_Array::T* findTyped(Type* type) { return find([type](typename T_Array::T* obj){ return obj->type() == type; }); }
+		T* findTyped(Type* type) { return find([type](T* obj){ return obj->type() == type; }); }
 
-		void removeTyped(Type* type) { remove(find([type](typename T_Array::T* obj){ return obj->type() == type; })); }
+		void removeTyped(Type* type) { remove(find([type](T* obj){ return obj->type() == type; })); }
 	};
 
 	template <class T_Array>
 	class Chained : public T_Array, public StoreObserver<typename T_Array::T>
 	{
 	public:
+		typedef typename T_Array::T T;
+
+	public:
 		Chained() : T_Array() {}
 
-		void handleAdd(typename T_Array::T* object) { add(object); }
-		void handleRemove(typename T_Array::T* object) { remove(object); }
+		void handleAdd(T* object) { add(object); }
+		void handleRemove(T* object) { remove(object); }
 	};
 }
 

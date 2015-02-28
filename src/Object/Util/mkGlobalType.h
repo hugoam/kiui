@@ -5,6 +5,8 @@
 #ifndef MK_GLOBALTYPE_H_INCLUDED
 #define MK_GLOBALTYPE_H_INCLUDED
 
+#include <Object/Util/mkMake.h>
+
 #include <memory>
 #include <vector>
 
@@ -36,7 +38,7 @@ namespace mk
 	public:
 		LazyGlobalInit() { LazyGlobal::sGlobals.push_back(this); }
 
-		void init() { GlobalType<T>::sInstance = std::make_unique<T>(); }
+		void init() { GlobalType<T>::sInstance = make_unique<T>(); }
 	};
 
 	template <class T>
@@ -44,12 +46,12 @@ namespace mk
 	{
 	public:
 		static T* me() { return sInstance.get(); }
-		static std::unique_ptr<T> sInstance;
+		static unique_ptr<T> sInstance;
 		static LazyGlobalInit<T> sInit;
 	};
 
 	template <class T>
-	std::unique_ptr<T> GlobalType<T>::sInstance;
+	unique_ptr<T> GlobalType<T>::sInstance;
 
 	template <class T>
 	LazyGlobalInit<T> GlobalType<T>::sInit;

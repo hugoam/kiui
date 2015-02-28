@@ -47,7 +47,9 @@ namespace mk
 namespace mk
 {
 	typedef std::string string;
-	typedef uintptr_t Id;
+	//using std::string;
+
+	typedef unsigned int Id;
 
 	class Modular;
 	class Proto;

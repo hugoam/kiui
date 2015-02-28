@@ -25,15 +25,14 @@ namespace mk
 				(*it)->setIndex(index++);
 		}
 
-		void checkIndexes()
+		bool checkIndexes()
 		{
 			size_t index = 0;
-			bool error = false;
 			for(auto& obj : mStore)
-				if((*it)->index() != index++)
-					error = true;
+				if(obj->index() != index++)
+					return false;
 
-			return !error;
+			return true;
 		}
 
 		void move(size_t from, size_t to)
@@ -42,16 +41,16 @@ namespace mk
 			reindex(from < to ? from : to);
 		}
 
-		void add(typename T_Array::R object)
+		void add(R object)
 		{
 			object->setIndex(mStore.size());
-			T_Array::add(std::forward<typename T_Array::R>(object));
+			T_Array::add(std::forward<R>(object));
 		}
 
-		void insert(typename T_Array::R object, size_t index)
+		void insert(R object, size_t index)
 		{
 			object->setIndex(index);
-			T_Array::insert(std::forward<typename T_Array::R>(object), index);
+			T_Array::insert(std::forward<R>(object), index);
 			reindex(index);
 		}
 

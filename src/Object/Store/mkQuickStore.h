@@ -23,7 +23,6 @@ namespace mk
 	class QuickStore : public StoreBase<QuickStore<T>, T, T*> // TObject<QuickStore>
 	{
 	public:
-		typedef T ObjectType;
 		typedef std::unordered_set<T*> StoreContainer;
 
 	public:

@@ -22,12 +22,12 @@ namespace mk
 	template <> inline Type* storetype<TypeObject>() { return Typed<TypeObject>::cls(); }
 	template <> inline Type* storetype<Object>() { return Typed<Object>::cls(); }
 
-	template <class T_Array, class T, class R>
-	class StoreBase : public Store<T>, public Stock, public Typed<T_Array, void, Stock>
+	template <class T_Array, class T_Element, class T_Ressource>
+	class StoreBase : public Store<T_Element>, public Stock, public Typed<T_Array, void, Stock>
 	{
 	public:
-		typedef T T;
-		typedef R R;
+		typedef T_Element T;
+		typedef T_Ressource R;
 
 	public:
 		StoreBase()
