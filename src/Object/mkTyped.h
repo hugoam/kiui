@@ -42,7 +42,7 @@ namespace mk
 	typename Type Typed<T, S, I>::sType = Type(typecls<I>());
 
 	template <class T>
-	T* upcast(Object* object)
+	T* upcast(TypeObject* object)
 	{
 		if(object->type()->upcast(Typed<T>::cls()))
 			return static_cast<T*>(object);
@@ -51,7 +51,7 @@ namespace mk
 	}
 
 	template <class T>
-	T* downcast(Object* object)
+	T* downcast(TypeObject* object)
 	{
 		if(object->type() == Typed<T>::cls())
 			return static_cast<T*>(object);
@@ -68,6 +68,7 @@ namespace mk
 	template <> inline Type* typecls<Id>() { return Typed<Id>::cls(); }
 	template <> inline Type* typecls<bool>() { return Typed<bool>::cls(); }
 	template <> inline Type* typecls<int>() { return Typed<int>::cls(); }
+	template <> inline Type* typecls<unsigned int>() { return Typed<unsigned int>::cls(); }
 	template <> inline Type* typecls<float>() { return Typed<float>::cls(); }
 	template <> inline Type* typecls<double>() { return Typed<double>::cls(); }
 	template <> inline Type* typecls<string>() { return Typed<string>::cls(); }
@@ -76,6 +77,7 @@ namespace mk
 	extern template class __declspec(dllimport) Typed<Id>;
 	extern template class __declspec(dllimport) Typed<bool>;
 	extern template class __declspec(dllimport) Typed<int>;
+	extern template class __declspec(dllimport) Typed<unsigned int>;
 	extern template class __declspec(dllimport) Typed<float>;
 	extern template class __declspec(dllimport) Typed<double>;
 	extern template class __declspec(dllimport) Typed<string>;
