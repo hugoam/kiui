@@ -105,37 +105,43 @@ namespace mk
 	class MK_UI_EXPORT InputInt : public Form
 	{
 	public:
-		InputInt(const string& label, int value); //, IntCallback callback);
+		InputInt(const string& label, int value, std::function<void(int)> callback = nullptr);
 	};
 
 	class MK_UI_EXPORT InputFloat : public Form
 	{
 	public:
-		InputFloat(const string& label, float value); //, FloatCallback callback);
+		InputFloat(const string& label, float value, std::function<void(float)> callback = nullptr);
 	};
 
 	class MK_UI_EXPORT InputBool : public Form
 	{
 	public:
-		InputBool(const string& label, bool value);
+		InputBool(const string& label, bool value, std::function<void(void)> on = nullptr, std::function<void(void)> off = nullptr);
 	};
 
 	class MK_UI_EXPORT InputText : public Form
 	{
 	public:
-		InputText(const string& label, const string& text);
+		InputText(const string& label, const string& text, std::function<void(string)> callback = nullptr, bool reverse = false);
+	};
+
+	class MK_UI_EXPORT InputDropdown : public Form
+	{
+	public:
+		InputDropdown(const string& label, StringVector choices, std::function<void(string)> callback = nullptr, bool reverse = false);
 	};
 	
 	class MK_UI_EXPORT SliderInt : public Form
 	{
 	public:
-		SliderInt(const string& label, Stat<int> value); //, IntCallback callback);
+		SliderInt(const string& label, Stat<int> value, std::function<void(int)> callback = nullptr);
 	};
 
 	class MK_UI_EXPORT SliderFloat : public Form
 	{
 	public:
-		SliderFloat(const string& label, Stat<float> value); //, FloatCallback callback);
+		SliderFloat(const string& label, Stat<float> value, std::function<void(float)> callback = nullptr);
 	};
 }
 

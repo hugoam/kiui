@@ -103,7 +103,7 @@ namespace mk
 	}
 
 	FIntStat::FIntStat(Lref& value, bool edit)
-		: FValue(value, "intstat", edit)
+		: FValue(value, "intstat")
 	{
 		mScheme.setMapper([this]() { return make<WIntSlider>(this); });
 	}
@@ -115,7 +115,7 @@ namespace mk
 	}
 
 	FFloatStat::FFloatStat(Lref& value, bool edit)
-		: FValue(value, "floatstat", edit)
+		: FValue(value, "floatstat")
 	{
 		mScheme.setMapper([this]() { return make<WFloatSlider>(this); });
 	}
@@ -152,42 +152,55 @@ namespace mk
 		mScheme.setMapper([this]() { return make<WString>(this); });
 	}
 
-	InputInt::InputInt(const string& label, int value)
+	InputInt::InputInt(const string& label, int value, std::function<void(int)> callback)
 		: Form("intinput")
 	{
 		this->makeappend<FInt>(value);
 		this->makeappend<Label>("", label);
 	}
 
-	InputFloat::InputFloat(const string& label, float value)
+	InputFloat::InputFloat(const string& label, float value, std::function<void(float)> callback)
 		: Form("floatinput")
 	{
 		this->makeappend<FFloat>(value);
 		this->makeappend<Label>("", label);
 	}
 
-	InputBool::InputBool(const string& label, bool value)
+	InputBool::InputBool(const string& label, bool value, std::function<void()> on, std::function<void()> off)
 		: Form("boolinput")
 	{
 		this->makeappend<FBool>(value);
 		this->makeappend<Label>("", label);
 	}
 
-	InputText::InputText(const string& label, const string& text)
+	InputText::InputText(const string& label, const string& text, std::function<void(string)> callback, bool reverse)
 		: Form("textinput")
 	{
 		this->makeappend<FString>(text);
 		this->makeappend<Label>("", label);
+
+		if(reverse)
+			this->move(0, 1);
 	}
 
-	SliderInt::SliderInt(const string& label, Stat<int> value)
+	InputDropdown::InputDropdown(const string& label, StringVector choices, std::function<void(string)> callback, bool reverse)
+		: Form("dropdowninput")
+	{
+		this->makeappend<Dropdown>(callback, choices);
+		this->makeappend<Label>("", label);
+
+		if(reverse)
+			this->move(0, 1);
+	}
+
+	SliderInt::SliderInt(const string& label, Stat<int> value, std::function<void(int)> callback)
 		: Form("sliderint")
 	{
 		this->makeappend<FIntStat>(value),
 		this->makeappend<Label>("", label);
 	}
 
-	SliderFloat::SliderFloat(const string& label, Stat<float> value)
+	SliderFloat::SliderFloat(const string& label, Stat<float> value, std::function<void(float)> callback)
 		: Form("sliderfloat")
 	{
 		this->makeappend<FFloatStat>(value);
@@ -197,7 +210,7 @@ namespace mk
 	//std::unique_ptr<Form> dispatchStoreForm(Form* member, Lref& lref, Stock* store) { return std::make_unique<FStore>(member, member->as<FMember>()->dmember()); }
 
 	template <class T_Val, class T_Form>
-	Form* dispatchValueForm(Form* parent, Lref& lref, T_Val val) { UNUSED(val); return parent->makeappend<T_Form>(lref); }
+	Form* dispatchValueForm(Form* parent, Lref& lref, T_Val val) { return parent->makeappend<T_Form>(lref); }
 
 	//template class Dispatch<ObjectForm, Stock*, dispatchStoreForm>;
 
