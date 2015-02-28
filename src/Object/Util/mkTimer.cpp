@@ -67,7 +67,7 @@ namespace mk
 
 	size_t Clock::readTick()
 	{
-		return this->read() / TICK_INTERVAL;
+		return size_t(this->read() / TICK_INTERVAL);
 	}
 
 	size_t Clock::stepTick()

@@ -11,6 +11,7 @@ namespace mk
 	{
 	public:
 		reverse_adapter(T& c) : c(c) { }
+		reverse_adapter& operator=(const reverse_adapter&) = delete;
 		typename T::const_reverse_iterator begin() { return c.rbegin(); }
 		typename T::const_reverse_iterator end() { return c.rend(); }
 	private:

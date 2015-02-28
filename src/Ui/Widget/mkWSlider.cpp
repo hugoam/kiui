@@ -138,7 +138,7 @@ namespace mk
 
 	void WIntSlider::updateSlider()
 	{
-		mSlider->resetMetrics(mStat->ref<Stat<int>>().min(), mStat->ref<Stat<int>>().max(), mStat->ref<Stat<int>>().value(), 1.f);
+		mSlider->resetMetrics(float(mStat->ref<Stat<int>>().min()), float(mStat->ref<Stat<int>>().max()), float(mStat->ref<Stat<int>>().value()), 1.f);
 		mSlider->updateKnob();
 		mDisplay->setLabel(mStat->getString());
 	}

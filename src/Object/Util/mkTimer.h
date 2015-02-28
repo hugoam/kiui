@@ -9,9 +9,7 @@
 #include <ctime>
 #include <map>
 
-//#include <Object/String/mkStringConvert.h>
-
-#define TICK_INTERVAL 0.02f
+#define TICK_INTERVAL 0.02
 
 namespace mk
 {
