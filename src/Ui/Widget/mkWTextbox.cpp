@@ -5,6 +5,8 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Widget/mkWTextbox.h>
 
+#include <Object/String/mkStringConvert.h>
+
 #include <Object/mkRef.h>
 
 #include <Ui/Frame/mkFrame.h>
@@ -21,6 +23,12 @@ namespace mk
 	WTextbox::WTextbox(Form* form, Lref& value)
 		: Widget("", form)
 		, mValue(value)
+	{}
+
+	WTextbox::WTextbox(Form* form, string text)
+		: Widget("", form)
+		, mLref(lref(text))
+		, mValue(mLref)
 	{}
 
 	bool WTextbox::leftClick(float xPos, float yPos)

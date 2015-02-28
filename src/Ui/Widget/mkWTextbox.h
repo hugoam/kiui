@@ -8,6 +8,7 @@
 /* mk */
 #include <Ui/mkUiForward.h>
 #include <Ui/Widget/mkWidget.h>
+#include <Object/mkRef.h>
 
 namespace mk
 {
@@ -20,6 +21,7 @@ namespace mk
 		bool leftClick(float xPos, float yPos);
 
 	protected:
+		Lref mLref;
 		Lref& mValue;
 		string mText;
 	};
