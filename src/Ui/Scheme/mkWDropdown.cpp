@@ -35,7 +35,7 @@ namespace mk
 	void WDropdown::build()
 	{
 		Sheet::build();
-		mHeader = this->makeappend<Widget>("dropdownheader");
+		mHeader = this->makeappend<Sheet>("dropdownheader");
 		mDropbox = this->makeappend<WDropdownBox>();
 		mDropButton = this->makeappend<WButton>("", "dropdownbutton", std::bind(&WDropdown::dropdown, this));
 
@@ -48,7 +48,7 @@ namespace mk
 		if(mSelected == nullptr)
 		{
 			mSelected = button;
-			mHeader->reset(widget->clas());
+			mHeader->makeappend<Widget>("", widget->form());
 		}
 
 		return button;
@@ -92,7 +92,8 @@ namespace mk
 
 		mSelected = button;
 		
-		mHeader->reset(button->content()->form());
+		mHeader->clear();
+		mHeader->makeappend<Widget>("", button->content()->form());
 
 		mOnSelected(button->content());
 	}
@@ -108,13 +109,14 @@ namespace mk
 		return true;
 	}
 
-	Dropdown::Dropdown(Trigger onSelected)
+	Dropdown::Dropdown(Trigger onSelected, std::function<void(string)> onSelectedString)
 		: Form("dropdown", "", [this](){ return std::make_unique<WDropdown>(std::bind(&Dropdown::onSelected, this, _1)); })
 		, mOnSelected(onSelected)
+		, mOnSelectedString(onSelectedString)
 	{}
 
-	Dropdown::Dropdown(Trigger onSelected, StringVector choices)
-		: Dropdown(onSelected)
+	Dropdown::Dropdown(std::function<void(string)> onSelected, StringVector choices)
+		: Dropdown(nullptr, onSelected)
 	{
 		for(string& choice : choices)
 			this->makeappend<Label>("", choice);
@@ -122,6 +124,9 @@ namespace mk
 
 	void Dropdown::onSelected(Widget* widget)
 	{
-		mOnSelected(widget->form());
+		if(mOnSelected)
+			mOnSelected(widget->form());
+		else if(mOnSelectedString)
+			mOnSelectedString(string(widget->form()->label()));
 	}
 }

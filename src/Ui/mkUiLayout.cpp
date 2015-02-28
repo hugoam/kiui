@@ -209,11 +209,11 @@ namespace mk
 		//skinner->skin("bgrey")->mBorderColour = Colour(1.f, 1.f, 1.f);
 		//skinner->skin("bgrey")->mBorderWidth = 1.f;
 
-		skinner->add("dropdownbutton", Colour(1.f, 1.f, 1.f, 0.f));
+		skinner->add("dropdownbutton", "midgrey");
 		//skinner->skin("dropdownbutton")->mImageColour = Colour(0.6f, 0.6f, 0.6f);
 		skinner->skin("dropdownbutton")->mImage = "arrow_down_15.png";
 
-		skinner->add("dropdownbutton.hovered", "dropdownbutton");
+		skinner->add("dropdownbutton.hovered", "lightgrey");
 		skinner->skin("dropdownbutton.hovered")->mBackgroundColour = Colour(1.f, 0.f, 0.f);
 		skinner->skin("dropdownbutton")->mSubInks[HOVERED] = skinner->skin("dropdownbutton.hovered");
 
@@ -308,7 +308,7 @@ namespace mk
 
 		skinner->add("dropdownheader", "empty");
 		
-		skinner->add("dropbutton", "white"); // was "empty", not possible at the moment
+		skinner->add("dropbutton", "midgrey"); // was "empty", not possible at the moment
 		skinner->skin("dropbutton")->mSubInks[ACTIVATED] = skinner->skin("red");
 		skinner->skin("dropbutton")->mSubInks[HOVERED] = skinner->skin("lightgrey");
 
@@ -338,8 +338,8 @@ namespace mk
 		skinner->add("windowheader", "lightgrey");
 
 		skinner->add("radioswitch", "white");
-		skinner->add("dropdown", "white");
-		skinner->add("dropdownbox", "white");
+
+
 
 		skinner->add("tab", "red");
 		skinner->add("headtabs", "black");
@@ -356,7 +356,11 @@ namespace mk
 		skinner->skin("typein.active")->mCornerRadius = 3.f;
 		skinner->skin("typein")->mSubInks[ACTIVATED] = skinner->skin("typein.active");
 
-		skinner->add("bool", "typein");
+		skinner->add("dropdown", "typein");
+		skinner->add("dropdownbox", "lightgrey");
+
+		skinner->add("bool", "midgrey");
+		skinner->skin("bool")->mSubInks[ACTIVATED] = skinner->skin("lightgrey");
 
 		//skinner->add(StringVector({ "int", "float", "string", "bool" }), "typein");
 
@@ -440,11 +444,14 @@ namespace mk
 
 		layout->add(StringVector({ "controls", "radioswitch", "radiobutton", "dropdown", "dropdownheader", "dropbutton" }), "wrap_inline");
 
-		layout->add(StringVector({ "columnheader", "dropdown", "typein", "value", "string", "int", "float", "intstat", "floatstat", "xslider", "yslider", "sliderint", "sliderfloat", "intinput", "floatinput", "boolinput", "textinput", "expandboxheader", "expandbox", "expandboxcontainer", "windowheader", "table", "tablehead", "headtabs", "scrollbar" }), "div");
+		layout->add(StringVector({ "columnheader", "dropdown", "dropdownheader", "typein", "value", "string", "int", "float", "intstat", "floatstat", "xslider", "yslider", "sliderint", "sliderfloat", "dropdowninput", "intinput", "floatinput", "boolinput", "textinput", "expandboxheader", "expandbox", "expandboxcontainer", "windowheader", "table", "tablehead", "headtabs", "scrollbar" }), "div");
 
 		layout->add(StringVector({ "root" }), "layer");
 
 		layout->add(StringVector({ "dropdownbox", "tooltip", "context" }), "shrinkwindow");
+
+		layout->style("dropdownbox")->d_sizing[DIM_X] = EXPAND;
+		layout->style("dropdownbox")->d_span[DIM_X] = 1.f;
 
 		layout->style("tablehead")->d_opacity = _OPAQUE;
 		layout->style("tablehead")->d_spacing[DIM_X] = 1.f;
@@ -510,8 +517,11 @@ namespace mk
 
 		layout->style("closebutton")->d_size = DimFloat(15.f, 15.f);
 		layout->style("scrollbutton")->d_size = DimFloat(15.f, 15.f);
-		layout->style("dropdownbutton")->d_size = DimFloat(15.f, 15.f);
 		layout->style("expandbutton")->d_size = DimFloat(15.f, 15.f);
+
+		layout->style("dropdownbutton")->d_span[DIM_Y] = 1.f;
+		layout->style("dropdownbutton")->d_sizing[DIM_Y] = EXPAND;
+		layout->style("dropdownbutton")->d_size = DimFloat(15.f, 0.f);
 
 		layout->style("gridline")->d_layoutDim = DIM_X;
 

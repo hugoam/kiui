@@ -10,6 +10,8 @@
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Form/mkForm.h>
 
+#include <functional>
+
 namespace mk
 {
 	class MK_UI_EXPORT WDropdownBox : public Sheet
@@ -41,7 +43,7 @@ namespace mk
 
 	protected:
 		Trigger mOnSelected;
-		Widget* mHeader;
+		Sheet* mHeader;
 		WButton* mDropButton;
 		WDropdownBox* mDropbox;
 		WWrapButton* mSelected;
@@ -51,13 +53,14 @@ namespace mk
 	class MK_UI_EXPORT Dropdown : public Form
 	{
 	public:
-		Dropdown(Trigger onSelected);
-		Dropdown(Trigger onSelected, StringVector choices);
+		Dropdown(Trigger onSelected, std::function<void(string)> onSelectedString = nullptr);
+		Dropdown(std::function<void(string)> onSelected, StringVector choices);
 
 		void onSelected(Widget* widget);
 
 	protected:
 		Trigger mOnSelected;
+		std::function<void(string)> mOnSelectedString;
 	};
 }
 
