@@ -28,6 +28,12 @@ namespace mk
 		Label(const string& cls, const string& label);
 	};
 
+	class MK_UI_EXPORT Textbox : public Form
+	{
+	public:
+		Textbox(const string& cls, const string& text);
+	};
+
 	class MK_UI_EXPORT Image : public Form
 	{
 	public:

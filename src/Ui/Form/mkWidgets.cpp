@@ -5,6 +5,8 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Form/mkWidgets.h>
 
+#include <Ui/Widget/mkWTextbox.h>
+
 #include <Object/String/mkStringConvert.h>
 #include <Object/mkStem.h>
 
@@ -14,6 +16,10 @@ namespace mk
 {
 	Label::Label(const string& cls, const string& label)
 		: Form(cls + " label", label)
+	{}
+
+	Textbox::Textbox(const string& cls, const string& text)
+		: Form(cls + " text", text, [this, text](){ return make<WTextbox>(this, text); })
 	{}
 
 	Image::Image(const string& cls, const string& image)
