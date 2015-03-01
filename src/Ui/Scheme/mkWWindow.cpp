@@ -25,10 +25,10 @@ namespace mk
 {
 	WWindow::WWindow(Trigger onClose, string title, bool closable, bool dockable, WDocksection* dock, string clas)
 		: Sheet(dock ? clas + "window dockwindow" : clas + "window window")
-		, mContent(nullptr)
 		, mName(title)
 		, mClosable(closable)
 		, mDockable(dockable)
+		, mContent(nullptr)
 		, mOnClose(onClose)
 		, mDock(dock)
 	{}

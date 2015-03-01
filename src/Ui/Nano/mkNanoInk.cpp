@@ -25,10 +25,10 @@ namespace mk
 
 	NanoInk::NanoInk(Frame* frame, NanoLayer* layer)
 		: Inkbox(frame)
-		, mLayer(layer)
-		, mVisible(frame->visible())
 		, mCtx(layer->target()->ctx())
+		, mLayer(layer)
 		, mImage(0)
+		, mVisible(frame->visible())
 	{}
 
 	NanoInk::~NanoInk()

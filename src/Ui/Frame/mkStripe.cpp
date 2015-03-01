@@ -21,11 +21,11 @@ namespace mk
 		: Frame(parent, widget, clas)
 		, d_depth(d_style->d_layoutDim == DIM_X ? DIM_Y : DIM_X)
 		, d_length(d_style->d_layoutDim)
+		, d_cursor(0.f)
 		, d_sequence()
 		, d_sequenceLength(0)
 		, d_maxDepth(0)
 		, d_relayout(true)
-		, d_cursor(0.f)
 		, d_weightTable(d_style->d_weightTable)
 	{
 		d_frameType = STRIPE;
@@ -185,8 +185,7 @@ namespace mk
 		for(Frame* frame : d_contents)
 			if(frame->dexpand(d_length))
 				if(frame->flow())
-					frame->setSizeDim(d_length, freeSpace * frame->dspan(d_length) - (frame == d_sequence.back() ? 0.f : d_style->d_spacing[d_length]));
-					// @note not optimal since we remove the spacing from the first item, but to account for spacing evenly we should keep track of the number of expanding elements
+					frame->setSizeDim(d_length, freeSpace * frame->dspan(d_length) - (frame == d_sequence.back() ? 0.f : d_style->d_spacing[d_length])); // @note not optimal since we remove the spacing from the first item, but to account for spacing evenly we should keep track of the number of expanding elements
 				else
 					frame->setSizeDim(d_length, dspace(d_length));
 	}

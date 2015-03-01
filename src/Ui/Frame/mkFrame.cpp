@@ -22,11 +22,11 @@ namespace mk
 {
 	Frame::Frame(Stripe* parent, Widget* widget, string clas, size_t zorder)
 		: Uibox(widget->elementStyle(clas))
-		, d_parent(parent)
 		, d_widget(widget)
+		, d_parent(parent)
 		, d_dirty(DIRTY_SKIN)
-		, d_visible(!parent || parent->visible())
 		, d_hidden(false)
+		, d_visible(!parent || parent->visible())
 		, d_clipPos(0.f, 0.f)
 		, d_clipSize(0.f, 0.f)
 		, d_skin(widget->elementSkin(clas))
@@ -149,6 +149,8 @@ namespace mk
 			this->updatePosition();
 			this->clip();
 			d_inkbox->updateFrame();
+		case CLEAN:
+			break;
 		};
 
 		d_dirty = CLEAN;

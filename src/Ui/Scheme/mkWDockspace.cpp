@@ -105,8 +105,8 @@ namespace mk
 
 	WDockline::WDockline(WDockspace* dockspace, WDockline* dockline, Dimension dim, size_t index)
 		: GridSheet(dim, dim == DIM_X ? "xdockline" : "ydockline")
-		, mDockline(dockline)
 		, mDockspace(dockspace)
+		, mDockline(dockline)
 		, mIndex(index)
 	{
 		mType = cls();

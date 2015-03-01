@@ -31,11 +31,11 @@ namespace mk
 		, mFullIndex(concatIndex())
 		, mCls(cls)
 		, mLabel(label)
-		, mDestroy(false)
-		, mScheme(this, containerMapper, elementMapper)
-		, mWidget(nullptr)
 		, mLastTick(0)
 		, mUpdated(0)
+		, mScheme(this, containerMapper, elementMapper)
+		, mWidget(nullptr)
+		, mDestroy(false)
 	{}
 
 	Form::~Form()

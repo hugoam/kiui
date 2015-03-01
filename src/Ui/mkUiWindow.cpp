@@ -35,14 +35,14 @@ namespace mk
 	std::map<string, std::function<unique_ptr<Widget>(Form*)>> UiWindow::sDispatch;
 
 	UiWindow::UiWindow(User* user)
-		: mShutdownRequested(false)
+		: mLayout(make_unique<UiLayout>())
+		, mSkinner(make_unique<UiSkinner>()) 
 		, mController(this)
+		, mDragging(nullptr)
 		, mLeftPressed(false)
 		, mShiftPressed(false)
 		, mCtrlPressed(false)
-		, mDragging(false)
-		, mSkinner(make_unique<UiSkinner>())
-		, mLayout(make_unique<UiLayout>())
+		, mShutdownRequested(false)
 		, mUser(user)
 	{
 		setupUiLayout(mSkinner.get(), mLayout.get());
