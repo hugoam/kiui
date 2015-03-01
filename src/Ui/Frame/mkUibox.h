@@ -18,16 +18,16 @@
 
 namespace mk
 {
-	enum _I_ Pivot : unsigned int
-	{
-		FORWARD = 0,
-		REVERSE = 1
-	};
-
 	enum _I_ Dimension : unsigned int
 	{
 		DIM_X = 0,
 		DIM_Y = 1
+	};
+
+	enum _I_ Pivot : unsigned int
+	{
+		FORWARD = 0,
+		REVERSE = 1
 	};
 
 	enum _I_ FrameType : unsigned int
@@ -93,7 +93,61 @@ namespace mk
 		_A_ _M_ float y() { return d_values[1]; }
 
 		void setX(float x) { d_values[0] = x; }
-		void setY(float y) { d_values[0] = y; }
+		void setY(float y) { d_values[1] = y; }
+	};
+
+	class _I_ ImageSkin : public Struct, public Typed < ImageSkin >
+	{
+	public:
+		ImageSkin(string tl, string tr, string br, string bl, string t, string r, string b, string l, string fill)
+			: d_topLeft(tl), d_topRight(tr), d_bottomRight(br), d_bottomLeft(bl)
+			, d_top(t), d_right(r), d_bottom(b), d_left(l)
+			, d_fill(fill)
+		{}
+
+		ImageSkin()
+		{}
+
+		_A_ _M_ string d_topLeft;
+		_A_ _M_ string d_topRight;
+		_A_ _M_ string d_bottomRight;
+		_A_ _M_ string d_bottomLeft;
+
+		_A_ _M_ string d_top;
+		_A_ _M_ string d_right;
+		_A_ _M_ string d_bottom;
+		_A_ _M_ string d_left;
+
+		_A_ _M_ string d_fill;
+	};
+
+	class _I_ BoxFloat : public Struct, public Typed<BoxFloat>
+	{
+	public:
+		_C_ BoxFloat(float x, float y, float z, float w) : d_values({ x, y, z, w }), d_uniform(false), d_null(false) {}
+		BoxFloat(float uniform) : d_values({ uniform, uniform, uniform, uniform }), d_uniform(true), d_null(false) {}
+		BoxFloat() : d_values({ 0.f, 0.f, 0.f, 0.f }), d_uniform(true), d_null(true) {}
+
+		float operator [](size_t i) const { return d_values[i]; }
+		float& operator [](size_t i) { return d_values[i]; }
+
+		_A_ _M_ float x() { return d_values[0]; }
+		_A_ _M_ float y() { return d_values[1]; }
+		_A_ _M_ float z() { return d_values[2]; }
+		_A_ _M_ float w() { return d_values[3]; }
+
+		bool uniform() { return d_uniform; }
+		bool null() { return d_null; }
+
+		void setX(float x) { d_values[0] = x; }
+		void setY(float y) { d_values[1] = y; }
+		void setZ(float z) { d_values[2] = z; }
+		void setW(float w) { d_values[3] = w; }
+
+	protected:
+		std::array<float, 4> d_values;
+		bool d_uniform;
+		bool d_null;
 	};
 
 	class _I_ DimSizing : public Struct, public Dim<Sizing>, public Typed<DimSizing>
@@ -126,7 +180,7 @@ namespace mk
 	{
 	public:
 		LayoutStyle(const string& name, Flow flow, BoxLayer layer, Opacity opacity, bool div, DimSizing sizing = DimSizing(SHRINK, SHRINK), DimFloat span = DimFloat(0.f, 0.f), Dimension layoutDim = DIM_X, Overflow overflow = CLIP)
-			: d_name(name), d_flow(flow), d_layer(layer), d_opacity(opacity), d_div(div), d_layoutDim(layoutDim), d_overflow(overflow), d_span(span), d_size(0.f, 0.f), d_frontpadding(0.f, 0.f), d_backpadding(0.f, 0.f), d_margin(0.f, 0.f), d_spacing(0.f, 0.f), d_pivot(FORWARD, FORWARD), d_updated(0)
+			: d_name(name), d_flow(flow), d_layer(layer), d_opacity(opacity), d_div(div), d_layoutDim(layoutDim), d_overflow(overflow), d_span(span), d_size(0.f, 0.f), d_padding(0.f, 0.f, 0.f, 0.f), d_margin(0.f, 0.f), d_spacing(0.f, 0.f), d_pivot(FORWARD, FORWARD), d_updated(0)
 		{}
 
 		LayoutStyle()
@@ -147,8 +201,7 @@ namespace mk
 		_A_ _M_ DimSizing d_sizing;
 		_A_ _M_ DimFloat d_span;
 		_A_ _M_ DimFloat d_size;
-		_A_ _M_ DimFloat d_frontpadding;
-		_A_ _M_ DimFloat d_backpadding;
+		_A_ _M_ BoxFloat d_padding;
 		_A_ _M_ DimFloat d_margin;
 		_A_ _M_ DimFloat d_spacing;
 		_A_ _M_ DimPivot d_pivot;

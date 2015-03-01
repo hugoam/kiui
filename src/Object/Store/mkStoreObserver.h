@@ -45,9 +45,7 @@ namespace mk
 		StoreObserver<Object>* mObserver;
 	};
 
-#ifndef OBJECT_EXPORT
-	template class __declspec(dllimport) StoreObserver<Object>;
-#endif
+	template class MK_OBJECT_EXPORT StoreObserver<Object>;
 }
 
 #endif // MK_STOREOBSERVER_H_INCLUDED

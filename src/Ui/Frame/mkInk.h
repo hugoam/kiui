@@ -62,11 +62,12 @@ namespace mk
 		_A_ _M_ Colour mBorderColour;
 		_A_ _M_ Colour mImageColour;
 		_A_ _M_ Colour mTextColour;
-		_A_ _M_ float mBorderWidth;
-		_A_ _M_ float mCornerRadius;
+		_A_ _M_ BoxFloat mBorderWidth;
+		_A_ _M_ BoxFloat mCornerRadius;
 		_A_ _M_ DimFloat mMargin;
 		_A_ _M_ DimFloat mPadding;
 		_A_ _M_ string mImage;
+		_A_ _M_ ImageSkin mImageSkin;
 
 		std::map<WidgetState, InkStyle*> mSubInks;
 	};

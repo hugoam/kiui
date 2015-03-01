@@ -10,6 +10,7 @@
 #include <Object/Store/mkRegistry.h>
 #include <Object/Store/mkArray.h>
 #include <Object/Util/mkColour.h>
+#include <Object/String/mkString.h>
 
 /* standard */
 #include <map>

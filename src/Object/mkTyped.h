@@ -65,14 +65,14 @@ namespace mk
 	template <> inline Type* typecls<string>() { return Typed<string>::cls(); }
 
 #ifndef OBJECT_EXPORT
-	extern template class __declspec(dllimport) Typed<bool>;
-	extern template class __declspec(dllimport) Typed<int>;
-	extern template class __declspec(dllimport) Typed<unsigned int>;
-	extern template class __declspec(dllimport) Typed<float>;
-	extern template class __declspec(dllimport) Typed<double>;
-	extern template class __declspec(dllimport) Typed<string>;
+	extern template class MK_OBJECT_EXPORT Typed<bool>;
+	extern template class MK_OBJECT_EXPORT Typed<int>;
+	extern template class MK_OBJECT_EXPORT Typed<unsigned int>;
+	extern template class MK_OBJECT_EXPORT Typed<float>;
+	extern template class MK_OBJECT_EXPORT Typed<double>;
+	extern template class MK_OBJECT_EXPORT Typed<string>;
 
-	extern template class __declspec(dllimport) Typed<Array<Object>>;
+	extern template class MK_OBJECT_EXPORT Typed<Array<Object>>;
 #endif
 }
 

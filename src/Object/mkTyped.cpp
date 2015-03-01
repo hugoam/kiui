@@ -10,13 +10,13 @@
 
 namespace mk
 {
-	template class __declspec(dllexport) Typed<bool>;
-	template class __declspec(dllexport) Typed<int>;
-	template class __declspec(dllexport) Typed<unsigned int>;
-	template class __declspec(dllexport) Typed<float>;
-	template class __declspec(dllexport) Typed<double>;
-	template class __declspec(dllexport) Typed<string>;
+	template class MK_OBJECT_EXPORT Typed<bool>;
+	template class MK_OBJECT_EXPORT Typed<int>;
+	template class MK_OBJECT_EXPORT Typed<unsigned int>;
+	template class MK_OBJECT_EXPORT Typed<float>;
+	template class MK_OBJECT_EXPORT Typed<double>;
+	template class MK_OBJECT_EXPORT Typed<string>;
 
-	template class __declspec(dllexport) Typed<Array<Object>>;
-	template class __declspec(dllexport) StoreObserver<Object>;
+	template class MK_OBJECT_EXPORT Typed<Array<Object>>;
+	template class MK_OBJECT_EXPORT StoreObserver<Object>;
 }

@@ -21,14 +21,14 @@ namespace mk
 
 		void reindex(size_t index)
 		{
-			for(auto it = mStore.begin() + index; it != mStore.end(); ++it)
-				(*it)->setIndex(index++);
+			for(auto& obj : this->mStore)
+				obj->setIndex(index++);
 		}
 
 		bool checkIndexes()
 		{
 			size_t index = 0;
-			for(auto& obj : mStore)
+			for(auto& obj : this->mStore)
 				if(obj->index() != index++)
 					return false;
 
@@ -43,7 +43,7 @@ namespace mk
 
 		void add(R object)
 		{
-			object->setIndex(mStore.size());
+			object->setIndex(this->mStore.size());
 			T_Array::add(std::forward<R>(object));
 		}
 
@@ -76,8 +76,8 @@ namespace mk
 
 		void swap(size_t from, size_t to)
 		{
-			auto fromit = mStore.begin() + from;
-			auto toit = mStore.begin() + to;
+			auto fromit = this->mStore.begin() + from;
+			auto toit = this->mStore.begin() + to;
 
 			(*toit).swap(*fromit);
 

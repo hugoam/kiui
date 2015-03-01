@@ -96,12 +96,12 @@ namespace mk
 
 	void WInt::plus()
 	{
-		mDisplay->value()->assign<int>(mDisplay->value()->get<int>() + 1);
+		mDisplay->value()->ref<int>() = mDisplay->value()->get<int>() + 1;
 	}
 
 	void WInt::minus()
 	{
-		mDisplay->value()->assign<int>(mDisplay->value()->get<int>() - 1);
+		mDisplay->value()->ref<int>() = mDisplay->value()->get<int>() - 1;
 	}
 
 	WFloat::WFloat(Form* form)
@@ -119,12 +119,12 @@ namespace mk
 
 	void WFloat::plus()
 	{
-		mDisplay->value()->assign<float>(mDisplay->value()->get<float>() + 0.1f);
+		mDisplay->value()->ref<float>() = mDisplay->value()->get<float>() + 0.1f;
 	}
 
 	void WFloat::minus()
 	{
-		mDisplay->value()->assign<float>(mDisplay->value()->get<float>() - 0.1f);
+		mDisplay->value()->ref<float>() = mDisplay->value()->get<float>() - 0.1f;
 	}
 
 	WBool::WBool(Form* form)

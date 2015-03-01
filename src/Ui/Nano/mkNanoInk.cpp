@@ -51,29 +51,34 @@ namespace mk
 
 		//nvgSave(mCtx);
 
-		float left = floor(mFrame->dabsolute(DIM_X) + mFrame->dclippos(DIM_X) + mFrame->inkstyle()->mMargin[DIM_X]);
-		float top = floor(mFrame->dabsolute(DIM_Y) + mFrame->dclippos(DIM_Y) + mFrame->inkstyle()->mMargin[DIM_Y]);
-		float pleft = left + mFrame->inkstyle()->mPadding[DIM_X];
-		float ptop = top + mFrame->inkstyle()->mPadding[DIM_Y];
+		float left = floor(mFrame->dabsolute(DIM_X) + mFrame->inkstyle()->mMargin[DIM_X]);
+		float top = floor(mFrame->dabsolute(DIM_Y) + mFrame->inkstyle()->mMargin[DIM_Y]);
 
 		float width = floor(mFrame->dclipsize(DIM_X) - mFrame->inkstyle()->mMargin[DIM_X] * 2.f);
 		float height = floor(mFrame->dclipsize(DIM_Y) - mFrame->inkstyle()->mMargin[DIM_Y] * 2.f);
+
+		float pleft = left + mFrame->inkstyle()->mPadding[DIM_X];
+		float ptop = top + mFrame->inkstyle()->mPadding[DIM_Y];
 		float pwidth = width - 2.f * mFrame->inkstyle()->mPadding[DIM_X];
 		float pheight = height - 2.f * mFrame->inkstyle()->mPadding[DIM_Y];
+
+		float clipleft = left + mFrame->dclippos(DIM_X);
+		float cliptop = top + mFrame->dclippos(DIM_Y);
 
 		//std::cerr << "ink :: draw " << mFrame->style()->name() << " at " << left << " , " << top << " size " << width << " , " << height << std::endl;
 
 		// Rect
 
 		if(mFrame->dclip(DIM_X) || mFrame->dclip(DIM_Y))
-			nvgScissor(mCtx, left, top, width, height);
+			nvgScissor(mCtx, clipleft, cliptop, width, height);
 
 		nvgBeginPath(mCtx);
 
-		if(mFrame->inkstyle()->mCornerRadius)
-			nvgRoundedRect(mCtx, left, top, width, height, mFrame->inkstyle()->mCornerRadius);
-		else
+		if(mFrame->inkstyle()->mCornerRadius.null())
 			nvgRect(mCtx, left, top, width, height);
+		else
+			nvgRoundedRect4(mCtx, left, top, width, height, mFrame->inkstyle()->mCornerRadius.x(), mFrame->inkstyle()->mCornerRadius.y(), mFrame->inkstyle()->mCornerRadius.z(), mFrame->inkstyle()->mCornerRadius.w());
+			//nvgRoundedRect(mCtx, left, top, width, height, mFrame->inkstyle()->mCornerRadius);
 
 		if(mFrame->inkstyle()->mBackgroundColour.a() != 0.f)
 		{
@@ -81,9 +86,9 @@ namespace mk
 			nvgFill(mCtx);
 		}
 		
-		if(mFrame->inkstyle()->mBorderWidth > 0.f)
+		if(mFrame->inkstyle()->mBorderWidth.x() > 0.f)
 		{
-			nvgStrokeWidth(mCtx, mFrame->inkstyle()->mBorderWidth / 2.f);
+			nvgStrokeWidth(mCtx, mFrame->inkstyle()->mBorderWidth.x() / 2.f);
 			nvgStrokeColor(mCtx, nvgColour(mFrame->inkstyle()->mBorderColour));
 			nvgStroke(mCtx);
 		}

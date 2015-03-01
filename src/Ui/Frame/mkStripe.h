@@ -79,7 +79,7 @@ namespace mk
 
 		void distributeWeights();
 
-		inline float dspace(Dimension dim) { return d_size[dim] - d_style->d_frontpadding[dim] - d_style->d_backpadding[dim]; }
+		inline float dspace(Dimension dim) { return d_size[dim] - d_style->d_padding[dim] - d_style->d_padding[dim+2]; }
 		inline float dpivotposition(Dimension dim, Frame* frame) { return d_style->d_pivot[dim] ? dsize(dim) - frame->dsize(dim) - frame->dposition(dim) : frame->dposition(dim); }
 
 		FrameType frameType() { return STRIPE; }

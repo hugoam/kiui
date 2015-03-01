@@ -161,7 +161,7 @@ namespace mk
 		static inline string to(const std::vector<T>& val) { return vector_to_string(val); }
 
 		static inline void from(const string& str, std::vector<T>& vec) { string_to_vector(str, vec); }
-		static inline std::vector<T> from(const string& str) { return string_to_vector(str); }
+		static inline std::vector<T> from(const string& str) { return string_to_vector<T>(str); }
 	};
 
 

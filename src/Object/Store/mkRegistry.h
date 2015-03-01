@@ -36,7 +36,7 @@ namespace mk
 
 		void add(unique_ptr<T> pt)
 		{
-			for(auto obs : mObservers)
+			for(auto obs : this->mObservers)
 				obs->handleAdd(pt.get());
 
 			mStore.emplace_back(std::move(pt));
@@ -44,7 +44,7 @@ namespace mk
 
 		void insert(unique_ptr<T> pt, size_t index)
 		{
-			for(auto obs : mObservers)
+			for(auto obs : this->mObservers)
 				obs->handleAdd(pt.get());
 
 			mStore.emplace(mStore.begin() + index, std::move(pt));
@@ -52,7 +52,7 @@ namespace mk
 
 		void remove(T* object)
 		{
-			for(auto obs : mObservers)
+			for(auto obs : this->mObservers)
 				obs->handleRemove(object);
 
 			mStore.erase(std::remove_if(mStore.begin(), mStore.end(), [object](const unique_ptr<T>& p) { return p.get() == object; }), mStore.end());
@@ -61,7 +61,7 @@ namespace mk
 		void remove(size_t pos)
 		{
 			T* object = mStore[pos].get();
-			for(auto obs : mObservers)
+			for(auto obs : this->mObservers)
 				obs->handleRemove(object);
 
 			mStore.erase(mStore.begin() + pos);

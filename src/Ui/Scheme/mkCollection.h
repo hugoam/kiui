@@ -6,8 +6,9 @@
 #define MK_COLLECTION_H_INCLUDED
 
 /* mk headers */
-#include <Object/mkTyped.h>
 #include <Object/Util/mkMake.h>
+#include <Object/mkTyped.h>
+#include <Object/mkRef.h>
 #include <Ui/mkUiForward.h>
 #include <Ui/Form/mkForm.h>
 #include <Ui/Form/mkButton.h>
@@ -96,7 +97,7 @@ namespace mk
 	public:
 		TypedCollection(Form* form, Iterable<Object>* store, Store<T>* tstore, FormMapper mapper)
 			: ObjectCollection(form, store, mapper)
-			, GenericObserver(tstore, this)
+			, GenericObserver<T>(tstore, this)
 		{}
 	};
 }

@@ -424,10 +424,8 @@ namespace mk
 
 		layout->add("dockwindow", "partition");
 
-		layout->style("window")->d_frontpadding = DimFloat(4.f, 4.f);
-		layout->style("window")->d_backpadding = DimFloat(4.f, 4.f);
-		layout->style("dockwindow")->d_frontpadding = DimFloat(1.f, 1.f);
-		layout->style("dockwindow")->d_backpadding = DimFloat(1.f, 1.f);
+		layout->style("window")->d_padding = BoxFloat(4.f);
+		layout->style("dockwindow")->d_padding = BoxFloat(1.f);
 
 		layout->style("dockwindow")->d_opacity = _OPAQUE;
 
@@ -490,7 +488,7 @@ namespace mk
 		layout->style("table")->d_spacing[DIM_Y] = 2.f;
 		layout->style("table")->d_layoutDim = DIM_Y;
 
-		layout->style("expandboxcontainer")->d_frontpadding = DimFloat(12.f, 2.f);
+		layout->style("expandboxcontainer")->d_padding = BoxFloat(12.f, 2.f, 0.f, 0.f);
 
 		layout->style("dropbutton")->d_opacity = _OPAQUE;
 
@@ -534,7 +532,7 @@ namespace mk
 
 		layout->add("string", "fixed");
 
-		layout->style("tab")->d_frontpadding = DimFloat(0.f, 4.f);
+		layout->style("tab")->d_padding = BoxFloat(0.f, 4.f, 0.f, 0.f);
 
 		layout->add("newobject", "div");
 		layout->addOverride("newobject", "dropdown", "div");

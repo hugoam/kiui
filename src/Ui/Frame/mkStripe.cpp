@@ -143,7 +143,7 @@ namespace mk
 				d_sequenceLength += frame->doffset(d_length) + (frame == d_sequence.back() ? 0.f : d_style->d_spacing[d_length]);
 
 		if(dshrink(d_length))// || dwrap(d_length))
-			this->setSizeDim(d_length, d_sequenceLength + d_style->d_frontpadding[d_length] + d_style->d_backpadding[d_length]);
+			this->setSizeDim(d_length, d_sequenceLength + d_style->d_padding[d_length] + d_style->d_padding[d_length+2]);
 	}
 
 	void Stripe::updateDepth()
@@ -155,7 +155,7 @@ namespace mk
 				d_maxDepth = std::max(d_maxDepth, frame->doffset(d_depth));
 
 		if(dshrink(d_depth)) // || dwrap(d_depth))
-			this->setSizeDim(d_depth, d_maxDepth + d_style->d_frontpadding[d_length] + d_style->d_backpadding[d_length]);
+			this->setSizeDim(d_depth, d_maxDepth + d_style->d_padding[d_depth] + d_style->d_padding[d_depth+2]);
 	}
 
 	void Stripe::normalizeSpan()
@@ -234,19 +234,19 @@ namespace mk
 			pos += frame->doffset(d_length);
 		}
 
-		return -pos + d_style->d_frontpadding[d_length];
+		return -pos + d_style->d_padding[d_length];
 	}
 
 	void Stripe::positionSequence()
 	{
-		float offset = -d_cursor + d_style->d_frontpadding[d_length];
+		float offset = -d_cursor + d_style->d_padding[d_length];
 
 		Frame* prev = nullptr;
 		for(Frame* frame : d_sequence)
 			if(!frame->hidden())
 			{
 				frame->setPositionDim(d_length, !prev ? offset : prev->dposition(d_length) + prev->dsize(d_length) + d_style->d_spacing[d_length]);
-				frame->setPositionDim(d_depth, d_style->d_frontpadding[d_depth] + frame->dmargin(d_depth) / 2);
+				frame->setPositionDim(d_depth, d_style->d_padding[d_depth] + frame->dmargin(d_depth) / 2);
 				prev = frame;
 			}
 	}

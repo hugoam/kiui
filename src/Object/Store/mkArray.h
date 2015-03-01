@@ -152,9 +152,9 @@ namespace mk
 	public:
 		Named() : T_Array() {}
 
-		T* findNamed(const string& name) { return find([name](T* obj){ return obj->name() == name; }); }
+		T* findNamed(const string& name) { return T_Array::find([name](T* obj){ return obj->name() == name; }); }
 
-		void removeNamed(const string& name) { remove(find([name](T* obj){ return obj->name() == name; })); }
+		void removeNamed(const string& name) { remove(T_Array::find([name](T* obj){ return obj->name() == name; })); }
 	};
 
 	template <class T_Array>
@@ -166,9 +166,9 @@ namespace mk
 	public:
 		TypeIndexed() : T_Array() {}
 
-		T* findTyped(Type* type) { return find([type](T* obj){ return obj->type() == type; }); }
+		T* findTyped(Type* type) { return T_Array::find([type](T* obj){ return obj->type() == type; }); }
 
-		void removeTyped(Type* type) { remove(find([type](T* obj){ return obj->type() == type; })); }
+		void removeTyped(Type* type) { remove(T_Array::find([type](T* obj){ return obj->type() == type; })); }
 	};
 
 	template <class T_Array>

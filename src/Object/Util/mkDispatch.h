@@ -68,8 +68,8 @@ namespace mk
 			return check(type);
 		}
 
-		typedef C C;
-		typedef R R;
+		typedef C Context;
+		typedef R Return;
 
 	protected:
 		static std::vector<std::function<R (C, Lref&)>> mDispatcher;
@@ -79,7 +79,7 @@ namespace mk
 	typename std::vector<std::function<R (C, Lref&)>> HashDispatch<D,C,R>::mDispatcher = std::vector<std::function<R (C, Lref&)>>();
 
 
-	template <class D, class T, typename D::R(*f)(typename D::C, Lref&, T)>
+	template <class D, class T, typename D::Return(*f)(typename D::Context, Lref&, T)>
 	class Dispatch
 	{
 	public:
@@ -88,7 +88,7 @@ namespace mk
 			D::branch(typecls<typename BareType<T>::type>(), &dispatch); // @todo Here for Object types it fetches from Typed<T> which could lead to incorrect behavior
 		}
 
-		static typename D::R dispatch(typename D::C context, Lref& lref)
+		static typename D::Return dispatch(typename D::Context context, Lref& lref)
 		{
 			return f(context, lref, DispatchRef<typename UnrefType<T>::type>::ref(lref));
 		}
@@ -97,8 +97,8 @@ namespace mk
 		static Dispatch<D,T,f> branch;
 	};
 
-	template <class D, class T, typename D::R(*f)(typename D::C, Lref&, T)>
-	typename Dispatch<D,T,f> Dispatch<D,T,f>::branch = Dispatch<D,T,f>();
+	template <class D, class T, typename D::Return(*f)(typename D::Context, Lref&, T)>
+	Dispatch<D,T,f> Dispatch<D,T,f>::branch = Dispatch<D,T,f>();
 }
 
 #endif // mkDISPATCH_H_INCLUDED
