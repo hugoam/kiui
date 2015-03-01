@@ -34,7 +34,7 @@ namespace mk
 		~Array()
 		{
 			for(T* obj : mStore)
-				for(StoreObserver<T>* obs : mObservers)
+				for(StoreObserver<T>* obs : this->mObservers)
 					obs->handleRemove(obj);
 		}
 
@@ -55,7 +55,7 @@ namespace mk
 		{
 			mStore.push_back(object);
 
-			for(StoreObserver<T>* obs : mObservers)
+			for(StoreObserver<T>* obs : this->mObservers)
 				obs->handleAdd(object);
 		}
 
@@ -63,7 +63,7 @@ namespace mk
 		{
 			mStore.insert(mStore.begin() + index, object);
 
-			for(StoreObserver<T>* obs : mObservers)
+			for(StoreObserver<T>* obs : this->mObservers)
 				obs->handleAdd(object);
 		}
 
@@ -72,7 +72,7 @@ namespace mk
 			T* object = mStore[pos];
 			mStore.erase(mStore.begin() + pos);
 
-			for(StoreObserver<T>* obs : mObservers)
+			for(StoreObserver<T>* obs : this->mObservers)
 				obs->handleRemove(object);
 		}
 
@@ -80,7 +80,7 @@ namespace mk
 		{
 			mStore.erase(std::remove(mStore.begin(), mStore.end(), object), mStore.end());
 
-			for(StoreObserver<T>* obs : mObservers)
+			for(StoreObserver<T>* obs : this->mObservers)
 				obs->handleRemove(object);
 		}
 
@@ -115,7 +115,7 @@ namespace mk
 
 		void select(T* object)
 		{
-			clear();
+			this->clear();
 			add(object);
 		}
 

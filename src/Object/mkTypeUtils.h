@@ -119,44 +119,6 @@ namespace mk
 	{
 		static inline Object* get(T& val) { UNUSED(val); return nullptr; }
 	};
-
-	template <class T>
-	struct RefMget
-	{
-		static inline T mget(const Ref* ref) { return ref->any<T>()->copy(); }
-		typedef T type;
-	};
-
-	template <class T>
-	struct RefMget<T*>
-	{
-		static inline T* mget(const Ref* ref) { return ref->as<T>(); }
-		typedef T* type;
-	};
-
-	template <class T>
-	struct RefAssign
-	{
-		static inline void set(Ref* ref, typename Pass<T>::forward val) { Assign<typename Pass<T>::forward>::set(ref->any<T>()->ref(), std::forward<typename Pass<T>::forward>(val)); }
-	};
-
-	template <class T>
-	struct RefAssign<T*>
-	{
-		static inline void set(Ref* ref, T* obj) { ref->assign(obj); }
-	};
-
-	template <class T>
-	struct RefSet
-	{
-		static inline void set(Ref* ref, typename Pass<T>::ctype val) { Assign<typename Pass<T>::ctype>::set(ref->any<T>()->ref(), std::forward<typename Pass<T>::ctype>(val)); }
-	};
-
-	template <class T>
-	struct RefSet<T*>
-	{
-		static inline void set(Ref* ref, T* obj) { ref->assign(obj); }
-	};
 }
 
 #endif // mkOBJECTREF_H_INCLUDED

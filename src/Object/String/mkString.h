@@ -7,12 +7,37 @@
 
 /* Basic headers */
 #include <Object/mkObjectForward.h>
+#include <Object/mkTypeUtils.h>
 
 #include <string>
 #include <vector>
+#include <type_traits>
 
 namespace mk
 {
+	template <class T, bool isobject = std::is_base_of<Object, typename BareType<T>::type>::value, bool isenum = std::is_enum<T>::value>
+	struct StringConverter
+	{};
+
+	template <class T>
+	inline T fromString(const string& str) { return StringConverter<T>::from(str); }
+
+	template <class T>
+	inline void fromString(const string& str, T& val) { StringConverter<T>::from(str, val); }
+
+	template <class T>
+	inline string toString(const T& val) { return StringConverter<T>::to(val); }
+
+	template <class T>
+	inline void toString(const T& val, string& str) { return StringConverter<T>::to(val, str); }
+
+	// string - string conversion
+	template <> inline string fromString<string>(const string& str) { return str; }
+	template <> inline void fromString<string>(const string& str, string& val) { val = str; }
+
+	template <> inline string toString<string>(const string& val){ return val; }
+	template <> inline void toString<string>(const string& val, string& str){ str = val; }
+
 	typedef std::vector<string> StringVector;
 
 	MK_OBJECT_EXPORT StringVector splitString(const string& str, const string& separator);

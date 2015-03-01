@@ -18,37 +18,6 @@
 namespace mk
 {
 	template <class T>
-	inline T fromString(const string& str)
-	{
-		return AsString<T>::from(str);
-	}
-
-	template <class T>
-	inline void fromString(const string& str, T& val)
-	{
-		AsString<T>::from(str, val);
-	}
-
-	template <class T>
-	inline string toString(const T& val)
-	{
-		return AsString<T>::to(val);
-	}
-
-	template <class T>
-	inline void toString(const T& val, string& str)
-	{
-		return AsString<T>::to(val, str);
-	}
-
-	// string - string conversion
-	template <> inline string fromString<string>(const string& str) { return str; }
-	template <> inline void fromString<string>(const string& str, string& val) { val = str; }
-
-	template <> inline string toString<string>(const string& val){ return val; }
-	template <> inline void toString<string>(const string& val, string& str){ str = val; }
-
-	template <class T>
 	inline void string_to_type(const string& str, T& val)
 	{
 		std::stringstream ss(str);
@@ -145,9 +114,8 @@ namespace mk
 		}
 	}
 
-
-	template <class T, bool isobject = std::is_base_of<Object, BareType<T>::type>::value, bool isenum = std::is_enum<T>::value>
-	struct AsString
+	template <class T>
+	struct StringConverter<T, false, false>
 	{
 		static inline void to(const T& val, string& str) { type_to_string(val, str); }
 		static inline string to(const T& val) { string str; type_to_string(val, str); return str; }
@@ -157,7 +125,7 @@ namespace mk
 	};
 
 	template <class T>
-	struct AsString<T, false, true>
+	struct StringConverter<T, false, true>
 	{
 		static inline void to(const T& val, string& str) { type_to_string(static_cast<const unsigned int&>(val), str); }
 		static inline string to(const T& val) { string str; type_to_string(static_cast<const unsigned int&>(val), str); return str; }
@@ -167,7 +135,7 @@ namespace mk
 	};
 
 	template <class T>
-	struct AsString<T, true, false>
+	struct StringConverter<T, true, false>
 	{
 		static inline void to(const T& val, string& str) { UNUSED(val); UNUSED(str); }
 		static inline string to(const T& val) { UNUSED(val); return ""; }
@@ -177,7 +145,7 @@ namespace mk
 	};
 
 	template <class T>
-	struct AsString<unique_ptr<T>, false, false>
+	struct StringConverter<unique_ptr<T>, false, false>
 	{
 		static inline void to(const unique_ptr<T>& val, string& str) { type_to_string(val.get(), str); }
 		static inline string to(const unique_ptr<T>& val) { string str; type_to_string(val.get(), str); return str; }
@@ -187,7 +155,7 @@ namespace mk
 	};
 
 	template <class T>
-	struct AsString<std::vector<T>, false, false>
+	struct StringConverter<std::vector<T>, false, false>
 	{
 		static inline void to(const std::vector<T>& val, string& str) { vector_to_string(val, str); }
 		static inline string to(const std::vector<T>& val) { return vector_to_string(val); }
@@ -201,16 +169,16 @@ namespace mk
 	template <> inline IdObject* fromString<IdObject*>(const string& str) { UNUSED(str); return nullptr; }
 	template <> inline void fromString<IdObject*>(const string& str, IdObject*& val) { UNUSED(str); UNUSED(val); }
 
-	template <> inline string toString<IdObject*>(IdObject* const& object) { return AsString<Id>::to(object->id()); }
-	template <> inline void toString<IdObject*>(IdObject* const& object, string& str) { AsString<Id>::to(object->id(), str); }
+	template <> inline string toString<IdObject*>(IdObject* const& object) { return StringConverter<Id>::to(object->id()); }
+	template <> inline void toString<IdObject*>(IdObject* const& object, string& str) { StringConverter<Id>::to(object->id(), str); }
 
 
 	// Part - string conversion
 	template <> inline Part* fromString<Part*>(const string& str) { UNUSED(str); return nullptr; }
 	template <> inline void fromString<Part*>(const string& str, Part*& val) { UNUSED(str); UNUSED(val); }
 
-	template <> inline string toString<Part*>(Part* const& part) { return AsString<Id>::to(part->stem()->id()); }
-	template <> inline void toString<Part*>(Part* const& part, string& str) { AsString<Id>::to(part->stem()->id(), str); }
+	template <> inline string toString<Part*>(Part* const& part) { return StringConverter<Id>::to(part->stem()->id()); }
+	template <> inline void toString<Part*>(Part* const& part, string& str) { StringConverter<Id>::to(part->stem()->id(), str); }
 }
 
 #endif // MK_STRINGCONVERT_H_INCLUDED

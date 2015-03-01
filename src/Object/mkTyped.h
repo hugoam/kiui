@@ -9,7 +9,6 @@
 #include <Object/mkObjectForward.h>
 #include <Object/mkType.h>
 #include <Object/mkObject.h>
-#include <Object/String/mkString.h>
 
 namespace mk
 {

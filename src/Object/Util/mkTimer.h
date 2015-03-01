@@ -6,6 +6,8 @@
 #define MK_TIMER_H_INCLUDED
 
 /* Basic headers */
+#include <Object/mkTyped.h>
+#include <Object/mkObject.h>
 #include <ctime>
 #include <map>
 
@@ -32,7 +34,7 @@ namespace mk
 		inline int seconds() { return int(value) % 60; }
 	};
 
-	class MK_OBJECT_EXPORT TimeSpan
+	class MK_OBJECT_EXPORT TimeSpan : public Struct, public Typed<TimeSpan>
 	{
 	public:
 		TimeSpan(Time s, Time e) : start(s), end(e) {}

@@ -5,6 +5,7 @@
 #ifndef MK_GLOBALTYPE_H_INCLUDED
 #define MK_GLOBALTYPE_H_INCLUDED
 
+#include <Object/mkObjectForward.h>
 #include <Object/Util/mkMake.h>
 
 #include <memory>

@@ -20,21 +20,14 @@ namespace mk
 	template <class T>
 	class TStat;
 
-	template <class T>
-	class StatObserver
-	{
-	public:
-		virtual void handleUpdate(TStat<T>* stat, T value) = 0;
-	};
+	template<typename T>
+	using StatObserver = std::function<void(TStat<T>* stat, T value)>;
 
 	template <class T>
 	class TStat
 	{
 	public:
-		typedef std::function<void (TStat<T>* stat, T value)> UpdateHandler;
-
-	public:
-		TStat(T base, T min, T max, const UpdateHandler& handler = UpdateHandler())
+		TStat(T base, T min, T max, const StatObserver<T>& handler = nullptr)
 			: mBase(base)
 			, mValue(base)
 			, mMax(max)
@@ -77,7 +70,7 @@ namespace mk
 
 		operator T() const { return mValue; }
 
-		void addUpdateHandler(const UpdateHandler& handler) { mUpdateHandlers.push_back(handler); handler(this, mValue); }
+		void addUpdateHandler(const StatObserver<T>& handler) { mUpdateHandlers.push_back(handler); handler(this, mValue); }
 
 		T rincrement(T amount) { T diff = std::min(mMax - mValue, amount); mValue += diff; update(); return diff; }
 		T rdecrement(T amount) { T diff = std::max(-mMin + mValue, amount); mValue -= diff; update(); return diff; }
@@ -94,7 +87,7 @@ namespace mk
 			if(mMax && mValue > mMax)
 				mValue = mMax;
 
-			for(UpdateHandler& handler : mUpdateHandlers)
+			for(StatObserver<T>& handler : mUpdateHandlers)
 				handler(this, mValue);
 		}
 
@@ -131,7 +124,7 @@ namespace mk
 		T mMin;
 		T mMax;
 
-		std::vector<UpdateHandler> mUpdateHandlers; 
+		std::vector<StatObserver<T>> mUpdateHandlers;
 
 		typedef std::map<void*, T> ModifierMap;
 		ModifierMap mModifiers;
@@ -141,7 +134,7 @@ namespace mk
 	class TNamedStat : public TStat<T>
 	{
 	public:
-		TNamedStat(T base, T min, T max, const UpdateHandler& handler = UpdateHandler())//StatObserver<T>* observer = 0)
+		TNamedStat(T base, T min, T max, const StatObserver<T>& handler = nullptr)
 			: TStat<T>(base, min, max)
 		{}
 

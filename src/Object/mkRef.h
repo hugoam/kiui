@@ -7,8 +7,9 @@
 
 /* mk headers */
 #include <Object/mkObjectForward.h>
-#include <Object/mkType.h>
+#include <Object/mkTyped.h>
 #include <Object/mkTypeUtils.h>
+#include <Object/String/mkString.h>
 #include <Object/Util/mkMake.h>
 
 /* Standard */
@@ -34,7 +35,7 @@ namespace mk
 		inline Type* type() const { return mType; }
 		inline Imprint* imprint() const { return mType->imprint(); }
 		inline bool null() const { return mType == nullptr; }
-		inline void assign(Object* object) { mObject = object; }
+		inline void setobject(Object* object) { mObject = object; }
 		inline size_t update() { return mUpdate; }
 
 		virtual unique_ptr<Ref> clone() const { return make_unique<Ref>(mObject, mType); };
@@ -52,25 +53,19 @@ namespace mk
 		inline T& ref() { return this->any<T>()->ref(); }
 
 		template <class T>
-		inline T* as() const { return mObject->as<T>(); }
+		inline const T& get() const { return this->any<T>()->get(); }
 
 		template <class T>
-		inline const T& get() const { return this->any<T>()->get(); }
+		inline void set(typename Pass<T>::ctype val) { this->any<T>()->set(std::forward<typename Pass<T>::ctype>(val)); }
+
+		template <class T>
+		inline T* as() const { return mObject->as<T>(); }
 
 		template <class T>
 		inline T copy() { return this->any<T>()->copy(); }
 
 		template <class T>
 		inline T copy() const { return this->any<T>()->copy(); }
-
-		template <class T>
-		inline T mget() { return RefMget<T>::mget(this); }
-
-		template <class T>
-		inline void set(typename Pass<T>::ctype val) { RefSet<T>::set(this, val); ++mUpdate; }
-
-		template <class T>
-		inline void assign(typename Pass<T>::forward val) { RefAssign<T>::set(this, std::forward<typename Pass<T>::forward>(val)); ++mUpdate; }
 
 		Ref(const Ref& ref) = delete;
 		Ref& operator=(const Ref& ref) = delete;
@@ -89,7 +84,7 @@ namespace mk
 	class Any : public Ref, public Allocator<T>
 	{
 	public:
-		Any(typename Pass<T>::forward value) : Ref(typecls<T>()), mContent() { RefAssign<T>::set(this, std::forward<typename Pass<T>::forward>(value)); mObject = RefObject<T>::get(mContent); }
+		Any(typename Pass<T>::forward value) : Ref(typecls<T>()), mContent() { this->assign(std::forward<typename Pass<T>::forward>(value)); mObject = RefObject<T>::get(mContent); }
 		Any() : Ref(typecls<T>()), mContent() { mObject = RefObject<T>::get(mContent); }
 
 		unique_ptr<Ref> clone() const { return make_unique<Any<T>>(this->copy()); }
@@ -101,6 +96,9 @@ namespace mk
 		const T& get() const { return mContent; }
 		T copy() { return Copy<T>::copy(mContent); }
 		T copy() const { return Copy<T>::copy(mContent); }
+
+		void assign(typename Pass<T>::forward val) { Assign<typename Pass<T>::forward>::set(mContent, std::forward<typename Pass<T>::forward>(val)); }
+		void set(typename Pass<T>::ctype val) { Assign<typename Pass<T>::ctype>::set(mContent, std::forward<typename Pass<T>::ctype>(val)); }
 
 	public:
 		T mContent;
@@ -128,7 +126,7 @@ namespace mk
 	struct MakeRef { static unique_ptr<Ref> make(typename Pass<T>::forward val) { return make_unique<Any<T>>(std::forward<typename Pass<T>::forward>(val)); }; };
 
 	template <class T>
-	struct MakeRef<T*> { static unique_ptr<Ref> make(T* obj) { return obj ? make_unique<Ref>(obj->as<Object>(), T::cls()) : make_unique<Ref>(T::cls()); }; };
+	struct MakeRef<T*> { static unique_ptr<Ref> make(T* obj) { return obj ? make_unique<Ref>(obj, T::cls()) : make_unique<Ref>(T::cls()); }; };
 
 	class MK_OBJECT_EXPORT Lref
 	{

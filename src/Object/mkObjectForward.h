@@ -72,6 +72,9 @@ namespace mk
 	class Typed;
 
 	template <class T>
+	class GlobalType;
+
+	template <class T>
 	class StoreObserver;
 
 	template <class T>
