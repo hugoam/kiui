@@ -153,7 +153,7 @@ namespace mk
 	{};
 
 	template <>
-	class MK_OBJECT_EXPORT _I_ _S_ Stat<float> : public Struct, public Typed<Stat<float>>, public TStat<float>
+	class _I_ _S_ Stat<float> : public Struct, public Typed<Stat<float>>, public TStat<float>
 	{
 	public:
 		_C_ Stat(float value = 0.f, float min = 0.f, float max = 10.f) : TStat<float>(value, min, max) {}
@@ -168,7 +168,7 @@ namespace mk
 	};
 
 	template <>
-	class MK_OBJECT_EXPORT _I_ _S_ Stat<int> : public Struct, public Typed<Stat<int>>, public TStat<int>
+	class _I_ _S_ Stat<int> : public Struct, public Typed<Stat<int>>, public TStat<int>
 	{
 	public:
 		_C_ Stat(int value = 0, int min = 0, int max = 10) : TStat<int>(value, min, max) {}
@@ -181,6 +181,9 @@ namespace mk
 
 		void setValue(int value) { TStat<int>::modify(value); }
 	};
+
+	template class MK_OBJECT_EXPORT Stat<int>;
+	template class MK_OBJECT_EXPORT Stat<float>;
 }
 
 #endif // MK_STAT_H_INCLUDED

@@ -10,9 +10,9 @@
 
 namespace mk
 {
-	template class __declspec(dllexport) Typed<Id>;
 	template class __declspec(dllexport) Typed<bool>;
 	template class __declspec(dllexport) Typed<int>;
+	template class __declspec(dllexport) Typed<unsigned int>;
 	template class __declspec(dllexport) Typed<float>;
 	template class __declspec(dllexport) Typed<double>;
 	template class __declspec(dllexport) Typed<string>;
