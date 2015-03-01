@@ -184,10 +184,12 @@ namespace mk
 
 		for(Frame* frame : d_contents)
 			if(frame->dexpand(d_length))
+			{
 				if(frame->flow())
 					frame->setSizeDim(d_length, freeSpace * frame->dspan(d_length) - (frame == d_sequence.back() ? 0.f : d_style->d_spacing[d_length])); // @note not optimal since we remove the spacing from the first item, but to account for spacing evenly we should keep track of the number of expanding elements
 				else
 					frame->setSizeDim(d_length, dspace(d_length));
+			}
 	}
 
 	void Stripe::relayout()
