@@ -13,13 +13,6 @@
 
 namespace mk
 {
-	enum TypeIndexing
-	{
-		NONE,
-		INDEXED,
-		LIBRARED
-	};
-
 	template <class T>
 	inline Type* typecls()
 	{
@@ -39,7 +32,7 @@ namespace mk
 	};
 
 	template <class T, class S, class I>
-	typename Type Typed<T, S, I>::sType = Type(typecls<I>());
+	Type Typed<T, S, I>::sType(typecls<I>());
 
 	template <class T>
 	T* upcast(TypeObject* object)

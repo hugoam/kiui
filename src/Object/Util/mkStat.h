@@ -142,7 +142,7 @@ namespace mk
 	{
 	public:
 		TNamedStat(T base, T min, T max, const UpdateHandler& handler = UpdateHandler())//StatObserver<T>* observer = 0)
-			: TStat(base, min, max)
+			: TStat<T>(base, min, max)
 		{}
 
 		const string& name() { return T_Name; }
@@ -156,30 +156,30 @@ namespace mk
 	class MK_OBJECT_EXPORT _I_ _S_ Stat<float> : public Struct, public Typed<Stat<float>>, public TStat<float>
 	{
 	public:
-		_C_ Stat(float value = 0.f, float min = 0.f, float max = 10.f) : TStat(value, min, max) {}
+		_C_ Stat(float value = 0.f, float min = 0.f, float max = 10.f) : TStat<float>(value, min, max) {}
 		Stat(const Stat<float>&) = default;
 		Stat<float>& operator=(const Stat<float>&) = default;
 
-		_A_ _M_ float value() const { return TStat::value(); }
-		_A_ float min() const { return TStat::min(); }
-		_A_ float max() const { return TStat::max(); }
-
-		void setValue(float value) { TStat::modify(value); }
+		_A_ _M_ float value() const { return TStat<float>::value(); }
+		_A_ float min() const { return TStat<float>::min(); }
+		_A_ float max() const { return TStat<float>::max(); }
+		
+		void setValue(float value) { TStat<float>::modify(value); }
 	};
 
 	template <>
 	class MK_OBJECT_EXPORT _I_ _S_ Stat<int> : public Struct, public Typed<Stat<int>>, public TStat<int>
 	{
 	public:
-		_C_ Stat(int value = 0, int min = 0, int max = 10) : TStat(value, min, max) {}
+		_C_ Stat(int value = 0, int min = 0, int max = 10) : TStat<int>(value, min, max) {}
 		Stat(const Stat<int>&) = default;
 		Stat<int>& operator=(const Stat<int>&) = default;
 
-		_A_ _M_ int value() const { return TStat::value(); }
-		_A_ int min() const { return TStat::min(); }
-		_A_ int max() const { return TStat::max(); }
+		_A_ _M_ int value() const { return TStat<int>::value(); }
+		_A_ int min() const { return TStat<int>::min(); }
+		_A_ int max() const { return TStat<int>::max(); }
 
-		void setValue(int value) { TStat::modify(value); }
+		void setValue(int value) { TStat<int>::modify(value); }
 	};
 }
 

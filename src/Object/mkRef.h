@@ -89,8 +89,8 @@ namespace mk
 	class Any : public Ref, public Allocator<T>
 	{
 	public:
-		Any(typename Pass<T>::forward value) : Ref(typeof<T>()), mContent() { RefAssign<T>::set(this, std::forward<typename Pass<T>::forward>(value)); mObject = RefObject<T>::get(mContent); }
-		Any() : Ref(typeof<T>()), mContent() { mObject = RefObject<T>::get(mContent); }
+		Any(typename Pass<T>::forward value) : Ref(typecls<T>()), mContent() { RefAssign<T>::set(this, std::forward<typename Pass<T>::forward>(value)); mObject = RefObject<T>::get(mContent); }
+		Any() : Ref(typecls<T>()), mContent() { mObject = RefObject<T>::get(mContent); }
 
 		unique_ptr<Ref> clone() const { return make_unique<Any<T>>(this->copy()); }
 

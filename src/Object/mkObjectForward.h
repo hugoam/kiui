@@ -8,7 +8,7 @@
 #include <string>
 #include <type_traits>
 
-#define UNUSED(x) x
+#define UNUSED(x) (void)(x)
 
 #ifdef MK_STD_PROXIES
 namespace std
@@ -100,6 +100,9 @@ namespace mk
 
 	template <class T>
 	class Memory;
+
+	template <class T>
+	class Stat;
 
 	class AbstractPool;
 	class MultiPool;
