@@ -79,7 +79,6 @@ namespace mk
 	extern template class MK_OBJECT_EXPORT Typed<std::vector<Object*>>;
 
 	extern template class MK_OBJECT_EXPORT Typed<Array<Object>>;
-	extern template class MK_OBJECT_EXPORT StoreObserver<Object>;
 #endif
 }
 
