@@ -72,7 +72,7 @@ namespace mk
 		bool hasAttr(const string& name) { return mAttrs.find(name) != mAttrs.end(); }
 		const string& getAttr(const string& name) const { if(mAttrs.find(name) != mAttrs.end()) return mAttrs.at(name); else return sNullString; }
 
-		void setIndex(Id index);
+		void setIndex(size_t index);
 
 		void setCls(const string& cls) { mCls = cls; }
 		void setLabel(const string& label) { mLabel = label; mUpdated = mLastTick; }
@@ -134,7 +134,7 @@ namespace mk
 
 	protected:
 		Form* mParent;
-		Id mIndex;
+		size_t mIndex;
 		string mFullIndex;
 		string mCls;
 		string mLabel;
