@@ -47,19 +47,19 @@ namespace mk
 		template <class T, class... Args>
 		inline T* vmakeappend(Args&&... args)
 		{
-			return this->vappend(make_unique<T>(std::forward<Args>(args)...))->as<T>();
+			return this->vappend(make_unique<T>(std::forward<Args>(args)...))->template as<T>();
 		}
 
 		template <class T, class... Args>
 		inline T* makeappend(Args&&... args)
 		{
-			return this->append(make_unique<T>(std::forward<Args>(args)...))->as<T>();
+			return this->append(make_unique<T>(std::forward<Args>(args)...))->template as<T>();
 		}
 
 		template <class T, class... Args>
 		inline T* makeinsert(size_t index, Args&&... args)
 		{
-			return this->insert(make_unique<T>(std::forward<Args>(args)...), index)->as<T>();
+			return this->insert(make_unique<T>(std::forward<Args>(args)...), index)->template as<T>();
 		}
 
 	protected:

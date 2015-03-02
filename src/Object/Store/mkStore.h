@@ -112,8 +112,8 @@ namespace mk
 
 		using Typed<T_Array, void, Stock>::cls;
 
-		inline T_Array* self() { return this->as<T_Array>(); }
-		inline const T_Array* self() const { return this->as<T_Array>(); }
+		inline T_Array* self() { return this->template as<T_Array>(); }
+		inline const T_Array* self() const { return this->template as<T_Array>(); }
 
 	protected:
 		Type* mType;

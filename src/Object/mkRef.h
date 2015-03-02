@@ -45,7 +45,7 @@ namespace mk
 
 		template <class T>
 		inline Any<T>* any() { return static_cast<Any<T>*>(this); }
-		
+
 		template <class T>
 		inline const Any<T>* any() const { return static_cast<const Any<T>*>(this); }
 

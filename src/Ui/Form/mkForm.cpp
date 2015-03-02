@@ -86,7 +86,7 @@ namespace mk
 
 	Form* Form::append(unique_ptr<Form> form)
 	{
-		return this->insert(std::move(form), this->last()); 
+		return this->insert(std::move(form), this->last());
 	}
 
 	unique_ptr<Form> Form::release(size_t pos)
@@ -95,7 +95,7 @@ namespace mk
 			mContents.at(pos)->widget()->detach();
 		return mContents.release(pos);
 	}
-	
+
 	void Form::remove(size_t index)
 	{
 		mContents.at(index)->destroy();
@@ -109,7 +109,7 @@ namespace mk
 			return toString(mIndex);
 	}
 
-	void Form::setIndex(size_t index)
+	void Form::setIndex(Id index)
 	{
 		mIndex = index;
 		this->updateIndex();
@@ -125,7 +125,7 @@ namespace mk
 	void Form::updateIndex()
 	{
 		mFullIndex = concatIndex();
-		
+
  		for(auto& pt : mContents.store())
 			pt->as<Form>()->updateIndex();
 	}
@@ -145,7 +145,7 @@ namespace mk
 	{
 		this->destroy();
 		/*mDestroy = true;
-		
+
 		size_t pos = mParent->last();
 		if(pos && pos != mIndex)
 			mParent->mContents.move(mIndex, pos);*/

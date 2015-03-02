@@ -66,12 +66,12 @@ namespace mk
 		current->makeappend<SliderFloat>("float input", Stat<float>(1.123f, 0.0f, 2.0f));
 		current->makeappend<SliderFloat>("log float", Stat<float>(0.f, 0.0f, 10.0f));
 		current->makeappend<SliderFloat>("signed log float", Stat<float>(0.f, -10.0f, 10.0f));
-		current->makeappend<SliderFloat>("unbound float", Stat<float>(123456789.0f, -FLT_MAX, FLT_MAX));
+		current->makeappend<SliderFloat>("unbound float", Stat<float>(123456789.0f, std::numeric_limits<float>::min(), std::numeric_limits<float>::max()));
 	}
 
 	void exampleApp()
 	{
-		unique_ptr<GlWindow> glwindow = make_unique<GlWindow>(1200, 800, "mk UiEditApp", "../Data/interface");
+		unique_ptr<GlWindow> glwindow = make_unique<GlWindow>(1200, 800, "mk UiEditApp", "./data");
 		glwindow->initContext();
 
 		UiWindow* uiwindow = glwindow->uiWindow();
