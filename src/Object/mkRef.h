@@ -123,11 +123,7 @@ namespace mk
 	//T* cast() const { return upcast<T>(mObject); }
 
 	template <class T>
-	struct MakeRef {
-        static unique_ptr<Ref> make(typename Pass<T>::forward val) {
-            return make_unique<Any<T>>(std::forward<typename Pass<T>::forward>(val));
-        };
-    };
+	struct MakeRef { static unique_ptr<Ref> make(typename Pass<T>::forward val) { return make_unique<Any<T>>(std::forward<typename Pass<T>::forward>(val)); }; };
 
 	template <class T>
 	struct MakeRef<T*> { static unique_ptr<Ref> make(T* obj) { return obj ? make_unique<Ref>(obj, T::cls()) : make_unique<Ref>(T::cls()); }; };
