@@ -4,34 +4,35 @@
 * @version 1.14
 *
 * @section LICENSE
-* 
-* This source file is part of OgreOggSound, an OpenAL wrapper library for   
-* use with the Ogre Rendering Engine.										 
-*                                                                           
-* Copyright 2010 Ian Stangoe 
-*                                                                           
-* OgreOggSound is free software: you can redistribute it and/or modify		  
-* it under the terms of the GNU Lesser General Public License as published	 
-* by the Free Software Foundation, either version 3 of the License, or		 
-* (at your option) any later version.										 
-*																			 
-* OgreOggSound is distributed in the hope that it will be useful,			 
-* but WITHOUT ANY WARRANTY; without even the implied warranty of			 
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the			 
-* GNU Lesser General Public License for more details.						 
-*																			 
-* You should have received a copy of the GNU Lesser General Public License	 
-* along with OgreOggSound.  If not, see <http://www.gnu.org/licenses/>.	 
+*
+* This source file is part of OgreOggSound, an OpenAL wrapper library for
+* use with the Ogre Rendering Engine.
+*
+* Copyright 2010 Ian Stangoe
+*
+* OgreOggSound is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as published
+* by the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* OgreOggSound is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public License
+* along with OgreOggSound.  If not, see <http://www.gnu.org/licenses/>.
 *
 * @section DESCRIPTION
-* 
+*
 * Template class for a lockless queue system to pass items from one thread to another.
-* Only 1 thread can push and 1 thread can pop it. 
+* Only 1 thread can push and 1 thread can pop it.
 * All credit goes to: Lf3THn4D
 */
 
 #ifndef MK_LOCKLESSQUEUE_H
 #define MK_LOCKLESSQUEUE_H
+#include <cstddef>
 
 namespace mk
 {

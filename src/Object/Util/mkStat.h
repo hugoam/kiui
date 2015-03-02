@@ -138,7 +138,7 @@ namespace mk
 			: TStat<T>(base, min, max)
 		{}
 
-		const string& name() { return T_Name; }
+		const string name() { return T_Name; }
 	};
 
 	template <class T>

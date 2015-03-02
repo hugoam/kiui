@@ -119,7 +119,7 @@ namespace mk
 		template <class T, class... Args>
 		inline T* makeappend(Args&&... args)
 		{
-			return this->append(make_unique<T>(std::forward<Args>(args)...))->as<T>();
+			return this->append(make_unique<T>(std::forward<Args>(args)...))->template as<T>();
 		}
 
 	public:
