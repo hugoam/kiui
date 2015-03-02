@@ -9,15 +9,9 @@ project(KIUI)
 set(CMAKE_MODULE_PATH ${KIUI_SOURCE_DIR}/cmake/modules ${KIUI_SOURCE_DIR}/cmake/packages ${CMAKE_MODULE_PATH})
 
 set(WARNING_LEVEL "/W4")
- 
-add_definitions("-DOBJECT_EXPORT")
-add_definitions("-DUI_EXPORT")
-
-if (MSVC)
-	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
-endif ()
 
 find_package(OpenGL)
 find_package(GLFW)
 		
 add_subdirectory(src)
+add_subdirectory(example)
