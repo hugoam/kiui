@@ -24,4 +24,5 @@ namespace mk
 	template class MK_OBJECT_EXPORT Typed<std::vector<Object*>>;
 
 	template class MK_OBJECT_EXPORT Typed<Array<Object>>;
+	template class MK_OBJECT_EXPORT StoreObserver<Object>;
 }
