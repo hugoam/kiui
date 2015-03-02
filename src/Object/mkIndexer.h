@@ -19,7 +19,7 @@
 namespace mk
 {
 #ifndef OBJECT_EXPORT
-	template class __declspec(dllimport) Store<TypeObject>;
+	template class MK_OBJECT_EXPORT Store<TypeObject>;
 #endif
 
 	class MK_OBJECT_EXPORT Indexer : /*public Stock, */public Store<TypeObject>
