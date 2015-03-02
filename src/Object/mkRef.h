@@ -120,13 +120,17 @@ namespace mk
 		unique_ptr<Ref> clone() const { return make_unique<Any<None>>(); }
 	};
 
-	//T* cast() const { return upcast<T>(mObject); }
+	template <class T>
+	struct MakeRef
+	{
+		static unique_ptr<Ref> make(typename Pass<T>::forward val) { return make_unique<Any<T>>(std::forward<typename Pass<T>::forward>(val)); };
+	};
 
 	template <class T>
-	struct MakeRef { static unique_ptr<Ref> make(typename Pass<T>::forward val) { return make_unique<Any<T>>(std::forward<typename Pass<T>::forward>(val)); }; };
-
-	template <class T>
-	struct MakeRef<T*> { static unique_ptr<Ref> make(T* obj) { return obj ? make_unique<Ref>(obj, T::cls()) : make_unique<Ref>(T::cls()); }; };
+	struct MakeRef<T*>
+	{
+		static unique_ptr<Ref> make(T* obj) { return obj ? make_unique<Ref>(obj, T::cls()) : make_unique<Ref>(T::cls()); };
+	};
 
 	class MK_OBJECT_EXPORT Lref
 	{

@@ -109,7 +109,7 @@ namespace mk
 			return toString(mIndex);
 	}
 
-	void Form::setIndex(Id index)
+	void Form::setIndex(size_t index)
 	{
 		mIndex = index;
 		this->updateIndex();
