@@ -215,8 +215,8 @@ namespace mk
 		if(flow() && (dshrink(dim) || dfixed(dim))) // Upward notification -> when shrinking
 			d_parent->flowChanged(this, dim);
 
-		if(dexpand(dim)) // Downward notification -> when expanding
-			this->resized(dim);
+		//if(dexpand(dim)) // Downward notification -> when expanding
+		this->resized(dim);
 	}
 
 	void Frame::setSpanDim(Dimension dim, float span)
@@ -273,7 +273,7 @@ namespace mk
 
 		d_visible = true;
 		d_inkLayer ? d_inkLayer->show() : d_inkbox->show();
-		this->setDirty(DIRTY_SKIN);
+		this->setDirty(DIRTY_WIDGET);
 	}
 
 	void Frame::setInvisible()
@@ -307,5 +307,27 @@ namespace mk
 			return this;
 		else
 			return nullptr;
+	}
+
+	FrameSkin::FrameSkin(Frame* frame, ImageSkin* skin)
+		: d_frame(frame)
+		, d_skin(skin)
+	{
+		d_left = floor(frame->dabsolute(DIM_X) + frame->inkstyle()->mMargin[DIM_X]);
+		d_top = floor(frame->dabsolute(DIM_Y) + frame->inkstyle()->mMargin[DIM_Y]);
+
+		float width = floor(frame->dsize(DIM_X) - frame->inkstyle()->mMargin[DIM_X] - frame->inkstyle()->mMargin[DIM_X + 2]);
+		float height = floor(frame->dsize(DIM_Y) - frame->inkstyle()->mMargin[DIM_Y] - frame->inkstyle()->mMargin[DIM_Y + 2]);
+
+		d_inleft = d_left + d_skin->d_leftIn;
+		d_inright = d_left + width - d_skin->d_rightIn;
+		d_intop = d_top + d_skin->d_topIn;
+		d_inbottom = d_top + height - d_skin->d_bottomIn;
+
+		d_outtop = d_top - d_skin->d_topOut;
+		d_outleft = d_left - d_skin->d_leftOut;
+
+		d_inwidth = d_inright - d_inleft;
+		d_inheight = d_inbottom - d_intop;
 	}
 }

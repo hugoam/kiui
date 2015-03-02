@@ -25,7 +25,7 @@ namespace mk
 
 	NanoInk::NanoInk(Frame* frame, NanoLayer* layer)
 		: Inkbox(frame)
-		, mCtx(layer->target()->ctx())
+		, mCtx(layer->target()->window()->ctx())
 		, mLayer(layer)
 		, mImage(0)
 		, mVisible(frame->visible())
@@ -51,34 +51,34 @@ namespace mk
 
 		//nvgSave(mCtx);
 
-		float left = floor(mFrame->dabsolute(DIM_X) + mFrame->inkstyle()->mMargin[DIM_X]);
-		float top = floor(mFrame->dabsolute(DIM_Y) + mFrame->inkstyle()->mMargin[DIM_Y]);
+		float left = floor(mFrame->dabsolute(DIM_X) + mFrame->dclippos(DIM_X) + mFrame->inkstyle()->mMargin[DIM_X]);
+		float top = floor(mFrame->dabsolute(DIM_Y) + mFrame->dclippos(DIM_Y) + mFrame->inkstyle()->mMargin[DIM_Y]);
 
-		float width = floor(mFrame->dclipsize(DIM_X) - mFrame->inkstyle()->mMargin[DIM_X] * 2.f);
-		float height = floor(mFrame->dclipsize(DIM_Y) - mFrame->inkstyle()->mMargin[DIM_Y] * 2.f);
+		float width = floor(mFrame->dclipsize(DIM_X) - mFrame->inkstyle()->mMargin[DIM_X] - mFrame->inkstyle()->mMargin[DIM_X + 2]);
+		float height = floor(mFrame->dclipsize(DIM_Y) - mFrame->inkstyle()->mMargin[DIM_Y] - mFrame->inkstyle()->mMargin[DIM_Y + 2]);
 
 		float pleft = left + mFrame->inkstyle()->mPadding[DIM_X];
 		float ptop = top + mFrame->inkstyle()->mPadding[DIM_Y];
 		float pwidth = width - 2.f * mFrame->inkstyle()->mPadding[DIM_X];
 		float pheight = height - 2.f * mFrame->inkstyle()->mPadding[DIM_Y];
 
-		float clipleft = left + mFrame->dclippos(DIM_X);
-		float cliptop = top + mFrame->dclippos(DIM_Y);
+		//float clipleft = left + mFrame->dclippos(DIM_X);
+		//float cliptop = top + mFrame->dclippos(DIM_Y);
 
 		//std::cerr << "ink :: draw " << mFrame->style()->name() << " at " << left << " , " << top << " size " << width << " , " << height << std::endl;
 
 		// Rect
 
 		if(mFrame->dclip(DIM_X) || mFrame->dclip(DIM_Y))
-			nvgScissor(mCtx, clipleft, cliptop, width, height);
+			nvgScissor(mCtx, left, top, width, height);
 
 		nvgBeginPath(mCtx);
 
 		if(mFrame->inkstyle()->mCornerRadius.null())
 			nvgRect(mCtx, left, top, width, height);
 		else
-			nvgRoundedRect4(mCtx, left, top, width, height, mFrame->inkstyle()->mCornerRadius.x(), mFrame->inkstyle()->mCornerRadius.y(), mFrame->inkstyle()->mCornerRadius.z(), mFrame->inkstyle()->mCornerRadius.w());
-			//nvgRoundedRect(mCtx, left, top, width, height, mFrame->inkstyle()->mCornerRadius);
+			//nvgRoundedRect4(mCtx, left, top, width, height, mFrame->inkstyle()->mCornerRadius.x(), mFrame->inkstyle()->mCornerRadius.y(), mFrame->inkstyle()->mCornerRadius.z(), mFrame->inkstyle()->mCornerRadius.w());
+			nvgRoundedRect(mCtx, left, top, width, height, mFrame->inkstyle()->mCornerRadius.x());
 
 		if(mFrame->inkstyle()->mBackgroundColour.a() != 0.f)
 		{
@@ -101,6 +101,29 @@ namespace mk
 			nvgRect(mCtx, left, top, width, height);
 			nvgFillPaint(mCtx, imgPaint);
 			nvgFill(mCtx);
+		}
+
+		// ImageSkin
+		if(!mFrame->inkstyle()->mImageSkin.null())
+		{
+			ImageSkin& imgskin = mFrame->inkstyle()->mImageSkin;
+			FrameSkin fskin(mFrame, &imgskin);
+
+			// Borders
+			this->drawImage(mTop, fskin.d_inleft, fskin.d_top, fskin.d_inwidth, imgskin.d_topIn); // Top
+			this->drawImage(mRight, fskin.d_inright, fskin.d_intop, imgskin.d_rightIn, fskin.d_inheight); // Right
+
+			this->drawImage(mBottom, fskin.d_inleft, fskin.d_inbottom, fskin.d_inwidth, imgskin.d_bottomIn); // Bottom
+			this->drawImage(mLeft, fskin.d_left, fskin.d_intop, imgskin.d_leftIn, fskin.d_inheight); // Left
+
+			// Corners
+			this->drawImage(mTopLeft, fskin.d_outleft, fskin.d_outtop, imgskin.d_leftIn + imgskin.d_leftOut, imgskin.d_topIn + imgskin.d_topOut);
+			this->drawImage(mTopRight, fskin.d_inright, fskin.d_outtop, imgskin.d_rightIn + imgskin.d_rightOut, imgskin.d_topIn + imgskin.d_topOut);
+			this->drawImage(mBottomRight, fskin.d_inright, fskin.d_inbottom, imgskin.d_rightIn + imgskin.d_rightOut, imgskin.d_bottomIn + imgskin.d_bottomOut);
+			this->drawImage(mBottomLeft, fskin.d_outleft, fskin.d_inbottom, imgskin.d_leftIn + imgskin.d_leftOut, imgskin.d_bottomIn + imgskin.d_bottomOut);
+
+			// Fill
+			this->drawImage(mFill, fskin.d_inleft, fskin.d_intop, fskin.d_inwidth, fskin.d_inheight);
 		}
 
 		// Caption
@@ -155,15 +178,54 @@ namespace mk
 		if(mFrame->inkstyle()->mEmpty || !mVisible)
 			return;
 
-		string image = mFrame->widget()->image();
+		const string& image = mFrame->widget()->image();
 
 		if(image != "")
-		{
-			if(NanoWindow::sImages.find(image) == NanoWindow::sImages.end())
-				NanoWindow::sImages[image] = nvgCreateImage(mCtx, ("../Data/interface/uisprites/" + image).c_str(), 0);
+			mImage = fetchImage(image);
 
-			mImage = NanoWindow::sImages[image];
+		if(!mFrame->inkstyle()->mImageSkin.null())
+		{
+			ImageSkin& imgskin = mFrame->inkstyle()->mImageSkin;
+
+			mTop = fetchImage(imgskin.d_top);
+			mRight = fetchImage(imgskin.d_right);
+			mBottom = fetchImage(imgskin.d_bottom);
+			mLeft = fetchImage(imgskin.d_left);
+
+			mTopLeft = fetchImage(imgskin.d_topLeft);
+			mTopRight = fetchImage(imgskin.d_topRight);
+			mBottomRight = fetchImage(imgskin.d_bottomRight);
+			mBottomLeft = fetchImage(imgskin.d_bottomLeft);
+
+			mFill = fetchImage(imgskin.d_fill);
+
+			if(!imgskin.d_size)
+			{
+				int unused;
+				nvgImageSize(mCtx, mTop, &unused, &imgskin.d_topIn);
+				nvgImageSize(mCtx, mRight, &imgskin.d_rightIn, &unused);
+				nvgImageSize(mCtx, mBottom, &unused, &imgskin.d_bottomIn);
+				nvgImageSize(mCtx, mLeft, &imgskin.d_leftIn, &unused);
+
+				nvgImageSize(mCtx, mTopLeft, &imgskin.d_leftOut, &imgskin.d_topOut);
+				nvgImageSize(mCtx, mBottomRight, &imgskin.d_rightOut, &imgskin.d_bottomOut);
+
+				imgskin.d_leftOut -= imgskin.d_leftIn;
+				imgskin.d_topOut -= imgskin.d_topIn;
+				imgskin.d_bottomOut -= imgskin.d_bottomIn;
+				imgskin.d_rightOut -= imgskin.d_rightIn;
+			}
 		}
+	}
+
+	int NanoInk::fetchImage(const string& image)
+	{
+		auto it = NanoWindow::sImages.find(image);
+		if(it != NanoWindow::sImages.end())
+			return (*it).second;
+
+		NanoWindow::sImages[image] = nvgCreateImage(mCtx, (mLayer->target()->window()->ressourcePath() + "/uisprites/" + image).c_str(), 0);
+		return NanoWindow::sImages[image];
 	}
 
 	void NanoInk::updateFrame()
@@ -171,5 +233,14 @@ namespace mk
 		if(mFrame->inkstyle()->mEmpty || !mVisible || mFrame->dsize(DIM_X) == 0.f || mFrame->dsize(DIM_X) == 0.f)
 			return;
 
+	}
+
+	void NanoInk::drawImage(int image, float left, float top, float width, float height)
+	{
+		NVGpaint imgPaint = nvgImagePattern(mCtx, left, top, width, height, 0.0f / 180.0f*NVG_PI, image, 1.f);
+		nvgBeginPath(mCtx);
+		nvgRect(mCtx, left, top, width, height);
+		nvgFillPaint(mCtx, imgPaint);
+		nvgFill(mCtx);
 	}
 }

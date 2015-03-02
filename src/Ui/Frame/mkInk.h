@@ -40,8 +40,9 @@ namespace mk
 	class MK_UI_EXPORT _I_ InkStyle : public Struct, public Typed<InkStyle>
 	{
 	public:
-		_C_ InkStyle(string name, Colour background, Colour text, Colour border = Colour(), float borderWidth = 0.f, DimFloat margin = { 0.f, 0.f }, DimFloat padding = { 0.f, 0.f }, string image = "")
-			: mName(name), mEmpty(false), mBackgroundColour(background), mBorderColour(border), mTextColour(text), mImageColour(1.f, 1.f, 1.f), mBorderWidth(borderWidth), mMargin(margin), mPadding(padding), mImage(image), mCornerRadius(0.f)
+		_C_ InkStyle(string name, Colour background, Colour text)
+			: mName(name), mEmpty(false), mBackgroundColour(background), mBorderColour(), mTextColour(text), mImageColour(1.f, 1.f, 1.f)
+			, mBorderWidth(0.f), mMargin(0.f, 0.f, 0.f, 0.f), mPadding(0.f, 0.f), mImage(""), mCornerRadius(0.f)
 		{}
 
 		InkStyle(string name)
@@ -64,7 +65,7 @@ namespace mk
 		_A_ _M_ Colour mTextColour;
 		_A_ _M_ BoxFloat mBorderWidth;
 		_A_ _M_ BoxFloat mCornerRadius;
-		_A_ _M_ DimFloat mMargin;
+		_A_ _M_ BoxFloat mMargin;
 		_A_ _M_ DimFloat mPadding;
 		_A_ _M_ string mImage;
 		_A_ _M_ ImageSkin mImageSkin;

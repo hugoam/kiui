@@ -2048,19 +2048,19 @@ static float clamprad(float r, float d) { return nvg__minf(r, nvg__absf(d)*0.5f)
 
 void nvgRoundedRect4(NVGcontext* ctx, float x, float y, float w, float h, float r0, float r1, float r2, float r3)
 {
-float vals[] = {
-	NVG_MOVETO, x, y+clamprad(r0,h),
-	NVG_LINETO, x, y+h-clamprad(r1,h),
-	NVG_BEZIERTO, x, y+h-clamprad(r1,h)*(1-NVG_KAPPA90), x+clamprad(r0,w)*(1-NVG_KAPPA90), y+h, x+clamprad(r0,w), y+h,
-	NVG_LINETO, x+w-clamprad(r1,w), y+h,
-	NVG_BEZIERTO, x+w-clamprad(r1,w)*(1-NVG_KAPPA90), y+h, x+w, y+h-clamprad(r1,h)*(1-NVG_KAPPA90), x+w, y+h-clamprad(r1,h),
-	NVG_LINETO, x+w, y+clamprad(r0,h),
-	NVG_BEZIERTO, x+w, y+clamprad(r0,h)*(1-NVG_KAPPA90), x+w-clamprad(r1,w)*(1-NVG_KAPPA90), y, x+w-clamprad(r1,w), y,
-	NVG_LINETO, x+clamprad(r0,w), y,
-	NVG_BEZIERTO, x+clamprad(r0,w)*(1-NVG_KAPPA90), y, x, y+clamprad(r0,h)*(1-NVG_KAPPA90), x, y+clamprad(r0,h),
-	NVG_CLOSE
-};
-nvg__appendCommands(ctx, vals, NVG_COUNTOF(vals));
+	float vals[] = {
+		NVG_MOVETO, x, y+clamprad(r0,h),
+		NVG_LINETO, x, y+h-clamprad(r1,h),
+		NVG_BEZIERTO, x, y+h-clamprad(r1,h)*(1-NVG_KAPPA90), x+clamprad(r0,w)*(1-NVG_KAPPA90), y+h, x+clamprad(r0,w), y+h,
+		NVG_LINETO, x+w-clamprad(r1,w), y+h,
+		NVG_BEZIERTO, x+w-clamprad(r1,w)*(1-NVG_KAPPA90), y+h, x+w, y+h-clamprad(r1,h)*(1-NVG_KAPPA90), x+w, y+h-clamprad(r1,h),
+		NVG_LINETO, x+w, y+clamprad(r0,h),
+		NVG_BEZIERTO, x+w, y+clamprad(r0,h)*(1-NVG_KAPPA90), x+w-clamprad(r1,w)*(1-NVG_KAPPA90), y, x+w-clamprad(r1,w), y,
+		NVG_LINETO, x+clamprad(r0,w), y,
+		NVG_BEZIERTO, x+clamprad(r0,w)*(1-NVG_KAPPA90), y, x, y+clamprad(r0,h)*(1-NVG_KAPPA90), x, y+clamprad(r0,h),
+		NVG_CLOSE
+	};
+	nvg__appendCommands(ctx, vals, NVG_COUNTOF(vals));
 }
 
 void nvgEllipse(NVGcontext* ctx, float cx, float cy, float rx, float ry)

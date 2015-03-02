@@ -36,8 +36,6 @@ namespace mk
 	template <> inline Type* typecls<Opacity>() { return Typed<Sizing>::cls(); }
 	template <> inline Type* typecls<FrameType>() { return Typed<Sizing>::cls(); }
 
-	template <> inline Type* typecls<std::vector<float>>() { return Typed<std::vector<float>>::cls(); }
-
 	template class MK_UI_EXPORT Typed<Dimension>;
 	template class MK_UI_EXPORT Typed<Sizing>;
 	template class MK_UI_EXPORT Typed<Pivot>;
@@ -46,8 +44,6 @@ namespace mk
 	template class MK_UI_EXPORT Typed<BoxLayer>;
 	template class MK_UI_EXPORT Typed<Opacity>;
 	template class MK_UI_EXPORT Typed<FrameType>;
-
-	template class MK_UI_EXPORT Typed<std::vector<float>>;
 }
 
 #endif // MK_UITYPES_H_INCLUDED

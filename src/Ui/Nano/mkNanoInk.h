@@ -26,12 +26,18 @@ namespace mk
 
 		float contentSize(Dimension dim);
 
+		int fetchImage(const string& image);
+		void drawImage(int image, float x, float y, float w, float h);
+
 		void nanodraw();
 
 	protected:
 		NVGcontext* mCtx;
 		NanoLayer* mLayer;
 		int mImage;
+		int mTop, mRight, mBottom, mLeft;
+		int mTopLeft, mTopRight, mBottomRight, mBottomLeft;
+		int mFill;
 		bool mVisible;
 	};
 

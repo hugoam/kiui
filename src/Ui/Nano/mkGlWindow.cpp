@@ -44,8 +44,9 @@ namespace mk
 		}
 	}
 
-	GlWindow::GlWindow(size_t width, size_t height, string title)
+	GlWindow::GlWindow(size_t width, size_t height, string title, string ressourcePath)
 		: RenderWindow(width, height, title, 0)
+		, mRessourcePath(ressourcePath)
 		, mUiWindow()
 		, mGlWindow(nullptr)
 	{}
@@ -97,7 +98,7 @@ namespace mk
 		// Calculate pixel ration for hi-dpi devices.
 		float pxRatio = (float)mFbWidth / (float)winWidth;
 
-		mNanoWindow = make_unique<NanoWindow>(mWidth, mHeight, pxRatio);
+		mNanoWindow = make_unique<NanoWindow>(mWidth, mHeight, pxRatio, mRessourcePath);
 		mUiWindow = make_unique<UiWindow>();
 		mUiWindow->setup(this, mNanoWindow.get(), nullptr);
 		this->initInput(mUiWindow.get(), 0);

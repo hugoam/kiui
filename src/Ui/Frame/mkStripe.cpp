@@ -340,6 +340,8 @@ namespace mk
 	void Stripe::resized(Dimension dim)
 	{
 		UNUSED(dim);
+		this->updateDepth();
+		this->updateLength();
 		d_relayout = true;
 	}
 

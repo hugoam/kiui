@@ -74,8 +74,8 @@ namespace mk
 				this->draw(subframe);
 	}
 
-	NanoTarget::NanoTarget(NVGcontext* ctx)
-		: mCtx(ctx)
+	NanoTarget::NanoTarget(NanoWindow* window)
+		: mWindow(window)
 		, mZMax(0)
 	{
 		mLayers.resize(16);
@@ -104,14 +104,16 @@ namespace mk
 
 	std::map<string, int> NanoWindow::sImages;
 
-	NanoWindow::NanoWindow(size_t width, size_t height, float pixelRatio)
+	NanoWindow::NanoWindow(size_t width, size_t height, float pixelRatio, string ressourcePath)
 		: mWidth(width)
 		, mHeight(height)
 		, mPixelRatio(pixelRatio)
+		, mRessourcePath(ressourcePath)
 		, mCtx(nullptr)
 	{
+		string fontPath = ressourcePath + "/fonts/DejaVuSans.ttf";
 		mCtx = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES); // | NVG_DEBUG);
-		nvgCreateFont(mCtx, "dejavu", "../Data/interface/fonts/DejaVuSans.ttf");
+		nvgCreateFont(mCtx, "dejavu", fontPath.c_str());
 		nvgFontSize(mCtx, 14.0f);
 		nvgFontFace(mCtx, "dejavu");
 
@@ -121,7 +123,7 @@ namespace mk
 			return;
 		}
 
-		mScreenTarget = make_unique<NanoTarget>(mCtx);
+		mScreenTarget = make_unique<NanoTarget>(this);
 	}
 
 	NanoWindow::~NanoWindow()

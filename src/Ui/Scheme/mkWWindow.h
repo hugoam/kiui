@@ -67,8 +67,12 @@ namespace mk
 		Widget* mContent;
 		Trigger mOnClose;
 		Sheet* mHeader;
+		Sheet* mBody;
 		WLabel* mTitle;
 		WButton* mCloseButton;
+
+		bool mDragging;
+		bool mResizing;
 
 		//Form* mContent;
 

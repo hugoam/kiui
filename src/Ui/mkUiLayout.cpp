@@ -100,7 +100,7 @@ namespace mk
 
 	void UiSkinner::add(string name, Colour colour)
 	{
-		mSkins.add(make_unique<InkStyle>(name, colour, Colour(1.f, 1.f, 1.f), Colour(), 0.f));
+		mSkins.add(make_unique<InkStyle>(name, colour, Colour(1.f, 1.f, 1.f)));
 	}
 
 	void UiSkinner::add(string name, string base)
@@ -228,10 +228,10 @@ namespace mk
 		skinner->skin("sliderknob")->mSubInks[HOVERED] = skinner->skin("sliderknob.hovered");
 
 		skinner->add("scrollerknob", "lightgrey");
-		skinner->skin("scrollerknob")->mMargin[DIM_X] = 4.f;
+		skinner->skin("scrollerknob")->mMargin = BoxFloat(4.f, 0.f, 4.f, 0.f);
 
 		skinner->add("scrollerknob.hovered", "red");
-		skinner->skin("scrollerknob.hovered")->mMargin[DIM_X] = 4.f;
+		skinner->skin("scrollerknob.hovered")->mMargin = BoxFloat(4.f, 0.f, 4.f, 0.f);
 		skinner->skin("scrollerknob")->mSubInks[HOVERED] = skinner->skin("scrollerknob.hovered");
 
 		skinner->add("expandbutton", Colour(1.f, 1.f, 1.f, 0.f));
@@ -332,13 +332,28 @@ namespace mk
 		skinner->add("list", "black");
 		skinner->add("collection", "black");
 
-		skinner->add("window", "alphagrey");
+		//skinner->add("window", "grey");
+		//skinner->skin("window")->mImageSkin = ImageSkin("tlook");
+
 		skinner->add("dockwindow", "black");
 
-		skinner->add("windowheader", "lightgrey");
+		skinner->add("window", "transparent");
+
+		skinner->add("windowheader", "transparent");
+		skinner->skin("windowheader")->mImageSkin = ImageSkin("tlookhead");
+
+		skinner->add("windowbody", "transparent");
+		skinner->skin("windowbody")->mImageSkin = ImageSkin("tlook");
+		skinner->skin("windowbody")->mMargin = BoxFloat(10.f, -5.f, 5.f, 0.f);
+
+		skinner->add("ceguibutton", "transparent");
+		skinner->skin("ceguibutton")->mImageSkin = ImageSkin("tlookbutton");
+		skinner->skin("ceguibutton")->mPadding = DimFloat(20.f, 8.f);
+
+		/*skinner->add("windowheader", "lightgrey");
+		skinner->add("windowbody", "transparent");*/
 
 		skinner->add("radioswitch", "white");
-
 
 
 		skinner->add("tab", "red");
@@ -424,7 +439,6 @@ namespace mk
 
 		layout->add("dockwindow", "partition");
 
-		layout->style("window")->d_padding = BoxFloat(4.f);
 		layout->style("dockwindow")->d_padding = BoxFloat(1.f);
 
 		layout->style("dockwindow")->d_opacity = _OPAQUE;
@@ -436,9 +450,7 @@ namespace mk
 		layout->add(StringVector({ "bool" }), "fixed");
 		layout->add(StringVector({ "expandbutton", "closebutton", "dropdownbutton", "scrollbutton", "slidervalue", "xscrollerspacer", "yscrollerspacer" "xsliderspacer", "ysliderspacer", "xscrollerknob", "yscrollerknob", "xsliderknob", "ysliderknob", "checkbox" }), "fixed");
 
-		layout->add(StringVector({ "scrollpartition", "scrollsheet", "scrollbox", "tree", "list", "tab", "docksection", "xdockline", "ydockline", "dockspace", "dockwindowboard", "collection", "tabber", "tabs", "xscroller", "yscroller", "gridline" }), "partition");
-
-		layout->add(StringVector({ "windowboard" }), "wrap");
+		layout->add(StringVector({ "scrollpartition", "scrollsheet", "scrollbox", "tree", "list", "tab", "docksection", "xdockline", "ydockline", "dockspace", "dockwindowboard", "windowbody", "collection", "tabber", "tabs", "xscroller", "yscroller", "gridline" }), "partition");
 
 		layout->add(StringVector({ "controls", "radioswitch", "radiobutton", "dropdown", "dropdownheader", "dropbutton" }), "wrap_inline");
 
@@ -454,6 +466,12 @@ namespace mk
 		layout->style("tablehead")->d_opacity = _OPAQUE;
 		layout->style("tablehead")->d_spacing[DIM_X] = 1.f;
 		
+		layout->style("windowheader")->d_sizing[DIM_Y] = FIXED;
+		layout->style("windowheader")->d_size[DIM_Y] = 30.f;
+
+		layout->style("windowbody")->d_padding = BoxFloat(20.f, 10.f, 10.f, 10.f);
+		//layout->style("windowbody")->d_padding = BoxFloat(4.f);
+
 		layout->style("int")->d_opacity = _OPAQUE;
 		layout->style("float")->d_opacity = _OPAQUE;
 		layout->style("string")->d_opacity = _OPAQUE;
@@ -466,6 +484,7 @@ namespace mk
 
 		layout->style("tree")->d_overflow = SCROLL;
 		layout->style("list")->d_overflow = SCROLL;
+		layout->style("windowbody")->d_overflow = SCROLL;
 		layout->style("scrollpartition")->d_overflow = SCROLL;
 
 		layout->style("list")->d_sizing = DimSizing(CAPPED, CAPPED);
@@ -484,6 +503,8 @@ namespace mk
 		layout->style("expandbox")->d_layoutDim = DIM_Y;
 		layout->style("expandboxcontainer")->d_layoutDim = DIM_Y;
 		layout->style("expandboxcontainer")->d_spacing[DIM_Y] = 2.f;
+
+		layout->style("scrollpartition")->d_spacing[DIM_Y] = 4.f;
 
 		layout->style("table")->d_spacing[DIM_Y] = 2.f;
 		layout->style("table")->d_layoutDim = DIM_Y;

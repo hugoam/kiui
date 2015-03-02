@@ -135,6 +135,29 @@ namespace mk
 		unique_ptr<InkLayer> d_inkLayer;
 		unique_ptr<Inkbox> d_inkbox;
 	};
+
+	class MK_UI_EXPORT FrameSkin
+	{
+	public:
+		FrameSkin(Frame* frame, ImageSkin* skin);
+
+		Frame* d_frame;
+		ImageSkin* d_skin;
+
+		float d_left;
+		float d_top;
+
+		float d_inleft;
+		float d_intop;
+		float d_inright;
+		float d_inbottom;
+
+		float d_inwidth;
+		float d_inheight;
+
+		float d_outtop;
+		float d_outleft;
+	};
 }
 
 #endif // MK_WIDGET_H_INCLUDED

@@ -30,6 +30,8 @@ namespace mk
 		, mDockable(dockable)
 		, mContent(nullptr)
 		, mOnClose(onClose)
+		, mDragging(false)
+		, mResizing(false)
 		, mDock(dock)
 	{}
 
@@ -40,6 +42,7 @@ namespace mk
 	{
 		Sheet::build();
 		mHeader = this->makeappend<Sheet>("windowheader");
+		mBody = this->makeappend<Sheet>("windowbody");
 		mTitle = mHeader->makeappend<WLabel>(mName, "label");
 		mCloseButton = mClosable ? mHeader->makeappend<WButton>("", "closebutton", std::bind(&WWindow::close, this)) : nullptr;
 
@@ -129,6 +132,7 @@ namespace mk
 
 		mFrame->setPosition(mFrame->dabsolute(DIM_X), mFrame->dabsolute(DIM_Y));
 		mFrame->moveToTop();
+		mDragging = true;
 	}
 	
 	void WWindow::close()
@@ -142,16 +146,20 @@ namespace mk
 	{
 		mTitle->setLabel(widget->name());
 		mContent = widget.get();
-		return this->append(std::move(widget));
+		return mBody->append(std::move(widget));
 	}
 
 	bool WWindow::leftDragStart(float xPos, float yPos)
 	{
-		UNUSED(xPos); UNUSED(yPos);
 		if(mDockable && mDock)
 			this->undock();
+		else if(yPos - mFrame->dabsolute(DIM_Y) > mFrame->dsize(DIM_Y) * 0.8f && xPos - mFrame->dabsolute(DIM_X) > mFrame->dsize(DIM_X) * 0.8f)
+			mResizing = true;
+		else
+			mDragging = true;
 
-		mFrame->moveToTop();
+		if(mDragging)
+			mFrame->moveToTop();
 
 		return true;
 	}
@@ -159,7 +167,10 @@ namespace mk
 	bool WWindow::leftDrag(float xPos, float yPos, float xDif, float yDif)
 	{
 		UNUSED(xPos); UNUSED(yPos);
-		mFrame->setPosition(mFrame->dposition(DIM_X) + xDif, mFrame->dposition(DIM_Y) + yDif);
+		if(mDragging)
+			mFrame->setPosition(mFrame->dposition(DIM_X) + xDif, mFrame->dposition(DIM_Y) + yDif);
+		else if(mResizing)
+			mFrame->setSize(mFrame->dsize(DIM_X) + xDif, mFrame->dsize(DIM_Y) + yDif);
 
 		return true;
 	}
@@ -193,6 +204,9 @@ namespace mk
 				this->dock(section);
 			}
 		}
+
+		mDragging = false;
+		mResizing = false;
 
 		return true;
 	}

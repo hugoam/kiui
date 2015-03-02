@@ -9,11 +9,13 @@
 
 #include <Ui/Nano/mkGlWindow.h>
 
+#include <float.h>
+
 namespace mk
 {
 	void createTestWindow(Form* parent)
 	{
-		std::unique_ptr<Form> boardpt = std::make_unique<Form>("scrollpartition");
+		unique_ptr<Form> boardpt = make_unique<Form>("scrollpartition");
 
 		Window* window = parent->makeappend<Window>(std::move(boardpt));
 		WWindow* wwindow = window->widget()->as<WWindow>();
@@ -26,6 +28,7 @@ namespace mk
 		board->setName("kiUi Test");
 
 		board->makeappend<Label>("", "kiui says hello.");
+		board->makeappend<Button>("ceguibutton", "I'm a TaharezLook button.");
 
 		//for(size_t i = 0; i < 20; ++i)
 		//	window->makeappend<Label>("", "This window is being created by the ShowTestWindow() function. Please refer to the code for programming reference.\n\nUser Guide:");
@@ -64,14 +67,11 @@ namespace mk
 		current->makeappend<SliderFloat>("log float", Stat<float>(0.f, 0.0f, 10.0f));
 		current->makeappend<SliderFloat>("signed log float", Stat<float>(0.f, -10.0f, 10.0f));
 		current->makeappend<SliderFloat>("unbound float", Stat<float>(123456789.0f, -FLT_MAX, FLT_MAX));
-
-		// current->makeappend<SliderAngle>("angle", 0.f);
-		// current->makeappend<FVector3>("slider float3", 0.0f, 1.0f);
 	}
 
 	void exampleApp()
 	{
-		std::unique_ptr<GlWindow> glwindow = std::make_unique<GlWindow>(1200, 800, "mk UiEditApp");
+		unique_ptr<GlWindow> glwindow = make_unique<GlWindow>(1200, 800, "mk UiEditApp", "../Data/interface");
 		glwindow->initContext();
 
 		UiWindow* uiwindow = glwindow->uiWindow();

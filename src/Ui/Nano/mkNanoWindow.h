@@ -46,9 +46,9 @@ namespace mk
 	class MK_UI_EXPORT NanoTarget : public InkTarget
 	{
 	public:
-		NanoTarget(NVGcontext* ctx);
+		NanoTarget(NanoWindow* window);
 
-		NVGcontext* ctx() { return mCtx; }
+		NanoWindow* window() { return mWindow; }
 		size_t zmax() { return mZMax; }
 
 		unique_ptr<InkLayer> layer(Frame* frame, size_t z);
@@ -57,7 +57,7 @@ namespace mk
 		void nanodraw();
 
 	protected:
-		NVGcontext* mCtx;
+		NanoWindow* mWindow;
 		size_t mZMax;
 		std::vector<std::vector<NanoLayer*>> mLayers;
 	};
@@ -71,19 +71,23 @@ namespace mk
 	class MK_UI_EXPORT NanoWindow : public InkWindow
 	{
 	public:
-		NanoWindow(size_t width, size_t height, float pixelRatio);
+		NanoWindow(size_t width, size_t height, float pixelRatio, string ressourcePath);
 		~NanoWindow();
 
 		void nextFrame();
 
 		InkTarget* screenTarget();
 
+		string ressourcePath() { return mRessourcePath; }
+		NVGcontext* ctx() { return mCtx; }
+		
 		static std::map<string, int> sImages;
 
 	protected:
 		size_t mWidth;
 		size_t mHeight;
 		float mPixelRatio;
+		string mRessourcePath;
 		unique_ptr<NanoGl> mNanoGl;
 
 		NVGcontext* mCtx;
