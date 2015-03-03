@@ -12,12 +12,13 @@ set(GLFW_INCLUDE_PATHS
 )
 
 set(GLFW_LIB_PATHS
-		${PROJECT_SOURCE_DIR}/../../external/glfw/include
-		${PROJECT_SOURCE_DIR}/../external/glfw/include
-		/usr/local/include
-		/usr/X11/include
-		/usr/include
-		/opt/local/include
+		${PROJECT_SOURCE_DIR}/../../external/glfw/src
+		${PROJECT_SOURCE_DIR}/../external/glfw/src
+		${PROJECT_SOURCE_DIR}/../../external/glfw/lib/x64
+		${PROJECT_SOURCE_DIR}/../external/glfw/lib/x64
+		/usr/local
+		/usr/X11
+		/usr
 )
 
 if(WIN32)

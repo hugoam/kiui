@@ -44,5 +44,9 @@ include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(${GLFW_INCLUDE_DIR})
 
 install(FILES ${HEADERS_FILES} DESTINATION "include")
- 
-#install(TARGETS kiui LIBRARY DESTINATION "lib")
+
+if (WIN32)
+	install(TARGETS kiui LIBRARY DESTINATION "lib" RUNTIME DESTINATION "lib")
+else ()
+	install(TARGETS kiui LIBRARY DESTINATION "lib")
+endif ()
