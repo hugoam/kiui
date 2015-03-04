@@ -10,6 +10,8 @@ set(CMAKE_MODULE_PATH ${KIUI_SOURCE_DIR}/cmake/modules ${KIUI_SOURCE_DIR}/cmake/
 
 set(WARNING_LEVEL "/W4")
 
+add_compile_options(${WARNING_LEVEL})
+
 find_package(OpenGL)
 find_package(GLFW)
 		

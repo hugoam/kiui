@@ -1,10 +1,8 @@
-# Custom cmake module for CEGUI to find glfw
+# Custom cmake module for kiui to find glfw
 
 include(FindPackageHandleStandardArgs)
 
 set(GLFW_INCLUDE_PATHS
-		${PROJECT_SOURCE_DIR}/../../external/glfw/include
-		${PROJECT_SOURCE_DIR}/../external/glfw/include
 		/usr/local/include
 		/usr/X11/include
 		/usr/include
@@ -12,10 +10,6 @@ set(GLFW_INCLUDE_PATHS
 )
 
 set(GLFW_LIB_PATHS
-		${PROJECT_SOURCE_DIR}/../../external/glfw/src
-		${PROJECT_SOURCE_DIR}/../external/glfw/src
-		${PROJECT_SOURCE_DIR}/../../external/glfw/lib/x64
-		${PROJECT_SOURCE_DIR}/../external/glfw/lib/x64
 		/usr/local
 		/usr/X11
 		/usr
