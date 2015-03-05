@@ -16,7 +16,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT Frame : public Object, public Typed<Frame>, public Uibox, public Updatable
+	class MK_UI_EXPORT _I_ Frame : public Object, public Typed<Frame>, public Uibox, public Updatable
 	{
 	public:
 		Frame(Stripe* parent, Widget* widget, string clas = "", size_t zorder = 0);
