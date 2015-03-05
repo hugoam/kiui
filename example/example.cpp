@@ -11,7 +11,7 @@
 
 int main(int argc, char *argv[])
 {
-	std::unique_ptr<mk::GlWindow> glwindow = std::make_unique<mk::GlWindow>(1200, 800, "mk UiEditApp", "../Data/interface");
+	std::unique_ptr<mk::GlWindow> glwindow = std::make_unique<mk::GlWindow>(1200, 800, "mk UiEditApp", "../data/interface");
 	glwindow->initContext();
 
 	mk::UiWindow* uiwindow = glwindow->uiWindow();
