@@ -175,7 +175,7 @@ namespace mk
 
 	void NanoInk::updateStyle()
 	{
-		if(mFrame->inkstyle()->mEmpty || !mVisible)
+		if(mFrame->inkstyle()->mEmpty)
 			return;
 
 		const string& image = mFrame->widget()->image();
