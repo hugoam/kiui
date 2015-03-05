@@ -17,6 +17,14 @@ It is designed according to the following design goals :
 
 ![screenshot of the example window with a raw skin](kiui.png?raw=true)
 
+Auto-Layout
+===========
+
+Every single element in kiUi auto-layouts ! You have nothing to do. No position to set, no size to determine.
+Code the logic : Just add your widgets and define the logic as you please.
+Code the appearance : Just set your fonts, font-size, images, and kiUi will do the rest.
+The style can be defined and tweaked separately by an artist. Style are defined in C++ as of now, but Style Sheets are planned to come soon.
+
 Usage
 ====
 ```C++
