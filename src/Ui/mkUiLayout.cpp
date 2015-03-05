@@ -337,21 +337,25 @@ namespace mk
 
 		skinner->add("dockwindow", "black");
 
-		skinner->add("window", "transparent");
+		skinner->add("window", "alphagrey");
+		skinner->add("windowheader", "lightgrey");
 
-		skinner->add("windowheader", "transparent");
-		skinner->skin("windowheader")->mImageSkin = ImageSkin("tlookhead");
+		skinner->add("tlookwindow", "transparent");
 
-		skinner->add("windowbody", "transparent");
-		skinner->skin("windowbody")->mImageSkin = ImageSkin("tlook");
-		skinner->skin("windowbody")->mMargin = BoxFloat(10.f, -5.f, 5.f, 0.f);
+		skinner->add("tlookwindowheader", "transparent");
+		skinner->skin("tlookwindowheader")->mImageSkin = ImageSkin("tlookhead");
+
+		skinner->add("tlookwindowbody", "transparent");
+		skinner->skin("tlookwindowbody")->mImageSkin = ImageSkin("tlook");
+		skinner->skin("tlookwindowbody")->mMargin = BoxFloat(10.f, -5.f, 5.f, 0.f);
+
+		skinner->addOverride("uieditboard", "window", "tlookwindow");
+		skinner->addOverride("uieditboard", "windowheader", "tlookwindowheader");
+		skinner->addOverride("uieditboard", "windowbody", "tlookwindowbody");
 
 		skinner->add("ceguibutton", "transparent");
 		skinner->skin("ceguibutton")->mImageSkin = ImageSkin("tlookbutton");
 		skinner->skin("ceguibutton")->mPadding = DimFloat(20.f, 8.f);
-
-		/*skinner->add("windowheader", "lightgrey");
-		skinner->add("windowbody", "transparent");*/
 
 		skinner->add("radioswitch", "white");
 
@@ -363,6 +367,11 @@ namespace mk
 		skinner->skin("expandboxheader")->mSubInks[ACTIVATED] = skinner->skin("red");
 
 		skinner->add("expandboxcontainer", "grey");
+
+		skinner->add("treenodeheader", "transparent");
+		skinner->skin("treenodeheader")->mSubInks[ACTIVATED] = skinner->skin("red");
+
+		skinner->add("treenodecontainer", "transparent");
 
 		skinner->add("typein", "lightgrey");
 		skinner->skin("typein")->mCornerRadius = 3.f;
@@ -454,7 +463,9 @@ namespace mk
 
 		layout->add(StringVector({ "controls", "radioswitch", "radiobutton", "dropdown", "dropdownheader", "dropbutton" }), "wrap_inline");
 
-		layout->add(StringVector({ "columnheader", "dropdown", "dropdownheader", "typein", "value", "string", "int", "float", "intstat", "floatstat", "xslider", "yslider", "sliderint", "sliderfloat", "dropdowninput", "intinput", "floatinput", "boolinput", "textinput", "expandboxheader", "expandbox", "expandboxcontainer", "windowheader", "table", "tablehead", "headtabs", "scrollbar" }), "div");
+		layout->add(StringVector({ "columnheader", "dropdown", "dropdownheader", "typein", "value", "string", "int", "float", "intstat", "floatstat", "xslider", "yslider", "sliderint", "sliderfloat", "dropdowninput", "intinput", "floatinput", "boolinput", "textinput", "windowheader", "table", "tablehead", "headtabs", "scrollbar" }), "div");
+		layout->add(StringVector({ "expandbox", "expandboxheader", "expandboxcontainer" }), "div");
+		layout->add(StringVector({ "treenode", "treenodeheader", "treenodecontainer" }), "div");
 
 		layout->add(StringVector({ "root" }), "layer");
 
@@ -465,12 +476,8 @@ namespace mk
 
 		layout->style("tablehead")->d_opacity = _OPAQUE;
 		layout->style("tablehead")->d_spacing[DIM_X] = 1.f;
-		
-		layout->style("windowheader")->d_sizing[DIM_Y] = FIXED;
-		layout->style("windowheader")->d_size[DIM_Y] = 30.f;
 
-		layout->style("windowbody")->d_padding = BoxFloat(20.f, 10.f, 10.f, 10.f);
-		//layout->style("windowbody")->d_padding = BoxFloat(4.f);
+		layout->style("windowbody")->d_padding = BoxFloat(4.f);
 
 		layout->style("int")->d_opacity = _OPAQUE;
 		layout->style("float")->d_opacity = _OPAQUE;
@@ -503,13 +510,18 @@ namespace mk
 		layout->style("expandbox")->d_layoutDim = DIM_Y;
 		layout->style("expandboxcontainer")->d_layoutDim = DIM_Y;
 		layout->style("expandboxcontainer")->d_spacing[DIM_Y] = 2.f;
+		layout->style("expandboxcontainer")->d_padding = BoxFloat(12.f, 2.f, 0.f, 0.f);
+
+		layout->style("treenode")->d_layoutDim = DIM_Y;
+		layout->style("treenodecontainer")->d_layoutDim = DIM_Y;
+		layout->style("treenodecontainer")->d_padding = BoxFloat(12.f, 2.f, 0.f, 0.f);
 
 		layout->style("scrollpartition")->d_spacing[DIM_Y] = 4.f;
 
 		layout->style("table")->d_spacing[DIM_Y] = 2.f;
 		layout->style("table")->d_layoutDim = DIM_Y;
 
-		layout->style("expandboxcontainer")->d_padding = BoxFloat(12.f, 2.f, 0.f, 0.f);
+		
 
 		layout->style("dropbutton")->d_opacity = _OPAQUE;
 
@@ -557,5 +569,15 @@ namespace mk
 
 		layout->add("newobject", "div");
 		layout->addOverride("newobject", "dropdown", "div");
+
+		layout->add("tlookwindowbody", "windowbody");
+		layout->style("tlookwindowbody")->d_padding = BoxFloat(20.f, 10.f, 10.f, 10.f);
+
+		layout->add("tlookwindowheader", "windowheader");
+		layout->style("tlookwindowheader")->d_sizing[DIM_Y] = FIXED;
+		layout->style("tlookwindowheader")->d_size[DIM_Y] = 30.f;
+
+		layout->addOverride("uieditboard", "windowheader", "tlookwindowheader");
+		layout->addOverride("uieditboard", "windowbody", "tlookwindowbody");
 	}
 }
