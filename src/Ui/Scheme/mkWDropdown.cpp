@@ -36,7 +36,7 @@ namespace mk
 	{
 		Sheet::build();
 		mHeader = this->makeappend<Sheet>("dropdownheader");
-		mDropbox = this->makeappend<WDropdownBox>();
+		mDropbox = this->makeappend<WDropdownBox>(this);
 		mDropButton = this->makeappend<WButton>("", "dropdownbutton", std::bind(&WDropdown::dropdown, this));
 
 		mDropbox->frame()->hide();
@@ -98,14 +98,15 @@ namespace mk
 		mOnSelected(button->content());
 	}
 
-	WDropdownBox::WDropdownBox()
+	WDropdownBox::WDropdownBox(WDropdown* dropdown)
 		: Sheet("dropdownbox")
+		, mDropdown(dropdown)
 	{}
 
 	bool WDropdownBox::leftClick(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
-		mParent->as<WDropdown>()->dropup();
+		mDropdown->dropup();
 		return true;
 	}
 

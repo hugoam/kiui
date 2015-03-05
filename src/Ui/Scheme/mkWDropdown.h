@@ -17,7 +17,7 @@ namespace mk
 	class MK_UI_EXPORT WDropdownBox : public Sheet
 	{
 	public:
-		WDropdownBox();
+		WDropdownBox(WDropdown* dropdown);
 
 		bool leftClick(float x, float y);
 
