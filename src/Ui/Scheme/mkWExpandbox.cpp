@@ -26,10 +26,10 @@ namespace mk
 	void WExpandbox::build()
 	{
 		Sheet::build();
-		mHeader = this->makeappend<Sheet>("expandboxheader");
+		mHeader = this->makeappend<Sheet>(mClas + "header");
 		mExpandButton = mHeader->makeappend<WToggle>("expandbutton", std::bind(&WExpandbox::expand, this), std::bind(&WExpandbox::collapse, this), !mCollapsed);
 		mTitleLabel = mHeader->makeappend<WLabel>(mTitle, "title");
-		mContainer = this->makeappend<Sheet>("expandboxcontainer");
+		mContainer = this->makeappend<Sheet>(mClas + "container");
 
 		mContainer->frame()->hide();
 	}

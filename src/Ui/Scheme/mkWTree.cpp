@@ -16,6 +16,12 @@ using namespace std::placeholders;
 
 namespace mk
 {
+	WTreeNode::WTreeNode(string image, string title, bool collapsed)
+		: WExpandbox(title, collapsed)
+	{
+		mClas = "treenode";
+	}
+
 	WTree::WTree(string cls, Form* form)
 		: ScrollSheet(cls, form)
 		, mRootNode(nullptr)
@@ -25,7 +31,7 @@ namespace mk
 	WTree::~WTree()
 	{}
 
-	void WTree::select(WExpandbox* selected)
+	void WTree::select(WTreeNode* selected)
 	{
 		if(mSelected)
 			mSelected->header()->updateState(ENABLED);
@@ -37,14 +43,19 @@ namespace mk
 		while(node != this)
 		{
 			if(node->clas() == "expandbox")
-				node->as<WExpandbox>()->expand();
+			{
+				node->as<WTreeNode>()->expand();
+				for(auto& widget : node->parent()->contents()->store())
+					if(widget.get() != node)
+						widget->as<WTreeNode>()->collapse();
+			}
 			node = node->parent();
 		}
-
-		/*for(auto& widget : mRootNode->contents()->store())
-			if(widget.get() != node)
-				widget->as<WExpandbox>()->collapse();*/
 	}
+
+	TreeNode::TreeNode(string image, string title, bool collapsed)
+		: Expandbox(title, collapsed)
+	{}
 
 	Tree::Tree(string cls)
 		: Form(cls + " tree", "", [this]() { return make_unique<WTree>("tree", this); })
