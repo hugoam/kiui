@@ -24,20 +24,7 @@ namespace mk
 			- ordering of the elements in a collection
 	*/
 
-	/*
-		Types of forms :
-			-Dropdown (one form is shown at a given time, with selection action)
-			-Tabs (one form is shown at a given time)
-	*/
-
-	enum FormUpdate
-	{
-		FORM_DEFAULT = 0,
-		FORM_ADDED = 1,
-		FORM_REMOVED = 2,
-		//FORM_DESTROYED = 3,
-		FORM_UPDATED = 3
-	};
+	typedef std::vector<std::unique_ptr<Form>> UniqueFormVector;
 
     class MK_UI_EXPORT Form : public TypeObject, public Typed<Form>, public Updatable
     {
@@ -47,6 +34,8 @@ namespace mk
 	public:
 		Form(const string& cls, const string& label = "", SchemeMapper containerMapper = nullptr, SchemeMapper elementMapper = nullptr);
 		~Form();
+
+		virtual void build() {}
 
 		UiWindow* uiWindow();
 		Form* parent() { return mParent; }
@@ -65,8 +54,6 @@ namespace mk
 		const string& image() const { return this->getAttr("image"); }
 		const string& name() const { return this->getAttr("name"); }
 		const string& tooltip() const { return this->getAttr("tooltip"); }
-
-		const string& fullIndex() const { return mFullIndex; }
 
 		std::map<string, string>& attrs() { return mAttrs; }
 		bool hasAttr(const string& name) { return mAttrs.find(name) != mAttrs.end(); }
@@ -88,10 +75,7 @@ namespace mk
 		void bind(Form* parent);
 
 		void destroy();
-		void flagDestroy();
-
 		void clear();
-		void flagClear();
 		
 		void remove(size_t index);
 
@@ -107,7 +91,6 @@ namespace mk
 
 		Form* prev();
 		Form* next();
-		size_t last();
 
 		bool contains(Form* other);
 
@@ -130,12 +113,9 @@ namespace mk
 		//void updated();
 		//void altered();
 
-		bool destroyed() { return mDestroy; }
-
 	protected:
 		Form* mParent;
 		size_t mIndex;
-		string mFullIndex;
 		string mCls;
 		string mLabel;
 
@@ -150,12 +130,17 @@ namespace mk
 
 		Index<Registry<Form>> mContents;
 
-		bool mDestroy;
-
 		static string sNullString;
     };
 
-
+	enum FormUpdate
+	{
+		FORM_DEFAULT = 0,
+		FORM_ADDED = 1,
+		FORM_REMOVED = 2,
+		//FORM_DESTROYED = 3,
+		FORM_UPDATED = 3
+	};
 }
 
 #endif // MK_FORM_H_INCLUDED

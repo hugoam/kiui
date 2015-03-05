@@ -28,14 +28,12 @@ namespace mk
 		: TypeObject(Form::cls())
 		, mParent(nullptr)
 		, mIndex(0)
-		, mFullIndex(concatIndex())
 		, mCls(cls)
 		, mLabel(label)
 		, mLastTick(0)
 		, mUpdated(0)
 		, mScheme(this, containerMapper, elementMapper)
 		, mWidget(nullptr)
-		, mDestroy(false)
 	{}
 
 	Form::~Form()
@@ -86,7 +84,7 @@ namespace mk
 
 	Form* Form::append(unique_ptr<Form> form)
 	{
-		return this->insert(std::move(form), this->last());
+		return this->insert(std::move(form), mContents.size());
 	}
 
 	unique_ptr<Form> Form::release(size_t pos)
@@ -104,7 +102,7 @@ namespace mk
 	string Form::concatIndex()
 	{
 		if(mParent)
-			return mParent->fullIndex() + "." + toString(mIndex);
+			return mParent->concatIndex() + "." + toString(mIndex);
 		else
 			return toString(mIndex);
 	}
@@ -122,61 +120,16 @@ namespace mk
 			mWidget->frame()->as<Stripe>()->move(from, to);
 	}
 
-	void Form::updateIndex()
-	{
-		mFullIndex = concatIndex();
-
- 		for(auto& pt : mContents.store())
-			pt->as<Form>()->updateIndex();
-	}
-
-	size_t Form::last()
-	{
-		size_t pos = mContents.size();
-		while(pos)
-			if(!mContents.at(pos-1)->as<Form>()->destroyed())
-				break;
-			else
-				--pos;
-		return pos;
-	}
-
-	void Form::flagDestroy()
-	{
-		this->destroy();
-		/*mDestroy = true;
-
-		size_t pos = mParent->last();
-		if(pos && pos != mIndex)
-			mParent->mContents.move(mIndex, pos);*/
-	}
-
 	void Form::clear()
 	{
 		for(auto& pt : reverse_adapt(mContents.store()))
-			pt->mWidget->destroy();
-
+			mScheme.remove(pt.get());
 		mContents.clear();
-	}
-
-	void Form::flagClear()
-	{
-		this->clear();
-		/*for(auto& pt : reverse_adapt(mContents.store()))
-			pt->as<Form>()->flagDestroy();*/
 	}
 
 	void Form::nextFrame(size_t tick, size_t delta)
 	{
-		UNUSED(delta);
-		//std::cerr << "Form :: nextFrame " << tick << " , " << delta << std::endl;
-		mLastTick = tick;
-
-		/*if(mDestroy)
-			this->destroy();
-		else
-			for(int i = mContents.size()-1; i >= 0; --i)
-				mContents.at(i)->as<Form>()->nextFrame(tick, delta);*/
+		UNUSED(tick); UNUSED(delta);
 	}
 
 	Form* Form::prev()
@@ -189,9 +142,12 @@ namespace mk
 		return mParent->contents()->at(mIndex + 1);
 	}
 
-	bool Form::contains(Form* other)
+	bool Form::contains(Form* form)
 	{
-		return std::search(other->fullIndex().begin(), other->fullIndex().end(), mFullIndex.begin(), mFullIndex.end()) != other->fullIndex().end();
+		while(form && form != this)
+			form = form->parent();
+
+		return form == this;
 	}
 
 	Form* Form::findParent(const string& cls)
