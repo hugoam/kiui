@@ -27,14 +27,14 @@
 
 namespace mk
 {
-	template <> inline Type* typecls<Dimension>() { return Typed<Sizing>::cls(); }
+	template <> inline Type* typecls<Dimension>() { return Typed<Dimension>::cls(); }
 	template <> inline Type* typecls<Sizing>() { return Typed<Sizing>::cls(); }
 	template <> inline Type* typecls<Pivot>() { return Typed<Pivot>::cls(); }
-	template <> inline Type* typecls<Flow>() { return Typed<Sizing>::cls(); }
-	template <> inline Type* typecls<Overflow>() { return Typed<Sizing>::cls(); }
-	template <> inline Type* typecls<BoxLayer>() { return Typed<Sizing>::cls(); }
-	template <> inline Type* typecls<Opacity>() { return Typed<Sizing>::cls(); }
-	template <> inline Type* typecls<FrameType>() { return Typed<Sizing>::cls(); }
+	template <> inline Type* typecls<Flow>() { return Typed<Flow>::cls(); }
+	template <> inline Type* typecls<Overflow>() { return Typed<Overflow>::cls(); }
+	template <> inline Type* typecls<BoxLayer>() { return Typed<BoxLayer>::cls(); }
+	template <> inline Type* typecls<Opacity>() { return Typed<Opacity>::cls(); }
+	template <> inline Type* typecls<FrameType>() { return Typed<FrameType>::cls(); }
 
 	template class MK_UI_EXPORT Typed<Dimension>;
 	template class MK_UI_EXPORT Typed<Sizing>;
