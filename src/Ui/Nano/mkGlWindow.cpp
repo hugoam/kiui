@@ -18,6 +18,7 @@
 
 #include <iostream>
 
+#define CAP_FRAMERATE
 #ifdef CAP_FRAMERATE
 #include <thread>
 #endif
