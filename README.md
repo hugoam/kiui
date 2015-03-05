@@ -51,6 +51,15 @@ Skins
 
 kiUi was conceived so that each element can be styled in a way very similar to CSS
 
+Editor
+======
+
+kiUi will come with a simple editor currently a work in progress and using kiUi
+
+![screenshot of the WIP editor for kiUi](editor.jpg?raw=true)
+
+
+
 ## License
 The library is licensed under [zlib license](LICENSE.txt)
 
