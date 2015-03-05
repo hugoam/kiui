@@ -139,12 +139,12 @@ namespace mk
 		return mFrame->style();
 	}
 
-	InkStyle* Widget::elementSkin(string clas)
+	InkStyle* Widget::elementSkin(const string& clas)
 	{
 		return mParent->elementSkin(clas);
 	}
 
-	LayoutStyle* Widget::elementStyle(string clas)
+	LayoutStyle* Widget::elementStyle(const string& clas)
 	{
 		return mParent->elementStyle(clas);
 	}

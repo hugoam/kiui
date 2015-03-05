@@ -34,7 +34,7 @@ namespace mk
 		mOverrides = this->uiWindow()->skinner()->hasOverrides(mClas);
 	}
 
-	InkStyle* Sheet::elementSkin(string clas)
+	InkStyle* Sheet::elementSkin(const string& clas)
 	{
 		if(mOverrides)
 			return this->uiWindow()->skinner()->elementSkin(clas, mClas);
@@ -42,7 +42,7 @@ namespace mk
 			return mParent->elementSkin(clas);
 	}
 
-	LayoutStyle* Sheet::elementStyle(string clas)
+	LayoutStyle* Sheet::elementStyle(const string& clas)
 	{
 		if(mOverrides)
 			return this->uiWindow()->layout()->elementStyle(clas, mClas);
@@ -231,12 +231,12 @@ namespace mk
 		mFrame->setOpacity(_OPAQUE);
 	}
 
-	InkStyle* RootSheet::elementSkin(string clas)
+	InkStyle* RootSheet::elementSkin(const string& clas)
 	{
 		return mWindow->skinner()->elementSkin(clas, "");
 	}
 
-	LayoutStyle* RootSheet::elementStyle(string clas)
+	LayoutStyle* RootSheet::elementStyle(const string& clas)
 	{
 		return mWindow->layout()->elementStyle(clas, "");
 	}

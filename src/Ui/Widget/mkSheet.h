@@ -17,7 +17,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT Sheet : public Widget
+	class MK_UI_EXPORT _I_ Sheet : public Widget
 	{
 	public:
 		Sheet(string clas, Form* form = nullptr);
@@ -30,8 +30,8 @@ namespace mk
 		inline Stripe* stripe() { return mFrame->as<Stripe>(); }
 		inline Registry<Widget>* contents() { return &mContents; }
 
-		InkStyle* elementSkin(string clas);
-		LayoutStyle* elementStyle(string clas);
+		InkStyle* elementSkin(const string& clas);
+		LayoutStyle* elementStyle(const string& clas);
 
 		virtual Sheet* vaddwrapper(Widget* widget) { UNUSED(widget); return nullptr; }
 		virtual Widget* vappend(unique_ptr<Widget> widget) { return append(std::move(widget)); }
@@ -151,8 +151,8 @@ namespace mk
 		UiWindow* uiWindow() { return mWindow; }
 		RootSheet* rootWidget() { return this; }
 
-		InkStyle* elementSkin(string clas);
-		LayoutStyle* elementStyle(string clas);
+		InkStyle* elementSkin(const string& clas);
+		LayoutStyle* elementStyle(const string& clas);
 
 	protected:
 		UiWindow* mWindow;

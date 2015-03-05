@@ -48,8 +48,8 @@ namespace mk
 
 		virtual Sheet* clone(Sheet* parent);
 
-		virtual InkStyle* elementSkin(string clas);
-		virtual LayoutStyle* elementStyle(string clas);
+		virtual InkStyle* elementSkin(const string& clas);
+		virtual LayoutStyle* elementStyle(const string& clas);
 
 		virtual FrameType frameType();
 		virtual size_t zorder() { return 0; }
