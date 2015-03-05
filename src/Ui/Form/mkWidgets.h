@@ -26,18 +26,21 @@ namespace mk
 	{
 	public:
 		Label(const string& cls, const string& label);
+		Label(const string& label);
 	};
 
 	class MK_UI_EXPORT Textbox : public Form
 	{
 	public:
 		Textbox(const string& cls, const string& text);
+		Textbox(const string& text);
 	};
 
 	class MK_UI_EXPORT Image : public Form
 	{
 	public:
 		Image(const string& cls, const string& image);
+		Image(const string& image);
 	};
 	
 	class MK_UI_EXPORT DynamicImage : public Form

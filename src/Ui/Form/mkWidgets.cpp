@@ -17,9 +17,17 @@ namespace mk
 	Label::Label(const string& cls, const string& label)
 		: Form(cls + " label", label)
 	{}
+	
+	Label::Label(const string& label)
+		: Label("", label)
+	{}
 
 	Textbox::Textbox(const string& cls, const string& text)
 		: Form(cls + " text", text, [this, text](){ return make_unique<WTextbox>(this, text); })
+	{}
+
+	Textbox::Textbox(const string& text)
+		: Textbox("", text)
 	{}
 
 	Image::Image(const string& cls, const string& image)
@@ -27,6 +35,10 @@ namespace mk
 	{
 		this->setImage(image);
 	}
+
+	Image::Image(const string& image)
+		: Image("", image)
+	{}
 
 	DynamicImage::DynamicImage(const string& cls, unique_ptr<Image256> image)
 		: Form(cls + " dynamicimage")
