@@ -36,7 +36,7 @@ namespace mk
 	class MK_UI_EXPORT RadioSwitch : public Form
 	{
 	public:
-		RadioSwitch(Trigger onSelected, size_t active = 0);
+		RadioSwitch(Trigger onSelected, size_t active = 0, StringVector labels = StringVector());
 
 		void onSelected(Widget* widget);
 

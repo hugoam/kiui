@@ -52,10 +52,13 @@ namespace mk
 		mOnSelected(button->content());
 	}
 
-	RadioSwitch::RadioSwitch(Trigger onSelected, size_t active)
+	RadioSwitch::RadioSwitch(Trigger onSelected, size_t active, StringVector labels)
 		: Form("radioswitch", "", [this, active]() { return make_unique<WRadioSwitch>(std::bind(&RadioSwitch::onSelected, this, _1), active); })
 		, mOnSelected(onSelected)
-	{}
+	{
+		for(string& label : labels)
+			this->makeappend<Label>(label);
+	}
 
 	void RadioSwitch::onSelected(Widget* widget)
 	{
