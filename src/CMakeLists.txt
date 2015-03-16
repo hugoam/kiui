@@ -43,9 +43,10 @@ target_link_libraries(kiui ${GLFW_LIBRARIES})
 include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(${GLFW_INCLUDE_DIR})
 
-#target_include_directories(kiui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-#install(FILES ${HEADER_FILES} DESTINATION "include")
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION "include")
 
 if (WIN32)
