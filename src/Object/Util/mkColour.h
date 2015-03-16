@@ -33,6 +33,21 @@ namespace mk
 		float mG;
 		float mB;
 		float mA;
+
+	public:
+		static Colour Black;
+		static Colour Red;
+		static Colour Green;
+		static Colour Blue;
+		static Colour Pink;
+		static Colour Cyan;
+		static Colour Yellow;
+		static Colour White;
+		static Colour LightGrey;
+		static Colour MidGrey;
+		static Colour DarkGrey;
+		static Colour AlphaGrey;
+		static Colour Transparent;
 	};
 }
 

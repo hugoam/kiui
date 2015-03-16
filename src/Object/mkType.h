@@ -29,6 +29,9 @@ namespace mk
 		~Type();
 
 		_A_ Id id() const { return IdObject::id(); }
+		_A_ const string& name() const { return mName; }
+		_A_ const Type* base() const { return mBase; }
+
 		Imprint* imprint() { return mImprint; }
 		Proto* proto() { return mProto; }
 		Indexer* indexer() { return mIndexer; }
@@ -36,6 +39,7 @@ namespace mk
 
 		Type* base() { return mBase; }
 
+		void setupName(string name) { mName = name; }
 		void setupProto(Proto* proto) { mProto = proto; }
 		void setupIndexer(Indexer* indexer) { mIndexer = indexer; }
 		void setupLibrary(AbstractPool* library) { mLibrary = library; }
@@ -52,7 +56,9 @@ namespace mk
 		Type();
 
 	protected:
+		string mName;
 		Type* mBase;
+
 		unique_ptr<ImprintStub> mImprintStub;
 		Imprint* mImprint;
 		Proto* mProto;

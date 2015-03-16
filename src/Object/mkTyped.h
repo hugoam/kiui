@@ -20,7 +20,7 @@ namespace mk
 
 	template <> inline Type* typecls<void>() { return nullptr; }
 
-	template <class T, class S = void, class I = void>
+	template <class T, class I = void>
 	class Typed
 	{
 	public:
@@ -30,13 +30,13 @@ namespace mk
 		static Type sType;
 	};
 
-	template <class T, class S, class I>
-	Type Typed<T, S, I>::sType(typecls<I>());
+	template <class T, class I>
+	Type Typed<T, I>::sType(typecls<I>());
 
 	template <class T>
 	T* upcast(TypeObject* object)
 	{
-		if(object->type()->upcast(Typed<T>::cls()))
+		if(object->type()->upcast(typecls(T)))
 			return static_cast<T*>(object);
 
 		return 0;
@@ -45,7 +45,7 @@ namespace mk
 	template <class T>
 	T* downcast(TypeObject* object)
 	{
-		if(object->type() == Typed<T>::cls())
+		if(object->type() == typecls<T>())
 			return static_cast<T*>(object);
 
 		return 0;

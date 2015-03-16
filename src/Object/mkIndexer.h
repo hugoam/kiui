@@ -28,6 +28,8 @@ namespace mk
 		Indexer(Type* type) : mType(type), mCount(0), mObjects() { mType->setupIndexer(this); mObjects.emplace_back(nullptr); }
 		~Indexer() {}
 
+		std::vector<IdObject*>& objects() { return mObjects; }
+
 		size_t vsize() const { return size(); }
 		void vclear() { clear(); }
 		Type* sequenceType() const { return mType; }
@@ -67,8 +69,8 @@ namespace mk
 		std::vector<StoreObserver<TypeObject>*> mObservers;
 	};
 
-	template <class T, class S = void, class I = void>
-	class Indexed : public Typed<T, S, I>
+	template <class T, class I = void>
+	class Indexed : public Typed<T, I>
 	{
 	public:
 		static inline Indexer* indexer() { return &sIndexer; }
@@ -76,8 +78,8 @@ namespace mk
 		static Indexer sIndexer;
 	};
 
-	template <class T, class S, class I>
-	Indexer Indexed<T, S, I>::sIndexer = Indexer(T::cls());
+	template <class T, class I>
+	Indexer Indexed<T, I>::sIndexer = Indexer(T::cls());
 }
 
 #endif // MK_INDEXER_H_INCLUDED

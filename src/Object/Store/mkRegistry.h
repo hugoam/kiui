@@ -77,14 +77,14 @@ namespace mk
 		unique_ptr<T> release(T* object)
 		{
 			auto it = std::find_if(mStore.begin(), mStore.end(), [object](const unique_ptr<T>& p) { return p.get() == object; });
-			return std::move(*it);
+			unique_ptr<T> pointer = std::move(*it);
+			mStore.erase(it);
+			return pointer;
 		}
 
 		void move(size_t from, size_t to)
 		{
-			unique_ptr<T> ptr = std::move(mStore[from]);
-			mStore.insert(mStore.begin() + to, std::move(ptr)); // emplace doesn't work, don't know why // orig is "it" here.
-			mStore.erase(from < to ? mStore.begin() + from : mStore.begin() + from + 1);
+			std::swap(mStore[from], mStore[to]);
 		}
 
 		void transfer(T* object, Registry<T>* other)

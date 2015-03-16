@@ -21,8 +21,8 @@ namespace mk
 
 		void reindex(size_t index)
 		{
-			for(auto& obj : this->mStore)
-				obj->setIndex(index++);
+			for(size_t i = index; i < this->mStore.size(); ++i)
+				this->mStore[i]->setIndex(index++);
 		}
 
 		bool checkIndexes()

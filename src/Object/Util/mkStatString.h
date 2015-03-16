@@ -11,11 +11,11 @@
 
 namespace mk
 {
-	template <> inline void fromString<Stat<float>>(const string& str, Stat<float>& val) { val.setValue(fromString<float>(str)); }
-	template <> inline string toString<Stat<float>>(const Stat<float>& val){ return toString<float>(val.value()); }
+	template <> inline void fromString<AutoStat<float>>(const string& str, AutoStat<float>& val) { val.modify(fromString<float>(str)); }
+	template <> inline string toString<AutoStat<float>>(const AutoStat<float>& val){ return toString<float>(val.value()); }
 
-	template <> inline void fromString<Stat<int>>(const string& str, Stat<int>& val) { val.setValue(fromString<int>(str)); }
-	template <> inline string toString<Stat<int>>(const Stat<int>& val){ return toString<int>(val.value()); }
+	template <> inline void fromString<AutoStat<int>>(const string& str, AutoStat<int>& val) { val.modify(fromString<int>(str)); }
+	template <> inline string toString<AutoStat<int>>(const AutoStat<int>& val){ return toString<int>(val.value()); }
 }
 
 #endif // MK_STAT_H_INCLUDED

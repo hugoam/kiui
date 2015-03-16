@@ -152,9 +152,9 @@ namespace mk
 	public:
 		Named() : T_Array() {}
 
-		T* findNamed(const string& name) { return T_Array::find([name](T* obj){ return obj->name() == name; }); }
+		T* findNamed(const string& name) { return T_Array::find([&name](T* obj){ return obj->name() == name; }); }
 
-		void removeNamed(const string& name) { remove(T_Array::find([name](T* obj){ return obj->name() == name; })); }
+		void removeNamed(const string& name) { remove(T_Array::find([&name](T* obj){ return obj->name() == name; })); }
 	};
 
 	template <class T_Array>

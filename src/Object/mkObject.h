@@ -63,6 +63,14 @@ namespace mk
 		Id mId;
 	};
 
+	class MK_OBJECT_EXPORT IdStruct : public IdObject
+	{
+	public:
+		IdStruct(Type* type) : IdObject(type) {}
+		IdStruct(const IdStruct& other) : IdObject(other.type()) {}
+		IdStruct& operator=(const IdStruct&) { return *this; }
+	};
+
 	typedef std::vector<Object*> ObjectVector;
 }
 

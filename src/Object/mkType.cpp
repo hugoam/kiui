@@ -14,6 +14,7 @@ namespace mk
 
 	Type::Type(Type* base)
 		: IdObject(++sTypeId)
+		, mName()
 		, mBase(base)
 		, mProto(nullptr)
 		, mIndexer(nullptr)
@@ -22,6 +23,7 @@ namespace mk
 
 	Type::Type()
 		: IdObject(++sTypeId)
+		, mName()
 		, mBase(nullptr)
 		, mProto(nullptr)
 		, mIndexer(Indexed<Type>::indexer())

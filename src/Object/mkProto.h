@@ -79,7 +79,7 @@ namespace mk
 	Proto Prototyped<T, Parts...>::sProto(T::cls());
 
 	template <class T, class S, class... Parts>
-	class TPrototype : public Part, public Indexed<T, S>, public Prototyped<T, Parts...>
+	class TPrototype : public Part, public Indexed<T>, public Prototyped<T, Parts...>
 	{
 	public:
 		TPrototype(Stem* stem) : Part(T::cls(), stem) {}

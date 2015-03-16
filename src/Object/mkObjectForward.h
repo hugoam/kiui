@@ -68,7 +68,7 @@ namespace mk
 	class Ref;
 	class Lref;
 
-	template <class T, class S, class I>
+	template <class T, class I>
 	class Typed;
 
 	template <class T>

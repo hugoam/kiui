@@ -85,7 +85,7 @@ namespace mk
 	public:
 		Dispatch()
 		{
-			D::branch(typecls<typename BareType<T>::type>(), &dispatch); // @todo Here for Object types it fetches from Typed<T> which could lead to incorrect behavior
+			D::branch(typecls<typename BareType<T>::type>(), &dispatch);
 		}
 
 		static typename D::Return dispatch(typename D::Context context, Lref& lref)

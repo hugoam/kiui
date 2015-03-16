@@ -16,18 +16,6 @@
 namespace mk
 {
 	template <class T>
-	struct Copyable { static const bool value = true; };
-
-	template <class T>
-	struct Copyable<unique_ptr<T>> { static const bool value = false; };
-
-	template <class T>
-	struct Copyable<std::vector<T>> { static const bool value = Copyable<T>::value; };
-
-	template <class T>
-	struct PassValue { typedef T type; };
-
-	template <class T>
 	struct BareType { typedef T type; };
 
 	template <class T>
@@ -46,7 +34,7 @@ namespace mk
 	struct UnrefType<T*> { typedef T* type; };
 
 	template <class T>
-	struct Pass { typedef const T& ctype; typedef T type; typedef typename PassValue<T>::type forward; };
+	struct Pass { typedef const T& ctype; typedef T type; typedef const T& forward; };
 
 	template <class T>
 	struct Pass<T*> { typedef T* ctype; typedef T* type; typedef T* forward; };

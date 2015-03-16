@@ -23,7 +23,7 @@ namespace mk
 	template <> inline Type* storetype<Object>() { return Typed<Object>::cls(); }
 
 	template <class T_Array, class T_Element, class T_Ressource>
-	class StoreBase : public Store<T_Element>, public Stock, public Typed<T_Array, void, Stock>
+	class StoreBase : public Store<T_Element>, public Stock, public Typed<T_Array, Stock>
 	{
 	public:
 		typedef T_Element T;
@@ -110,7 +110,7 @@ namespace mk
 
 		Type* sequenceType() const { return mType; }
 
-		using Typed<T_Array, void, Stock>::cls;
+		using Typed<T_Array, Stock>::cls;
 
 		inline T_Array* self() { return this->template as<T_Array>(); }
 		inline const T_Array* self() const { return this->template as<T_Array>(); }

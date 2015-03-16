@@ -8,6 +8,7 @@
 /* mk */
 #include <Object/mkTyped.h>
 #include <Object/mkObjectForward.h>
+#include <Object/Util/mkGlobalType.h>
 
 /* Standard */
 #include <functional>
@@ -18,165 +19,224 @@
 namespace mk
 {
 	template <class T>
-	class TStat;
-
-	template<typename T>
-	using StatObserver = std::function<void(TStat<T>* stat, T value)>;
-
-	template <class T>
-	class TStat
+	class StatDef : public Struct, public Typed<Struct>
 	{
 	public:
-		TStat(T base, T min, T max, const StatObserver<T>& handler = nullptr)
+		StatDef(T min = T(), T max = T(), T step = T())
+			: mMin(min)
+			, mMax(max)
+			, mStep(step)
+		{}
+
+		inline T min() const { return mMin; }
+		inline T max() const { return mMax; }
+		inline T step() const { return mStep; }
+
+		T rincrement(T& value, T amount) const { T diff = std::min(mMax - value, amount); value += diff; update(value); return diff; }
+		T rdecrement(T& value, T amount) const { T diff = std::max(-mMin + value, amount); value -= diff; update(value); return diff; }
+		void increment(T& value, T amount) const { value += amount; update(value); }
+		void decrement(T& value, T amount) const { value -= amount; update(value); }
+
+		void decrement(T& value) const { value += mStep; update(value); }
+		void increment(T& value) const { value -= mStep; update(value); }
+
+		void multiply(T& value, T& base, T multiplier) const { T diff = value - base; base *= multiplier; value = base + diff; update(value); }
+		
+		void modify(T& value, T& base, T val) const { value += val - base; base = value; update(value); }
+		void modify(T& value, T val) const { value = val; update(value); }
+
+		void update(T& value) const
+		{
+			if(value < mMin)
+				value = mMin;
+			if(value > mMax)
+				value = mMax;
+		}
+
+	protected:
+		T mMin;
+		T mMax;
+		T mStep;
+	};
+
+	template <class T>
+	class Stat
+	{
+	public:
+		Stat(T base = T())
 			: mBase(base)
 			, mValue(base)
-			, mMax(max)
-			, mMin(min)
-			, mUpdateHandlers()
-		{
-			if(handler) // @bug
-				mUpdateHandlers.push_back(handler);
-		}
-
-		TStat()
-			: mBase()
-			, mValue()
-			, mMax()
-			, mMin()
-			, mUpdateHandlers()
+			//, mUpdateHandlers()
 		{}
-
-		TStat& operator=(const TStat& other)
-		{
-			mBase = other.mBase;
-			mValue = other.mValue;
-			mMax = other.mMax;
-			mMin = other.mMin;
-			return *this;
-		}
-
-		TStat(const TStat& other)
-			: mBase(other.mBase)
-			, mValue(other.mValue)
-			, mMax(other.mMax)
-			, mMin(other.mMin)
-			, mUpdateHandlers()
-		{}
-
-		T base() const { return mBase; }
-		T value() const { return mValue; }
-		T max() const { return mMax; }
-		T min() const { return mMin; }
 
 		operator T() const { return mValue; }
 
-		void addUpdateHandler(const StatObserver<T>& handler) { mUpdateHandlers.push_back(handler); handler(this, mValue); }
+		inline T base() const { return mBase; }
+		inline T value() const { return mValue; }
 
-		T rincrement(T amount) { T diff = std::min(mMax - mValue, amount); mValue += diff; update(); return diff; }
-		T rdecrement(T amount) { T diff = std::max(-mMin + mValue, amount); mValue -= diff; update(); return diff; }
-		void increment(T amount) { mValue += amount; update(); }
-		void decrement(T amount) { mValue -= amount; update(); }
-		void multiply(T multiplier) { T diff = mValue - mBase; mBase*= multiplier; mValue = mBase + diff; update(); }
-
-		void modify(T value) { mValue += value - mBase; mBase = value; }
-
-		void update()
-		{
-			if(mMin && mValue < mMin)
-				mValue = mMin;
-			if(mMax && mValue > mMax)
-				mValue = mMax;
-
-			for(StatObserver<T>& handler : mUpdateHandlers)
-				handler(this, mValue);
-		}
-
-		void setMax(T max) { mMax = max; update(); }
-		void setMin(T min) { mMin = min; update(); }
-		
-		void setModifier(void* owner, T amount)
+		void setModifier(const StatDef<T>& def, void* owner, T amount)
 		{
 			mValue += amount;
 
 			mModifiers[owner] = amount;
-			update();
+			def.update(mValue);
 		}
 
-		void updateModifier(void* owner, T amount)
+		void updateModifier(const StatDef<T>& def, void* owner, T amount)
 		{
 			mValue -= mModifiers[owner];
 			mValue += amount;
 
 			mModifiers[owner] = amount;
-			update();
+			def.update(mValue);
 		}
 
-		void removeModifier(void* owner)
+		void removeModifier(const StatDef<T>& def, void* owner)
 		{
 			mValue += mModifiers[owner];
 			mModifiers.erase(owner);
-			update();
+			def.update(mValue);
 		}
+
+		//void addUpdateHandler(const StatObserver<T>& handler) { mUpdateHandlers.push_back(handler); handler(this, mValue); }
+
+		virtual const StatDef<T>& vdef() const = 0;
 
 	protected:
 		T mBase;
 		T mValue;
-		T mMin;
-		T mMax;
 
-		std::vector<StatObserver<T>> mUpdateHandlers;
+		//std::vector<StatObserver<T>> mUpdateHandlers;
 
 		typedef std::map<void*, T> ModifierMap;
 		ModifierMap mModifiers;
 	};
 
-	template <class T, const char* T_Name>
-	class TNamedStat : public TStat<T>
+	template <class T, class T_Def>
+	class DefStat : public Stat<T>
 	{
 	public:
-		TNamedStat(T base, T min, T max, const StatObserver<T>& handler = nullptr)
-			: TStat<T>(base, min, max)
+		DefStat(T base = T())
+			: Stat<T>(base)
+		{}
+
+		const T_Def* self() const { return static_cast<const T_Def*>(this); }
+
+		const StatDef<T>& vdef() const { return self()->def(); }
+
+		inline T min() const { return self()->def().min(); }
+		inline T max() const { return self()->def().max(); }
+		inline T step() const { return self()->def().step(); }
+
+		inline void modify(T value) { self()->def().modify(mValue, mBase, value); }
+
+		inline T rincrement(T amount) { return self()->def().rincrement(mValue, amount); }
+		inline T rdecrement(T amount) { return self()->def().rdecrement(mValue, amount); }
+		inline void increment(T amount) { self()->def().increment(mValue, amount); }
+		inline void decrement(T amount) { self()->def().decrement(mValue, amount); }
+
+		inline void increment() { self()->def().increment(mValue); }
+		inline void decrement() { self()->def().increment(mValue); }
+
+		inline void multiply(T multiplier) { self()->def().multiply(mValue, mBase, multiplier); }
+		
+		inline void setModifier(void* owner, T amount) { Stat<T>::setModifier(self()->def(), owner, amount); }
+		inline void updateModifier(void* owner, T amount) { Stat<T>::updateModifier(self()->def(), owner, amount); }
+		inline void removeModifier(void* owner) { Stat<T>::removeModifier(self()->def(), owner); }
+	};
+
+	template <class T, class T_Def, const char* T_Name>
+	class TNamedStat : public DefStat<T, T_Def>
+	{
+	public:
+		TNamedStat(T base = T())//, const StatObserver<T>& handler = nullptr)
+			: DefStat<T, T_Def>(base)
 		{}
 
 		const string name() { return T_Name; }
 	};
 
 	template <class T>
-	class Stat
-	{};
-
-	template <>
-	class _I_ _S_ Stat<float> : public Struct, public Typed<Stat<float>>, public TStat<float>
+	class AutoStat : public Struct, public Typed<AutoStat<T>>
 	{
 	public:
-		_C_ Stat(float value = 0.f, float min = 0.f, float max = 10.f) : TStat<float>(value, min, max) {}
-		Stat(const Stat<float>&) = default;
-		Stat<float>& operator=(const Stat<float>&) = default;
+		AutoStat(T value = T(), T min = T(), T max = T(), T step = T())
+			: mValue(value)
+			, mValueRef(mValue)
+			, mDef(min, max, step)
+		{}
 
-		_A_ _M_ float value() const { return TStat<float>::value(); }
-		_A_ float min() const { return TStat<float>::min(); }
-		_A_ float max() const { return TStat<float>::max(); }
-		
-		void setValue(float value) { TStat<float>::modify(value); }
+		AutoStat(T& value, const StatDef<T>& def)
+			: mValue()
+			, mValueRef(value)
+			, mDef(def)
+		{}
+
+		AutoStat(const AutoStat& other)
+			: mValue(other.mValue)
+			, mValueRef(other.mValueRef)
+			, mDef(other.mDef)
+		{}
+
+		AutoStat& operator=(const AutoStat& other)
+		{
+			mValue = other.mValue;
+			mValueRef = other.mValueRef;
+			mDef = other.mDef;
+			return *this;
+		}
+
+		inline T value() const { return mValueRef; }
+
+		inline T min() const { return mDef.min(); }
+		inline T max() const { return mDef.max(); }
+		inline T step() const { return mDef.step(); }
+
+		inline void modify(T value) { mDef.modify(mValueRef, value); }
+
+		inline void increment() { mDef.increment(mValueRef); }
+		inline void decrement() { mDef.decrement(mValueRef); }
+
+		const StatDef<T>& vdef() const { return mDef; }
+
+	protected:
+		T mValue;
+		T& mValueRef;
+		StatDef<T> mDef;
 	};
 
-	template <>
-	class _I_ _S_ Stat<int> : public Struct, public Typed<Stat<int>>, public TStat<int>
+	template class MK_OBJECT_EXPORT AutoStat<int>;
+	template class MK_OBJECT_EXPORT AutoStat<float>;
+
+	class MK_OBJECT_EXPORT _I_ _S_ Ratio : public Struct, public Typed<Ratio>, public DefStat<float, Ratio>
 	{
 	public:
-		_C_ Stat(int value = 0, int min = 0, int max = 10) : TStat<int>(value, min, max) {}
-		Stat(const Stat<int>&) = default;
-		Stat<int>& operator=(const Stat<int>&) = default;
+		_C_ Ratio(float value = 0.f) : DefStat<float, Ratio>(value) {}
+		Ratio(const Ratio&) = default;
+		Ratio& operator=(const Ratio&) = default;
 
-		_A_ _M_ int value() const { return TStat<int>::value(); }
-		_A_ int min() const { return TStat<int>::min(); }
-		_A_ int max() const { return TStat<int>::max(); }
+		_A_ _M_ float value() const { return DefStat<float, Ratio>::value(); }
+		void setValue(float value) { DefStat<float, Ratio>::modify(value); }
 
-		void setValue(int value) { TStat<int>::modify(value); }
+		const StatDef<float>& def() const { return mDef; }
+
+		static StatDef<float> mDef;
 	};
 
-	template class MK_OBJECT_EXPORT Stat<int>;
-	template class MK_OBJECT_EXPORT Stat<float>;
+	class MK_OBJECT_EXPORT _I_ _S_ Gauge : public Struct, public Typed<Gauge>, public DefStat<float, Gauge>
+	{
+	public:
+		_C_ Gauge(float value = 0.f) : DefStat<float, Gauge>(value) {}
+		Gauge(const Gauge&) = default;
+		Gauge& operator=(const Gauge&) = default;
+
+		_A_ _M_ float value() const { return DefStat<float, Gauge>::value(); }
+		void setValue(float value) { DefStat<float, Gauge>::modify(value); }
+
+		const StatDef<float>& def() const { return mDef; }
+
+		static StatDef<float> mDef;
+	};
 }
 
 #endif // MK_STAT_H_INCLUDED

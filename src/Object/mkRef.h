@@ -35,7 +35,7 @@ namespace mk
 		inline Type* type() const { return mType; }
 		inline Imprint* imprint() const { return mType->imprint(); }
 		inline bool null() const { return mType == nullptr; }
-		inline void setobject(Object* object) { mObject = object; }
+		inline void setobject(Object* object) { mObject = object; ++mUpdate; }
 		inline size_t update() { return mUpdate; }
 
 		virtual unique_ptr<Ref> clone() const { return make_unique<Ref>(mObject, mType); };
@@ -84,12 +84,12 @@ namespace mk
 	class Any : public Ref, public Allocator<T>
 	{
 	public:
-		Any(typename Pass<T>::forward value) : Ref(typecls<T>()), mContent() { this->assign(std::forward<typename Pass<T>::forward>(value)); mObject = RefObject<T>::get(mContent); }
+		Any(typename Pass<T>::forward value) : Ref(typecls<T>()), mContent(Copy<T>::copy(value)) { mObject = RefObject<T>::get(mContent); }
 		Any() : Ref(typecls<T>()), mContent() { mObject = RefObject<T>::get(mContent); }
 
 		unique_ptr<Ref> clone() const { return make_unique<Any<T>>(this->copy()); }
 
-		void setString(const string& value) { fromString<T>(value, mContent); }
+		void setString(const string& value) { fromString<T>(value, mContent); ++mUpdate; }
 		string getString() { return toString<T>(mContent); }
 
 		T& ref() { return mContent; }
@@ -97,8 +97,8 @@ namespace mk
 		T copy() { return Copy<T>::copy(mContent); }
 		T copy() const { return Copy<T>::copy(mContent); }
 
-		void assign(typename Pass<T>::forward val) { Assign<typename Pass<T>::forward>::set(mContent, std::forward<typename Pass<T>::forward>(val)); }
-		void set(typename Pass<T>::ctype val) { Assign<typename Pass<T>::ctype>::set(mContent, std::forward<typename Pass<T>::ctype>(val)); }
+		void assign(typename Pass<T>::forward val) { Assign<typename Pass<T>::forward>::set(mContent, std::forward<typename Pass<T>::forward>(val)); ++mUpdate; }
+		void set(typename Pass<T>::ctype val) { Assign<typename Pass<T>::ctype>::set(mContent, std::forward<typename Pass<T>::ctype>(val)); ++mUpdate;  }
 
 	public:
 		T mContent;
