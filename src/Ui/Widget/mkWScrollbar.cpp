@@ -20,8 +20,50 @@
 
 namespace mk
 {
-	WScroller::WScroller()
-		: WSlider(DIM_Y, "scroller")
+	WScroller::WScroller(Dimension dim)
+		: WSlider(dim, styleCls())
+	{}
+
+	WScrollerX::WScrollerX()
+		: WScroller(DIM_X)
+	{}
+
+	void WScrollerX::build()
+	{
+		mSpaceBefore = this->makeappend<WSpacerX>();
+		mButton = this->makeappend<WScrollerKnobY>();
+		mSpaceAfter = this->makeappend<WSpacerX>();
+
+		WSlider::build();
+	}
+
+	WScrollerY::WScrollerY()
+		: WScroller(DIM_Y)
+	{}
+
+	void WScrollerY::build()
+	{
+		mSpaceBefore = this->makeappend<WSpacerY>();
+		mButton = this->makeappend<WScrollerKnobY>();
+		mSpaceAfter = this->makeappend<WSpacerY>();
+
+		WSlider::build();
+	}
+
+	WScrollerKnobX::WScrollerKnobX()
+		: WSliderKnob(DIM_X, styleCls())
+	{}
+
+	WScrollerKnobY::WScrollerKnobY()
+		: WSliderKnob(DIM_Y, styleCls())
+	{}
+
+	WScrollUp::WScrollUp(const Trigger& trigger)
+		: WButton("", styleCls(), trigger)
+	{}
+
+	WScrollDown::WScrollDown(const Trigger& trigger)
+		: WButton("", styleCls(), trigger)
 	{}
 
 	void WScroller::sliderStep(float value, bool ended)
@@ -31,7 +73,7 @@ namespace mk
 	}
 
 	WScrollbar::WScrollbar(Stripe* sheet)
-		: Sheet("scrollbar")
+		: Sheet(styleCls())
 		, mSheet(sheet)
 	{}
 
@@ -43,9 +85,9 @@ namespace mk
 	void WScrollbar::build()
 	{
 		Sheet::build();
-		mUp = this->makeappend<WButton>("", "scrollbutton_up scrollbutton", std::bind(&WScrollbar::scrollup, this));
-		mScroller = this->makeappend<WScroller>();
-		mDown = this->makeappend<WButton>("", "scrollbutton_down scrollbutton", std::bind(&WScrollbar::scrolldown, this));
+		mUp = this->makeappend<WScrollUp>(std::bind(&WScrollbar::scrollup, this));
+		mScroller = this->makeappend<WScrollerY>();
+		mDown = this->makeappend<WScrollDown>(std::bind(&WScrollbar::scrolldown, this));
 
 		mScroller->resetMetrics(0.f, mSheet->sequenceLength() - mSheet->dclipsize(DIM_Y), mSheet->cursor(), 1.f, mSheet->dclipsize(DIM_Y));
 	}
@@ -71,4 +113,8 @@ namespace mk
 
 		mScroller->updateMetrics(0.f, mSheet->sequenceLength() - mSheet->dclipsize(DIM_Y), mSheet->cursor(), 1.f, mSheet->dclipsize(DIM_Y));
 	}
+
+	WScrollSheet::WScrollSheet()
+		: Sheet(styleCls())
+	{}
 }

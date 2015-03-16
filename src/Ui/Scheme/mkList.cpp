@@ -9,14 +9,18 @@
 
 namespace mk
 {
-	List::List(const string& cls)
-		: Form(cls + " list", "")
-	{}
+	List::List(Style* style)
+		: Form(style ? style : styleCls())
+	{
+		mType = cls();
+	}
 
-	SortList::SortList(const string& cls)
-		: List(cls + " sortlist")
-		//, Dropper(this)
-	{}
+	SortList::SortList(Style* style)
+		: List(style ? style : styleCls())
+		, Dropper(this)
+	{
+		mType = cls();
+	}
 
 	/*void SortList::move(Form* form, size_t index)
 	{

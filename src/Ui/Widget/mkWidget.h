@@ -13,13 +13,14 @@
 #include <Ui/mkUiForward.h>
 #include <Ui/Frame/mkUibox.h>
 #include <Ui/Input/mkInputDispatcher.h>
+#include <Ui/Style/mkStyle.h>
 
 #include <functional>
 #include <memory>
 
 namespace mk
 {
-	enum WidgetState : unsigned short
+	enum _I_ WidgetState : unsigned int
 	{
 		ENABLED = 0,
 		HOVERED = 1,
@@ -30,26 +31,25 @@ namespace mk
 		DISABLED = 6
 	};
 
+
+
 	class MK_UI_EXPORT _I_ Widget : public TypeObject, public Typed<Widget>, public InputReceiver, public Updatable
 	{
 	public:
-		Widget(string clas, Form* form = nullptr);
+		Widget(Style* style, Form* form = nullptr);
 		~Widget();
 
-		_A_ Sheet* parent() { return mParent; }
-		_A_ string clas() { return mClas; }
-		_A_ Frame* frame() { return mFrame.get(); }
-		_A_ InkStyle* skin();
-		_A_ LayoutStyle* layoutStyle();
-		_A_ InkStyle* inkStyle();
-		
-		inline WidgetState state() { return mState; }
-		inline Form* form() { return mForm; }
+		_A_ inline Sheet* parent() { return mParent; }
+		_A_ inline Frame* frame() { return mFrame.get(); }
+		_A_ inline Form* form() { return mForm; }
+		_A_ inline WidgetState state() { return mState; }
+		_A_ _M_ inline Style* style() { return mStyle; }
+
+		void setStyle(Style* style);
 
 		virtual Sheet* clone(Sheet* parent);
 
-		virtual InkStyle* elementSkin(const string& clas);
-		virtual LayoutStyle* elementStyle(const string& clas);
+		virtual Style* fetchOverride(Style* style);
 
 		virtual FrameType frameType();
 		virtual size_t zorder() { return 0; }
@@ -58,7 +58,7 @@ namespace mk
 		virtual const string& label();
 		virtual const string& image();
 		virtual const string& tooltip();
-		virtual const string& hoverCursor();
+		virtual Style* hoverCursor();
 
 		virtual RootSheet* rootWidget();
 		virtual InkTarget* inkTarget();
@@ -67,8 +67,8 @@ namespace mk
 
 		virtual void build() {}
 
-		void bind(Sheet* parent);
-		void rebind(Sheet* parent, bool insert = false, size_t index = 0);
+		void bind(Sheet* parent, size_t index);
+		void rebind(Sheet* parent, size_t index);
 
 		unique_ptr<Widget> unbind();
 		unique_ptr<Widget> extract();
@@ -79,7 +79,7 @@ namespace mk
 		Widget* copy(Sheet* parent);
 
 		void reset(Form* form);
-		void reset(string clas);
+		void reset(Style* style);
 
 		void nextFrame(size_t tick, size_t delta);
 
@@ -133,7 +133,7 @@ namespace mk
 
 	protected:
 		Sheet* mParent;
-		string mClas;
+		Style* mStyle;
 		unique_ptr<Frame> mFrame;
 		WidgetState mState;
 

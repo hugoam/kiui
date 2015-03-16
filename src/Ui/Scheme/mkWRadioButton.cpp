@@ -20,8 +20,12 @@ using namespace std::placeholders;
 
 namespace mk
 {
-	WRadioSwitch::WRadioSwitch(Trigger onSelected, size_t active)
-		: Sheet("radioswitch")
+	WRadioChoice::WRadioChoice(Widget* content, const Trigger& trigger)
+		: WWrapButton(content, styleCls(), trigger)
+	{}
+
+	WRadioSwitch::WRadioSwitch(const Trigger& onSelected, size_t active)
+		: Sheet(styleCls())
 		, mOnSelected(onSelected)
 		, mActive(nullptr)
 		, mActiveIndex(active)
@@ -29,7 +33,7 @@ namespace mk
 
 	Sheet* WRadioSwitch::vaddwrapper(Widget* widget)
 	{
-		WWrapButton* button = this->makeappend<WWrapButton>(widget, "radiobutton", std::bind(&WRadioSwitch::activated, this, _1));
+		WWrapButton* button = this->makeappend<WRadioChoice>(widget, std::bind(&WRadioSwitch::activated, this, _1));
 		if(button->frame()->index() == mActiveIndex)
 		{
 			mActive = button;
@@ -52,8 +56,8 @@ namespace mk
 		mOnSelected(button->content());
 	}
 
-	RadioSwitch::RadioSwitch(Trigger onSelected, size_t active, StringVector labels)
-		: Form("radioswitch", "", [this, active]() { return make_unique<WRadioSwitch>(std::bind(&RadioSwitch::onSelected, this, _1), active); })
+	RadioSwitch::RadioSwitch(const Trigger& onSelected, size_t active, StringVector labels)
+		: Form(nullptr, "", [this, active]() { return make_unique<WRadioSwitch>(std::bind(&RadioSwitch::onSelected, this, _1), active); })
 		, mOnSelected(onSelected)
 	{
 		for(string& label : labels)

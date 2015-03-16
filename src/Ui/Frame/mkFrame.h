@@ -19,17 +19,18 @@ namespace mk
 	class MK_UI_EXPORT _I_ Frame : public Object, public Typed<Frame>, public Uibox, public Updatable
 	{
 	public:
-		Frame(Stripe* parent, Widget* widget, string clas = "", size_t zorder = 0);
+		Frame(Stripe* parent, Widget* widget, size_t index);
 		~Frame();
 
 		enum Dirty
 		{
-			CLEAN,			// Frame doesn't need update
-			DIRTY_FRAME,	// The size of the frame has changed
-			DIRTY_CONTENT,	// The content of the inkbox has changed
-			DIRTY_WIDGET,	// The content of the widget has changed
-			DIRTY_SKIN,		// The skin of the frame has changed
-			DIRTY_FLOW		// The flow of the frame has changed
+			CLEAN,				// Frame doesn't need update
+			DIRTY_FRAME,		// The size of the frame has changed
+			DIRTY_CONTENT,		// The content of the inkbox has changed
+			DIRTY_WIDGET,		// The content of the widget has changed
+			DIRTY_SKIN,			// The skin of the frame has changed
+			//DIRTY_FLOW,			// The flow of the frame has changed
+			DIRTY_VISIBILITY	// The visibility of the frame has changed
 		};
 
 		inline Widget* widget() { return d_widget; }
@@ -40,13 +41,13 @@ namespace mk
 		inline size_t index() { return d_index; }
 
 		inline Inkbox* inkbox() { return d_inkbox.get(); }
-		inline InkStyle* skin() { return d_skin; }
+		inline Style* wstyle() { return d_wstyle; }
 		inline InkStyle* inkstyle() { return d_inkstyle; }
 
 		void setIndex(size_t index) { d_index = index; }
 		void setDirty(Dirty dirty) { if(dirty > d_dirty) d_dirty = dirty; }
 
-		InkLayer* layer();
+		Layer* layer();
 
 		void show();
 		void hide();
@@ -54,16 +55,13 @@ namespace mk
 		void setVisible();
 		void setInvisible();
 
-		void moveToTop();
+		//void moveToTop();
 
 		void remove();
 
-		void shrink();
 		void clip();
-		void redraw();
-		void reset();
 
-		virtual FrameType frameType() { return FRAME; }
+		FrameType frameType();
 
 		virtual void setVisible(bool visible);
 
@@ -75,7 +73,7 @@ namespace mk
 
 		virtual void nextFrame(size_t tick, size_t delta);
 
-		void reset(LayoutStyle* style, InkStyle* skin);
+		void reset(Style* style);
 
 		void updatePosition();
 		void updateSize();
@@ -129,10 +127,9 @@ namespace mk
 		DimFloat d_clipSize;
 		size_t d_index;
 
-		InkStyle* d_skin;
+		Style* d_wstyle;
 		InkStyle* d_inkstyle;
 
-		unique_ptr<InkLayer> d_inkLayer;
 		unique_ptr<Inkbox> d_inkbox;
 	};
 

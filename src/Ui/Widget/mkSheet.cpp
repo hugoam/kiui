@@ -9,6 +9,7 @@
 #include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
+#include <Ui/Frame/mkLayer.h>
 
 #include <Ui/Widget/mkWScrollbar.h>
 
@@ -21,33 +22,35 @@
 
 namespace mk
 {
-	Sheet::Sheet(string clas, Form* form)
-		: Widget(clas, form)
-		, mOverrides(false)
+	Sheet::Sheet(Style* style, Form* form)
+		: Widget(style, form)
+		, mScrollbar(nullptr)
 	{}
 
 	Sheet::~Sheet()
 	{}
 
 	void Sheet::build()
-	{
-		mOverrides = this->uiWindow()->skinner()->hasOverrides(mClas);
-	}
+	{}
 
-	InkStyle* Sheet::elementSkin(const string& clas)
+	void Sheet::nextFrame(size_t tick, size_t delta)
 	{
-		if(mOverrides)
-			return this->uiWindow()->skinner()->elementSkin(clas, mClas);
-		else
-			return mParent->elementSkin(clas);
-	}
-
-	LayoutStyle* Sheet::elementStyle(const string& clas)
-	{
-		if(mOverrides)
-			return this->uiWindow()->layout()->elementStyle(clas, mClas);
-		else
-			return mParent->elementStyle(clas);
+		Widget::nextFrame(tick, delta);
+		
+		// @todo @bug for a sheet with 0 size the following seems to cause a crash in Stripe::nextFrame()
+		if(mFrame->style()->d_overflow == SCROLL)
+			if(this->stripe()->overflow() && !mScrollbar)
+			{
+				mScrollsheet = mParent->makeappend<WScrollSheet>();
+				mScrollsheet->append(mParent->release(this));
+				mScrollbar = mScrollsheet->makeappend<WScrollbar>(this->stripe());
+			}
+			else if(!this->stripe()->overflow() && mScrollbar)
+			{
+				mScrollsheet->parent()->append(mScrollsheet->release(this));
+				mScrollsheet->destroy();
+				mScrollbar = nullptr;
+			}
 	}
 
 	Widget* Sheet::append(unique_ptr<Widget> unique)
@@ -58,36 +61,46 @@ namespace mk
 	Widget* Sheet::insert(unique_ptr<Widget> unique, size_t index)
 	{
 		Widget* widget = unique.get();
-		mContents.insert(std::move(unique), index);
-		widget->parent() ? widget->rebind(this) : widget->bind(this);
+		mContents.insert(mContents.begin() + index, std::move(unique));
+		widget->parent() ? widget->rebind(this, index) : widget->bind(this, index);
 		return widget;
 	}
 
 	unique_ptr<Widget> Sheet::release(Widget* widget)
 	{
 		widget->detach();
-		return mContents.release(widget);
+
+		size_t pos = 0;
+		while(mContents[pos].get() != widget)
+			++pos;
+
+		unique_ptr<Widget> pointer = std::move(mContents[pos]);
+		mContents.erase(mContents.begin() + pos);
+		return pointer;
 	}
 
 	unique_ptr<Widget> Sheet::release(size_t index)
 	{
 		mContents.at(index)->detach();
-		return mContents.release(index);
+
+		unique_ptr<Widget> pointer = std::move(mContents[index]);
+		mContents.erase(mContents.begin() + index);
+		return pointer;
 	}
 
 	void Sheet::clear()
 	{
-		for(auto& widget : mContents.store())
+		for(auto& widget : mContents)
 			widget->detach();
 
 		mContents.clear();
 	}
 
-	GridSheet::GridSheet(Dimension dim, string clas, Form* form)
-		: Sheet(clas, form)
+	GridSheet::GridSheet(Dimension dim, Style* style, Form* form)
+		: Sheet(style, form)
 		, mDim(dim)
 		, mResizing(nullptr)
-		, mHoverCursor(mDim == DIM_X ? "resize_h cursor" : "resize_v cursor")
+		, mHoverCursor(mDim == DIM_X ? ResizeCursorX::styleCls() : ResizeCursorY::styleCls())
 	{}
 
 	void GridSheet::build()
@@ -124,9 +137,9 @@ namespace mk
 		float offset = mDim == DIM_X ? xDif * pixspan : yDif * pixspan;
 
 		//std::cerr << "Dragging resize offset " << offset << std::endl;
-		prev->frame()->setSpanDim(mDim, prev->frame()->dspan(mDim) + offset);
-		next->frame()->setSpanDim(mDim, next->frame()->dspan(mDim) - offset);
-		//std::cerr << prev->frame()->dspan(mDim) << " + " << next->frame()->dspan(mDim) << " = " << 1.f << std::endl;
+		this->stripe()->weights()[prev->frame()->index()] = prev->frame()->dspan(mDim) + offset;
+		this->stripe()->weights()[next->frame()->index()] = next->frame()->dspan(mDim) - offset;
+		this->stripe()->markRelayout();
 
 		this->gridResized(prev, next);
 
@@ -139,47 +152,8 @@ namespace mk
 		return true;
 	}
 
-	ScrollSheet::ScrollSheet(string clas, Form* form)
-		: Sheet("scrollsheet", form)
-		, mClas(clas)
-		, mForm(form)
-		//, mSheet(this->makeappend<Sheet>(clas, form))
-		, mScrollbar(nullptr)
-	{}
-
-	void ScrollSheet::build()
-	{
-		Sheet::build();
-		mScrollbox = this->makeappend<Sheet>("scrollbox");
-		mSheet = mScrollbox->makeappend<Sheet>(mClas, mForm);
-	}
-
-	Widget* ScrollSheet::vappend(unique_ptr<Widget> widget)
-	{
-		return mSheet->vappend(std::move(widget));
-	}
-
-	unique_ptr<Widget> ScrollSheet::vrelease(Widget* widget)
-	{
-		return mSheet->vrelease(widget);
-	}
-
-	void ScrollSheet::nextFrame(size_t tick, size_t delta)
-	{
-		UNUSED(tick); UNUSED(delta);
-		if(mSheet->stripe()->overflow() && !mScrollbar)
-		{
-			mScrollbar = this->makeappend<WScrollbar>(mSheet->stripe());
-		}
-		else if(!mSheet->stripe()->overflow() && mScrollbar)
-		{
-			this->release(mScrollbar);
-			mScrollbar = nullptr;
-		}
-	}
-
 	Cursor::Cursor()
-		: Widget("cursor")
+		: Widget(styleCls())
 	{}
 
 	void Cursor::nextFrame()
@@ -199,46 +173,35 @@ namespace mk
 
 	void Cursor::hover(Widget* widget)
 	{
-		if(widget->hoverCursor() != "")
+		if(widget->hoverCursor())
 			this->reset(widget->hoverCursor());
 	}
 
 	void Cursor::unhover(Widget* widget)
 	{
-		if(widget->hoverCursor() != "")
-			this->reset("cursor");
+		if(widget->hoverCursor())
+			this->reset(styleCls());
 	}
 
 	Tooltip::Tooltip(const string& label)
-		: Widget("tooltip")
+		: Widget(styleCls())
 		, mLabel(label)
 	{}
 
 	Tooltip::~Tooltip()
 	{}
 
-	void Tooltip::setLabel(string label)
+	void Tooltip::setLabel(const string& label)
 	{
 		mLabel = label;
 		mFrame->setDirty(Frame::DIRTY_WIDGET);
 	}
 
 	RootSheet::RootSheet(UiWindow* window, Form* form)
-		: Sheet("", form)
+		: Sheet(styleCls(), form)
 		, mWindow(window)
 	{
-		mFrame = make_unique<Stripe>(nullptr, this, form->clas());
+		mFrame = make_unique<Layer>(nullptr, this, 0);
 		mFrame->setOpacity(_OPAQUE);
 	}
-
-	InkStyle* RootSheet::elementSkin(const string& clas)
-	{
-		return mWindow->skinner()->elementSkin(clas, "");
-	}
-
-	LayoutStyle* RootSheet::elementStyle(const string& clas)
-	{
-		return mWindow->layout()->elementStyle(clas, "");
-	}
-
 }

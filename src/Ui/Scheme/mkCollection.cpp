@@ -30,8 +30,8 @@ namespace mk
 		Lref ref(object, type);
 		unique_ptr<Form> form = mMapper(ref);
 		mMapping[object] = form.get();
-		if(index > mForm->contents()->size())
-			index = mForm->contents()->size(); // @Warning, this should ultimately be removed, it's a kludge for collections with holes in their indexes
+		if(index > mForm->contents().size())
+			index = mForm->contents().size(); // @Warning, this should ultimately be removed, it's a kludge for collections with holes in their indexes
 		mForm->insert(std::move(form), index);
 	}
 

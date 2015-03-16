@@ -9,9 +9,7 @@ namespace mk
 {
 	Dropper::Dropper(Form* form)
 		: mForm(form)
-	{
-		mForm->setCls(form->clas() + " dropper");
-	}
+	{}
 
 	void Dropper::drop(Form* form, size_t index)
 	{

@@ -13,7 +13,6 @@ namespace mk
 		, d_span(style->d_span)
 		, d_sizing(style->d_sizing)
 		, d_opacity(style->d_opacity)
-		, d_frameType(FRAME)
 		, d_style(style)
 	{}
 
@@ -23,7 +22,6 @@ namespace mk
 		, d_span(0.f, 0.f)
 		, d_sizing(SHRINK, SHRINK)
 		, d_opacity(_VOID)
-		, d_frameType(FRAME)
 		, d_style(nullptr)
 	{}
 

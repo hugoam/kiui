@@ -9,13 +9,13 @@
 
 namespace mk
 {
-	Hook::Hook(Object* object, Type* type, const std::string& cls, const string& label, const string& image, Trigger trigger)
-		: Button(cls + "hook", label, image, trigger)
+	Hook::Hook(Object* object, Type* type, Style* style, const string& label, const string& image, const Trigger& trigger)
+		: Button(style, label, image, trigger)
 		, mObject(object)
 		, mObjectType(type)
 	{}
 
-	Hook::Hook(TypeObject* object, const std::string& cls, const string& label, const string& image, Trigger trigger)
-		: Hook(object, object->type(), cls, label, image, trigger)
+	Hook::Hook(TypeObject* object, Style* style, const string& label, const string& image, const Trigger& trigger)
+		: Hook(object, object->type(), style, label, image, trigger)
 	{}
 }

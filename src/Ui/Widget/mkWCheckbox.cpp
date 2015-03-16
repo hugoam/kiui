@@ -20,7 +20,7 @@
 namespace mk
 {
 	WCheckbox::WCheckbox(Form* form, Lref& value)
-		: Widget("", form)
+		: Widget(styleCls(), form)
 		, mValue(value)
 	{
 		mForm->setLabel("");

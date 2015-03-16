@@ -19,23 +19,71 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT WScroller : public WSlider
+	class MK_UI_EXPORT WScroller : public WSlider, public Styled<WScroller>
 	{
 	public:
-		WScroller();
+		WScroller(Dimension dim);
 
 		void sliderStep(float offset, bool ended);
+
+		using Styled<WScroller>::styleCls;
 	};
 
-	class MK_UI_EXPORT WScrollbar : public Sheet
+	class MK_UI_EXPORT WScrollerX : public WScroller
+	{
+	public:
+		WScrollerX();
+
+		void build();
+	};
+
+	class MK_UI_EXPORT WScrollerY : public WScroller
+	{
+	public:
+		WScrollerY();
+
+		void build();
+	};
+
+	class MK_UI_EXPORT WScrollerKnobX : public WSliderKnob, public Styled<WScrollerKnobX>
+	{
+	public:
+		WScrollerKnobX();
+
+		using Styled<WScrollerKnobX>::styleCls;
+	};
+
+	class MK_UI_EXPORT WScrollerKnobY : public WSliderKnob, public Styled<WScrollerKnobY>
+	{
+	public:
+		WScrollerKnobY();
+
+		using Styled<WScrollerKnobY>::styleCls;
+	};
+
+	class MK_UI_EXPORT WScrollUp : public WButton, public Styled<WScrollUp>
+	{
+	public:
+		WScrollUp(const Trigger& trigger);
+
+		using Styled<WScrollUp>::styleCls;
+	};
+
+	class MK_UI_EXPORT WScrollDown : public WButton, public Styled<WScrollDown>
+	{
+	public:
+		WScrollDown(const Trigger& trigger);
+
+		using Styled<WScrollDown>::styleCls;
+	};
+
+	class MK_UI_EXPORT WScrollbar : public Sheet, public Styled<WScrollbar>
 	{
 	public:
 		WScrollbar(Stripe* sheet);
 		~WScrollbar();
 
 		void build();
-
-		string clas() { return "scrollbar"; }
 
 		void scrollup();
 		void scrolldown();
@@ -47,6 +95,12 @@ namespace mk
 		WButton* mUp;
 		WScroller* mScroller;
 		WButton* mDown;
+	};
+
+	class MK_UI_EXPORT WScrollSheet : public Sheet, public Styled<WScrollSheet>
+	{
+	public:
+		WScrollSheet();
 	};
 }
 

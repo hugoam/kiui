@@ -13,6 +13,7 @@
 #include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
+#include <Ui/Frame/mkLayer.h>
 #include <Ui/Frame/mkGrid.h>
 
 #include <Ui/mkUiWindow.h>
@@ -23,8 +24,21 @@ using namespace std::placeholders;
 
 namespace mk
 {
-	WWindow::WWindow(Trigger onClose, string title, bool closable, bool dockable, WDocksection* dock, string clas)
-		: Sheet(dock ? clas + "window dockwindow" : clas + "window window")
+	WWindowHeader::WWindowHeader()
+		: Sheet(styleCls())
+	{}
+
+	WWindowBody::WWindowBody()
+		: Sheet(styleCls())
+	{}
+
+	WCloseButton::WCloseButton(const Trigger& trigger)
+		: WButton("", styleCls(), trigger)
+	{}
+
+	WWindow::WWindow(const Trigger& onClose, string title, bool closable, bool dockable, WDocksection* dock)
+		//: Sheet(dock ? style + "window dockwindow" : style + "window window")
+		: Sheet(dock ? WDockWindow::styleCls() : WWindow::styleCls())
 		, mName(title)
 		, mClosable(closable)
 		, mDockable(dockable)
@@ -41,10 +55,10 @@ namespace mk
 	void WWindow::build()
 	{
 		Sheet::build();
-		mHeader = this->makeappend<Sheet>("windowheader");
-		mBody = this->makeappend<Sheet>("windowbody");
-		mTitle = mHeader->makeappend<WLabel>(mName, "label");
-		mCloseButton = mClosable ? mHeader->makeappend<WButton>("", "closebutton", std::bind(&WWindow::close, this)) : nullptr;
+		mHeader = this->makeappend<WWindowHeader>();
+		mBody = this->makeappend<WWindowBody>();
+		mTitle = mHeader->makeappend<WLabel>(mName);
+		mCloseButton = mClosable ? mHeader->makeappend<WCloseButton>(std::bind(&WWindow::close, this)) : nullptr;
 
 		if(!mDock)
 		{
@@ -110,7 +124,7 @@ namespace mk
 	void WWindow::dock(WDocksection* docksection)
 	{
 		std::cerr << ">>>>>>>>>>>  Window :: dock" << std::endl;
-		this->reset("dockwindow");
+		this->reset(WDockWindow::styleCls());
 		docksection->dock(this);
 		mDock = docksection;
 	}
@@ -119,19 +133,12 @@ namespace mk
 	{
 		std::cerr << ">>>>>>>>>>>  Window :: undock" << std::endl;
 
-		if(mDock->contents()->size() == 1)
-		{
-			Frame* givespan = mDock->frame()->index() > 0 ? mDock->prev()->frame() : mDock->next()->frame();
-			Dimension dim = mDock->dockline()->dim();
-			givespan->setSpanDim(dim, givespan->dspan(dim) + mDock->frame()->dspan(dim));
-		}
-
-		this->reset("window");
+		this->reset(WWindow::styleCls());
 		mDock->undock(this);
 		mDock = nullptr;
 
 		mFrame->setPosition(mFrame->dabsolute(DIM_X), mFrame->dabsolute(DIM_Y));
-		mFrame->moveToTop();
+		mFrame->as<Layer>()->moveToTop();
 		mDragging = true;
 	}
 	
@@ -159,7 +166,7 @@ namespace mk
 			mDragging = true;
 
 		if(mDragging)
-			mFrame->moveToTop();
+			mFrame->as<Layer>()->moveToTop();
 
 		return true;
 	}
@@ -185,22 +192,7 @@ namespace mk
 
 			if(widget)
 			{
-				WDocksection* origin = widget->as<WDocksection>();
 				WDocksection* section = widget->as<WDocksection>()->docktarget(xPos, yPos);
-
-				if(section != origin)
-				{
-					WDockline* dockline = section->dockline();
-
-					float weight = 1.f;
-					float span = mFrame->dsize(dockline->dim()) / dockline->frame()->dsize(dockline->dim()) * weight;
-
-					span = std::min(span, origin->frame()->dspan(dockline->dim()) / 2.f);
-
-					origin->frame()->setSpanDim(dockline->dim(), origin->frame()->dspan(dockline->dim()) - span);
-					section->frame()->setSpanDim(dockline->dim(), span);
-				}
-
 				this->dock(section);
 			}
 		}
@@ -214,19 +206,19 @@ namespace mk
 	bool WWindow::leftClick(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
-		mFrame->moveToTop();
+		mFrame->as<Layer>()->moveToTop();
 		return true;
 	}
 
 	bool WWindow::rightClick(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
-		mFrame->moveToTop();
+		mFrame->as<Layer>()->moveToTop();
 		return true;
 	}
 
-	Window::Window(unique_ptr<Form> content, bool closable, bool dockable, Form::Trigger onClose)
-		: Form("window", "", [this, closable, dockable]() { return make_unique<WWindow>(std::bind(&Window::onClose, this, _1), this->name(), closable, dockable); })
+	Window::Window(unique_ptr<Form> content, bool closable, bool dockable, const Trigger& onClose)
+		: Form(nullptr, "", [this, closable, dockable]() { return make_unique<WWindow>(std::bind(&Window::onClose, this, _1), this->name(), closable, dockable); })
 		, mOnClose(onClose)
 	{
 		this->append(std::move(content));

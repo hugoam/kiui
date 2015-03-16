@@ -31,6 +31,8 @@ namespace mk
 	class InputPropagator;
 	class InputWidget;
 
+	class Style;
+
 	class Form;
 	class RootForm;
 
@@ -55,6 +57,9 @@ namespace mk
 	class Expandbox;
 	class RadioSwitch;
 
+	class Tree;
+	class TreeNode;
+
 	class Window;
 	class Dockspace;
 
@@ -68,9 +73,10 @@ namespace mk
 	class Uibox;
 	class Frame;
 	class Stripe;
+	class Layer;
 	class LayoutStyle;
 
-	enum WidgetState : unsigned short;
+	enum WidgetState : unsigned int;
 
 	class Widget;
 	class Sheet;
@@ -81,9 +87,12 @@ namespace mk
 	class WWrapButton;
 	class WToggle;
 	class WSlider;
-	class WSlideButton;
+	class WSliderKnob;
 	class WScroller;
 	class WScrollbar;
+
+	template <class T>
+	class WStatSlider;
 
 	class WDropdown;
 	class WDropdownBox;
@@ -99,9 +108,8 @@ namespace mk
 
 	class Cursor;
 
-	class UiInker;
-	class UiSkinner;
-	class UiLayout;
+	class Skinner;
+	class Styler;
 	class UiWindow;
 	
 	class FMethod;
@@ -112,9 +120,10 @@ namespace mk
 	class FBool;
 	class FInt;
 	class FFloat;
-	class FIntStat;
-	class FFloatStat;
 	class FString;
+
+	template <class T>
+	class FStat;
 
 	class Hook;
 	class FObjectEdit;

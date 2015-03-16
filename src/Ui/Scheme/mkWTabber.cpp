@@ -14,8 +14,12 @@ using namespace std::placeholders;
 
 namespace mk
 {
+	WTabHeader::WTabHeader(const string& label, const Trigger& trigger)
+		: WButton(label, styleCls(), trigger)
+	{}
+
 	WTab::WTab(WButton* header, bool active)
-		: Sheet("tab")
+		: Sheet(styleCls())
 		, mHeader(header)
 		, mActive(active)
 	{}
@@ -29,8 +33,16 @@ namespace mk
 			mHeader->activate();
 	}
 
-	WTabber::WTabber(string cls, bool downtabs)
-		: Sheet(cls)
+	WTabberHead::WTabberHead()
+		: Sheet(styleCls())
+	{}
+
+	WTabberBody::WTabberBody()
+		: Sheet(styleCls())
+	{}
+
+	WTabber::WTabber(Style* style, bool downtabs)
+		: Sheet(style ? style : styleCls())
 		, mCurrentTab(nullptr)
 		, mDownTabs(downtabs)
 	{}
@@ -41,8 +53,8 @@ namespace mk
 	void WTabber::build()
 	{
 		Sheet::build();
-		mHeaders = this->makeappend<Sheet>("headtabs");
-		mTabs = this->makeappend<Sheet>("tabs");
+		mHeaders = this->makeappend<WTabberHead>();
+		mTabs = this->makeappend<WTabberBody>();
 
 		if(mDownTabs)
 			mFrame->as<Stripe>()->move(0, 1);
@@ -51,13 +63,16 @@ namespace mk
 
 	Widget* WTabber::vappend(unique_ptr<Widget> widget)
 	{
-		WButton* header = mHeaders->makeappend<WButton>(widget->name(), "tabheader", std::bind(&WTabber::headerClicked, this, _1));
+		WButton* header = mHeaders->makeappend<WTabHeader>(widget->name(), std::bind(&WTabber::headerClicked, this, _1));
 		WTab* tab = mTabs->makeappend<WTab>(header, mCurrentTab == nullptr);
 
 		if(!mCurrentTab)
 			mCurrentTab = tab;
-		else if(mTabs->contents()->size() == 2)
+		else if(mTabs->contents().size() == 2)
+		{
 			mHeaders->frame()->show();
+			mTabs->contents().at(0)->reset(WTab::styleCls());
+		}
 
 		return tab->append(std::move(widget));
 	}
@@ -73,10 +88,13 @@ namespace mk
 		tab->header()->destroy();
 		tab->destroy();
 
-		if(mTabs->contents()->size() > 0)
+		if(mTabs->contents().size() > 0)
 			this->showTab(size_t(0));
-		if(mTabs->contents()->size() == 1)
+		if(mTabs->contents().size() == 1)
+		{
 			mHeaders->frame()->hide();
+			mTabs->contents().at(0)->reset(WTab::styleCls()); // was onlytab
+		}
 
 		return unique;
 	}
@@ -100,10 +118,10 @@ namespace mk
 
 	void WTabber::showTab(size_t index)
 	{
-		this->showTab(mTabs->contents()->at(index)->as<WTab>());
+		this->showTab(mTabs->contents().at(index)->as<WTab>());
 	}
 
 	Tabber::Tabber()
-		: Form("tabber", "", []() { return make_unique<WTabber>("tabber"); })
+		: Form(nullptr, "", []() { return make_unique<WTabber>(); })
 	{}
 }

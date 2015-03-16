@@ -12,7 +12,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT WTextbox : public Widget
+	class MK_UI_EXPORT WTextbox : public Widget, public Styled<WTextbox>
 	{
 	public:
 		WTextbox(Form* form, Lref& value);

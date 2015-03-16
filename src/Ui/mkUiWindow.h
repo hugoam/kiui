@@ -44,6 +44,7 @@ namespace mk
 		~UiWindow();
 
 		void setup(RenderWindow* renderWindow, InkWindow* inkWindow, InputWindow* inputWindow);
+		void init();
 
 		RenderWindow* renderWindow() { return mRenderWindow; }
 		InkWindow* inkWindow() { return mInkWindow; }
@@ -52,8 +53,7 @@ namespace mk
 
 		User* user() { return mUser; }
 
-		UiLayout* layout() { return mLayout.get(); }
-		UiSkinner* skinner() { return mSkinner.get(); }
+		Styler* styler() { return mStyler.get(); }
 
 		float xdrag() { return mXDragStart; }
 		float ydrag() { return mYDragStart; }
@@ -115,8 +115,7 @@ namespace mk
 		InkWindow* mInkWindow;
 		InputWindow* mInputWindow;
 
-		unique_ptr<UiLayout> mLayout;
-		unique_ptr<UiSkinner> mSkinner;
+		unique_ptr<Styler> mStyler;
 
 		unique_ptr<RootForm> mRootForm;
 		RootSheet* mRootSheet;

@@ -14,15 +14,46 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT WWindow : public Sheet
+	class MK_UI_EXPORT _I_ WDockWindow : public Object, public Typed<WDockWindow>, public Styled<WDockWindow>
+	{};
+
+	class MK_UI_EXPORT _I_ WWindowHeader : public Sheet, public Typed<WWindowHeader>, public Styled<WWindowHeader>
 	{
 	public:
-		WWindow(Trigger onClose, string title, bool closable = true, bool dockable = false, WDocksection* dock = nullptr, string clas = "");
+		WWindowHeader();
+
+		using Typed<WWindowHeader>::cls;
+	};
+
+	class MK_UI_EXPORT _I_ WWindowBody : public Sheet, public Typed<WWindowBody>, public Styled<WWindowBody>
+	{
+	public:
+		WWindowBody();
+
+		using Typed<WWindowBody>::cls;
+	};
+
+	class MK_UI_EXPORT _I_ WCloseButton : public WButton, public Typed<WCloseButton>, public Styled<WCloseButton>
+	{
+	public:
+		WCloseButton(const Trigger& trigger);
+
+		using Typed<WCloseButton>::cls;
+		using Styled<WCloseButton>::styleCls;
+	};
+
+
+	class MK_UI_EXPORT WWindow : public Sheet, public Styled<WWindow>
+	{
+	public:
+		WWindow(const Trigger& onClose, string title, bool closable = true, bool dockable = false, WDocksection* dock = nullptr);
 		~WWindow();
 
 		void build();
 
 		const string& name();
+
+		FrameType frameType() { return LAYER; }
 
 		void setClosable();
 		void setUnclosable();
@@ -82,7 +113,7 @@ namespace mk
 	class MK_UI_EXPORT Window : public Form
 	{
 	public:
-		Window(unique_ptr<Form> content, bool closable = true, bool dockable = false, Trigger onClose = nullptr);
+		Window(unique_ptr<Form> content, bool closable = true, bool dockable = false, const Trigger& onClose = nullptr);
 
 		void onClose(Widget* widget);
 

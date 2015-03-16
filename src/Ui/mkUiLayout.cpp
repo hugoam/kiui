@@ -26,558 +26,358 @@
 
 #include <Ui/Controller/mkController.h>
 
+#include <Ui/mkUiTypes.h>
+
 #include <iostream>
 
 namespace mk
 {
-	UiLayout::UiLayout()
+	Styler::Styler()
 	{}
 
-	void UiLayout::add(string name)
+	void Styler::prepare()
 	{
-		mLayoutStyles.add(make_unique<LayoutStyle>(name, FLOW, FLAT, _OPAQUE, false, DimSizing(SHRINK, SHRINK), DimFloat(0.f, 0.f), DIM_Y));
-	}
+		mOverrides.resize(InkStyle::indexer()->size());
 
-	void UiLayout::add(string name, string base)
-	{
-		this->add(name);
-		this->style(name)->copy(this->style(base));
-	}
-
-	void UiLayout::add(StringVector names, string base)
-	{
-		for(string& name : names)
-			this->add(name, base);
-	}
-
-	LayoutStyle* UiLayout::style(string name)
-	{
-		return mLayoutStyles.findNamed(name);
-	}
-
-	LayoutStyle* UiLayout::elementStyle(string clas, string overrider)
-	{
-		std::vector<string> classes = splitString(clas, " ");
-
-		for(string& cls : classes)
-		{
-			LayoutStyle* style;
-
-			if(mOverrides.find(overrider) != mOverrides.end())
-				for(string& overriden : mOverrides[overrider])
-					if(overriden == cls || overriden == "")
-						return mLayoutStyles.findNamed(overrider + "." + cls);
-
-			style = mLayoutStyles.findNamed(cls);
-
-			if(style)
-				return style;
-		}
-
-		std::cerr << "Layout Style not found for clas " << clas << std::endl;
-		return mLayoutStyles.findNamed("default");
-	}
-
-	void UiLayout::addOverride(string stem, string name, string skin)
-	{
-		mOverrides[stem].push_back(name);
-		this->add(stem + "." + name, skin);
-	}
-
-	bool UiLayout::hasOverrides(string stem)
-	{
-		return mOverrides.find(stem) != mOverrides.end();
-	}
-
-
-	UiSkinner::UiSkinner()
-	{}
-
-	void UiSkinner::add(string name)
-	{
-		mSkins.add(make_unique<InkStyle>(name));
-	}
-
-	void UiSkinner::add(string name, Colour colour)
-	{
-		mSkins.add(make_unique<InkStyle>(name, colour, Colour(1.f, 1.f, 1.f)));
-	}
-
-	void UiSkinner::add(string name, string base)
-	{
-		InkStyle* baseskin = this->skin(base);
-		this->add(name);
-		this->skin(name)->copy(baseskin);
-	}
-
-	void UiSkinner::add(StringVector names, string base)
-	{
-		for(string name : names)
-			this->add(name, base);
-	}
-
-	InkStyle* UiSkinner::skin(string name)
-	{
-		return mSkins.findNamed(name);
-	}
-
-	InkStyle* UiSkinner::elementSkin(string clas, string overrider)
-	{
-		std::vector<string> classes = splitString(clas, " ");
-
-		for(string& cls : classes)
-		{
-			InkStyle* style;
-
-			if(overrider != "")
+		for(Object* object : InkStyle::indexer()->objects())
+			if(object)
 			{
-				//std::cerr << "overrider :: " << overrider << " clas " << clas << std::endl;
-				if(mOverrides.find(overrider) != mOverrides.end())
-					for(string& overriden : mOverrides[overrider])
-						if(overriden == cls || overriden == "")
-							return mSkins.findNamed(overrider + "." + cls);
+				InkStyle* ink = object->as<InkStyle>();
+				if(ink->mBackgroundColour.a() > 0.f || ink->mTextColour.a() > 0.f || ink->mBorderColour.a() > 0.f || !ink->mImage.empty())
+					ink->mEmpty = false;
 			}
-
-			style = mSkins.findNamed(cls);
-			if(style)
-				return style;
-		}
-
-		return mSkins.findNamed("default");
 	}
 
-	void UiSkinner::addOverride(string stem, string name, string skin)
+	void Styler::inheritLayout(StyleVector styles, Style* base)
 	{
-		mOverrides[stem].push_back(name);
-		this->add(stem + "." + name, skin);
+		for(Style* style : styles)
+			style->inheritLayout(base);
 	}
 
-	bool UiSkinner::hasOverrides(string stem)
+	void Styler::inheritSkins(StyleVector styles, Style* base)
 	{
-		return mOverrides.find(stem) != mOverrides.end();
+		for(Style* style : styles)
+			style->inheritSkins(base);
 	}
 
-	void setupUiLayout(UiSkinner* skinner, UiLayout* layout)
+	Style* Styler::fetchOverride(Style* style, Style* overrider)
+	{
+		if(mOverrides[overrider->id()].size() > 0)
+			for(StyleOverride& override : mOverrides[overrider->id()])
+				if(override.mStyle == style)
+					return override.mOverride;
+
+		return nullptr;
+	}
+
+	void Styler::override(Style* stem, Style* overrideWhat, Style* overrideWith)
+	{
+		if(mOverrides.size() <= stem->id())
+			mOverrides.resize(stem->id() + 1);
+
+		mOverrides[stem->id()].emplace_back();
+		mOverrides[stem->id()].back().mStyle = overrideWhat;
+		mOverrides[stem->id()].back().mOverride = overrideWith;
+	}
+
+	InkStyle* Styler::dynamicSkin(const string& name, Colour colour)
+	{
+		mDynamicSkins.add(make_unique<InkStyle>(name, colour, Colour(1.f, 1.f, 1.f)));
+		return mDynamicSkins.findNamed(name);
+	}
+
+	InkStyle* Styler::fetchSkin(const string& name)
+	{
+		return mDynamicSkins.findNamed(name);
+	}
+
+	void setupUiLayout(Styler* styler)
 	{
 		// @todo WSIWYG mode for frame OPACITY parameter where any frame inked with background is set as _OPAQUE
 		// this will allow to have an editor interface where any rectangle you see can be selected
 		// whereas if it was set as _VOID it would not be possible to select it (the pinpointing just passes through)
 
-		// Skins
-
-		skinner->add("default", Colour(0.f, 0.f, 0.f, 0.f));
-		skinner->skin("default")->mTextColour = Colour(1.f, 1.f, 1.f);
-		skinner->skin("default")->mPadding = DimFloat(3.f, 3.f);
-		//skinner->skin("default")->mBorderColour = Colour(1.f, 1.f, 1.f);
-		//skinner->skin("default")->mBorderWidth = 1.f;
-
-		skinner->add("empty");
-
-		skinner->add("black", Colour(0.f, 0.f, 0.f));
-		skinner->skin("black")->mPadding = DimFloat(3.f, 3.f);
-		skinner->add("grey", Colour(0.3f, 0.3f, 0.3f));
-		skinner->skin("grey")->mPadding = DimFloat(3.f, 3.f);
-		skinner->add("alphagrey", Colour(0.3f, 0.3f, 0.3f, 0.7f));
-		skinner->skin("alphagrey")->mPadding = DimFloat(3.f, 3.f);
-		skinner->add("midgrey", Colour(0.45f, 0.45f, 0.45f));
-		skinner->skin("midgrey")->mPadding = DimFloat(3.f, 3.f);
-		skinner->add("lightgrey", Colour(0.6f, 0.6f, 0.6f));
-		skinner->skin("lightgrey")->mPadding = DimFloat(3.f, 3.f);
-		skinner->add("red", Colour(1.f, 0.f, 0.f));
-		skinner->skin("red")->mPadding = DimFloat(3.f, 3.f);
-		skinner->add("pink", Colour(1.f, 0.f, 1.f));
-		skinner->skin("pink")->mPadding = DimFloat(3.f, 3.f);
-		skinner->add("blue", Colour(0.f, 0.f, 1.f));
-		skinner->skin("blue")->mPadding = DimFloat(3.f, 3.f);
-
-		skinner->add("transparent", Colour(0.f, 0.f, 0.f, 0.f));
-		skinner->skin("transparent")->mPadding = DimFloat(3.f, 3.f);
-
-		skinner->add("whitetext", Colour(0.f, 0.f, 0.f, 0.f));
-		skinner->skin("whitetext")->mTextColour = Colour(1.f, 1.f, 1.f);
-		skinner->skin("whitetext")->mPadding = DimFloat(3.f, 3.f);
-
-		skinner->add("blacktext", Colour(0.f, 0.f, 0.f, 0.f));
-		skinner->skin("blacktext")->mTextColour = Colour(0.f, 0.f, 0.f);
-		skinner->skin("blacktext")->mPadding = DimFloat(3.f, 3.f);
-
-		skinner->add("white", Colour(1.f, 1.f, 1.f));
-		skinner->skin("white")->mTextColour = Colour(0.f, 0.f, 0.f);
-		skinner->skin("white")->mPadding = DimFloat(3.f, 3.f);
-
-		skinner->add("bgrey", Colour(0.3f, 0.3f, 0.3f));
-		//skinner->skin("bgrey")->mBorderColour = Colour(1.f, 1.f, 1.f);
-		//skinner->skin("bgrey")->mBorderWidth = 1.f;
-
-		skinner->add("dropdownbutton", "midgrey");
-		//skinner->skin("dropdownbutton")->mImageColour = Colour(0.6f, 0.6f, 0.6f);
-		skinner->skin("dropdownbutton")->mImage = "arrow_down_15.png";
-
-		skinner->add("dropdownbutton.hovered", "lightgrey");
-		skinner->skin("dropdownbutton.hovered")->mBackgroundColour = Colour(1.f, 0.f, 0.f);
-		skinner->skin("dropdownbutton")->mSubInks[HOVERED] = skinner->skin("dropdownbutton.hovered");
-
-		skinner->add("sliderknob", "lightgrey");
-		skinner->skin("sliderknob")->mCornerRadius = 3.f;
-
-		skinner->add("slidervalue", "lightgrey");
-		skinner->skin("slidervalue")->mCornerRadius = 3.f;
-
-		skinner->add("sliderknob.hovered", "red");
-		skinner->skin("sliderknob.hovered")->mCornerRadius = 3.f;
-		skinner->skin("sliderknob")->mSubInks[HOVERED] = skinner->skin("sliderknob.hovered");
-
-		skinner->add("scrollerknob", "lightgrey");
-		skinner->skin("scrollerknob")->mMargin = BoxFloat(4.f, 0.f, 4.f, 0.f);
-
-		skinner->add("scrollerknob.hovered", "red");
-		skinner->skin("scrollerknob.hovered")->mMargin = BoxFloat(4.f, 0.f, 4.f, 0.f);
-		skinner->skin("scrollerknob")->mSubInks[HOVERED] = skinner->skin("scrollerknob.hovered");
-
-		skinner->add("expandbutton", Colour(1.f, 1.f, 1.f, 0.f));
-		skinner->skin("expandbutton")->mImage = "arrow_right_15.png";
-
-		skinner->add("expandbutton.hover", Colour(1.f, 0.f, 0.f));
-		skinner->skin("expandbutton.hover")->mImage = "arrow_right_15.png";
-		skinner->skin("expandbutton")->mSubInks[HOVERED] = skinner->skin("expandbutton.hover");
-
-		skinner->add("expandbutton.active", Colour(1.f, 1.f, 1.f, 0.f));
-		skinner->skin("expandbutton.active")->mImage = "arrow_down_15.png";
-		skinner->skin("expandbutton")->mSubInks[ACTIVATED] = skinner->skin("expandbutton.active");
-
-		skinner->add("expandbutton.activehover", Colour(1.f, 0.f, 0.f));
-		skinner->skin("expandbutton.activehover")->mImage = "arrow_down_15.png";
-		skinner->skin("expandbutton")->mSubInks[ACTIVATED_HOVERED] = skinner->skin("expandbutton.activehover");
-
-		skinner->add("scrollbutton_up", Colour(1.f, 1.f, 1.f, 0.f));
-		//skinner->skin("scrollbutton_up")->mImageColour = Colour(0.6f, 0.6f, 0.6f);
-		skinner->skin("scrollbutton_up")->mImage = "arrow_up_15.png";
-
-		skinner->add("scrollbutton_up.hovered", "scrollbutton_up");
-		skinner->skin("scrollbutton_up.hovered")->mBackgroundColour = Colour(1.f, 0.f, 0.f);
-		skinner->skin("scrollbutton_up")->mSubInks[HOVERED] = skinner->skin("scrollbutton_up.hovered");
-
-		skinner->add("scrollbutton_down", Colour(1.f, 1.f, 1.f, 0.f));
-		//skinner->skin("scrollbutton_down")->mImageColour = Colour(0.6f, 0.6f, 0.6f);
-		skinner->skin("scrollbutton_down")->mImage = "arrow_down_15.png";
-
-		skinner->add("scrollbutton_down.hovered", "scrollbutton_down");
-		skinner->skin("scrollbutton_down.hovered")->mBackgroundColour = Colour(1.f, 0.f, 0.f);
-		skinner->skin("scrollbutton_down")->mSubInks[HOVERED] = skinner->skin("scrollbutton_down.hovered");
-
-		skinner->add("cursor", Colour(1.f, 1.f, 1.f, 0.f));
-		skinner->skin("cursor")->mImage = "mousepointer.png";
-
-		skinner->add("resize_v", Colour(1.f, 1.f, 1.f, 0.f));
-		skinner->skin("resize_v")->mImage = "resize_v_20.png";
-
-		skinner->add("resize_h", Colour(1.f, 1.f, 1.f, 0.f));
-		skinner->skin("resize_h")->mImage = "resize_h_20.png";
-
-
-		skinner->add("scrollbar", "black");
-
-		skinner->add("slider", "midgrey");
-		skinner->skin("slider")->mCornerRadius = 3.f;
-
-		skinner->add("xslider", "slider");
-		skinner->add("yslider", "slider");
-
-		skinner->add("xscroller", "black");
-		skinner->add("yscroller", "black");
-
-		skinner->add("xsliderknob", "sliderknob");
-		skinner->add("ysliderknob", "sliderknob");
-
-		skinner->add("xscrollerknob", "scrollerknob");
-		skinner->add("yscrollerknob", "scrollerknob");
-
-		skinner->add("button", "midgrey");
-		skinner->skin("button")->mSubInks[HOVERED] = skinner->skin("lightgrey");
-		skinner->skin("button")->mSubInks[ACTIVATED] = skinner->skin("red");
-		skinner->skin("button")->mSubInks[ACTIVATED_HOVERED] = skinner->skin("red");
-
-		skinner->add("imagebutton", "transparent");
-		skinner->skin("imagebutton")->mSubInks[HOVERED] = skinner->skin("lightgrey");
-		skinner->skin("imagebutton")->mSubInks[ACTIVATED] = skinner->skin("red");
-		skinner->skin("imagebutton")->mSubInks[ACTIVATED_HOVERED] = skinner->skin("red");
-
-		skinner->add("hook", "button");
-		skinner->add("tabheader", "button");
-		skinner->add("columnheader", "button");
-
-		skinner->add("dropdownheader", "empty");
-		
-		skinner->add("dropbutton", "midgrey"); // was "empty", not possible at the moment
-		skinner->skin("dropbutton")->mSubInks[ACTIVATED] = skinner->skin("red");
-		skinner->skin("dropbutton")->mSubInks[HOVERED] = skinner->skin("lightgrey");
-
-		skinner->add("enumid", "blacktext");
-
-		skinner->add("radiobutton", "white"); // was "empty", not possible at the moment
-		skinner->skin("radiobutton")->mSubInks[ACTIVATED] = skinner->skin("red");
-		skinner->skin("radiobutton")->mSubInks[HOVERED] = skinner->skin("lightgrey");
-		skinner->skin("radiobutton")->mSubInks[ACTIVATED_HOVERED] = skinner->skin("lightgrey");
-
-		skinner->add("xdockline", "empty");
-		skinner->add("ydockline", "empty");
-
-		skinner->add("xdragline", "button");
-		skinner->add("ydragline", "button");
-
-		skinner->add("tooltip", "red");
-
-		skinner->add("label", "whitetext");
-
-		skinner->add("list", "black");
-		skinner->add("collection", "black");
-
-		//skinner->add("window", "grey");
-		//skinner->skin("window")->mImageSkin = ImageSkin("tlook");
-
-		skinner->add("dockwindow", "black");
-
-		skinner->add("window", "alphagrey");
-		skinner->add("windowheader", "lightgrey");
-
-		skinner->add("tlookwindow", "transparent");
-
-		skinner->add("tlookwindowheader", "transparent");
-		skinner->skin("tlookwindowheader")->mImageSkin = ImageSkin("tlookhead");
-
-		skinner->add("tlookwindowbody", "transparent");
-		skinner->skin("tlookwindowbody")->mImageSkin = ImageSkin("tlook");
-		skinner->skin("tlookwindowbody")->mMargin = BoxFloat(10.f, -5.f, 5.f, 0.f);
-
-		skinner->addOverride("uieditboard", "window", "tlookwindow");
-		skinner->addOverride("uieditboard", "windowheader", "tlookwindowheader");
-		skinner->addOverride("uieditboard", "windowbody", "tlookwindowbody");
-
-		skinner->add("ceguibutton", "transparent");
-		skinner->skin("ceguibutton")->mImageSkin = ImageSkin("tlookbutton");
-		skinner->skin("ceguibutton")->mPadding = DimFloat(20.f, 8.f);
-
-		skinner->add("radioswitch", "white");
-
-
-		skinner->add("tab", "red");
-		skinner->add("headtabs", "black");
-
-		skinner->add("expandboxheader", "lightgrey");
-		skinner->skin("expandboxheader")->mSubInks[ACTIVATED] = skinner->skin("red");
-
-		skinner->add("expandboxcontainer", "grey");
-
-		skinner->add("treenodeheader", "transparent");
-		skinner->skin("treenodeheader")->mSubInks[ACTIVATED] = skinner->skin("red");
-
-		skinner->add("treenodecontainer", "transparent");
-
-		skinner->add("typein", "lightgrey");
-		skinner->skin("typein")->mCornerRadius = 3.f;
-
-		skinner->add("typein.active", "red");
-		skinner->skin("typein.active")->mCornerRadius = 3.f;
-		skinner->skin("typein")->mSubInks[ACTIVATED] = skinner->skin("typein.active");
-
-		skinner->add("dropdown", "typein");
-		skinner->add("dropdownbox", "lightgrey");
-
-		skinner->add("bool", "midgrey");
-		skinner->skin("bool")->mSubInks[ACTIVATED] = skinner->skin("lightgrey");
-
-		//skinner->add(StringVector({ "int", "float", "string", "bool" }), "typein");
 
 		// Built-in Layouts
 
-		layout->add("cursor");
-		layout->style("cursor")->d_flow = MANUAL;
-		layout->style("cursor")->d_layer = LAYER;
-		layout->style("cursor")->d_opacity = _VOID;
-		layout->style("cursor")->d_span = DimFloat(0.f, 0.f);
-		layout->style("cursor")->d_size = DimFloat(10.f, 18.f);
+		Cursor::styleCls()->layout()->d_flow = MANUAL;
+		Cursor::styleCls()->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
 
-		layout->add("default");
+		PartitionX::styleCls()->layout()->d_layoutDim = DIM_X;
+		PartitionX::styleCls()->layout()->d_sizing = DimSizing(EXPAND, EXPAND);
 
-		layout->add("window");
-		layout->style("window")->d_flow = MANUAL;
-		layout->style("window")->d_layer = LAYER;
-		layout->style("window")->d_layoutDim = DIM_Y;
+		PartitionY::styleCls()->layout()->d_layoutDim = DIM_Y;
+		PartitionY::styleCls()->layout()->d_sizing = DimSizing(EXPAND, EXPAND);
 
-		layout->style("window")->d_span = DimFloat(0.f, 0.f);
-		layout->style("window")->d_size = DimFloat(480.f, 350.f);
-		layout->style("window")->d_sizing = DimSizing(FIXED, FIXED);
+		DivX::styleCls()->layout()->d_layoutDim = DIM_X;
+		DivX::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
 
-		layout->add("shrinkwindow", "window");
-		layout->style("shrinkwindow")->d_span = DimFloat(0.f, 0.f);
-		layout->style("shrinkwindow")->d_size = DimFloat(0.f, 0.f);
-		layout->style("shrinkwindow")->d_sizing = DimSizing(SHRINK, SHRINK);
+		DivY::styleCls()->layout()->d_layoutDim = DIM_Y;
+		DivY::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
 
-		layout->add("partition");
-		layout->style("partition")->d_span = DimFloat(1.f, 1.f);
-		layout->style("partition")->d_opacity = _VOID;
-		layout->style("partition")->d_layoutDim = DIM_Y;
-		layout->style("partition")->d_sizing = DimSizing(EXPAND, EXPAND);
+		WrapY::styleCls()->layout()->d_layoutDim = DIM_Y;
+		WrapY::styleCls()->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
 
-		layout->add("layer");
-		layout->style("layer")->d_flow = MANUAL;
-		layout->style("layer")->d_layer = LAYER;
-		layout->style("layer")->d_opacity = _VOID;
-		layout->style("layer")->d_span = DimFloat(1.f, 1.f);
-		layout->style("layer")->d_sizing = DimSizing(EXPAND, EXPAND);
+		WrapX::styleCls()->layout()->d_layoutDim = DIM_X;
+		WrapX::styleCls()->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
 
-		layout->add("div");
-		layout->style("div")->d_opacity = _VOID;
-		layout->style("div")->d_layoutDim = DIM_X;
-		layout->style("div")->d_span = DimFloat(1.f, 0.f); // @todo Div should actually shrink perpendicularly to parent layout dimension
-		layout->style("div")->d_sizing = DimSizing(EXPAND, SHRINK);
+		Control::styleCls()->layout()->d_opacity = _OPAQUE;
+		Control::styleCls()->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
 
-		layout->add("wrap");
-		layout->style("wrap")->d_opacity = _VOID;
-		layout->style("wrap")->d_sizing = DimSizing(SHRINK, SHRINK);
+		WWindow::styleCls()->layout()->d_flow = MANUAL;
+		WWindow::styleCls()->layout()->d_opacity = _OPAQUE;
+		WWindow::styleCls()->layout()->d_layoutDim = DIM_Y;
+		WWindow::styleCls()->layout()->d_size = DimFloat(480.f, 350.f);
+		WWindow::styleCls()->layout()->d_sizing = DimSizing(FIXED, FIXED);
 
-		layout->add("wrap_inline");
-		layout->style("wrap_inline")->d_layoutDim = DIM_X;
-		layout->style("wrap_inline")->d_sizing = DimSizing(SHRINK, SHRINK);
-
-		layout->add("leaf");
-		layout->style("leaf")->d_sizing = DimSizing(SHRINK, SHRINK);
-
-		layout->add("fixed");
-		layout->style("fixed")->d_sizing = DimSizing(FIXED, FIXED);
-
-		layout->add("dockwindow", "partition");
-
-		layout->style("dockwindow")->d_padding = BoxFloat(1.f);
-
-		layout->style("dockwindow")->d_opacity = _OPAQUE;
+		WDockWindow::styleCls()->layout()->d_opacity = _OPAQUE;
+		WDockWindow::styleCls()->layout()->d_sizing = DimSizing(EXPAND, EXPAND);
+		WDockWindow::styleCls()->layout()->d_padding = BoxFloat(1.f);
 
 		// Layouts
 
-		layout->add(StringVector({ "label", "title", "image", "button", "hook", "tabheader" }), "leaf");
+		styler->inheritLayout(StyleVector({ WButton::styleCls() }), Control::styleCls());
+		styler->inheritLayout(StyleVector({ WColumnHeader::styleCls(), WTabHeader::styleCls(), WRadioChoice::styleCls() }), Control::styleCls());
+		styler->inheritLayout(StyleVector({ WTreeNodeToggle::styleCls(), WExpandboxToggle::styleCls(), WDropdownToggle::styleCls(), WCloseButton::styleCls() }), Control::styleCls());
+		styler->inheritLayout(StyleVector({ WSliderKnobX::styleCls(), WSliderKnobY::styleCls() }), Control::styleCls());
+		styler->inheritLayout(StyleVector({ WScrollerKnobX::styleCls(), WScrollerKnobY::styleCls(), WScrollUp::styleCls(), WScrollDown::styleCls() }), Control::styleCls());
+		styler->inheritLayout(StyleVector({ Label::styleCls(), Image::styleCls(), Hook::styleCls() }), Control::styleCls());
 
-		layout->add(StringVector({ "bool" }), "fixed");
-		layout->add(StringVector({ "expandbutton", "closebutton", "dropdownbutton", "scrollbutton", "slidervalue", "xscrollerspacer", "yscrollerspacer" "xsliderspacer", "ysliderspacer", "xscrollerknob", "yscrollerknob", "xsliderknob", "ysliderknob", "checkbox" }), "fixed");
+		styler->inheritLayout(StyleVector({ WLabel::styleCls(), WTitle::styleCls() }), WrapX::styleCls());
+		styler->inheritLayout(StyleVector({ WNumControls::styleCls(), WRadioSwitch::styleCls(), WDropdown::styleCls(), WDropdownHeader::styleCls() }), WrapX::styleCls());
 
-		layout->add(StringVector({ "scrollpartition", "scrollsheet", "scrollbox", "tree", "list", "tab", "docksection", "xdockline", "ydockline", "dockspace", "dockwindowboard", "windowbody", "collection", "tabber", "tabs", "xscroller", "yscroller", "gridline" }), "partition");
+		styler->inheritLayout(StyleVector({ WTable::styleCls(), WDropdownBox::styleCls(), }), DivY::styleCls());
+		styler->inheritLayout(StyleVector({ WDropdown::styleCls(), WDropdownHeader::styleCls(), WDropdownChoice::styleCls(), }), DivX::styleCls());
+		styler->inheritLayout(StyleVector({ WExpandbox::styleCls(), WExpandboxBody::styleCls() }), DivY::styleCls());
+		styler->inheritLayout(StyleVector({ WTreeNode::styleCls(), WTreeNodeBody::styleCls() }), DivY::styleCls());
+		styler->inheritLayout(StyleVector({ WTabberHead::styleCls(), WTableHead::styleCls(), WWindowHeader::styleCls(), WExpandboxHeader::styleCls(), WTreeNodeHeader::styleCls() }), DivX::styleCls());
+		styler->inheritLayout(StyleVector({ Header::styleCls() }), DivX::styleCls());
 
-		layout->add(StringVector({ "controls", "radioswitch", "radiobutton", "dropdown", "dropdownheader", "dropbutton" }), "wrap_inline");
-
-		layout->add(StringVector({ "columnheader", "dropdown", "dropdownheader", "typein", "value", "string", "int", "float", "intstat", "floatstat", "xslider", "yslider", "sliderint", "sliderfloat", "dropdowninput", "intinput", "floatinput", "boolinput", "textinput", "windowheader", "table", "tablehead", "headtabs", "scrollbar" }), "div");
-		layout->add(StringVector({ "expandbox", "expandboxheader", "expandboxcontainer" }), "div");
-		layout->add(StringVector({ "treenode", "treenodeheader", "treenodecontainer" }), "div");
-
-		layout->add(StringVector({ "root" }), "layer");
-
-		layout->add(StringVector({ "dropdownbox", "tooltip", "context" }), "shrinkwindow");
-
-		layout->style("dropdownbox")->d_sizing[DIM_X] = EXPAND;
-		layout->style("dropdownbox")->d_span[DIM_X] = 1.f;
-
-		layout->style("tablehead")->d_opacity = _OPAQUE;
-		layout->style("tablehead")->d_spacing[DIM_X] = 1.f;
-
-		layout->style("windowbody")->d_padding = BoxFloat(4.f);
-
-		layout->style("int")->d_opacity = _OPAQUE;
-		layout->style("float")->d_opacity = _OPAQUE;
-		layout->style("string")->d_opacity = _OPAQUE;
-		layout->style("bool")->d_opacity = _OPAQUE;
-
-		layout->style("checkbox")->d_opacity = _OPAQUE;
-
-		layout->style("bool")->d_size = DimFloat(15.f, 15.f);
-		layout->style("checkbox")->d_size = DimFloat(15.f, 15.f);
-
-		layout->style("tree")->d_overflow = SCROLL;
-		layout->style("list")->d_overflow = SCROLL;
-		layout->style("windowbody")->d_overflow = SCROLL;
-		layout->style("scrollpartition")->d_overflow = SCROLL;
-
-		layout->style("list")->d_sizing = DimSizing(CAPPED, CAPPED);
-
-		layout->style("scrollsheet")->d_layoutDim = DIM_X;
-
-		layout->style("docksection")->d_layoutDim = DIM_Y;
-
-		layout->style("ydockline")->d_opacity = _OPAQUE;
-		layout->style("xdockline")->d_opacity = _OPAQUE;
-		layout->style("ydockline")->d_layoutDim = DIM_Y;
-		layout->style("xdockline")->d_layoutDim = DIM_X;
-		layout->style("ydockline")->d_spacing = DimFloat(0.f, 5.f);
-		layout->style("xdockline")->d_spacing = DimFloat(5.f, 0.f);
-
-		layout->style("expandbox")->d_layoutDim = DIM_Y;
-		layout->style("expandboxcontainer")->d_layoutDim = DIM_Y;
-		layout->style("expandboxcontainer")->d_spacing[DIM_Y] = 2.f;
-		layout->style("expandboxcontainer")->d_padding = BoxFloat(12.f, 2.f, 0.f, 0.f);
-
-		layout->style("treenode")->d_layoutDim = DIM_Y;
-		layout->style("treenodecontainer")->d_layoutDim = DIM_Y;
-		layout->style("treenodecontainer")->d_padding = BoxFloat(12.f, 2.f, 0.f, 0.f);
-
-		layout->style("scrollpartition")->d_spacing[DIM_Y] = 4.f;
-
-		layout->style("table")->d_spacing[DIM_Y] = 2.f;
-		layout->style("table")->d_layoutDim = DIM_Y;
-
+		styler->inheritLayout(StyleVector({ WSpacerX::styleCls(), WSpacerY::styleCls() }), PartitionX::styleCls());
+		styler->inheritLayout(StyleVector({ WDocklineX::styleCls(), WScrollSheet::styleCls() }), PartitionX::styleCls());
 		
+		styler->inheritLayout(StyleVector({ WDockspace::styleCls(), WDocksection::styleCls(), WDocklineY::styleCls() }), PartitionY::styleCls());
+		styler->inheritLayout(StyleVector({ WWindowBody::styleCls(), WTabber::styleCls(), WTabberBody::styleCls(), WTab::styleCls(), WTree::styleCls(), List::styleCls() }), PartitionY::styleCls());
 
-		layout->style("dropbutton")->d_opacity = _OPAQUE;
+		styler->inheritLayout(StyleVector({ Tooltip::styleCls(), WContextMenu::styleCls() }), WrapY::styleCls());
+		
+		styler->inheritLayout(StyleVector({ ResizeCursorX::styleCls(), ResizeCursorY::styleCls() }), Cursor::styleCls());
 
-		layout->style("label")->d_opacity = _VOID;
+		styler->inheritLayout(StyleVector({ WTypeIn::styleCls(), WString::styleCls(), WInt::styleCls(), WFloat::styleCls() }), DivX::styleCls());
+		styler->inheritLayout(StyleVector({ WStatSlider<int>::styleCls(), WStatSlider<float>::styleCls() }), DivX::styleCls());
+		styler->inheritLayout(StyleVector({ WSliderX::styleCls() }), DivX::styleCls());
+		styler->inheritLayout(StyleVector({ WSliderY::styleCls() }), DivY::styleCls());
+		styler->inheritLayout(StyleVector({ SliderInt::styleCls(), SliderFloat::styleCls() }), DivX::styleCls());
+		styler->inheritLayout(StyleVector({ InputInt::styleCls(), InputFloat::styleCls(), InputBool::styleCls(), InputText::styleCls(), InputDropdown::styleCls() }), DivX::styleCls());
 
-		layout->style("tooltip")->d_opacity = _VOID;
+		styler->inheritLayout(StyleVector({ WScrollerX::styleCls() }), PartitionX::styleCls());
+		styler->inheritLayout(StyleVector({ WScrollerY::styleCls() }), PartitionY::styleCls());
 
-		layout->style("slidervalue")->d_size = DimFloat(40.f, 18.f);
+		styler->inheritLayout(StyleVector({ RootSheet::styleCls() }), PartitionY::styleCls());
 
-		layout->style("xsliderknob")->d_size = DimFloat(0.f, 18.f);
-		layout->style("ysliderknob")->d_size = DimFloat(18.f, 0.f);
+		WTableHead::styleCls()->layout()->d_opacity = _OPAQUE;
+		WColumnHeader::styleCls()->layout()->d_opacity = _VOID;
 
-		layout->style("xscrollerknob")->d_sizing = DimSizing(FIXED, EXPAND);
-		layout->style("yscrollerknob")->d_sizing = DimSizing(EXPAND, FIXED);
+		WTab::styleCls()->layout()->d_overflow = SCROLL;
+		WTree::styleCls()->layout()->d_overflow = SCROLL;
+		List::styleCls()->layout()->d_overflow = SCROLL;
+		WWindowBody::styleCls()->layout()->d_overflow = SCROLL;
 
-		//layout->style("xsliderknob")->d_flow = MANUAL;
-		//layout->style("ysliderknob")->d_flow = MANUAL;
+		List::styleCls()->layout()->d_sizing = DimSizing(CAPPED, CAPPED);
+		
+		WSliderX::styleCls()->layout()->d_weight = LIST;
+		WSliderY::styleCls()->layout()->d_weight = LIST;
 
-		//layout->style("xscrollerknob")->d_flow = MANUAL;
-		//layout->style("yscrollerknob")->d_flow = MANUAL;
+		WScrollerX::styleCls()->layout()->d_weight = LIST;
+		WScrollerY::styleCls()->layout()->d_weight = LIST;
 
-		layout->style("scrollbar")->d_sizing = DimSizing(SHRINK, EXPAND);
-		layout->style("scrollbar")->d_layoutDim = DIM_Y;
+		WDocklineY::styleCls()->layout()->d_weight = LIST;
+		WDocklineX::styleCls()->layout()->d_weight = LIST;
+		WDocklineY::styleCls()->layout()->d_opacity = _OPAQUE;
+		WDocklineX::styleCls()->layout()->d_opacity = _OPAQUE;
+		WDocklineY::styleCls()->layout()->d_spacing = DimFloat(0.f, 5.f);
+		WDocklineX::styleCls()->layout()->d_spacing = DimFloat(5.f, 0.f);
 
-		layout->style("closebutton")->d_size = DimFloat(15.f, 15.f);
-		layout->style("scrollbutton")->d_size = DimFloat(15.f, 15.f);
-		layout->style("expandbutton")->d_size = DimFloat(15.f, 15.f);
+		WMasterDockline::styleCls()->inheritLayout(WDocklineX::styleCls());
 
-		layout->style("dropdownbutton")->d_span[DIM_Y] = 1.f;
-		layout->style("dropdownbutton")->d_sizing[DIM_Y] = EXPAND;
-		layout->style("dropdownbutton")->d_size = DimFloat(15.f, 0.f);
+		WExpandboxBody::styleCls()->layout()->d_spacing = DimFloat(0.f, 2.f);
+		WExpandboxBody::styleCls()->layout()->d_padding = BoxFloat(12.f, 2.f, 0.f, 2.f);
 
-		layout->style("gridline")->d_layoutDim = DIM_X;
+		WTreeNodeBody::styleCls()->layout()->d_padding = BoxFloat(12.f, 2.f, 0.f, 2.f);
 
-		layout->style("headtabs")->d_layoutDim = DIM_X;
+		WTable::styleCls()->layout()->d_spacing = DimFloat(0.f, 2.f);
+		WTable::styleCls()->layout()->d_layoutDim = DIM_Y;
+		WTable::styleCls()->layout()->d_weight = TABLE;
 
-		layout->style("tab")->d_overflow = SCROLL;
-		layout->style("tab")->d_layoutDim = DIM_X;
+		WTreeNodeHeader::styleCls()->layout()->d_opacity = _OPAQUE;
+		
+		WDropdownBox::styleCls()->layout()->d_flow = MANUAL;
+		WDropdownChoice::styleCls()->layout()->d_opacity = _OPAQUE;
 
-		layout->style("windowheader")->d_opacity = _VOID;
+		WSliderKnobX::styleCls()->layout()->d_sizing = DimSizing(FIXED, FIXED);
+		WSliderKnobY::styleCls()->layout()->d_sizing = DimSizing(FIXED, FIXED);
+		WSliderKnobX::styleCls()->layout()->d_size = DimFloat(8.f, 18.f);
+		WSliderKnobY::styleCls()->layout()->d_size = DimFloat(18.f, 8.f);
 
-		layout->add("string", "fixed");
+		WScrollerKnobX::styleCls()->layout()->d_sizing = DimSizing(EXPAND, EXPAND);
+		WScrollerKnobY::styleCls()->layout()->d_sizing = DimSizing(EXPAND, EXPAND);
 
-		layout->style("tab")->d_padding = BoxFloat(0.f, 4.f, 0.f, 0.f);
+		WScrollbar::styleCls()->layout()->d_sizing = DimSizing(SHRINK, EXPAND);
+		WScrollbar::styleCls()->layout()->d_layoutDim = DIM_Y;
 
-		layout->add("newobject", "div");
-		layout->addOverride("newobject", "dropdown", "div");
+		WDropdownToggle::styleCls()->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
 
-		layout->add("tlookwindowbody", "windowbody");
-		layout->style("tlookwindowbody")->d_padding = BoxFloat(20.f, 10.f, 10.f, 10.f);
+		//GridSheet::styleCls()->layout()->d_layoutDim = DIM_X;
+
+		WTab::styleCls()->layout()->d_padding = BoxFloat(0.f, 4.f, 0.f, 0.f);
+
+
+
+		// Skins
+
+		EmptyStyle::styleCls()->skin()->mEmpty = true;
+
+		WTableHead::styleCls()->layout()->d_spacing[DIM_X] = 1.f;
+
+		WWindowBody::styleCls()->layout()->d_padding = BoxFloat(4.f);
+
+		WCheckbox::styleCls()->layout()->d_size = DimFloat(15.f, 15.f);
+
+		Cursor::styleCls()->skin()->mImage = "mousepointer.png";
+
+		ResizeCursorX::styleCls()->skin()->mImage = "resize_h_20.png";
+		ResizeCursorY::styleCls()->skin()->mImage = "resize_v_20.png";
+
+		WSliderKnob::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
+		WSliderKnob::styleCls()->skin()->mCornerRadius = 3.f;
+		WSliderKnob::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
+
+		WDropdownToggle::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
+		WDropdownToggle::styleCls()->skin()->mImage = "arrow_down_15.png";
+		WDropdownToggle::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
+
+		WExpandboxToggle::styleCls()->skin()->mImage = "arrow_down_15.png";
+		WExpandboxToggle::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
+		WExpandboxToggle::styleCls()->decline(ACTIVATED)->mImage = "arrow_right_15.png";
+		WExpandboxToggle::styleCls()->decline(ACTIVATED_HOVERED)->mImage = "arrow_right_15.png";
+		WExpandboxToggle::styleCls()->decline(ACTIVATED_HOVERED)->mBackgroundColour = Colour::Red;
+
+		WTreeNodeToggle::styleCls()->inheritSkins(WExpandboxToggle::styleCls());
+
+		WLabel::styleCls()->skin()->mTextColour = Colour::White;
+		WLabel::styleCls()->skin()->mPadding = DimFloat(2.f, 2.f);
+		
+		Label::styleCls()->inheritSkins(WLabel::styleCls());
+		WTitle::styleCls()->inheritSkins(WLabel::styleCls());
+		WTypeIn::styleCls()->inheritSkins(WLabel::styleCls());
+
+		WButton::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
+		WButton::styleCls()->skin()->mTextColour = Colour::White;
+		WButton::styleCls()->skin()->mPadding = DimFloat(2.f, 2.f);
+		WButton::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::LightGrey;
+		WButton::styleCls()->decline(ACTIVATED)->mBackgroundColour = Colour::Red;
+		WButton::styleCls()->decline(ACTIVATED_HOVERED)->mBackgroundColour = Colour::Red;
+
+		WImgButton::styleCls()->inheritSkins(WButton::styleCls());
+		WImgButton::styleCls()->decline(ENABLED)->mBackgroundColour = Colour::Transparent;
+
+		Hook::styleCls()->inheritSkins(WButton::styleCls());
+		WTabHeader::styleCls()->inheritSkins(WButton::styleCls());
+		WColumnHeader::styleCls()->inheritSkins(WButton::styleCls());
+		WDropdownChoice::styleCls()->inheritSkins(WButton::styleCls());
+		WRadioChoice::styleCls()->inheritSkins(WButton::styleCls());
+
+		WSliderKnobX::styleCls()->inheritSkins(WSliderKnob::styleCls());
+		WSliderKnobY::styleCls()->inheritSkins(WSliderKnob::styleCls());
+
+		WScrollerKnobX::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
+		WScrollerKnobY::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
+
+		WScrollerKnobX::styleCls()->skin()->mMargin = BoxFloat(0.f, 4.f, 0.f, 4.f);
+		WScrollerKnobY::styleCls()->skin()->mMargin = BoxFloat(4.f, 0.f, 4.f, 0.f);
+
+		WScrollerKnobX::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
+		WScrollerKnobY::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
+
+		WScrollbar::styleCls()->skin()->mBackgroundColour = Colour::Black;
+
+		WSlider::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
+		WSlider::styleCls()->skin()->mCornerRadius = 3.f;
+
+		WSliderX::styleCls()->inheritSkins(WSlider::styleCls());
+		WSliderY::styleCls()->inheritSkins(WSlider::styleCls());
+
+		WScrollUp::styleCls()->skin()->mImage = "arrow_up_15.png";
+		WScrollUp::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
+
+		WScrollDown::styleCls()->skin()->mImage = "arrow_down_15.png";
+		WScrollDown::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
+
+		WScroller::styleCls()->skin()->mBackgroundColour = Colour::Black;
+
+		WDropdownHeader::styleCls()->inheritSkins(EmptyStyle::styleCls());
+		WDocklineX::styleCls()->inheritSkins(EmptyStyle::styleCls());
+		WDocklineY::styleCls()->inheritSkins(EmptyStyle::styleCls());
+
+		Tooltip::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
+
+		List::styleCls()->skin()->mBackgroundColour = Colour::Black;
+
+		Header::styleCls()->layout()->d_padding = BoxFloat(6.f, 6.f, 6.f, 6.f);
+
+		WWindow::styleCls()->skin()->mBackgroundColour = Colour::AlphaGrey;
+		WDockWindow::styleCls()->skin()->mBackgroundColour = Colour::Black;
+		WWindowHeader::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
+
+		WTab::styleCls()->skin()->mBackgroundColour = Colour::Red;
+		WTabberHead::styleCls()->skin()->mBackgroundColour = Colour::Black;
+
+		WExpandboxHeader::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
+		WExpandboxHeader::styleCls()->decline(ACTIVATED)->mBackgroundColour = Colour::Red;
+
+		WExpandboxBody::styleCls()->skin()->mBackgroundColour = Colour::DarkGrey;
+
+		WTreeNodeHeader::styleCls()->skin()->mBackgroundColour = Colour::Transparent;
+		WTreeNodeHeader::styleCls()->decline(ACTIVATED)->mBackgroundColour = Colour::Red;
+
+		WTreeNodeBody::styleCls()->skin()->mBackgroundColour = Colour::Transparent;
+
+		WTypeIn::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
+		WTypeIn::styleCls()->skin()->mCornerRadius = 3.f;
+		WTypeIn::styleCls()->decline(ACTIVATED)->mBackgroundColour = Colour::Red;
+
+		WString::styleCls()->inheritSkins(WTypeIn::styleCls());
+
+		WDropdown::styleCls()->inheritSkins(WTypeIn::styleCls());
+		WDropdownBox::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
+
+		WCheckbox::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
+		WCheckbox::styleCls()->decline(ACTIVATED)->mBackgroundColour = Colour::LightGrey;
+
+		//skinner->add(StringVector({ "int", "float", "string", "bool" }), "typein");
+
+		/*skinner->add("tlookwindow", Colour::Transparent);
+
+		skinner->add("tlookwindowheader", Colour::Transparent);
+		skinner->skin("tlookwindowheader")->mImageSkin = ImageSkin("tlookhead");
+
+		skinner->add("tlookwindowbody", Colour::Transparent);
+		skinner->skin("tlookwindowbody")->mImageSkin = ImageSkin("tlook");
+		skinner->skin("tlookwindowbody")->mMargin = BoxFloat(10.f, -5.f, 5.f, 0.f);
+
+		skinner->add("ceguibutton", Colour::Transparent);
+		skinner->skin("ceguibutton")->mImageSkin = ImageSkin("tlookbutton");
+		skinner->skin("ceguibutton")->mPadding = DimFloat(20.f, 8.f);*/
+
+
+		/*layout->add("tlookwindowbody", "windowbody");
+		Wtlookwindowbody::styleCls()->layout()->d_padding = BoxFloat(20.f, 10.f, 10.f, 10.f);
 
 		layout->add("tlookwindowheader", "windowheader");
-		layout->style("tlookwindowheader")->d_sizing[DIM_Y] = FIXED;
-		layout->style("tlookwindowheader")->d_size[DIM_Y] = 30.f;
+		Wtlookwindowheader::styleCls()->layout()->d_sizing[DIM_Y] = FIXED;
+		Wtlookwindowheader::styleCls()->layout()->d_size[DIM_Y] = 30.f;
 
 		layout->addOverride("uieditboard", "windowheader", "tlookwindowheader");
-		layout->addOverride("uieditboard", "windowbody", "tlookwindowbody");
+		layout->addOverride("uieditboard", "windowbody", "tlookwindowbody");*/
 	}
 }

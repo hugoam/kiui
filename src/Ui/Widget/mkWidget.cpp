@@ -11,10 +11,13 @@
 #include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
+#include <Ui/Frame/mkLayer.h>
 #include <Ui/Frame/mkGrid.h>
 
 #include <Ui/mkUiWindow.h>
 #include <Ui/mkUiLayout.h>
+
+#include <Ui/Form/mkRootForm.h>
 
 #include <Object/Store/mkReverse.h>
 
@@ -24,53 +27,51 @@ namespace mk
 {
 	string Widget::sNullString;
 
-	Widget::Widget(string clas, Form* form)
+	Widget::Widget(Style* style, Form* form)
 		: TypeObject(cls())
 		, mParent(nullptr)
-		, mClas(clas != "" ? clas : form->clas())
+		, mStyle(style)
 		, mFrame(nullptr)
 		, mState(ENABLED)
 		, mForm(form)
 	{
-		if(clas != "" && form)
-			std::cerr << "WARNING : widget has both a form : " << form->clas() << " and a clas : " << clas << " overriding with the latter" << std::endl;
+		if(!mStyle && form)
+			mStyle = form->style();
+
+		if(!mStyle)
+			int i = 0;
 	}
 
 	Widget::~Widget()
 	{
-		//if(mParent)
-		//	this->detach();
-
 		if(mState == HOVERED)
 			uiWindow()->unhover();
 		if(mState == FOCUSED)
 			uiWindow()->deactivate(this);
 	}
 
-	void Widget::bind(Sheet* parent)
+	void Widget::bind(Sheet* parent, size_t index)
 	{
 		mParent = parent;
+		mStyle = this->fetchOverride(mStyle);
+
 		Stripe* stripe = mParent ? mParent->frame()->as<Stripe>() : nullptr;
 
-		if(this->frameType() == STRIPE)
-			mFrame = make_unique<Stripe>(stripe, this, this->clas());
+		if(this->frameType() == LAYER)
+			mFrame = make_unique<Layer>(stripe, this, index, this->zorder());
+		else if(this->frameType() == STRIPE)
+			mFrame = make_unique<Stripe>(stripe, this, index);
 		else
-			mFrame = make_unique<Frame>(stripe, this, this->clas(), this->zorder());
+			mFrame = make_unique<Frame>(stripe, this, index);
 
 		this->build();
 	}
-	
-	void Widget::rebind(Sheet* parent, bool insert, size_t index)
-	{
-		//if(mParent)
-		//	this->detach();
 
+	void Widget::rebind(Sheet* parent, size_t index)
+	{
 		mParent = parent;
 
-		if(!insert)
-			parent->frame()->as<Stripe>()->append(mFrame.get());
-		else
-			parent->frame()->as<Stripe>()->insert(mFrame.get(), index);
+		parent->frame()->as<Stripe>()->insert(mFrame.get(), index);
 
 		mFrame->migrate(mParent->frame()->as<Stripe>());
 	}
@@ -90,8 +91,7 @@ namespace mk
 
 	void Widget::destroy()
 	{
-		this->detach();
-		mParent->as<Sheet>()->contents()->remove(this);
+		mParent->as<Sheet>()->release(this);
 	}
 
 	void Widget::detach()
@@ -112,56 +112,39 @@ namespace mk
 
 	Sheet* Widget::clone(Sheet* parent)
 	{
-		return parent->makeappend<Sheet>(mClas, mForm);
+		return parent->makeappend<Sheet>(mStyle, mForm);
 	}
 
 	void Widget::reset(Form* form)
 	{
 		mForm = form;
-		this->reset(form->clas());
+		this->reset(form->style());
 	}
 
-	void Widget::reset(string clas)
+	void Widget::setStyle(Style* style)
 	{
-		LayoutStyle* style = this->elementStyle(clas);
-		InkStyle* skin = this->elementSkin(clas);
-
-		mFrame->reset(style, skin);
+		this->reset(style);
 	}
 
-	InkStyle* Widget::skin()
+	void Widget::reset(Style* style)
 	{
-		return mFrame->skin();
+		mFrame->reset(style);
 	}
 
-	LayoutStyle* Widget::layoutStyle()
+	Style* Widget::fetchOverride(Style* style)
 	{
-		return mFrame->style();
+		Style* overrider = this->uiWindow()->styler()->fetchOverride(style, mStyle);
+		if(overrider)
+			return overrider;
+		else if(mParent)
+			return mParent->fetchOverride(style);
+		else
+			return style;
 	}
-
-	InkStyle* Widget::elementSkin(const string& clas)
-	{
-		return mParent->elementSkin(clas);
-	}
-
-	LayoutStyle* Widget::elementStyle(const string& clas)
-	{
-		return mParent->elementStyle(clas);
-	}
-
-	InkStyle* Widget::inkStyle()
-	{
-		return mFrame->inkstyle();
-	}
-
-	/*string Widget::clas()
-	{
-		return mForm ? mForm->clas() : "";
-	}*/
 
 	FrameType Widget::frameType()
 	{
-		return mForm ? (mForm->container() ? STRIPE : FRAME) : FRAME;
+		return FRAME;
 	}
 
 	const string& Widget::name()
@@ -171,7 +154,7 @@ namespace mk
 
 	const string& Widget::image()
 	{
-		if(mFrame->inkstyle()->mImage != "")
+		if(!mFrame->inkstyle()->mImage.empty())
 			return mFrame->inkstyle()->mImage;
 		else
 			return mForm ? mForm->image() : sNullString;
@@ -187,9 +170,9 @@ namespace mk
 		return mForm ? mForm->tooltip() : sNullString;
 	}
 
-	const string& Widget::hoverCursor()
+	Style* Widget::hoverCursor()
 	{
-		return sNullString;
+		return nullptr;
 	}
 
 	RootSheet* Widget::rootWidget()
@@ -231,7 +214,7 @@ namespace mk
 		//std::cerr << "Widget :: nextFrame " << tick << " , " << delta << std::endl;
 		if(mForm)
 		{
-			if(mForm->updated() == mForm->lastTick())
+			if(mForm->updated() == mForm->rootForm()->lastTick())
 				this->markDirty();
 			mForm->nextFrame(tick, delta);
 		}
@@ -240,17 +223,20 @@ namespace mk
 	Widget* Widget::pinpoint(float x, float y, bool opaque)
 	{
 		Frame* target = mFrame->pinpoint(x, y, opaque);
-		return target->widget();
+		if(target)
+			return target->widget();
+		else
+			return nullptr;
 	}
 
 	Widget* Widget::prev()
 	{
-		return mFrame->parent()->sequence()[mFrame->index() - 1]->widget();
+		return mFrame->parent()->contents()[mFrame->index() - 1]->widget();
 	}
 
 	Widget* Widget::next()
 	{
-		return mFrame->parent()->sequence()[mFrame->index() + 1]->widget();
+		return mFrame->parent()->contents()[mFrame->index() + 1]->widget();
 	}
 
 	InputReceiver* Widget::propagateMouse(float x, float y)
@@ -305,10 +291,7 @@ namespace mk
 	bool Widget::mouseEntered(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
-		/*if(mForm)
-			std::cerr << "HOVERED : " << mForm->clas() << " style : " << mFrame->skin()->name() << std::endl;
-		else
-			std::cerr << "HOVERED : " << mFrame->style()->name() << " style : " << mFrame->skin()->name() << std::endl;*/
+		std::cerr << "HOVERED : " << mFrame->wstyle()->name() << std::endl;
 		this->hover();
 		return true;
 	}

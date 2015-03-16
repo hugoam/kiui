@@ -19,7 +19,7 @@ namespace mk
 	class Scheme
 	{
 	public:
-		Scheme(Form* form, SchemeMapper mapper, SchemeMapper elementMapper);
+		Scheme(Form* form, SchemeMapper mapper);
 
 		Form* form() { return mForm; }
 
@@ -28,7 +28,7 @@ namespace mk
 		void append(Form* form);
 		void remove(Form* form);
 
-		void reset(SchemeMapper containerMapper, SchemeMapper elementMapper);
+		void reset(SchemeMapper mapper);
 		void apply();
 		void clear();
 
@@ -42,7 +42,6 @@ namespace mk
 		Sheet* mSheet;
 		
 		SchemeMapper mMapper;
-		SchemeMapper mElementMapper;
 
 		Collection* mCollection;
 	};

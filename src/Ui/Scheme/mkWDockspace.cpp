@@ -25,42 +25,20 @@
 
 namespace mk
 {
-	WDocksection::WDocksection(WDockline* dockline, size_t index, string clas)
-		: WTabber(clas + " docksection", true)
+	WDocksection::WDocksection(WDockline* dockline, size_t index, Style* style)
+		: WTabber(style ? style : styleCls(), true)
 		, mDockline(dockline)
 		, mIndex(index)
 	{
 		mType = cls();
-
 	}
 
 	WDocksection::~WDocksection()
-	{
-		mDockline->dockspace()->setSpan(this->dockid(), mFrame->dspan(mDockline->dim()));
-	}
+	{}
 
 	void WDocksection::build()
 	{
 		WTabber::build();
-
-		mFrame->parent()->move(mFrame->index(), mIndex);
-		mDockline->dockspace()->addSpan(this->dockid());
-		this->updateSpan();
-	}
-
-	void WDocksection::updateSpan()
-	{
-		float span = mDockline->dockspace()->getSpan(this->dockid());
-		mFrame->setSpanDim(mDockline->dim(), span);
-		std::cerr << "Update dock " << this->dockid() << " span " << span << std::endl;
-	}
-
-	string WDocksection::dockid()
-	{
-		if(mDockline)
-			return mDockline->dockid() + "." + toString(mFrame->index());
-		else
-			return toString(mFrame->index());
 	}
 
 	void WDocksection::dock(WWindow* window)
@@ -72,18 +50,25 @@ namespace mk
 	{
 		this->rootWidget()->append(this->vrelease(window));
 
-		if(mTabs->contents()->size() == 0)
+		if(mTabs->contents().size() == 0)
 			mDockline->removeSection(this);
 	}
 
 
-	WDocksection* WDocksection::docktarget(Dimension dim, size_t index, bool after)
+	WDocksection* WDocksection::docktarget(Dimension dim, bool after)
 	{
-		WDockline* dockline = mDockline;
-		if(dockline->dim() == dim)
-			return dockline->insertSection(index + (after ? 1 : 0));
+		float span = mFrame->dsize(mDockline->dim()) / mDockline->frame()->dsize(mDockline->dim());
+		span = std::min(span, this->frame()->dspan(mDockline->dim()) / 2.f);
+
+		if(mDockline->dim() == dim)
+		{
+			mDockline->stripe()->weights()[mFrame->index()] -= span;
+			return mDockline->insertSection(mFrame->index() + (after ? 1 : 0), nullptr, span);
+		}
 		else
-			return dockline->insertLine(index, true)->insertSection(after ? 1 : 0);
+		{
+			return mDockline->insertLine(mFrame->index(), true, span)->insertSection(after ? 1 : 0);
+		}
 	}
 
 	WDocksection* WDocksection::docktarget(float xPos, float yPos)
@@ -92,19 +77,19 @@ namespace mk
 		float yRel = yPos - mFrame->dabsolute(DIM_Y);
 
 		if(xRel < mFrame->dsize(DIM_X) * 0.25f)
-			return this->docktarget(DIM_X, mFrame->index(), false); // dock left
+			return this->docktarget(DIM_X, false); // dock left
 		else if(xRel > mFrame->dsize(DIM_X) * 0.75f)
-			return this->docktarget(DIM_X, mFrame->index(), true); // dock right
+			return this->docktarget(DIM_X, true); // dock right
 		else if(yRel < mFrame->dsize(DIM_Y) * 0.25f)
-			return this->docktarget(DIM_Y, mFrame->index(), false); // dock under
+			return this->docktarget(DIM_Y, false); // dock under
 		else if(yRel > mFrame->dsize(DIM_Y) * 0.75f)
-			return this->docktarget(DIM_Y, mFrame->index(), true); // dock above
+			return this->docktarget(DIM_Y, true); // dock above
 		else
 			return this; // dock on
 	}
 
-	WDockline::WDockline(WDockspace* dockspace, WDockline* dockline, Dimension dim, size_t index)
-		: GridSheet(dim, dim == DIM_X ? "xdockline" : "ydockline")
+	WDockline::WDockline(WDockspace* dockspace, WDockline* dockline, Dimension dim, size_t index, Style* style)
+		: GridSheet(dim, style)
 		, mDockspace(dockspace)
 		, mDockline(dockline)
 		, mIndex(index)
@@ -113,74 +98,62 @@ namespace mk
 	}
 
 	WDockline::~WDockline()
-	{
-		if(mDockline)
-			mDockspace->setSpan(mDockline->dockid(), mFrame->dspan(mDockline->dim()));
-	}
+	{}
 
 	void WDockline::build()
 	{
 		GridSheet::build();
-		mFrame->parent()->move(mFrame->index(), mIndex);
-		mDockspace->addSpan(this->dockid());
-		this->updateSpan();
 	}
 
-	string WDockline::dockid()
+	WDockline* WDockline::insertLine(size_t index, bool replace, float span)
 	{
-		if(mDockline)
-			return mDockline->dockid() + "." + toString(mFrame->index());
+		if(!replace && this->stripe()->weights().size() < this->stripe()->sequence().size() + 1)
+			this->stripe()->weights().insert(this->stripe()->weights().begin() + index, span);
+
+		WDockline* dockline;
+
+		if(mDim == DIM_X)
+			dockline = this->makeinsert<WDocklineY>(index, mDockspace, this, index);
 		else
-			return toString(mFrame->index());
-	}
-
-	void WDockline::updateSpan()
-	{
-		if(mDockline)
-		{
-			float span = mDockspace->getSpan(this->dockid());
-			mFrame->setSpanDim(mDockline->dim(), span);
-			std::cerr << "Update dock line " << this->dockid() << " span " << span << std::endl;
-		}
-	}
-
-	WDockline* WDockline::insertLine(size_t index, bool replace)
-	{
-		WDockline* dockline = this->makeinsert<WDockline>(index, mDockspace, this, mDim == DIM_X ? DIM_Y : DIM_X, index);
+			dockline = this->makeinsert<WDocklineX>(index, mDockspace, this, index);
 
 		if(replace)
 		{
-			dockline->contents()->add(this->release(index + 1));
-			dockline->contents()->at(dockline->contents()->size()-1)->rebind(dockline);
+			dockline->stripe()->weights().push_back(1.f);
+			dockline->append(this->release(index + 1));
 		}
+
 		return dockline;
 	}
 
-	WDocksection* WDockline::insertSection(size_t index, string clas)
+	WDocksection* WDockline::insertSection(size_t index, Style* style, float span)
 	{
-		WDocksection* docksection = this->makeinsert<WDocksection>(index, this, index, clas);
+		if(this->stripe()->weights().size() < this->stripe()->sequence().size() + 1)
+			this->stripe()->weights().insert(this->stripe()->weights().begin() + index, span);
+
+		WDocksection* docksection = this->makeinsert<WDocksection>(index, this, index, style);
 		return docksection;
 	}
 
 	void WDockline::removeSection(WDocksection* section)
 	{
+		Frame* givespan = section->frame()->index() > 0 ? section->prev()->frame() : section->next()->frame();
+		this->stripe()->weights()[givespan->index()] += section->frame()->dspan(mDim);
+		this->stripe()->markRelayout();
+
+		this->stripe()->weights().erase(this->stripe()->weights().begin() + section->frame()->index());
 		section->destroy();
+
 		if(mContents.size() == 1)
 			mParent->as<WDockline>()->removeLine(this);
 	}
 
 	void WDockline::removeLine(WDockline* line)
 	{
-		size_t index = line->frame()->index();
-		
-		WDocksection* section = line->contents()->at(0)->as<WDocksection>();
+		Widget* section = this->insert(line->release(0U), line->frame()->index());
 		section->as<WDocksection>()->setDockline(this);
-		section->rebind(this, true, index);
-		mContents.insert(line->contents()->release(size_t(0)), index);
 
 		line->destroy();
-
-		section->updateSpan();
 
 		if(mContents.size() == 1)
 			mParent->as<WDockline>()->removeLine(this);
@@ -194,8 +167,8 @@ namespace mk
 		while(ids.size() > 1)
 		{
 			size_t index = fromString<size_t>(ids.back());
-			if(index < dockline->contents()->size())
-				dockline = dockline->contents()->at(index)->as<WDockline>();
+			if(index < dockline->contents().size())
+				dockline = dockline->contents().at(index)->as<WDockline>();
 			else
 				dockline = dockline->insertLine(index);
 			ids.pop_back();
@@ -204,7 +177,7 @@ namespace mk
 		return dockline;
 	}
 
-	WDocksection* WDockline::findOrCreateSection(string dockid, string clas)
+	WDocksection* WDockline::findOrCreateSection(const string& dockid, Style* style)
 	{
 		std::vector<string> ids = splitString(dockid, ".");
 		std::reverse(ids.begin(), ids.end());
@@ -212,54 +185,50 @@ namespace mk
 		WDockline* dockline = this->findLine(ids);
 
 		size_t index = fromString<size_t>(ids.back());
-		if(index < dockline->contents()->size())
-			return dockline->contents()->at(index)->as<WDocksection>();
+		if(index < dockline->contents().size())
+			return dockline->contents().at(index)->as<WDocksection>();
 		else
-			return dockline->insertSection(index, clas);
+			return dockline->insertSection(index, style);
 	}
 
-	WDocksection* WDockline::findSection(string dockid)
+	WDocksection* WDockline::findSection(const string& dockid)
 	{
 		return findOrCreateSection(dockid);
 	}
 
+	WDocklineX::WDocklineX(WDockspace* dockspace, WDockline* dockline, size_t index)
+		: WDockline(dockspace, dockline, DIM_X, index, styleCls())
+	{}
+
+	WDocklineY::WDocklineY(WDockspace* dockspace, WDockline* dockline, size_t index)
+		: WDockline(dockspace, dockline, DIM_Y, index, styleCls())
+	{}
+
+	WMasterDockline::WMasterDockline(WDockspace* dockspace)
+		: WDockline(dockspace, nullptr, DIM_X, 0, styleCls())
+	{}
+
 	WDockspace::WDockspace()
-		: Sheet("dockspace")
-		, mDockSpans()
+		: Sheet(styleCls())
 	{}
 
 	void WDockspace::build()
 	{
 		Sheet::build();
-		mMainLine = this->makeappend<WDockline>(this, nullptr, DIM_X, 0);
-	}
-
-	float WDockspace::getSpan(string dockid)
-	{
-		return mDockSpans[dockid];
-	}
-
-	void WDockspace::setSpan(string dockid, float span)
-	{
-		std::cerr << "Saving span for dock " << dockid << " value " << span << std::endl;
-		mDockSpans[dockid] = span;
-	}
-
-	void WDockspace::addSpan(string dockid)
-	{
-		if(mDockSpans.find(dockid) == mDockSpans.end())
-			mDockSpans[dockid] = 1.f;
+		mMainLine = this->makeappend<WMasterDockline>(this);
 	}
 
 	Widget* WDockspace::vappend(unique_ptr<Widget> widget)
 	{
-		string dockid = widget->form()->attrs()["dockid"];
+		string dockid = widget->form()->attrs()["dockid"]->get<string>();
 		WDocksection* section = mMainLine->findOrCreateSection(dockid);
-		WWindow* window = section->vmakeappend<WWindow>(nullptr, widget->name(), true, true, section, widget->clas());
+		WWindow* window = section->vmakeappend<WWindow>(nullptr, widget->name(), true, true, section);
 		return window->vappend(std::move(widget));
 	}
 
-	Dockspace::Dockspace(const string& cls)
-		: Form(cls + " dockspace", "", []() { return make_unique<WDockspace>(); })
-	{}
+	Dockspace::Dockspace(Style* style)
+		: Form(style, "", []() { return make_unique<WDockspace>(); })
+	{
+		mType = cls();
+	}
 }

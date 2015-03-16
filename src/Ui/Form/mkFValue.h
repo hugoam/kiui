@@ -8,8 +8,8 @@
 /* mk headers */
 #include <Object/mkTyped.h>
 #include <Object/Store/mkArray.h>
-#include <Object/mkObjectForward.h>
 #include <Object/mkRef.h>
+#include <Ui/mkUiForward.h>
 #include <Ui/Form/mkForm.h>
 
 #include <Object/Util/mkStat.h>
@@ -20,18 +20,17 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT ValueForm : public HashDispatch<ValueForm, Form*, Form*>
+	class MK_UI_EXPORT ValueForm : public HashDispatch<ValueForm, Form*, FValue*>
 	{};
 
 	class MK_UI_EXPORT FValue : public Form
 	{
 	public:
-		FValue(Lref& lref, const string& cls, bool edit = false);
-		FValue(Lref&& lref, const string& cls, bool edit = false);
-
-		void nextFrame(size_t tick, size_t delta);
+		FValue(Lref& lref, Style* style, bool edit = false, SchemeMapper mapper = nullptr);
+		FValue(Lref&& lref, Style* style, bool edit = false, SchemeMapper mapper = nullptr);
 
 		Lref& valref() { return mLref; }
+		size_t update() { return mUpdate; }
 
 		string toString();
 		void setString(const string& value);
@@ -44,106 +43,6 @@ namespace mk
 		size_t mUpdate;
 		bool mEdit;
 	};
-
-	class MK_UI_EXPORT FInt : public FValue, public Typed<FInt>
-	{
-	public:
-		FInt(Lref& value, bool edit = true);
-		FInt(int value);
-
-		void updateValue();
-
-		using Typed<FInt>::cls;
-	};
-
-	class MK_UI_EXPORT FFloat : public FValue, public Typed<FFloat>
-	{
-	public:
-		FFloat(Lref& value, bool edit = true);
-		FFloat(float value);
-
-		void updateValue();
-
-		using Typed<FFloat>::cls;
-	};
-
-	class MK_UI_EXPORT FIntStat : public FValue, public Typed<FIntStat>
-	{
-	public:
-		FIntStat(Lref& value, bool edit = true);
-		FIntStat(Stat<int> value);
-
-		using Typed<FIntStat>::cls;
-	};
-
-	class MK_UI_EXPORT FFloatStat : public FValue, public Typed<FFloatStat>
-	{
-	public:
-		FFloatStat(Lref& value, bool edit = true);
-		FFloatStat(Stat<float> value);
-
-		using Typed<FFloatStat>::cls;
-	};
-
-	class MK_UI_EXPORT FBool : public FValue, public Typed<FBool>
-	{
-	public:
-		FBool(Lref& value, bool edit = true);
-		FBool(bool value);
-
-		using Typed<FBool>::cls;
-	};
-
-	class MK_UI_EXPORT FString : public FValue, public Typed<FString>
-	{
-	public:
-		FString(Lref& value, bool edit = true);
-		FString(string value);
-
-		using Typed<FString>::cls;
-	};
-
-	class MK_UI_EXPORT InputInt : public Form
-	{
-	public:
-		InputInt(const string& label, int value, std::function<void(int)> callback = nullptr);
-	};
-
-	class MK_UI_EXPORT InputFloat : public Form
-	{
-	public:
-		InputFloat(const string& label, float value, std::function<void(float)> callback = nullptr);
-	};
-
-	class MK_UI_EXPORT InputBool : public Form
-	{
-	public:
-		InputBool(const string& label, bool value, std::function<void(void)> on = nullptr, std::function<void(void)> off = nullptr);
-	};
-
-	class MK_UI_EXPORT InputText : public Form
-	{
-	public:
-		InputText(const string& label, const string& text, std::function<void(string)> callback = nullptr, bool reverse = false);
-	};
-
-	class MK_UI_EXPORT InputDropdown : public Form
-	{
-	public:
-		InputDropdown(const string& label, StringVector choices, std::function<void(string)> callback = nullptr, bool reverse = false);
-	};
-	
-	class MK_UI_EXPORT SliderInt : public Form
-	{
-	public:
-		SliderInt(const string& label, Stat<int> value, std::function<void(int)> callback = nullptr);
-	};
-
-	class MK_UI_EXPORT SliderFloat : public Form
-	{
-	public:
-		SliderFloat(const string& label, Stat<float> value, std::function<void(float)> callback = nullptr);
-	};
 }
 
-#endif // MK_FOBJECT_H_INCLUDED
+#endif // MK_FVALUE_H_INCLUDED

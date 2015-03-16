@@ -19,18 +19,20 @@ namespace mk
 		BUTTON_ACTIVE = 2,
 	};
 
-	class MK_UI_EXPORT Button : public Form
+	class MK_UI_EXPORT _I_ Button : public Form, public Typed<Button, Form>, public Styled<Button>
 	{
 	public:
 		typedef std::function<void(Button*)> Trigger;
 
 	public:
-		Button(const string& cls, const string& label, const string& image = "", Trigger trigger = nullptr);
+		Button(Style* style, const string& label, const string& image = "", const Trigger& trigger = nullptr);
 
 		virtual void trigger() { mTrigger(this); }
 		virtual void triggerAlt() { this->trigger(); }
 		virtual void triggerShift() { this->trigger(); }
 		virtual void triggerCtrl() { this->trigger(); }
+
+		using Typed<Button, Form>::cls;
 
 	protected:
 		Trigger mTrigger;

@@ -14,25 +14,36 @@
 
 namespace mk
 {
-	// @todo add size_t d_shiftpos, from the shiftpos, the rest of the elements in the sequence are reverse positioned (from the end)
+	typedef std::vector<Frame*> FrameVector;
+
+	class MK_UI_EXPORT FlowSequence
+	{
+	public:
+		FlowSequence(FrameVector& vec) : d_vector(vec), d_size(0) {}
+		FlowSequence& operator=(const FlowSequence&) = delete;
+		FrameVector::const_iterator begin() { return d_vector.begin(); }
+		FrameVector::const_iterator end() { return d_vector.begin() + d_size; }
+		size_t& size() { return d_size; }
+	private:
+		FrameVector& d_vector;
+		size_t d_size;
+	};
+
 	class MK_UI_EXPORT Stripe : public Frame
 	{
 	public:
-		typedef std::vector<Frame*> Sequence;
-
-	public:
-		Stripe(Stripe* parent, Widget* widget, string clas = "");
+		Stripe(Stripe* parent, Widget* widget, size_t index);
 		~Stripe();
 
-		inline Sequence& contents() { return d_contents; }
-		inline Sequence& sequence() { return d_sequence; }
+		inline FrameVector& contents() { return d_contents; }
+		inline FlowSequence& sequence() { return d_sequence; }
 
 		inline float sequenceLength() { return d_sequenceLength; }
 		inline Dimension layoutDim() { return d_style->d_layoutDim; }
 		inline bool overflow() { return d_sequenceLength > dclipsize(d_length); }
 		inline float cursor() { return d_cursor; }
 		
-		inline std::vector<float>& weightTable() { return d_weightTable; }
+		inline std::vector<float>& weights() { return *d_weights.get(); }
 
 		void setCursor(float cursor) { d_cursor = cursor; d_relayout = true; }
 
@@ -41,18 +52,18 @@ namespace mk
 		void remove(Frame* widget);
 		void clear();
 
-		void appendManual(Frame* frame);
 		void insertManual(Frame* frame, size_t index);
 		void removeManual(Frame* frame);
 
 		void insertFlow(Frame* widget, size_t index);
 		void removeFlow(Frame* widget);
 
-		void shiftBack(Frame* frame);
-		void move(size_t from, size_t to);
+		void appendManual(Frame* frame)	{ this->insertManual(frame, d_contents.size()); }
 
-		void appendFlow(Frame* widget) { insertFlow(widget, d_sequence.size()); }
-		void prependFlow(Frame* widget) { insertFlow(widget, 0); }
+		void appendFlow(Frame* widget) { this->insertFlow(widget, d_sequence.size()); }
+		void prependFlow(Frame* widget) { this->insertFlow(widget, 0); }
+
+		void move(size_t from, size_t to);
 
 		void markDirty(Dirty dirty);
 		void setVisible(bool visible);
@@ -63,13 +74,16 @@ namespace mk
 
 		void resized(Dimension dim);
 
-		void flowChanged(Frame* child);
-		void flowChanged(Frame* child, Dimension dim);
+		void flowHidden(Frame* child);
+		void flowShown(Frame* child);
+
+		void flowSizedLength(Frame* child, float delta);
+		void flowSizedDepth(Frame* child, float delta);
+		void flowSized(Frame* child, Dimension dim, float delta);
 
 		void normalizeSpan();
 
-		void reindexFlow(size_t from);
-		void reindexManual(size_t from);
+		void reindex(size_t from);
 
 		float firstVisible();
 
@@ -77,12 +91,13 @@ namespace mk
 
 		void deepRelayout();
 
-		void distributeWeights();
+		void initWeights();
+		void storeWeights();
+		void dispatchWeights();
+		void dispatchTableWeights();
 
 		inline float dspace(Dimension dim) { return d_size[dim] - d_style->d_padding[dim] - d_style->d_padding[dim+2]; }
 		inline float dpivotposition(Dimension dim, Frame* frame) { return d_style->d_pivot[dim] ? dsize(dim) - frame->dsize(dim) - frame->dposition(dim) : frame->dposition(dim); }
-
-		FrameType frameType() { return STRIPE; }
 
 		Frame* pinpoint(float x, float y, bool opaque);
 
@@ -94,6 +109,9 @@ namespace mk
 		void updateDepth();
 		void updateLength();
 
+		void recomputeDepth();
+		void recomputeLength();
+
 		void expandDepth();
 		void expandLength();
 
@@ -104,15 +122,15 @@ namespace mk
 		Dimension d_length;
 		float d_cursor;
 
-		Sequence d_sequence;
-		Sequence d_contents;
+		FrameVector d_contents;
+		FlowSequence d_sequence;
 
 		float d_sequenceLength;
 		float d_maxDepth;
 
 		bool d_relayout;
 
-		std::vector<float> d_weightTable;
+		unique_ptr<std::vector<float>> d_weights;
 	};
 }
 

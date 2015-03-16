@@ -7,12 +7,15 @@
 
 /* mk headers */
 #include <Object/mkTyped.h>
+#include <Object/mkRef.h>
+#include <Object/mkIndexer.h>
 #include <Object/Store/mkRegistry.h>
 #include <Object/Store/mkIndexStore.h>
 #include <Object/Util/mkUpdatable.h>
 #include <Object/Util/mkMake.h>
 #include <Ui/mkUiForward.h>
 #include <Ui/Scheme/mkScheme.h>
+#include <Ui/Style/mkStyle.h>
 
 #include <map>
 
@@ -26,13 +29,13 @@ namespace mk
 
 	typedef std::vector<std::unique_ptr<Form>> UniqueFormVector;
 
-    class MK_UI_EXPORT Form : public TypeObject, public Typed<Form>, public Updatable
+    class MK_UI_EXPORT _I_ Form : public TypeObject, public Typed<Form>, public Updatable
     {
     public:
 		typedef std::function<void(Form*)> Trigger;
 
 	public:
-		Form(const string& cls, const string& label = "", SchemeMapper containerMapper = nullptr, SchemeMapper elementMapper = nullptr);
+		Form(Style* style, const string& label = "", SchemeMapper mapper = nullptr);
 		~Form();
 
 		virtual void build() {}
@@ -41,33 +44,37 @@ namespace mk
 		Form* parent() { return mParent; }
 		Id index() const { return mIndex; }
 		Widget* widget() { return mWidget; }
-		bool container() { return mLabel == ""; }
+		bool container() { return mLabel.empty(); }
 		size_t updated() { return mUpdated; }
-		size_t lastTick() { return mLastTick; }
 
 		Scheme* scheme() { return &mScheme; }
 		void setScheme(unique_ptr<Scheme> scheme);
 		void setWidget(Widget* widget) { mWidget = widget; }
 
-		const string& clas() const { return mCls; }
+		Style* style() const { return mStyle; }
 		const string& label() const { return mLabel; }
-		const string& image() const { return this->getAttr("image"); }
-		const string& name() const { return this->getAttr("name"); }
-		const string& tooltip() const { return this->getAttr("tooltip"); }
+		const string& image() const { return this->getAttr("image")->get<string>(); }
+		const string& name() const { return this->getAttr("name")->get<string>(); }
+		const string& tooltip() const { return this->getAttr("tooltip")->get<string>(); }
 
-		std::map<string, string>& attrs() { return mAttrs; }
+		LrefDict& attrs() { return mAttrs; }
 		bool hasAttr(const string& name) { return mAttrs.find(name) != mAttrs.end(); }
-		const string& getAttr(const string& name) const { if(mAttrs.find(name) != mAttrs.end()) return mAttrs.at(name); else return sNullString; }
+		const Lref& getAttr(const string& name) const { if(mAttrs.find(name) != mAttrs.end()) return mAttrs.at(name); else return sNullString; }
 
-		void setIndex(size_t index);
+		template <class T>
+		void setAttr(const string& name, const T& val) { mAttrs.insert(std::make_pair(name, lref(val))); }
 
-		void setCls(const string& cls) { mCls = cls; }
-		void setLabel(const string& label) { mLabel = label; mUpdated = mLastTick; }
-		void setImage(const string& image) { mAttrs["image"] = image; }
-		void setName(const string& name) { mAttrs["name"] = name; }
-		void setTooltip(const string& tooltip) { mAttrs["tooltip"] = tooltip; }
+		void setIndex(size_t index) { mIndex = index; }
 
-		Registry<Form>* contents() { return &mContents; }
+		void setStyle(Style* style);
+		void setLabel(const string& label);
+		void setImage(const string& image) { this->setAttr("image", image); }
+		void setName(const string& name) { this->setAttr("name", name); }
+		void setTooltip(const string& tooltip) { this->setAttr("tooltip", tooltip); }
+
+		std::vector<unique_ptr<Form>>& contents() { return mContents; }
+
+		Form* child(size_t index) { return mContents.at(index).get(); }
 
 		void nextFrame(size_t tick, size_t delta);
 
@@ -77,6 +84,7 @@ namespace mk
 		void destroy();
 		void clear();
 		
+		void destroy(size_t index);
 		void remove(size_t index);
 
 		Form* insert(unique_ptr<Form> form, size_t index);
@@ -85,16 +93,16 @@ namespace mk
 
 		// Indexing
 		string concatIndex();
-		void updateIndex();
 
 		void move(size_t from, size_t to);
+		void reindex(size_t index);
 
 		Form* prev();
 		Form* next();
 
 		bool contains(Form* other);
 
-		Form* findParent(const string& cls);
+		Form* findParent(Type* type);
 
 		// Specialization
 		RootForm* rootForm();
@@ -108,29 +116,23 @@ namespace mk
 	public:
 		Form* find(const string& search);
 
-		//void added();
-		//void removed();
-		//void updated();
-		//void altered();
-
 	protected:
 		Form* mParent;
 		size_t mIndex;
-		string mCls;
+		Style* mStyle;
 		string mLabel;
 
-		size_t mLastTick;
 		size_t mUpdated;
 
 		Scheme mScheme;
 
 		Widget* mWidget;
 
-		std::map<string, string> mAttrs;
+		LrefDict mAttrs;
 
-		Index<Registry<Form>> mContents;
+		std::vector<unique_ptr<Form>> mContents;
 
-		static string sNullString;
+		static Lref sNullString;
     };
 
 	enum FormUpdate

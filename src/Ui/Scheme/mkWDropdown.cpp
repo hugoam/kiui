@@ -13,6 +13,7 @@
 #include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
+#include <Ui/Frame/mkLayer.h>
 
 #include <Ui/Frame/mkFrame.h>
 
@@ -22,8 +23,8 @@ using namespace std::placeholders;
 
 namespace mk
 {
-	WDropdown::WDropdown(Trigger onSelected)
-		: Sheet("dropdown")
+	WDropdown::WDropdown(const Trigger& onSelected)
+		: Sheet(styleCls())
 		, mOnSelected(onSelected)
 		, mSelected(nullptr)
 		, mDown(false)
@@ -35,20 +36,20 @@ namespace mk
 	void WDropdown::build()
 	{
 		Sheet::build();
-		mHeader = this->makeappend<Sheet>("dropdownheader");
+		mHeader = this->makeappend<WDropdownHeader>();
 		mDropbox = this->makeappend<WDropdownBox>(this);
-		mDropButton = this->makeappend<WButton>("", "dropdownbutton", std::bind(&WDropdown::dropdown, this));
+		mDropButton = this->makeappend<WDropdownToggle>(std::bind(&WDropdown::dropdown, this));
 
 		mDropbox->frame()->hide();
 	}
 
 	Sheet* WDropdown::vaddwrapper(Widget* widget)
 	{
-		WWrapButton* button = mDropbox->makeappend<WWrapButton>(widget, "dropbutton", std::bind(&WDropdown::selected, this, _1));
+		WWrapButton* button = mDropbox->makeappend<WDropdownChoice>(widget, std::bind(&WDropdown::selected, this, _1));
 		if(mSelected == nullptr)
 		{
 			mSelected = button;
-			mHeader->makeappend<Widget>("", widget->form());
+			mHeader->makeappend<Widget>(nullptr, widget->form());
 		}
 
 		return button;
@@ -61,7 +62,6 @@ namespace mk
 
 	void WDropdown::dropup()
 	{
-		mDropbox->rebind(this);
 		mDropbox->frame()->hide();
 		uiWindow()->modalOff();
 
@@ -70,17 +70,15 @@ namespace mk
 
 	void WDropdown::dropdown()
 	{
-		if(mDropbox->contents()->size() == 0)
+		if(mDropbox->contents().size() == 0)
 			return;
 
-		mDropbox->rebind(this->rootWidget());
 		mDropbox->frame()->show();
-		mDropbox->frame()->moveToTop();
+		mDropbox->frame()->as<Layer>()->moveToTop();
 
 		uiWindow()->modalOn(mDropbox);
 
-		Frame* frame = mFrame.get(); //mHeader->frame();
-		mDropbox->frame()->setPosition(frame->dabsolute(DIM_X), frame->dabsolute(DIM_Y) + frame->dsize(DIM_Y));
+		mDropbox->frame()->setPositionDim(DIM_Y, mFrame->dsize(DIM_Y));
 
 		mDown = true;
 	}
@@ -93,13 +91,25 @@ namespace mk
 		mSelected = button;
 		
 		mHeader->clear();
-		mHeader->makeappend<Widget>("", button->content()->form());
+		mHeader->makeappend<Widget>(nullptr, button->content()->form());
 
 		mOnSelected(button->content());
 	}
 
+	WDropdownHeader::WDropdownHeader()
+		: Sheet(styleCls())
+	{}
+
+	WDropdownToggle::WDropdownToggle(const Trigger& trigger)
+		: WButton("", styleCls(), trigger)
+	{}
+
+	WDropdownChoice::WDropdownChoice(Widget* content, const Trigger& trigger)
+		: WWrapButton(content, styleCls(), trigger)
+	{}
+
 	WDropdownBox::WDropdownBox(WDropdown* dropdown)
-		: Sheet("dropdownbox")
+		: Sheet(styleCls())
 		, mDropdown(dropdown)
 	{}
 
@@ -110,8 +120,8 @@ namespace mk
 		return true;
 	}
 
-	Dropdown::Dropdown(Trigger onSelected, std::function<void(string)> onSelectedString)
-		: Form("dropdown", "", [this](){ return make_unique<WDropdown>(std::bind(&Dropdown::onSelected, this, _1)); })
+	Dropdown::Dropdown(const Trigger& onSelected, std::function<void(string)> onSelectedString)
+		: Form(nullptr, "", [this](){ return make_unique<WDropdown>(std::bind(&Dropdown::onSelected, this, _1)); })
 		, mOnSelected(onSelected)
 		, mOnSelectedString(onSelectedString)
 	{}
@@ -120,7 +130,7 @@ namespace mk
 		: Dropdown(nullptr, onSelected)
 	{
 		for(string& choice : choices)
-			this->makeappend<Label>("", choice);
+			this->makeappend<Label>(choice);
 	}
 
 	void Dropdown::onSelected(Widget* widget)

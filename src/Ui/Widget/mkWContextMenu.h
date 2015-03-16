@@ -11,7 +11,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT WContextMenu : public Sheet
+	class MK_UI_EXPORT WContextMenu : public Sheet, public Styled<WContextMenu>
 	{
 	public:
 		WContextMenu(Form* form);

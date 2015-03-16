@@ -38,7 +38,6 @@ namespace mk
 		int mTop, mRight, mBottom, mLeft;
 		int mTopLeft, mTopRight, mBottomRight, mBottomLeft;
 		int mFill;
-		bool mVisible;
 	};
 
 }

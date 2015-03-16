@@ -6,11 +6,12 @@
 #define MK_INK_H
 
 /* mk Front */
-#include <Object/Util/mkColour.h>
+#include <Object/mkIndexer.h>
 #include <Ui/mkUiForward.h>
 #include <Ui/Input/mkInputDispatcher.h>
 #include <Ui/Form/mkForm.h>
-#include <Ui/Frame/mkUibox.h>
+#include <Ui/Frame/mkFrame.h>
+#include <Ui/Style/mkStyle.h>
 
 namespace mk
 {
@@ -37,49 +38,14 @@ namespace mk
 		virtual unique_ptr<InkLayer> layer(Frame* frame, size_t z = 0) = 0;
 	};
 
-	class MK_UI_EXPORT _I_ InkStyle : public Struct, public Typed<InkStyle>
-	{
-	public:
-		_C_ InkStyle(string name, Colour background, Colour text)
-			: mName(name), mEmpty(false), mBackgroundColour(background), mBorderColour(), mTextColour(text), mImageColour(1.f, 1.f, 1.f)
-			, mBorderWidth(0.f), mMargin(0.f, 0.f, 0.f, 0.f), mPadding(0.f, 0.f), mImage(""), mCornerRadius(0.f)
-		{}
-
-		InkStyle(string name)
-			: mName(name), mEmpty(true)
-		{}
-
-		InkStyle()
-		{}
-
-		InkStyle& operator=(const InkStyle&) = default;
-		void copy(InkStyle* other) { string name = mName; *this = *other; mName = name; }
-
-		const string& name() { return mName; }
-
-		_A_ _M_ string mName;
-		_A_ _M_ bool mEmpty;
-		_A_ _M_ Colour mBackgroundColour;
-		_A_ _M_ Colour mBorderColour;
-		_A_ _M_ Colour mImageColour;
-		_A_ _M_ Colour mTextColour;
-		_A_ _M_ BoxFloat mBorderWidth;
-		_A_ _M_ BoxFloat mCornerRadius;
-		_A_ _M_ BoxFloat mMargin;
-		_A_ _M_ DimFloat mPadding;
-		_A_ _M_ string mImage;
-		_A_ _M_ ImageSkin mImageSkin;
-
-		std::map<WidgetState, InkStyle*> mSubInks;
-	};
-
 	class MK_UI_EXPORT Inkbox
 	{
 	public:
-		Inkbox(Frame* frame) : mFrame(frame) {}
+		Inkbox(Frame* frame) : mFrame(frame), mVisible(frame->visible()) {}
 		virtual ~Inkbox() {}
 
 		Frame* frame() { return mFrame; }
+		bool visible() { return mVisible; }
 
 		virtual void show() = 0;
 		virtual void hide() = 0;
@@ -92,6 +58,7 @@ namespace mk
 
 	protected:
 		Frame* mFrame;
+		bool mVisible;
 	};
 }
 

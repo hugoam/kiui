@@ -12,11 +12,13 @@
 
 namespace mk
 {
-	Button::Button(const string& cls, const string& label, const string& image, Trigger trigger)
-		: Form(cls + " button", label, [this]() { return make_unique<WButton>(this); })
+	Button::Button(Style* style, const string& label, const string& image, const Trigger& trigger)
+		: Form(style, label, [this]() { return make_unique<WButton>(this); })
 		, mTrigger(trigger)
 	{
-		if(image != "")
+		mType = cls();
+
+		if(!image.empty())
 		{
 			string lower = image;
 			std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower); // Images names are lowercase for now

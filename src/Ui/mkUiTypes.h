@@ -8,7 +8,9 @@
 #include <Ui/Form/mkForm.h>
 #include <Ui/Form/mkRootForm.h>
 #include <Ui/Form/mkButton.h>
+#include <Ui/Form/mkInput.h>
 #include <Ui/Form/mkWidgets.h>
+#include <Ui/Form/mkHook.h>
 
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkInk.h>
@@ -16,10 +18,19 @@
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Widget/mkSheet.h>
 
-#include <Ui/Scheme/mkWExpandbox.h>
+#include <Ui/Widget/mkWButton.h>
+#include <Ui/Widget/mkWSlider.h>
+#include <Ui/Widget/mkWScrollbar.h>
+#include <Ui/Widget/mkWCheckbox.h>
+#include <Ui/Widget/mkWTypeIn.h>
+
 #include <Ui/Scheme/mkWDropdown.h>
-#include <Ui/Scheme/mkWTabber.h>
+#include <Ui/Scheme/mkWRadioButton.h>
+#include <Ui/Scheme/mkWExpandbox.h>
+#include <Ui/Scheme/mkWTree.h>
 #include <Ui/Scheme/mkWTable.h>
+#include <Ui/Scheme/mkWTabber.h>
+#include <Ui/Scheme/mkWDockspace.h>
 
 #include <Ui/Frame/mkDimString.h>
 
@@ -34,7 +45,9 @@ namespace mk
 	template <> inline Type* typecls<Overflow>() { return Typed<Overflow>::cls(); }
 	template <> inline Type* typecls<BoxLayer>() { return Typed<BoxLayer>::cls(); }
 	template <> inline Type* typecls<Opacity>() { return Typed<Opacity>::cls(); }
+	template <> inline Type* typecls<Weight>() { return Typed<Weight>::cls(); }
 	template <> inline Type* typecls<FrameType>() { return Typed<FrameType>::cls(); }
+	template <> inline Type* typecls<WidgetState>() { return Typed<WidgetState>::cls(); }
 
 	template class MK_UI_EXPORT Typed<Dimension>;
 	template class MK_UI_EXPORT Typed<Sizing>;
@@ -43,7 +56,9 @@ namespace mk
 	template class MK_UI_EXPORT Typed<Overflow>;
 	template class MK_UI_EXPORT Typed<BoxLayer>;
 	template class MK_UI_EXPORT Typed<Opacity>;
+	template class MK_UI_EXPORT Typed<Weight>;
 	template class MK_UI_EXPORT Typed<FrameType>;
+	template class MK_UI_EXPORT Typed<WidgetState>;
 }
 
 #endif // MK_UITYPES_H_INCLUDED

@@ -8,14 +8,33 @@
 /* mk */
 #include <Ui/Scheme/mkScheme.h>
 #include <Ui/Widget/mkSheet.h>
+#include <Ui/Widget/mkWButton.h>
 #include <Ui/Form/mkForm.h>
 
 namespace mk
 {
-	class MK_UI_EXPORT WExpandbox : public Sheet
+	class MK_UI_EXPORT WExpandboxHeader : public Sheet, public Styled<WExpandboxHeader>
 	{
 	public:
-		WExpandbox(string title, bool collapsed = false);
+		WExpandboxHeader();
+	};
+
+	class MK_UI_EXPORT WExpandboxBody : public Sheet, public Styled<WExpandboxBody>
+	{
+	public:
+		WExpandboxBody();
+	};
+
+	class MK_UI_EXPORT WExpandboxToggle : public WToggle, public Styled<WExpandboxToggle>
+	{
+	public:
+		WExpandboxToggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on);
+	};
+
+	class MK_UI_EXPORT WExpandbox : public Sheet, public Styled<WExpandbox>
+	{
+	public:
+		WExpandbox(Form* form, const string& title, bool collapsed = false);
 		~WExpandbox();
 
 		void build();
@@ -40,7 +59,7 @@ namespace mk
 	class MK_UI_EXPORT Expandbox : public Form
 	{
 	public:
-		Expandbox(string title = "", bool collapsed = false);
+		Expandbox(const string& title = "", bool collapsed = false);
 	};
 
 }

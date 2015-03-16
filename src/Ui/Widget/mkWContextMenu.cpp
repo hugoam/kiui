@@ -17,7 +17,7 @@
 namespace mk
 {
 	WContextMenu::WContextMenu(Form* form)
-		: Sheet("", form)
+		: Sheet(styleCls(), form)
 	{
 		uiWindow()->contextOn(this);
 	}

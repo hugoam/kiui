@@ -6,17 +6,20 @@
 #define MK_WSLIDER_H
 
 /* mk */
+#include <Object/Util/mkStat.h>
+#include <Object/String/mkStringConvert.h>
 #include <Ui/mkUiForward.h>
 #include <Ui/Frame/mkUibox.h>
+#include <Ui/Form/mkFValue.h>
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Widget/mkWButton.h>
 
 namespace mk
 {
-	class MK_UI_EXPORT WSlideButton : public WButton 
+	class MK_UI_EXPORT WSliderKnob : public WButton, public Styled<WSliderKnob>
 	{
 	public:
-		WSlideButton(string clas, Dimension dim = DIM_X);
+		WSliderKnob(Dimension dim = DIM_X, Style* style = nullptr);
 
 		float offset(float pos);
 
@@ -24,26 +27,54 @@ namespace mk
 		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
 		bool leftDragEnd(float xPos, float yPos);
 
+		using Styled<WSliderKnob>::styleCls;
+
 	protected:
 		Dimension mDim;
 		float mStartPos;
 		float mStartOffset;
 	};
 
-	class MK_UI_EXPORT WSlider : public Sheet
+	class MK_UI_EXPORT WSpacerX : public Widget, public Styled<WSpacerX>
 	{
 	public:
-		WSlider(Dimension dim = DIM_X, string clas = "", Trigger onUpdated = nullptr);
+		WSpacerX();
+	};
+
+	class MK_UI_EXPORT WSpacerY : public Widget, public Styled<WSpacerY>
+	{
+	public:
+		WSpacerY();
+	};
+
+	class MK_UI_EXPORT WSliderKnobX : public WSliderKnob, public Styled<WSliderKnobX>
+	{
+	public:
+		WSliderKnobX();
+
+		using Styled<WSliderKnobX>::styleCls;
+	};
+
+	class MK_UI_EXPORT WSliderKnobY : public WSliderKnob, public Styled<WSliderKnobY>
+	{
+	public:
+		WSliderKnobY();
+
+		using Styled<WSliderKnobY>::styleCls;
+	};
+
+	class MK_UI_EXPORT WSlider : public Sheet, public Styled<WSlider>
+	{
+	public:
+		WSlider(Dimension dim = DIM_X, Style* style = nullptr, const Trigger& onUpdated = nullptr);
 
 		void build();
 
 		Widget* spaceBefore() { return mSpaceBefore; }
-		WSlideButton* slider() { return mButton; }
+		WSliderKnob* slider() { return mButton; }
 		Widget* spaceAfter() { return mSpaceAfter; }
 
 		float val() { return mVal; }
-
-		string clas() { return mDim == DIM_X ? "xslider" : "yslider"; }
 
 		void updateMetrics(float min, float max, float val, float stepLength, float knobLength = 0.f);
 		void resetMetrics(float min, float max, float val, float stepLength, float knobLength = 0.f);
@@ -58,7 +89,7 @@ namespace mk
 	protected:
 		Dimension mDim;
 		Widget* mSpaceBefore;
-		WSlideButton* mButton;
+		WSliderKnob* mButton;
 		Widget* mSpaceAfter;
 
 		float mMin;
@@ -66,6 +97,7 @@ namespace mk
 		float mVal;
 		float mStepLength;
 		float mKnobLength;
+		bool mFixedKnob;
 
 		float mNumSteps;
 		int mStep;
@@ -73,46 +105,81 @@ namespace mk
 		Trigger mOnUpdated;
 	};
 
-	class MK_UI_EXPORT WStatSlider : public Sheet
+	class MK_UI_EXPORT WSliderX : public WSlider, public Styled<WSliderX>
 	{
 	public:
-		WStatSlider(Form* form, Lref& stat, Dimension dim = DIM_X);
+		WSliderX(const Trigger& onUpdated = Trigger());
 
 		void build();
 
-		void onUpdate();
+		using Styled<WSliderX>::styleCls;
+	};
 
-		virtual void updateValue() = 0;
-		virtual void updateSlider() = 0;
+	class MK_UI_EXPORT WSliderY : public WSlider, public Styled<WSliderY>
+	{
+	public:
+		WSliderY(const Trigger& onUpdated = Trigger());
+
+		void build();
+
+		using Styled<WSliderY>::styleCls;
+	};
+
+	template <class T>
+	class WStatSlider : public Sheet, public Typed<WStatSlider<T>>, public Styled<WStatSlider<T>>
+	{
+	public:
+		WStatSlider(FValue* form, AutoStat<T> stat, Dimension dim = DIM_X)
+			: Sheet(styleCls(), form)
+			, mStat(stat)
+			, mDim(dim)
+		{}
+
+		void build()
+		{
+			Sheet::build();
+			if(mDim == DIM_X)
+				mSlider = this->makeappend<WSliderX>(std::bind(&WStatSlider::onUpdate, this));
+			else
+				mSlider = this->makeappend<WSliderY>(std::bind(&WStatSlider::onUpdate, this));
+
+			mDisplay = this->makeappend<WLabel>(toString(mStat.value()));
+
+			this->updateSlider();
+		}
+
+		void onUpdate()
+		{
+			this->updateValue();
+		}
+
+		void updateSlider()
+		{
+			mSlider->resetMetrics(float(mStat.min()), float(mStat.max()), float(mStat.value()), float(mStat.step()));
+			mSlider->updateKnob();
+			mDisplay->setLabel(toString(mStat.value()));
+		}
+
+		void updateValue()
+		{
+			mStat.modify(T(mSlider->val()));
+			mForm->as<FValue>()->updateValue();
+			mDisplay->setLabel(toString(mStat.value()));
+		}
+
+		using Typed<WStatSlider<T>>::cls;
 
 	protected:
-		Lref& mStat;
+		AutoStat<T> mStat;
+
 		Dimension mDim;
+
 		WSlider* mSlider;
 		WLabel* mDisplay;
 	};
 
-	class MK_UI_EXPORT WIntSlider : public WStatSlider
-	{
-	public:
-		WIntSlider(FIntStat* form);
-
-		int value(float offset);
-
-		void updateSlider();
-		void updateValue();
-	};
-
-	class MK_UI_EXPORT WFloatSlider : public WStatSlider
-	{
-	public:
-		WFloatSlider(FFloatStat* form);
-
-		float value(float offset);
-
-		void updateSlider();
-		void updateValue();
-	};
+	template class MK_UI_EXPORT _I_ WStatSlider<float>;
+	template class MK_UI_EXPORT _I_ WStatSlider<int>;
 }
 
 #endif

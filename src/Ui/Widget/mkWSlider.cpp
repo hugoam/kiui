@@ -23,19 +23,21 @@
 
 namespace mk
 {
-	WSlideButton::WSlideButton(string clas, Dimension dim)
-		: WButton("", clas)
+	WSliderKnob::WSliderKnob(Dimension dim, Style* style)
+		: WButton("", style)
 		, mDim(dim)
+		, mStartPos(0.f)
+		, mStartOffset(0.f)
 	{}
 
-	float WSlideButton::offset(float pos)
+	float WSliderKnob::offset(float pos)
 	{
 		float length = mFrame->parent()->dsize(mDim) - mFrame->dsize(mDim);
 		float offset = std::min(length, std::max(0.f, mStartOffset + pos - mStartPos));
 		return offset;
 	}
 
-	bool WSlideButton::leftDragStart(float xPos, float yPos)
+	bool WSliderKnob::leftDragStart(float xPos, float yPos)
 	{
 		mStartPos = mDim == DIM_X ? xPos : yPos;
 		mStartOffset = mFrame->dposition(mDim);
@@ -43,32 +45,83 @@ namespace mk
 		return true;
 	}
 
-	bool WSlideButton::leftDrag(float xPos, float yPos, float xDif, float yDif)
+	bool WSliderKnob::leftDrag(float xPos, float yPos, float xDif, float yDif)
 	{
 		UNUSED(xDif); UNUSED(yDif);
 		mParent->as<WSlider>()->offsetChange(offset(mDim == DIM_X ? xPos : yPos), false);
 		return true;
 	}
 
-	bool WSlideButton::leftDragEnd(float xPos, float yPos)
+	bool WSliderKnob::leftDragEnd(float xPos, float yPos)
 	{
 		mParent->as<WSlider>()->offsetChange(offset(mDim == DIM_X ? xPos : yPos), true);
 		updateState(ENABLED);
 		return true;
 	}
 
-	WSlider::WSlider(Dimension dim, string clas, Trigger onUpdated)
-		: Sheet(clas == "" ? (dim == DIM_X ? "xslider" : "yslider") : (dim == DIM_X ? "x" + clas : "y" + clas))
+	WSliderKnobX::WSliderKnobX()
+		: WSliderKnob(DIM_X, styleCls())
+	{}
+
+	WSliderKnobY::WSliderKnobY()
+		: WSliderKnob(DIM_Y, styleCls())
+	{}
+
+	WSpacerX::WSpacerX()
+		: Widget(styleCls())
+	{}
+
+	WSpacerY::WSpacerY()
+		: Widget(styleCls())
+	{}
+
+
+	WSlider::WSlider(Dimension dim, Style* style, const Trigger& onUpdated)
+		: Sheet(style ? style : styleCls())
 		, mDim(dim)
 		, mOnUpdated(onUpdated)
+		, mFixedKnob(false)
 	{}
+	
+	WSliderX::WSliderX(const Trigger& onUpdated)
+		: WSlider(DIM_X, styleCls(), onUpdated)
+	{}
+
+	void WSliderX::build()
+	{
+		mSpaceBefore = this->makeappend<WSpacerX>();
+		mButton = this->makeappend<WSliderKnobX>();
+		mSpaceAfter = this->makeappend<WSpacerX>();
+
+		WSlider::build();
+	}
+
+	WSliderY::WSliderY(const Trigger& onUpdated)
+		: WSlider(DIM_Y, styleCls(), onUpdated)
+	{}
+
+	void WSliderY::build()
+	{
+		mSpaceBefore = this->makeappend<WSpacerY>();
+		mButton = this->makeappend<WSliderKnobY>();
+		mSpaceAfter = this->makeappend<WSpacerY>();
+
+		WSlider::build();
+	}
 
 	void WSlider::build()
 	{
 		Sheet::build();
-		mSpaceBefore = this->makeappend<Widget>(mClas + "spacer");
-		mButton = this->makeappend<WSlideButton>(mClas + "knob", mDim);
-		mSpaceAfter = this->makeappend<Widget>(mClas + "spacer");
+
+		if(mButton->frame()->style()->d_sizing[mDim] == FIXED)
+			mFixedKnob = true;
+
+		this->stripe()->initWeights();
+
+		if(mFixedKnob)
+			this->stripe()->weights() = { 1.f, -1.f, 1.f };
+		else
+			this->stripe()->weights() = { 1.f, 1.f, 1.f };
 	}
 
 	void WSlider::offsetChange(float offset, bool ended)
@@ -105,64 +158,18 @@ namespace mk
 
 	void WSlider::updateKnob()
 	{
-		// @was : mButton->frame()->setPositionDim(mDim, offset);
+		this->stripe()->weights()[0] = mVal - mMin;
+		this->stripe()->weights()[2] = mMax - mVal;
 
-		mSpaceBefore->frame()->setSpanDim(mDim, mVal);
-		mButton->frame()->setSpanDim(mDim, mKnobLength);
+		if(!mFixedKnob)
+			this->stripe()->weights()[1] = mKnobLength;
+
+		/*mSpaceBefore->frame()->setSpanDim(mDim, mVal - mMin);
 		mSpaceAfter->frame()->setSpanDim(mDim, mMax - mVal);
-	}
 
-	WStatSlider::WStatSlider(Form* form, Lref& stat, Dimension dim)
-		: Sheet("", form)
-		, mStat(stat)
-		, mDim(dim)
-	{}
+		if(!mFixedKnob)
+			mButton->frame()->setSpanDim(mDim, mKnobLength);*/
 
-	void WStatSlider::build()
-	{
-		Sheet::build();
-		mSlider = this->makeappend<WSlider>(mDim, "", std::bind(&WStatSlider::onUpdate, this));
-		mDisplay = this->makeappend<WLabel>(mStat->getString(), "slidervalue");
-
-		this->updateSlider();
-	}
-
-	void WStatSlider::onUpdate()
-	{
-		this->updateValue();
-	}
-
-	WIntSlider::WIntSlider(FIntStat* form)
-		: WStatSlider(form, form->valref())
-	{}
-
-	void WIntSlider::updateSlider()
-	{
-		mSlider->resetMetrics(float(mStat->ref<Stat<int>>().min()), float(mStat->ref<Stat<int>>().max()), float(mStat->ref<Stat<int>>().value()), 1.f);
-		mSlider->updateKnob();
-		mDisplay->setLabel(mStat->getString());
-	}
-
-	void WIntSlider::updateValue()
-	{
-		mStat->ref<Stat<int>>().setValue(int(mSlider->val()));
-		mDisplay->setLabel(mStat->getString());
-	}
-
-	WFloatSlider::WFloatSlider(FFloatStat* form)
-		: WStatSlider(form, form->valref())
-	{}
-	
-	void WFloatSlider::updateSlider()
-	{
-		mSlider->resetMetrics(mStat->ref<Stat<float>>().min(), mStat->ref<Stat<float>>().max(), mStat->ref<Stat<float>>().value(), 0.1f);
-		mSlider->updateKnob();
-		mDisplay->setLabel(mStat->getString());
-	}
-
-	void WFloatSlider::updateValue()
-	{
-		mStat->ref<Stat<float>>().setValue(mSlider->val());
-		mDisplay->setLabel(mStat->getString());
+		this->stripe()->markRelayout();
 	}
 }

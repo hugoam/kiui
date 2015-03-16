@@ -20,7 +20,7 @@
 namespace mk
 {
 	RootForm::RootForm(UiWindow* uiWindow)
-		: Form("root")
+		: Form(nullptr)
 		, mWindow(uiWindow)
 		, mLastTick(0)
 	{

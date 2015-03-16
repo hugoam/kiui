@@ -15,10 +15,16 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT WRadioSwitch : public Sheet
+	class MK_UI_EXPORT WRadioChoice : public WWrapButton, public Styled<WRadioChoice>
 	{
 	public:
-		WRadioSwitch(Trigger onSelected, size_t active);
+		WRadioChoice(Widget* content, const Trigger& trigger);
+	};
+
+	class MK_UI_EXPORT WRadioSwitch : public Sheet, public Styled<WRadioSwitch>
+	{
+	public:
+		WRadioSwitch(const Trigger& onSelected, size_t active);
 
 		Sheet* vaddwrapper(Widget* widget);
 		unique_ptr<Widget> vrelease(Widget* widget);
@@ -36,7 +42,7 @@ namespace mk
 	class MK_UI_EXPORT RadioSwitch : public Form
 	{
 	public:
-		RadioSwitch(Trigger onSelected, size_t active = 0, StringVector labels = StringVector());
+		RadioSwitch(const Trigger& onSelected, size_t active = 0, StringVector labels = StringVector());
 
 		void onSelected(Widget* widget);
 

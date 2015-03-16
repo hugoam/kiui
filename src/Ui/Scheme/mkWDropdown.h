@@ -8,16 +8,39 @@
 /* mk */
 #include <Ui/Scheme/mkScheme.h>
 #include <Ui/Widget/mkSheet.h>
+#include <Ui/Widget/mkWButton.h>
 #include <Ui/Form/mkForm.h>
 
 #include <functional>
 
 namespace mk
 {
-	class MK_UI_EXPORT WDropdownBox : public Sheet
+	class MK_UI_EXPORT WDropdownHeader : public Sheet, public Styled<WDropdownHeader>
+	{
+	public:
+		WDropdownHeader();
+	};
+
+	class MK_UI_EXPORT WDropdownToggle : public WButton, public Styled<WDropdownToggle>
+	{
+	public:
+		WDropdownToggle(const Trigger& trigger);
+
+		using Styled<WDropdownToggle>::styleCls;
+	};
+
+	class MK_UI_EXPORT WDropdownChoice : public WWrapButton, public Styled < WDropdownChoice >
+	{
+	public:
+		WDropdownChoice(Widget* content, const Trigger& trigger);
+	};
+
+	class MK_UI_EXPORT WDropdownBox : public Sheet, public Styled<WDropdownBox>
 	{
 	public:
 		WDropdownBox(WDropdown* dropdown);
+
+		FrameType frameType() { return LAYER; }
 
 		bool leftClick(float x, float y);
 
@@ -25,10 +48,10 @@ namespace mk
 		WDropdown* mDropdown;
 	};
 
-	class MK_UI_EXPORT WDropdown : public Sheet
+	class MK_UI_EXPORT WDropdown : public Sheet, public Styled<WDropdown>
 	{
 	public:
-		WDropdown(Trigger onSelected);
+		WDropdown(const Trigger& onSelected);
 		~WDropdown();
 
 		void build();
@@ -53,7 +76,7 @@ namespace mk
 	class MK_UI_EXPORT Dropdown : public Form
 	{
 	public:
-		Dropdown(Trigger onSelected, std::function<void(string)> onSelectedString = nullptr);
+		Dropdown(const Trigger& onSelected, std::function<void(string)> onSelectedString = nullptr);
 		Dropdown(std::function<void(string)> onSelected, StringVector choices);
 
 		void onSelected(Widget* widget);

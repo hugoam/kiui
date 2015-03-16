@@ -16,10 +16,9 @@
 
 namespace mk
 {
-	Scheme::Scheme(Form* form, SchemeMapper mapper, SchemeMapper elementMapper)
+	Scheme::Scheme(Form* form, SchemeMapper mapper)
 		: mForm(form)
 		, mMapper(mapper)
-		, mElementMapper(elementMapper)
 	{}
 
 	unique_ptr<Widget> Scheme::makeWidget()
@@ -27,18 +26,14 @@ namespace mk
 		if(mMapper)
 			return mMapper();
 
-		std::vector<string> classes = splitString(mForm->clas(), " ");
+		Style* style = mForm->style();
 
-		for(string& cls : classes)
-			if(UiWindow::sDispatch.find(cls) != UiWindow::sDispatch.end())
-				return UiWindow::sDispatch[cls](mForm);
-
-		if(mForm->parent()->widget()->elementStyle(mForm->clas())->d_overflow == SCROLL)
-			return make_unique<ScrollSheet>("", mForm);
+		if(style && UiWindow::sDispatch.find(style->name()) != UiWindow::sDispatch.end())
+			return UiWindow::sDispatch[style->name()](mForm);
 		else if(mForm->container())
-			return make_unique<Sheet>("", mForm);
+			return make_unique<Sheet>(nullptr, mForm);
 		else
-			return make_unique<Widget>("", mForm);
+			return make_unique<Widget>(nullptr, mForm);
 	}
 
 	void Scheme::append(Form* form)
@@ -57,10 +52,9 @@ namespace mk
 		mSheet->vrelease(form->widget());
 	}
 
-	void Scheme::reset(SchemeMapper mapper, SchemeMapper elementMapper)
+	void Scheme::reset(SchemeMapper mapper)
 	{
 		mMapper = mapper;
-		mElementMapper = elementMapper;
 		this->clear();
 		this->apply();
 	}
@@ -70,7 +64,7 @@ namespace mk
 		mForm->parent()->scheme()->append(mForm);
 		mSheet = mForm->widget()->as<Sheet>();
 
-		for(auto& child : mForm->contents()->store())
+		for(auto& child : mForm->contents())
 			this->append(child.get());
 	}
 
@@ -79,7 +73,7 @@ namespace mk
 		mForm = nullptr;
 		mSheet->destroy();
 
-		for(auto& child : mForm->contents()->store())
+		for(auto& child : mForm->contents())
 			this->remove(child.get());
 	}
 }

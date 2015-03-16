@@ -14,63 +14,56 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT WDocksection : public WTabber, public Typed<WDocksection>
+	class MK_UI_EXPORT _I_ WDocksection : public WTabber, public Typed<WDocksection>, public Styled<WDocksection>
 	{
 	public:
-		WDocksection(WDockline* dockline, size_t index, string clas);
+		WDocksection(WDockline* dockline, size_t index, Style* style);
 		~WDocksection();
 
 		void build();
-
-		string dockid();
 
 		size_t index() { return mIndex; }
 		WDockline* dockline() { return mDockline; }
 
 		void setDockline(WDockline* dockline) { mDockline = dockline; }
 
-		void updateSpan();
-
 		void dock(WWindow* window);
 		void undock(WWindow* window);
 
-		WDocksection* docktarget(Dimension dim, size_t index, bool after);
+		WDocksection* docktarget(Dimension dim, bool after);
 		WDocksection* docktarget(float x, float y);
 
 		using Typed<WDocksection>::cls;
+		using Styled<WDocksection>::styleCls;
 
 	protected:
 		WDockline* mDockline;
 		size_t mIndex;
 	};
 
-	class MK_UI_EXPORT WDockline : public GridSheet, public Typed<WDockline>
+	class MK_UI_EXPORT _I_ WDockline : public GridSheet, public Typed<WDockline>
 	{
 	public:
-		WDockline(WDockspace* dockspace, WDockline* dockline, Dimension dim, size_t index);
+		WDockline(WDockspace* dockspace, WDockline* dockline, Dimension dim, size_t index, Style* style);
 		~WDockline();
 
 		void build();
-
-		string dockid();
 
 		Dimension dim() { return mDim; }
 		size_t index() { return mIndex; }
 		WDockline* dockline() { return mDockline; }
 		WDockspace* dockspace() { return mDockspace; }
 
-		WDockline* insertLine(size_t index, bool replace = false);
-		WDocksection* insertSection(size_t index, string clas = "");
+		WDockline* insertLine(size_t index, bool replace = false, float span = 1.f);
+		WDocksection* insertSection(size_t index, Style* style = nullptr, float span = 1.f);
 
 		void removeSection(WDocksection* docksection);
 		void removeLine(WDockline* dockline);
 
 		WDockline* findLine(std::vector<string>& ids);
 
-		WDocksection* findOrCreateSection(string dockid, string clas = "");
-		WDocksection* findSection(string dockid);
-
-		void updateSpan();
+		WDocksection* findOrCreateSection(const string& dockid, Style* style = nullptr);
+		WDocksection* findSection(const string& dockid);
 
 		using Typed<WDockline>::cls;
 
@@ -80,7 +73,31 @@ namespace mk
 		size_t mIndex;
 	};
 
-	class MK_UI_EXPORT WDockspace : public Sheet, public Typed<WDockspace>
+	class MK_UI_EXPORT _I_ WDocklineX : public WDockline, public Typed<WDocklineX>, public Styled<WDocklineX>
+	{
+	public:
+		WDocklineX(WDockspace* dockspace, WDockline* dockline, size_t index);
+
+		using Typed<WDocklineX>::cls;
+	};
+
+	class MK_UI_EXPORT _I_ WDocklineY : public WDockline, public Typed<WDocklineY>, public Styled<WDocklineY>
+	{
+	public:
+		WDocklineY(WDockspace* dockspace, WDockline* dockline, size_t index);
+
+		using Typed<WDocklineY>::cls;
+	};
+
+	class MK_UI_EXPORT _I_ WMasterDockline : public WDockline, public Typed<WMasterDockline>, public Styled<WMasterDockline>
+	{
+	public:
+		WMasterDockline(WDockspace* dockspace);
+
+		using Typed<WMasterDockline>::cls;
+	};
+
+	class MK_UI_EXPORT _I_ WDockspace : public Sheet, public Typed<WDockspace>, public Styled<WDockspace>
 	{
 	public:
 		WDockspace();
@@ -89,11 +106,7 @@ namespace mk
 
 		WDockline* mainline() { return mMainLine; }
 
-		float getSpan(string dockid);
-		void setSpan(string dockid, float span);
-		void addSpan(string dockid);
-
-		void addSection(string name);
+		void addSection(const string& name);
 
 		Widget* vappend(unique_ptr<Widget> widget);
 		//unique_ptr<Widget> vrelease(Widget* widget);
@@ -101,14 +114,15 @@ namespace mk
 		using Typed<WDockspace>::cls;
 
 	protected:
-		std::map<string, float> mDockSpans;
-		WDockline* mMainLine;
+		WMasterDockline* mMainLine;
 	};
 
-	class MK_UI_EXPORT Dockspace : public Form
+	class MK_UI_EXPORT Dockspace : public Form, public Typed<Dockspace, Form>
 	{
 	public:
-		Dockspace(const string& cls = "");
+		Dockspace(Style* style = nullptr);
+
+		using Typed<Dockspace, Form>::cls;
 	};
 }
 

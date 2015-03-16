@@ -34,7 +34,9 @@ namespace mk
 	{}
 
 	NanoLayer::~NanoLayer()
-	{}
+	{
+		mTarget->removeLayer(this);
+	}
 
 	unique_ptr<Inkbox> NanoLayer::inkbox(Frame* frame)
 	{
@@ -56,8 +58,8 @@ namespace mk
 
 	void NanoLayer::moveToTop()
 	{
-		mIndex = mTarget->zmax();
 		mTarget->moveToTop(this);
+		mIndex = mTarget->zmax();
 	}
 
 	void NanoLayer::nanodraw()
@@ -69,7 +71,7 @@ namespace mk
 	{
 		static_cast<NanoInk*>(frame->inkbox())->nanodraw();
 
-		if(frame->frameType() == STRIPE)
+		if(frame->frameType() >= STRIPE)
 			for(Frame* subframe : frame->as<Stripe>()->contents())
 				this->draw(subframe);
 	}
@@ -91,7 +93,8 @@ namespace mk
 
 	void NanoTarget::moveToTop(NanoLayer* layer)
 	{
-		UNUSED(layer);
+		this->removeLayer(layer);
+		mLayers[mZMax].push_back(layer);
 	}
 
 	unique_ptr<InkLayer> NanoTarget::layer(Frame* frame, size_t z)
@@ -100,6 +103,11 @@ namespace mk
 		unique_ptr<NanoLayer> layer = make_unique<NanoLayer>(frame, this, z);
 		mLayers[z].push_back(layer.get());
 		return std::move(layer);
+	}
+
+	void NanoTarget::removeLayer(NanoLayer* layer)
+	{
+		mLayers[layer->index()].erase(std::remove(mLayers[layer->index()].begin(), mLayers[layer->index()].end(), layer), mLayers[layer->index()].end());
 	}
 
 	std::map<string, int> NanoWindow::sImages;

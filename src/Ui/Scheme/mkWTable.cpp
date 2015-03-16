@@ -15,18 +15,22 @@ using namespace std::placeholders;
 namespace mk
 {
 	WTableHead::WTableHead()
-		: GridSheet(DIM_X, "tablehead")
+		: GridSheet(DIM_X, styleCls())
 	{}
 
 	void WTableHead::gridResized(Widget* first, Widget* second)
 	{
-		mParent->stripe()->weightTable()[first->frame()->index()] = first->frame()->dspan(DIM_X);
-		mParent->stripe()->weightTable()[second->frame()->index()] = second->frame()->dspan(DIM_X);
+		mParent->stripe()->weights()[first->frame()->index()] = first->frame()->dspan(DIM_X);
+		mParent->stripe()->weights()[second->frame()->index()] = second->frame()->dspan(DIM_X);
 		mParent->stripe()->markRelayout();
 	}
 
+	WColumnHeader::WColumnHeader(const string& label)
+		: WLabel(label, styleCls())
+	{}
+
 	WTable::WTable(StringVector columns, std::vector<float> weights)
-		: Sheet("table")
+		: Sheet(styleCls())
 		, mColumns(columns)
 		, mWeights(weights)
 	{}
@@ -39,14 +43,15 @@ namespace mk
 		mHead = this->makeappend<WTableHead>();
 
 		for(string& name : mColumns)
-			mHead->makeappend<WLabel>(name, "columnheader");
+			mHead->makeappend<WColumnHeader>(name);
 
+		this->stripe()->initWeights();
 		for(float& weight : mWeights)
-			this->stripe()->weightTable().push_back(weight);
+			this->stripe()->weights().push_back(weight);
 	}
 
 	Table::Table(StringVector columns, std::vector<float> weights)
-		: Form("table", "", [columns, weights]() { return make_unique<WTable>(columns, weights); })
+		: Form(nullptr, "", [columns, weights]() { return make_unique<WTable>(columns, weights); })
 	{}
 
 	// @ todo : table->add(Form* form)

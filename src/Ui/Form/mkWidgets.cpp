@@ -14,63 +14,85 @@
 
 namespace mk
 {
-	Label::Label(const string& cls, const string& label)
-		: Form(cls + " label", label)
+	Control::Control(SchemeMapper mapper)
+		: Form(styleCls(), "", mapper)
 	{}
+
+	WrapX::WrapX(SchemeMapper mapper)
+		: Form(styleCls(), "", mapper)
+	{}
+
+	WrapY::WrapY(SchemeMapper mapper)
+		: Form(styleCls(), "", mapper)
+	{}
+
+	DivX::DivX(SchemeMapper mapper)
+		: Form(styleCls(), "", mapper)
+	{}
+
+	DivY::DivY(SchemeMapper mapper)
+		: Form(styleCls(), "", mapper)
+	{}
+
+	PartitionX::PartitionX(SchemeMapper mapper)
+		: Form(styleCls(), "", mapper)
+	{}
+
+	PartitionY::PartitionY(SchemeMapper mapper)
+		: Form(styleCls(), "", mapper)
+	{}
+
+	Header::Header(SchemeMapper mapper)
+		: Form(styleCls(), "", mapper)
+	{}
+
+	Label::Label(Style* style, const string& label)
+		: Form(style ? style : styleCls(), label, [this](){ return make_unique<WLabel>(this); })
+	{
+		mType = cls();
+	}
 	
 	Label::Label(const string& label)
-		: Label("", label)
+		: Label(styleCls(), label)
 	{}
 
-	Textbox::Textbox(const string& cls, const string& text)
-		: Form(cls + " text", text, [this, text](){ return make_unique<WTextbox>(this, text); })
-	{}
+	Textbox::Textbox(Style* style, const string& text)
+		: Form(style, text, [this, text](){ return make_unique<WTextbox>(this, text); })
+	{
+		mType = cls();
+	}
 
 	Textbox::Textbox(const string& text)
-		: Textbox("", text)
+		: Textbox(nullptr, text)
 	{}
 
-	Image::Image(const string& cls, const string& image)
-		: Form(cls + " image")
+	Image::Image(Style* style, const string& image)
+		: Form(style ? style : styleCls())
 	{
+		mType = cls();
 		this->setImage(image);
 	}
 
 	Image::Image(const string& image)
-		: Image("", image)
+		: Image(nullptr, image)
 	{}
 
-	DynamicImage::DynamicImage(const string& cls, unique_ptr<Image256> image)
-		: Form(cls + " dynamicimage")
+	DynamicImage::DynamicImage(Style* style, unique_ptr<Image256> image)
+		: Form(style)
 		, mImage(std::move(image))
-	{}
+	{
+		mType = cls();
+	}
 
 	DynamicImage::~DynamicImage()
 	{}
 
-	Bar::Bar(const string& cls, Stat<float>* stat)
-		: Form(cls + " statbar")
+	ProgressBar::ProgressBar(Style* style, AutoStat<float> stat)
+		: Form(style)
 		, mStat(stat)
-		, mValueLabel(this->makeappend<Label>("valuelabel", toString(mStat->value())))
-		, mBaseBar(this->makeappend<Form>("basebar"))
-		, mValueBar(this->makeappend<Form>("valuebar"))
+		, mValueLabel(this->makeappend<Label>(toString(mStat.value())))
 	{
+		mType = cls();
 		//this->update();
-	}
-
-	void Bar::nextFrame(size_t tick, size_t delta)
-	{
-		Form::nextFrame(tick, delta);
-
-		string val = toString(mStat->value());
-		if(val != mValueLabel->label())
-			this->update();
-	}
-
-	void Bar::update()
-	{
-		mValueLabel->setLabel(toString(mStat->value()));
-		mBaseBar->attrs()["ratio"] = toString((mStat->base() - mStat->min()) / (mStat->max() - mStat->min()));
-		mValueBar->attrs()["ratio"] = toString((mStat->value() - mStat->min()) / (mStat->max() - mStat->min()));
 	}
 }

@@ -14,35 +14,86 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT WTreeNode : public WExpandbox
+	class MK_UI_EXPORT _I_ WTreeNodeHeader : public WWrapButton, public Typed<WTreeNodeHeader>, public Styled<WTreeNodeHeader>
 	{
 	public:
-		WTreeNode(string image, string title, bool collapsed = false);
+		WTreeNodeHeader(const Trigger& trigger);
+
+		using Typed<WTreeNodeHeader>::cls;
 	};
 
-	class MK_UI_EXPORT WTree : public ScrollSheet
+	class MK_UI_EXPORT _I_ WTreeNodeBody : public Sheet, public Typed<WTreeNodeBody>, public Styled<WTreeNodeBody>
 	{
 	public:
-		WTree(string cls, Form* form);
+		WTreeNodeBody();
+
+		using Typed<WTreeNodeBody>::cls;
+	};
+
+	class MK_UI_EXPORT _I_ WTreeNodeToggle : public WToggle, public Typed<WTreeNodeToggle>, public Styled<WTreeNodeToggle>
+	{
+	public:
+		WTreeNodeToggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on);
+
+		using Typed<WTreeNodeToggle>::cls;
+	};
+
+	class MK_UI_EXPORT _I_ WTreeNode : public WExpandbox, public Typed<WTreeNode>, public Styled<WTreeNode>
+	{
+	public:
+		WTreeNode(Form* form, const string& image, const string& title, bool collapsed = false);
+
+		void build();
+
+		void selected();
+
+		using Typed<WTreeNode>::cls;
+		using Styled<WTreeNode>::styleCls;
+	};
+
+	class MK_UI_EXPORT _I_ WTree : public Sheet, public Typed<WTree, Widget>, public Styled<WTree>
+	{
+	public:
+		WTree(Form* form, const Trigger& trigger);
 		~WTree();
 
 		void select(WTreeNode* node);
 
+		using Typed<WTree, Widget>::cls;
+
 	protected:
 		WTreeNode* mRootNode;
 		WTreeNode* mSelected;
+		Trigger mOnSelected;
 	};
 
-	class MK_UI_EXPORT TreeNode : public Expandbox
+	class MK_UI_EXPORT TreeNode : public Form
 	{
 	public:
-		TreeNode(string image, string title, bool collapsed = false);
+		TreeNode(Object* object, Tree* tree, bool collapsed = false);
+		~TreeNode();
+
+		Object* object() { return mObject; }
+
+	protected:
+		Object* mObject;
+		Tree* mTree;
 	};
 
-	class MK_UI_EXPORT Tree : public Form
+	class MK_UI_EXPORT Tree : public Form, public Styled<Tree>
 	{
 	public:
-		Tree(string cls = "");
+		Tree(std::function<void(Object*)> onSelected, Style* style = nullptr);
+
+		void selected(Widget* widget);
+
+		void select(Object* object);
+		void addNode(Object* object, TreeNode* node);
+		void removeNode(Object* object, TreeNode* node);
+
+	protected:
+		std::map<Object*, TreeNode*> mNodes;
+		std::function<void(Object*)> mOnSelected;
 	};
 }
 

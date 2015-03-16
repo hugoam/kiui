@@ -12,18 +12,26 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT WLabel :public Widget
+	class MK_UI_EXPORT WLabel :public Widget, public Styled<WLabel>
 	{
 	public:
 		WLabel(Form* form);
-		WLabel(string label, string clas);
+		WLabel(const string& label, Style* style = nullptr);
 
 		const string& label() { return mLabel; }
 		
-		void setLabel(string label);
+		void setLabel(const string& label);
 
 	protected:
 		string mLabel;
+	};
+
+	class MK_UI_EXPORT WTitle : public WLabel, public Styled<WTitle>
+	{
+	public:
+		WTitle(const string& label);
+
+		using Styled<WTitle>::styleCls;
 	};
 
 	template <class T_Widget>
@@ -33,7 +41,7 @@ namespace mk
 		typedef std::function<void(T_Widget*)> Trigger;
 
 	public:
-		WidgetTrigger(Trigger trigger) : mTrigger(trigger) {}
+		WidgetTrigger(const Trigger& trigger) : mTrigger(trigger) {}
 
 		virtual void trigger() { if(mTrigger) mTrigger(static_cast<T_Widget*>(this)); }
 		virtual void triggerAlt() { if(mTriggerAlt) mTriggerAlt(static_cast<T_Widget*>(this)); }
@@ -47,14 +55,14 @@ namespace mk
 		Trigger mTriggerCtrl;
 	};
 
-	class MK_UI_EXPORT WButton : public Widget, public WidgetTrigger<WButton>
+	class MK_UI_EXPORT WButton : public Widget, public WidgetTrigger<WButton>, public Styled<WButton>
 	{
 	public:
 		using WidgetTrigger<WButton>::Trigger;
 
 	public:
 		WButton(Form* form);
-		WButton(string label, string clas, Trigger trigger = Trigger());
+		WButton(const string& label, Style* style = nullptr, const Trigger& trigger = Trigger());
 
 		const string& label() { return mLabel; }
 
@@ -66,13 +74,24 @@ namespace mk
 		string mLabel;
 	};
 
+	class MK_UI_EXPORT WImgButton : public WButton, public Styled<WImgButton>
+	{
+	public:
+		using WidgetTrigger<WButton>::Trigger;
+	public:
+
+		WImgButton(const string& image, const Trigger& trigger = Trigger());
+
+		using Styled<WImgButton>::styleCls;
+	};
+
 	class MK_UI_EXPORT WWrapButton : public Sheet, public WidgetTrigger<WWrapButton>
 	{
 	public:
 		using WidgetTrigger<WWrapButton>::Trigger;
 
 	public:
-		WWrapButton(Widget* content, string clas, Trigger trigger = Trigger());
+		WWrapButton(Widget* content, Style* style, const Trigger& trigger = Trigger());
 
 		Widget* content();
 
@@ -90,7 +109,7 @@ namespace mk
 		typedef std::function<void(WToggle*)> Trigger;
 
 	public:
-		WToggle(string clas, Trigger triggerOn, Trigger triggerOff, bool isOn = true);
+		WToggle(Style* style, const Trigger& triggerOn, const Trigger& triggerOff, bool isOn = true);
 
 		void build();
 		

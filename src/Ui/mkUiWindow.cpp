@@ -35,8 +35,7 @@ namespace mk
 	std::map<string, std::function<unique_ptr<Widget>(Form*)>> UiWindow::sDispatch;
 
 	UiWindow::UiWindow(User* user)
-		: mLayout(make_unique<UiLayout>())
-		, mSkinner(make_unique<UiSkinner>()) 
+		: mStyler(make_unique<Styler>())
 		, mController(this)
 		, mDragging(nullptr)
 		, mLeftPressed(false)
@@ -45,7 +44,7 @@ namespace mk
 		, mShutdownRequested(false)
 		, mUser(user)
 	{
-		setupUiLayout(mSkinner.get(), mLayout.get());
+		setupUiLayout(mStyler.get());
 	}
 
 	UiWindow::~UiWindow()
@@ -59,6 +58,9 @@ namespace mk
 		mInkWindow = inkWindow;
 		mInputWindow = inputWindow;
 
+		mWidth = renderWindow->width();
+		mHeight = renderWindow->height();
+
 		mRootForm = make_unique<RootForm>(this);
 		mRootSheet = mRootForm->sheet();
 
@@ -66,6 +68,11 @@ namespace mk
 
 		mActiveFrame = mRootSheet;
 		mHovered = mRootSheet;
+	}
+
+	void UiWindow::init()
+	{
+		mStyler->prepare();
 
 		mCursor = mRootSheet->makeappend<Cursor>();
 		mTooltip = mRootSheet->makeappend<Tooltip>("");
@@ -127,14 +134,14 @@ namespace mk
 	bool UiWindow::nextFrame()
 	{
 		mTooltipTimer += mTooltipClock.step();
-		if(mTooltipTimer > 0.5f && !mTooltip->frame()->visible() && mTooltip->label() != "")
+		if(mTooltipTimer > 0.5f && !mTooltip->frame()->visible() && !mTooltip->label().empty())
 			this->tooltipOn();
 
 		size_t tick = mClock.readTick();
 		size_t delta = mClock.stepTick();
 
-		mCursor->nextFrame();
 		mRootSheet->frame()->as<Stripe>()->nextFrame(tick, delta);
+		mCursor->nextFrame();
 
 		return !mShutdownRequested;
 	}
@@ -305,7 +312,11 @@ namespace mk
 
 	InputReceiver* ModalWidget::controlMouse(float x, float y)
 	{
-		return mWidget->pinpoint(x, y);
+		InputReceiver* receiver = mWidget->pinpoint(x, y);
+		if(receiver)
+			return receiver;
+		else
+			return mWidget;
 	}
 	
 	InputReceiver* ModalWidget::controlKey()

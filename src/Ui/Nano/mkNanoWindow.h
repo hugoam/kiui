@@ -52,6 +52,7 @@ namespace mk
 		size_t zmax() { return mZMax; }
 
 		unique_ptr<InkLayer> layer(Frame* frame, size_t z);
+		void removeLayer(NanoLayer* layer);
 
 		void moveToTop(NanoLayer* layer);
 		void nanodraw();

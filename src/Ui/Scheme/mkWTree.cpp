@@ -16,17 +16,52 @@ using namespace std::placeholders;
 
 namespace mk
 {
-	WTreeNode::WTreeNode(string image, string title, bool collapsed)
-		: WExpandbox(title, collapsed)
+	WTreeNodeHeader::WTreeNodeHeader(const Trigger& trigger)
+		: WWrapButton(nullptr, styleCls(), trigger)
+	{}
+
+	WTreeNodeBody::WTreeNodeBody()
+		: Sheet(styleCls())
+	{}
+
+	WTreeNodeToggle::WTreeNodeToggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on)
+		: WToggle(styleCls(), triggerOn, triggerOff, on)
+	{}
+
+	WTreeNode::WTreeNode(Form* form, const string& image, const string& title, bool collapsed)
+		: WExpandbox(form, title, collapsed)
 	{
-		mClas = "treenode";
+		mType = cls();
+		mStyle = styleCls();
 	}
 
-	WTree::WTree(string cls, Form* form)
-		: ScrollSheet(cls, form)
+	void WTreeNode::build()
+	{
+		Sheet::build();
+		mHeader = this->makeappend<WTreeNodeHeader>(std::bind(&WTreeNode::selected, this));
+		mContainer = this->makeappend<WTreeNodeBody>();
+
+		mExpandButton = mHeader->makeappend<WTreeNodeToggle>(std::bind(&WExpandbox::expand, this), std::bind(&WExpandbox::collapse, this), !mCollapsed);
+		mTitleLabel = mHeader->makeappend<WTitle>(mTitle);
+	}
+
+	void WTreeNode::selected()
+	{
+		Sheet* parent = mParent;
+		while(parent->type() != WTree::cls())
+			parent = parent->parent();
+
+		parent->as<WTree>()->select(this);
+	}
+
+	WTree::WTree(Form* form, const Trigger& trigger)
+		: Sheet(styleCls(), form)
 		, mRootNode(nullptr)
 		, mSelected(nullptr)
-	{}
+		, mOnSelected(trigger)
+	{
+		mType = cls();
+	}
 
 	WTree::~WTree()
 	{}
@@ -39,25 +74,62 @@ namespace mk
 		selected->header()->updateState(ACTIVATED);
 		mSelected = selected;
 
-		Widget* node = selected;
+		/*Widget* node = selected;
 		while(node != this)
 		{
-			if(node->clas() == "expandbox")
+			if(node->type() == WTreeNode::cls())
 			{
 				node->as<WTreeNode>()->expand();
-				for(auto& widget : node->parent()->contents()->store())
+				for(auto& widget : node->parent()->contents())
 					if(widget.get() != node)
 						widget->as<WTreeNode>()->collapse();
 			}
 			node = node->parent();
-		}
+		}*/
+
+		mOnSelected(selected);
 	}
 
-	TreeNode::TreeNode(string image, string title, bool collapsed)
+	/*TreeNode::TreeNode(const string& image, const string& title, bool collapsed)
 		: Expandbox(title, collapsed)
+	{}*/
+
+	TreeNode::TreeNode(Object* object, Tree* tree, bool collapsed)
+		: Form(nullptr, "", [this]() { return make_unique<WTreeNode>(this, "", this->name()); })
+		//: Form("formnode", "Form " + form->style(), [this]() { return make_unique<WTreeNode>(this, "", this->label()); })
+		, mObject(object)
+		, mTree(tree)
+	{
+		mTree->addNode(mObject, this);
+	}
+
+	TreeNode::~TreeNode()
+	{
+		mTree->removeNode(mObject, this);
+	}
+
+	Tree::Tree(std::function<void(Object*)> onSelected, Style* style)
+		: Form(style ? style : styleCls(), "", [this]() { return make_unique<WTree>(this, std::bind(&Tree::selected, this, _1)); })
+		, mOnSelected(onSelected)
 	{}
 
-	Tree::Tree(string cls)
-		: Form(cls + " tree", "", [this]() { return make_unique<WTree>("tree", this); })
-	{}
+	void Tree::selected(Widget* widget)
+	{
+		mOnSelected(widget->as<WTreeNode>()->form()->as<TreeNode>()->object());
+	}
+
+	void Tree::select(Object* object)
+	{
+		mWidget->as<WTree>()->select(mNodes[object]->widget()->as<WTreeNode>());
+	}
+
+	void Tree::addNode(Object* object, TreeNode* node)
+	{
+		mNodes[object] = node;
+	}
+
+	void Tree::removeNode(Object* object, TreeNode* node)
+	{
+		mNodes.erase(object);
+	}
 }

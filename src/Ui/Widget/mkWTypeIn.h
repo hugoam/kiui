@@ -13,10 +13,10 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT WTypeIn : public Widget, public Controller
+	class MK_UI_EXPORT _I_ WTypeIn : public Widget, public Controller, public Typed<WTypeIn>, public Styled<WTypeIn>
 	{
 	public:
-		WTypeIn(Form* form);
+		WTypeIn(Form* form, Style* style = nullptr);
 
 		Lref& value();
 
@@ -24,7 +24,9 @@ namespace mk
 
 		bool keyDown(KeyCode code, char c);
 
-		void setAllowedChars(string chars);
+		void setAllowedChars(const string& chars);
+
+		using Typed<WTypeIn>::cls;
 
 	protected:
 		Lref& mValue;
@@ -33,13 +35,30 @@ namespace mk
 		string mAllowedChars;
 	};
 
-	class MK_UI_EXPORT WString : public WTypeIn
+	class MK_UI_EXPORT _I_ WString : public WTypeIn, public Typed<WString>, public Styled<WString>
 	{
 	public:
 		WString(Form* form);
+
+		using Typed<WString>::cls;
+		using Styled<WString>::styleCls;
 	};
 
-	class MK_UI_EXPORT WInt : public Sheet
+	class MK_UI_EXPORT WNumControls : public Sheet, public Styled<WNumControls>
+	{
+	public:
+		WNumControls(const Trigger& plus, Trigger minus);
+
+		void build();
+
+	protected:
+		Trigger mPlusTrigger;
+		Trigger mMinusTrigger;
+		WButton* mPlus;
+		WButton* mMinus;
+	};
+
+	class MK_UI_EXPORT _I_ WInt : public Sheet, public Typed<WInt>, public Styled<WInt>
 	{
 	public:
 		WInt(Form* form);
@@ -49,14 +68,14 @@ namespace mk
 		void plus();
 		void minus();
 
+		using Typed<WInt>::cls;
+
 	protected:
 		WTypeIn* mDisplay;
-		Sheet* mControls;
-		WButton* mPlus;
-		WButton* mMinus;
+		WNumControls* mControls;
 	};
 
-	class MK_UI_EXPORT WFloat : public Sheet
+	class MK_UI_EXPORT _I_ WFloat : public Sheet, public Typed<WFloat>, public Styled<WFloat>
 	{
 	public:
 		WFloat(Form* form);
@@ -66,15 +85,14 @@ namespace mk
 		void plus();
 		void minus();
 
+		using Typed<WFloat>::cls;
+
 	protected:
 		WTypeIn* mDisplay;
-		Sheet* mControls;
-		WButton* mPlus;
-		WButton* mMinus;
-
+		WNumControls* mControls;
 	};
 
-	class MK_UI_EXPORT WBool : public WCheckbox
+	class MK_UI_EXPORT WBool : public WCheckbox, public Styled<WBool>
 	{
 	public:
 		WBool(Form* form);

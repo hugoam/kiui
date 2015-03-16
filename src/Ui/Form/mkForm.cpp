@@ -22,22 +22,25 @@
 
 namespace mk
 {
-	string Form::sNullString;
+	Lref Form::sNullString = lref(string(""));
 
-	Form::Form(const string& cls, const string& label, SchemeMapper containerMapper, SchemeMapper elementMapper)
+	Form::Form(Style* style, const string& label, SchemeMapper mapper)
 		: TypeObject(Form::cls())
 		, mParent(nullptr)
 		, mIndex(0)
-		, mCls(cls)
+		, mStyle(style)
 		, mLabel(label)
-		, mLastTick(0)
 		, mUpdated(0)
-		, mScheme(this, containerMapper, elementMapper)
+		, mScheme(this, mapper)
 		, mWidget(nullptr)
 	{}
 
 	Form::~Form()
 	{}
+
+	void Form::setStyle(Style* style) { mStyle = style; /*mUpdated = this->rootForm()->lastTick();*/ }
+
+	void Form::setLabel(const string& label) { mLabel = label; /*mUpdated = this->rootForm()->lastTick();*/ }
 
 	RootForm* Form::rootForm()
 	{
@@ -59,14 +62,14 @@ namespace mk
 		mParent = parent;
 		mParent->scheme()->append(this);
 
-		for(auto& form : mContents.store())
+		for(auto& form : mContents)
 			form->bind(this);
 	}
 
 	void Form::destroy()
 	{
 		mParent->scheme()->remove(this);
-		mParent->mContents.remove(mIndex);
+		mParent->remove(mIndex);
 	}
 
 	Form* Form::insert(unique_ptr<Form> pt, size_t index)
@@ -74,7 +77,8 @@ namespace mk
 		Form* form = pt.get();
 
 		form->mParent = this;
-		mContents.insert(std::move(pt), index);
+		mContents.emplace(mContents.begin() + index, std::move(pt));
+		this->reindex(index);
 
 		if(mWidget)
 			form->bind(this);
@@ -91,12 +95,28 @@ namespace mk
 	{
 		if(mContents.at(pos)->widget())
 			mContents.at(pos)->widget()->detach();
-		return mContents.release(pos);
+
+		unique_ptr<Form> pointer = std::move(mContents[pos]);
+		mContents.erase(mContents.begin() + pos);
+		this->reindex(pos);
+		return pointer;
 	}
 
 	void Form::remove(size_t index)
 	{
+		mContents.erase(mContents.begin() + index);
+		this->reindex(index);
+	}
+
+	void Form::destroy(size_t index)
+	{
 		mContents.at(index)->destroy();
+	}
+
+	void Form::reindex(size_t index)
+	{
+		for(size_t i = index; i < mContents.size(); ++i)
+			mContents[i]->setIndex(index++);
 	}
 
 	string Form::concatIndex()
@@ -107,22 +127,18 @@ namespace mk
 			return toString(mIndex);
 	}
 
-	void Form::setIndex(size_t index)
-	{
-		mIndex = index;
-		this->updateIndex();
-	}
-
 	void Form::move(size_t from, size_t to)
 	{
-		mContents.move(from, to);
+		std::swap(mContents[from], mContents[to]);
+		this->reindex(from < to ? from : to);
+
 		if(mWidget)
 			mWidget->frame()->as<Stripe>()->move(from, to);
 	}
 
 	void Form::clear()
 	{
-		for(auto& pt : reverse_adapt(mContents.store()))
+		for(auto& pt : reverse_adapt(mContents))
 			mScheme.remove(pt.get());
 		mContents.clear();
 	}
@@ -134,12 +150,12 @@ namespace mk
 
 	Form* Form::prev()
 	{
-		return mParent->contents()->at(mIndex - 1);
+		return mParent->child(mIndex - 1);
 	}
 
 	Form* Form::next()
 	{
-		return mParent->contents()->at(mIndex + 1);
+		return mParent->child(mIndex + 1);
 	}
 
 	bool Form::contains(Form* form)
@@ -150,14 +166,14 @@ namespace mk
 		return form == this;
 	}
 
-	Form* Form::findParent(const string& cls)
+	Form* Form::findParent(Type* type)
 	{
-		if(mCls == cls)
+		if(this->type() == type)
 			return this;
 		else if(mParent)
-			return mParent->findParent(cls);
+			return mParent->findParent(type);
 		else
-			return 0;
+			return nullptr;
 	}
 
 	Form* Form::find(const string& search)
@@ -168,38 +184,13 @@ namespace mk
 			string id = search.substr(0, pos);
 			string subsearch = search.substr(pos + 1);
 
-			Form* next = mContents.at(fromString<size_t>(id));
+			Form* next = this->child(fromString<size_t>(id));
 
 			return next->find(subsearch);
 		}
 		else
 		{
-			return mContents.at(fromString<size_t>(search));
+			return this->child(fromString<size_t>(search));
 		}
 	}
-
-	/*void Form::added()
-	{
-	rootForm()->add(this);
-	this->flagUptod();
-	}
-
-	void Form::removed()
-	{
-	rootForm()->remove(this);
-	}
-
-	void Form::updated()
-	{
-	mWidget->flagFormUpdate();
-	rootForm()->update(this);
-	this->flagUptod();
-	}
-
-	void Form::altered()
-	{
-	//rootForm()->alter(this);
-	this->flagUptod();
-	}*/
-
 }

@@ -11,56 +11,47 @@
 #include <Object/Store/mkArray.h>
 #include <Object/Util/mkColour.h>
 #include <Object/String/mkString.h>
+#include <Ui/Style/mkStyle.h>
 
 /* standard */
 #include <map>
 
 namespace mk
 {
-	class MK_UI_EXPORT UiSkinner
+	struct MK_UI_EXPORT StyleOverride
 	{
-	public:
-		UiSkinner();
-
-		void add(string name);
-		void add(string name, Colour colour);
-		void add(string name, string base);
-		void add(StringVector names, string base);
-
-		void addOverride(string stem, string name, string skin);
-		bool hasOverrides(string stem);
-
-		InkStyle* skin(string name);
-
-		InkStyle* elementSkin(string clas, string overrider);
-
-	protected:
-		Named<Registry<InkStyle>> mSkins;
-		std::map<string, std::vector<string>> mOverrides;
+		Style* mStyle;
+		Style* mOverride;
 	};
 
-	class MK_UI_EXPORT UiLayout
+	typedef std::map<WidgetState, string> InkIdMap;
+
+	class MK_UI_EXPORT Styler
 	{
 	public:
-		UiLayout();
+		Styler();
 
-		void add(string name);
-		void add(string name, string base);
-		void add(StringVector names, string base);
+		void prepare();
 
-		void addOverride(string stem, string name, string skin);
-		bool hasOverrides(string stem);
+		void inheritLayout(StyleVector names, Style* base);
+		void inheritSkins(StyleVector names, Style* base);
 
-		LayoutStyle* style(string name);
+		void override(Style* stem, Style* style, Style* overrider);
 
-		LayoutStyle* elementStyle(string clas, string overrider);
+		Style* fetchOverride(Style* style, Style* overrider);
+
+		InkStyle* dynamicSkin(const string& name, Colour colour);
+		InkStyle* fetchSkin(const string& name);
 
 	protected:
-		Named<Registry<LayoutStyle>> mLayoutStyles;
-		std::map<string, std::vector<string>> mOverrides;
+		Named<Registry<InkStyle>> mDynamicSkins;
+		std::vector<std::vector<StyleOverride>> mOverrides;
 	};
 
-	void setupUiLayout(UiSkinner* skinner, UiLayout* layout);
+	class MK_UI_EXPORT EmptyStyle : public Object, public Typed<EmptyStyle>, public Styled<EmptyStyle>
+	{};
+
+	void setupUiLayout(Styler* styler);
 }
 
 #endif

@@ -22,8 +22,8 @@
 
 namespace mk
 {
-	WTypeIn::WTypeIn(Form* form)
-		: Widget("typein", form)
+	WTypeIn::WTypeIn(Form* form, Style* style)
+		: Widget(style ? style : styleCls(), form)
 		, mValue(form->as<FValue>()->valref())
 		, mHasPeriod(false)
 	{
@@ -36,7 +36,7 @@ namespace mk
 		return mForm->as<FValue>()->valref();
 	}
 
-	void WTypeIn::setAllowedChars(string chars)
+	void WTypeIn::setAllowedChars(const string& chars)
 	{
 		mAllowedChars = chars;
 	}
@@ -78,53 +78,65 @@ namespace mk
 	}
 
 	WString::WString(Form* form)
-		: WTypeIn(form)
+		: WTypeIn(form, styleCls())
 	{}
 
+	WNumControls::WNumControls(const Trigger& plus, Trigger minus)
+		: Sheet(styleCls())
+		, mPlusTrigger(plus)
+		, mMinusTrigger(minus)
+	{}
+
+	void WNumControls::build()
+	{
+		mPlus = this->makeappend<WButton>("+", nullptr, mPlusTrigger);
+		mMinus = this->makeappend<WButton>("-", nullptr, mMinusTrigger);
+	}
+
 	WInt::WInt(Form* form)
-		: Sheet("", form)
+		: Sheet(styleCls(), form)
 	{}
 
 	void WInt::build()
 	{
 		mDisplay = this->makeappend<WTypeIn>(mForm);
 		mDisplay->setAllowedChars("1234567890");
-		mControls = this->makeappend<Sheet>("controls");
-		mPlus = mControls->makeappend<WButton>("+", "button", std::bind(&WInt::plus, this));
-		mMinus = mControls->makeappend<WButton>("-", "button", std::bind(&WInt::minus, this));
+		mControls = this->makeappend<WNumControls>(std::bind(&WInt::plus, this), std::bind(&WInt::minus, this));
 	}
 
 	void WInt::plus()
 	{
-		mDisplay->value()->ref<int>() = mDisplay->value()->get<int>() + 1;
+		mDisplay->value()->set<int>(mDisplay->value()->get<int>() + 1);
+		mForm->as<FValue>()->updateValue();
 	}
 
 	void WInt::minus()
 	{
-		mDisplay->value()->ref<int>() = mDisplay->value()->get<int>() - 1;
+		mDisplay->value()->set<int>(mDisplay->value()->get<int>() - 1);
+		mForm->as<FValue>()->updateValue();
 	}
 
 	WFloat::WFloat(Form* form)
-		: Sheet("", form)
+		: Sheet(styleCls(), form)
 	{}
 
 	void WFloat::build()
 	{
 		mDisplay = this->makeappend<WTypeIn>(mForm);
 		mDisplay->setAllowedChars("1234567890.");
-		mControls = this->makeappend<Sheet>("controls");
-		mPlus = mControls->makeappend<WButton>("+", "button", std::bind(&WFloat::plus, this));
-		mMinus = mControls->makeappend<WButton>("-", "button", std::bind(&WFloat::minus, this));
+		mControls = this->makeappend<WNumControls>(std::bind(&WFloat::plus, this), std::bind(&WFloat::minus, this));
 	}
 
 	void WFloat::plus()
 	{
-		mDisplay->value()->ref<float>() = mDisplay->value()->get<float>() + 0.1f;
+		mDisplay->value()->set<float>(mDisplay->value()->get<float>() + 0.1f);
+		mForm->as<FValue>()->updateValue();
 	}
 
 	void WFloat::minus()
 	{
-		mDisplay->value()->ref<float>() = mDisplay->value()->get<float>() - 0.1f;
+		mDisplay->value()->set<float>(mDisplay->value()->get<float>() - 0.1f);
+		mForm->as<FValue>()->updateValue();
 	}
 
 	WBool::WBool(Form* form)

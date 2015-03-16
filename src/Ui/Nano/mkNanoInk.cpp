@@ -14,8 +14,6 @@
 
 #include <Ui/Nano/nanovg/nanovg.h>
 
-#include <iostream>
-
 namespace mk
 {
 	NVGcolor nvgColour(const Colour& colour)
@@ -28,7 +26,6 @@ namespace mk
 		, mCtx(layer->target()->window()->ctx())
 		, mLayer(layer)
 		, mImage(0)
-		, mVisible(frame->visible())
 	{}
 
 	NanoInk::~NanoInk()
@@ -46,6 +43,8 @@ namespace mk
 
 	void NanoInk::nanodraw()
 	{
+		//std::cerr << "ink :: draw " << mFrame->style()->name() << std::endl;
+
 		if(mFrame->inkstyle()->mEmpty || !mVisible || mFrame->dclip(DIM_Y) == Frame::HIDDEN || mFrame->dclip(DIM_X) == Frame::HIDDEN)
 			return;
 
@@ -127,7 +126,7 @@ namespace mk
 		}
 
 		// Caption
-		if(mFrame->widget()->label() != "" && !(pwidth <= 0.f || pheight <= 0.f))
+		if(!mFrame->widget()->label().empty() && !(pwidth <= 0.f || pheight <= 0.f))
 		{
 			nvgFontSize(mCtx, 14.0f);
 			nvgFontFace(mCtx, "dejavu");
@@ -151,7 +150,14 @@ namespace mk
 
 	float NanoInk::contentSize(Dimension dim)
 	{
-		if(mFrame->widget()->label() != "")
+		if(mImage)
+		{
+			int width, height;
+			nvgImageSize(mCtx, mImage, &width, &height);
+
+			return dim == DIM_X ? float(width) : float(height);
+		}
+		else if(!mFrame->widget()->label().empty())
 		{
 			float bounds[4];
 
@@ -180,7 +186,7 @@ namespace mk
 
 		const string& image = mFrame->widget()->image();
 
-		if(image != "")
+		if(!image.empty())
 			mImage = fetchImage(image);
 
 		if(!mFrame->inkstyle()->mImageSkin.null())

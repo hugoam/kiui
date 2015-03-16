@@ -21,12 +21,12 @@
 namespace mk
 {
 	WTextbox::WTextbox(Form* form, Lref& value)
-		: Widget("", form)
+		: Widget(styleCls(), form)
 		, mValue(value)
 	{}
 
 	WTextbox::WTextbox(Form* form, string text)
-		: Widget("", form)
+		: Widget(styleCls(), form)
 		, mLref(lref(text))
 		, mValue(mLref)
 	{}

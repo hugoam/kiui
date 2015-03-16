@@ -11,7 +11,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT WCheckbox : public Widget
+	class MK_UI_EXPORT _I_ WCheckbox : public Widget, public Typed<WCheckbox>, public Styled<WCheckbox>
 	{
 	public:
 		WCheckbox(Form* form, Lref& value);
@@ -21,6 +21,8 @@ namespace mk
 		void updateChecked();
 
 		bool leftClick(float xPos, float yPos);
+
+		using Typed<WCheckbox>::cls;
 
 	protected:
 		Lref& mValue;

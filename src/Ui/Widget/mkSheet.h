@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_LAYER_H_INCLUDED
-#define MK_LAYER_H_INCLUDED
+#ifndef MK_SHEET_H_INCLUDED
+#define MK_SHEET_H_INCLUDED
 
 /* mk */
 #include <Object/mkId.h>
@@ -20,18 +20,17 @@ namespace mk
 	class MK_UI_EXPORT _I_ Sheet : public Widget
 	{
 	public:
-		Sheet(string clas, Form* form = nullptr);
+		Sheet(Style* style, Form* form = nullptr);
 		~Sheet();
 
 		void build();
 
+		void nextFrame(size_t tick, size_t delta);
+
 		FrameType frameType() { return STRIPE; }
 
 		inline Stripe* stripe() { return mFrame->as<Stripe>(); }
-		inline Registry<Widget>* contents() { return &mContents; }
-
-		InkStyle* elementSkin(const string& clas);
-		LayoutStyle* elementStyle(const string& clas);
+		inline std::vector<unique_ptr<Widget>>& contents() { return mContents; }
 
 		virtual Sheet* vaddwrapper(Widget* widget) { UNUSED(widget); return nullptr; }
 		virtual Widget* vappend(unique_ptr<Widget> widget) { return append(std::move(widget)); }
@@ -63,18 +62,19 @@ namespace mk
 		}
 
 	protected:
-		Registry<Widget> mContents;
-		bool mOverrides;
+		std::vector<unique_ptr<Widget>> mContents;
+		Sheet* mScrollsheet;
+		WScrollbar* mScrollbar;
 	};
 
 	class MK_UI_EXPORT GridSheet : public Sheet
 	{
 	public:
-		GridSheet(Dimension dim, string clas, Form* form = nullptr);
+		GridSheet(Dimension dim, Style* style, Form* form = nullptr);
 
 		void build();
 
-		const string& hoverCursor() { return mHoverCursor; }
+		Style* hoverCursor() { return mHoverCursor; }
 
 		bool leftDragStart(float xPos, float yPos);
 		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
@@ -85,35 +85,15 @@ namespace mk
 	protected:
 		Dimension mDim;
 		Widget* mResizing;
-		string mHoverCursor;
+		Style* mHoverCursor;
 	};
 
-	class MK_UI_EXPORT ScrollSheet : public Sheet
-	{
-	public:
-		ScrollSheet(string clas, Form* form = nullptr);
-
-		void build();
-
-		Widget* vappend(unique_ptr<Widget> widget);
-		unique_ptr<Widget> vrelease(Widget* widget);
-
-		void nextFrame(size_t tick, size_t delta);
-
-	protected:
-		Sheet* mScrollbox;
-		Sheet* mSheet;
-		string mClas;
-		Form* mForm;
-		WScrollbar* mScrollbar;
-	};
-
-	class Cursor : public Widget
+	class MK_UI_EXPORT _I_ Cursor : public Widget, public Typed<Cursor>, public Styled<Cursor>
 	{
 	public:
 		Cursor();
 
-		string clas() { return "cursor"; }
+		FrameType frameType() { return LAYER; }
 		size_t zorder() { return 15; }
 
 		void nextFrame();
@@ -121,42 +101,52 @@ namespace mk
 		void hover(Widget* hovered);
 		void unhover(Widget* hovered);
 
+		using Typed<Cursor>::cls;
+
 	protected:
 		bool mDirty;
 	};
 
-	class Tooltip : public Widget
+	class MK_UI_EXPORT ResizeCursorX : public Object, public Typed<ResizeCursorX>, public Styled<ResizeCursorX>
+	{};
+
+	class MK_UI_EXPORT ResizeCursorY : public Object, public Typed<ResizeCursorY>, public Styled<ResizeCursorY>
+	{};
+
+	class MK_UI_EXPORT _I_ Tooltip : public Widget, public Typed<Tooltip>, public Styled<Tooltip>
 	{
 	public:
 		Tooltip(const string& label);
 		~Tooltip();
 
-		string clas() { return "tooltip"; }
 		const string& label() { return mLabel; }
+		FrameType frameType() { return LAYER; }
 		size_t zorder() { return 14; }
 
-		void setLabel(string label);
+		void setLabel(const string& label);
+
+		using Typed<Tooltip>::cls;
 
 	protected:
 		string mLabel;
 	};
 
-	class MK_UI_EXPORT RootSheet : public Sheet
+	class MK_UI_EXPORT _I_ RootSheet : public Sheet, public Typed<RootSheet>, public Styled<RootSheet>
 	{
 	public:
 		RootSheet(UiWindow* window, Form* form);
 
 		void init();
 
+		FrameType frameType() { return LAYER; }
 		UiWindow* uiWindow() { return mWindow; }
 		RootSheet* rootWidget() { return this; }
 
-		InkStyle* elementSkin(const string& clas);
-		LayoutStyle* elementStyle(const string& clas);
+		using Typed<RootSheet>::cls;
 
 	protected:
 		UiWindow* mWindow;
 	};
 }
 
-#endif // MK_LAYER_H_INCLUDED
+#endif // MK_SHEET_H_INCLUDED

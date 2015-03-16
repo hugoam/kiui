@@ -8,11 +8,20 @@
 /* mk */
 #include <Ui/Scheme/mkScheme.h>
 #include <Ui/Widget/mkSheet.h>
+#include <Ui/Widget/mkWButton.h>
 #include <Ui/Form/mkForm.h>
 
 namespace mk
 {
-	class MK_UI_EXPORT WTab : public Sheet
+	class MK_UI_EXPORT WTabHeader : public WButton, public Styled<WTabHeader>
+	{
+	public:
+		WTabHeader(const string& label, const Trigger& trigger);
+
+		using Styled<WTabHeader>::styleCls;
+	};
+
+	class MK_UI_EXPORT _I_ WTab : public Sheet, public Typed<WTab>, public Styled<WTab>
 	{
 	public:
 		WTab(WButton* header, bool active);
@@ -21,15 +30,33 @@ namespace mk
 
 		WButton* header() { return mHeader; }
 
+		using Typed<WTab>::cls;
+
 	protected:
 		WButton* mHeader;
 		bool mActive;
 	};
 
-	class MK_UI_EXPORT WTabber : public Sheet
+	class MK_UI_EXPORT _I_ WTabberHead : public Sheet, public Typed<WTabberHead>, public Styled<WTabberHead>
 	{
 	public:
-		WTabber(string cls, bool downtabs = false);
+		WTabberHead();
+
+		using Typed<WTabberHead>::cls;
+	};
+
+	class MK_UI_EXPORT _I_ WTabberBody : public Sheet, public Typed<WTabberBody>, public Styled<WTabberBody>
+	{
+	public:
+		WTabberBody();
+
+		using Typed<WTabberBody>::cls;
+	};
+
+	class MK_UI_EXPORT WTabber : public Sheet, public Styled<WTabber>
+	{
+	public:
+		WTabber(Style* style = nullptr, bool downtabs = false);
 		~WTabber();
 
 		void build();

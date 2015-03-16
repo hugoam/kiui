@@ -100,6 +100,92 @@ namespace mk
 			, GenericObserver<T>(tstore, this)
 		{}
 	};
+
+	template <class T, class R>
+	struct ResPointer { static inline T* pointer(const R& r) { return r; } };
+
+	template <class T>
+	struct ResPointer<T, unique_ptr<T>> { static inline T* pointer(const unique_ptr<T>& r) { return r.get(); } };
+
+
+	template <class R, class T>
+	class VectorObserver
+	{
+	public:
+		VectorObserver(const std::vector<R>& vector) : mVector(vector) {}
+
+		void update(size_t tick)
+		{
+			bool modified = false;
+
+			for(size_t i = 0; i < mVector.size(); ++i)
+			{
+				if(i >= mCopy.size())
+				{
+					for(; i < mVector.size(); ++i)
+						this->handleAdd(ResPointer<T, R>::pointer(mVector[i]), i);
+					modified = true;
+					break;
+				}
+
+				if(ResPointer<T, R>::pointer(mVector[i]) == mCopy[i])
+					continue;
+
+				size_t j = i;
+				while(j < mVector.size()-1 && j < mCopy.size()-1 && ResPointer<T, R>::pointer(mVector[i]) != mCopy[j] && ResPointer<T, R>::pointer(mVector[j]) != mCopy[i])
+					++j;
+
+				if(ResPointer<T, R>::pointer(mVector[i]) == mCopy[j])
+					for(; i < j; ++i)
+						this->handleAdd(ResPointer<T, R>::pointer(mVector[i]), i);
+				else if(ResPointer<T, R>::pointer(mVector[j]) == mCopy[i])
+					for(; i < j; ++i)
+						this->handleRemove(mCopy[i], i);
+				else
+				{
+					this->handleAdd(ResPointer<T, R>::pointer(mVector[i]), i);
+					this->handleRemove(mCopy[i], i);
+				}
+
+				modified = true;
+			}
+
+			if(modified)
+			{
+				mCopy.clear();
+				mCopy.resize(mVector.size());
+				for(size_t i = 0; i < mVector.size(); ++i)
+					mCopy[i] = ResPointer<T, R>::pointer(mVector[i]);
+			}
+		}
+
+		virtual void handleAdd(T* object, size_t index) = 0;
+		virtual void handleRemove(T* object, size_t index) = 0;
+
+	protected:
+		const std::vector<R>& mVector;
+		std::vector<T*> mCopy;
+	};
+
+	template <class R, class T>
+	class VectorCollection : public Collection, public VectorObserver<R, T>
+	{
+	public:
+		VectorCollection(Form* form, std::vector<R>& vector, FormMapper mapper)
+			: Collection(form, mapper)
+			, VectorObserver<R, T>(vector)
+		{}
+
+		void handleAdd(T* object, size_t index)
+		{
+			this->add(object , T::cls(), index);
+		}
+
+		void handleRemove(T* object, size_t index)
+		{
+			this->remove(object, T::cls());
+		}
+	};
 }
 
 #endif // MK_WIDGET_H_INCLUDED

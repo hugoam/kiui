@@ -14,21 +14,27 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT List : public Form
+	class MK_UI_EXPORT List : public Form, public Typed<List, Form>, public Styled<List>
 	{
 	public:
-		List(const string& cls);
+		List(Style* style = nullptr);
+
+		using Typed<List, Form>::cls;
 	};
 
-	class MK_UI_EXPORT SortList : public List//, public Dropper
+	class MK_UI_EXPORT SortList : public List, public Typed<SortList, List>, public Dropper
 	{
 	public:
-		SortList(const string& cls);
+		SortList(Style* style);
 
-		//void move(Form* form, size_t index);
-		//void transfer(Form* form, SortList* list, size_t index);
+		Form* swapdrop(Form* form, Dropper* source) { UNUSED(form); UNUSED(source); return nullptr; }
+		bool candrop(Form* form, Dropper* source) { UNUSED(form); UNUSED(source); return false; }
+		void dropin(Form* form, Dropper* source, size_t index) { UNUSED(form); UNUSED(source); UNUSED(index); }
+		void dropout(Form* form, Dropper* source) { UNUSED(form); UNUSED(source); }
 
 		virtual void moved(size_t from, size_t to) { UNUSED(from); UNUSED(to); }
+
+		using Typed<SortList, List>::cls;
 	};
 }
 

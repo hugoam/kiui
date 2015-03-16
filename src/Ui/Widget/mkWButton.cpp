@@ -19,23 +19,27 @@
 namespace mk
 {
 	WLabel::WLabel(Form* form)
-		: Widget("", form)
+		: Widget(styleCls(), form)
 		, mLabel(form->label())
 	{}
 	
-	WLabel::WLabel(string label, string clas)
-		: Widget(clas)
+	WLabel::WLabel(const string& label, Style* style)
+		: Widget(style ? style : styleCls())
 		, mLabel(label)
 	{}
 
-	void WLabel::setLabel(string label)
+	void WLabel::setLabel(const string& label)
 	{
 		mLabel = label;
 		mFrame->setDirty(Frame::DIRTY_WIDGET);
 	}
 
+	WTitle::WTitle(const string& label)
+		: WLabel(label, styleCls())
+	{}
+
 	WButton::WButton(Form* form)
-		: Widget("", form)
+		: Widget(styleCls(), form)
 		, WidgetTrigger(nullptr)
 		, mLabel(form->label())
 	{
@@ -43,8 +47,8 @@ namespace mk
 		mTriggerShift = std::bind(&Button::trigger, form->as<Button>());
 	}
 
-	WButton::WButton(string label, string clas, Trigger trigger)
-		: Widget(clas)
+	WButton::WButton(const string& label, Style* style, const Trigger& trigger)
+		: Widget(style ? style : styleCls())
 		, WidgetTrigger(trigger)
 		, mLabel(label)
 	{}
@@ -77,8 +81,8 @@ namespace mk
 		return true;
 	}
 
-	WWrapButton::WWrapButton(Widget* content, string clas, Trigger trigger)
-		: Sheet(clas)
+	WWrapButton::WWrapButton(Widget* content, Style* style, const Trigger& trigger)
+		: Sheet(style)
 		, WidgetTrigger(trigger)
 		, mContent(content)
 	{}
@@ -116,8 +120,8 @@ namespace mk
 		return true;
 	}
 
-	WToggle::WToggle(string clas, Trigger triggerOn, Trigger triggerOff, bool on)
-		: Widget(clas)
+	WToggle::WToggle(Style* style, const Trigger& triggerOn, const Trigger& triggerOff, bool on)
+		: Widget(style)
 		, mTriggerOn(triggerOn)
 		, mTriggerOff(triggerOff)
 		, mOn(on)

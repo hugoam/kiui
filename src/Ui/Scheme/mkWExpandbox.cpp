@@ -14,8 +14,20 @@
 
 namespace mk
 {
-	WExpandbox::WExpandbox(string title, bool collapsed)
-		: Sheet("expandbox")
+	WExpandboxHeader::WExpandboxHeader()
+		: Sheet(styleCls())
+	{}
+
+	WExpandboxBody::WExpandboxBody()
+		: Sheet(styleCls())
+	{}
+
+	WExpandboxToggle::WExpandboxToggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on)
+		: WToggle(styleCls(), triggerOn, triggerOff, on)
+	{}
+
+	WExpandbox::WExpandbox(Form* form, const string& title, bool collapsed)
+		: Sheet(styleCls(), form)
 		, mTitle(title)
 		, mCollapsed(collapsed)
 	{}
@@ -26,10 +38,11 @@ namespace mk
 	void WExpandbox::build()
 	{
 		Sheet::build();
-		mHeader = this->makeappend<Sheet>(mClas + "header");
-		mExpandButton = mHeader->makeappend<WToggle>("expandbutton", std::bind(&WExpandbox::expand, this), std::bind(&WExpandbox::collapse, this), !mCollapsed);
-		mTitleLabel = mHeader->makeappend<WLabel>(mTitle, "title");
-		mContainer = this->makeappend<Sheet>(mClas + "container");
+		mHeader = this->makeappend<WExpandboxHeader>();
+		mContainer = this->makeappend<WExpandboxBody>();
+
+		mExpandButton = mHeader->makeappend<WExpandboxToggle>(std::bind(&WExpandbox::expand, this), std::bind(&WExpandbox::collapse, this), !mCollapsed);
+		mTitleLabel = mHeader->makeappend<WTitle>(mTitle);
 
 		mContainer->frame()->hide();
 	}
@@ -58,10 +71,12 @@ namespace mk
 		mCollapsed = true;
 	}
 
-	Expandbox::Expandbox(string title, bool collapsed)
-		: Form("expandbox", "", [this, collapsed]() { return make_unique<WExpandbox>(this->name(), collapsed); })
+	Expandbox::Expandbox(const string& title, bool collapsed)
+		: Form(nullptr, title, [this, collapsed]() { return make_unique<WExpandbox>(this, this->label(), collapsed); })
+		//: Form("expandbox", "", [this, collapsed]() { return make_unique<WExpandbox>(this->name(), collapsed); })
+		//: Form("expandbox", "", [title, collapsed]() { return make_unique<WExpandbox>(title, collapsed); })
 	{
-		if(title != "")
-			this->setName(title);
+		//if(!title.empty())
+			//this->setName(title);
 	}
 }
