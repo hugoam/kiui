@@ -17,6 +17,7 @@
 
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Widget/mkSheet.h>
+#include <Ui/Widget/mkRootSheet.h>
 
 #include <Ui/Widget/mkWButton.h>
 #include <Ui/Widget/mkWSlider.h>

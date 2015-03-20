@@ -24,6 +24,9 @@ namespace mk
 		~Sheet();
 
 		void build();
+		
+		void show();
+		void hide();
 
 		void nextFrame(size_t tick, size_t delta);
 
@@ -40,6 +43,7 @@ namespace mk
 		Widget* append(unique_ptr<Widget> widget);
 		unique_ptr<Widget> release(Widget* widget);
 		unique_ptr<Widget> release(size_t index);
+		Widget* at(size_t index) { return mContents.at(index).get(); }
 
 		void clear();
 
@@ -129,23 +133,6 @@ namespace mk
 
 	protected:
 		string mLabel;
-	};
-
-	class MK_UI_EXPORT _I_ RootSheet : public Sheet, public Typed<RootSheet>, public Styled<RootSheet>
-	{
-	public:
-		RootSheet(UiWindow* window, Form* form);
-
-		void init();
-
-		FrameType frameType() { return LAYER; }
-		UiWindow* uiWindow() { return mWindow; }
-		RootSheet* rootWidget() { return this; }
-
-		using Typed<RootSheet>::cls;
-
-	protected:
-		UiWindow* mWindow;
 	};
 }
 

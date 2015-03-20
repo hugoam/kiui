@@ -76,14 +76,14 @@ namespace mk
 	class MK_UI_EXPORT Dropdown : public Form
 	{
 	public:
-		Dropdown(const Trigger& onSelected, std::function<void(string)> onSelectedString = nullptr);
-		Dropdown(std::function<void(string)> onSelected, StringVector choices);
+		Dropdown(const Trigger& onSelected, std::function<void(const string&)> onSelectedString = nullptr);
+		Dropdown(std::function<void(const string&)> onSelected, StringVector choices);
 
 		void onSelected(Widget* widget);
 
 	protected:
 		Trigger mOnSelected;
-		std::function<void(string)> mOnSelectedString;
+		std::function<void(const string&)> mOnSelectedString;
 	};
 }
 

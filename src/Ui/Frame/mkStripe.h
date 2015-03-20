@@ -52,16 +52,8 @@ namespace mk
 		void remove(Frame* widget);
 		void clear();
 
-		void insertManual(Frame* frame, size_t index);
-		void removeManual(Frame* frame);
-
 		void insertFlow(Frame* widget, size_t index);
 		void removeFlow(Frame* widget);
-
-		void appendManual(Frame* frame)	{ this->insertManual(frame, d_contents.size()); }
-
-		void appendFlow(Frame* widget) { this->insertFlow(widget, d_sequence.size()); }
-		void prependFlow(Frame* widget) { this->insertFlow(widget, 0); }
 
 		void move(size_t from, size_t to);
 
@@ -92,7 +84,6 @@ namespace mk
 		void deepRelayout();
 
 		void initWeights();
-		void storeWeights();
 		void dispatchWeights();
 		void dispatchTableWeights();
 

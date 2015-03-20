@@ -17,9 +17,6 @@
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Widget/mkSheet.h>
 
-#include <Ui/mkUiWindow.h>
-#include <Ui/mkUiLayout.h>
-
 namespace mk
 {
 	Lref Form::sNullString = lref(string(""));

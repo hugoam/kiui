@@ -12,7 +12,13 @@
 
 namespace mk
 {
-	MK_UI_EXPORT Window* createTestWindow(Form* parent);
+	MK_UI_EXPORT Dockspace* createUiTestDockspace(Form* parent);
+	MK_UI_EXPORT Tabber* createUiTestTabs(Form* parent);
+	MK_UI_EXPORT Table* createUiTestTable(Form* parent);
+	MK_UI_EXPORT Table* createUiTestTableAlt(Form* parent);
+	MK_UI_EXPORT Tree* createUiTestTree(Form* parent);
+	MK_UI_EXPORT Form* createUiTestControls(Form* parent);
+	MK_UI_EXPORT Window* createUiTestWindow(Form* parent);
 }
 
 #endif // MK_UI_H_INCLUDED

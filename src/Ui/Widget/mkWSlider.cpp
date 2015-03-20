@@ -116,12 +116,12 @@ namespace mk
 		if(mButton->frame()->style()->d_sizing[mDim] == FIXED)
 			mFixedKnob = true;
 
-		this->stripe()->initWeights();
+		/*this->stripe()->initWeights();
 
 		if(mFixedKnob)
 			this->stripe()->weights() = { 1.f, -1.f, 1.f };
 		else
-			this->stripe()->weights() = { 1.f, 1.f, 1.f };
+			this->stripe()->weights() = { 1.f, 1.f, 1.f };*/
 	}
 
 	void WSlider::offsetChange(float offset, bool ended)
@@ -158,18 +158,10 @@ namespace mk
 
 	void WSlider::updateKnob()
 	{
-		this->stripe()->weights()[0] = mVal - mMin;
-		this->stripe()->weights()[2] = mMax - mVal;
-
-		if(!mFixedKnob)
-			this->stripe()->weights()[1] = mKnobLength;
-
-		/*mSpaceBefore->frame()->setSpanDim(mDim, mVal - mMin);
+		mSpaceBefore->frame()->setSpanDim(mDim, mVal - mMin);
 		mSpaceAfter->frame()->setSpanDim(mDim, mMax - mVal);
 
 		if(!mFixedKnob)
-			mButton->frame()->setSpanDim(mDim, mKnobLength);*/
-
-		this->stripe()->markRelayout();
+			mButton->frame()->setSpanDim(mDim, mKnobLength);
 	}
 }

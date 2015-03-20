@@ -36,7 +36,8 @@ namespace mk
 	{
 		FRAME = 0,
 		STRIPE = 1,
-		LAYER = 2
+		LAYER = 2,
+		LAYER3D = 3
 	};
 
 	enum _I_ Flow : unsigned int

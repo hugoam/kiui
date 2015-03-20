@@ -111,7 +111,7 @@ namespace mk
 		this->makeappend<Label>(label);
 	}
 
-	InputText::InputText(const string& label, const string& text, std::function<void(string)> callback, bool reverse)
+	InputText::InputText(const string& label, const string& text, std::function<void(const string&)> callback, bool reverse)
 		: Form(styleCls())
 	{
 		this->makeappend<FString>(text);
@@ -121,7 +121,7 @@ namespace mk
 			this->move(0, 1);
 	}
 
-	InputDropdown::InputDropdown(const string& label, StringVector choices, std::function<void(string)> callback, bool reverse)
+	InputDropdown::InputDropdown(const string& label, StringVector choices, std::function<void(const string&)> callback, bool reverse)
 		: Form(styleCls())
 	{
 		this->makeappend<Dropdown>(callback, choices);

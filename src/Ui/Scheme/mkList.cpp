@@ -5,7 +5,8 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Scheme/mkList.h>
 
-#include <Object/mkStem.h>
+#include <Ui/Form/mkButton.h>
+#include <Ui/Form/mkWidgets.h>
 
 namespace mk
 {
@@ -13,6 +14,20 @@ namespace mk
 		: Form(style ? style : styleCls())
 	{
 		mType = cls();
+	}
+
+	LabelList::LabelList(StringVector labels)
+		: List()
+	{
+		for(string& label : labels)
+			this->makeappend<Label>(label);
+	}
+	
+	ButtonList::ButtonList(StringVector labels)
+		: List()
+	{
+		for(string& label : labels)
+			this->makeappend<Label>(label);
 	}
 
 	SortList::SortList(Style* style)

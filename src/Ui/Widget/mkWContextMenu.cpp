@@ -12,18 +12,18 @@
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 
-#include <Ui/mkUiWindow.h>
+#include <Ui/Widget/mkRootSheet.h>
 
 namespace mk
 {
 	WContextMenu::WContextMenu(Form* form)
 		: Sheet(styleCls(), form)
 	{
-		uiWindow()->contextOn(this);
+		this->rootSheet()->contextOn(this);
 	}
 
 	WContextMenu::~WContextMenu()
 	{
-		uiWindow()->contextOff();
+		this->rootSheet()->contextOff();
 	}
 }

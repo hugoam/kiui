@@ -12,6 +12,7 @@
 
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Widget/mkSheet.h>
+#include <Ui/Widget/mkRootSheet.h>
 
 #include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
@@ -172,8 +173,10 @@ namespace mk
 
 		styler->inheritLayout(StyleVector({ WScrollerX::styleCls() }), PartitionX::styleCls());
 		styler->inheritLayout(StyleVector({ WScrollerY::styleCls() }), PartitionY::styleCls());
-
+		
 		styler->inheritLayout(StyleVector({ RootSheet::styleCls() }), PartitionY::styleCls());
+
+		RootSheet::styleCls()->layout()->d_opacity = _OPAQUE;
 
 		WTableHead::styleCls()->layout()->d_opacity = _OPAQUE;
 		WColumnHeader::styleCls()->layout()->d_opacity = _VOID;

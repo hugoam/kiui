@@ -77,7 +77,7 @@ namespace mk
 		using Styled<WScrollDown>::styleCls;
 	};
 
-	class MK_UI_EXPORT WScrollbar : public Sheet, public Styled<WScrollbar>
+	class MK_UI_EXPORT _I_ WScrollbar : public Sheet, public Typed<WScrollbar>, public Styled<WScrollbar>
 	{
 	public:
 		WScrollbar(Stripe* sheet);
@@ -85,10 +85,15 @@ namespace mk
 
 		void build();
 
+		void show();
+		void hide();
+	
 		void scrollup();
 		void scrolldown();
 		void scroll(float offset);
 		void nextFrame(size_t tick, size_t delta);
+
+		using Typed<WScrollbar>::cls;
 
 	protected:
 		Stripe* mSheet;
@@ -97,10 +102,12 @@ namespace mk
 		WButton* mDown;
 	};
 
-	class MK_UI_EXPORT WScrollSheet : public Sheet, public Styled<WScrollSheet>
+	class MK_UI_EXPORT _I_ WScrollSheet : public Sheet, public Typed<WScrollSheet>, public Styled<WScrollSheet>
 	{
 	public:
 		WScrollSheet();
+
+		using Typed<WScrollSheet>::cls;
 	};
 }
 

@@ -57,6 +57,7 @@ namespace mk
 
 		//void moveToTop();
 
+		void transfer(Stripe* stripe, size_t index);
 		void remove();
 
 		void clip();

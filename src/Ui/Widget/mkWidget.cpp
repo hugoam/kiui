@@ -6,6 +6,7 @@
 #include <Ui/Widget/mkWidget.h>
 
 #include <Ui/Widget/mkSheet.h>
+#include <Ui/Widget/mkRootSheet.h>
 
 #include <Ui/Form/mkForm.h>
 #include <Ui/Frame/mkInk.h>
@@ -45,9 +46,9 @@ namespace mk
 	Widget::~Widget()
 	{
 		if(mState == HOVERED)
-			uiWindow()->unhover();
+			this->rootSheet()->unhover();
 		if(mState == FOCUSED)
-			uiWindow()->deactivate(this);
+			this->rootSheet()->deactivate(this);
 	}
 
 	void Widget::bind(Sheet* parent, size_t index)
@@ -55,9 +56,11 @@ namespace mk
 		mParent = parent;
 		mStyle = this->fetchOverride(mStyle);
 
-		Stripe* stripe = mParent ? mParent->frame()->as<Stripe>() : nullptr;
+		Stripe* stripe = mParent->frame()->as<Stripe>();
 
-		if(this->frameType() == LAYER)
+		if(this->frameType() == LAYER3D)
+			mFrame = make_unique<Layer>(nullptr, this, index, this->zorder());
+		else if(this->frameType() == LAYER)
 			mFrame = make_unique<Layer>(stripe, this, index, this->zorder());
 		else if(this->frameType() == STRIPE)
 			mFrame = make_unique<Stripe>(stripe, this, index);
@@ -71,9 +74,7 @@ namespace mk
 	{
 		mParent = parent;
 
-		parent->frame()->as<Stripe>()->insert(mFrame.get(), index);
-
-		mFrame->migrate(mParent->frame()->as<Stripe>());
+		mFrame->transfer(mParent->frame()->as<Stripe>(), index);
 	}
 
 	unique_ptr<Widget> Widget::unbind()
@@ -97,6 +98,16 @@ namespace mk
 	void Widget::detach()
 	{
 		mFrame->remove();
+	}
+
+	void Widget::show()
+	{
+		mFrame->show();
+	}
+	
+	void Widget::hide()
+	{
+		mFrame->hide();
 	}
 
 	Widget* Widget::copy(Sheet* parent)
@@ -175,14 +186,14 @@ namespace mk
 		return nullptr;
 	}
 
-	RootSheet* Widget::rootWidget()
+	RootSheet* Widget::rootSheet()
 	{
-		return mParent->rootWidget();
+		return mParent->rootSheet();
 	}
 
 	InkTarget* Widget::inkTarget()
 	{
-		return this->uiWindow()->inkWindow()->screenTarget();
+		return mParent->inkTarget();
 	}
 
 	bool Widget::contains(Widget* widget)
@@ -195,7 +206,7 @@ namespace mk
 
 	UiWindow*  Widget::uiWindow()
 	{
-		return this->rootWidget()->uiWindow();
+		return this->rootSheet()->uiWindow();
 	}
 
 	void Widget::markDirty()
@@ -211,6 +222,8 @@ namespace mk
 
 	void Widget::nextFrame(size_t tick, size_t delta)
 	{
+		mFrame->nextFrame(tick, delta);
+
 		//std::cerr << "Widget :: nextFrame " << tick << " , " << delta << std::endl;
 		if(mForm)
 		{
@@ -239,6 +252,19 @@ namespace mk
 		return mFrame->parent()->contents()[mFrame->index() + 1]->widget();
 	}
 
+	InputReceiver* Widget::controlMouse(float x, float y)
+	{
+		if(mState == DRAGGED || mState == PRESSED)
+			return this;
+		else
+			return this->pinpoint(x, y);
+	}
+	
+	InputReceiver* Widget::controlKey()
+	{
+		return this;
+	}
+
 	InputReceiver* Widget::propagateMouse(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
@@ -263,17 +289,19 @@ namespace mk
 	void Widget::focus()
 	{
 		this->updateState(FOCUSED);
-		uiWindow()->activate(this);
+		this->rootSheet()->activate(this);
 	}
 
 	void Widget::unfocus()
 	{
 		this->updateState(ENABLED);
-		uiWindow()->deactivate(this);
+		this->rootSheet()->deactivate(this);
 	}
 
 	void Widget::hover()
 	{
+		this->rootSheet()->cursor()->hover(this);
+
 		if(mState == ACTIVATED)
 			this->updateState(ACTIVATED_HOVERED);
 		else
@@ -282,6 +310,8 @@ namespace mk
 	
 	void Widget::unhover()
 	{
+		this->rootSheet()->cursor()->unhover(this);
+
 		if(mState == ACTIVATED_HOVERED || mState == ACTIVATED)
 			this->updateState(ACTIVATED);
 		else
@@ -300,6 +330,44 @@ namespace mk
 	{
 		UNUSED(x); UNUSED(y);
 		this->unhover();
+		return true;
+	}
+
+	bool Widget::mouseMoved(float xPos, float yPos, float xDif, float yDif)
+	{
+		if(mState == DRAGGED)
+		{
+			this->leftDrag(xPos, yPos, xDif, yDif);
+		}
+		else if(mState == PRESSED && (abs(xPos - this->rootSheet()->lastPressedX()) > 8.f || abs(yPos - this->rootSheet()->lastPressedY()) > 8.f))
+		{
+			this->leftDragStart(this->rootSheet()->lastPressedX(), this->rootSheet()->lastPressedY());
+			mState = DRAGGED;
+			//mFrame->setOpacity(_VOID);
+		}
+
+		return true;
+	}
+
+	bool Widget::mousePressed(float xPos, float yPos, MouseButton button)
+	{
+		this->rootSheet()->modalOn(this);
+		mState = PRESSED;
+		return true;
+	}
+
+	bool Widget::mouseReleased(float xPos, float yPos, MouseButton button)
+	{
+		this->rootSheet()->modalOff();
+
+		if(mState == DRAGGED)
+			this->leftDragEnd(xPos, yPos);
+		else if(button == LEFT_BUTTON)
+			this->leftClick(xPos, yPos);
+		else if(button == RIGHT_BUTTON)
+			this->rightClick(xPos, yPos);
+
+		mState = ENABLED;
 		return true;
 	}
 }

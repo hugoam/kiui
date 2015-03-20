@@ -106,13 +106,13 @@ namespace mk
 	class MK_UI_EXPORT InputText : public Form, public Styled<InputText>
 	{
 	public:
-		InputText(const string& label, const string& text, std::function<void(string)> callback = nullptr, bool reverse = false);
+		InputText(const string& label, const string& text, std::function<void(const string&)> callback = nullptr, bool reverse = false);
 	};
 
 	class MK_UI_EXPORT InputDropdown : public Form, public Styled<InputDropdown>
 	{
 	public:
-		InputDropdown(const string& label, StringVector choices, std::function<void(string)> callback = nullptr, bool reverse = false);
+		InputDropdown(const string& label, StringVector choices, std::function<void(const string&)> callback = nullptr, bool reverse = false);
 	};
 	
 	class MK_UI_EXPORT SliderInt : public Form, public Styled<SliderInt>

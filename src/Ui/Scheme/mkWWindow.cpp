@@ -16,7 +16,7 @@
 #include <Ui/Frame/mkLayer.h>
 #include <Ui/Frame/mkGrid.h>
 
-#include <Ui/mkUiWindow.h>
+#include <Ui/Widget/mkRootSheet.h>
 
 #include <iostream>
 
@@ -42,6 +42,8 @@ namespace mk
 		, mName(title)
 		, mClosable(closable)
 		, mDockable(dockable)
+		, mMovable(false)
+		, mSizable(false)
 		, mContent(nullptr)
 		, mOnClose(onClose)
 		, mDragging(false)
@@ -62,20 +64,20 @@ namespace mk
 
 		if(!mDock)
 		{
-			float x = uiWindow()->width() / 2 - mFrame->dsize(DIM_X) / 2;
-			float y = uiWindow()->height() / 2 - mFrame->dsize(DIM_Y) / 2;
+			float x = this->rootSheet()->frame()->dsize(DIM_X) / 2 - mFrame->dsize(DIM_X) / 2;
+			float y = this->rootSheet()->frame()->dsize(DIM_Y) / 2 - mFrame->dsize(DIM_Y) / 2;
 			mFrame->setPosition(x, y);
 		}
 	}
 
 	void WWindow::setClosable()
 	{
-		mCloseButton->frame()->show();
+		mCloseButton->show();
 	}
 
 	void WWindow::setUnclosable()
 	{
-		mCloseButton->frame()->hide();
+		mCloseButton->hide();
 	}
 
 	void WWindow::setScrollable()
@@ -108,12 +110,12 @@ namespace mk
 
 	void WWindow::showTitlebar()
 	{
-		mHeader->frame()->show();
+		mHeader->show();
 	}
 
 	void WWindow::hideTitlebar()
 	{
-		mHeader->frame()->hide();
+		mHeader->hide();
 	}
 
 	const string& WWindow::name()
@@ -160,9 +162,9 @@ namespace mk
 	{
 		if(mDockable && mDock)
 			this->undock();
-		else if(yPos - mFrame->dabsolute(DIM_Y) > mFrame->dsize(DIM_Y) * 0.8f && xPos - mFrame->dabsolute(DIM_X) > mFrame->dsize(DIM_X) * 0.8f)
+		else if(mSizable && (yPos - mFrame->dabsolute(DIM_Y) > mFrame->dsize(DIM_Y) * 0.8f && xPos - mFrame->dabsolute(DIM_X) > mFrame->dsize(DIM_X) * 0.8f))
 			mResizing = true;
-		else
+		else if(mMovable)
 			mDragging = true;
 
 		if(mDragging)
@@ -186,7 +188,7 @@ namespace mk
 	{
 		if(mDockable)
 		{
-			Widget* widget = uiWindow()->rootSheet()->pinpoint(xPos, yPos);
+			Widget* widget = this->rootSheet()->pinpoint(xPos, yPos);
 			while(widget && widget->type() != WDocksection::cls())
 				widget = widget->parent();
 

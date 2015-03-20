@@ -28,7 +28,9 @@ namespace mk
 		ACTIVATED = 3,
 		ACTIVATED_HOVERED = 4,
 		FOCUSED = 5,
-		DISABLED = 6
+		DISABLED = 6,
+		PRESSED = 7,
+		DRAGGED = 8
 	};
 
 
@@ -60,12 +62,15 @@ namespace mk
 		virtual const string& tooltip();
 		virtual Style* hoverCursor();
 
-		virtual RootSheet* rootWidget();
+		virtual RootSheet* rootSheet();
 		virtual InkTarget* inkTarget();
 
 		UiWindow* uiWindow();
 
 		virtual void build() {}
+
+		virtual void show();
+		virtual void hide();
 
 		void bind(Sheet* parent, size_t index);
 		void rebind(Sheet* parent, size_t index);
@@ -103,6 +108,9 @@ namespace mk
 
 		bool contains(Widget* widget);
 
+		InputReceiver* controlMouse(float x, float y);
+		InputReceiver* controlKey();
+
 		InputReceiver* propagateMouse(float x, float y);
 		InputReceiver* propagateKey();
 
@@ -112,7 +120,14 @@ namespace mk
 		bool mouseEntered(float x, float y);
 		bool mouseLeaved(float x, float y);
 
-		bool mouseMoved(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return true; };
+		//bool mouseMoved(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return true; };
+		//bool mousePressed(float xPos, float yPos, MouseButton button) { UNUSED(xPos); UNUSED(yPos); UNUSED(button); return false; };
+		//bool mouseReleased(float xPos, float yPos, MouseButton button) { UNUSED(xPos); UNUSED(yPos); UNUSED(button); return false; };
+
+		bool mouseMoved(float xPos, float yPos, float xDif, float yDif);
+		bool mousePressed(float xPos, float yPos, MouseButton button);
+		bool mouseReleased(float xPos, float yPos, MouseButton button);
+
 		bool mouseWheel(float xPos, float yPos, float amount) { UNUSED(xPos); UNUSED(yPos); UNUSED(amount); return true; };
 
 		bool leftPressed(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };

@@ -12,8 +12,8 @@
 
 namespace mk
 {
-	Button::Button(Style* style, const string& label, const string& image, const Trigger& trigger)
-		: Form(style, label, [this]() { return make_unique<WButton>(this); })
+	Button::Button(const string& label, const string& image, const Trigger& trigger, Style* style)
+		: Form(style ? style : styleCls(), label, [this]() { return make_unique<WButton>(this); })
 		, mTrigger(trigger)
 	{
 		mType = cls();

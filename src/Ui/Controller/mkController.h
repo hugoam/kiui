@@ -16,7 +16,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT Controller : public InputReceiver, public InputController
+	class MK_UI_EXPORT Controller : public InputReceiver
 	{
 	public:
 		Controller();

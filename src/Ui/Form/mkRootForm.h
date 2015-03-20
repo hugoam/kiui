@@ -31,6 +31,7 @@ namespace mk
 	{
 	public:
 		RootForm(UiWindow* window);
+		~RootForm();
 
 		RootForm* rootForm() { return this; }
 

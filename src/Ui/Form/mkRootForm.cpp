@@ -13,6 +13,7 @@
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Widget/mkSheet.h>
+#include <Ui/Widget/mkRootSheet.h>
 
 #include <Ui/mkUiWindow.h>
 #include <Ui/mkUiLayout.h>
@@ -30,6 +31,9 @@ namespace mk
 		mWidget = mSheet.get();
 		mScheme.setSheet(mSheet.get());
 	}
+
+	RootForm::~RootForm()
+	{}
 
 	void RootForm::nextFrame(size_t tick, size_t delta)
 	{

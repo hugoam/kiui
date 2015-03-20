@@ -22,6 +22,18 @@ namespace mk
 		using Typed<List, Form>::cls;
 	};
 
+	class MK_UI_EXPORT LabelList : public List
+	{
+	public:
+		LabelList(StringVector labels = StringVector());
+	};
+
+	class MK_UI_EXPORT ButtonList : public List
+	{
+	public:
+		ButtonList(StringVector labels = StringVector());
+	};
+
 	class MK_UI_EXPORT SortList : public List, public Typed<SortList, List>, public Dropper
 	{
 	public:

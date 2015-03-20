@@ -25,32 +25,55 @@ namespace mk
 	Sheet::Sheet(Style* style, Form* form)
 		: Widget(style, form)
 		, mScrollbar(nullptr)
+		, mScrollsheet(nullptr)
 	{}
 
 	Sheet::~Sheet()
-	{}
+	{
+		if(mFrame->style()->d_overflow == SCROLL)
+			mScrollsheet->destroy();
+	}
 
 	void Sheet::build()
-	{}
+	{
+		if(mFrame->style()->d_overflow == SCROLL)
+		{
+			mScrollsheet = mParent->makeappend<WScrollSheet>();
+			mScrollsheet->append(mParent->release(this));
+			mScrollbar = mScrollsheet->makeappend<WScrollbar>(this->stripe());
+		}
+	}
+
+	void Sheet::show()
+	{
+		if(mScrollsheet)
+			mScrollsheet->show();
+		else
+			Widget::show();
+	}
+
+	void Sheet::hide()
+	{
+		if(mScrollsheet)
+			mScrollsheet->hide();
+		else
+			Widget::hide();
+	}
 
 	void Sheet::nextFrame(size_t tick, size_t delta)
 	{
 		Widget::nextFrame(tick, delta);
 		
-		// @todo @bug for a sheet with 0 size the following seems to cause a crash in Stripe::nextFrame()
+		for(size_t i = 0; i < mContents.size(); ++i)
+			mContents[i]->nextFrame(tick, delta);
+
 		if(mFrame->style()->d_overflow == SCROLL)
-			if(this->stripe()->overflow() && !mScrollbar)
-			{
-				mScrollsheet = mParent->makeappend<WScrollSheet>();
-				mScrollsheet->append(mParent->release(this));
-				mScrollbar = mScrollsheet->makeappend<WScrollbar>(this->stripe());
-			}
-			else if(!this->stripe()->overflow() && mScrollbar)
-			{
-				mScrollsheet->parent()->append(mScrollsheet->release(this));
-				mScrollsheet->destroy();
-				mScrollbar = nullptr;
-			}
+		{
+			if(this->stripe()->overflow() && mScrollbar->frame()->hidden())
+				mScrollbar->show();
+			else if(!this->stripe()->overflow() && !mScrollbar->frame()->hidden())
+				mScrollbar->hide();
+		}
 	}
 
 	Widget* Sheet::append(unique_ptr<Widget> unique)
@@ -136,10 +159,9 @@ namespace mk
 		float pixspan = 1.f / mFrame->as<Stripe>()->dsize(mDim);
 		float offset = mDim == DIM_X ? xDif * pixspan : yDif * pixspan;
 
-		//std::cerr << "Dragging resize offset " << offset << std::endl;
-		this->stripe()->weights()[prev->frame()->index()] = prev->frame()->dspan(mDim) + offset;
-		this->stripe()->weights()[next->frame()->index()] = next->frame()->dspan(mDim) - offset;
-		this->stripe()->markRelayout();
+		std::cerr << "Dragging resize offset " << offset << std::endl;
+		prev->frame()->setSpanDim(mDim, prev->frame()->dspan(mDim) + offset);
+		next->frame()->setSpanDim(mDim, next->frame()->dspan(mDim) - offset);
 
 		this->gridResized(prev, next);
 
@@ -195,13 +217,5 @@ namespace mk
 	{
 		mLabel = label;
 		mFrame->setDirty(Frame::DIRTY_WIDGET);
-	}
-
-	RootSheet::RootSheet(UiWindow* window, Form* form)
-		: Sheet(styleCls(), form)
-		, mWindow(window)
-	{
-		mFrame = make_unique<Layer>(nullptr, this, 0);
-		mFrame->setOpacity(_OPAQUE);
 	}
 }

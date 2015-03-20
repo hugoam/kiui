@@ -7,7 +7,7 @@
 
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Frame/mkInk.h> //@ inclusion-kludge
-#include <Ui/mkUiWindow.h>
+#include <Ui/Widget/mkRootSheet.h>
 
 namespace mk
 {
@@ -42,18 +42,18 @@ namespace mk
 	void Controller::take(Widget* widget)
 	{
 		mWidget = widget;
-		mWidget->uiWindow()->takeControl(this);
+		mWidget->rootSheet()->takeControl(this);
 	}
 
 	void Controller::stack(Widget* widget)
 	{
 		mWidget = widget;
-		mWidget->uiWindow()->stackControl(this);
+		mWidget->rootSheet()->stackControl(this);
 	}
 
 	void Controller::yield()
 	{
-		mWidget->uiWindow()->yieldControl(this);
+		mWidget->rootSheet()->yieldControl(this);
 	}
 
 	bool Controller::keyUp(KeyCode keyCode, char c)

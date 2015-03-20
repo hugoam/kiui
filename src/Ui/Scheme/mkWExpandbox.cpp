@@ -44,13 +44,13 @@ namespace mk
 		mExpandButton = mHeader->makeappend<WExpandboxToggle>(std::bind(&WExpandbox::expand, this), std::bind(&WExpandbox::collapse, this), !mCollapsed);
 		mTitleLabel = mHeader->makeappend<WTitle>(mTitle);
 
-		mContainer->frame()->hide();
+		mContainer->hide();
 	}
 
 	Widget* WExpandbox::vappend(unique_ptr<Widget> widget)
 	{
 		if(!mCollapsed && mContainer->frame()->hidden())
-			mContainer->frame()->show();
+			mContainer->show();
 		return mContainer->append(std::move(widget));
 	}
 
@@ -61,13 +61,13 @@ namespace mk
 
 	void WExpandbox::expand()
 	{
-		mContainer->frame()->show();
+		mContainer->show();
 		mCollapsed = false;
 	}
 
 	void WExpandbox::collapse()
 	{
-		mContainer->frame()->hide();
+		mContainer->hide();
 		mCollapsed = true;
 	}
 

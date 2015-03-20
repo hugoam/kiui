@@ -35,7 +35,7 @@ namespace mk
 		, d_index(index)
 		, d_wstyle(widget->style())
 		, d_inkstyle(d_wstyle->skin())
-		, d_inkbox(widget->frameType() != LAYER ? this->layer()->inkLayer()->inkbox(this) : nullptr)
+		, d_inkbox(widget->frameType() < LAYER ? this->layer()->inkLayer()->inkbox(this) : nullptr)
 	{
 		if(d_parent)
 			d_parent->insert(this, index);
@@ -58,26 +58,21 @@ namespace mk
 
 	Layer* Frame::layer()
 	{
-		if(this->frameType() == LAYER)
-			return this->as<Layer>();
-		else
+		if(this->frameType() < LAYER)
 			return d_parent->layer();
+		else
+			return this->as<Layer>();	
 	}
 
 	void Frame::reset(Style* style)
 	{
-		bool flowChange = style->layout()->d_flow != d_style->d_flow;
-
 		d_parent->remove(this);
 
 		this->setStyle(style->layout());
 		d_wstyle = style;
 		d_inkstyle = style->skin();
 
-		//if(flowChange)
-		//	d_parent->append(this);
-		//else
-			d_parent->insert(this, d_index);
+		d_parent->insert(this, d_index);
 
 		this->setDirty(DIRTY_WIDGET);
 	}
@@ -116,9 +111,6 @@ namespace mk
 		//if(d_style->d_updated == tick)
 		//	this->setStyle(d_style);
 
-		if(d_widget)
-			d_widget->nextFrame(tick, delta);
-
 		switch(d_dirty)
 		{
 		case DIRTY_VISIBILITY:
@@ -141,18 +133,18 @@ namespace mk
 		d_dirty = CLEAN;
 	}
 
+	void Frame::transfer(Stripe* stripe, size_t index)
+	{
+		stripe->insert(this, index);
+		this->migrate(stripe);
+	}
+
 	void Frame::migrate(Stripe* stripe)
 	{
-		// we hide and show, to preserve drawing order
-		// doesn't work because we now hide and show in deffered
-		//if(d_visible)
-		//	this->setVisible(false);
-		//this->setVisible(true);
-
 		if(this->frameType() == LAYER)
 			return;
 
-		d_inkbox = stripe->layer()->inkLayer()->inkbox(this);
+		d_inkbox = this->layer()->inkLayer()->inkbox(this);
 		this->setDirty(DIRTY_WIDGET);
 	}
 
@@ -196,7 +188,7 @@ namespace mk
 		d_clipSize[dim] = size;
 		this->setDirty(DIRTY_FRAME);
 
-		if(flow() && (dshrink(dim) || dfixed(dim))) // Upward notification -> when shrinking
+		if(d_parent && flow() && (dshrink(dim) || dfixed(dim))) // Upward notification -> when shrinking
 			d_parent->flowSized(this, dim, delta);
 
 		//if(dexpand(dim)) // Downward notification -> when expanding
@@ -211,6 +203,8 @@ namespace mk
 		d_sizing[dim] = EXPAND;
 		d_span[dim] = span;
 		this->setDirty(DIRTY_FRAME);
+
+		d_parent->markRelayout();
 	}
 
 	void Frame::setPositionDim(Dimension dim, float position)
@@ -250,7 +244,7 @@ namespace mk
 
 	void Frame::setVisible()
 	{
-		if(!d_parent->visible() || d_hidden)
+		if(d_visible || !d_parent->visible() || d_hidden)
 			return;
 
 		d_visible = true;

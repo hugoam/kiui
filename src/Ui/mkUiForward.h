@@ -51,12 +51,13 @@ namespace mk
 	class Collection;
 	class Scheme;
 
-	class List;
 	class Tabber;
 	class Dropdown;
 	class Expandbox;
 	class RadioSwitch;
 
+	class List;
+	class Table;
 	class Tree;
 	class TreeNode;
 

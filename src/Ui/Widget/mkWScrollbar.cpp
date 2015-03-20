@@ -78,9 +78,7 @@ namespace mk
 	{}
 
 	WScrollbar::~WScrollbar()
-	{
-		mSheet->setCursor(0.f);
-	}
+	{}
 
 	void WScrollbar::build()
 	{
@@ -90,6 +88,17 @@ namespace mk
 		mDown = this->makeappend<WScrollDown>(std::bind(&WScrollbar::scrolldown, this));
 
 		mScroller->resetMetrics(0.f, mSheet->sequenceLength() - mSheet->dclipsize(DIM_Y), mSheet->cursor(), 1.f, mSheet->dclipsize(DIM_Y));
+	}
+
+	void WScrollbar::show()
+	{
+		Widget::show();
+	}
+
+	void WScrollbar::hide()
+	{
+		Widget::hide();
+		mSheet->setCursor(0.f);
 	}
 
 	void WScrollbar::scrollup()
@@ -109,7 +118,7 @@ namespace mk
 
 	void WScrollbar::nextFrame(size_t tick, size_t delta)
 	{
-		Widget::nextFrame(tick, delta);
+		Sheet::nextFrame(tick, delta);
 
 		mScroller->updateMetrics(0.f, mSheet->sequenceLength() - mSheet->dclipsize(DIM_Y), mSheet->cursor(), 1.f, mSheet->dclipsize(DIM_Y));
 	}

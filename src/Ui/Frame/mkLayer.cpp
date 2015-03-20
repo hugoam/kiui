@@ -29,7 +29,8 @@ namespace mk
 
 	Layer::~Layer()
 	{
-		d_parent->layer()->layers().erase(std::remove(d_parent->layer()->layers().begin(), d_parent->layer()->layers().end(), this), d_parent->layer()->layers().end());
+		if(d_parent)
+			d_parent->layer()->layers().erase(std::remove(d_parent->layer()->layers().begin(), d_parent->layer()->layers().end(), this), d_parent->layer()->layers().end());
 	}
 
 	void Layer::nextFrame(size_t tick, size_t delta)
@@ -64,8 +65,6 @@ namespace mk
 			}
 
 		result = Stripe::pinpoint(x, y, opaque);
-		if(!result && !d_parent)
-			int i = 0;
 		return result;
 	}
 }

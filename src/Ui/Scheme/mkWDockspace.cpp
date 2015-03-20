@@ -19,7 +19,7 @@
 
 #include <Ui/Scheme/mkWWindow.h>
 
-#include <Ui/mkUiWindow.h>
+#include <Ui/Widget/mkRootSheet.h>
 
 #include <iostream>
 
@@ -48,7 +48,7 @@ namespace mk
 
 	void WDocksection::undock(WWindow* window)
 	{
-		this->rootWidget()->append(this->vrelease(window));
+		this->rootSheet()->append(this->vrelease(window));
 
 		if(mTabs->contents().size() == 0)
 			mDockline->removeSection(this);
@@ -107,9 +107,6 @@ namespace mk
 
 	WDockline* WDockline::insertLine(size_t index, bool replace, float span)
 	{
-		if(!replace && this->stripe()->weights().size() < this->stripe()->sequence().size() + 1)
-			this->stripe()->weights().insert(this->stripe()->weights().begin() + index, span);
-
 		WDockline* dockline;
 
 		if(mDim == DIM_X)
@@ -118,30 +115,29 @@ namespace mk
 			dockline = this->makeinsert<WDocklineX>(index, mDockspace, this, index);
 
 		if(replace)
-		{
-			dockline->stripe()->weights().push_back(1.f);
+			dockline->frame()->setSpanDim(mDim, this->stripe()->contents()[index + 1]->dspan(mDim));
+		else
+			dockline->frame()->setSpanDim(mDim, span);
+
+		if(replace)
 			dockline->append(this->release(index + 1));
-		}
 
 		return dockline;
 	}
 
 	WDocksection* WDockline::insertSection(size_t index, Style* style, float span)
 	{
-		if(this->stripe()->weights().size() < this->stripe()->sequence().size() + 1)
-			this->stripe()->weights().insert(this->stripe()->weights().begin() + index, span);
-
 		WDocksection* docksection = this->makeinsert<WDocksection>(index, this, index, style);
+		docksection->frame()->setSpanDim(mDim, span);
 		return docksection;
 	}
 
 	void WDockline::removeSection(WDocksection* section)
 	{
 		Frame* givespan = section->frame()->index() > 0 ? section->prev()->frame() : section->next()->frame();
-		this->stripe()->weights()[givespan->index()] += section->frame()->dspan(mDim);
+		givespan->setSpanDim(mDim, givespan->dspan(mDim) + section->frame()->dspan(mDim));
 		this->stripe()->markRelayout();
 
-		this->stripe()->weights().erase(this->stripe()->weights().begin() + section->frame()->index());
 		section->destroy();
 
 		if(mContents.size() == 1)
@@ -152,6 +148,7 @@ namespace mk
 	{
 		Widget* section = this->insert(line->release(0U), line->frame()->index());
 		section->as<WDocksection>()->setDockline(this);
+		section->frame()->setSpanDim(mDim, line->frame()->dspan(mDim));
 
 		line->destroy();
 

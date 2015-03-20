@@ -21,13 +21,13 @@ namespace mk
     class MK_UI_EXPORT InputDispatcher
     {
 	public:
-		virtual void mousePressed(float x, float y, MouseButton button) = 0;
-		virtual void mouseMoved(float x, float y, float xDif, float yDif) = 0;
-		virtual void mouseReleased(float x, float y, MouseButton button) = 0;
-		virtual void mouseWheeled(float x, float y, float amount) = 0;
+		virtual void dispatchMousePressed(float x, float y, MouseButton button) = 0;
+		virtual void dispatchMouseMoved(float x, float y, float xDif, float yDif) = 0;
+		virtual void dispatchMouseReleased(float x, float y, MouseButton button) = 0;
+		virtual void dispatchMouseWheeled(float x, float y, float amount) = 0;
 
-		virtual void keyPressed(KeyCode key, char c) = 0;
-		virtual void keyReleased(KeyCode key, char c) = 0;
+		virtual void dispatchKeyPressed(KeyCode key, char c) = 0;
+		virtual void dispatchKeyReleased(KeyCode key, char c) = 0;
     };
 
 	class MK_UI_EXPORT InputController
@@ -40,9 +40,12 @@ namespace mk
 		virtual void deactivated() {}
 	};
 
-	class MK_UI_EXPORT InputReceiver
+	class MK_UI_EXPORT InputReceiver : public InputController
 	{
 	public:
+		InputReceiver* controlMouse(float x, float y) { UNUSED(x); UNUSED(y); return this; }
+		InputReceiver* controlKey() { return this; }
+
 		virtual InputReceiver* propagateMouse(float x, float y) { UNUSED(x); UNUSED(y); return this; }
 		virtual InputReceiver* propagateKey() { return this; }
 
@@ -55,8 +58,8 @@ namespace mk
 		virtual bool mouseMoved(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return false; };
 		virtual bool mouseWheel(float xPos, float yPos, float amount) { UNUSED(xPos); UNUSED(yPos); UNUSED(amount); return false; };
 
-		virtual bool leftPressed(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
-		virtual bool rightPressed(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
+		virtual bool mousePressed(float xPos, float yPos, MouseButton button) { UNUSED(xPos); UNUSED(yPos); UNUSED(button); return false; };
+		virtual bool mouseReleased(float xPos, float yPos, MouseButton button) { UNUSED(xPos); UNUSED(yPos); UNUSED(button); return false; };
 
 		virtual bool leftClick(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
 		virtual bool rightClick(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };

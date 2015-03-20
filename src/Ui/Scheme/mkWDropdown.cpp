@@ -17,7 +17,7 @@
 
 #include <Ui/Frame/mkFrame.h>
 
-#include <Ui/mkUiWindow.h>
+#include <Ui/Widget/mkRootSheet.h>
 
 using namespace std::placeholders;
 
@@ -40,7 +40,7 @@ namespace mk
 		mDropbox = this->makeappend<WDropdownBox>(this);
 		mDropButton = this->makeappend<WDropdownToggle>(std::bind(&WDropdown::dropdown, this));
 
-		mDropbox->frame()->hide();
+		mDropbox->hide();
 	}
 
 	Sheet* WDropdown::vaddwrapper(Widget* widget)
@@ -62,8 +62,8 @@ namespace mk
 
 	void WDropdown::dropup()
 	{
-		mDropbox->frame()->hide();
-		uiWindow()->modalOff();
+		mDropbox->hide();
+		this->rootSheet()->modalOff();
 
 		mDown = false;
 	}
@@ -73,10 +73,10 @@ namespace mk
 		if(mDropbox->contents().size() == 0)
 			return;
 
-		mDropbox->frame()->show();
+		mDropbox->show();
 		mDropbox->frame()->as<Layer>()->moveToTop();
 
-		uiWindow()->modalOn(mDropbox);
+		this->rootSheet()->modalOn(mDropbox);
 
 		mDropbox->frame()->setPositionDim(DIM_Y, mFrame->dsize(DIM_Y));
 
@@ -120,13 +120,13 @@ namespace mk
 		return true;
 	}
 
-	Dropdown::Dropdown(const Trigger& onSelected, std::function<void(string)> onSelectedString)
+	Dropdown::Dropdown(const Trigger& onSelected, std::function<void(const string&)> onSelectedString)
 		: Form(nullptr, "", [this](){ return make_unique<WDropdown>(std::bind(&Dropdown::onSelected, this, _1)); })
 		, mOnSelected(onSelected)
 		, mOnSelectedString(onSelectedString)
 	{}
 
-	Dropdown::Dropdown(std::function<void(string)> onSelected, StringVector choices)
+	Dropdown::Dropdown(std::function<void(const string&)> onSelected, StringVector choices)
 		: Dropdown(nullptr, onSelected)
 	{
 		for(string& choice : choices)

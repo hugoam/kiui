@@ -175,25 +175,28 @@ namespace mk
 		float clampedX = std::max(0.f, std::min(float(mWidth), mMouseX));
 		float clampedY = std::max(0.f, std::min(float(mHeight), mMouseY));
 
-		mUiWindow->mouseMoved(clampedX, clampedY, xDif, yDif);
+		mUiWindow->dispatchMouseMoved(clampedX, clampedY, xDif, yDif);
 	}
 
 	void GlWindow::injectMouseButton(int button, int action, int mods)
 	{
+		float clampedX = std::max(0.f, std::min(float(mWidth), mMouseX));
+		float clampedY = std::max(0.f, std::min(float(mHeight), mMouseY));
+
 		UNUSED(mods);
 		if(action == GLFW_PRESS)
-			mInput->mousePressed(mMouseX, mMouseY, convertGlfwButton(button));
+			mInput->dispatchMousePressed(clampedX, clampedY, convertGlfwButton(button));
 		else if(action == GLFW_RELEASE)
-			mInput->mouseReleased(mMouseX, mMouseY, convertGlfwButton(button));
+			mInput->dispatchMouseReleased(clampedX, clampedY, convertGlfwButton(button));
 	}
 
 	void GlWindow::injectKey(int key, int scancode, int action, int mods)
 	{
 		UNUSED(key); UNUSED(mods);
 		if(action == GLFW_PRESS)
-			mInput->keyPressed((KeyCode) scancode, ' ');
+			mInput->dispatchKeyPressed((KeyCode) scancode, ' ');
 		else if(action == GLFW_RELEASE)
-			mInput->keyReleased((KeyCode)scancode, ' ');
+			mInput->dispatchKeyReleased((KeyCode)scancode, ' ');
 	}
 
 	void GlWindow::injectChar(int codepoint, int mods)

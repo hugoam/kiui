@@ -10,7 +10,7 @@
 namespace mk
 {
 	Hook::Hook(Object* object, Type* type, Style* style, const string& label, const string& image, const Trigger& trigger)
-		: Button(style, label, image, trigger)
+		: Button(label, image, trigger, style)
 		, mObject(object)
 		, mObjectType(type)
 	{}

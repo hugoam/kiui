@@ -28,7 +28,7 @@ namespace mk
 	{
 		Sheet::build();
 		if(!mActive)
-			mFrame->hide();
+			this->hide();
 		else
 			mHeader->activate();
 	}
@@ -58,7 +58,7 @@ namespace mk
 
 		if(mDownTabs)
 			mFrame->as<Stripe>()->move(0, 1);
-		mHeaders->frame()->hide();
+		mHeaders->hide();
 	}
 
 	Widget* WTabber::vappend(unique_ptr<Widget> widget)
@@ -69,10 +69,7 @@ namespace mk
 		if(!mCurrentTab)
 			mCurrentTab = tab;
 		else if(mTabs->contents().size() == 2)
-		{
-			mHeaders->frame()->show();
-			mTabs->contents().at(0)->reset(WTab::styleCls());
-		}
+			mHeaders->show();
 
 		return tab->append(std::move(widget));
 	}
@@ -91,10 +88,7 @@ namespace mk
 		if(mTabs->contents().size() > 0)
 			this->showTab(size_t(0));
 		if(mTabs->contents().size() == 1)
-		{
-			mHeaders->frame()->hide();
-			mTabs->contents().at(0)->reset(WTab::styleCls()); // was onlytab
-		}
+			mHeaders->hide();
 
 		return unique;
 	}
@@ -108,17 +102,17 @@ namespace mk
 	{
 		if(mCurrentTab)
 		{
-			mCurrentTab->frame()->hide();
+			mCurrentTab->hide();
 			mCurrentTab->header()->deactivate();
 		}
-		tab->frame()->show();
+		tab->show();
 		tab->header()->activate();
 		mCurrentTab = tab;
 	}
 
 	void WTabber::showTab(size_t index)
 	{
-		this->showTab(mTabs->contents().at(index)->as<WTab>());
+		this->showTab(mTabs->at(index)->as<Sheet>()->at(0)->as<WTab>());
 	}
 
 	Tabber::Tabber()

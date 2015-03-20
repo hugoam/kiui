@@ -25,7 +25,7 @@ namespace mk
 		typedef std::function<void(Button*)> Trigger;
 
 	public:
-		Button(Style* style, const string& label, const string& image = "", const Trigger& trigger = nullptr);
+		Button(const string& label, const string& image = "", const Trigger& trigger = nullptr, Style* style = nullptr);
 
 		virtual void trigger() { mTrigger(this); }
 		virtual void triggerAlt() { this->trigger(); }
