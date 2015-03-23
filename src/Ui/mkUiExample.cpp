@@ -71,7 +71,7 @@ namespace mk
 
 	Table* createUiTestTableAlt(Form* parent)
 	{
-		Table* table = parent->makeappend<Table>(StringVector(), std::vector<float>({ 0.33f, 0.33f, 0.33f }));
+		Table* table = parent->makeappend<Table>(StringVector({ "Column 0", "Column 1", "Column 3" }), std::vector<float>({ 0.33f, 0.33f, 0.33f }));
 
 		table->makeappend<LabelList>(StringVector({ "Hello", "ImGui", "World!" }));
 		table->makeappend<ButtonList>(StringVector({ "Banana", "Apple", "Corniflower" }));
@@ -89,23 +89,22 @@ namespace mk
 		box2->makeappend<Label>("Blah blah blah");
 
 
-		/*ImGui::Columns(1);
-		ImGui::Separator();
-		ImGui::Columns(2, "multiple components");
-		static float foo = 1.0f;
-		ImGui::InputFloat("red", &foo, 0.05f, 0, 3); ImGui::NextColumn();
-		static float bar = 1.0f;
-		ImGui::InputFloat("blue", &bar, 0.05f, 0, 3); ImGui::NextColumn();
-		ImGui::Columns(1);
-		ImGui::Separator();
-		ImGui::Columns(2, "word wrapping");
-		ImGui::TextWrapped("The quick brown fox jumps over the lazy dog.");
-		ImGui::Text("Hello Left");
-		ImGui::NextColumn();
-		ImGui::TextWrapped("The quick brown fox jumps over the lazy dog.");
-		ImGui::Text("Hello Right");
-		ImGui::Columns(1);
-		ImGui::Separator();*/
+		table = parent->makeappend<Table>(StringVector({ "Left", "Right" }), std::vector<float>({ 0.5f, 0.5f }));
+
+		line = table->makeappend<List>();
+
+		line->makeappend<InputFloat>("Red", 0.05f);
+		line->makeappend<InputFloat>("Blue", 0.05f);
+
+		line = table->makeappend<List>();
+
+		line->makeappend<Textbox>("The quick brown fox jumps over the lazy dog.");
+		line->makeappend<Textbox>("The quick brown fox jumps over the lazy dog.");
+
+		line = table->makeappend<List>();
+
+		line->makeappend<Label>("Hello Left");
+		line->makeappend<Label>("Hello Right");
 
 		return table;
 	}
@@ -119,11 +118,11 @@ namespace mk
 
 		for(size_t i = 0; i < 5; i++)
 		{
-			TreeNode* node = tree->makeappend<TreeNode>(nullptr, tree);
-			node->setName("Child " + toString(i));
+			TreeNode* innernode = node->makeappend<TreeNode>(nullptr, tree);
+			innernode->setName("Child " + toString(i));
 
-			node->makeappend<Label>("Blah blah");
-			node->makeappend<Button>("Print");
+			innernode->makeappend<Label>("Blah blah");
+			innernode->makeappend<Button>("Print");
 		}
 
 		return tree;
@@ -131,40 +130,29 @@ namespace mk
 
 	Tree* createUiTestTableTree(Form* parent)
 	{
-		return nullptr;
+		Tree* tree = parent->makeappend<Tree>(nullptr);
 
-		/*if(ImGui::TreeNode("Inside a tree.."))
-		{
-			if(ImGui::TreeNode("node 1 (with borders)"))
-			{
-				ImGui::Columns(4);
-				ImGui::Text("aaa"); ImGui::NextColumn();
-				ImGui::Text("bbb"); ImGui::NextColumn();
-				ImGui::Text("ccc"); ImGui::NextColumn();
-				ImGui::Text("ddd"); ImGui::NextColumn();
-				ImGui::Text("eee"); ImGui::NextColumn();
-				ImGui::Text("fff"); ImGui::NextColumn();
-				ImGui::Text("ggg"); ImGui::NextColumn();
-				ImGui::Text("hhh"); ImGui::NextColumn();
-				ImGui::Columns(1);
-				ImGui::TreePop();
-			}
-			if(ImGui::TreeNode("node 2 (without borders)"))
-			{
-				ImGui::Columns(4, NULL, false);
-				ImGui::Text("aaa"); ImGui::NextColumn();
-				ImGui::Text("bbb"); ImGui::NextColumn();
-				ImGui::Text("ccc"); ImGui::NextColumn();
-				ImGui::Text("ddd"); ImGui::NextColumn();
-				ImGui::Text("eee"); ImGui::NextColumn();
-				ImGui::Text("fff"); ImGui::NextColumn();
-				ImGui::Text("ggg"); ImGui::NextColumn();
-				ImGui::Text("hhh"); ImGui::NextColumn();
-				ImGui::Columns(1);
-				ImGui::TreePop();
-			}
-			ImGui::TreePop();
-		}*/
+		TreeNode* node = tree->makeappend<TreeNode>(nullptr, tree);
+		node->setName("Inside a tree...");
+
+		node = node->makeappend<TreeNode>(nullptr, tree);
+		node->setName("node 1 (with borders)");
+
+		TableNode* tablenode = node->makeappend<TableNode>(nullptr, tree);
+		
+		tablenode->makeappend<Label>("aaa");
+		tablenode->makeappend<Label>("bbb");
+		tablenode->makeappend<Label>("ccc");
+		tablenode->makeappend<Label>("ddd");
+
+		tablenode = node->makeappend<TableNode>(nullptr, tree);
+
+		tablenode->makeappend<Label>("eee");
+		tablenode->makeappend<Label>("fff");
+		tablenode->makeappend<Label>("ggg");
+		tablenode->makeappend<Label>("hhh");
+
+		return tree;
 	}
 
 	Textbox* createUiTestMarkupText(Form* parent)
@@ -241,6 +229,48 @@ namespace mk
 		return table;
 	}
 
+	Form* createUiTestImageSkin(Form* parent)
+	{
+		Styler* styler = parent->uiWindow()->styler();
+
+		styler->dynamicStyle("tlookwindow");
+		styler->fetchStyle("tlookwindow")->inheritLayout(WWindow::styleCls());
+
+		styler->dynamicStyle("tlookwindowheader");
+		styler->fetchStyle("tlookwindowheader")->inheritLayout(WWindowHeader::styleCls());
+		styler->fetchStyle("tlookwindowheader")->layout()->d_sizing[DIM_Y] = FIXED;
+		styler->fetchStyle("tlookwindowheader")->layout()->d_size[DIM_Y] = 30.f;
+		styler->fetchStyle("tlookwindowheader")->skin()->mImageSkin = ImageSkin("tlookhead");
+		styler->fetchStyle("tlookwindowheader")->skin()->mEmpty = false;
+
+		styler->dynamicStyle("tlookwindowbody");
+		styler->fetchStyle("tlookwindowbody")->inheritLayout(WWindowBody::styleCls());
+		styler->fetchStyle("tlookwindowbody")->layout()->d_padding = BoxFloat(20.f, 10.f, 10.f, 10.f);
+		styler->fetchStyle("tlookwindowbody")->skin()->mImageSkin = ImageSkin("tlook");
+		styler->fetchStyle("tlookwindowbody")->skin()->mMargin = BoxFloat(10.f, -5.f, 5.f, 0.f);
+		styler->fetchStyle("tlookwindowbody")->skin()->mEmpty = false;
+
+		styler->dynamicStyle("tlookbutton");
+		styler->fetchStyle("tlookbutton")->inheritLayout(WButton::styleCls());
+		styler->fetchStyle("tlookbutton")->skin()->mTextColour = Colour::White;
+		styler->fetchStyle("tlookbutton")->skin()->mImageSkin = ImageSkin("tlookbutton");
+		styler->fetchStyle("tlookbutton")->skin()->mPadding = DimFloat(20.f, 8.f);
+		styler->fetchStyle("tlookbutton")->skin()->mEmpty = false;
+
+		styler->dynamicStyle("tlooksection");
+		styler->fetchStyle("tlooksection")->inheritLayout(PartitionX::styleCls());
+
+		styler->override(styler->fetchStyle("tlooksection"), WWindow::styleCls(), styler->fetchStyle("tlookwindow"));
+		styler->override(styler->fetchStyle("tlooksection"), WWindowHeader::styleCls(), styler->fetchStyle("tlookwindowheader"));
+		styler->override(styler->fetchStyle("tlooksection"), WWindowBody::styleCls(), styler->fetchStyle("tlookwindowbody"));
+		styler->override(styler->fetchStyle("tlooksection"), WButton::styleCls(), styler->fetchStyle("tlookbutton"));
+
+		Form* overrider = parent->makeappend<Form>(styler->fetchStyle("tlooksection"));
+		createUiTestWindow(overrider);
+
+		return overrider;
+	}
+
 	Form* createUiTestInlineControls(Form* parent)
 	{
 		Form* div = parent->makeappend<DivY>();
@@ -277,25 +307,29 @@ namespace mk
 		return div;
 	}
 
+	Form* createUiTestProgressDialog(Form* parent)
+	{
+		Dialog* dialog = parent->makeappend<Dialog>();
+		ProgressBar* bar = dialog->makeappend<ProgressBar>();
+		bar->widget()->as<WProgressBar>()->setPercentage(0.57f);
+		return dialog;
+	}
+
 	Window* createUiTestWindow(Form* parent)
 	{
-		unique_ptr<Form> boardpt = make_unique<DivY>();
+		unique_ptr<Form> boardpt = make_unique<ScrollDivY>();
 
 		Window* window = parent->makeappend<Window>(std::move(boardpt));
 		WWindow* wwindow = window->widget()->as<WWindow>();
 
-		//wwindow->setMovable();
-		//wwindow->setResizable();
+		wwindow->setMovable();
+		wwindow->setResizable();
 
 		Form* board = window->child(0);
 
 		board->setName("kiUi Test");
 
 		board->makeappend<Label>("kiui says hello.");
-		board->makeappend<Button>("I'm a TaharezLook button."); // "ceguibutton"
-
-		// @todo Add Styling : Size : 550, 680
-		// @todo Add Styling : Table : 0.65f, 0.35f
 
 		Form* current;
 

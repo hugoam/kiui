@@ -47,9 +47,7 @@ namespace mk
  	}
 
 	Frame::~Frame()
-	{
-		d_inkbox->hide(); // Destroys the inkboxes before the layer so that we don't try to destroy unexisting inkboxes (crash)
-	}
+	{}
 
 	FrameType Frame::frameType()
 	{

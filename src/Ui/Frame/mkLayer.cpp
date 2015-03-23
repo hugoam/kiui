@@ -29,6 +29,8 @@ namespace mk
 
 	Layer::~Layer()
 	{
+		d_inkbox.reset(); // destroy the inkbox before the layer
+
 		if(d_parent)
 			d_parent->layer()->layers().erase(std::remove(d_parent->layer()->layers().begin(), d_parent->layer()->layers().end(), this), d_parent->layer()->layers().end());
 	}

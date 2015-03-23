@@ -68,7 +68,7 @@ namespace mk
 
 		if(!mCurrentTab)
 			mCurrentTab = tab;
-		else if(mTabs->contents().size() == 2)
+		else if(mTabs->count() == 2)
 			mHeaders->show();
 
 		return tab->append(std::move(widget));
@@ -85,9 +85,9 @@ namespace mk
 		tab->header()->destroy();
 		tab->destroy();
 
-		if(mTabs->contents().size() > 0)
+		if(mTabs->count() > 0)
 			this->showTab(size_t(0));
-		if(mTabs->contents().size() == 1)
+		if(mTabs->count() == 1)
 			mHeaders->hide();
 
 		return unique;
@@ -112,7 +112,7 @@ namespace mk
 
 	void WTabber::showTab(size_t index)
 	{
-		this->showTab(mTabs->at(index)->as<Sheet>()->at(0)->as<WTab>());
+		this->showTab(mTabs->at(index)->as<WTab>());
 	}
 
 	Tabber::Tabber()

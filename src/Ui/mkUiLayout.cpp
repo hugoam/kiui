@@ -81,15 +81,15 @@ namespace mk
 		mOverrides[stem->id()].back().mOverride = overrideWith;
 	}
 
-	InkStyle* Styler::dynamicSkin(const string& name, Colour colour)
+	Style* Styler::dynamicStyle(const string& name)
 	{
-		mDynamicSkins.add(make_unique<InkStyle>(name, colour, Colour(1.f, 1.f, 1.f)));
-		return mDynamicSkins.findNamed(name);
+		mDynamicStyles.add(make_unique<Style>(name));
+		return mDynamicStyles.findNamed(name);
 	}
 
-	InkStyle* Styler::fetchSkin(const string& name)
+	Style* Styler::fetchStyle(const string& name)
 	{
-		return mDynamicSkins.findNamed(name);
+		return mDynamicStyles.findNamed(name);
 	}
 
 	void setupUiLayout(Styler* styler)
@@ -116,6 +116,9 @@ namespace mk
 		DivY::styleCls()->layout()->d_layoutDim = DIM_Y;
 		DivY::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
 
+		ScrollDivY::styleCls()->layout()->d_layoutDim = DIM_X;
+		ScrollDivY::styleCls()->layout()->d_sizing = DimSizing(EXPAND, EXPAND);
+
 		WrapY::styleCls()->layout()->d_layoutDim = DIM_Y;
 		WrapY::styleCls()->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
 
@@ -124,6 +127,10 @@ namespace mk
 
 		Control::styleCls()->layout()->d_opacity = _OPAQUE;
 		Control::styleCls()->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
+
+		Dialog::styleCls()->layout()->d_layoutDim = DIM_Y;
+		Dialog::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
+		Dialog::styleCls()->layout()->d_padding = BoxFloat(15.f, 15.f, 8.f, 8.f);
 
 		WWindow::styleCls()->layout()->d_flow = MANUAL;
 		WWindow::styleCls()->layout()->d_opacity = _OPAQUE;
@@ -137,7 +144,7 @@ namespace mk
 
 		// Layouts
 
-		styler->inheritLayout(StyleVector({ WButton::styleCls() }), Control::styleCls());
+		styler->inheritLayout(StyleVector({ WButton::styleCls(), WCheckbox::styleCls() }), Control::styleCls());
 		styler->inheritLayout(StyleVector({ WColumnHeader::styleCls(), WTabHeader::styleCls(), WRadioChoice::styleCls() }), Control::styleCls());
 		styler->inheritLayout(StyleVector({ WTreeNodeToggle::styleCls(), WExpandboxToggle::styleCls(), WDropdownToggle::styleCls(), WCloseButton::styleCls() }), Control::styleCls());
 		styler->inheritLayout(StyleVector({ WSliderKnobX::styleCls(), WSliderKnobY::styleCls() }), Control::styleCls());
@@ -181,10 +188,11 @@ namespace mk
 		WTableHead::styleCls()->layout()->d_opacity = _OPAQUE;
 		WColumnHeader::styleCls()->layout()->d_opacity = _VOID;
 
-		WTab::styleCls()->layout()->d_overflow = SCROLL;
 		WTree::styleCls()->layout()->d_overflow = SCROLL;
 		List::styleCls()->layout()->d_overflow = SCROLL;
-		WWindowBody::styleCls()->layout()->d_overflow = SCROLL;
+
+		WTree::styleCls()->layout()->d_layoutDim = DIM_X;
+		List::styleCls()->layout()->d_layoutDim = DIM_X;
 
 		List::styleCls()->layout()->d_sizing = DimSizing(CAPPED, CAPPED);
 		
@@ -230,8 +238,6 @@ namespace mk
 
 		WDropdownToggle::styleCls()->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
 
-		//GridSheet::styleCls()->layout()->d_layoutDim = DIM_X;
-
 		WTab::styleCls()->layout()->d_padding = BoxFloat(0.f, 4.f, 0.f, 0.f);
 
 
@@ -244,6 +250,7 @@ namespace mk
 
 		WWindowBody::styleCls()->layout()->d_padding = BoxFloat(4.f);
 
+		WCheckbox::styleCls()->layout()->d_sizing = DimSizing(FIXED, FIXED);
 		WCheckbox::styleCls()->layout()->d_size = DimFloat(15.f, 15.f);
 
 		Cursor::styleCls()->skin()->mImage = "mousepointer.png";
@@ -284,6 +291,7 @@ namespace mk
 		WImgButton::styleCls()->inheritSkins(WButton::styleCls());
 		WImgButton::styleCls()->decline(ENABLED)->mBackgroundColour = Colour::Transparent;
 
+		//WToggle::styleCls()->inheritSkins(WButton::styleCls());
 		Hook::styleCls()->inheritSkins(WButton::styleCls());
 		WTabHeader::styleCls()->inheritSkins(WButton::styleCls());
 		WColumnHeader::styleCls()->inheritSkins(WButton::styleCls());
@@ -329,7 +337,7 @@ namespace mk
 		Header::styleCls()->layout()->d_padding = BoxFloat(6.f, 6.f, 6.f, 6.f);
 
 		WWindow::styleCls()->skin()->mBackgroundColour = Colour::AlphaGrey;
-		WDockWindow::styleCls()->skin()->mBackgroundColour = Colour::Black;
+		WDockWindow::styleCls()->skin()->mBackgroundColour = Colour::DarkGrey;
 		WWindowHeader::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
 
 		WTab::styleCls()->skin()->mBackgroundColour = Colour::Red;
@@ -355,32 +363,9 @@ namespace mk
 		WDropdownBox::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
 
 		WCheckbox::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
+		WCheckbox::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
 		WCheckbox::styleCls()->decline(ACTIVATED)->mBackgroundColour = Colour::LightGrey;
 
-		//skinner->add(StringVector({ "int", "float", "string", "bool" }), "typein");
-
-		/*skinner->add("tlookwindow", Colour::Transparent);
-
-		skinner->add("tlookwindowheader", Colour::Transparent);
-		skinner->skin("tlookwindowheader")->mImageSkin = ImageSkin("tlookhead");
-
-		skinner->add("tlookwindowbody", Colour::Transparent);
-		skinner->skin("tlookwindowbody")->mImageSkin = ImageSkin("tlook");
-		skinner->skin("tlookwindowbody")->mMargin = BoxFloat(10.f, -5.f, 5.f, 0.f);
-
-		skinner->add("ceguibutton", Colour::Transparent);
-		skinner->skin("ceguibutton")->mImageSkin = ImageSkin("tlookbutton");
-		skinner->skin("ceguibutton")->mPadding = DimFloat(20.f, 8.f);*/
-
-
-		/*layout->add("tlookwindowbody", "windowbody");
-		Wtlookwindowbody::styleCls()->layout()->d_padding = BoxFloat(20.f, 10.f, 10.f, 10.f);
-
-		layout->add("tlookwindowheader", "windowheader");
-		Wtlookwindowheader::styleCls()->layout()->d_sizing[DIM_Y] = FIXED;
-		Wtlookwindowheader::styleCls()->layout()->d_size[DIM_Y] = 30.f;
-
-		layout->addOverride("uieditboard", "windowheader", "tlookwindowheader");
-		layout->addOverride("uieditboard", "windowbody", "tlookwindowbody");*/
+		styler->override(WTable::styleCls(), List::styleCls(), DivX::styleCls());
 	}
 }

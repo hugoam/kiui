@@ -22,7 +22,6 @@ namespace mk
 
 	void WTableHead::gridResized(Widget* first, Widget* second)
 	{
-		std::cerr << "TableHead :: gridResized first " << first->frame()->dspan(DIM_X) << " second " << second->frame()->dspan(DIM_X) << std::endl;
 		mParent->stripe()->weights()[first->frame()->index()] = first->frame()->dspan(DIM_X);
 		mParent->stripe()->weights()[second->frame()->index()] = second->frame()->dspan(DIM_X);
 		mParent->stripe()->markRelayout();

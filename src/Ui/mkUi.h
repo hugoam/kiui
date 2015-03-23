@@ -18,7 +18,9 @@ namespace mk
 	MK_UI_EXPORT Table* createUiTestTableAlt(Form* parent);
 	MK_UI_EXPORT Tree* createUiTestTree(Form* parent);
 	MK_UI_EXPORT Form* createUiTestControls(Form* parent);
+	MK_UI_EXPORT Form* createUiTestProgressDialog(Form* parent);
 	MK_UI_EXPORT Window* createUiTestWindow(Form* parent);
+	MK_UI_EXPORT Form* createUiTestImageSkin(Form* parent);
 }
 
 #endif // MK_UI_H_INCLUDED

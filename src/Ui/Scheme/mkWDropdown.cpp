@@ -70,7 +70,7 @@ namespace mk
 
 	void WDropdown::dropdown()
 	{
-		if(mDropbox->contents().size() == 0)
+		if(mDropbox->count() == 0)
 			return;
 
 		mDropbox->show();

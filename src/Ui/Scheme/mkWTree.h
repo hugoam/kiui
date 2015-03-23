@@ -51,7 +51,7 @@ namespace mk
 		using Styled<WTreeNode>::styleCls;
 	};
 
-	class MK_UI_EXPORT _I_ WTree : public Sheet, public Typed<WTree, Widget>, public Styled<WTree>
+	class MK_UI_EXPORT _I_ WTree : public ScrollSheet, public Typed<WTree, Widget>, public Styled<WTree>
 	{
 	public:
 		WTree(Form* form, const Trigger& trigger);
@@ -72,6 +72,19 @@ namespace mk
 	public:
 		TreeNode(Object* object, Tree* tree, bool collapsed = false);
 		~TreeNode();
+
+		Object* object() { return mObject; }
+
+	protected:
+		Object* mObject;
+		Tree* mTree;
+	};
+
+	class MK_UI_EXPORT TableNode : public Form
+	{
+	public:
+		TableNode(Object* object, Tree* tree, bool collapsed = false);
+		~TableNode();
 
 		Object* object() { return mObject; }
 

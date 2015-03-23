@@ -55,7 +55,7 @@ namespace mk
 	}
 
 	WTree::WTree(Form* form, const Trigger& trigger)
-		: Sheet(styleCls(), form)
+		: ScrollSheet(styleCls(), form)
 		, mRootNode(nullptr)
 		, mSelected(nullptr)
 		, mOnSelected(trigger)
@@ -107,6 +107,15 @@ namespace mk
 	{
 		mTree->removeNode(mObject, this);
 	}
+
+	TableNode::TableNode(Object* object, Tree* tree, bool collapsed)
+		: Form(nullptr, "", [this]() { return make_unique<WTreeNode>(this, "", this->name()); })
+		, mObject(object)
+		, mTree(tree)
+	{}
+
+	TableNode::~TableNode()
+	{}
 
 	Tree::Tree(std::function<void(Object*)> onSelected, Style* style)
 		: Form(style ? style : styleCls(), "", [this]() { return make_unique<WTree>(this, std::bind(&Tree::selected, this, _1)); })

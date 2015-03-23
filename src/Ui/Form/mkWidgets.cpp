@@ -6,9 +6,9 @@
 #include <Ui/Form/mkWidgets.h>
 
 #include <Ui/Widget/mkWTextbox.h>
+#include <Ui/Widget/mkWProgressBar.h>
 
 #include <Object/String/mkStringConvert.h>
-#include <Object/mkStem.h>
 
 #include <Object/Image/mkImage.h>
 
@@ -34,12 +34,20 @@ namespace mk
 		: Form(styleCls(), "", mapper)
 	{}
 
+	ScrollDivY::ScrollDivY()
+		: Form(styleCls(), "", [this](){ return make_unique<ScrollSheet>(nullptr, this); })
+	{}
+
 	PartitionX::PartitionX(SchemeMapper mapper)
 		: Form(styleCls(), "", mapper)
 	{}
 
 	PartitionY::PartitionY(SchemeMapper mapper)
 		: Form(styleCls(), "", mapper)
+	{}
+
+	Dialog::Dialog()
+		: Form(styleCls())
 	{}
 
 	Header::Header(SchemeMapper mapper)
@@ -87,12 +95,9 @@ namespace mk
 	DynamicImage::~DynamicImage()
 	{}
 
-	ProgressBar::ProgressBar(Style* style, AutoStat<float> stat)
-		: Form(style)
-		, mStat(stat)
-		, mValueLabel(this->makeappend<Label>(toString(mStat.value())))
+	ProgressBar::ProgressBar()
+		: Form(nullptr, "", [](){ return make_unique<WProgressBarX>(); })
 	{
 		mType = cls();
-		//this->update();
 	}
 }

@@ -40,11 +40,11 @@ namespace mk
 
 		Style* fetchOverride(Style* style, Style* overrider);
 
-		InkStyle* dynamicSkin(const string& name, Colour colour);
-		InkStyle* fetchSkin(const string& name);
+		Style* dynamicStyle(const string& name);
+		Style* fetchStyle(const string& name);
 
 	protected:
-		Named<Registry<InkStyle>> mDynamicSkins;
+		Named<Registry<Style>> mDynamicStyles;
 		std::vector<std::vector<StyleOverride>> mOverrides;
 	};
 

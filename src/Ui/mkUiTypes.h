@@ -22,6 +22,7 @@
 #include <Ui/Widget/mkWButton.h>
 #include <Ui/Widget/mkWSlider.h>
 #include <Ui/Widget/mkWScrollbar.h>
+#include <Ui/Widget/mkWProgressBar.h>
 #include <Ui/Widget/mkWCheckbox.h>
 #include <Ui/Widget/mkWTypeIn.h>
 
@@ -36,6 +37,7 @@
 #include <Ui/Frame/mkDimString.h>
 
 #include <Ui/mkUiWindow.h>
+#include <Ui/mkUiLayout.h>
 
 namespace mk
 {

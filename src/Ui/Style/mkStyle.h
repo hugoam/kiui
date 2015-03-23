@@ -102,10 +102,11 @@ namespace mk
 	class MK_UI_EXPORT _I_ Style : public IdStruct, public Indexed<Style>, public NonCopy
 	{
 	public:
-		Style(Type* type = nullptr);
+		Style(Type* type);
+		Style(const string& name);
 		~Style();
 
-		_A_ const string& name() { return mStyleType->name(); }
+		_A_ const string& name() { return mName.empty() ? mStyleType->name() : mName; }
 		_A_ LayoutStyle* layout() { return &mLayout; }
 		_A_ InkStyle* skin() { return &mSkin; }
 
@@ -120,6 +121,7 @@ namespace mk
 
 	protected:
 		Type* mStyleType;
+		string mName;
 		LayoutStyle mLayout;
 		InkStyle mSkin;
 		StyleMap mSubskins;

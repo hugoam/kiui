@@ -59,6 +59,14 @@ namespace mk
 
 		using Typed<DivY, Form>::cls;
 	};
+	
+	class MK_UI_EXPORT _I_ ScrollDivY : public Form, public Typed<ScrollDivY, Form>, public Styled<ScrollDivY>
+	{
+	public:
+		ScrollDivY();
+
+		using Typed<ScrollDivY, Form>::cls;
+	};
 
 	class MK_UI_EXPORT _I_ PartitionX : public Form, public Typed<PartitionX, Form>, public Styled<PartitionX>
 	{
@@ -74,6 +82,14 @@ namespace mk
 		PartitionY(SchemeMapper mapper = nullptr);
 
 		using Typed<PartitionY, Form>::cls;
+	};
+
+	class MK_UI_EXPORT _I_ Dialog : public Form, public Typed<Dialog, Form>, public Styled<Dialog>
+	{
+	public:
+		Dialog();
+
+		using Typed<Dialog, Form>::cls;
 	};
 
 	class MK_UI_EXPORT _I_ Header : public Form, public Typed<Header, Form>, public Styled<Header>
@@ -128,7 +144,7 @@ namespace mk
 	class MK_UI_EXPORT ProgressBar : public Form, public Typed<ProgressBar, Form>
 	{
 	public:
-		ProgressBar(Style* style, AutoStat<float> stat);
+		ProgressBar();
 
 		using Typed<ProgressBar, Form>::cls;
 

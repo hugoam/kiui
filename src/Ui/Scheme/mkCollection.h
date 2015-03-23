@@ -171,7 +171,7 @@ namespace mk
 	class VectorCollection : public Collection, public VectorObserver<R, T>
 	{
 	public:
-		VectorCollection(Form* form, std::vector<R>& vector, FormMapper mapper)
+		VectorCollection(Form* form, const std::vector<R>& vector, FormMapper mapper)
 			: Collection(form, mapper)
 			, VectorObserver<R, T>(vector)
 		{}

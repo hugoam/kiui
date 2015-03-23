@@ -50,7 +50,7 @@ namespace mk
 	{
 		this->rootSheet()->append(this->vrelease(window));
 
-		if(mTabs->contents().size() == 0)
+		if(mTabs->count() == 0)
 			mDockline->removeSection(this);
 	}
 
@@ -62,7 +62,7 @@ namespace mk
 
 		if(mDockline->dim() == dim)
 		{
-			mDockline->stripe()->weights()[mFrame->index()] -= span;
+			mFrame->setSpanDim(mDockline->dim(), mFrame->dspan(mDockline->dim()) - span);
 			return mDockline->insertSection(mFrame->index() + (after ? 1 : 0), nullptr, span);
 		}
 		else
@@ -136,12 +136,11 @@ namespace mk
 	{
 		Frame* givespan = section->frame()->index() > 0 ? section->prev()->frame() : section->next()->frame();
 		givespan->setSpanDim(mDim, givespan->dspan(mDim) + section->frame()->dspan(mDim));
-		this->stripe()->markRelayout();
 
 		section->destroy();
 
-		if(mContents.size() == 1)
-			mParent->as<WDockline>()->removeLine(this);
+		if(mContents.size() == 1 && mDockline)
+			mDockline->removeLine(this);
 	}
 
 	void WDockline::removeLine(WDockline* line)
@@ -152,8 +151,8 @@ namespace mk
 
 		line->destroy();
 
-		if(mContents.size() == 1)
-			mParent->as<WDockline>()->removeLine(this);
+		if(mContents.size() == 1 && mDockline)
+			mDockline->removeLine(this);
 	}
 
 	WDockline* WDockline::findLine(std::vector<string>& ids)
@@ -164,8 +163,8 @@ namespace mk
 		while(ids.size() > 1)
 		{
 			size_t index = fromString<size_t>(ids.back());
-			if(index < dockline->contents().size())
-				dockline = dockline->contents().at(index)->as<WDockline>();
+			if(index < dockline->count())
+				dockline = dockline->at(index)->as<WDockline>();
 			else
 				dockline = dockline->insertLine(index);
 			ids.pop_back();
@@ -182,8 +181,8 @@ namespace mk
 		WDockline* dockline = this->findLine(ids);
 
 		size_t index = fromString<size_t>(ids.back());
-		if(index < dockline->contents().size())
-			return dockline->contents().at(index)->as<WDocksection>();
+		if(index < dockline->count())
+			return dockline->at(index)->as<WDocksection>();
 		else
 			return dockline->insertSection(index, style);
 	}

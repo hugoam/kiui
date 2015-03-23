@@ -27,7 +27,7 @@ namespace mk
 		: List()
 	{
 		for(string& label : labels)
-			this->makeappend<Label>(label);
+			this->makeappend<Button>(label);
 	}
 
 	SortList::SortList(Style* style)
