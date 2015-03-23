@@ -33,21 +33,20 @@ namespace mk
 		, mParent(nullptr)
 		, mStyle(style)
 		, mFrame(nullptr)
-		, mState(ENABLED)
+		, mState(NOSTATE)
 		, mForm(form)
 	{
 		if(!mStyle && form)
 			mStyle = form->style();
-
-		if(!mStyle)
-			int i = 0;
 	}
 
 	Widget::~Widget()
 	{
-		if(mState == HOVERED)
+		if(mState & MODAL)
+			this->rootSheet()->modalOff();
+		if(mState & HOVERED)
 			this->rootSheet()->unhover();
-		if(mState == FOCUSED)
+		if(mState & FOCUSED)
 			this->rootSheet()->deactivate(this);
 	}
 
@@ -214,9 +213,9 @@ namespace mk
 		mFrame->setDirty(Frame::DIRTY_WIDGET);
 	}
 
-	void Widget::updateState(WidgetState state)
+	void Widget::toggleState(WidgetState state)
 	{
-		mState = state;
+		mState = static_cast<WidgetState>(mState ^ state);
 		mFrame->updateState(mState);
 	}
 
@@ -235,7 +234,7 @@ namespace mk
 
 	Widget* Widget::pinpoint(float x, float y, bool modal)
 	{
-		if(mState >= PRESSED)
+		if(mState & PRESSED)
 			return this;
 
 		Frame* target = mFrame->pinpoint(x, y, true);
@@ -270,23 +269,23 @@ namespace mk
 
 	void Widget::activate()
 	{
-		this->updateState(ACTIVATED);
+		this->toggleState(ACTIVATED);
 	}
 
 	void Widget::deactivate()
 	{
-		this->updateState(ENABLED);
+		this->toggleState(ACTIVATED);
 	}
 
 	void Widget::focus()
 	{
-		this->updateState(FOCUSED);
+		this->toggleState(FOCUSED);
 		this->rootSheet()->activate(this);
 	}
 
 	void Widget::unfocus()
 	{
-		this->updateState(ENABLED);
+		this->toggleState(FOCUSED);
 		this->rootSheet()->deactivate(this);
 	}
 
@@ -294,20 +293,26 @@ namespace mk
 	{
 		this->rootSheet()->cursor()->hover(this);
 
-		if(mState == ACTIVATED)
-			this->updateState(ACTIVATED_HOVERED);
-		else
-			this->updateState(HOVERED);
+		this->toggleState(HOVERED);
 	}
 	
 	void Widget::unhover()
 	{
 		this->rootSheet()->cursor()->unhover(this);
 
-		if(mState == ACTIVATED_HOVERED || mState == ACTIVATED)
-			this->updateState(ACTIVATED);
-		else
-			this->updateState(ENABLED);
+		this->toggleState(HOVERED);
+	}
+
+	void Widget::modal()
+	{
+		this->rootSheet()->modalOn(this);
+		this->toggleState(MODAL);
+	}
+
+	void Widget::unmodal()
+	{
+		this->rootSheet()->modalOff();
+		this->toggleState(MODAL);
 	}
 
 	bool Widget::mouseEntered(float x, float y)
@@ -327,14 +332,14 @@ namespace mk
 
 	bool Widget::mouseMoved(float xPos, float yPos, float xDif, float yDif)
 	{
-		if(mState == DRAGGED)
+		if(mState & DRAGGED)
 		{
 			this->leftDrag(xPos, yPos, xDif, yDif);
 		}
-		else if(mState == PRESSED && (abs(xPos - this->rootSheet()->lastPressedX()) > 8.f || abs(yPos - this->rootSheet()->lastPressedY()) > 8.f))
+		else if(mState & PRESSED && (abs(xPos - this->rootSheet()->lastPressedX()) > 8.f || abs(yPos - this->rootSheet()->lastPressedY()) > 8.f))
 		{
 			this->leftDragStart(this->rootSheet()->lastPressedX(), this->rootSheet()->lastPressedY());
-			mState = DRAGGED;
+			this->toggleState(DRAGGED);
 			mFrame->setOpacity(_VOID);
 		}
 
@@ -343,18 +348,20 @@ namespace mk
 
 	bool Widget::mousePressed(float xPos, float yPos, MouseButton button)
 	{
-		this->rootSheet()->modalOn(this);
-		mState = PRESSED;
+		this->modal();
+		this->toggleState(PRESSED);
 		return true;
 	}
 
 	bool Widget::mouseReleased(float xPos, float yPos, MouseButton button)
 	{
-		this->rootSheet()->modalOff();
+		this->unmodal();
+		this->toggleState(PRESSED);
 
-		if(mState == DRAGGED)
+		if(mState & DRAGGED)
 		{
 			this->leftDragEnd(xPos, yPos);
+			this->toggleState(DRAGGED);
 			mFrame->setOpacity(_OPAQUE);
 		}
 		else if(button == LEFT_BUTTON)
@@ -362,7 +369,6 @@ namespace mk
 		else if(button == RIGHT_BUTTON)
 			this->rightClick(xPos, yPos);
 
-		mState = ENABLED;
 		return true;
 	}
 }

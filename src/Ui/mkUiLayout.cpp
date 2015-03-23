@@ -149,6 +149,7 @@ namespace mk
 		styler->inheritLayout(StyleVector({ WTreeNodeToggle::styleCls(), WExpandboxToggle::styleCls(), WDropdownToggle::styleCls(), WCloseButton::styleCls() }), Control::styleCls());
 		styler->inheritLayout(StyleVector({ WSliderKnobX::styleCls(), WSliderKnobY::styleCls() }), Control::styleCls());
 		styler->inheritLayout(StyleVector({ WScrollerKnobX::styleCls(), WScrollerKnobY::styleCls(), WScrollUp::styleCls(), WScrollDown::styleCls() }), Control::styleCls());
+		styler->inheritLayout(StyleVector({ WDir::styleCls(), WFile::styleCls() }), Control::styleCls());
 		styler->inheritLayout(StyleVector({ Label::styleCls(), Image::styleCls(), Hook::styleCls() }), Control::styleCls());
 
 		styler->inheritLayout(StyleVector({ WLabel::styleCls(), WTitle::styleCls() }), WrapX::styleCls());
@@ -159,13 +160,13 @@ namespace mk
 		styler->inheritLayout(StyleVector({ WExpandbox::styleCls(), WExpandboxBody::styleCls() }), DivY::styleCls());
 		styler->inheritLayout(StyleVector({ WTreeNode::styleCls(), WTreeNodeBody::styleCls() }), DivY::styleCls());
 		styler->inheritLayout(StyleVector({ WTabberHead::styleCls(), WTableHead::styleCls(), WWindowHeader::styleCls(), WExpandboxHeader::styleCls(), WTreeNodeHeader::styleCls() }), DivX::styleCls());
-		styler->inheritLayout(StyleVector({ Header::styleCls() }), DivX::styleCls());
+		styler->inheritLayout(StyleVector({ Sequence::styleCls(), Header::styleCls() }), DivX::styleCls());
 
 		styler->inheritLayout(StyleVector({ WSpacerX::styleCls(), WSpacerY::styleCls() }), PartitionX::styleCls());
 		styler->inheritLayout(StyleVector({ WDocklineX::styleCls(), WScrollSheet::styleCls() }), PartitionX::styleCls());
 		
 		styler->inheritLayout(StyleVector({ WDockspace::styleCls(), WDocksection::styleCls(), WDocklineY::styleCls() }), PartitionY::styleCls());
-		styler->inheritLayout(StyleVector({ WWindowBody::styleCls(), WTabber::styleCls(), WTabberBody::styleCls(), WTab::styleCls(), WTree::styleCls(), List::styleCls() }), PartitionY::styleCls());
+		styler->inheritLayout(StyleVector({ WWindowBody::styleCls(), WTabber::styleCls(), WTabberBody::styleCls(), WTab::styleCls(), WTree::styleCls(), WList::styleCls(), List::styleCls() }), PartitionY::styleCls());
 
 		styler->inheritLayout(StyleVector({ Tooltip::styleCls(), WContextMenu::styleCls() }), WrapY::styleCls());
 		
@@ -183,6 +184,11 @@ namespace mk
 		
 		styler->inheritLayout(StyleVector({ RootSheet::styleCls() }), PartitionY::styleCls());
 
+		styler->inheritLayout(StyleVector({ WDirectory::styleCls() }), WList::styleCls());
+
+		WFile::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
+		WDir::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
+
 		RootSheet::styleCls()->layout()->d_opacity = _OPAQUE;
 
 		WTableHead::styleCls()->layout()->d_opacity = _OPAQUE;
@@ -192,6 +198,7 @@ namespace mk
 		List::styleCls()->layout()->d_overflow = SCROLL;
 
 		WTree::styleCls()->layout()->d_layoutDim = DIM_X;
+		WList::styleCls()->layout()->d_layoutDim = DIM_X;
 		List::styleCls()->layout()->d_layoutDim = DIM_X;
 
 		List::styleCls()->layout()->d_sizing = DimSizing(CAPPED, CAPPED);
@@ -269,8 +276,8 @@ namespace mk
 		WExpandboxToggle::styleCls()->skin()->mImage = "arrow_down_15.png";
 		WExpandboxToggle::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
 		WExpandboxToggle::styleCls()->decline(ACTIVATED)->mImage = "arrow_right_15.png";
-		WExpandboxToggle::styleCls()->decline(ACTIVATED_HOVERED)->mImage = "arrow_right_15.png";
-		WExpandboxToggle::styleCls()->decline(ACTIVATED_HOVERED)->mBackgroundColour = Colour::Red;
+		WExpandboxToggle::styleCls()->decline(static_cast<WidgetState>(ACTIVATED | HOVERED))->mImage = "arrow_right_15.png";
+		WExpandboxToggle::styleCls()->decline(static_cast<WidgetState>(ACTIVATED | HOVERED))->mBackgroundColour = Colour::Red;
 
 		WTreeNodeToggle::styleCls()->inheritSkins(WExpandboxToggle::styleCls());
 
@@ -286,10 +293,10 @@ namespace mk
 		WButton::styleCls()->skin()->mPadding = DimFloat(2.f, 2.f);
 		WButton::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::LightGrey;
 		WButton::styleCls()->decline(ACTIVATED)->mBackgroundColour = Colour::Red;
-		WButton::styleCls()->decline(ACTIVATED_HOVERED)->mBackgroundColour = Colour::Red;
+		WButton::styleCls()->decline(static_cast<WidgetState>(ACTIVATED | HOVERED))->mBackgroundColour = Colour::Red;
 
 		WImgButton::styleCls()->inheritSkins(WButton::styleCls());
-		WImgButton::styleCls()->decline(ENABLED)->mBackgroundColour = Colour::Transparent;
+		WImgButton::styleCls()->skin()->mBackgroundColour = Colour::Transparent;
 
 		//WToggle::styleCls()->inheritSkins(WButton::styleCls());
 		Hook::styleCls()->inheritSkins(WButton::styleCls());
@@ -298,6 +305,9 @@ namespace mk
 		WDropdownChoice::styleCls()->inheritSkins(WButton::styleCls());
 		WRadioChoice::styleCls()->inheritSkins(WButton::styleCls());
 
+		WDir::styleCls()->inheritSkins(WButton::styleCls());
+		WFile::styleCls()->inheritSkins(WButton::styleCls());
+		
 		WSliderKnobX::styleCls()->inheritSkins(WSliderKnob::styleCls());
 		WSliderKnobY::styleCls()->inheritSkins(WSliderKnob::styleCls());
 
@@ -332,6 +342,7 @@ namespace mk
 
 		Tooltip::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
 
+		WList::styleCls()->skin()->mBackgroundColour = Colour::Black;
 		List::styleCls()->skin()->mBackgroundColour = Colour::Black;
 
 		Header::styleCls()->layout()->d_padding = BoxFloat(6.f, 6.f, 6.f, 6.f);

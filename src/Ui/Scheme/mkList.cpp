@@ -10,21 +10,31 @@
 
 namespace mk
 {
+	WList::WList(Form* form)
+		: ScrollSheet(styleCls(), form)
+	{}
+
 	List::List(Style* style)
+		: Form(style ? style : styleCls(), "", [this](){ return make_unique<WList>(this); })
+	{
+		mType = cls();
+	}
+
+	Sequence::Sequence(Style* style)
 		: Form(style ? style : styleCls())
 	{
 		mType = cls();
 	}
 
-	LabelList::LabelList(StringVector labels)
-		: List()
+	LabelSequence::LabelSequence(StringVector labels)
+		: Sequence()
 	{
 		for(string& label : labels)
 			this->makeappend<Label>(label);
 	}
 	
-	ButtonList::ButtonList(StringVector labels)
-		: List()
+	ButtonSequence::ButtonSequence(StringVector labels)
+		: Sequence()
 	{
 		for(string& label : labels)
 			this->makeappend<Button>(label);

@@ -90,8 +90,6 @@ namespace mk
 		float mXDragStart;
 		float mYDragStart;
 
-		Widget* mPressed;
-
 		Widget* mActiveFrame;
 		Widget* mContextMenu;
 

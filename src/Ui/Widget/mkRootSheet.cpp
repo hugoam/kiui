@@ -25,7 +25,6 @@ namespace mk
 	RootSheet::RootSheet(UiWindow* window, Form* form, bool absolute)
 		: Sheet(styleCls(), form)
 		, mWindow(window)
-		, mPressed(nullptr)
 		, mLeftPressed(false)
 		, mActiveFrame(this)
 		, mHovered(this)
@@ -221,8 +220,6 @@ namespace mk
 		while(receiver != this && !receiver->mousePressed(xPos, yPos, button))
 			receiver = receiver->propagateMouse(xPos, yPos);
 	
-		mPressed = static_cast<Widget*>(receiver);
-
 		return true;
 	}
 

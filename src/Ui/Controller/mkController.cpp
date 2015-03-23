@@ -41,19 +41,19 @@ namespace mk
 
 	void Controller::take(Widget* widget)
 	{
-		mWidget = widget;
-		mWidget->rootSheet()->takeControl(this);
+		mInputWidget = widget;
+		mInputWidget->rootSheet()->takeControl(this);
 	}
 
 	void Controller::stack(Widget* widget)
 	{
-		mWidget = widget;
-		mWidget->rootSheet()->stackControl(this);
+		mInputWidget = widget;
+		mInputWidget->rootSheet()->stackControl(this);
 	}
 
 	void Controller::yield()
 	{
-		mWidget->rootSheet()->yieldControl(this);
+		mInputWidget->rootSheet()->yieldControl(this);
 	}
 
 	bool Controller::keyUp(KeyCode keyCode, char c)

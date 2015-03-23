@@ -11,9 +11,18 @@
 #include <Ui/Scheme/mkScheme.h>
 #include <Ui/Form/mkForm.h>
 #include <Ui/Form/mkDropper.h>
+#include <Ui/Widget/mkSheet.h>
 
 namespace mk
 {
+	class MK_UI_EXPORT _I_ WList : public ScrollSheet, public Typed<WList, Widget>, public Styled<WList>
+	{
+	public:
+		WList(Form* form);
+
+		using Typed<WList, Widget>::cls;
+	};
+
 	class MK_UI_EXPORT List : public Form, public Typed<List, Form>, public Styled<List>
 	{
 	public:
@@ -22,16 +31,24 @@ namespace mk
 		using Typed<List, Form>::cls;
 	};
 
-	class MK_UI_EXPORT LabelList : public List
+	class MK_UI_EXPORT Sequence : public Form, public Typed<Sequence, Form>, public Styled<Sequence>
 	{
 	public:
-		LabelList(StringVector labels = StringVector());
+		Sequence(Style* style = nullptr);
+
+		using Typed<Sequence, Form>::cls;
 	};
 
-	class MK_UI_EXPORT ButtonList : public List
+	class MK_UI_EXPORT LabelSequence : public Sequence
 	{
 	public:
-		ButtonList(StringVector labels = StringVector());
+		LabelSequence(StringVector labels = StringVector());
+	};
+
+	class MK_UI_EXPORT ButtonSequence : public Sequence
+	{
+	public:
+		ButtonSequence(StringVector labels = StringVector());
 	};
 
 	class MK_UI_EXPORT SortList : public List, public Typed<SortList, List>, public Dropper

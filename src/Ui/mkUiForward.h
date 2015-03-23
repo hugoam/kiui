@@ -84,6 +84,8 @@ namespace mk
 	class RootSheet;
 
 	class WLabel;
+	class WTitle;
+	class WIcon;
 	class WButton;
 	class WWrapButton;
 	class WToggle;
@@ -122,6 +124,14 @@ namespace mk
 	class FInt;
 	class FFloat;
 	class FString;
+
+	class InputString;
+	class InputBool;
+	class InputInt;
+	class InputFloat;
+
+	class SliderInt;
+	class SliderFloat;
 
 	template <class T>
 	class FStat;

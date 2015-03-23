@@ -22,18 +22,17 @@ namespace mk
 {
 	enum _I_ WidgetState : unsigned int
 	{
-		ENABLED = 0,
-		HOVERED = 1,
-		TRIGGERED = 2,
-		ACTIVATED = 3,
-		ACTIVATED_HOVERED = 4,
-		FOCUSED = 5,
-		DISABLED = 6,
-		PRESSED = 7,
-		DRAGGED = 8
+		NOSTATE = 0,
+		ENABLED = 1 << 0,
+		HOVERED = 1 << 1,
+		TRIGGERED = 1 << 2,
+		ACTIVATED = 1 << 3,
+		FOCUSED = 1 << 4,
+		DISABLED = 1 << 5,
+		PRESSED = 1 << 6,
+		DRAGGED = 1 << 7,
+		MODAL = 1 << 8
 	};
-
-
 
 	class MK_UI_EXPORT _I_ Widget : public TypeObject, public Typed<Widget>, public InputReceiver, public Updatable
 	{
@@ -88,16 +87,21 @@ namespace mk
 
 		void nextFrame(size_t tick, size_t delta);
 
-		void updateState(WidgetState);
+		void toggleState(WidgetState);
 
 		void markDirty();
 
 		void activate();
 		void deactivate();
+
 		void hover();
 		void unhover();
+
 		void focus();
 		void unfocus();
+
+		void modal();
+		void unmodal();
 
 		Widget* copyTo(Sheet* sheet);
 

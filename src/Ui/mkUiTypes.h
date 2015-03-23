@@ -25,6 +25,7 @@
 #include <Ui/Widget/mkWProgressBar.h>
 #include <Ui/Widget/mkWCheckbox.h>
 #include <Ui/Widget/mkWTypeIn.h>
+#include <Ui/Widget/mkWDirectory.h>
 
 #include <Ui/Scheme/mkWDropdown.h>
 #include <Ui/Scheme/mkWRadioButton.h>

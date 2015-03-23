@@ -63,7 +63,7 @@ namespace mk
 	void WDropdown::dropup()
 	{
 		mDropbox->hide();
-		this->rootSheet()->modalOff();
+		mDropbox->unmodal();
 
 		mDown = false;
 	}
@@ -74,9 +74,8 @@ namespace mk
 			return;
 
 		mDropbox->show();
+		mDropbox->modal();
 		mDropbox->frame()->as<Layer>()->moveToTop();
-
-		this->rootSheet()->modalOn(mDropbox);
 
 		mDropbox->frame()->setPositionDim(DIM_Y, mFrame->dsize(DIM_Y));
 

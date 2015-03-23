@@ -40,7 +40,7 @@ namespace mk
 
 	protected:
 		InputController* mLower;
-		Widget* mWidget;
+		Widget* mInputWidget;
 
 		typedef std::function<void ()> KeyHandler;
 		typedef std::map<KeyCode, KeyHandler> KeyMap;

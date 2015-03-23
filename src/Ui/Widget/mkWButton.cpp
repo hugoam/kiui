@@ -38,6 +38,22 @@ namespace mk
 		: WLabel(label, styleCls())
 	{}
 
+	WIcon::WIcon(Form* form)
+		: Widget(styleCls(), form)
+		, mImage(form->image())
+	{}
+
+	WIcon::WIcon(const string& image, Style* style)
+		: Widget(style ? style : styleCls())
+		, mImage(image)
+	{}
+
+	void WIcon::setImage(const string& image)
+	{
+		mImage = image;
+		mFrame->setDirty(Frame::DIRTY_WIDGET);
+	}
+
 	WButton::WButton(Form* form)
 		: Widget(styleCls(), form)
 		, WidgetTrigger(nullptr)
@@ -56,7 +72,7 @@ namespace mk
 	bool WButton::leftPressed(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
-		updateState(TRIGGERED);
+		toggleState(TRIGGERED);
 		return true;
 	}
 
@@ -70,7 +86,7 @@ namespace mk
 		else
 			this->trigger();
 
-		//updateState(HOVERED);
+		//toggleState(HOVERED);
 		return true;
 	}
 
@@ -95,7 +111,7 @@ namespace mk
 	bool WWrapButton::leftPressed(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
-		updateState(TRIGGERED);
+		toggleState(TRIGGERED);
 		return true;
 	}
 
@@ -109,7 +125,7 @@ namespace mk
 		else
 			this->trigger();
 
-		//updateState(HOVERED);
+		//toggleState(HOVERED);
 		return true;
 	}
 
@@ -130,7 +146,7 @@ namespace mk
 	void WToggle::build()
 	{
 		if(mOn)
-			this->updateState(ACTIVATED);
+			this->toggleState(ACTIVATED);
 	}
 
 	void WToggle::toggle()
@@ -139,13 +155,13 @@ namespace mk
 		{
 			mOn = false;
 			mTriggerOff(this);
-			this->updateState(ENABLED);
+			this->toggleState(ACTIVATED);
 		}
 		else
 		{
 			mOn = true;
 			mTriggerOn(this);
-			this->updateState(ACTIVATED);
+			this->toggleState(ACTIVATED);
 		}
 	}
 

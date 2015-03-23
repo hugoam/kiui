@@ -33,10 +33,7 @@ namespace mk
 
 	void WCheckbox::updateChecked()
 	{
-		if(mValue->any<bool>()->ref())
-			this->updateState(ACTIVATED);
-		else
-			this->updateState(ENABLED);
+		this->toggleState(ACTIVATED);
 	}
 
 	bool WCheckbox::leftClick(float xPos, float yPos)

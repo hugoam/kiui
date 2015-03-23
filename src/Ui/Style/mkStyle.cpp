@@ -5,6 +5,8 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Style/mkStyle.h>
 
+#include <Object/Store/mkReverse.h>
+
 #include <Ui/Widget/mkWidget.h>
 
 namespace mk
@@ -14,7 +16,7 @@ namespace mk
 		, mStyleType(type)
 		, mName()
 		, mLayout("", FLOW, _VOID, false, DimSizing(SHRINK, SHRINK), DimFloat(1.f, 1.f), DIM_Y)
-		, mSubskins(5)
+		, mSubskins()
 	{}
 
 	Style::Style(const string& name)
@@ -22,7 +24,7 @@ namespace mk
 		, mStyleType(nullptr)
 		, mName(name)
 		, mLayout("", FLOW, _VOID, false, DimSizing(SHRINK, SHRINK), DimFloat(1.f, 1.f), DIM_Y)
-		, mSubskins(5)
+		, mSubskins()
 	{}
 
 	Style::~Style()
@@ -37,20 +39,22 @@ namespace mk
 	{
 		mSkin = *base->skin();
 
-		if(base->subskin(ENABLED))
-			mSubskins[ENABLED] = make_unique<InkStyle>(*base->subskin(ENABLED));
-		if(base->subskin(HOVERED))
-			mSubskins[HOVERED] = make_unique<InkStyle>(*base->subskin(HOVERED));
-		if(base->subskin(ACTIVATED))
-			mSubskins[ACTIVATED] = make_unique<InkStyle>(*base->subskin(ACTIVATED));
-		if(base->subskin(ACTIVATED_HOVERED))
-			mSubskins[ACTIVATED_HOVERED] = make_unique<InkStyle>(*base->subskin(ACTIVATED_HOVERED));
+		for(auto& subskin : base->subskins())
+			mSubskins.emplace_back(subskin.mState, subskin.mSkin);
+	}
+
+	InkStyle* Style::subskin(WidgetState state)
+	{
+		for(SubSkin& skin : reverse_adapt(mSubskins))
+			if(skin.mState == state)
+				return &skin.mSkin;
+
+		return &mSkin;
 	}
 
 	InkStyle* Style::decline(WidgetState state)
 	{
-		if(!mSubskins[state])
-			mSubskins[state] = make_unique<InkStyle>(mSkin);
-		return mSubskins[state].get();
+		mSubskins.emplace_back(state, mSkin);
+		return &mSubskins.back().mSkin;
 	}
 }

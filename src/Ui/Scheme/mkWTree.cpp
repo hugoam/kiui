@@ -69,9 +69,9 @@ namespace mk
 	void WTree::select(WTreeNode* selected)
 	{
 		if(mSelected)
-			mSelected->header()->updateState(ENABLED);
+			mSelected->header()->toggleState(ACTIVATED);
 
-		selected->header()->updateState(ACTIVATED);
+		selected->header()->toggleState(ACTIVATED);
 		mSelected = selected;
 
 		/*Widget* node = selected;

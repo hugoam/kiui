@@ -6,6 +6,7 @@
 #include <Ui/Frame/mkFrame.h>
 
 #include <Object/String/mkString.h>
+#include <Object/Store/mkReverse.h>
 
 #include <Ui/Form/mkForm.h>
 #include <Ui/Widget/mkWidget.h>
@@ -166,11 +167,7 @@ namespace mk
 	void Frame::updateState(WidgetState state)
 	{
 		InkStyle* inkstyle = d_inkstyle;
-
-		if(d_wstyle->subskin(state))
-			d_inkstyle = d_wstyle->subskin(state);
-		else
-			d_inkstyle = d_wstyle->skin();
+		d_inkstyle = d_wstyle->subskin(state);
 
 		if(d_inkstyle != inkstyle)
 			this->setDirty(DIRTY_SKIN);

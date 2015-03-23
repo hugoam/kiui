@@ -34,6 +34,20 @@ namespace mk
 		using Styled<WTitle>::styleCls;
 	};
 
+	class MK_UI_EXPORT WIcon :public Widget, public Styled<WLabel>
+	{
+	public:
+		WIcon(Form* form);
+		WIcon(const string& image, Style* style = nullptr);
+
+		const string& image() { return mImage; }
+
+		void setImage(const string& image);
+
+	protected:
+		string mImage;
+	};
+
 	template <class T_Widget>
 	class WidgetTrigger
 	{

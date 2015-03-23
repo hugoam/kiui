@@ -97,7 +97,19 @@ namespace mk
 	};
 
 	typedef std::vector<Style*> StyleVector;
-	typedef std::vector<unique_ptr<InkStyle>> StyleMap;
+
+	class MK_UI_EXPORT SubSkin
+	{
+	public:
+		SubSkin() {}
+		SubSkin(WidgetState state) : mState(state) {}
+		SubSkin(WidgetState state, const InkStyle& skin) : mState(state), mSkin(skin) {}
+
+		WidgetState mState;
+		InkStyle mSkin;
+	};
+
+	typedef std::vector<SubSkin> StyleTable;
 
 	class MK_UI_EXPORT _I_ Style : public IdStruct, public Indexed<Style>, public NonCopy
 	{
@@ -111,9 +123,9 @@ namespace mk
 		_A_ InkStyle* skin() { return &mSkin; }
 
 		Type* styleType() { return mStyleType; }
-
-		InkStyle* subskin(WidgetState state) { return mSubskins[state].get(); }
+		const StyleTable& subskins() { return mSubskins; }
 		
+		InkStyle* subskin(WidgetState state);
 		InkStyle* decline(WidgetState state);
 
 		void inheritLayout(Style* base);
@@ -124,7 +136,7 @@ namespace mk
 		string mName;
 		LayoutStyle mLayout;
 		InkStyle mSkin;
-		StyleMap mSubskins;
+		StyleTable mSubskins;
 	};
 
 	template <class T>

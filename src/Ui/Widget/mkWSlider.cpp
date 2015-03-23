@@ -41,7 +41,7 @@ namespace mk
 	{
 		mStartPos = mDim == DIM_X ? xPos : yPos;
 		mStartOffset = mFrame->dposition(mDim);
-		updateState(ACTIVATED);
+		toggleState(ACTIVATED);
 		return true;
 	}
 
@@ -55,7 +55,7 @@ namespace mk
 	bool WSliderKnob::leftDragEnd(float xPos, float yPos)
 	{
 		mParent->as<WSlider>()->offsetChange(offset(mDim == DIM_X ? xPos : yPos), true);
-		updateState(ENABLED);
+		toggleState(ACTIVATED);
 		return true;
 	}
 

@@ -62,9 +62,9 @@ namespace mk
 	{
 		Table* table = parent->makeappend<Table>(StringVector({ "ID", "Name", "Path", "Flags" }), std::vector<float>({ 0.25f, 0.25f, 0.25f, 0.25f }));
 
-		table->makeappend<LabelList>(StringVector({ "0000", "Robert", "/path/robert", "...." }));
-		table->makeappend<LabelList>(StringVector({ "0001", "Stephanie", "/path/stephanie", "line 1" }));
-		table->makeappend<LabelList>(StringVector({ "0002", "C64", "/path/computer", "...." }));
+		table->makeappend<LabelSequence>(StringVector({ "0000", "Robert", "/path/robert", "...." }));
+		table->makeappend<LabelSequence>(StringVector({ "0001", "Stephanie", "/path/stephanie", "line 1" }));
+		table->makeappend<LabelSequence>(StringVector({ "0002", "C64", "/path/computer", "...." }));
 
 		return table;
 	}
@@ -73,11 +73,11 @@ namespace mk
 	{
 		Table* table = parent->makeappend<Table>(StringVector({ "Column 0", "Column 1", "Column 3" }), std::vector<float>({ 0.33f, 0.33f, 0.33f }));
 
-		table->makeappend<LabelList>(StringVector({ "Hello", "ImGui", "World!" }));
-		table->makeappend<ButtonList>(StringVector({ "Banana", "Apple", "Corniflower" }));
+		table->makeappend<LabelSequence>(StringVector({ "Hello", "ImGui", "World!" }));
+		table->makeappend<ButtonSequence>(StringVector({ "Banana", "Apple", "Corniflower" }));
 		table->makeappend<RadioSwitch>(Form::Trigger(), 0, StringVector({ "radio a", "radio b", "radio b" }));
 
-		List* line = table->makeappend<List>();
+		Sequence* line = table->makeappend<Sequence>();
 
 		Expandbox* box0 = line->makeappend<Expandbox>("Category A");
 		box0->makeappend<Label>("Blah blah blah");
@@ -91,17 +91,17 @@ namespace mk
 
 		table = parent->makeappend<Table>(StringVector({ "Left", "Right" }), std::vector<float>({ 0.5f, 0.5f }));
 
-		line = table->makeappend<List>();
+		line = table->makeappend<Sequence>();
 
 		line->makeappend<InputFloat>("Red", 0.05f);
 		line->makeappend<InputFloat>("Blue", 0.05f);
 
-		line = table->makeappend<List>();
+		line = table->makeappend<Sequence>();
 
 		line->makeappend<Textbox>("The quick brown fox jumps over the lazy dog.");
 		line->makeappend<Textbox>("The quick brown fox jumps over the lazy dog.");
 
-		line = table->makeappend<List>();
+		line = table->makeappend<Sequence>();
 
 		line->makeappend<Label>("Hello Left");
 		line->makeappend<Label>("Hello Right");
