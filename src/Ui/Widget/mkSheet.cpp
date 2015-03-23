@@ -11,6 +11,8 @@
 #include <Ui/Frame/mkStripe.h>
 #include <Ui/Frame/mkLayer.h>
 
+#include <Ui/Form/mkWidgets.h>
+
 #include <Ui/Widget/mkWScrollbar.h>
 
 #include <Ui/mkUiWindow.h>
@@ -24,41 +26,10 @@ namespace mk
 {
 	Sheet::Sheet(Style* style, Form* form)
 		: Widget(style, form)
-		, mScrollbar(nullptr)
-		, mScrollsheet(nullptr)
 	{}
 
 	Sheet::~Sheet()
-	{
-		if(mFrame->style()->d_overflow == SCROLL)
-			mScrollsheet->destroy();
-	}
-
-	void Sheet::build()
-	{
-		if(mFrame->style()->d_overflow == SCROLL)
-		{
-			mScrollsheet = mParent->makeappend<WScrollSheet>();
-			mScrollsheet->append(mParent->release(this));
-			mScrollbar = mScrollsheet->makeappend<WScrollbar>(this->stripe());
-		}
-	}
-
-	void Sheet::show()
-	{
-		if(mScrollsheet)
-			mScrollsheet->show();
-		else
-			Widget::show();
-	}
-
-	void Sheet::hide()
-	{
-		if(mScrollsheet)
-			mScrollsheet->hide();
-		else
-			Widget::hide();
-	}
+	{}
 
 	void Sheet::nextFrame(size_t tick, size_t delta)
 	{
@@ -66,14 +37,6 @@ namespace mk
 		
 		for(size_t i = 0; i < mContents.size(); ++i)
 			mContents[i]->nextFrame(tick, delta);
-
-		if(mFrame->style()->d_overflow == SCROLL)
-		{
-			if(this->stripe()->overflow() && mScrollbar->frame()->hidden())
-				mScrollbar->show();
-			else if(!this->stripe()->overflow() && !mScrollbar->frame()->hidden())
-				mScrollbar->hide();
-		}
 	}
 
 	Widget* Sheet::append(unique_ptr<Widget> unique)
@@ -119,6 +82,41 @@ namespace mk
 		mContents.clear();
 	}
 
+	ScrollSheet::ScrollSheet(Style* style, Form* form)
+		: Sheet(style, form)
+		, mSheet(nullptr)
+		, mScrollbar(nullptr)
+	{}
+
+	ScrollSheet::~ScrollSheet()
+	{}
+
+	void ScrollSheet::build()
+	{
+		mSheet = this->makeappend<Sheet>(DivY::styleCls());
+		mScrollbar = this->makeappend<WScrollbar>(mSheet->stripe());
+	}
+
+	void ScrollSheet::nextFrame(size_t tick, size_t delta)
+	{
+		Sheet::nextFrame(tick, delta);
+
+		if(mSheet->stripe()->overflow() && mScrollbar->frame()->hidden())
+			mScrollbar->show();
+		else if(!mSheet->stripe()->overflow() && !mScrollbar->frame()->hidden())
+			mScrollbar->hide();
+	}
+
+	Widget* ScrollSheet::vappend(unique_ptr<Widget> widget)
+	{
+		return mSheet->vappend(std::move(widget));
+	}
+
+	unique_ptr<Widget> ScrollSheet::vrelease(Widget* widget)
+	{
+		return mSheet->vrelease(widget);
+	}
+
 	GridSheet::GridSheet(Dimension dim, Style* style, Form* form)
 		: Sheet(style, form)
 		, mDim(dim)
@@ -159,7 +157,7 @@ namespace mk
 		float pixspan = 1.f / mFrame->as<Stripe>()->dsize(mDim);
 		float offset = mDim == DIM_X ? xDif * pixspan : yDif * pixspan;
 
-		std::cerr << "Dragging resize offset " << offset << std::endl;
+		//std::cerr << "Dragging resize offset " << offset << std::endl;
 		prev->frame()->setSpanDim(mDim, prev->frame()->dspan(mDim) + offset);
 		next->frame()->setSpanDim(mDim, next->frame()->dspan(mDim) - offset);
 

@@ -23,17 +23,13 @@ namespace mk
 		Sheet(Style* style, Form* form = nullptr);
 		~Sheet();
 
-		void build();
-		
-		void show();
-		void hide();
-
 		void nextFrame(size_t tick, size_t delta);
 
 		FrameType frameType() { return STRIPE; }
 
 		inline Stripe* stripe() { return mFrame->as<Stripe>(); }
-		inline std::vector<unique_ptr<Widget>>& contents() { return mContents; }
+		inline const std::vector<unique_ptr<Widget>>& contents() { return mContents; }
+		inline size_t count() { return mContents.size(); }
 
 		virtual Sheet* vaddwrapper(Widget* widget) { UNUSED(widget); return nullptr; }
 		virtual Widget* vappend(unique_ptr<Widget> widget) { return append(std::move(widget)); }
@@ -67,7 +63,23 @@ namespace mk
 
 	protected:
 		std::vector<unique_ptr<Widget>> mContents;
-		Sheet* mScrollsheet;
+	};
+
+	class MK_UI_EXPORT _I_ ScrollSheet : public Sheet
+	{
+	public:
+		ScrollSheet(Style* style, Form* form = nullptr);
+		~ScrollSheet();
+
+		void build();
+
+		void nextFrame(size_t tick, size_t delta);
+
+		Widget* vappend(unique_ptr<Widget> widget);
+		unique_ptr<Widget> vrelease(Widget* widget);
+
+	protected:
+		Sheet* mSheet;
 		WScrollbar* mScrollbar;
 	};
 
