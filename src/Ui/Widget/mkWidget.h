@@ -101,15 +101,12 @@ namespace mk
 
 		Widget* copyTo(Sheet* sheet);
 
-		Widget* pinpoint(float x, float y, bool opaque = true);
+		virtual Widget* pinpoint(float x, float y, bool modal = false);
 
 		Widget* prev();
 		Widget* next();
 
 		bool contains(Widget* widget);
-
-		InputReceiver* controlMouse(float x, float y);
-		InputReceiver* controlKey();
 
 		InputReceiver* propagateMouse(float x, float y);
 		InputReceiver* propagateKey();

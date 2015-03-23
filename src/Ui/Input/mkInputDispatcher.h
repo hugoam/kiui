@@ -40,11 +40,11 @@ namespace mk
 		virtual void deactivated() {}
 	};
 
-	class MK_UI_EXPORT InputReceiver : public InputController
+	class MK_UI_EXPORT InputReceiver// : public InputController
 	{
 	public:
-		InputReceiver* controlMouse(float x, float y) { UNUSED(x); UNUSED(y); return this; }
-		InputReceiver* controlKey() { return this; }
+		//InputReceiver* controlMouse(float x, float y) { UNUSED(x); UNUSED(y); return this; }
+		//InputReceiver* controlKey() { return this; }
 
 		virtual InputReceiver* propagateMouse(float x, float y) { UNUSED(x); UNUSED(y); return this; }
 		virtual InputReceiver* propagateKey() { return this; }

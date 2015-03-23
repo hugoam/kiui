@@ -25,7 +25,7 @@ namespace mk
 	RootSheet::RootSheet(UiWindow* window, Form* form, bool absolute)
 		: Sheet(styleCls(), form)
 		, mWindow(window)
-		, mDragging(nullptr)
+		, mPressed(nullptr)
 		, mLeftPressed(false)
 		, mActiveFrame(this)
 		, mHovered(this)
@@ -93,14 +93,16 @@ namespace mk
 
 	void RootSheet::modalOn(Widget* widget)
 	{
-		mModalFrame = widget;
-		mModalWidget.modalOn(widget);
+		mModals.push_back(widget);
+		if(mParent)
+			mParent->rootSheet()->modalOn(this);
 	}
 
 	void RootSheet::modalOff()
 	{
-		mModalFrame = nullptr;
-		mModalWidget.modalOff();
+		mModals.pop_back();
+		if(mParent)
+			mParent->rootSheet()->modalOff();
 	}
 
 	void RootSheet::takeControl(Controller* controller)
@@ -126,17 +128,19 @@ namespace mk
 	}
 
 	InputReceiver* RootSheet::controlMouse(float x, float y)
-	{
-		Widget* widget = this->pinpoint(x, y);
-		if(widget == this)
-			return this;
+	{ 
+		if(mModals.size() > 0)
+			return mModals.back()->pinpoint(x, y, true);
 		else
-			return widget->controlMouse(x, y);
+			return this->pinpoint(x, y);
 	}
 
 	InputReceiver* RootSheet::controlKey()
 	{
-		return mActiveFrame;
+		if(mModals.size() > 0)
+			return mModals.back();
+		else
+			return mActiveFrame;
 	}
 
 	bool RootSheet::keyUp(KeyCode code, char c)
@@ -161,6 +165,11 @@ namespace mk
 
 	bool RootSheet::mouseMoved(float xPos, float yPos, float xDif, float yDif)
 	{
+		this->transformCoordinates(xPos, yPos);
+
+		xDif = xPos - mLastX;
+		yDif = yPos - mLastY;
+
 		mLastX = xPos;
 		mLastY = yPos;
 
@@ -190,6 +199,8 @@ namespace mk
 
 	bool RootSheet::mouseWheel(float xPos, float yPos, float amount)
 	{
+		this->transformCoordinates(xPos, yPos);
+
 		InputReceiver* receiver = mController->controlMouse(xPos, yPos);
 
 		while(receiver != this && !receiver->mouseWheel(xPos, yPos, amount))
@@ -200,6 +211,8 @@ namespace mk
 
 	bool RootSheet::mousePressed(float xPos, float yPos, MouseButton button)
 	{
+		this->transformCoordinates(xPos, yPos);
+
 		mLastPressedX = xPos;
 		mLastPressedY = yPos;
 
@@ -208,51 +221,20 @@ namespace mk
 		while(receiver != this && !receiver->mousePressed(xPos, yPos, button))
 			receiver = receiver->propagateMouse(xPos, yPos);
 	
+		mPressed = static_cast<Widget*>(receiver);
+
 		return true;
 	}
 
 	bool RootSheet::mouseReleased(float xPos, float yPos, MouseButton button)
 	{
+		this->transformCoordinates(xPos, yPos);
+
 		InputReceiver* receiver = mController->controlMouse(xPos, yPos);
 
 		while(receiver != this && !receiver->mouseReleased(xPos, yPos, button))
 			receiver = receiver->propagateMouse(xPos, yPos);
 	
 		return true;
-	}
-
-	ModalWidget::ModalWidget()
-		: mModals()
-	{}
-
-	ModalWidget::~ModalWidget()
-	{}
-
-	void ModalWidget::modalOn(Widget* widget)
-	{
-		mModals.push_back(widget);
-		if(mModals.size() == 1)
-			this->stack(widget);
-	}
-
-	void ModalWidget::modalOff()
-	{
-		mModals.pop_back();
-		if(mModals.size() == 0)
-			this->yield();
-	}
-
-	InputReceiver* ModalWidget::controlMouse(float x, float y)
-	{
-		InputReceiver* receiver = mModals.back()->controlMouse(x, y);
-		if(receiver)
-			return receiver;
-		else
-			return mModals.back();
-	}
-
-	InputReceiver* ModalWidget::controlKey()
-	{
-		return mModals.back();
 	}
 }

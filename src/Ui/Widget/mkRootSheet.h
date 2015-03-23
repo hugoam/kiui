@@ -15,23 +15,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT ModalWidget : public Controller
-	{
-	public:
-		ModalWidget();
-		~ModalWidget();
-
-		InputReceiver* controlMouse(float x, float y);
-		InputReceiver* controlKey();
-
-		void modalOn(Widget* widget);
-		void modalOff();
-
-	protected:
-		std::vector<Widget*> mModals;
-	};
-
-	class MK_UI_EXPORT _I_ RootSheet : public Sheet, public Typed<RootSheet>, public Styled<RootSheet>
+	class MK_UI_EXPORT _I_ RootSheet : public Sheet, public Typed<RootSheet>, public Styled<RootSheet>, public InputController
 	{
 	public:
 		RootSheet(UiWindow* window, Form* form, bool absolute = true);
@@ -69,6 +53,8 @@ namespace mk
 		bool mousePressed(float xPos, float yPos, MouseButton button);
 		bool mouseReleased(float xPos, float yPos, MouseButton button);
 
+		virtual void transformCoordinates(float& xPos, float& yPos) { UNUSED(xPos); UNUSED(yPos); }
+
 		void activate(Widget* widget);
 		void deactivate(Widget* widget);
 
@@ -104,13 +90,12 @@ namespace mk
 		float mXDragStart;
 		float mYDragStart;
 
-		InputReceiver* mDragging;
+		Widget* mPressed;
 
 		Widget* mActiveFrame;
 		Widget* mContextMenu;
-		Widget* mModalFrame;
 
-		ModalWidget mModalWidget;
+		std::vector<Widget*> mModals;
 
 		Clock mTooltipClock;
 		double mTooltipTimer;

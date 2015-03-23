@@ -233,11 +233,16 @@ namespace mk
 		}
 	}
 
-	Widget* Widget::pinpoint(float x, float y, bool opaque)
+	Widget* Widget::pinpoint(float x, float y, bool modal)
 	{
-		Frame* target = mFrame->pinpoint(x, y, opaque);
+		if(mState >= PRESSED)
+			return this;
+
+		Frame* target = mFrame->pinpoint(x, y, true);
 		if(target)
 			return target->widget();
+		else if(modal)
+			return this;
 		else
 			return nullptr;
 	}
@@ -250,19 +255,6 @@ namespace mk
 	Widget* Widget::next()
 	{
 		return mFrame->parent()->contents()[mFrame->index() + 1]->widget();
-	}
-
-	InputReceiver* Widget::controlMouse(float x, float y)
-	{
-		if(mState == DRAGGED || mState == PRESSED)
-			return this;
-		else
-			return this->pinpoint(x, y);
-	}
-	
-	InputReceiver* Widget::controlKey()
-	{
-		return this;
 	}
 
 	InputReceiver* Widget::propagateMouse(float x, float y)
@@ -321,7 +313,7 @@ namespace mk
 	bool Widget::mouseEntered(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
-		std::cerr << "HOVERED : " << mFrame->wstyle()->name() << std::endl;
+		//std::cerr << "HOVERED : " << mFrame->wstyle()->name() << std::endl;
 		this->hover();
 		return true;
 	}
@@ -343,7 +335,7 @@ namespace mk
 		{
 			this->leftDragStart(this->rootSheet()->lastPressedX(), this->rootSheet()->lastPressedY());
 			mState = DRAGGED;
-			//mFrame->setOpacity(_VOID);
+			mFrame->setOpacity(_VOID);
 		}
 
 		return true;
@@ -361,7 +353,10 @@ namespace mk
 		this->rootSheet()->modalOff();
 
 		if(mState == DRAGGED)
+		{
 			this->leftDragEnd(xPos, yPos);
+			mFrame->setOpacity(_OPAQUE);
+		}
 		else if(button == LEFT_BUTTON)
 			this->leftClick(xPos, yPos);
 		else if(button == RIGHT_BUTTON)
