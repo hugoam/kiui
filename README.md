@@ -1,8 +1,3 @@
-## Disclaimer
-This is a very early work-in-progress and is provided with no guarantee whatsoever of usability or even compilability.
-Everything, from the namespaces to the class interfaces should be expected to undergo complete modification in the coming weeks.
-It is, as of now, completely undocumented apart from the present overview.
-
 kiUi
 ====
 
@@ -32,12 +27,12 @@ Usage
 UiWindow* uiwindow = new UiWindow();
 
 Form* root = uiwindow->rootForm();
-Window* window = root->makeappend<Window>("window", "Example window");
+Window* window = root->makeappend<Window>("Example window");
 
-Expandbox* expandbox = window->makeappend<Expandbox>("expandbox", "Collapsable box");
+Expandbox* expandbox = window->makeappend<Expandbox>("Collapsable box");
 
-Label* label = expandbox->makeappend<Label>("label", "kiUi says hello.");
-Button* button = expand->makeappend<Button>("button", "Push me");
+Label* label = expandbox->makeappend<Label>("kiUi says hello.");
+Button* button = expand->makeappend<Button>("Push me");
 ```
 
 Nano
@@ -55,6 +50,16 @@ while(pursue)
     pursue = glwindow->renderFrame();
 ```
 
+Widgets
+=======
+
+- Dockspace
+- Tabber
+- Table
+- Window (resize, drag, dock)
+- Radiobutton
+- Dropdown
+
 Skins
 =====
 
@@ -63,9 +68,9 @@ kiUi was conceived so that each element can be styled in a way very similar to C
 Editor
 ======
 
-kiUi will come with a simple editor currently a work in progress and using kiUi
+kiUi will come with a simple editor which also uses kiUi for its interface
 
-![screenshot of the WIP editor for kiUi](editor.jpg?raw=true)
+![screenshot of the WIP editor for kiUi](editor.png?raw=true)
 
 
 
