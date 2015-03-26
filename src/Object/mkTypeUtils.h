@@ -34,16 +34,16 @@ namespace mk
 	struct UnrefType<T*> { typedef T* type; };
 
 	template <class T>
-	struct Pass { typedef const T& ctype; typedef T type; typedef const T& forward; };
+	struct Pass { typedef const T& ctype; typedef const T& forward; };
 
 	template <class T>
-	struct Pass<T*> { typedef T* ctype; typedef T* type; typedef T* forward; };
+	struct Pass<T*> { typedef T* ctype; typedef T* forward; };
 
 	template <class T>
-	struct Pass<unique_ptr<T>> { typedef const unique_ptr<T>& ctype; typedef unique_ptr<T> type; typedef unique_ptr<T> forward; };
+	struct Pass<unique_ptr<T>> { typedef const unique_ptr<T>& ctype; typedef unique_ptr<T> forward; };
 
 	template <class T>
-	struct Pass<std::vector<T>> { typedef const std::vector<T>& ctype; typedef std::vector<T> type; typedef std::vector<T>& forward; };
+	struct Pass<std::vector<T>> { typedef const std::vector<T>& ctype; typedef std::vector<T>& forward; };
 
 	template <class T>
 	struct Copy

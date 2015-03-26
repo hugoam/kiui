@@ -12,8 +12,6 @@
 #include <Object/mkStem.h>
 #include <Object/mkProto.h>
 #include <Object/mkRef.h>
-#include <Object/Store/mkArray.h>
-#include <Object/Store/mkRegistry.h>
 #include <Object/String/mkString.h>
 #include <Object/Util/mkColour.h>
 #include <Object/Util/mkStat.h>

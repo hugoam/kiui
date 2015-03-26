@@ -5,8 +5,7 @@
 #include <Object/mkObjectConfig.h>
 #include <Object/mkTyped.h>
 
-#include <Object/Store/mkArray.h>
-#include <Object/Store/mkStoreObserver.h>
+#include <Object/Iterable/mkStoreObserver.h>
 
 namespace mk
 {
@@ -22,8 +21,6 @@ namespace mk
 
 	template class MK_OBJECT_EXPORT Typed<std::vector<Type*>>;
 	template class MK_OBJECT_EXPORT Typed<std::vector<Object*>>;
-
-	template class MK_OBJECT_EXPORT Typed<Array<Object>>;
 
 	template class MK_OBJECT_EXPORT StoreObserver<Object>;
 }
