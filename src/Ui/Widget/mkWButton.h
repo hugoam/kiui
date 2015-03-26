@@ -34,7 +34,7 @@ namespace mk
 		using Styled<WTitle>::styleCls;
 	};
 
-	class MK_UI_EXPORT WIcon :public Widget, public Styled<WLabel>
+	class MK_UI_EXPORT WIcon :public Widget, public Styled<WIcon>
 	{
 	public:
 		WIcon(Form* form);
@@ -92,8 +92,8 @@ namespace mk
 	{
 	public:
 		using WidgetTrigger<WButton>::Trigger;
-	public:
 
+	public:
 		WImgButton(const string& image, const Trigger& trigger = Trigger());
 
 		using Styled<WImgButton>::styleCls;

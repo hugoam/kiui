@@ -109,20 +109,19 @@ namespace mk
 			FrameSkin fskin(mFrame, &imgskin);
 
 			// Borders
-			this->drawImage(mTop, fskin.d_inleft, fskin.d_top, fskin.d_inwidth, imgskin.d_topIn); // Top
-			this->drawImage(mRight, fskin.d_inright, fskin.d_intop, imgskin.d_rightIn, fskin.d_inheight); // Right
-
-			this->drawImage(mBottom, fskin.d_inleft, fskin.d_inbottom, fskin.d_inwidth, imgskin.d_bottomIn); // Bottom
-			this->drawImage(mLeft, fskin.d_left, fskin.d_intop, imgskin.d_leftIn, fskin.d_inheight); // Left
+			this->drawSkinImage(mSkin, fskin.d_inleft, fskin.d_top, fskin.d_inwidth, imgskin.d_topIn, -imgskin.d_leftIn, 0.f, width); // Top
+			this->drawSkinImage(mSkin, fskin.d_inright, fskin.d_intop, imgskin.d_rightIn, fskin.d_inheight, -(imgskin.d_leftIn + imgskin.d_fillWidth), -imgskin.d_topIn, 0.f, height); // Right
+			this->drawSkinImage(mSkin, fskin.d_inleft, fskin.d_inbottom, fskin.d_inwidth, imgskin.d_bottomIn, -imgskin.d_leftIn, -(imgskin.d_topIn + imgskin.d_fillHeight), width); // Bottom
+			this->drawSkinImage(mSkin, fskin.d_left, fskin.d_intop, imgskin.d_leftIn, fskin.d_inheight, 0.f, -imgskin.d_topIn, 0.f, height); // Left
 
 			// Corners
-			this->drawImage(mTopLeft, fskin.d_outleft, fskin.d_outtop, imgskin.d_leftIn + imgskin.d_leftOut, imgskin.d_topIn + imgskin.d_topOut);
-			this->drawImage(mTopRight, fskin.d_inright, fskin.d_outtop, imgskin.d_rightIn + imgskin.d_rightOut, imgskin.d_topIn + imgskin.d_topOut);
-			this->drawImage(mBottomRight, fskin.d_inright, fskin.d_inbottom, imgskin.d_rightIn + imgskin.d_rightOut, imgskin.d_bottomIn + imgskin.d_bottomOut);
-			this->drawImage(mBottomLeft, fskin.d_outleft, fskin.d_inbottom, imgskin.d_leftIn + imgskin.d_leftOut, imgskin.d_bottomIn + imgskin.d_bottomOut);
+			this->drawSkinImage(mSkin, fskin.d_outleft, fskin.d_outtop, imgskin.d_leftIn + imgskin.d_leftOut, imgskin.d_topIn + imgskin.d_topOut, 0.f, 0.f); // TopLeft
+			this->drawSkinImage(mSkin, fskin.d_inright, fskin.d_outtop, imgskin.d_rightIn + imgskin.d_rightOut, imgskin.d_topIn + imgskin.d_topOut, -(imgskin.d_leftIn + imgskin.d_fillWidth), 0.f); // TopRight
+			this->drawSkinImage(mSkin, fskin.d_inright, fskin.d_inbottom, imgskin.d_rightIn + imgskin.d_rightOut, imgskin.d_bottomIn + imgskin.d_bottomOut, -(imgskin.d_leftIn + imgskin.d_fillWidth), -(imgskin.d_topIn + imgskin.d_fillHeight));
+			this->drawSkinImage(mSkin, fskin.d_outleft, fskin.d_inbottom, imgskin.d_leftIn + imgskin.d_leftOut, imgskin.d_bottomIn + imgskin.d_bottomOut, 0.f, -(imgskin.d_topIn + imgskin.d_fillHeight));
 
 			// Fill
-			this->drawImage(mFill, fskin.d_inleft, fskin.d_intop, fskin.d_inwidth, fskin.d_inheight);
+			this->drawSkinImage(mSkin, fskin.d_inleft, fskin.d_intop, fskin.d_inwidth, fskin.d_inheight, -imgskin.d_leftIn, -imgskin.d_topIn, width, height);
 		}
 
 		// Caption
@@ -193,33 +192,9 @@ namespace mk
 		{
 			ImageSkin& imgskin = mFrame->inkstyle()->mImageSkin;
 
-			mTop = fetchImage(imgskin.d_top);
-			mRight = fetchImage(imgskin.d_right);
-			mBottom = fetchImage(imgskin.d_bottom);
-			mLeft = fetchImage(imgskin.d_left);
-
-			mTopLeft = fetchImage(imgskin.d_topLeft);
-			mTopRight = fetchImage(imgskin.d_topRight);
-			mBottomRight = fetchImage(imgskin.d_bottomRight);
-			mBottomLeft = fetchImage(imgskin.d_bottomLeft);
-
-			mFill = fetchImage(imgskin.d_fill);
-
-			if(!imgskin.d_size)
+			if(!imgskin.d_image.empty())
 			{
-				int unused;
-				nvgImageSize(mCtx, mTop, &unused, &imgskin.d_topIn);
-				nvgImageSize(mCtx, mRight, &imgskin.d_rightIn, &unused);
-				nvgImageSize(mCtx, mBottom, &unused, &imgskin.d_bottomIn);
-				nvgImageSize(mCtx, mLeft, &imgskin.d_leftIn, &unused);
-
-				nvgImageSize(mCtx, mTopLeft, &imgskin.d_leftOut, &imgskin.d_topOut);
-				nvgImageSize(mCtx, mBottomRight, &imgskin.d_rightOut, &imgskin.d_bottomOut);
-
-				imgskin.d_leftOut -= imgskin.d_leftIn;
-				imgskin.d_topOut -= imgskin.d_topIn;
-				imgskin.d_bottomOut -= imgskin.d_bottomIn;
-				imgskin.d_rightOut -= imgskin.d_rightIn;
+				mSkin = fetchImage(imgskin.d_image);
 			}
 		}
 	}
@@ -244,6 +219,34 @@ namespace mk
 	void NanoInk::drawImage(int image, float left, float top, float width, float height)
 	{
 		NVGpaint imgPaint = nvgImagePattern(mCtx, left, top, width, height, 0.0f / 180.0f*NVG_PI, image, 1.f);
+		nvgBeginPath(mCtx);
+		nvgRect(mCtx, left, top, width, height);
+		nvgFillPaint(mCtx, imgPaint);
+		nvgFill(mCtx);
+	}
+
+	void NanoInk::drawSkinImage(int image, float left, float top, float width, float height, float x, float y, float stretchwidth, float stretchheight)
+	{
+		int imgwidth, imgheight;
+		nvgImageSize(mCtx, image, &imgwidth, &imgheight);
+
+		if(mFrame->widget()->label() == "Corniflower")
+			int i = 0;
+
+		if(stretchwidth > 0.f)
+		{
+			float ratio = stretchwidth / mFrame->inkstyle()->mImageSkin.d_fillWidth; //float(imgwidth);
+			x *= ratio;
+			imgwidth *= ratio;
+		}
+		if(stretchheight > 0.f)
+		{
+			float ratio = stretchheight / mFrame->inkstyle()->mImageSkin.d_fillHeight; //float(imgheight);
+			y *= ratio;
+			imgheight *= ratio;
+		}
+
+		NVGpaint imgPaint = nvgImagePattern(mCtx, left + x, top + y, imgwidth, imgheight, 0.0f / 180.0f*NVG_PI, image, 1.f);
 		nvgBeginPath(mCtx);
 		nvgRect(mCtx, left, top, width, height);
 		nvgFillPaint(mCtx, imgPaint);

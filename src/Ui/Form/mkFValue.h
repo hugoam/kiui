@@ -7,7 +7,6 @@
 
 /* mk headers */
 #include <Object/mkTyped.h>
-#include <Object/Store/mkArray.h>
 #include <Object/mkRef.h>
 #include <Ui/mkUiForward.h>
 #include <Ui/Form/mkForm.h>

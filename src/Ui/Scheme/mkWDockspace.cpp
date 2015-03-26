@@ -48,12 +48,21 @@ namespace mk
 
 	void WDocksection::undock(WWindow* window)
 	{
-		this->rootSheet()->append(this->vrelease(window));
+		this->rootSheet()->append(WTabber::vrelease(window));
 
 		if(mTabs->count() == 0)
 			mDockline->removeSection(this);
 	}
 
+	unique_ptr<Widget> WDocksection::vrelease(Widget* widget)
+	{
+		unique_ptr<Widget> unique = WTabber::vrelease(widget);
+
+		if(mTabs->count() == 0)
+			mDockline->removeSection(this);
+
+		return unique;
+	}
 
 	WDocksection* WDocksection::docktarget(Dimension dim, bool after)
 	{

@@ -5,7 +5,7 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Frame/mkStripe.h>
 
-#include <Object/Store/mkReverse.h>
+#include <Object/Iterable/mkReverse.h>
 
 #include <Ui/Frame/mkInk.h>
 
@@ -20,8 +20,8 @@
 namespace mk
 {
 
-	Stripe::Stripe(Stripe* parent, Widget* widget, size_t index)
-		: Frame(parent, widget, index)
+	Stripe::Stripe(Widget* widget, size_t index)
+		: Frame(widget, index)
 		, d_depth(d_style->d_layoutDim == DIM_X ? DIM_Y : DIM_X)
 		, d_length(d_style->d_layoutDim)
 		, d_cursor(0.f)
@@ -46,8 +46,7 @@ namespace mk
 
 	void Stripe::insert(Frame* frame, size_t index)
 	{
-		frame->setVisible(d_visible);
-		frame->setParent(this);
+		frame->bind(this);
 
 		if(frame->flow())
 			index = std::min(d_sequence.size(), index);
@@ -61,6 +60,7 @@ namespace mk
 
 	void Stripe::remove(Frame* frame)
 	{
+		frame->unbind();
 		d_contents.erase(d_contents.begin() + frame->index());
 		this->reindex(frame->index());
 

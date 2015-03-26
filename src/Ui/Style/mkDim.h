@@ -51,7 +51,8 @@ namespace mk
 		FIXED = 0,
 		SHRINK = 1,
 		EXPAND = 2,
-		CAPPED = 3
+		WRAP = 3,
+		CAPPED = 4
 	};
 
 	enum _I_ Overflow : unsigned int

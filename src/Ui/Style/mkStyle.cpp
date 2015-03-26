@@ -5,7 +5,7 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Style/mkStyle.h>
 
-#include <Object/Store/mkReverse.h>
+#include <Object/Iterable/mkReverse.h>
 
 #include <Ui/Widget/mkWidget.h>
 
@@ -46,9 +46,8 @@ namespace mk
 	InkStyle* Style::subskin(WidgetState state)
 	{
 		for(SubSkin& skin : reverse_adapt(mSubskins))
-			if(skin.mState == state)
+			if((state & skin.mState) == skin.mState)
 				return &skin.mSkin;
-
 		return &mSkin;
 	}
 

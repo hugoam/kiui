@@ -7,7 +7,6 @@
 
 /* mk headers */
 #include <Object/mkTyped.h>
-#include <Object/Store/mkArray.h>
 #include <Object/mkRef.h>
 #include <Ui/mkUiForward.h>
 #include <Ui/Form/mkFValue.h>
@@ -21,27 +20,33 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT FInt : public FValue, public Typed<FInt>
+	template <class T>
+	class FInput : public FValue, public Typed<FInput<T>>
 	{
 	public:
-		FInt(Lref& value, bool edit = true);
-		FInt(int value);
+		FInput(Lref& value, bool edit = true)
+			: FValue(value, nullptr, edit)
+		{
+			mType = cls();
+			mScheme.setMapper([this]() { return make_unique<WInput<T>>(mLref); });
+			setLabel(this->toString());
+		}
 
-		void updateValue();
+		FInput(T value, std::function<void(T)> callback = nullptr)
+			: FValue(lref(value), nullptr)
+		{
+			mType = cls();
+			mScheme.setMapper([this, callback]() { return make_unique<WInput<T>>(mLref, callback); });
+		}
 
-		using Typed<FInt>::cls;
+		using Typed<FInput<T>>::cls;
 	};
 
-	class MK_UI_EXPORT FFloat : public FValue, public Typed<FFloat>
-	{
-	public:
-		FFloat(Lref& value, bool edit = true);
-		FFloat(float value);
-
-		void updateValue();
-
-		using Typed<FFloat>::cls;
-	};
+	template class MK_UI_EXPORT FInput<int>;
+	template class MK_UI_EXPORT FInput<float>;
+	template class MK_UI_EXPORT FInput<double>;
+	template class MK_UI_EXPORT FInput<bool>;
+	template class MK_UI_EXPORT FInput<string>;
 
 	template <class T>
 	class FStat : public FValue, public Typed<FStat<T>>
@@ -51,14 +56,14 @@ namespace mk
 			: FValue(value, nullptr, edit)
 		{
 			mType = cls();
-			mScheme.setMapper([this]() { return make_unique<WStatSlider<T>>(this, this->valref()->ref<AutoStat<T>>()); });
+			mScheme.setMapper([this]() { return make_unique<WStatSlider<T>>(mLref); });
 		}
 
-		FStat(AutoStat<T> value)
+		FStat(AutoStat<T> value, std::function<void(T)> callback = nullptr)
 			: FValue(lref(value), nullptr)
 		{
 			mType = cls();
-			mScheme.setMapper([this]() { return make_unique<WStatSlider<T>>(this, this->valref()->ref<AutoStat<T>>()); });
+			mScheme.setMapper([this, callback]() { return make_unique<WStatSlider<T>>(mLref, callback); });
 		}
 
 		using Typed<FStat<T>>::cls;
@@ -66,24 +71,6 @@ namespace mk
 
 	template class MK_UI_EXPORT FStat<int>;
 	template class MK_UI_EXPORT FStat<float>;
-
-	class MK_UI_EXPORT FBool : public FValue, public Typed<FBool>
-	{
-	public:
-		FBool(Lref& value, bool edit = true);
-		FBool(bool value);
-
-		using Typed<FBool>::cls;
-	};
-
-	class MK_UI_EXPORT FString : public FValue, public Typed<FString>
-	{
-	public:
-		FString(Lref& value, bool edit = true);
-		FString(string value);
-
-		using Typed<FString>::cls;
-	};
 
 	class MK_UI_EXPORT InputInt : public Form, public Styled<InputInt>
 	{
@@ -100,13 +87,13 @@ namespace mk
 	class MK_UI_EXPORT InputBool : public Form, public Styled<InputBool>
 	{
 	public:
-		InputBool(const string& label, bool value, std::function<void(void)> on = nullptr, std::function<void(void)> off = nullptr);
+		InputBool(const string& label, bool value, std::function<void(bool)> callback = nullptr);
 	};
 
 	class MK_UI_EXPORT InputText : public Form, public Styled<InputText>
 	{
 	public:
-		InputText(const string& label, const string& text, std::function<void(const string&)> callback = nullptr, bool reverse = false);
+		InputText(const string& label, const string& text, std::function<void(string)> callback = nullptr, bool reverse = false);
 	};
 
 	class MK_UI_EXPORT InputDropdown : public Form, public Styled<InputDropdown>

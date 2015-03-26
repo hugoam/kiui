@@ -6,7 +6,7 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Frame/mkLayer.h>
 
-#include <Object/Store/mkReverse.h>
+#include <Object/Iterable/mkReverse.h>
 
 #include <Ui/Frame/mkInk.h>
 
@@ -17,22 +17,37 @@
 
 namespace mk
 {
-	Layer::Layer(Stripe* parent, Widget* widget, size_t index, size_t zorder)
-		: Stripe(parent, widget, index)
+	Layer::Layer(Widget* widget, size_t index, size_t zorder)
+		: Stripe(widget, index)
 		, d_inkLayer(widget->inkTarget()->layer(this, zorder))
-	{
-		d_inkbox = d_inkLayer->inkbox(this);
-
-		if(parent)
-			parent->layer()->layers().push_back(this);
-	}
+		, d_parentLayer(nullptr)
+	{}
 
 	Layer::~Layer()
 	{
 		d_inkbox.reset(); // destroy the inkbox before the layer
 
-		if(d_parent)
-			d_parent->layer()->layers().erase(std::remove(d_parent->layer()->layers().begin(), d_parent->layer()->layers().end(), this), d_parent->layer()->layers().end());
+		if(d_parentLayer)
+			this->unbind();
+	}
+
+	void Layer::bind()
+	{
+		d_inkbox = d_inkLayer->inkbox(this);
+	}
+
+	void Layer::bind(Stripe* parent)
+	{
+		Frame::bind(parent);
+		d_parentLayer = parent->layer();
+		d_parentLayer->layers().push_back(this);
+	}
+
+	void Layer::unbind()
+	{
+		Frame::unbind();
+		d_parentLayer->layers().erase(std::remove(d_parentLayer->layers().begin(), d_parentLayer->layers().end(), this), d_parentLayer->layers().end());
+		d_parentLayer = nullptr;
 	}
 
 	void Layer::nextFrame(size_t tick, size_t delta)

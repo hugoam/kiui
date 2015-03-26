@@ -72,7 +72,7 @@ namespace mk
 	bool WButton::leftPressed(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
-		toggleState(TRIGGERED);
+		//toggleState(TRIGGERED);
 		return true;
 	}
 
@@ -151,18 +151,13 @@ namespace mk
 
 	void WToggle::toggle()
 	{
+		mOn = !mOn;
+		this->toggleState(ACTIVATED);
+
 		if(mOn)
-		{
-			mOn = false;
-			mTriggerOff(this);
-			this->toggleState(ACTIVATED);
-		}
-		else
-		{
-			mOn = true;
 			mTriggerOn(this);
-			this->toggleState(ACTIVATED);
-		}
+		else
+			mTriggerOff(this);
 	}
 
 	bool WToggle::leftClick(float x, float y)

@@ -20,20 +20,21 @@
 
 #include <Ui/mkUiWindow.h>
 
+#include <iostream>
+
 namespace mk
 {
-	WTypeIn::WTypeIn(Form* form, Style* style)
-		: Widget(style ? style : styleCls(), form)
-		, mValue(form->as<FValue>()->valref())
+	WInputBase::WInputBase(Lref& value, Style* style)
+		: Sheet(style ? style : styleCls())
+		, mValue(value)
+	{}
+
+	WTypeIn::WTypeIn(WInputBase* input, Style* style)
+		: Widget(style ? style : styleCls())
+		, mInput(input)
 		, mHasPeriod(false)
 	{
-		mString = form->as<FValue>()->toString();
-		mForm->setLabel(mString);
-	}
-
-	Lref& WTypeIn::value()
-	{
-		return mForm->as<FValue>()->valref();
+		mString = mInput->value()->getString();
 	}
 
 	void WTypeIn::setAllowedChars(const string& chars)
@@ -41,13 +42,16 @@ namespace mk
 		mAllowedChars = chars;
 	}
 
+	void WTypeIn::updateString()
+	{
+		mString = mInput->value()->getString();
+		this->markDirty();
+	}
+
 	bool WTypeIn::leftClick(float xPos, float yPos)
 	{
 		UNUSED(xPos); UNUSED(yPos);
 		this->activate();
-		this->stack(this);
-		mString = "";
-		mForm->setLabel(mString);
 		return true;
 	}
 
@@ -56,8 +60,8 @@ namespace mk
 		if(code == KC_RETURN)
 		{
 			this->deactivate();
-			this->yield();
-			mForm->as<FValue>()->setString(mString);
+			mInput->value()->setString(mString);
+			mInput->notifyUpdate();
 		}
 		else if(code == KC_BACK)
 		{
@@ -71,15 +75,12 @@ namespace mk
 			mString.push_back(c);
 		}
 
-		mForm->as<FValue>()->setString(mString);
-		mForm->setLabel(mString);
-
+		mInput->value()->setString(mString);
+		mInput->notifyUpdate();
+		this->markDirty();
+		
 		return true;
 	}
-
-	WString::WString(Form* form)
-		: WTypeIn(form, styleCls())
-	{}
 
 	WNumControls::WNumControls(const Trigger& plus, Trigger minus)
 		: Sheet(styleCls())
@@ -92,54 +93,4 @@ namespace mk
 		mPlus = this->makeappend<WButton>("+", nullptr, mPlusTrigger);
 		mMinus = this->makeappend<WButton>("-", nullptr, mMinusTrigger);
 	}
-
-	WInt::WInt(Form* form)
-		: Sheet(styleCls(), form)
-	{}
-
-	void WInt::build()
-	{
-		mDisplay = this->makeappend<WTypeIn>(mForm);
-		mDisplay->setAllowedChars("1234567890");
-		mControls = this->makeappend<WNumControls>(std::bind(&WInt::plus, this), std::bind(&WInt::minus, this));
-	}
-
-	void WInt::plus()
-	{
-		mDisplay->value()->set<int>(mDisplay->value()->get<int>() + 1);
-		mForm->as<FValue>()->updateValue();
-	}
-
-	void WInt::minus()
-	{
-		mDisplay->value()->set<int>(mDisplay->value()->get<int>() - 1);
-		mForm->as<FValue>()->updateValue();
-	}
-
-	WFloat::WFloat(Form* form)
-		: Sheet(styleCls(), form)
-	{}
-
-	void WFloat::build()
-	{
-		mDisplay = this->makeappend<WTypeIn>(mForm);
-		mDisplay->setAllowedChars("1234567890.");
-		mControls = this->makeappend<WNumControls>(std::bind(&WFloat::plus, this), std::bind(&WFloat::minus, this));
-	}
-
-	void WFloat::plus()
-	{
-		mDisplay->value()->set<float>(mDisplay->value()->get<float>() + 0.1f);
-		mForm->as<FValue>()->updateValue();
-	}
-
-	void WFloat::minus()
-	{
-		mDisplay->value()->set<float>(mDisplay->value()->get<float>() - 0.1f);
-		mForm->as<FValue>()->updateValue();
-	}
-
-	WBool::WBool(Form* form)
-		: WCheckbox(form, form->as<FValue>()->valref())
-	{}
 }

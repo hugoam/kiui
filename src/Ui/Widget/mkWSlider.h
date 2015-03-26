@@ -13,6 +13,7 @@
 #include <Ui/Form/mkFValue.h>
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Widget/mkWButton.h>
+#include <Ui/Widget/mkWTypeIn.h>
 
 namespace mk
 {
@@ -126,12 +127,12 @@ namespace mk
 	};
 
 	template <class T>
-	class WStatSlider : public Sheet, public Typed<WStatSlider<T>>, public Styled<WStatSlider<T>>
+	class WStatSlider : public WTypedInput<T>, public Typed<WStatSlider<T>>//, public Styled<WStatSlider<T>>
 	{
 	public:
-		WStatSlider(FValue* form, AutoStat<T> stat, Dimension dim = DIM_X)
-			: Sheet(styleCls(), form)
-			, mStat(stat)
+		WStatSlider(Lref& lref, std::function<void(T)> callback = nullptr, Dimension dim = DIM_X)
+			: WTypedInput<T>(lref, nullptr, callback)
+			, mStat(lref->ref<AutoStat<T>>())
 			, mDim(dim)
 		{}
 
@@ -163,14 +164,16 @@ namespace mk
 		void updateValue()
 		{
 			mStat.modify(T(mSlider->val()));
-			mForm->as<FValue>()->updateValue();
+			this->notifyUpdate();
 			mDisplay->setLabel(toString(mStat.value()));
 		}
+
+		void notifyUpdate() { ++mUpdate; if(mOnUpdate) mOnUpdate(mStat.value()); if(mForm) mForm->as<FValue>()->updateValue(); }
 
 		using Typed<WStatSlider<T>>::cls;
 
 	protected:
-		AutoStat<T> mStat;
+		AutoStat<T>& mStat;
 
 		Dimension mDim;
 

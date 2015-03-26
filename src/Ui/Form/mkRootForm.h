@@ -7,8 +7,6 @@
 
 /* mk headers */
 #include <Object/mkTyped.h>
-#include <Object/Store/mkRegistry.h>
-#include <Object/Store/mkIndexStore.h>
 #include <Object/Util/mkUpdatable.h>
 #include <Object/Util/mkMake.h>
 #include <Ui/Form/mkForm.h>

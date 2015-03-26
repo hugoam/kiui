@@ -33,6 +33,11 @@ namespace mk
 			mHeader->activate();
 	}
 
+	unique_ptr<Widget> WTab::vrelease(Widget* widget)
+	{
+		return mParent->parent()->vrelease(widget);
+	}
+
 	WTabberHead::WTabberHead()
 		: Sheet(styleCls())
 	{}

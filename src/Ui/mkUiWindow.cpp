@@ -48,7 +48,7 @@ namespace mk
 
 	UiWindow::~UiWindow()
 	{
-		mRootSheet->clear();
+		//mRootSheet->clear();
 	}
 
 	void UiWindow::setup(RenderWindow* renderWindow, InkWindow* inkWindow, InputWindow* inputWindow)
@@ -57,8 +57,8 @@ namespace mk
 		mInkWindow = inkWindow;
 		mInputWindow = inputWindow;
 
-		mWidth = renderWindow->width();
-		mHeight = renderWindow->height();
+		mWidth = float(renderWindow->width());
+		mHeight = float(renderWindow->height());
 
 		mRootForm = make_unique<RootForm>(this);
 		mRootSheet = mRootForm->sheet();

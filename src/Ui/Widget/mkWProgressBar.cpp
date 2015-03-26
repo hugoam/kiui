@@ -16,6 +16,14 @@
 
 namespace mk
 {
+	WProgressFillerX::WProgressFillerX()
+		: Widget(styleCls())
+	{}
+
+	WProgressFillerY::WProgressFillerY()
+		: Widget(styleCls())
+	{}
+
 	WProgressBar::WProgressBar(Dimension dim, Style* style, const Trigger& onUpdated)
 		: Sheet(style)
 		, mDim(dim)
@@ -28,15 +36,22 @@ namespace mk
 		Sheet::build();
 
 		if(mDim == DIM_X)
-			mFiller = this->makeappend<WSpacerX>();
+		{
+			mFiller = this->makeappend<WProgressFillerX>();
+			mSpacer = this->makeappend<WSpacerX>();
+		}
 		else
-			mFiller = this->makeappend<WSpacerY>();
+		{
+			mFiller = this->makeappend<WProgressFillerY>();
+			mSpacer = this->makeappend<WSpacerY>();
+		}
 	}
 
 	void WProgressBar::setPercentage(float percentage)
 	{
 		mPercentage = percentage;
 		mFiller->frame()->setSpanDim(mDim, percentage);
+		mSpacer->frame()->setSpanDim(mDim, 1.f - percentage);
 	}
 
 	WProgressBarX::WProgressBarX()
@@ -44,6 +59,6 @@ namespace mk
 	{}
 
 	WProgressBarY::WProgressBarY()
-		: WProgressBar(DIM_X, styleCls())
+		: WProgressBar(DIM_Y, styleCls())
 	{}
 }

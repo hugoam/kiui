@@ -14,7 +14,7 @@
 
 #include <Ui/Widget/mkWSlider.h>
 
-#include <Object/Store/mkReverse.h>
+#include <Object/Iterable/mkReverse.h>
 
 #include <iostream>
 

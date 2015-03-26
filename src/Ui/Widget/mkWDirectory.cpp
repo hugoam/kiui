@@ -20,16 +20,19 @@ namespace mk
 
 	void WDir::build()
 	{
-		this->makeappend<WIcon>("dir");
+		this->makeappend<WIcon>("folder_20.png");
 		this->makeappend<WLabel>(mName);
 	}
 
 	void WDir::trigger()
 	{
-		if(mName != "..")
-			mParent->parent()->as<WDirectory>()->moveIn(mName);
-		else
+		if(mName == ".")
+			return;
+		if(mName == "..")
 			mParent->parent()->as<WDirectory>()->moveOut();
+		else
+			mParent->parent()->as<WDirectory>()->moveIn(mName);
+			
 	}
 
 	WFile::WFile(const string& name)
@@ -39,7 +42,7 @@ namespace mk
 
 	void WFile::build()
 	{
-		this->makeappend<WIcon>("file");
+		this->makeappend<WIcon>("file_20.png");
 		this->makeappend<WLabel>(mName);
 	}
 

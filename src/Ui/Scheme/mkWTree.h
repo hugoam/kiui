@@ -45,6 +45,9 @@ namespace mk
 
 		void build();
 
+		Widget* vappend(unique_ptr<Widget> widget);
+		unique_ptr<Widget> vrelease(Widget* widget);
+
 		void selected();
 
 		using Typed<WTreeNode>::cls;
@@ -70,7 +73,7 @@ namespace mk
 	class MK_UI_EXPORT TreeNode : public Form
 	{
 	public:
-		TreeNode(Object* object, Tree* tree, bool collapsed = false);
+		TreeNode(Object* object, Tree* tree, const string& name = "", bool collapsed = false);
 		~TreeNode();
 
 		Object* object() { return mObject; }
@@ -97,6 +100,7 @@ namespace mk
 	{
 	public:
 		Tree(std::function<void(Object*)> onSelected, Style* style = nullptr);
+		~Tree();
 
 		void selected(Widget* widget);
 

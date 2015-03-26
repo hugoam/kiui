@@ -93,6 +93,7 @@ namespace mk
 	class WSliderKnob;
 	class WScroller;
 	class WScrollbar;
+	class WInputBase;
 
 	template <class T>
 	class WStatSlider;

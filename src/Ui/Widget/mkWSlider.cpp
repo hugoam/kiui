@@ -113,20 +113,13 @@ namespace mk
 	{
 		Sheet::build();
 
-		if(mButton->frame()->style()->d_sizing[mDim] == FIXED)
+		if(mButton->frame()->style()->d_sizing[mDim] != EXPAND)
 			mFixedKnob = true;
-
-		/*this->stripe()->initWeights();
-
-		if(mFixedKnob)
-			this->stripe()->weights() = { 1.f, -1.f, 1.f };
-		else
-			this->stripe()->weights() = { 1.f, 1.f, 1.f };*/
 	}
 
 	void WSlider::offsetChange(float offset, bool ended)
 	{
-		int step = int(offset / (mFrame->dsize(mDim) - mButton->frame()->dsize(mDim)) * (mNumSteps - 1.f));
+		int step = int(round(offset / (mFrame->dsize(mDim) - mButton->frame()->dsize(mDim)) * (mNumSteps - 1.f)));
 		if(step != mStep)
 		{
 			mStep = step;

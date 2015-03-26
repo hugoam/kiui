@@ -18,103 +18,31 @@ using namespace std::placeholders;
 
 namespace mk
 {
-	FInt::FInt(Lref& value, bool edit)
-		: FValue(value, nullptr, edit)
-	{
-		mType = cls();
-		mScheme.setMapper([this]() { return make_unique<WInt>(this); });
-		setLabel(this->toString());
-	}
-
-	FInt::FInt(int value)
-		: FValue(lref(value), nullptr)
-	{
-		mType = cls();
-		mScheme.setMapper([this]() { return make_unique<WInt>(this); });
-	}
-
-	void FInt::updateValue()
-	{
-		setLabel(this->toString());
-		FValue::updateValue();
-	}
-	
-	FFloat::FFloat(Lref& value, bool edit)
-		: FValue(value, nullptr, edit)
-	{
-		mType = cls();
-		mScheme.setMapper([this]() { return make_unique<WFloat>(this); });
-		setLabel(this->toString());
-	}
-
-	FFloat::FFloat(float value)
-		: FValue(lref(value), nullptr)
-	{
-		mType = cls();
-		mScheme.setMapper([this]() { return make_unique<WFloat>(this); });
-	}
-
-	void FFloat::updateValue()
-	{
-		setLabel(this->toString());
-		FValue::updateValue();
-	}
-
-	FBool::FBool(Lref& value, bool edit)
-		: FValue(value, nullptr, edit)
-	{
-		mType = cls();
-		mScheme.setMapper([this]() { return make_unique<WBool>(this); });
-		setLabel(this->toString());
-	}
-
-	FBool::FBool(bool value)
-		: FValue(lref(value), nullptr)
-	{
-		mType = cls();
-		mScheme.setMapper([this]() { return make_unique<WBool>(this); });
-	}
-
-	FString::FString(Lref& value, bool edit)
-		: FValue(value, nullptr, edit)
-	{
-		mType = cls();
-		mScheme.setMapper([this]() { return make_unique<WString>(this); });
-		setLabel(this->toString());
-	}
-	
-	FString::FString(string value)
-		: FValue(lref(value), nullptr)
-	{
-		mType = cls();
-		mScheme.setMapper([this]() { return make_unique<WString>(this); });
-	}
-
 	InputInt::InputInt(const string& label, int value, std::function<void(int)> callback)
 		: Form(styleCls())
 	{
-		this->makeappend<FInt>(value);
+		this->makeappend<FInput<int>>(value, callback);
 		this->makeappend<Label>(label);
 	}
 
 	InputFloat::InputFloat(const string& label, float value, std::function<void(float)> callback)
 		: Form(styleCls())
 	{
-		this->makeappend<FFloat>(value);
+		this->makeappend<FInput<float>>(value, callback);
 		this->makeappend<Label>(label);
 	}
 
-	InputBool::InputBool(const string& label, bool value, std::function<void()> on, std::function<void()> off)
+	InputBool::InputBool(const string& label, bool value, std::function<void(bool)> callback)
 		: Form(styleCls())
 	{
-		this->makeappend<FBool>(value);
+		this->makeappend<FInput<bool>>(value, callback);
 		this->makeappend<Label>(label);
 	}
 
-	InputText::InputText(const string& label, const string& text, std::function<void(const string&)> callback, bool reverse)
+	InputText::InputText(const string& label, const string& text, std::function<void(string)> callback, bool reverse)
 		: Form(styleCls())
 	{
-		this->makeappend<FString>(text);
+		this->makeappend<FInput<string>>(text, callback);
 		this->makeappend<Label>(label);
 
 		if(reverse)
@@ -134,14 +62,14 @@ namespace mk
 	SliderInt::SliderInt(const string& label, AutoStat<int> value, std::function<void(int)> callback)
 		: Form(styleCls())
 	{
-		this->makeappend<FStat<int>>(value),
+		this->makeappend<FStat<int>>(value, callback),
 		this->makeappend<Label>(label);
 	}
 
 	SliderFloat::SliderFloat(const string& label, AutoStat<float> value, std::function<void(float)> callback)
 		: Form(styleCls())
 	{
-		this->makeappend<FStat<float>>(value);
+		this->makeappend<FStat<float>>(value, callback);
 		this->makeappend<Label>(label);
 	}
 
@@ -166,12 +94,12 @@ namespace mk
 
 	//template class Dispatch<ObjectForm, Stock*, dispatchStoreForm>;
 
-	template class Dispatch<ValueForm, bool&, valueForm<bool&, FBool>>;
-	template class Dispatch<ValueForm, unsigned int&, valueForm<unsigned int&, FInt>>;
-	template class Dispatch<ValueForm, int&, statValueForm<int&, FInt>>;
-	template class Dispatch<ValueForm, float&, statValueForm<float&, FFloat>>;
-	template class Dispatch<ValueForm, double&, valueForm<double&, FFloat>>;
-	template class Dispatch<ValueForm, string&, valueForm<string&, FString>>;
+	template class Dispatch<ValueForm, bool&, valueForm<bool&, FInput<bool>>>;
+	template class Dispatch<ValueForm, unsigned int&, valueForm<unsigned int&, FInput<int>>>;
+	template class Dispatch<ValueForm, int&, statValueForm<int&, FInput<int>>>;
+	template class Dispatch<ValueForm, float&, statValueForm<float&, FInput<float>>>;
+	template class Dispatch<ValueForm, double&, valueForm<double&, FInput<double>>>;
+	template class Dispatch<ValueForm, string&, valueForm<string&, FInput<string>>>;
 
 	template class Dispatch<ValueForm, AutoStat<int>&, valueForm<AutoStat<int>&, FStat<float>>>;
 	template class Dispatch<ValueForm, AutoStat<float>&, valueForm<AutoStat<float>&, FStat<float>>>;

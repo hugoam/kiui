@@ -43,6 +43,25 @@ namespace mk
 
 		mExpandButton = mHeader->makeappend<WTreeNodeToggle>(std::bind(&WExpandbox::expand, this), std::bind(&WExpandbox::collapse, this), !mCollapsed);
 		mTitleLabel = mHeader->makeappend<WTitle>(mTitle);
+
+		mExpandButton->hide();
+		mContainer->hide();
+	}
+
+	Widget* WTreeNode::vappend(unique_ptr<Widget> widget)
+	{
+		if(mExpandButton->frame()->hidden())
+			mExpandButton->show();
+
+		return WExpandbox::vappend(std::move(widget));
+	}
+
+	unique_ptr<Widget> WTreeNode::vrelease(Widget* widget)
+	{
+		if(mContainer->count() == 1)
+			mExpandButton->hide();
+
+		return WExpandbox::vrelease(widget);
 	}
 
 	void WTreeNode::selected()
@@ -94,12 +113,13 @@ namespace mk
 		: Expandbox(title, collapsed)
 	{}*/
 
-	TreeNode::TreeNode(Object* object, Tree* tree, bool collapsed)
-		: Form(nullptr, "", [this]() { return make_unique<WTreeNode>(this, "", this->name()); })
+	TreeNode::TreeNode(Object* object, Tree* tree, const string& name, bool collapsed)
+		: Form(nullptr, "", [this, collapsed]() { return make_unique<WTreeNode>(this, "", this->name(), collapsed); })
 		//: Form("formnode", "Form " + form->style(), [this]() { return make_unique<WTreeNode>(this, "", this->label()); })
 		, mObject(object)
 		, mTree(tree)
 	{
+		this->setName(name);
 		mTree->addNode(mObject, this);
 	}
 
@@ -122,9 +142,15 @@ namespace mk
 		, mOnSelected(onSelected)
 	{}
 
+	Tree::~Tree()
+	{
+		mContents.clear();
+	}
+
 	void Tree::selected(Widget* widget)
 	{
-		mOnSelected(widget->as<WTreeNode>()->form()->as<TreeNode>()->object());
+		if(mOnSelected)
+			mOnSelected(widget->as<WTreeNode>()->form()->as<TreeNode>()->object());
 	}
 
 	void Tree::select(Object* object)

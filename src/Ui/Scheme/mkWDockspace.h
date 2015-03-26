@@ -27,6 +27,8 @@ namespace mk
 
 		void setDockline(WDockline* dockline) { mDockline = dockline; }
 
+		unique_ptr<Widget> vrelease(Widget* widget);
+
 		void dock(WWindow* window);
 		void undock(WWindow* window);
 

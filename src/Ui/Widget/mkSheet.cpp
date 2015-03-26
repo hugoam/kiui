@@ -18,7 +18,7 @@
 #include <Ui/mkUiWindow.h>
 #include <Ui/mkUiLayout.h>
 
-#include <Object/Store/mkReverse.h>
+#include <Object/Iterable/mkReverse.h>
 
 #include <iostream>
 
@@ -82,6 +82,14 @@ namespace mk
 		mContents.clear();
 	}
 
+	void Sheet::cleanup()
+	{
+		Widget::cleanup();
+
+		for(auto& widget : mContents)
+			widget->cleanup();
+	}
+
 	ScrollSheet::ScrollSheet(Style* style, Form* form)
 		: Sheet(style, form)
 		, mSheet(nullptr)
@@ -99,6 +107,9 @@ namespace mk
 
 	void ScrollSheet::nextFrame(size_t tick, size_t delta)
 	{
+		if(mSheet->stripe()->cursor() > 0.f && mSheet->stripe()->sequenceLength() - mSheet->stripe()->cursor() < mFrame->dsize(DIM_Y))
+			mSheet->stripe()->setCursor(mSheet->stripe()->sequenceLength() - mFrame->dsize(DIM_Y));
+
 		Sheet::nextFrame(tick, delta);
 
 		if(mSheet->stripe()->overflow() && mScrollbar->frame()->hidden())
@@ -176,10 +187,21 @@ namespace mk
 		: Widget(styleCls())
 	{}
 
+	void Cursor::build()
+	{
+		mHovered = mParent;
+	}
+
 	void Cursor::nextFrame()
 	{
 		if(mDirty)
 		{
+			/*if(mTooltip->frame()->visible())
+			this->tooltipOff();
+
+			mTooltipTimer = 0.f;
+			mTooltip->setLabel(static_cast<Widget*>(mHovered)->tooltip());*/
+
 			mFrame->inkbox()->updateFrame();
 			mDirty = false;
 		}
@@ -193,12 +215,14 @@ namespace mk
 
 	void Cursor::hover(Widget* widget)
 	{
+		mHovered = widget;
 		if(widget->hoverCursor())
 			this->reset(widget->hoverCursor());
 	}
 
 	void Cursor::unhover(Widget* widget)
 	{
+		mHovered = mParent;
 		if(widget->hoverCursor())
 			this->reset(styleCls());
 	}

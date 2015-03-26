@@ -16,7 +16,7 @@
 #include <Ui/mkUiWindow.h>
 #include <Ui/mkUiLayout.h>
 
-#include <Object/Store/mkReverse.h>
+#include <Object/Iterable/mkReverse.h>
 
 #include <iostream>
 
@@ -27,12 +27,17 @@ namespace mk
 		, mWindow(window)
 		, mLeftPressed(false)
 		, mActiveFrame(this)
-		, mHovered(this)
 		, mController(this)
 	{
 		if(absolute)
-			mFrame = make_unique<Layer>(nullptr, this, 0);
+		{
+			mFrame = make_unique<Layer>(this, 0);
+			mFrame->as<Layer>()->bind();
+		}
 	}
+
+	RootSheet::~RootSheet()
+	{}
 
 	void RootSheet::build()
 	{
@@ -43,10 +48,6 @@ namespace mk
 	void RootSheet::nextFrame(size_t tick, size_t delta)
 	{
 		Sheet::nextFrame(tick, delta);
-
-		mTooltipTimer += mTooltipClock.step();
-		if(mTooltipTimer > 0.5f && !mTooltip->frame()->visible() && !mTooltip->label().empty())
-			this->tooltipOn();
 
 		mCursor->nextFrame();
 	}
@@ -61,11 +62,6 @@ namespace mk
 	{
 		UNUSED(widget);
 		mActiveFrame = this;
-	}
-
-	void RootSheet::unhover()
-	{
-		mHovered = this;
 	}
 
 	void RootSheet::contextOn(Widget* contextMenu)
@@ -178,20 +174,6 @@ namespace mk
 
 		while(receiver != this && !receiver->mouseMoved(xPos, yPos, xDif, yDif))
 			receiver = receiver->propagateMouse(xPos, yPos);
-
-		if(receiver != mHovered)
-		{
-			mHovered->mouseLeaved(xPos, yPos);
-			receiver->mouseEntered(xPos, yPos);
-
-			mHovered = receiver;
-
-			if(mTooltip->frame()->visible())
-				this->tooltipOff();
-
-			mTooltipTimer = 0.f;
-			mTooltip->setLabel(static_cast<Widget*>(mHovered)->tooltip());
-		}
 
 		return true;
 	}

@@ -27,7 +27,7 @@ namespace mk
 	public:
 		Button(const string& label, const string& image = "", const Trigger& trigger = nullptr, Style* style = nullptr);
 
-		virtual void trigger() { mTrigger(this); }
+		virtual void trigger() { if(mTrigger) mTrigger(this); }
 		virtual void triggerAlt() { this->trigger(); }
 		virtual void triggerShift() { this->trigger(); }
 		virtual void triggerCtrl() { this->trigger(); }

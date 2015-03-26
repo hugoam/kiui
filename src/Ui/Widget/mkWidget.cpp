@@ -20,7 +20,7 @@
 
 #include <Ui/Form/mkRootForm.h>
 
-#include <Object/Store/mkReverse.h>
+#include <Object/Iterable/mkReverse.h>
 
 #include <iostream>
 
@@ -42,12 +42,19 @@ namespace mk
 
 	Widget::~Widget()
 	{
+		this->cleanup();
+	}
+
+	void Widget::cleanup()
+	{
 		if(mState & MODAL)
-			this->rootSheet()->modalOff();
+			this->unmodal();
 		if(mState & HOVERED)
-			this->rootSheet()->unhover();
+			this->unhover();
+		if(mState & ACTIVATED)
+			this->deactivate();
 		if(mState & FOCUSED)
-			this->rootSheet()->deactivate(this);
+			this->unfocus();
 	}
 
 	void Widget::bind(Sheet* parent, size_t index)
@@ -58,13 +65,18 @@ namespace mk
 		Stripe* stripe = mParent->frame()->as<Stripe>();
 
 		if(this->frameType() == LAYER3D)
-			mFrame = make_unique<Layer>(nullptr, this, index, this->zorder());
+			mFrame = make_unique<Layer>(this, index, this->zorder());
 		else if(this->frameType() == LAYER)
-			mFrame = make_unique<Layer>(stripe, this, index, this->zorder());
+			mFrame = make_unique<Layer>(this, index, this->zorder());
 		else if(this->frameType() == STRIPE)
-			mFrame = make_unique<Stripe>(stripe, this, index);
+			mFrame = make_unique<Stripe>(this, index);
 		else
-			mFrame = make_unique<Frame>(stripe, this, index);
+			mFrame = make_unique<Frame>(this, index);
+
+		if(this->frameType() != LAYER3D)
+			stripe->insert(mFrame.get(), index);
+		else
+			mFrame->as<Layer>()->bind();
 
 		this->build();
 	}
@@ -78,12 +90,13 @@ namespace mk
 
 	unique_ptr<Widget> Widget::unbind()
 	{
+		this->cleanup();
 		return mParent->as<Sheet>()->release(this);
 	}
 
 	unique_ptr<Widget> Widget::extract()
 	{
-		mFrame->remove();
+		this->cleanup();
 		unique_ptr<Widget> unique = mParent->as<Sheet>()->release(this);
 		mParent->destroy();
 		return unique;
@@ -91,7 +104,8 @@ namespace mk
 
 	void Widget::destroy()
 	{
-		mParent->as<Sheet>()->release(this);
+		this->cleanup();
+		mParent->as<Sheet>()->vrelease(this);
 	}
 
 	void Widget::detach()
@@ -269,37 +283,37 @@ namespace mk
 
 	void Widget::activate()
 	{
+		this->rootSheet()->activate(this);
 		this->toggleState(ACTIVATED);
 	}
 
 	void Widget::deactivate()
 	{
+		this->rootSheet()->deactivate(this);
 		this->toggleState(ACTIVATED);
 	}
 
 	void Widget::focus()
 	{
-		this->toggleState(FOCUSED);
 		this->rootSheet()->activate(this);
+		this->toggleState(FOCUSED);
 	}
 
 	void Widget::unfocus()
 	{
-		this->toggleState(FOCUSED);
 		this->rootSheet()->deactivate(this);
+		this->toggleState(FOCUSED);
 	}
 
 	void Widget::hover()
 	{
 		this->rootSheet()->cursor()->hover(this);
-
 		this->toggleState(HOVERED);
 	}
 	
 	void Widget::unhover()
 	{
 		this->rootSheet()->cursor()->unhover(this);
-
 		this->toggleState(HOVERED);
 	}
 
@@ -332,6 +346,12 @@ namespace mk
 
 	bool Widget::mouseMoved(float xPos, float yPos, float xDif, float yDif)
 	{
+		if(this->rootSheet()->cursor()->hovered() != this)
+		{
+			this->rootSheet()->cursor()->hovered()->mouseLeaved(xPos, yPos);
+			this->mouseEntered(xPos, yPos);
+		}
+
 		if(mState & DRAGGED)
 		{
 			this->leftDrag(xPos, yPos, xDif, yDif);

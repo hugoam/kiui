@@ -28,6 +28,8 @@ namespace mk
 
 		void build();
 
+		unique_ptr<Widget> vrelease(Widget* widget);
+
 		WButton* header() { return mHeader; }
 
 		using Typed<WTab>::cls;

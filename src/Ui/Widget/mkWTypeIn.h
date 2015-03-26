@@ -10,40 +10,67 @@
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Controller/mkController.h>
 #include <Ui/Widget/mkWCheckbox.h>
+#include <Ui/Form/mkFValue.h>
+
+#include <Object/String/mkStringConvert.h>
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ WTypeIn : public Widget, public Controller, public Typed<WTypeIn>, public Styled<WTypeIn>
+	class MK_UI_EXPORT _I_ WInputBase : public Sheet, public Typed<WInputBase>, public Styled<WInputBase>
 	{
 	public:
-		WTypeIn(Form* form, Style* style = nullptr);
+		WInputBase(Lref& value, Style* style = nullptr);
 
-		Lref& value();
+		Lref& value() { return mValue; }
+
+		virtual void notifyUpdate() = 0;
+
+		using Typed<WInputBase>::cls;
+
+	protected:
+		Lref& mValue;
+	};
+
+	template <class T>
+	class WTypedInput : public WInputBase
+	{
+	public:
+		WTypedInput(Lref& value, Style* style = nullptr, std::function<void(T)> callback = nullptr)
+			: WInputBase(value, style)
+			, mOnUpdate(callback)
+			, mUpdate(0)
+		{}
+
+		void notifyUpdate() { ++mUpdate; if(mOnUpdate) mOnUpdate(mValue->get<T>()); if(mForm) mForm->as<FValue>()->updateValue(); }
+
+	protected:
+		std::function<void(T)> mOnUpdate;
+		size_t mUpdate;
+	};
+
+	class MK_UI_EXPORT _I_ WTypeIn : public Widget, public Typed<WTypeIn>, public Styled<WTypeIn>
+	{
+	public:
+		WTypeIn(WInputBase* input, Style* style = nullptr);
+
+		Style* hoverCursor() { return CaretCursor::styleCls(); }
+		const string& label() { return mString; }
 
 		bool leftClick(float xPos, float yPos);
-
 		bool keyDown(KeyCode code, char c);
 
 		void setAllowedChars(const string& chars);
+		void updateString();
 
 		using Typed<WTypeIn>::cls;
 
 	protected:
-		Lref& mValue;
+		WInputBase* mInput;
 		string mString;
 		bool mHasPeriod;
 		string mAllowedChars;
 	};
-
-	class MK_UI_EXPORT _I_ WString : public WTypeIn, public Typed<WString>, public Styled<WString>
-	{
-	public:
-		WString(Form* form);
-
-		using Typed<WString>::cls;
-		using Styled<WString>::styleCls;
-	};
-
+	
 	class MK_UI_EXPORT WNumControls : public Sheet, public Styled<WNumControls>
 	{
 	public:
@@ -58,44 +85,106 @@ namespace mk
 		WButton* mMinus;
 	};
 
-	class MK_UI_EXPORT _I_ WInt : public Sheet, public Typed<WInt>, public Styled<WInt>
+	template <class T>
+	class WNumberInput : public WTypedInput<T>
 	{
 	public:
-		WInt(Form* form);
+		WNumberInput(Lref& value, std::function<void(T)> callback = nullptr)
+			: WTypedInput<T>(value, styleCls(), callback)
+			, mStep(1)
+		{}
 
-		void build();
+		void build()
+		{
+			mTypeIn = this->makeappend<WTypeIn>(this);
+			mControls = this->makeappend<WNumControls>(std::bind(&WNumberInput<T>::increment, this), std::bind(&WNumberInput<T>::decrement, this));
 
-		void plus();
-		void minus();
+			if(typecls<T>() == typecls<float>() || typecls<T>() == typecls<double>())
+				mTypeIn->setAllowedChars("1234567890.");
+			else
+				mTypeIn->setAllowedChars("1234567890");
+		}
 
-		using Typed<WInt>::cls;
+		void increment()
+		{
+			mValue->set<T>(mValue->get<T>() + mStep);
+			mTypeIn->updateString();
+			this->notifyUpdate();
+		}
+
+		void decrement()
+		{
+			mValue->set<T>(mValue->get<T>() - mStep);
+			mTypeIn->updateString();
+			this->notifyUpdate();
+		}
 
 	protected:
-		WTypeIn* mDisplay;
+		WTypeIn* mTypeIn;
 		WNumControls* mControls;
+		T mStep;
 	};
 
-	class MK_UI_EXPORT _I_ WFloat : public Sheet, public Typed<WFloat>, public Styled<WFloat>
+	template <class T>
+	class WInput
+	{};
+
+	template <>
+	class MK_UI_EXPORT _I_ WInput<int> : public WNumberInput<int>
 	{
 	public:
-		WFloat(Form* form);
-
-		void build();
-		
-		void plus();
-		void minus();
-
-		using Typed<WFloat>::cls;
-
-	protected:
-		WTypeIn* mDisplay;
-		WNumControls* mControls;
+		WInput(Lref& value, std::function<void(int)> callback = nullptr)
+			: WNumberInput<int>(value, callback)
+		{}
 	};
 
-	class MK_UI_EXPORT WBool : public WCheckbox, public Styled<WBool>
+	template <>
+	class MK_UI_EXPORT _I_ WInput<float> : public WNumberInput<float>
 	{
 	public:
-		WBool(Form* form);
+		WInput(Lref& value, std::function<void(float)> callback = nullptr)
+			: WNumberInput<float>(value, callback)
+		{}
+	};
+
+	template <>
+	class MK_UI_EXPORT _I_ WInput<double> : public WNumberInput<double>
+	{
+	public:
+		WInput(Lref& value, std::function<void(double)> callback = nullptr)
+			: WNumberInput<double>(value, callback)
+		{}
+	};
+
+	template <>
+	class MK_UI_EXPORT _I_ WInput<bool> : public WTypedInput<bool>, public Typed<WInput<bool>>, public Styled<WInput<bool>>
+	{
+	public:
+		WInput(Lref& value, std::function<void(bool)> callback = nullptr)
+			: WTypedInput<bool>(value, styleCls(), callback)
+		{}
+
+		void build()
+		{
+			this->makeappend<WCheckbox>(this, mValue->get<bool>());
+		}
+
+		using Styled<WInput<bool>>::styleCls;
+		using Typed<WInput<bool>>::cls;
+	};
+
+	template <>
+	class MK_UI_EXPORT _I_ WInput<string> : public WTypedInput<string>
+	{
+	public:
+		WInput(Lref& value, std::function<void(string)> callback = nullptr)
+			: WTypedInput<string>(value, nullptr, callback)
+		{}
+
+		void build()
+		{
+			this->makeappend<WTypeIn>(this);
+		}
 	};
 }
 

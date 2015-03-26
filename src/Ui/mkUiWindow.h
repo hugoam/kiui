@@ -7,8 +7,6 @@
 
 /* mk Front */
 #include <Object/Util/mkColour.h>
-#include <Object/Store/mkArray.h>
-#include <Object/Store/mkRegistry.h>
 #include <Object/Util/mkTimer.h>
 #include <Ui/mkUiForward.h>
 #include <Ui/Input/mkInputDispatcher.h>

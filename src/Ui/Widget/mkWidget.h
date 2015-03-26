@@ -9,7 +9,6 @@
 #include <Object/mkTyped.h>
 #include <Object/String/mkString.h>
 #include <Object/Util/mkUpdatable.h>
-#include <Object/Store/mkRegistry.h>
 #include <Ui/mkUiForward.h>
 #include <Ui/Frame/mkUibox.h>
 #include <Ui/Input/mkInputDispatcher.h>
@@ -71,9 +70,11 @@ namespace mk
 		virtual void show();
 		virtual void hide();
 
+		virtual void cleanup();
+
 		void bind(Sheet* parent, size_t index);
 		void rebind(Sheet* parent, size_t index);
-
+		
 		unique_ptr<Widget> unbind();
 		unique_ptr<Widget> extract();
 

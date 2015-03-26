@@ -42,8 +42,8 @@ namespace mk
 		, mName(title)
 		, mClosable(closable)
 		, mDockable(dockable)
-		, mMovable(false)
-		, mSizable(false)
+		, mMovable(true)
+		, mSizable(true)
 		, mContent(nullptr)
 		, mOnClose(onClose)
 		, mDragging(false)
@@ -60,6 +60,7 @@ namespace mk
 		mHeader = this->makeappend<WWindowHeader>();
 		mBody = this->makeappend<WWindowBody>();
 		mTitle = mHeader->makeappend<WLabel>(mName);
+		mHeader->makeappend<Widget>(DivX::styleCls());
 		mCloseButton = mClosable ? mHeader->makeappend<WCloseButton>(std::bind(&WWindow::close, this)) : nullptr;
 
 		if(!mDock)
@@ -70,42 +71,19 @@ namespace mk
 		}
 	}
 
-	void WWindow::setClosable()
+	void WWindow::toggleClosable()
 	{
-		mCloseButton->show();
+		mCloseButton->frame()->visible() ? mCloseButton->hide() : mCloseButton->show();
 	}
 
-	void WWindow::setUnclosable()
+	void WWindow::toggleMovable()
 	{
-		mCloseButton->hide();
+		mMovable = !mMovable;
 	}
 
-	void WWindow::setScrollable()
+	void WWindow::toggleResizable()
 	{
-	}
-
-	void WWindow::setUnscrollable()
-	{
-	}
-
-	void WWindow::setMovable()
-	{
-		mMovable = true;
-	}
-
-	void WWindow::setUnmovable()
-	{
-		mMovable = false;
-	}
-
-	void WWindow::setResizable()
-	{
-		mSizable = true;
-	}
-
-	void WWindow::setUnsizable()
-	{
-		mSizable = false;
+		mSizable = !mSizable;
 	}
 
 	void WWindow::showTitlebar()
@@ -228,6 +206,8 @@ namespace mk
 
 	void Window::onClose(Widget* widget)
 	{
-		mOnClose(widget->form());
+		if(mOnClose)
+			mOnClose(widget->form());
+		mParent->remove(mIndex);
 	}
 }

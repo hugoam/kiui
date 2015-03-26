@@ -113,13 +113,21 @@ namespace mk
 	{
 		Tree* tree = parent->makeappend<Tree>(nullptr);
 
-		TreeNode* node = tree->makeappend<TreeNode>(nullptr, tree);
-		node->setName("Tree");
+		TreeNode* node = tree->makeappend<TreeNode>(nullptr, tree, "Tree");
 
 		for(size_t i = 0; i < 5; i++)
 		{
-			TreeNode* innernode = node->makeappend<TreeNode>(nullptr, tree);
-			innernode->setName("Child " + toString(i));
+			TreeNode* innernode = node->makeappend<TreeNode>(nullptr, tree, "Child " + toString(i), true);
+			TreeNode* innestnode = innernode;
+			for(size_t j = 0; j < 5; j++)
+			{
+				innestnode = innestnode->makeappend<TreeNode>(nullptr, tree, "Child " + toString(i) + " : " + toString(j));
+			}
+		}
+
+		for(size_t i = 0; i < 5; i++)
+		{
+			TreeNode* innernode = node->makeappend<TreeNode>(nullptr, tree, "Child " + toString(5+i));
 
 			innernode->makeappend<Label>("Blah blah");
 			innernode->makeappend<Button>("Print");
@@ -229,43 +237,154 @@ namespace mk
 		return table;
 	}
 
-	Form* createUiTestImageSkin(Form* parent)
+	Form* createUiTestFileBrowser(Form* parent)
+	{
+		unique_ptr<Form> filebrowser = make_unique<Form>(nullptr, "", [](){ return make_unique<WDirectory>("../Data/interface"); });
+		filebrowser->setName("File Browser");
+		return parent->makeappend<Window>(std::move(filebrowser));
+	}
+
+	void declareImageSkin(Styler* styler, const string& name, Style* base, const string& image)
+	{
+		styler->dynamicStyle(name);
+		styler->fetchStyle(name)->inheritLayout(base);
+		styler->fetchStyle(name)->skin()->mImage = image + ".png";
+		styler->fetchStyle(name)->skin()->mEmpty = false;
+		styler->fetchStyle(name)->decline(HOVERED)->mImage = image + "_hovered.png";
+		styler->fetchStyle(name)->decline(PRESSED)->mImage = image + "_pressed.png";
+		styler->fetchStyle(name)->decline(ACTIVATED)->mImage = image + "_activated.png";
+	}
+
+	void declareStretchSkin(Styler* styler, const string& name, Style* base, const string& image, int a, int b, int c, int d, int e, int f, bool interact = false)
+	{
+		styler->dynamicStyle(name);
+		styler->fetchStyle(name)->inheritLayout(base);
+		styler->fetchStyle(name)->skin()->mImageSkin = ImageSkin(image + ".png", a, b, c, d, e, f);
+		styler->fetchStyle(name)->skin()->mEmpty = false;
+		if(interact)
+		{
+			styler->fetchStyle(name)->decline(HOVERED)->mImageSkin = ImageSkin(image + "_hovered.png", a, b, c, d, e, f);
+			styler->fetchStyle(name)->decline(PRESSED)->mImageSkin = ImageSkin(image + "_pressed.png", a, b, c, d, e, f);
+			styler->fetchStyle(name)->decline(ACTIVATED)->mImageSkin = ImageSkin(image + "_activated.png", a, b, c, d, e, f);
+		}
+	}
+
+	Form* createUiTestCeguiImageSkin(Form* parent)
 	{
 		Styler* styler = parent->uiWindow()->styler();
 
-		styler->dynamicStyle("tlookwindow");
-		styler->fetchStyle("tlookwindow")->inheritLayout(WWindow::styleCls());
+		styler->dynamicStyle("tlook_window");
+		styler->fetchStyle("tlook_window")->inheritLayout(WWindow::styleCls());
 
-		styler->dynamicStyle("tlookwindowheader");
-		styler->fetchStyle("tlookwindowheader")->inheritLayout(WWindowHeader::styleCls());
-		styler->fetchStyle("tlookwindowheader")->layout()->d_sizing[DIM_Y] = FIXED;
-		styler->fetchStyle("tlookwindowheader")->layout()->d_size[DIM_Y] = 30.f;
-		styler->fetchStyle("tlookwindowheader")->skin()->mImageSkin = ImageSkin("tlookhead");
-		styler->fetchStyle("tlookwindowheader")->skin()->mEmpty = false;
+		declareStretchSkin(styler, "tlook_windowheader", WWindowHeader::styleCls(), "tlook_windowheader", 15, 15, 34, 2, 53, 15);
+		styler->fetchStyle("tlook_windowheader")->layout()->d_sizing[DIM_Y] = FIXED;
+		styler->fetchStyle("tlook_windowheader")->layout()->d_size[DIM_Y] = 30.f;
 
-		styler->dynamicStyle("tlookwindowbody");
-		styler->fetchStyle("tlookwindowbody")->inheritLayout(WWindowBody::styleCls());
-		styler->fetchStyle("tlookwindowbody")->layout()->d_padding = BoxFloat(20.f, 10.f, 10.f, 10.f);
-		styler->fetchStyle("tlookwindowbody")->skin()->mImageSkin = ImageSkin("tlook");
-		styler->fetchStyle("tlookwindowbody")->skin()->mMargin = BoxFloat(10.f, -5.f, 5.f, 0.f);
-		styler->fetchStyle("tlookwindowbody")->skin()->mEmpty = false;
+		declareStretchSkin(styler, "tlook_windowbody", WWindowBody::styleCls(), "tlook_windowbody", 16, 16, 16, 16, 16, 16);
+		styler->fetchStyle("tlook_windowbody")->layout()->d_padding = BoxFloat(20.f, 10.f, 10.f, 10.f);
+		styler->fetchStyle("tlook_windowbody")->skin()->mMargin = BoxFloat(10.f, -5.f, 5.f, 0.f);
 
-		styler->dynamicStyle("tlookbutton");
-		styler->fetchStyle("tlookbutton")->inheritLayout(WButton::styleCls());
-		styler->fetchStyle("tlookbutton")->skin()->mTextColour = Colour::White;
-		styler->fetchStyle("tlookbutton")->skin()->mImageSkin = ImageSkin("tlookbutton");
-		styler->fetchStyle("tlookbutton")->skin()->mPadding = DimFloat(20.f, 8.f);
-		styler->fetchStyle("tlookbutton")->skin()->mEmpty = false;
+		styler->dynamicStyle("tlook_button");
+		styler->fetchStyle("tlook_button")->skin()->mTextColour = Colour::White;
+		styler->fetchStyle("tlook_button")->skin()->mPadding = DimFloat(20.f, 8.f);
+		declareStretchSkin(styler, "tlook_button", WButton::styleCls(), "tlook_button", 14, 6, 52, 20, 14, 6, true);
 
-		styler->dynamicStyle("tlooksection");
-		styler->fetchStyle("tlooksection")->inheritLayout(PartitionX::styleCls());
+		declareImageSkin(styler, "tlook_checkbox", WCheckbox::styleCls(), "tlook_checkbox");
 
-		styler->override(styler->fetchStyle("tlooksection"), WWindow::styleCls(), styler->fetchStyle("tlookwindow"));
-		styler->override(styler->fetchStyle("tlooksection"), WWindowHeader::styleCls(), styler->fetchStyle("tlookwindowheader"));
-		styler->override(styler->fetchStyle("tlooksection"), WWindowBody::styleCls(), styler->fetchStyle("tlookwindowbody"));
-		styler->override(styler->fetchStyle("tlooksection"), WButton::styleCls(), styler->fetchStyle("tlookbutton"));
+		declareImageSkin(styler, "tlook_scrollup", WScrollUp::styleCls(), "tlook_arrow_up");
+		declareImageSkin(styler, "tlook_scrolldown", WScrollDown::styleCls(), "tlook_arrow_down");
+		declareStretchSkin(styler, "tlook_scrollerknoby", WScrollerKnobY::styleCls(), "tlook_scrollerknoby", 7, 11, 2, 22, 5, 11, true);
+		styler->fetchStyle("tlook_scrollerknoby")->layout()->d_sizing[DIM_X] = FIXED;
+		styler->fetchStyle("tlook_scrollerknoby")->layout()->d_size[DIM_X] = 14.f;
 
-		Form* overrider = parent->makeappend<Form>(styler->fetchStyle("tlooksection"));
+		styler->dynamicStyle("tlook_section");
+		styler->fetchStyle("tlook_section")->inheritLayout(PartitionX::styleCls());
+
+		styler->override(styler->fetchStyle("tlook_section"), WWindow::styleCls(), styler->fetchStyle("tlook_window"));
+		styler->override(styler->fetchStyle("tlook_section"), WWindowHeader::styleCls(), styler->fetchStyle("tlook_windowheader"));
+		styler->override(styler->fetchStyle("tlook_section"), WWindowBody::styleCls(), styler->fetchStyle("tlook_windowbody"));
+		styler->override(styler->fetchStyle("tlook_section"), WButton::styleCls(), styler->fetchStyle("tlook_button"));
+		styler->override(styler->fetchStyle("tlook_section"), WCheckbox::styleCls(), styler->fetchStyle("tlook_checkbox"));
+		styler->override(styler->fetchStyle("tlook_section"), WScrollerKnobY::styleCls(), styler->fetchStyle("tlook_scrollerknoby"));
+		styler->override(styler->fetchStyle("tlook_section"), WScrollUp::styleCls(), styler->fetchStyle("tlook_scrollup"));
+		styler->override(styler->fetchStyle("tlook_section"), WScrollDown::styleCls(), styler->fetchStyle("tlook_scrolldown"));
+
+		Form* overrider = parent->makeappend<Form>(styler->fetchStyle("tlook_section"));
+		createUiTestWindow(overrider);
+
+		return overrider;
+	}
+
+	Form* createUiTestMyGuiImageSkin(Form* parent)
+	{
+		Styler* styler = parent->uiWindow()->styler();
+
+		styler->dynamicStyle("mygui_window");
+		styler->fetchStyle("mygui_window")->inheritLayout(WWindow::styleCls());
+
+		declareStretchSkin(styler, "mygui_windowheader", WWindowHeader::styleCls(), "mygui_windowheader", 7, 10, 52, 4, 9, 17);
+		styler->fetchStyle("mygui_windowheader")->layout()->d_sizing[DIM_Y] = FIXED;
+		styler->fetchStyle("mygui_windowheader")->layout()->d_size[DIM_Y] = 30.f;
+		styler->fetchStyle("mygui_windowheader")->layout()->d_padding = BoxFloat(10.f, 4.f, 10.f, 4.f);
+
+		declareStretchSkin(styler, "mygui_windowbody", WWindowBody::styleCls(), "mygui_windowbody", 3, 3, 15, 14, 5, 5);
+		styler->fetchStyle("mygui_windowbody")->skin()->mMargin = BoxFloat(0.f, -3.f, 0.f, 0.f);
+
+		declareStretchSkin(styler, "mygui_frame", DivX::styleCls(), "mygui_frame", 3, 3, 15, 14, 5, 5);
+		styler->fetchStyle("mygui_frame")->layout()->d_padding = BoxFloat(4.f, 4.f, 4.f, 4.f);
+
+		styler->dynamicStyle("mygui_typein");
+		styler->fetchStyle("mygui_typein")->skin()->mTextColour = Colour::White;
+		styler->fetchStyle("mygui_typein")->skin()->mPadding = DimFloat(4.f, 4.f);
+		declareStretchSkin(styler, "mygui_typein", WTypeIn::styleCls(), "mygui_editbox", 6, 6, 15, 12, 8, 8, true);
+		
+		styler->dynamicStyle("mygui_button");
+		styler->fetchStyle("mygui_button")->skin()->mTextColour = Colour::White;
+		styler->fetchStyle("mygui_button")->skin()->mPadding = DimFloat(8.f, 4.f);
+		declareStretchSkin(styler, "mygui_button", WButton::styleCls(), "mygui_button", 6, 6, 15, 12, 8, 8, true);
+
+		//styler->dynamicStyle("mygui_checkbox")->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
+		declareImageSkin(styler, "mygui_checkbox", Control::styleCls(), "mygui_checkbox");
+		styler->fetchStyle("mygui_checkbox")->decline(static_cast<WidgetState>(ACTIVATED | HOVERED))->mImage = "mygui_checkbox_activated_hovered.png";
+		styler->fetchStyle("mygui_checkbox")->decline(static_cast<WidgetState>(ACTIVATED | PRESSED))->mImage = "mygui_checkbox_activated_pressed.png";
+
+		declareImageSkin(styler, "mygui_scrollup", WScrollUp::styleCls(), "mygui_arrow_up");
+		declareImageSkin(styler, "mygui_scrolldown", WScrollDown::styleCls(), "mygui_arrow_down");
+
+		declareImageSkin(styler, "mygui_closebutton", WCloseButton::styleCls(), "mygui_closebutton");
+
+		//declareImageSkin(styler, "mygui_sliderknobx", WSliderKnobX::styleCls(), "mygui_sliderknobx");
+		//declareImageSkin(styler, "mygui_sliderknoby", WSliderKnobY::styleCls(), "mygui_sliderknoby");
+		//styler->fetchStyle("mygui_sliderknobx")->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
+
+		declareStretchSkin(styler, "mygui_sliderx", WSliderX::styleCls(), "mygui_sliderx_bis", 2, 1, 26, 17, 4, 3, true);
+		styler->fetchStyle("mygui_sliderx")->layout()->d_padding = BoxFloat(1.f, 1.f, 0.f, 0.f);
+
+		declareStretchSkin(styler, "mygui_sliderknobx", WSliderKnobX::styleCls(), "mygui_sliderknobx", 2, 1, 2, 10, 3, 3, true);
+		styler->fetchStyle("mygui_sliderknobx")->layout()->d_sizing = DimSizing(EXPAND, FIXED);
+		styler->fetchStyle("mygui_sliderknobx")->layout()->d_size[DIM_Y] = 14.f;
+
+		declareStretchSkin(styler, "mygui_scrollerknoby", WScrollerKnobY::styleCls(), "mygui_scrollerknoby", 5, 2, 2, 13, 7, 4, true);
+
+		styler->dynamicStyle("mygui_section");
+		styler->fetchStyle("mygui_section")->inheritLayout(PartitionX::styleCls());
+
+		styler->override(styler->fetchStyle("mygui_section"), WWindow::styleCls(), styler->fetchStyle("mygui_window"));
+		styler->override(styler->fetchStyle("mygui_section"), WWindowHeader::styleCls(), styler->fetchStyle("mygui_windowheader"));
+		styler->override(styler->fetchStyle("mygui_section"), WWindowBody::styleCls(), styler->fetchStyle("mygui_windowbody"));
+		styler->override(styler->fetchStyle("mygui_section"), WExpandboxHeader::styleCls(), styler->fetchStyle("mygui_frame"));
+		styler->override(styler->fetchStyle("mygui_section"), WTypeIn::styleCls(), styler->fetchStyle("mygui_typein"));
+		styler->override(styler->fetchStyle("mygui_section"), WDropdown::styleCls(), styler->fetchStyle("mygui_typein"));
+		styler->override(styler->fetchStyle("mygui_section"), WButton::styleCls(), styler->fetchStyle("mygui_button"));
+		styler->override(styler->fetchStyle("mygui_section"), WCloseButton::styleCls(), styler->fetchStyle("mygui_closebutton"));
+		styler->override(styler->fetchStyle("mygui_section"), WCheckbox::styleCls(), styler->fetchStyle("mygui_checkbox"));
+		styler->override(styler->fetchStyle("mygui_section"), WScrollerKnobY::styleCls(), styler->fetchStyle("mygui_scrollerknoby"));
+		styler->override(styler->fetchStyle("mygui_section"), WScrollUp::styleCls(), styler->fetchStyle("mygui_scrollup"));
+		styler->override(styler->fetchStyle("mygui_section"), WScrollDown::styleCls(), styler->fetchStyle("mygui_scrolldown"));
+		styler->override(styler->fetchStyle("mygui_section"), WSliderX::styleCls(), styler->fetchStyle("mygui_sliderx"));
+		styler->override(styler->fetchStyle("mygui_section"), WSliderKnobX::styleCls(), styler->fetchStyle("mygui_sliderknobx"));
+
+		Form* overrider = parent->makeappend<Form>(styler->fetchStyle("mygui_section"));
 		createUiTestWindow(overrider);
 
 		return overrider;
@@ -309,21 +428,24 @@ namespace mk
 
 	Form* createUiTestProgressDialog(Form* parent)
 	{
-		Dialog* dialog = parent->makeappend<Dialog>();
+		unique_ptr<Dialog> dialogpt = make_unique<Dialog>();
+		Dialog* dialog = dialogpt.get();
+		dialog->setName("Progress Dialog");
 		ProgressBar* bar = dialog->makeappend<ProgressBar>();
-		bar->widget()->as<WProgressBar>()->setPercentage(0.57f);
-		return dialog;
+		Window* window = parent->rootForm()->makeappend<Window>(std::move(dialogpt));
+		WProgressBar* wbar = bar->widget()->as<WProgressBar>();
+		wbar->setPercentage(0.57f);
+		dialog->makeappend<SliderFloat>("Set progress", AutoStat<float>(0.57f, 0.f, 1.f, 0.01f), [wbar](float val) { wbar->setPercentage(val); });
+		return window;
 	}
 
 	Window* createUiTestWindow(Form* parent)
 	{
 		unique_ptr<Form> boardpt = make_unique<ScrollDivY>();
+		boardpt->setName("kiUi v0.1");
 
 		Window* window = parent->makeappend<Window>(std::move(boardpt));
 		WWindow* wwindow = window->widget()->as<WWindow>();
-
-		wwindow->setMovable();
-		wwindow->setResizable();
 
 		Form* board = window->child(0);
 
@@ -338,12 +460,12 @@ namespace mk
 
 		current = board->makeappend<Expandbox>("Window options");
 
-		current->makeappend<InputBool>("titlebar", true, std::bind(&WWindow::showTitlebar, wwindow), std::bind(&WWindow::hideTitlebar, wwindow));
-		current->makeappend<InputBool>("movable", true, std::bind(&WWindow::setMovable, wwindow), std::bind(&WWindow::setUnmovable, wwindow));
-		current->makeappend<InputBool>("resizable", true, std::bind(&WWindow::setResizable, wwindow), std::bind(&WWindow::setUnsizable, wwindow));
-		current->makeappend<InputBool>("scrollable", true, std::bind(&WWindow::setScrollable, wwindow), std::bind(&WWindow::setUnscrollable, wwindow));
+		current->makeappend<InputBool>("titlebar", true, [wwindow](bool on) { on ? wwindow->showTitlebar() : wwindow->hideTitlebar(); });
+		current->makeappend<InputBool>("movable", true, [wwindow](bool on) { wwindow->toggleMovable(); });
+		current->makeappend<InputBool>("resizable", true, [wwindow](bool on) { wwindow->toggleResizable(); });
+		current->makeappend<InputBool>("closable", true, [wwindow](bool on) { wwindow->toggleClosable(); });
 
-		current->makeappend<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha){ window->widget()->frame()->inkstyle()->mBackgroundColour.setA(alpha); });
+		current->makeappend<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [window](float alpha){ window->widget()->frame()->inkstyle()->mBackgroundColour.setA(alpha); });
 
 		current = board->makeappend<Expandbox>("Widgets");
 		createUiTestControls(current);
@@ -544,5 +666,39 @@ namespace mk
 
 		return window;
 
+	}
+
+	void pickSample(Form* root, const string& name)
+	{
+		root->clear();
+
+		if(name == "Dockspace")
+			createUiTestDockspace(root);
+		else if(name == "Window")
+			createUiTestWindow(root);
+		else if(name == "Tabs")
+			createUiTestTabs(root);
+		else if(name == "Table")
+			createUiTestTable(root);
+		else if(name == "Tree")
+			createUiTestTree(root);
+		else if(name == "Controls")
+			createUiTestControls(root);
+		else if(name == "Skinned Window (Cegui)")
+			createUiTestCeguiImageSkin(root);
+		else if(name == "Skinned Window (MyGui)")
+			createUiTestMyGuiImageSkin(root);
+		else if(name == "File Browser")
+			createUiTestFileBrowser(root);
+		else if(name == "Progress Dialog")
+			createUiTestProgressDialog(root);
+	}
+
+	void createOgTestUi(Form* root)
+	{
+		Form* demoheader = root->makeappend<Header>();
+		Form* demobody = root->makeappend<PartitionX>();
+		demoheader->makeappend<Label>("Pick a demo sample : ");
+		demoheader->makeappend<Dropdown>(std::bind(&pickSample, demobody, std::placeholders::_1), StringVector({ "Dockspace", "Window", "Skinned Window (MyGui)", "Tabs", "Table", "Tree", "Controls", "File Browser", "Progress Dialog" }));
 	}
 }

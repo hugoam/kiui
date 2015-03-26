@@ -55,18 +55,9 @@ namespace mk
 
 		FrameType frameType() { return LAYER; }
 
-		void setClosable();
-		void setUnclosable();
-
-		void setScrollable();
-		void setUnscrollable();
-
-		void setMovable();
-		void setUnmovable();
-
-		void setResizable();
-		void setUnsizable();
-
+		void toggleClosable();
+		void toggleMovable();
+		void toggleResizable();
 		void showTitlebar();
 		void hideTitlebar();
 

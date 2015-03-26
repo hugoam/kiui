@@ -13,6 +13,22 @@
 
 namespace mk
 {
+	class MK_UI_EXPORT WProgressFillerX : public Widget, public Typed<WProgressFillerX>, public Styled<WProgressFillerX>
+	{
+	public:
+		WProgressFillerX();
+
+		using Typed<WProgressFillerX>::cls;
+	};
+
+	class MK_UI_EXPORT WProgressFillerY : public Widget, public Typed<WProgressFillerY>, public Styled<WProgressFillerY>
+	{
+	public:
+		WProgressFillerY();
+
+		using Typed<WProgressFillerY>::cls;
+	};
+
 	class MK_UI_EXPORT WProgressBar : public Sheet
 	{
 	public:
@@ -26,6 +42,7 @@ namespace mk
 	protected:
 		Dimension mDim;
 		Widget* mFiller;
+		Widget* mSpacer;
 
 		float mPercentage;
 

@@ -43,6 +43,8 @@ namespace mk
 
 		void clear();
 
+		void cleanup();
+
 		template <class T, class... Args>
 		inline T* vmakeappend(Args&&... args)
 		{
@@ -111,6 +113,9 @@ namespace mk
 
 		FrameType frameType() { return LAYER; }
 		size_t zorder() { return 15; }
+		Widget* hovered() { return mHovered; }
+
+		void build();
 
 		void nextFrame();
 		void setPosition(float x, float y);
@@ -121,12 +126,16 @@ namespace mk
 
 	protected:
 		bool mDirty;
+		Widget* mHovered;
 	};
 
 	class MK_UI_EXPORT ResizeCursorX : public Object, public Typed<ResizeCursorX>, public Styled<ResizeCursorX>
 	{};
 
 	class MK_UI_EXPORT ResizeCursorY : public Object, public Typed<ResizeCursorY>, public Styled<ResizeCursorY>
+	{};
+
+	class MK_UI_EXPORT CaretCursor : public Object, public Typed<CaretCursor>, public Styled<CaretCursor>
 	{};
 
 	class MK_UI_EXPORT _I_ Tooltip : public Widget, public Typed<Tooltip>, public Styled<Tooltip>

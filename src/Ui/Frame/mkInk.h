@@ -22,20 +22,22 @@ namespace mk
 		//virtual InkTarget* spaceTarget(Camera* camera, int width, int height) = 0;
 	};
 
+	class MK_UI_EXPORT InkTarget : public Object, public Typed<InkTarget>
+	{
+	public:
+		virtual unique_ptr<InkLayer> layer(Frame* frame, size_t z = 0) = 0;
+	};
+	
 	class MK_UI_EXPORT InkLayer : public Object, public Typed<InkLayer>
 	{
 	public:
+		virtual ~InkLayer() {}
+
 		virtual unique_ptr<Inkbox> inkbox(Frame* frame) = 0;
 
 		virtual void show() = 0;
 		virtual void hide() = 0;
 		virtual void moveToTop() = 0;
-	};
-
-	class MK_UI_EXPORT InkTarget : public Object, public Typed<InkTarget>
-	{
-	public:
-		virtual unique_ptr<InkLayer> layer(Frame* frame, size_t z = 0) = 0;
 	};
 
 	class MK_UI_EXPORT Inkbox

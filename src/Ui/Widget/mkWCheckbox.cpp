@@ -13,34 +13,28 @@
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 
+#include <Ui/Widget/mkWTypeIn.h>
+
 #include <Ui/mkUiWindow.h>
 
 #include <Ui/Widget/mkSheet.h>
 
 namespace mk
 {
-	WCheckbox::WCheckbox(Form* form, Lref& value)
-		: Widget(styleCls(), form)
-		, mValue(value)
+	WCheckbox::WCheckbox(WInputBase* input, bool on)
+		: WToggle(styleCls(), std::bind(&WCheckbox::on, this), std::bind(&WCheckbox::off, this), on)
+		, mInput(input)
+	{}
+
+	void WCheckbox::on()
 	{
-		mForm->setLabel("");
+		mInput->value()->set<bool>(mOn);
+		mInput->notifyUpdate();
 	}
 
-	void WCheckbox::build()
+	void WCheckbox::off()
 	{
-		this->updateChecked();
-	}
-
-	void WCheckbox::updateChecked()
-	{
-		this->toggleState(ACTIVATED);
-	}
-
-	bool WCheckbox::leftClick(float xPos, float yPos)
-	{
-		UNUSED(xPos); UNUSED(yPos);
-		mValue->any<bool>()->ref() = !mValue->get<bool>();
-		this->updateChecked();
-		return true;
+		mInput->value()->set<bool>(mOn);
+		mInput->notifyUpdate();
 	}
 }

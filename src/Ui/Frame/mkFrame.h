@@ -8,8 +8,6 @@
 /* mk */
 #include <Object/mkTyped.h>
 #include <Object/String/mkString.h>
-#include <Object/Store/mkRegistry.h>
-#include <Object/Store/mkIndexStore.h>
 #include <Object/Util/mkUpdatable.h>
 #include <Ui/mkUiForward.h>
 #include <Ui/Frame/mkUibox.h>
@@ -19,7 +17,7 @@ namespace mk
 	class MK_UI_EXPORT _I_ Frame : public Object, public Typed<Frame>, public Uibox, public Updatable
 	{
 	public:
-		Frame(Stripe* parent, Widget* widget, size_t index);
+		Frame(Widget* widget, size_t index);
 		~Frame();
 
 		enum Dirty
@@ -49,6 +47,9 @@ namespace mk
 
 		Layer* layer();
 
+		virtual void bind(Stripe* parent);
+		virtual void unbind();
+
 		void show();
 		void hide();
 
@@ -59,6 +60,9 @@ namespace mk
 
 		void transfer(Stripe* stripe, size_t index);
 		void remove();
+
+		Frame* prev();
+		Frame* next();
 
 		void clip();
 
@@ -96,7 +100,6 @@ namespace mk
 		void setSpanDim(Dimension dim, float span);
 		void setSpanDimDirect(Dimension dim, float span) { d_span[dim] = span; }
 		void setPositionDim(Dimension dim, float position);
-		void setParent(Stripe* parent) { d_parent = parent; }
 
 		inline void setPosition(float x, float y) { setPositionDim(DIM_X, x); setPositionDim(DIM_Y, y); }
 		inline void setSize(float width, float height) { setSizeDim(DIM_X, width); setSizeDim(DIM_Y, height); }

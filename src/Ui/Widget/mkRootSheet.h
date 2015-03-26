@@ -19,6 +19,7 @@ namespace mk
 	{
 	public:
 		RootSheet(UiWindow* window, Form* form, bool absolute = true);
+		~RootSheet();
 
 		void build();
 
@@ -58,8 +59,6 @@ namespace mk
 		void activate(Widget* widget);
 		void deactivate(Widget* widget);
 
-		void unhover();
-
 		void contextOn(Widget* contextMenu);
 		void contextOff();
 
@@ -83,7 +82,6 @@ namespace mk
 		float mLastPressedX;
 		float mLastPressedY;
 
-		InputReceiver* mHovered;
 		InputController* mController;
 
 		bool mLeftPressed;

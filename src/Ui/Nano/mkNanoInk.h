@@ -28,6 +28,9 @@ namespace mk
 
 		int fetchImage(const string& image);
 		void drawImage(int image, float x, float y, float w, float h);
+		void drawSkinImage(int image, float x, float y, float w, float h, float xoff = 0.f, float yoff = 0.f, float stretchwidth = 0.f, float stretchheight = 0.f);
+
+		void splitImageSkin(int image);
 
 		void nanodraw();
 
@@ -35,9 +38,7 @@ namespace mk
 		NVGcontext* mCtx;
 		NanoLayer* mLayer;
 		int mImage;
-		int mTop, mRight, mBottom, mLeft;
-		int mTopLeft, mTopRight, mBottomRight, mBottomLeft;
-		int mFill;
+		int mSkin;
 	};
 
 }

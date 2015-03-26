@@ -6,7 +6,7 @@
 #include <Ui/Frame/mkFrame.h>
 
 #include <Object/String/mkString.h>
-#include <Object/Store/mkReverse.h>
+#include <Object/Iterable/mkReverse.h>
 
 #include <Ui/Form/mkForm.h>
 #include <Ui/Widget/mkWidget.h>
@@ -24,23 +24,19 @@
 
 namespace mk
 {
-	Frame::Frame(Stripe* parent, Widget* widget, size_t index)
+	Frame::Frame(Widget* widget, size_t index)
 		: Uibox(widget->style()->layout())
 		, d_widget(widget)
-		, d_parent(parent)
+		, d_parent(nullptr)
 		, d_dirty(DIRTY_VISIBILITY)
 		, d_hidden(false)
-		, d_visible(!parent || parent->visible())
+		, d_visible(true)
 		, d_clipPos(0.f, 0.f)
 		, d_clipSize(0.f, 0.f)
 		, d_index(index)
 		, d_wstyle(widget->style())
 		, d_inkstyle(d_wstyle->skin())
-		, d_inkbox(widget->frameType() < LAYER ? this->layer()->inkLayer()->inkbox(this) : nullptr)
 	{
-		if(d_parent)
-			d_parent->insert(this, index);
-
 		if(dfixed(DIM_X))
 			setSizeDim(DIM_X, d_style->d_size[DIM_X]);
 		if(dfixed(DIM_Y))
@@ -65,22 +61,45 @@ namespace mk
 
 	void Frame::reset(Style* style)
 	{
+		Stripe* parent = d_parent;
 		d_parent->remove(this);
 
 		this->setStyle(style->layout());
 		d_wstyle = style;
 		d_inkstyle = style->skin();
 
-		d_parent->insert(this, d_index);
+		parent->insert(this, d_index);
 
 		this->setDirty(DIRTY_WIDGET);
+	}
+
+	void Frame::bind(Stripe* parent)
+	{
+		d_parent = parent;
+		d_inkbox = this->layer()->inkLayer()->inkbox(this);
+		this->setVisible(parent->visible());
+	}
+	
+	void Frame::unbind()
+	{
+		d_parent = nullptr;
+		d_visible = false;
+		d_inkbox.reset();
 	}
 
 	void Frame::remove()
 	{
 		d_parent->remove(this);
-		// d_parent = nullptr;
-		// @kludge possible dangling pointer, commented out for now because of ~Layer() which accesses d_parent
+	}
+
+	Frame* Frame::prev()
+	{
+		return d_parent->contents().at(d_index - 1);
+	}
+
+	Frame* Frame::next()
+	{
+		return d_parent->contents().at(d_index + 1);
 	}
 
 	void Frame::clip()

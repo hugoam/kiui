@@ -9,8 +9,6 @@
 #include <Object/mkTyped.h>
 #include <Object/mkRef.h>
 #include <Object/mkIndexer.h>
-#include <Object/Store/mkRegistry.h>
-#include <Object/Store/mkIndexStore.h>
 #include <Object/Util/mkUpdatable.h>
 #include <Object/Util/mkMake.h>
 #include <Ui/mkUiForward.h>
