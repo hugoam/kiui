@@ -7,9 +7,8 @@
 
 /* mk Front */
 #include <Ui/mkUiForward.h>
-#include <Object/Store/mkRegistry.h>
-#include <Object/Store/mkArray.h>
 #include <Object/Util/mkColour.h>
+#include <Object/Util/mkNonCopy.h>
 #include <Object/String/mkString.h>
 #include <Ui/Style/mkStyle.h>
 
@@ -26,10 +25,11 @@ namespace mk
 
 	typedef std::map<WidgetState, string> InkIdMap;
 
-	class MK_UI_EXPORT Styler
+	class MK_UI_EXPORT Styler : public NonCopy
 	{
 	public:
 		Styler();
+		~Styler();
 
 		void prepare();
 
@@ -44,7 +44,7 @@ namespace mk
 		Style* fetchStyle(const string& name);
 
 	protected:
-		Named<Registry<Style>> mDynamicStyles;
+		std::vector<std::unique_ptr<Style>> mDynamicStyles;
 		std::vector<std::vector<StyleOverride>> mOverrides;
 	};
 
