@@ -28,7 +28,7 @@ before_script:
   
 script:
   - cmake ..
-  - cmake --build . --target install
+  - sudo cmake --build . --target install
 
 os:
   - linux
