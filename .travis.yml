@@ -19,7 +19,7 @@ before_script:
   - cd glfw
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake -DBUILD_SHARED_LIBS=ON ..
   - make
   - sudo make install
   - cd ../..
