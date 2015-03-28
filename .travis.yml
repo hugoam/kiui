@@ -1,0 +1,23 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+  
+env:
+  matrix:
+    - BUILD_SYSTEM=cmake
+    
+install:
+  - sudo apt-get install cmake libpopt-dev
+  
+before_script:
+  - mkdir build
+  - cd build
+  
+script:
+  - cmake ..
+  - cmake --build . --target install
+
+os:
+  - linux
