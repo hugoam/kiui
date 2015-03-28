@@ -153,7 +153,7 @@ namespace mk
 
 	void WDockline::removeLine(WDockline* line)
 	{
-		Widget* section = this->insert(line->release(0U), line->frame()->index());
+		Widget* section = this->insert(line->release(size_t(0)), line->frame()->index());
 		section->as<WDocksection>()->setDockline(this);
 		section->frame()->setSpanDim(mDim, line->frame()->dspan(mDim));
 
