@@ -69,7 +69,7 @@ namespace mk
 		dirent* ent;
 
 		while((ent = readdir(dir)) != NULL)
-			if(ent->d_type & DT_DIR)
+			if(ent->d_type & DT_DIR && string(ent->d_name) != ".")
 				this->vmakeappend<WDir>(ent->d_name);
 
 		rewinddir(dir);
@@ -97,5 +97,49 @@ namespace mk
 	{
 		size_t pos = mPath.rfind("\\");
 		this->setLocation(mPath.substr(0, pos));
+	}
+
+	WFileBrowser::WFileBrowser(const string& path)
+		: Sheet(styleCls())
+	{}
+
+	void WFileBrowser::build()
+	{
+		mDirectory = this->makeappend<WDirectory>(mPath);
+	}
+
+	WFileNode::WFileNode(const string& name)
+		: WTreeNode(nullptr, "file_20.png", name, true)
+	{}
+
+	WDirectoryNode::WDirectoryNode(const string& path, const string& name, bool collapsed)
+		: WTreeNode(nullptr, "folder_20.png", name, collapsed)
+		, mPath(path)
+	{}
+
+	void WDirectoryNode::build()
+	{
+		WTreeNode::build();
+
+		if(mParent->type() != WDirectoryNode::cls() || !mParent->as<WDirectoryNode>()->mCollapsed)
+			this->update();
+	}
+
+	void WDirectoryNode::update()
+	{
+		DIR* dir = opendir(mPath.c_str());
+		dirent* ent;
+
+		while((ent = readdir(dir)) != NULL)
+			if(ent->d_type & DT_DIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
+				this->vmakeappend<WDirectoryNode>(mPath + "/" + ent->d_name, ent->d_name, true);
+
+		rewinddir(dir);
+
+		while((ent = readdir(dir)) != NULL)
+			if(ent->d_type & DT_REG)
+				this->vmakeappend<WFileNode>(ent->d_name);
+
+		closedir(dir);
 	}
 }

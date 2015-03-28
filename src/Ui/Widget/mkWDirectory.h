@@ -9,6 +9,7 @@
 #include <Ui/mkUiForward.h>
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Widget/mkWButton.h>
+#include <Ui/Scheme/mkWTree.h>
 
 struct dirent;
 
@@ -62,6 +63,43 @@ namespace mk
 	protected:
 		string mPath;
 	};
+
+	class MK_UI_EXPORT _I_ WFileBrowser : public Sheet, public Typed<WFileBrowser>, public Styled<WFileBrowser>
+	{
+	public:
+		WFileBrowser(const string& path);
+
+		void build();
+
+		using Typed<WFileBrowser>::cls;
+
+	protected:
+		string mPath;
+		WDirectory* mDirectory;
+	};
+
+	class MK_UI_EXPORT _I_ WFileNode : public WTreeNode, public Typed<WFileNode>
+	{
+	public:
+		WFileNode(const string& name);
+	};
+
+	class MK_UI_EXPORT _I_ WDirectoryNode : public WTreeNode, public Typed<WDirectoryNode>
+	{
+	public:
+		WDirectoryNode(const string& path, const string& name, bool collapsed);
+
+		void build();
+
+		void update();
+
+		using Typed<WDirectoryNode>::cls;
+
+	protected:
+		string mPath;
+	};
+
+
 }
 
 #endif
