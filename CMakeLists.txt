@@ -11,7 +11,16 @@ set(CMAKE_MODULE_PATH ${KIUI_SOURCE_DIR}/cmake/modules ${KIUI_SOURCE_DIR}/cmake/
 if (MSVC)
     set(WARNING_LEVEL "/W4")
     add_compile_options(${WARNING_LEVEL})
+#else ()
+#    add_compile_options("-Wall -Wno-long-long -pedantic")
 endif ()
+
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+    add_compile_options("-std=gnu++0x")
+elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+    add_compile_options("-std=c++0x)
+endif ()
+
 
 find_package(OpenGL)
 find_package(GLFW)
