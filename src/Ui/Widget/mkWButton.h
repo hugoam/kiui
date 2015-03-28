@@ -72,7 +72,7 @@ namespace mk
 	class MK_UI_EXPORT WButton : public Widget, public WidgetTrigger<WButton>, public Styled<WButton>
 	{
 	public:
-		using WidgetTrigger<WButton>::Trigger;
+		typedef WidgetTrigger<WButton>::Trigger Trigger;
 
 	public:
 		WButton(Form* form);
@@ -91,7 +91,7 @@ namespace mk
 	class MK_UI_EXPORT WImgButton : public WButton, public Styled<WImgButton>
 	{
 	public:
-		using WidgetTrigger<WButton>::Trigger;
+		typedef WidgetTrigger<WButton>::Trigger Trigger;
 
 	public:
 		WImgButton(const string& image, const Trigger& trigger = Trigger());
@@ -102,7 +102,7 @@ namespace mk
 	class MK_UI_EXPORT WWrapButton : public Sheet, public WidgetTrigger<WWrapButton>
 	{
 	public:
-		using WidgetTrigger<WWrapButton>::Trigger;
+		typedef WidgetTrigger<WWrapButton>::Trigger Trigger;
 
 	public:
 		WWrapButton(Widget* content, Style* style, const Trigger& trigger = Trigger());

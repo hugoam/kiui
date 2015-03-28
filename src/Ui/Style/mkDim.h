@@ -78,8 +78,8 @@ namespace mk
 	class _I_ Dim
 	{
 	public:
-		Dim(T x, T y) : d_values({ x, y }) {}
-		Dim() : d_values({ T(), T() }) {}
+		Dim(T x, T y) : d_values{{ x, y }} {}
+		Dim() : d_values{{ T(), T() }} {}
 
 		T operator [](size_t i) const { return d_values[i]; }
 		T& operator [](size_t i) { return d_values[i]; }
@@ -104,10 +104,10 @@ namespace mk
 	class _I_ BoxFloat : public Struct, public Typed<BoxFloat>
 	{
 	public:
-		_C_ BoxFloat(float x, float y, float z, float w) : d_values({ x, y, z, w }), d_uniform(false), d_null(false) {}
-		BoxFloat(int x, int y, int z, int w) : d_values({ float(x), float(y), float(z), float(w) }), d_uniform(false), d_null(false) {}
-		BoxFloat(float uniform) : d_values({ uniform, uniform, uniform, uniform }), d_uniform(true), d_null(false) {}
-		BoxFloat() : d_values({ 0.f, 0.f, 0.f, 0.f }), d_uniform(true), d_null(true) {}
+		_C_ BoxFloat(float x, float y, float z, float w) : d_values{{ x, y, z, w }}, d_uniform(false), d_null(false) {}
+		BoxFloat(int x, int y, int z, int w) : d_values{{ float(x), float(y), float(z), float(w) }}, d_uniform(false), d_null(false) {}
+		BoxFloat(float uniform) : d_values{{ uniform, uniform, uniform, uniform }}, d_uniform(true), d_null(false) {}
+		BoxFloat() : d_values{{ 0.f, 0.f, 0.f, 0.f }}, d_uniform(true), d_null(true) {}
 
 		float operator [](size_t i) const { return d_values[i]; }
 		float& operator [](size_t i) { return d_values[i]; }
