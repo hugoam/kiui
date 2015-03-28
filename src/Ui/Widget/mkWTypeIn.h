@@ -90,14 +90,14 @@ namespace mk
 	{
 	public:
 		WNumberInput(Lref& value, std::function<void(T)> callback = nullptr)
-			: WTypedInput<T>(value, styleCls(), callback)
+			: WTypedInput<T>(value, nullptr, callback)
 			, mStep(1)
 		{}
 
 		void build()
 		{
-			mTypeIn = this->makeappend<WTypeIn>(this);
-			mControls = this->makeappend<WNumControls>(std::bind(&WNumberInput<T>::increment, this), std::bind(&WNumberInput<T>::decrement, this));
+			mTypeIn = this->template makeappend<WTypeIn>(this);
+			mControls = this->template makeappend<WNumControls>(std::bind(&WNumberInput<T>::increment, this), std::bind(&WNumberInput<T>::decrement, this));
 
 			if(typecls<T>() == typecls<float>() || typecls<T>() == typecls<double>())
 				mTypeIn->setAllowedChars("1234567890.");
@@ -107,14 +107,14 @@ namespace mk
 
 		void increment()
 		{
-			mValue->set<T>(mValue->get<T>() + mStep);
+			this->mValue->template set<T>(this->mValue->template get<T>() + mStep);
 			mTypeIn->updateString();
 			this->notifyUpdate();
 		}
 
 		void decrement()
 		{
-			mValue->set<T>(mValue->get<T>() - mStep);
+			this->mValue->template set<T>(this->mValue->template get<T>() - mStep);
 			mTypeIn->updateString();
 			this->notifyUpdate();
 		}

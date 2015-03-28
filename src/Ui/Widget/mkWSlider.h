@@ -140,11 +140,11 @@ namespace mk
 		{
 			Sheet::build();
 			if(mDim == DIM_X)
-				mSlider = this->makeappend<WSliderX>(std::bind(&WStatSlider::onUpdate, this));
+				mSlider = this->template makeappend<WSliderX>(std::bind(&WStatSlider::onUpdate, this));
 			else
-				mSlider = this->makeappend<WSliderY>(std::bind(&WStatSlider::onUpdate, this));
+				mSlider = this->template makeappend<WSliderY>(std::bind(&WStatSlider::onUpdate, this));
 
-			mDisplay = this->makeappend<WLabel>(toString(mStat.value()));
+			mDisplay = this->template makeappend<WLabel>(toString(mStat.value()));
 
 			this->updateSlider();
 		}
@@ -168,7 +168,7 @@ namespace mk
 			mDisplay->setLabel(toString(mStat.value()));
 		}
 
-		void notifyUpdate() { ++mUpdate; if(mOnUpdate) mOnUpdate(mStat.value()); if(mForm) mForm->as<FValue>()->updateValue(); }
+		void notifyUpdate() { ++this->mUpdate; if(this->mOnUpdate) this->mOnUpdate(mStat.value()); if(this->mForm) this->mForm->template as<FValue>()->updateValue(); }
 
 		using Typed<WStatSlider<T>>::cls;
 
