@@ -31,7 +31,9 @@ namespace mk
 	{}
 	
 	Type::~Type()
-	{}
+	{
+		mIndexer = nullptr;
+	}
 
 	bool Type::upcast(Type* type)
 	{

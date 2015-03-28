@@ -37,6 +37,7 @@ namespace mk
 
 	IdObject::~IdObject()
 	{
-		mType->indexer()->remove(this);
+		if(mType->indexer())
+			mType->indexer()->remove(this);
 	}
 }
