@@ -73,11 +73,24 @@ namespace mk
 		this->setDirty(DIRTY_WIDGET);
 	}
 
+	void Frame::wrap(Dimension dim)
+	{
+		if(d_style->d_sizing[dim] == WRAP)
+		{
+			if(d_parent->d_sizing[dim] == EXPAND || d_parent->d_sizing[dim] == FIXED)
+				d_sizing[dim] = EXPAND;
+			if(d_parent->d_sizing[dim] == SHRINK)
+				d_sizing[dim] = SHRINK;
+		}
+	}
+
 	void Frame::bind(Stripe* parent)
 	{
 		d_parent = parent;
 		d_inkbox = this->layer()->inkLayer()->inkbox(this);
 		this->setVisible(parent->visible());
+		this->wrap(DIM_X);
+		this->wrap(DIM_Y);
 	}
 	
 	void Frame::unbind()
@@ -177,6 +190,9 @@ namespace mk
 		//if(!d_widget->label().empty() && this->container())
 		//	std::cerr << "WARNING : label of style " << d_widget->style() << " not fitted to text as it's a container" << std::endl;
 
+		if(!d_inkbox->visible())
+			return;
+
 		if(dshrink(DIM_X) && (this->frameType() == FRAME || this->as<Stripe>()->contents().size() == 0))
 			this->setSizeDim(DIM_X, d_inkbox->contentSize(DIM_X));
 		if(dshrink(DIM_Y) && (this->frameType() == FRAME || this->as<Stripe>()->contents().size() == 0)) // !this->container())
@@ -201,6 +217,9 @@ namespace mk
 		d_size[dim] = size;
 		d_clipSize[dim] = size;
 		this->setDirty(DIRTY_FRAME);
+
+		if(size == 0.f && (d_inkstyle->mImageSkin.d_image == "mygui_editbox.png"))
+			int i = 0;
 
 		if(d_parent && flow() && (dshrink(dim) || dfixed(dim))) // Upward notification -> when shrinking
 			d_parent->flowSized(this, dim, delta);

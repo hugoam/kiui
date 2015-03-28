@@ -66,6 +66,8 @@ namespace mk
 
 		void clip();
 
+		void wrap(Dimension dim);
+
 		FrameType frameType();
 
 		virtual void setVisible(bool visible);
@@ -94,7 +96,7 @@ namespace mk
 			HIDDEN
 		};
 
-		Clip dclip(Dimension dim) { if(dclipsize(dim) <= 0.f && dsize(dim) > 0.f) return HIDDEN; else if(dclipsize(dim) < dsize(dim)) return CLIPPED; else return VISIBLE; }
+		Clip dclip(Dimension dim) { if(dclipsize(dim) <= 0.f) return HIDDEN; else if(dclipsize(dim) < dsize(dim)) return CLIPPED; else return VISIBLE; }
 
 		void setSizeDim(Dimension dim, float size);
 		void setSpanDim(Dimension dim, float span);
@@ -144,6 +146,8 @@ namespace mk
 
 		Frame* d_frame;
 		ImageSkin* d_skin;
+
+		std::vector<BoxFloat> mRects;
 
 		float d_left;
 		float d_top;
