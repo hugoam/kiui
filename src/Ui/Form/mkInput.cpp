@@ -83,8 +83,8 @@ namespace mk
 	{
 		if(parent->hasAttr("stat"))
 		{
-			AutoStat<BareType<T_Val>::type> stat(val, parent->getAttr("stat")->get<StatDef<BareType<T_Val>::type>>());
-			return parent->makeappend<FStat<BareType<T_Val>::type>>(stat);
+			AutoStat<BareType<T_Val>::type> stat(val, parent->getAttr("stat")->get<StatDef<typename BareType<T_Val>::type>>());
+			return parent->makeappend<FStat<typename BareType<T_Val>::type>>(stat);
 		}
 		else
 		{
