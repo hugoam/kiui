@@ -3,10 +3,6 @@ language: cpp
 compiler:
   - gcc
   - clang
-  
-env:
-  matrix:
-    - BUILD_SYSTEM=cmake
     
 install:
   - sudo add-apt-repository ppa:smspillaz/cmake-2.8.12 -y
@@ -22,7 +18,7 @@ before_script:
   - cmake ..
   - make
   - sudo make install
-  - cd ..
+  - cd ../..
   - mkdir build
   - cd build
   
