@@ -9,9 +9,10 @@ env:
     - BUILD_SYSTEM=cmake
     
 install:
-  - sudo add-apt-repository --yes ppa:smspillaz/cmake-2.8.12
+  - sudo add-apt-repository ppa:smspillaz/cmake-2.8.12 -y
   - sudo apt-get update -qq
-  - sudo apt-get install cmake
+  - sudo apt-get purge cmake -qq
+  - sudo apt-get install cmake -qq
   
 before_script:
   - mkdir build
