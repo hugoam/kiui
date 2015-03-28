@@ -30,6 +30,7 @@ namespace mk
 
 	WTreeNode::WTreeNode(Form* form, const string& image, const string& title, bool collapsed)
 		: WExpandbox(form, title, collapsed)
+		, mImage(image)
 	{
 		mType = cls();
 		mStyle = styleCls();
@@ -42,16 +43,18 @@ namespace mk
 		mContainer = this->makeappend<WTreeNodeBody>();
 
 		mExpandButton = mHeader->makeappend<WTreeNodeToggle>(std::bind(&WExpandbox::expand, this), std::bind(&WExpandbox::collapse, this), !mCollapsed);
+		if(!mImage.empty())
+			mIcon = mHeader->makeappend<WIcon>(mImage);
 		mTitleLabel = mHeader->makeappend<WTitle>(mTitle);
 
-		mExpandButton->hide();
+		mExpandButton->toggleState(DISABLED);
 		mContainer->hide();
 	}
 
 	Widget* WTreeNode::vappend(unique_ptr<Widget> widget)
 	{
-		if(mExpandButton->frame()->hidden())
-			mExpandButton->show();
+		if(mContainer->count() == 0)
+			mExpandButton->toggleState(DISABLED);
 
 		return WExpandbox::vappend(std::move(widget));
 	}
@@ -59,7 +62,7 @@ namespace mk
 	unique_ptr<Widget> WTreeNode::vrelease(Widget* widget)
 	{
 		if(mContainer->count() == 1)
-			mExpandButton->hide();
+			mExpandButton->toggleState(DISABLED);
 
 		return WExpandbox::vrelease(widget);
 	}

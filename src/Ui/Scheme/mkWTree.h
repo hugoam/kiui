@@ -38,6 +38,9 @@ namespace mk
 		using Typed<WTreeNodeToggle>::cls;
 	};
 
+	class MK_UI_EXPORT WEmptyTreeNodeToggle : public Object, public Typed<WEmptyTreeNodeToggle>, public Styled<WEmptyTreeNodeToggle>
+	{};
+
 	class MK_UI_EXPORT _I_ WTreeNode : public WExpandbox, public Typed<WTreeNode>, public Styled<WTreeNode>
 	{
 	public:
@@ -52,6 +55,10 @@ namespace mk
 
 		using Typed<WTreeNode>::cls;
 		using Styled<WTreeNode>::styleCls;
+
+	protected:
+		string mImage;
+		WIcon* mIcon;
 	};
 
 	class MK_UI_EXPORT _I_ WTree : public ScrollSheet, public Typed<WTree, Widget>, public Styled<WTree>
