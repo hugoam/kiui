@@ -137,7 +137,7 @@ namespace mk
 
 		Dialog::styleCls()->layout()->d_layoutDim = DIM_Y;
 		Dialog::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
-		Dialog::styleCls()->layout()->d_padding = BoxFloat(15.f, 15.f, 8.f, 8.f);
+		Dialog::styleCls()->layout()->d_padding = BoxFloat(25.f, 12.f, 25.f, 12.f);
 		Dialog::styleCls()->layout()->d_spacing = DimFloat(6.f, 6.f);
 
 		WWindow::styleCls()->layout()->d_flow = MANUAL;
@@ -181,6 +181,7 @@ namespace mk
 		styler->inheritLayout(StyleVector({ Tooltip::styleCls(), WContextMenu::styleCls() }), WrapY::styleCls());
 		
 		styler->inheritLayout(StyleVector({ ResizeCursorX::styleCls(), ResizeCursorY::styleCls(), CaretCursor::styleCls() }), Cursor::styleCls());
+		styler->inheritLayout(StyleVector({ ResizeCursorDiagLeft::styleCls(), ResizeCursorDiagRight::styleCls(), MoveCursor::styleCls() }), Cursor::styleCls());
 
 		styler->inheritLayout(StyleVector({ WTypeIn::styleCls() }), DivX::styleCls());
 		styler->inheritLayout(StyleVector({ WInputBase::styleCls() }), DivX::styleCls());
@@ -204,12 +205,15 @@ namespace mk
 		WDir::styleCls()->layout()->d_spacing = DimFloat(2.f, 2.f);
 		WFile::styleCls()->layout()->d_padding = BoxFloat(2.f, 2.f, 2.f, 2.f);
 		WFile::styleCls()->layout()->d_spacing = DimFloat(2.f, 2.f);
-		
+		WTreeNodeHeader::styleCls()->layout()->d_padding = BoxFloat(2.f, 2.f, 2.f, 2.f);
+		WTreeNodeHeader::styleCls()->layout()->d_spacing = DimFloat(2.f, 2.f);
+
 		RootSheet::styleCls()->layout()->d_opacity = _OPAQUE;
 
 		WTypeIn::styleCls()->layout()->d_opacity = _OPAQUE;
 		WTypeIn::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
 
+		WWindowHeader::styleCls()->layout()->d_opacity = _OPAQUE;
 		WTableHead::styleCls()->layout()->d_opacity = _OPAQUE;
 		WColumnHeader::styleCls()->layout()->d_opacity = _VOID;
 
@@ -253,7 +257,7 @@ namespace mk
 		WExpandboxBody::styleCls()->layout()->d_spacing = DimFloat(0.f, 2.f);
 		WExpandboxBody::styleCls()->layout()->d_padding = BoxFloat(12.f, 2.f, 0.f, 2.f);
 
-		WTreeNodeBody::styleCls()->layout()->d_padding = BoxFloat(12.f, 2.f, 0.f, 2.f);
+		WTreeNodeBody::styleCls()->layout()->d_padding = BoxFloat(24.f, 2.f, 0.f, 2.f);
 
 		WTable::styleCls()->layout()->d_spacing = DimFloat(0.f, 2.f);
 		WTable::styleCls()->layout()->d_layoutDim = DIM_Y;
@@ -296,6 +300,9 @@ namespace mk
 
 		ResizeCursorX::styleCls()->skin()->mImage = "resize_h_20.png";
 		ResizeCursorY::styleCls()->skin()->mImage = "resize_v_20.png";
+		MoveCursor::styleCls()->skin()->mImage = "move_20.png";
+		ResizeCursorDiagLeft::styleCls()->skin()->mImage = "resize_diag_left_20.png";
+		ResizeCursorDiagRight::styleCls()->skin()->mImage = "resize_diag_right_20.png";
 		CaretCursor::styleCls()->skin()->mImage = "caret_white.png";
 
 		WSliderKnob::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
@@ -313,10 +320,13 @@ namespace mk
 		WExpandboxToggle::styleCls()->skin()->mImage = "arrow_right_15.png";
 		WExpandboxToggle::styleCls()->decline(ACTIVATED)->mImage = "arrow_down_15.png";
 		WExpandboxToggle::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
+		WExpandboxToggle::styleCls()->decline(DISABLED)->mImage = "empty_15.png";
 		WExpandboxToggle::styleCls()->decline(static_cast<WidgetState>(ACTIVATED | HOVERED))->mImage = "arrow_down_15.png";
 		WExpandboxToggle::styleCls()->subskin(static_cast<WidgetState>(ACTIVATED | HOVERED))->mBackgroundColour = Colour::Red;
 
 		WTreeNodeToggle::styleCls()->inheritSkins(WExpandboxToggle::styleCls());
+		WEmptyTreeNodeToggle::styleCls()->inheritLayout(WTreeNodeToggle::styleCls());
+		WEmptyTreeNodeToggle::styleCls()->inheritSkins(WTreeNodeToggle::styleCls());
 
 		WLabel::styleCls()->skin()->mTextColour = Colour::White;
 		WLabel::styleCls()->skin()->mPadding = DimFloat(2.f, 2.f);
@@ -342,9 +352,10 @@ namespace mk
 		WDropdownChoice::styleCls()->inheritSkins(WButton::styleCls());
 		WRadioChoice::styleCls()->inheritSkins(WButton::styleCls());
 
-		WDir::styleCls()->inheritSkins(WButton::styleCls());
-		WFile::styleCls()->inheritSkins(WButton::styleCls());
-		
+		WDir::styleCls()->inheritSkins(WImgButton::styleCls());
+		WFile::styleCls()->inheritSkins(WImgButton::styleCls());
+		WTreeNodeHeader::styleCls()->inheritSkins(WImgButton::styleCls());
+
 		WProgressBarX::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
 		WProgressBarX::styleCls()->skin()->mBorderColour = Colour::White;
 		WProgressBarX::styleCls()->skin()->mBorderWidth = 1.f;
@@ -385,6 +396,8 @@ namespace mk
 		WDocklineX::styleCls()->inheritSkins(EmptyStyle::styleCls());
 		WDocklineY::styleCls()->inheritSkins(EmptyStyle::styleCls());
 
+		Dialog::styleCls()->skin()->mBackgroundColour = Colour::DarkGrey;
+
 		Tooltip::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
 
 		WList::styleCls()->skin()->mBackgroundColour = Colour::Black;
@@ -396,6 +409,10 @@ namespace mk
 		WWindow::styleCls()->skin()->mBackgroundColour = Colour::AlphaGrey;
 		WDockWindow::styleCls()->skin()->mBackgroundColour = Colour::DarkGrey;
 		WWindowHeader::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
+		WWindowSizer::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
+		WWindowSizer::styleCls()->layout()->d_opacity = _OPAQUE;
+		WWindowSizer::styleCls()->layout()->d_sizing = DimSizing(EXPAND, FIXED);
+		WWindowSizer::styleCls()->layout()->d_size[DIM_Y] = 5.f;
 
 		WTab::styleCls()->skin()->mBackgroundColour = Colour::Red;
 		WTabberHead::styleCls()->skin()->mBackgroundColour = Colour::Black;
@@ -404,9 +421,6 @@ namespace mk
 		WExpandboxHeader::styleCls()->decline(ACTIVATED)->mBackgroundColour = Colour::Red;
 
 		WExpandboxBody::styleCls()->skin()->mBackgroundColour = Colour::DarkGrey;
-
-		WTreeNodeHeader::styleCls()->skin()->mBackgroundColour = Colour::Transparent;
-		WTreeNodeHeader::styleCls()->decline(ACTIVATED)->mBackgroundColour = Colour::Red;
 
 		WTreeNodeBody::styleCls()->skin()->mBackgroundColour = Colour::Transparent;
 
