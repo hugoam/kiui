@@ -34,16 +34,16 @@ namespace mk
 	Type Typed<T, I>::sType(typecls<I>());
 
 	template <class T>
-	T* upcast(TypeObject* object)
+	T* upcast(Object* object)
 	{
-		if(object->type()->upcast(typecls(T)))
+		if(object->type()->upcast(typecls<T>()))
 			return static_cast<T*>(object);
 
 		return 0;
 	}
 
 	template <class T>
-	T* downcast(TypeObject* object)
+	T* downcast(Object* object)
 	{
 		if(object->type() == typecls<T>())
 			return static_cast<T*>(object);
