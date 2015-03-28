@@ -9,7 +9,8 @@ env:
     - BUILD_SYSTEM=cmake
     
 install:
-  - sudo apt-get install cmake libpopt-dev
+  - sudo add-apt-repository --yes ppa:kalakris/cmake
+  - sudo apt-get install cmake
   
 before_script:
   - mkdir build
