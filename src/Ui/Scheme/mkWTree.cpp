@@ -132,7 +132,7 @@ namespace mk
 	}
 
 	TableNode::TableNode(Object* object, Tree* tree, bool collapsed)
-		: Form(nullptr, "", [this]() { return make_unique<WTreeNode>(this, "", this->name()); })
+		: Form(nullptr, "", [this, collapsed]() { return make_unique<WTreeNode>(this, "", this->name(), collapsed); })
 		, mObject(object)
 		, mTree(tree)
 	{}

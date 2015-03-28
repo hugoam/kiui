@@ -15,7 +15,6 @@
 #include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
-#include <Ui/Frame/mkGrid.h>
 
 #include <Ui/Scheme/mkWWindow.h>
 

@@ -13,7 +13,6 @@
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 #include <Ui/Frame/mkLayer.h>
-#include <Ui/Frame/mkGrid.h>
 
 #include <Ui/mkUiWindow.h>
 #include <Ui/mkUiLayout.h>
@@ -368,6 +367,7 @@ namespace mk
 
 	bool Widget::mousePressed(float xPos, float yPos, MouseButton button)
 	{
+		UNUSED(xPos); UNUSED(yPos); UNUSED(button);
 		this->modal();
 		this->toggleState(PRESSED);
 		return true;

@@ -139,6 +139,8 @@ namespace mk
 
 	void Frame::nextFrame(size_t tick, size_t delta)
 	{
+		UNUSED(tick); UNUSED(delta);
+
 		//if(d_style->d_updated == tick)
 		//	this->setStyle(d_style);
 
@@ -146,7 +148,6 @@ namespace mk
 		{
 		case DIRTY_VISIBILITY:
 			d_visible ? d_inkbox->show() : d_inkbox->hide();
-		//case DIRTY_FLOW:
 		case DIRTY_SKIN:
 			d_inkbox->updateStyle();
 		case DIRTY_WIDGET:
@@ -172,6 +173,7 @@ namespace mk
 
 	void Frame::migrate(Stripe* stripe)
 	{
+		UNUSED(stripe);
 		if(this->frameType() == LAYER)
 			return;
 
@@ -217,9 +219,6 @@ namespace mk
 		d_size[dim] = size;
 		d_clipSize[dim] = size;
 		this->setDirty(DIRTY_FRAME);
-
-		if(size == 0.f && (d_inkstyle->mImageSkin.d_image == "mygui_editbox.png"))
-			int i = 0;
 
 		if(d_parent && flow() && (dshrink(dim) || dfixed(dim))) // Upward notification -> when shrinking
 			d_parent->flowSized(this, dim, delta);

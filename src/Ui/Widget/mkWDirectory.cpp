@@ -101,6 +101,7 @@ namespace mk
 
 	WFileBrowser::WFileBrowser(const string& path)
 		: Sheet(styleCls())
+		, mPath(path)
 	{}
 
 	void WFileBrowser::build()

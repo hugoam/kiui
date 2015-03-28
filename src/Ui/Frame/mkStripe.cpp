@@ -76,6 +76,7 @@ namespace mk
 
 	void Stripe::insertFlow(Frame* frame, size_t index)
 	{
+		UNUSED(index);
 		++d_sequence.size();
 		d_relayout = true;
 
@@ -300,6 +301,7 @@ namespace mk
 
 	void Stripe::flowSizedLength(Frame* child, float delta)
 	{
+		UNUSED(child);
 		d_sequenceLength += delta;
 		this->updateLength();
 		d_relayout = true;

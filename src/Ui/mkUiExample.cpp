@@ -477,9 +477,9 @@ namespace mk
 		current = board->makeappend<Expandbox>("Window options");
 
 		current->makeappend<InputBool>("titlebar", true, [wwindow](bool on) { on ? wwindow->showTitlebar() : wwindow->hideTitlebar(); });
-		current->makeappend<InputBool>("movable", true, [wwindow](bool on) { wwindow->toggleMovable(); });
-		current->makeappend<InputBool>("resizable", true, [wwindow](bool on) { wwindow->toggleResizable(); });
-		current->makeappend<InputBool>("closable", true, [wwindow](bool on) { wwindow->toggleClosable(); });
+		current->makeappend<InputBool>("movable", true, [wwindow](bool) { wwindow->toggleMovable(); });
+		current->makeappend<InputBool>("resizable", true, [wwindow](bool) { wwindow->toggleResizable(); });
+		current->makeappend<InputBool>("closable", true, [wwindow](bool) { wwindow->toggleClosable(); });
 
 		current->makeappend<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [window](float alpha){ window->widget()->frame()->inkstyle()->mBackgroundColour.setA(alpha); });
 
