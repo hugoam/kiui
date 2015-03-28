@@ -8,19 +8,4 @@
 #include <Object/Iterable/mkStoreObserver.h>
 
 namespace mk
-{
-	template class MK_OBJECT_EXPORT Typed<bool>;
-	template class MK_OBJECT_EXPORT Typed<int>;
-	template class MK_OBJECT_EXPORT Typed<unsigned int>;
-	template class MK_OBJECT_EXPORT Typed<float>;
-	template class MK_OBJECT_EXPORT Typed<double>;
-	template class MK_OBJECT_EXPORT Typed<string>;
-
-	template class MK_OBJECT_EXPORT Typed<std::vector<float>>;
-	template class MK_OBJECT_EXPORT Typed<std::vector<string>>;
-
-	template class MK_OBJECT_EXPORT Typed<std::vector<Type*>>;
-	template class MK_OBJECT_EXPORT Typed<std::vector<Object*>>;
-
-	template class MK_OBJECT_EXPORT StoreObserver<Object>;
-}
+{}

@@ -9,7 +9,7 @@
 
 #include <Ui/Nano/mkGlWindow.h>
 
-#include <float.h>
+#include <cfloat>
 
 namespace mk
 {

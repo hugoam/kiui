@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <vector>
 #include <map>
+#include <cfloat>
 
 namespace mk
 {
@@ -128,17 +129,17 @@ namespace mk
 		inline T max() const { return self()->def().max(); }
 		inline T step() const { return self()->def().step(); }
 
-		inline void modify(T value) { self()->def().modify(mValue, mBase, value); }
+		inline void modify(T value) { self()->def().modify(this->mValue, this->mBase, value); }
 
-		inline T rincrement(T amount) { return self()->def().rincrement(mValue, amount); }
-		inline T rdecrement(T amount) { return self()->def().rdecrement(mValue, amount); }
-		inline void increment(T amount) { self()->def().increment(mValue, amount); }
-		inline void decrement(T amount) { self()->def().decrement(mValue, amount); }
+		inline T rincrement(T amount) { return self()->def().rincrement(this->mValue, amount); }
+		inline T rdecrement(T amount) { return self()->def().rdecrement(this->mValue, amount); }
+		inline void increment(T amount) { self()->def().increment(this->mValue, amount); }
+		inline void decrement(T amount) { self()->def().decrement(this->mValue, amount); }
 
-		inline void increment() { self()->def().increment(mValue); }
-		inline void decrement() { self()->def().increment(mValue); }
+		inline void increment() { self()->def().increment(this->mValue); }
+		inline void decrement() { self()->def().increment(this->mValue); }
 
-		inline void multiply(T multiplier) { self()->def().multiply(mValue, mBase, multiplier); }
+		inline void multiply(T multiplier) { self()->def().multiply(this->mValue, this->mBase, multiplier); }
 		
 		inline void setModifier(void* owner, T amount) { Stat<T>::setModifier(self()->def(), owner, amount); }
 		inline void updateModifier(void* owner, T amount) { Stat<T>::updateModifier(self()->def(), owner, amount); }

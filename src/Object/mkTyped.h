@@ -64,22 +64,18 @@ namespace mk
 	template <> inline Type* typecls<std::vector<Type*>>() { return Typed<std::vector<Type*>>::cls(); }
 	template <> inline Type* typecls<std::vector<Object*>>() { return Typed<std::vector<Object*>>::cls(); }
 
-#ifndef OBJECT_EXPORT
-	extern template class MK_OBJECT_EXPORT Typed<bool>;
-	extern template class MK_OBJECT_EXPORT Typed<int>;
-	extern template class MK_OBJECT_EXPORT Typed<unsigned int>;
-	extern template class MK_OBJECT_EXPORT Typed<float>;
-	extern template class MK_OBJECT_EXPORT Typed<double>;
-	extern template class MK_OBJECT_EXPORT Typed<string>;
+	template class MK_OBJECT_EXPORT Typed<bool>;
+	template class MK_OBJECT_EXPORT Typed<int>;
+	template class MK_OBJECT_EXPORT Typed<unsigned int>;
+	template class MK_OBJECT_EXPORT Typed<float>;
+	template class MK_OBJECT_EXPORT Typed<double>;
+	template class MK_OBJECT_EXPORT Typed<string>;
 
-	extern template class MK_OBJECT_EXPORT Typed<std::vector<float>>;
-	extern template class MK_OBJECT_EXPORT Typed<std::vector<string>>;
+	template class MK_OBJECT_EXPORT Typed<std::vector<float>>;
+	template class MK_OBJECT_EXPORT Typed<std::vector<string>>;
 
-	extern template class MK_OBJECT_EXPORT Typed<std::vector<Type*>>;
-	extern template class MK_OBJECT_EXPORT Typed<std::vector<Object*>>;
-
-	extern template class MK_OBJECT_EXPORT Typed<Array<Object>>;
-#endif
+	template class MK_OBJECT_EXPORT Typed<std::vector<Type*>>;
+	template class MK_OBJECT_EXPORT Typed<std::vector<Object*>>;
 }
 
 #endif // MK_TYPED_INCLUDED

@@ -367,16 +367,22 @@ namespace mk
 
 	bool Widget::mousePressed(float xPos, float yPos, MouseButton button)
 	{
-		UNUSED(xPos); UNUSED(yPos); UNUSED(button);
-		this->modal();
-		this->toggleState(PRESSED);
+		UNUSED(xPos); UNUSED(yPos);
+		if(button == LEFT_BUTTON)
+		{
+			this->modal();
+			this->toggleState(PRESSED);
+		}
 		return true;
 	}
 
 	bool Widget::mouseReleased(float xPos, float yPos, MouseButton button)
 	{
-		this->unmodal();
-		this->toggleState(PRESSED);
+		if(button == LEFT_BUTTON)
+		{
+			this->unmodal();
+			this->toggleState(PRESSED);
+		}
 
 		if(mState & DRAGGED)
 		{

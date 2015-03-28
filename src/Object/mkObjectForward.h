@@ -58,8 +58,9 @@ namespace mk
 	class Imprint;
 
 	class Object;
+	class TypeObject;
+	class IdObject;
 	class Stem;
-	class Part;
 	class Part;
 
 	class NonCopy;
