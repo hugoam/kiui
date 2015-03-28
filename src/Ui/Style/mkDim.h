@@ -105,6 +105,7 @@ namespace mk
 	{
 	public:
 		_C_ BoxFloat(float x, float y, float z, float w) : d_values({ x, y, z, w }), d_uniform(false), d_null(false) {}
+		BoxFloat(int x, int y, int z, int w) : d_values({ float(x), float(y), float(z), float(w) }), d_uniform(false), d_null(false) {}
 		BoxFloat(float uniform) : d_values({ uniform, uniform, uniform, uniform }), d_uniform(true), d_null(false) {}
 		BoxFloat() : d_values({ 0.f, 0.f, 0.f, 0.f }), d_uniform(true), d_null(true) {}
 

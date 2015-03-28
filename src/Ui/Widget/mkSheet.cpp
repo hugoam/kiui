@@ -168,9 +168,8 @@ namespace mk
 		float pixspan = 1.f / mFrame->as<Stripe>()->dsize(mDim);
 		float offset = mDim == DIM_X ? xDif * pixspan : yDif * pixspan;
 
-		//std::cerr << "Dragging resize offset " << offset << std::endl;
-		prev->frame()->setSpanDim(mDim, prev->frame()->dspan(mDim) + offset);
-		next->frame()->setSpanDim(mDim, next->frame()->dspan(mDim) - offset);
+		prev->frame()->setSpanDim(mDim, std::max(0.01f, prev->frame()->dspan(mDim) + offset));
+		next->frame()->setSpanDim(mDim, std::max(0.01f, next->frame()->dspan(mDim) - offset));
 
 		this->gridResized(prev, next);
 

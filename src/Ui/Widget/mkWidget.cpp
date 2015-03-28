@@ -90,7 +90,7 @@ namespace mk
 
 	unique_ptr<Widget> Widget::unbind()
 	{
-		this->cleanup();
+		//this->cleanup();
 		return mParent->as<Sheet>()->release(this);
 	}
 

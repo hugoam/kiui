@@ -17,10 +17,12 @@ namespace mk
 	MK_UI_EXPORT Table* createUiTestTable(Form* parent);
 	MK_UI_EXPORT Table* createUiTestTableAlt(Form* parent);
 	MK_UI_EXPORT Tree* createUiTestTree(Form* parent);
+	MK_UI_EXPORT Form* createUiTestInlineControls(Form* parent);
 	MK_UI_EXPORT Form* createUiTestControls(Form* parent);
 	MK_UI_EXPORT Form* createUiTestProgressDialog(Form* parent);
 	MK_UI_EXPORT Window* createUiTestWindow(Form* parent);
 	MK_UI_EXPORT Form* createUiTestFileBrowser(Form* parent);
+	MK_UI_EXPORT Form* createUiTestFileTree(Form* parent);
 	MK_UI_EXPORT Form* createUiTestMyGuiImageSkin(Form* parent);
 	MK_UI_EXPORT Form* createUiTestCeguiImageSkin(Form* parent);
 }

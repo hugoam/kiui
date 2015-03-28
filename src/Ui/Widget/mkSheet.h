@@ -135,6 +135,15 @@ namespace mk
 	class MK_UI_EXPORT ResizeCursorY : public Object, public Typed<ResizeCursorY>, public Styled<ResizeCursorY>
 	{};
 
+	class MK_UI_EXPORT MoveCursor : public Object, public Typed<MoveCursor>, public Styled<MoveCursor>
+	{};
+
+	class MK_UI_EXPORT ResizeCursorDiagLeft : public Object, public Typed<ResizeCursorDiagLeft>, public Styled<ResizeCursorDiagLeft>
+	{};
+
+	class MK_UI_EXPORT ResizeCursorDiagRight : public Object, public Typed<ResizeCursorDiagRight>, public Styled<ResizeCursorDiagRight>
+	{};
+
 	class MK_UI_EXPORT CaretCursor : public Object, public Typed<CaretCursor>, public Styled<CaretCursor>
 	{};
 
