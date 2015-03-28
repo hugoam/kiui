@@ -41,15 +41,22 @@ namespace mk
 	Tabber* createUiTestTabs(Form* root)
 	{
 		Tabber* tabber = root->makeappend<Tabber>();
+		Dialog* dialog;
 
-		unique_ptr<Form> tab0 = make_unique<Tabber>();
+		unique_ptr<Form> tab0 = make_unique<PartitionY>();
 		tab0->setAttr("name", string("Tab 0"));
+		dialog = tab0->makeappend<Dialog>();
+		createUiTestTable(dialog);
 
 		unique_ptr<Form> tab1 = make_unique<PartitionY>();
 		tab1->setAttr("name", string("Tab 1"));
+		dialog = tab1->makeappend<Dialog>();
+		createUiTestInlineControls(dialog);
 
 		unique_ptr<Form> tab2 = make_unique<PartitionY>();
 		tab2->setAttr("name", string("Tab 2"));
+		dialog = tab2->makeappend<Dialog>();
+		createUiTestControls(dialog);
 
 		tabber->append(std::move(tab0));
 		tabber->append(std::move(tab1));
@@ -73,7 +80,7 @@ namespace mk
 	{
 		Table* table = parent->makeappend<Table>(StringVector({ "Column 0", "Column 1", "Column 3" }), std::vector<float>({ 0.33f, 0.33f, 0.33f }));
 
-		table->makeappend<LabelSequence>(StringVector({ "Hello", "ImGui", "World!" }));
+		table->makeappend<LabelSequence>(StringVector({ "Hello", "kiUi", "World!" }));
 		table->makeappend<ButtonSequence>(StringVector({ "Banana", "Apple", "Corniflower" }));
 		table->makeappend<RadioSwitch>(Form::Trigger(), 0, StringVector({ "radio a", "radio b", "radio b" }));
 
@@ -121,7 +128,7 @@ namespace mk
 			TreeNode* innestnode = innernode;
 			for(size_t j = 0; j < 5; j++)
 			{
-				innestnode = innestnode->makeappend<TreeNode>(nullptr, tree, "Child " + toString(i) + " : " + toString(j));
+				innestnode = innestnode->makeappend<TreeNode>(nullptr, tree, "Child " + toString(i) + " : " + toString(j), true);
 			}
 		}
 
@@ -244,6 +251,14 @@ namespace mk
 		return parent->makeappend<Window>(std::move(filebrowser));
 	}
 
+	Form* createUiTestFileTree(Form* parent)
+	{
+		unique_ptr<Form> filetree = make_unique<Tree>(nullptr);
+		filetree->setName("File Tree");
+		filetree->makeappend<Form>(nullptr, "", [](){ return make_unique<WDirectoryNode>("../Data/interface", "interface", false); });
+		return parent->makeappend<Window>(std::move(filetree));
+	}
+
 	void declareImageSkin(Styler* styler, const string& name, Style* base, const string& image)
 	{
 		styler->dynamicStyle(name);
@@ -322,7 +337,8 @@ namespace mk
 		styler->dynamicStyle("mygui_window");
 		styler->fetchStyle("mygui_window")->inheritLayout(WWindow::styleCls());
 
-		declareStretchSkin(styler, "mygui_windowheader", WWindowHeader::styleCls(), "mygui_windowheader", 7, 10, 52, 4, 9, 17);
+		//declareStretchSkin(styler, "mygui_windowheader", WWindowHeader::styleCls(), "mygui_windowheader", 7, 10, 52, 4, 9, 17);
+		declareStretchSkin(styler, "mygui_windowheader", WWindowHeader::styleCls(), "mygui_windowheader_var", 7, 10, 29, 4, 32, 17);
 		styler->fetchStyle("mygui_windowheader")->layout()->d_sizing[DIM_Y] = FIXED;
 		styler->fetchStyle("mygui_windowheader")->layout()->d_size[DIM_Y] = 30.f;
 		styler->fetchStyle("mygui_windowheader")->layout()->d_padding = BoxFloat(10.f, 4.f, 10.f, 4.f);
@@ -353,16 +369,16 @@ namespace mk
 
 		declareImageSkin(styler, "mygui_closebutton", WCloseButton::styleCls(), "mygui_closebutton");
 
-		//declareImageSkin(styler, "mygui_sliderknobx", WSliderKnobX::styleCls(), "mygui_sliderknobx");
-		//declareImageSkin(styler, "mygui_sliderknoby", WSliderKnobY::styleCls(), "mygui_sliderknoby");
-		//styler->fetchStyle("mygui_sliderknobx")->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
+		declareImageSkin(styler, "mygui_sliderknoby", WSliderKnobY::styleCls(), "mygui_sliderknoby");
+		declareImageSkin(styler, "mygui_sliderknobx", WSliderKnobX::styleCls(), "mygui_sliderknobx");
+		styler->fetchStyle("mygui_sliderknobx")->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
 
 		declareStretchSkin(styler, "mygui_sliderx", WSliderX::styleCls(), "mygui_sliderx_bis", 2, 1, 26, 17, 4, 3, true);
 		styler->fetchStyle("mygui_sliderx")->layout()->d_padding = BoxFloat(1.f, 1.f, 0.f, 0.f);
 
-		declareStretchSkin(styler, "mygui_sliderknobx", WSliderKnobX::styleCls(), "mygui_sliderknobx", 2, 1, 2, 10, 3, 3, true);
+		/*declareStretchSkin(styler, "mygui_sliderknobx", WSliderKnobX::styleCls(), "mygui_sliderknobx", 2, 1, 2, 10, 3, 3, true);
 		styler->fetchStyle("mygui_sliderknobx")->layout()->d_sizing = DimSizing(EXPAND, FIXED);
-		styler->fetchStyle("mygui_sliderknobx")->layout()->d_size[DIM_Y] = 14.f;
+		styler->fetchStyle("mygui_sliderknobx")->layout()->d_size[DIM_Y] = 14.f;*/
 
 		declareStretchSkin(styler, "mygui_scrollerknoby", WScrollerKnobY::styleCls(), "mygui_scrollerknoby", 5, 2, 2, 13, 7, 4, true);
 
@@ -432,7 +448,7 @@ namespace mk
 		Dialog* dialog = dialogpt.get();
 		dialog->setName("Progress Dialog");
 		ProgressBar* bar = dialog->makeappend<ProgressBar>();
-		Window* window = parent->rootForm()->makeappend<Window>(std::move(dialogpt));
+		Window* window = parent->makeappend<Window>(std::move(dialogpt));
 		WProgressBar* wbar = bar->widget()->as<WProgressBar>();
 		wbar->setPercentage(0.57f);
 		dialog->makeappend<SliderFloat>("Set progress", AutoStat<float>(0.57f, 0.f, 1.f, 0.01f), [wbar](float val) { wbar->setPercentage(val); });
@@ -690,6 +706,8 @@ namespace mk
 			createUiTestMyGuiImageSkin(root);
 		else if(name == "File Browser")
 			createUiTestFileBrowser(root);
+		else if(name == "File Tree")
+			createUiTestFileTree(root);
 		else if(name == "Progress Dialog")
 			createUiTestProgressDialog(root);
 	}
@@ -699,6 +717,6 @@ namespace mk
 		Form* demoheader = root->makeappend<Header>();
 		Form* demobody = root->makeappend<PartitionX>();
 		demoheader->makeappend<Label>("Pick a demo sample : ");
-		demoheader->makeappend<Dropdown>(std::bind(&pickSample, demobody, std::placeholders::_1), StringVector({ "Dockspace", "Window", "Skinned Window (MyGui)", "Tabs", "Table", "Tree", "Controls", "File Browser", "Progress Dialog" }));
+		demoheader->makeappend<Dropdown>(std::bind(&pickSample, demobody, std::placeholders::_1), StringVector({ "Dockspace", "Window", "Skinned Window (MyGui)", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" }));
 	}
 }
