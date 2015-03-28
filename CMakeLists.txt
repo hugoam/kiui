@@ -16,10 +16,10 @@ if (MSVC)
 endif ()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-    add_compile_options("-std=gnu++0x")
+    add_compile_options("-std=gnu++11")
     add_definitions("-DSTD_NO_MAKE_UNIQUE")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
-    add_compile_options("-std=c++0x")
+    add_compile_options("-std=c++11")
     add_definitions("-DSTD_NO_MAKE_UNIQUE")
 endif ()
 
