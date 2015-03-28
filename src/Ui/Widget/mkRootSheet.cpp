@@ -37,7 +37,9 @@ namespace mk
 	}
 
 	RootSheet::~RootSheet()
-	{}
+	{
+		this->cleanup();
+	}
 
 	void RootSheet::build()
 	{
@@ -174,6 +176,9 @@ namespace mk
 
 		while(receiver != this && !receiver->mouseMoved(xPos, yPos, xDif, yDif))
 			receiver = receiver->propagateMouse(xPos, yPos);
+
+		if(receiver == this)
+			mCursor->hovered()->mouseLeaved(xPos, yPos);
 
 		return true;
 	}
