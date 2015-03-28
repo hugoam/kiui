@@ -6,9 +6,12 @@ compiler:
     
 install:
   - sudo add-apt-repository ppa:smspillaz/cmake-2.8.12 -y
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
   - sudo apt-get purge cmake -qq
   - sudo apt-get install cmake -qq
+  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 
 before_script:
   - git clone https://github.com/glfw/glfw.git
