@@ -9,8 +9,7 @@ project(KIUI)
 set(CMAKE_MODULE_PATH ${KIUI_SOURCE_DIR}/cmake/modules ${KIUI_SOURCE_DIR}/cmake/packages ${CMAKE_MODULE_PATH})
 
 if (MSVC)
-    set(WARNING_LEVEL "/W4")
-    add_compile_options(${WARNING_LEVEL})
+    add_compile_options(/W4)
 #else ()
 #    add_compile_options("-Wall -Wno-long-long -pedantic")
 endif ()
@@ -22,7 +21,6 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -std=c++11)
     add_definitions("-DSTD_NO_MAKE_UNIQUE")
 endif ()
-
 
 find_package(OpenGL)
 find_package(GLFW)

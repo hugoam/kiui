@@ -27,6 +27,7 @@ namespace mk
 
 		void setDockline(WDockline* dockline) { mDockline = dockline; }
 
+		Widget* vappend(unique_ptr<Widget> widget);
 		unique_ptr<Widget> vrelease(Widget* widget);
 
 		void dock(WWindow* window);

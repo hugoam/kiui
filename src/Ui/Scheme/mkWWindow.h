@@ -111,6 +111,9 @@ namespace mk
 		void dock(WDocksection* docksection);
 		void undock();
 
+		void docked();
+		void undocked();
+
 		void close();
 
 	protected:

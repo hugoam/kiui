@@ -53,6 +53,11 @@ namespace mk
 			mDockline->removeSection(this);
 	}
 
+	Widget* WDocksection::vappend(unique_ptr<Widget> widget)
+	{
+		return WTabber::vappend(std::move(widget));
+	}
+
 	unique_ptr<Widget> WDocksection::vrelease(Widget* widget)
 	{
 		unique_ptr<Widget> unique = WTabber::vrelease(widget);
@@ -227,6 +232,7 @@ namespace mk
 		string dockid = widget->form()->attrs()["dockid"]->get<string>();
 		WDocksection* section = mMainLine->findOrCreateSection(dockid);
 		WWindow* window = section->vmakeappend<WWindow>(nullptr, widget->name(), true, true, section);
+		window->docked();
 		return window->vappend(std::move(widget));
 	}
 

@@ -53,6 +53,7 @@ namespace mk
 		: ScrollSheet(styleCls())
 		, mPath(path)
 	{
+		char buffer[PATH_MAX];
 		mPath = replaceAll(mPath, "/", "\\");
 	}
 

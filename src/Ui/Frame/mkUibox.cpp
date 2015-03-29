@@ -31,7 +31,7 @@ namespace mk
 	void Uibox::setStyle(LayoutStyle* style)
 	{
 		d_style = style;
-		d_size = style->d_size;
+		//d_size = style->d_size; // Caused a bug because we don't set the size through setSize, so the layout isn't updated
 		d_span = style->d_span;
 		d_sizing = style->d_sizing;
 		d_opacity = style->d_opacity;

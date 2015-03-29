@@ -183,18 +183,31 @@ namespace mk
 	void WWindow::dock(WDocksection* docksection)
 	{
 		std::cerr << ">>>>>>>>>>>  Window :: dock" << std::endl;
-		this->reset(WDockWindow::styleCls());
-		docksection->dock(this);
+		this->docked();
 		mDock = docksection;
+		docksection->dock(this);
+	}
+
+	void WWindow::docked()
+	{
+		this->reset(WDockWindow::styleCls());
+		if(mSizable)
+			mFooter->hide();
 	}
 
 	void WWindow::undock()
 	{
 		std::cerr << ">>>>>>>>>>>  Window :: undock" << std::endl;
-
-		this->reset(WWindow::styleCls());
 		mDock->undock(this);
 		mDock = nullptr;
+		this->undocked();
+	}
+
+	void WWindow::undocked()
+	{
+		this->reset(WWindow::styleCls());
+		if(mSizable)
+			mFooter->show();
 
 		mFrame->setPosition(mFrame->dabsolute(DIM_X), mFrame->dabsolute(DIM_Y));
 		mFrame->as<Layer>()->moveToTop();
@@ -217,14 +230,16 @@ namespace mk
 	bool WWindow::leftClick(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
-		mFrame->as<Layer>()->moveToTop();
+		if(!mDock)
+			mFrame->as<Layer>()->moveToTop();
 		return true;
 	}
 
 	bool WWindow::rightClick(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
-		mFrame->as<Layer>()->moveToTop();
+		if(!mDock)
+			mFrame->as<Layer>()->moveToTop();
 		return true;
 	}
 

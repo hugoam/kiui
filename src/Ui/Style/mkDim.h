@@ -78,8 +78,12 @@ namespace mk
 	class _I_ Dim
 	{
 	public:
+#ifndef _MSC_VER
 		Dim(T x, T y) : d_values{{ x, y }} {}
-		Dim() : d_values{{ T(), T() }} {}
+#else
+		Dim(T x, T y) : d_values(std::array<T, 2>{ x, y }) {}
+#endif
+		Dim() : Dim(T(), T()) {}
 
 		T operator [](size_t i) const { return d_values[i]; }
 		T& operator [](size_t i) { return d_values[i]; }
@@ -104,10 +108,14 @@ namespace mk
 	class _I_ BoxFloat : public Struct, public Typed<BoxFloat>
 	{
 	public:
+#ifndef _MSC_VER
 		_C_ BoxFloat(float x, float y, float z, float w) : d_values{{ x, y, z, w }}, d_uniform(false), d_null(false) {}
-		BoxFloat(int x, int y, int z, int w) : d_values{{ float(x), float(y), float(z), float(w) }}, d_uniform(false), d_null(false) {}
-		BoxFloat(float uniform) : d_values{{ uniform, uniform, uniform, uniform }}, d_uniform(true), d_null(false) {}
-		BoxFloat() : d_values{{ 0.f, 0.f, 0.f, 0.f }}, d_uniform(true), d_null(true) {}
+#else
+		_C_ BoxFloat(float x, float y, float z, float w) : d_values(std::array<float, 4>{ x, y, z, w }), d_uniform(false), d_null(false) {}
+#endif
+		BoxFloat(int x, int y, int z, int w) : BoxFloat(float(x), float(y), float(z), float(w)) {}
+		BoxFloat(float uniform) : BoxFloat(uniform, uniform, uniform, uniform) {}
+		BoxFloat() : BoxFloat(0.f) {}
 
 		float operator [](size_t i) const { return d_values[i]; }
 		float& operator [](size_t i) { return d_values[i]; }
