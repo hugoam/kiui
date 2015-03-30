@@ -25,6 +25,8 @@ namespace mk
 		void hide();
 
 		float contentSize(Dimension dim);
+		size_t caretIndex(float x, float y);
+		void caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight);
 
 		int fetchImage(const string& image);
 		void drawImage(int image, float x, float y, float w, float h);

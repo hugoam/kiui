@@ -26,6 +26,7 @@ namespace mk
 	WWindowHeader::WWindowHeader(WWindow* window)
 		: Sheet(styleCls())
 		, mWindow(window)
+		, mTooltip("Drag me")
 	{}
 
 	void WWindowHeader::build()
@@ -41,7 +42,8 @@ namespace mk
 		if(mWindow->dock())
 			mWindow->undock();
 
-		mWindow->frame()->as<Layer>()->moveToTop();
+		mWindow->frame()->layer()->setOpacity(_VOID);
+		mWindow->frame()->layer()->moveToTop();
 		return true;
 	}
 
@@ -69,6 +71,7 @@ namespace mk
 			}
 		}
 
+		mWindow->frame()->layer()->setOpacity(_OPAQUE);
 		return true;
 	}
 

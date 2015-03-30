@@ -179,7 +179,7 @@ namespace mk
 
 		this->positionSequence();
 
-#if 1 // DEBUG
+#if 0 // DEBUG
 			Stripe* parent = d_parent;
 			while(parent)
 			{

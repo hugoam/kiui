@@ -28,6 +28,7 @@ namespace mk
 		void build();
 
 		Style* hoverCursor() { return MoveCursor::styleCls(); }
+		const string& tooltip() { return mTooltip; }
 
 		WLabel* title() { return mTitle; }
 		WButton* closeButton() { return mCloseButton; }
@@ -42,6 +43,7 @@ namespace mk
 		WWindow* mWindow;
 		WLabel* mTitle;
 		WButton* mCloseButton;
+		string mTooltip;
 	};
 
 	class MK_UI_EXPORT _I_ WWindowSizer : public Sheet, public Typed<WWindowSizer>, public Styled<WWindowSizer>

@@ -57,6 +57,8 @@ namespace mk
 		virtual void updateFrame() = 0;
 
 		virtual float contentSize(Dimension dim) = 0;
+		virtual size_t caretIndex(float x, float y) = 0;
+		virtual void caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight) = 0;
 
 	protected:
 		Frame* mFrame;

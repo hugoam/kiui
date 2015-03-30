@@ -140,6 +140,9 @@ namespace mk
 		Dialog::styleCls()->layout()->d_padding = BoxFloat(25.f, 12.f, 25.f, 12.f);
 		Dialog::styleCls()->layout()->d_spacing = DimFloat(6.f, 6.f);
 
+		Caret::styleCls()->layout()->d_flow = MANUAL;
+		Caret::styleCls()->layout()->d_sizing = DimSizing(FIXED, FIXED);
+		
 		WWindow::styleCls()->layout()->d_flow = MANUAL;
 		WWindow::styleCls()->layout()->d_opacity = _OPAQUE;
 		WWindow::styleCls()->layout()->d_layoutDim = DIM_Y;
@@ -162,10 +165,11 @@ namespace mk
 		styler->inheritLayout(StyleVector({ Label::styleCls(), Image::styleCls(), Hook::styleCls() }), Control::styleCls());
 
 		styler->inheritLayout(StyleVector({ WLabel::styleCls(), WTitle::styleCls() }), WrapX::styleCls());
-		styler->inheritLayout(StyleVector({ WNumControls::styleCls(), WRadioSwitch::styleCls(), WDropdown::styleCls(), WDropdownHeader::styleCls() }), WrapX::styleCls());
+		styler->inheritLayout(StyleVector({ WNumControls::styleCls(), WDropdownHeader::styleCls() }), WrapX::styleCls());
 		styler->inheritLayout(StyleVector({ WInput<bool>::styleCls() }), WrapX::styleCls());
 
 		styler->inheritLayout(StyleVector({ WTable::styleCls(), WDropdownBox::styleCls(), }), DivY::styleCls());
+		styler->inheritLayout(StyleVector({ WRadioSwitch::styleCls() }), DivX::styleCls());
 		styler->inheritLayout(StyleVector({ WDropdown::styleCls(), WDropdownHeader::styleCls(), WDropdownChoice::styleCls(), }), DivX::styleCls());
 		styler->inheritLayout(StyleVector({ WExpandbox::styleCls(), WExpandboxBody::styleCls() }), DivY::styleCls());
 		styler->inheritLayout(StyleVector({ WTreeNode::styleCls(), WTreeNodeBody::styleCls() }), DivY::styleCls());
@@ -178,7 +182,7 @@ namespace mk
 		styler->inheritLayout(StyleVector({ WDockspace::styleCls(), WDocksection::styleCls(), WDocklineY::styleCls() }), PartitionY::styleCls());
 		styler->inheritLayout(StyleVector({ WWindowBody::styleCls(), WTabber::styleCls(), WTabberBody::styleCls(), WTab::styleCls(), WTree::styleCls(), WList::styleCls(), List::styleCls() }), PartitionY::styleCls());
 
-		styler->inheritLayout(StyleVector({ Tooltip::styleCls(), WContextMenu::styleCls() }), WrapY::styleCls());
+		styler->inheritLayout(StyleVector({ Tooltip::styleCls(), WContextMenu::styleCls() }), Cursor::styleCls());
 		
 		styler->inheritLayout(StyleVector({ ResizeCursorX::styleCls(), ResizeCursorY::styleCls(), CaretCursor::styleCls() }), Cursor::styleCls());
 		styler->inheritLayout(StyleVector({ ResizeCursorDiagLeft::styleCls(), ResizeCursorDiagRight::styleCls(), MoveCursor::styleCls() }), Cursor::styleCls());
@@ -398,6 +402,8 @@ namespace mk
 
 		Dialog::styleCls()->skin()->mBackgroundColour = Colour::DarkGrey;
 
+		Tooltip::styleCls()->skin()->mPadding = DimFloat(4.f, 4.f);
+		Tooltip::styleCls()->skin()->mTextColour = Colour::White;
 		Tooltip::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
 
 		WList::styleCls()->skin()->mBackgroundColour = Colour::Black;
@@ -423,6 +429,8 @@ namespace mk
 		WExpandboxBody::styleCls()->skin()->mBackgroundColour = Colour::DarkGrey;
 
 		WTreeNodeBody::styleCls()->skin()->mBackgroundColour = Colour::Transparent;
+
+		Caret::styleCls()->skin()->mBackgroundColour = Colour::Black;
 
 		WTypeIn::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
 		WTypeIn::styleCls()->skin()->mCornerRadius = 3.f;

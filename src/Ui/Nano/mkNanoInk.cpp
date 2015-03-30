@@ -173,6 +173,14 @@ namespace mk
 		return 0.f;
 	}
 
+	size_t NanoInk::caretIndex(float x, float y)
+	{
+		return 0;
+	}
+
+	void NanoInk::caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight)
+	{}
+
 	void NanoInk::updateContent()
 	{
 

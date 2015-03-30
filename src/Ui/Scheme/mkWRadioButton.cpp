@@ -66,6 +66,7 @@ namespace mk
 
 	void RadioSwitch::onSelected(Widget* widget)
 	{
-		mOnSelected(widget->form());
+		if(mOnSelected)
+			mOnSelected(widget->form());
 	}
 }

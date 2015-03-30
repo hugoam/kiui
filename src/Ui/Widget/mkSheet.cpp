@@ -14,6 +14,7 @@
 #include <Ui/Form/mkWidgets.h>
 
 #include <Ui/Widget/mkWScrollbar.h>
+#include <Ui/Widget/mkRootSheet.h>
 
 #include <Ui/mkUiWindow.h>
 #include <Ui/mkUiLayout.h>
@@ -188,19 +189,17 @@ namespace mk
 
 	void Cursor::build()
 	{
+		mTooltip = this->rootSheet()->makeappend<Tooltip>("");
 		mHovered = mParent;
 	}
 
 	void Cursor::nextFrame()
 	{
+		if(mTooltipClock.read() > 0.5f && !mTooltip->frame()->visible() && !mHovered->tooltip().empty())
+			this->tooltipOn();
+
 		if(mDirty)
 		{
-			/*if(mTooltip->frame()->visible())
-			this->tooltipOff();
-
-			mTooltipTimer = 0.f;
-			mTooltip->setLabel(static_cast<Widget*>(mHovered)->tooltip());*/
-
 			mFrame->inkbox()->updateFrame();
 			mDirty = false;
 		}
@@ -208,8 +207,24 @@ namespace mk
 
 	void Cursor::setPosition(float x, float y)
 	{
+		if(mTooltip->frame()->visible())
+			this->tooltipOff();
+		mTooltipClock.step();
 		mFrame->setPosition(x, y);
 		mDirty = true;
+	}
+
+	void Cursor::tooltipOn()
+	{
+		mTooltip->setLabel(mHovered->tooltip());
+		mTooltip->frame()->setPosition(mFrame->dposition(DIM_X), mFrame->dposition(DIM_Y) + mFrame->dsize(DIM_Y));
+		mTooltip->show();
+	}
+
+	void Cursor::tooltipOff()
+	{
+		mTooltip->setLabel("");
+		mTooltip->hide();
 	}
 
 	void Cursor::hover(Widget* widget)
@@ -224,6 +239,26 @@ namespace mk
 		mHovered = mParent;
 		if(widget->hoverCursor())
 			this->reset(styleCls());
+	}
+
+	Caret::Caret(Frame* textFrame)
+		: Widget(styleCls())
+		, mTextFrame(textFrame)
+		, mIndex(0)
+		, mDirty(false)
+	{}
+
+	void Caret::nextFrame(size_t tick, size_t delta)
+	{
+		Widget::nextFrame(tick, delta);
+
+		if(mDirty && mTextFrame->inkbox()->visible())
+		{
+			float caretX, caretY, caretHeight;
+			mTextFrame->inkbox()->caretCoords(mIndex, caretX, caretY, caretHeight);
+			mFrame->setPosition(caretX, caretY);
+			mFrame->setSize(1.f, caretHeight);
+		}
 	}
 
 	Tooltip::Tooltip(const string& label)

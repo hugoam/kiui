@@ -9,6 +9,7 @@
 #include <Object/mkId.h>
 #include <Object/String/mkString.h>
 #include <Object/Util/mkUpdatable.h>
+#include <Object/Util/mkTimer.h>
 #include <Ui/mkUiForward.h>
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Frame/mkStripe.h>
@@ -119,14 +120,20 @@ namespace mk
 
 		void nextFrame();
 		void setPosition(float x, float y);
+
 		void hover(Widget* hovered);
 		void unhover(Widget* hovered);
+
+		void tooltipOn();
+		void tooltipOff();
 
 		using Typed<Cursor>::cls;
 
 	protected:
 		bool mDirty;
 		Widget* mHovered;
+		Tooltip* mTooltip;
+		Clock mTooltipClock;
 	};
 
 	class MK_UI_EXPORT ResizeCursorX : public Object, public Typed<ResizeCursorX>, public Styled<ResizeCursorX>
@@ -146,6 +153,25 @@ namespace mk
 
 	class MK_UI_EXPORT CaretCursor : public Object, public Typed<CaretCursor>, public Styled<CaretCursor>
 	{};
+
+	class MK_UI_EXPORT _I_ Caret : public Widget, public Typed<Caret>, public Styled<Caret>
+	{
+	public:
+		Caret(Frame* textFrame);
+
+		size_t index() { return mIndex; }
+
+		void setIndex(size_t index) { mIndex = index; mDirty = true; }
+
+		void nextFrame(size_t tick, size_t delta);
+
+		using Typed<Caret>::cls;
+
+	protected:
+		Frame* mTextFrame;
+		size_t mIndex;
+		bool mDirty;
+	};
 
 	class MK_UI_EXPORT _I_ Tooltip : public Widget, public Typed<Tooltip>, public Styled<Tooltip>
 	{

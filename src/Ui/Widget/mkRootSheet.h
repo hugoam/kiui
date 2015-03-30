@@ -62,9 +62,6 @@ namespace mk
 		void contextOn(Widget* contextMenu);
 		void contextOff();
 
-		void tooltipOn();
-		void tooltipOff();
-
 		void modalOn(Widget* widget);
 		void modalOff();
 
@@ -74,7 +71,6 @@ namespace mk
 		UiWindow* mWindow;
 
 		Cursor* mCursor;
-		Tooltip* mTooltip;
 
 		float mLastX;
 		float mLastY;
@@ -92,9 +88,6 @@ namespace mk
 		Widget* mContextMenu;
 
 		std::vector<Widget*> mModals;
-
-		Clock mTooltipClock;
-		double mTooltipTimer;
 	};
 }
 

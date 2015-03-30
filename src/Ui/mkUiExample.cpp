@@ -23,13 +23,19 @@ namespace mk
 		dock0->setAttr("dockid", string("0.0"));
 		dock0->setAttr("name", string("Dock 0"));
 
+		createUiTestControls(dock0.get());
+
 		unique_ptr<Form> dock1 = make_unique<PartitionY>();
 		dock1->setAttr("dockid", string("0.1"));
 		dock1->setAttr("name", string("Dock 1"));
 
+		createUiTestInlineControls(dock1.get());
+
 		unique_ptr<Form> dock2 = make_unique<PartitionY>();
 		dock2->setAttr("dockid", string("0.2"));
 		dock2->setAttr("name", string("Dock 2"));
+
+		createUiTestTable(dock2.get());
 
 		dockspace->append(std::move(dock0));
 		dockspace->append(std::move(dock1));
@@ -246,7 +252,7 @@ namespace mk
 
 	Form* createUiTestFileBrowser(Form* parent)
 	{
-		unique_ptr<Form> filebrowser = make_unique<Form>(nullptr, "", [](){ return make_unique<WDirectory>("../Data/interface"); });
+		unique_ptr<Form> filebrowser = make_unique<Form>(nullptr, "", [](){ return make_unique<WDirectory>(".."); });
 		filebrowser->setName("File Browser");
 		return parent->makeappend<Window>(std::move(filebrowser));
 	}
@@ -255,7 +261,7 @@ namespace mk
 	{
 		unique_ptr<Form> filetree = make_unique<Tree>(nullptr);
 		filetree->setName("File Tree");
-		filetree->makeappend<Form>(nullptr, "", [](){ return make_unique<WDirectoryNode>("../Data/interface", "interface", false); });
+		filetree->makeappend<Form>(nullptr, "", [](){ return make_unique<WDirectoryNode>("..", "..", false); });
 		return parent->makeappend<Window>(std::move(filetree));
 	}
 

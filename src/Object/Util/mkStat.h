@@ -175,7 +175,7 @@ namespace mk
 
 		AutoStat(const AutoStat& other)
 			: mValue(other.mValue)
-			, mValueRef(other.mValueRef)
+			, mValueRef(&other.mValue == &other.mValueRef ? mValue : other.mValueRef)
 			, mDef(other.mDef)
 		{}
 

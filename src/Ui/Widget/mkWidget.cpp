@@ -284,12 +284,14 @@ namespace mk
 	{
 		this->rootSheet()->activate(this);
 		this->toggleState(ACTIVATED);
+		this->activated();
 	}
 
 	void Widget::deactivate()
 	{
 		this->rootSheet()->deactivate(this);
 		this->toggleState(ACTIVATED);
+		this->deactivated();
 	}
 
 	void Widget::focus()

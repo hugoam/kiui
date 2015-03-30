@@ -44,7 +44,6 @@ namespace mk
 	void RootSheet::build()
 	{
 		mCursor = this->makeappend<Cursor>();
-		mTooltip = this->makeappend<Tooltip>("");
 	}
 
 	void RootSheet::nextFrame(size_t tick, size_t delta)
@@ -75,17 +74,6 @@ namespace mk
 	void RootSheet::contextOff()
 	{
 		mContextMenu = nullptr;
-	}
-
-	void RootSheet::tooltipOn()
-	{
-		mTooltip->show();
-		mTooltip->frame()->setPosition(mLastX, mCursor->frame()->dsize(DIM_Y) + mLastY);
-	}
-
-	void RootSheet::tooltipOff()
-	{
-		mTooltip->hide();
 	}
 
 	void RootSheet::modalOn(Widget* widget)

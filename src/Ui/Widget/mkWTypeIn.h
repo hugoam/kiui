@@ -48,19 +48,29 @@ namespace mk
 		size_t mUpdate;
 	};
 
-	class MK_UI_EXPORT _I_ WTypeIn : public Widget, public Typed<WTypeIn>, public Styled<WTypeIn>
+	class MK_UI_EXPORT _I_ WTypeIn : public Sheet, public Typed<WTypeIn>, public Styled<WTypeIn>
 	{
 	public:
 		WTypeIn(WInputBase* input, Style* style = nullptr);
 
+		void build();
+
 		Style* hoverCursor() { return CaretCursor::styleCls(); }
 		const string& label() { return mString; }
+		
+		void nextFrame(size_t tick, size_t delta);
+
+		void setAllowedChars(const string& chars);
+
+		void activated();
+		void deactivated();
+
+		void erase();
+		void insert(char c);
+		void updateString();
 
 		bool leftClick(float xPos, float yPos);
 		bool keyDown(KeyCode code, char c);
-
-		void setAllowedChars(const string& chars);
-		void updateString();
 
 		using Typed<WTypeIn>::cls;
 
@@ -69,6 +79,7 @@ namespace mk
 		string mString;
 		bool mHasPeriod;
 		string mAllowedChars;
+		Caret* mCaret;
 	};
 	
 	class MK_UI_EXPORT WNumControls : public Sheet, public Styled<WNumControls>

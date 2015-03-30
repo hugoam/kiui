@@ -195,9 +195,9 @@ namespace mk
 		if(!d_inkbox->visible())
 			return;
 
-		if(dshrink(DIM_X) && (this->frameType() == FRAME || this->as<Stripe>()->contents().size() == 0))
+		if(dshrink(DIM_X) && (this->frameType() == FRAME || this->as<Stripe>()->sequence().size() == 0))
 			this->setSizeDim(DIM_X, d_inkbox->contentSize(DIM_X));
-		if(dshrink(DIM_Y) && (this->frameType() == FRAME || this->as<Stripe>()->contents().size() == 0)) // !this->container())
+		if(dshrink(DIM_Y) && (this->frameType() == FRAME || this->as<Stripe>()->sequence().size() == 0)) // !this->container())
 			this->setSizeDim(DIM_Y, d_inkbox->contentSize(DIM_Y));
 	}
 

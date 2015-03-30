@@ -95,6 +95,9 @@ namespace mk
 		void activate();
 		void deactivate();
 
+		virtual void activated() {}
+		virtual void deactivated() {}
+
 		void hover();
 		void unhover();
 

@@ -30,16 +30,63 @@ namespace mk
 	{}
 
 	WTypeIn::WTypeIn(WInputBase* input, Style* style)
-		: Widget(style ? style : styleCls())
+		: Sheet(style ? style : styleCls())
 		, mInput(input)
 		, mHasPeriod(false)
 	{
 		mString = mInput->value()->getString();
 	}
 
+	void WTypeIn::build()
+	{
+		mCaret = this->makeappend<Caret>(mFrame.get());
+		mCaret->hide();
+	}
+
+	void WTypeIn::nextFrame(size_t tick, size_t delta)
+	{
+		Sheet::nextFrame(tick, delta);
+
+		if(mState & ACTIVATED)
+		{
+			bool odd = (tick / 25) % 2;
+			if(odd && mCaret->frame()->hidden())
+				mCaret->show();
+			else if(!odd && !mCaret->frame()->hidden())
+				mCaret->hide();
+		}
+	}
+
+	void WTypeIn::activated()
+	{
+		if(mCaret->frame()->hidden())
+			mCaret->show();
+	}
+
+	void WTypeIn::deactivated()
+	{
+		if(!mCaret->frame()->hidden())
+			mCaret->hide();
+	}
+
 	void WTypeIn::setAllowedChars(const string& chars)
 	{
 		mAllowedChars = chars;
+	}
+
+	void WTypeIn::erase()
+	{
+		if(mCaret->index() == 0)
+			return;
+
+		mString.erase(mString.begin() + mCaret->index() - 1);
+		mCaret->setIndex(mCaret->index() - 1);
+	}
+
+	void WTypeIn::insert(char c)
+	{
+		mString.insert(mString.begin() + mCaret->index(), c);
+		mCaret->setIndex(mCaret->index() + 1);
 	}
 
 	void WTypeIn::updateString()
@@ -51,13 +98,23 @@ namespace mk
 	bool WTypeIn::leftClick(float xPos, float yPos)
 	{
 		UNUSED(xPos); UNUSED(yPos);
-		this->activate();
+		mCaret->setIndex(mFrame->inkbox()->caretIndex(xPos - mFrame->dabsolute(DIM_X), yPos - mFrame->dabsolute(DIM_Y)));
+		if(!(mState & ACTIVATED))
+			this->activate();
 		return true;
 	}
 
 	bool WTypeIn::keyDown(KeyCode code, char c)
 	{
-		if(code == KC_RETURN)
+		if(code == KC_LEFT && mCaret->index() > 0)
+		{
+			mCaret->setIndex(mCaret->index() - 1);
+		}
+		else if(code == KC_RIGHT && mCaret->index() < mString.size())
+		{
+			mCaret->setIndex(mCaret->index() + 1);
+		}
+		else if(code == KC_RETURN)
 		{
 			this->deactivate();
 			mInput->value()->setString(mString);
@@ -65,14 +122,14 @@ namespace mk
 		}
 		else if(code == KC_BACK)
 		{
-			mString.pop_back();
+			this->erase();
 		}
-		else if(mAllowedChars.size() == 0 || mAllowedChars.find(c) != string::npos)
+		else if(c != 0 && mAllowedChars.size() == 0 || mAllowedChars.find(c) != string::npos)
 		{
 			if(c == '.' && mString.find('.') != string::npos)
 				return true;
 
-			mString.push_back(c);
+			this->insert(c);
 		}
 
 		mInput->value()->setString(mString);
