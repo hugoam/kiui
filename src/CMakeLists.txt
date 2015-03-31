@@ -35,6 +35,11 @@ add_definitions("-DUI_EXPORT")
 
 if (MSVC)
 	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
+	include(CheckIncludeFiles)
+	CHECK_INCLUDE_FILES(dirent.h HAVE_DIRENT_API) #Check for dirent.h header in MSVC include directories
+	if (NOT HAVE_DIRENT_API)
+		message(FATAL_ERROR "MSVC has no support for Dirent API, please include the header manually. See: http://www.softagalleria.net/dirent.php")
+	endif()
 endif ()
 
 add_library(kiui SHARED ${SOURCE_FILES} ${HEADER_FILES})
