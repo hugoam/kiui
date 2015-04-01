@@ -7,8 +7,6 @@
 
 #include <Object/Iterable/mkReverse.h>
 
-#include <Ui/Scheme/mkScheme.h>
-
 #include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Widget/mkWidget.h>
@@ -21,15 +19,12 @@
 namespace mk
 {
 	RootForm::RootForm(UiWindow* uiWindow)
-		: Form(nullptr)
+		: Form(nullptr, make_unique<RootSheet>(uiWindow, this))
 		, mWindow(uiWindow)
 		, mLastTick(0)
+		, mRootSheet(mSheet->as<RootSheet>())
 	{
 		mType = cls();
-
-		mSheet = make_unique<RootSheet>(mWindow, this);
-		mWidget = mSheet.get();
-		mScheme.setSheet(mSheet.get());
 	}
 
 	RootForm::~RootForm()

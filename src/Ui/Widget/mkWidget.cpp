@@ -27,16 +27,18 @@ namespace mk
 {
 	string Widget::sNullString;
 
-	Widget::Widget(Style* style, Form* form)
+	Widget::Widget(Style* style, FrameType frameType)
 		: TypeObject(cls())
 		, mParent(nullptr)
 		, mStyle(style)
 		, mFrame(nullptr)
-		, mState(NOSTATE)
-		, mForm(form)
+		, mState(UNBOUND)
+		, mForm(nullptr)
 	{
-		if(!mStyle && form)
-			mStyle = form->style();
+		if(frameType == STRIPE)
+			mFrame = make_unique<Stripe>(this);
+		else if(frameType == FRAME)
+			mFrame = make_unique<Frame>(this);
 	}
 
 	Widget::~Widget()
@@ -59,25 +61,13 @@ namespace mk
 	void Widget::bind(Sheet* parent, size_t index)
 	{
 		mParent = parent;
+		mState = static_cast<WidgetState>(mState ^ BOUND);
 		mStyle = this->fetchOverride(mStyle);
 
-		Stripe* stripe = mParent->frame()->as<Stripe>();
-
-		if(this->frameType() == LAYER3D)
-			mFrame = make_unique<Layer>(this, index, this->zorder());
-		else if(this->frameType() == LAYER)
-			mFrame = make_unique<Layer>(this, index, this->zorder());
-		else if(this->frameType() == STRIPE)
-			mFrame = make_unique<Stripe>(this, index);
-		else
-			mFrame = make_unique<Frame>(this, index);
-
-		if(this->frameType() != LAYER3D)
-			stripe->insert(mFrame.get(), index);
+		if(mFrame->frameType() != LAYER3D)
+			mParent->stripe()->insert(mFrame.get(), index);
 		else
 			mFrame->as<Layer>()->bind();
-
-		this->build();
 	}
 
 	void Widget::rebind(Sheet* parent, size_t index)
@@ -90,6 +80,7 @@ namespace mk
 	unique_ptr<Widget> Widget::unbind()
 	{
 		//this->cleanup();
+		mState = static_cast<WidgetState>(mState ^ BOUND);
 		return mParent->as<Sheet>()->release(this);
 	}
 
@@ -122,28 +113,6 @@ namespace mk
 		mFrame->hide();
 	}
 
-	Widget* Widget::copy(Sheet* parent)
-	{
-		Sheet* widget = this->clone(parent);
-
-		if(mFrame->frameType() == STRIPE)
-			for(Frame* frame : mFrame->as<Stripe>()->contents())
-				frame->widget()->copy(widget);
-
-		return widget;
-	}
-
-	Sheet* Widget::clone(Sheet* parent)
-	{
-		return parent->makeappend<Sheet>(mStyle, mForm);
-	}
-
-	void Widget::reset(Form* form)
-	{
-		mForm = form;
-		this->reset(form->style());
-	}
-
 	void Widget::setStyle(Style* style)
 	{
 		this->reset(style);
@@ -165,47 +134,16 @@ namespace mk
 			return style;
 	}
 
-	FrameType Widget::frameType()
-	{
-		return FRAME;
-	}
-
-	const string& Widget::name()
-	{
-		return mForm ? mForm->name() : sNullString;
-	}
-
 	const string& Widget::image()
 	{
 		if(!mFrame->inkstyle()->mImage.empty())
 			return mFrame->inkstyle()->mImage;
-		else
-			return mForm ? mForm->image() : sNullString;
-	}
-
-	const string& Widget::label()
-	{
-		return mForm ? mForm->label() : sNullString;
-	}
-
-	const string& Widget::tooltip()
-	{
-		return mForm ? mForm->tooltip() : sNullString;
-	}
-
-	Style* Widget::hoverCursor()
-	{
-		return nullptr;
+		return sNullString;
 	}
 
 	RootSheet* Widget::rootSheet()
 	{
 		return mParent->rootSheet();
-	}
-
-	InkTarget* Widget::inkTarget()
-	{
-		return mParent->inkTarget();
 	}
 
 	bool Widget::contains(Widget* widget)
@@ -239,8 +177,8 @@ namespace mk
 		//std::cerr << "Widget :: nextFrame " << tick << " , " << delta << std::endl;
 		if(mForm)
 		{
-			if(mForm->updated() == mForm->rootForm()->lastTick())
-				this->markDirty();
+			//if(mForm->updated() == mForm->rootForm()->lastTick())
+			//	this->markDirty();
 			mForm->nextFrame(tick, delta);
 		}
 	}

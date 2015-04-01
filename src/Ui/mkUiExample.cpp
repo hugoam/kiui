@@ -13,170 +13,144 @@
 
 namespace mk
 {
-	Dockspace* createUiTestDockspace(Form* root)
+	Dockspace* createUiTestDockspace(Sheet* root)
 	{
 		WMasterDockline::styleCls()->layout()->d_weights = { 0.2f, 0.6f, 0.2f };
 
-		Dockspace* dockspace = root->makeappend<Dockspace>();
+		Dockspace* dockspace = root->emplace<Dockspace>();
 
-		unique_ptr<Form> dock0 = make_unique<PartitionY>();
-		dock0->setAttr("dockid", string("0.0"));
-		dock0->setAttr("name", string("Dock 0"));
+		Page* dock0 = dockspace->emplace<Page>("Dock 0", "0.0");
+		createUiTestControls(dock0);
 
-		createUiTestControls(dock0.get());
+		Page* dock1 = dockspace->emplace<Page>("Dock 1", "0.1");
+		createUiTestInlineControls(dock1);
 
-		unique_ptr<Form> dock1 = make_unique<PartitionY>();
-		dock1->setAttr("dockid", string("0.1"));
-		dock1->setAttr("name", string("Dock 1"));
-
-		createUiTestInlineControls(dock1.get());
-
-		unique_ptr<Form> dock2 = make_unique<PartitionY>();
-		dock2->setAttr("dockid", string("0.2"));
-		dock2->setAttr("name", string("Dock 2"));
-
-		createUiTestTable(dock2.get());
-
-		dockspace->append(std::move(dock0));
-		dockspace->append(std::move(dock1));
-		dockspace->append(std::move(dock2));
+		Page* dock2 = dockspace->emplace<Page>("Dock 2", "0.2");
+		createUiTestTable(dock2);
 
 		return dockspace;
 	}
 
-	Tabber* createUiTestTabs(Form* root)
+	Tabber* createUiTestTabs(Sheet* root)
 	{
-		Tabber* tabber = root->makeappend<Tabber>();
-		Dialog* dialog;
+		Tabber* tabber = root->emplace<Tabber>();
 
-		unique_ptr<Form> tab0 = make_unique<PartitionY>();
-		tab0->setAttr("name", string("Tab 0"));
-		dialog = tab0->makeappend<Dialog>();
-		createUiTestTable(dialog);
+		Page* tab0 = tabber->emplace<Page>("Tab 0");
+		createUiTestTable(tab0);
 
-		unique_ptr<Form> tab1 = make_unique<PartitionY>();
-		tab1->setAttr("name", string("Tab 1"));
-		dialog = tab1->makeappend<Dialog>();
-		createUiTestInlineControls(dialog);
+		Page* tab1 = tabber->emplace<Page>("Tab 1");
+		createUiTestInlineControls(tab1);
 
-		unique_ptr<Form> tab2 = make_unique<PartitionY>();
-		tab2->setAttr("name", string("Tab 2"));
-		dialog = tab2->makeappend<Dialog>();
-		createUiTestControls(dialog);
-
-		tabber->append(std::move(tab0));
-		tabber->append(std::move(tab1));
-		tabber->append(std::move(tab2));
+		Page* tab2 = tabber->emplace<Page>("Tab 2");
+		createUiTestControls(tab2);
 
 		return tabber;
 	}
 
-	Table* createUiTestTable(Form* parent)
+	Table* createUiTestTable(Sheet* parent)
 	{
-		Table* table = parent->makeappend<Table>(StringVector({ "ID", "Name", "Path", "Flags" }), std::vector<float>({ 0.25f, 0.25f, 0.25f, 0.25f }));
+		Table* table = parent->emplace<Table>(StringVector({ "ID", "Name", "Path", "Flags" }), std::vector<float>({ 0.25f, 0.25f, 0.25f, 0.25f }));
 
-		table->makeappend<LabelSequence>(StringVector({ "0000", "Robert", "/path/robert", "...." }));
-		table->makeappend<LabelSequence>(StringVector({ "0001", "Stephanie", "/path/stephanie", "line 1" }));
-		table->makeappend<LabelSequence>(StringVector({ "0002", "C64", "/path/computer", "...." }));
+		table->emplace<LabelSequence>(StringVector({ "0000", "Robert", "/path/robert", "...." }));
+		table->emplace<LabelSequence>(StringVector({ "0001", "Stephanie", "/path/stephanie", "line 1" }));
+		table->emplace<LabelSequence>(StringVector({ "0002", "C64", "/path/computer", "...." }));
 
 		return table;
 	}
 
-	Table* createUiTestTableAlt(Form* parent)
+	Table* createUiTestTableAlt(Sheet* parent)
 	{
-		Table* table = parent->makeappend<Table>(StringVector({ "Column 0", "Column 1", "Column 3" }), std::vector<float>({ 0.33f, 0.33f, 0.33f }));
+		Table* table = parent->emplace<Table>(StringVector({ "Column 0", "Column 1", "Column 3" }), std::vector<float>({ 0.33f, 0.33f, 0.33f }));
 
-		table->makeappend<LabelSequence>(StringVector({ "Hello", "kiUi", "World!" }));
-		table->makeappend<ButtonSequence>(StringVector({ "Banana", "Apple", "Corniflower" }));
-		table->makeappend<RadioSwitch>(Form::Trigger(), 0, StringVector({ "radio a", "radio b", "radio b" }));
+		table->emplace<LabelSequence>(StringVector({ "Hello", "kiUi", "World!" }));
+		table->emplace<ButtonSequence>(StringVector({ "Banana", "Apple", "Corniflower" }));
+		table->emplace<RadioSwitch>(nullptr, 0, StringVector({ "radio a", "radio b", "radio b" }));
 
-		Sequence* line = table->makeappend<Sequence>();
+		Sequence* line = table->emplace<Sequence>();
 
-		Expandbox* box0 = line->makeappend<Expandbox>("Category A");
-		box0->makeappend<Label>("Blah blah blah");
+		Expandbox* box0 = line->emplace<Expandbox>("Category A");
+		box0->emplace<Label>("Blah blah blah");
 		
-		Expandbox* box1 = line->makeappend<Expandbox>("Category B");
-		box1->makeappend<Label>("Blah blah blah");
+		Expandbox* box1 = line->emplace<Expandbox>("Category B");
+		box1->emplace<Label>("Blah blah blah");
 
-		Expandbox* box2 = line->makeappend<Expandbox>("Category C");
-		box2->makeappend<Label>("Blah blah blah");
+		Expandbox* box2 = line->emplace<Expandbox>("Category C");
+		box2->emplace<Label>("Blah blah blah");
 
 
-		table = parent->makeappend<Table>(StringVector({ "Left", "Right" }), std::vector<float>({ 0.5f, 0.5f }));
+		table = parent->emplace<Table>(StringVector({ "Left", "Right" }), std::vector<float>({ 0.5f, 0.5f }));
 
-		line = table->makeappend<Sequence>();
+		line = table->emplace<Sequence>();
 
-		line->makeappend<InputFloat>("Red", 0.05f);
-		line->makeappend<InputFloat>("Blue", 0.05f);
+		line->emplace<InputFloat>("Red", 0.05f);
+		line->emplace<InputFloat>("Blue", 0.05f);
 
-		line = table->makeappend<Sequence>();
+		line = table->emplace<Sequence>();
 
-		line->makeappend<Textbox>("The quick brown fox jumps over the lazy dog.");
-		line->makeappend<Textbox>("The quick brown fox jumps over the lazy dog.");
+		line->emplace<Textbox>("The quick brown fox jumps over the lazy dog.");
+		line->emplace<Textbox>("The quick brown fox jumps over the lazy dog.");
 
-		line = table->makeappend<Sequence>();
+		line = table->emplace<Sequence>();
 
-		line->makeappend<Label>("Hello Left");
-		line->makeappend<Label>("Hello Right");
+		line->emplace<Label>("Hello Left");
+		line->emplace<Label>("Hello Right");
 
 		return table;
 	}
 
-	Tree* createUiTestTree(Form* parent)
+	Tree* createUiTestTree(Sheet* parent)
 	{
-		Tree* tree = parent->makeappend<Tree>(nullptr);
+		Tree* tree = parent->emplace<Tree>();
 
-		TreeNode* node = tree->makeappend<TreeNode>(nullptr, tree, "Tree");
+		TreeNode* node = tree->emplace<TreeNode>("", "Tree");
 
 		for(size_t i = 0; i < 5; i++)
 		{
-			TreeNode* innernode = node->makeappend<TreeNode>(nullptr, tree, "Child " + toString(i), true);
+			TreeNode* innernode = node->emplace<TreeNode>("", "Child " + toString(i), true);
 			TreeNode* innestnode = innernode;
 			for(size_t j = 0; j < 5; j++)
 			{
-				innestnode = innestnode->makeappend<TreeNode>(nullptr, tree, "Child " + toString(i) + " : " + toString(j), true);
+				innestnode = innestnode->emplace<TreeNode>("", "Child " + toString(i) + " : " + toString(j), true);
 			}
 		}
 
 		for(size_t i = 0; i < 5; i++)
 		{
-			TreeNode* innernode = node->makeappend<TreeNode>(nullptr, tree, "Child " + toString(5+i));
+			TreeNode* innernode = node->emplace<TreeNode>("", "Child " + toString(5+i));
 
-			innernode->makeappend<Label>("Blah blah");
-			innernode->makeappend<Button>("Print");
+			innernode->emplace<Label>("Blah blah");
+			innernode->emplace<Button>("Print");
 		}
 
 		return tree;
 	}
 
-	Tree* createUiTestTableTree(Form* parent)
+	Tree* createUiTestTableTree(Sheet* parent)
 	{
-		Tree* tree = parent->makeappend<Tree>(nullptr);
+		Tree* tree = parent->emplace<Tree>();
 
-		TreeNode* node = tree->makeappend<TreeNode>(nullptr, tree);
-		node->setName("Inside a tree...");
+		TreeNode* node = tree->emplace<TreeNode>("", "Inside a tree...");
 
-		node = node->makeappend<TreeNode>(nullptr, tree);
-		node->setName("node 1 (with borders)");
+		node = node->emplace<TreeNode>("", "node 1 (with borders)");
 
-		TableNode* tablenode = node->makeappend<TableNode>(nullptr, tree);
+		TreeNode* tablenode = node->emplace<TreeNode>("", "Table Node 0");
 		
-		tablenode->makeappend<Label>("aaa");
-		tablenode->makeappend<Label>("bbb");
-		tablenode->makeappend<Label>("ccc");
-		tablenode->makeappend<Label>("ddd");
+		tablenode->emplace<Label>("aaa");
+		tablenode->emplace<Label>("bbb");
+		tablenode->emplace<Label>("ccc");
+		tablenode->emplace<Label>("ddd");
 
-		tablenode = node->makeappend<TableNode>(nullptr, tree);
+		tablenode = node->emplace<TreeNode>("", "Table Node 1");
 
-		tablenode->makeappend<Label>("eee");
-		tablenode->makeappend<Label>("fff");
-		tablenode->makeappend<Label>("ggg");
-		tablenode->makeappend<Label>("hhh");
+		tablenode->emplace<Label>("eee");
+		tablenode->emplace<Label>("fff");
+		tablenode->emplace<Label>("ggg");
+		tablenode->emplace<Label>("hhh");
 
 		return tree;
 	}
 
-	Textbox* createUiTestMarkupText(Form* parent)
+	Textbox* createUiTestMarkupText(Sheet* parent)
 	{
 		return nullptr;
 
@@ -223,26 +197,26 @@ namespace mk
 		}*/
 	}
 
-	Form* createUiTestControls(Form* parent)
+	Sheet* createUiTestControls(Sheet* parent)
 	{
-		Table* table = parent->makeappend<Table>(StringVector({ "input", "label" }), std::vector<float>({ 0.7f, 0.3f }));
+		Table* table = parent->emplace<Table>(StringVector({ "input", "label" }), std::vector<float>({ 0.7f, 0.3f }));
 
-		table->makeappend<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {});
+		table->emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {});
 
-		table->makeappend<InputText>("string input", "Hello, world!");
-		table->makeappend<InputInt>("int input", 123);
-		table->makeappend<InputFloat>("float input", 0.001f);
+		table->emplace<InputText>("string input", "Hello, world!");
+		table->emplace<InputInt>("int input", 123);
+		table->emplace<InputFloat>("float input", 0.001f);
 
-		table->makeappend<SliderInt>("int 0..3", AutoStat<int>(2, 0, 3, 1));
-		table->makeappend<SliderInt>("int -100..100", AutoStat<int>(0, -100, 100, 1));
+		table->emplace<SliderInt>("int 0..3", AutoStat<int>(2, 0, 3, 1));
+		table->emplace<SliderInt>("int -100..100", AutoStat<int>(0, -100, 100, 1));
 
-		table->makeappend<SliderFloat>("float input", AutoStat<float>(1.123f, 0.0f, 2.0f, 0.001f));
-		table->makeappend<SliderFloat>("log float", AutoStat<float>(0.f, 0.0f, 10.0f, 1.f));
-		//table->makeappend<SliderFloat>("signed log float", AutoStat<float>(0.f, -10.0f, 10.0f, 1.f));
-		//table->makeappend<SliderFloat>("unbound float", AutoStat<float>(123456789.0f, -FLT_MAX, FLT_MAX, 1.f));
+		table->emplace<SliderFloat>("float input", AutoStat<float>(1.123f, 0.0f, 2.0f, 0.001f));
+		table->emplace<SliderFloat>("log float", AutoStat<float>(0.f, 0.0f, 10.0f, 1.f));
+		//table->emplace<SliderFloat>("signed log float", AutoStat<float>(0.f, -10.0f, 10.0f, 1.f));
+		//table->emplace<SliderFloat>("unbound float", AutoStat<float>(123456789.0f, -FLT_MAX, FLT_MAX, 1.f));
 
-		// table->makeappend<SliderAngle>("angle", 0.f);
-		// table->makeappend<FVector3>("slider float3", 0.0f, 1.0f);
+		// table->emplace<SliderAngle>("angle", 0.f);
+		// table->emplace<FVector3>("slider float3", 0.0f, 1.0f);
 
 		// ImGui::ColorEdit3("color 1", col1);
 		// ImGui::ColorEdit4("color 2", col2);
@@ -250,19 +224,19 @@ namespace mk
 		return table;
 	}
 
-	Form* createUiTestFileBrowser(Form* parent)
+	Sheet* createUiTestFileBrowser(Sheet* parent)
 	{
-		unique_ptr<Form> filebrowser = make_unique<Form>(nullptr, "", [](){ return make_unique<WDirectory>(".."); });
-		filebrowser->setName("File Browser");
-		return parent->makeappend<Window>(std::move(filebrowser));
+		Window* window = parent->emplace<Window>("File Browser");
+		Sheet* filebrowser = window->body()->emplace<Directory>("..");
+		return window;
 	}
 
-	Form* createUiTestFileTree(Form* parent)
+	Sheet* createUiTestFileTree(Sheet* parent)
 	{
-		unique_ptr<Form> filetree = make_unique<Tree>(nullptr);
-		filetree->setName("File Tree");
-		filetree->makeappend<Form>(nullptr, "", [](){ return make_unique<WDirectoryNode>("..", "..", false); });
-		return parent->makeappend<Window>(std::move(filetree));
+		Window* window = parent->emplace<Window>("File Tree");
+		Tree* filetree = window->body()->emplace<Tree>();
+		filetree->emplace<DirectoryNode>("..", "..", false);
+		return window;
 	}
 
 	void declareImageSkin(Styler* styler, const string& name, Style* base, const string& image)
@@ -290,66 +264,66 @@ namespace mk
 		}
 	}
 
-	Form* createUiTestCeguiImageSkin(Form* parent)
+	Sheet* createUiTestCeguiImageSkin(Sheet* parent)
 	{
 		Styler* styler = parent->uiWindow()->styler();
 
 		styler->dynamicStyle("tlook_window");
-		styler->fetchStyle("tlook_window")->inheritLayout(WWindow::styleCls());
+		styler->fetchStyle("tlook_window")->inheritLayout(Window::styleCls());
 
-		declareStretchSkin(styler, "tlook_windowheader", WWindowHeader::styleCls(), "tlook_windowheader", 15, 15, 34, 2, 53, 15);
+		declareStretchSkin(styler, "tlook_windowheader", WindowHeader::styleCls(), "tlook_windowheader", 15, 15, 34, 2, 53, 15);
 		styler->fetchStyle("tlook_windowheader")->layout()->d_sizing[DIM_Y] = FIXED;
 		styler->fetchStyle("tlook_windowheader")->layout()->d_size[DIM_Y] = 30.f;
 
-		declareStretchSkin(styler, "tlook_windowbody", WWindowBody::styleCls(), "tlook_windowbody", 16, 16, 16, 16, 16, 16);
+		declareStretchSkin(styler, "tlook_windowbody", WindowBody::styleCls(), "tlook_windowbody", 16, 16, 16, 16, 16, 16);
 		styler->fetchStyle("tlook_windowbody")->layout()->d_padding = BoxFloat(20.f, 10.f, 10.f, 10.f);
 		styler->fetchStyle("tlook_windowbody")->skin()->mMargin = BoxFloat(10.f, -5.f, 5.f, 0.f);
 
 		styler->dynamicStyle("tlook_button");
 		styler->fetchStyle("tlook_button")->skin()->mTextColour = Colour::White;
 		styler->fetchStyle("tlook_button")->skin()->mPadding = DimFloat(20.f, 8.f);
-		declareStretchSkin(styler, "tlook_button", WButton::styleCls(), "tlook_button", 14, 6, 52, 20, 14, 6, true);
+		declareStretchSkin(styler, "tlook_button", Button::styleCls(), "tlook_button", 14, 6, 52, 20, 14, 6, true);
 
-		declareImageSkin(styler, "tlook_checkbox", WCheckbox::styleCls(), "tlook_checkbox");
+		declareImageSkin(styler, "tlook_checkbox", Checkbox::styleCls(), "tlook_checkbox");
 
-		declareImageSkin(styler, "tlook_scrollup", WScrollUp::styleCls(), "tlook_arrow_up");
-		declareImageSkin(styler, "tlook_scrolldown", WScrollDown::styleCls(), "tlook_arrow_down");
-		declareStretchSkin(styler, "tlook_scrollerknoby", WScrollerKnobY::styleCls(), "tlook_scrollerknoby", 7, 11, 2, 22, 5, 11, true);
+		declareImageSkin(styler, "tlook_scrollup", ScrollUp::styleCls(), "tlook_arrow_up");
+		declareImageSkin(styler, "tlook_scrolldown", ScrollDown::styleCls(), "tlook_arrow_down");
+		declareStretchSkin(styler, "tlook_scrollerknoby", ScrollerKnobY::styleCls(), "tlook_scrollerknoby", 7, 11, 2, 22, 5, 11, true);
 		styler->fetchStyle("tlook_scrollerknoby")->layout()->d_sizing[DIM_X] = FIXED;
 		styler->fetchStyle("tlook_scrollerknoby")->layout()->d_size[DIM_X] = 14.f;
 
 		styler->dynamicStyle("tlook_section");
 		styler->fetchStyle("tlook_section")->inheritLayout(PartitionX::styleCls());
 
-		styler->override(styler->fetchStyle("tlook_section"), WWindow::styleCls(), styler->fetchStyle("tlook_window"));
-		styler->override(styler->fetchStyle("tlook_section"), WWindowHeader::styleCls(), styler->fetchStyle("tlook_windowheader"));
-		styler->override(styler->fetchStyle("tlook_section"), WWindowBody::styleCls(), styler->fetchStyle("tlook_windowbody"));
-		styler->override(styler->fetchStyle("tlook_section"), WButton::styleCls(), styler->fetchStyle("tlook_button"));
-		styler->override(styler->fetchStyle("tlook_section"), WCheckbox::styleCls(), styler->fetchStyle("tlook_checkbox"));
-		styler->override(styler->fetchStyle("tlook_section"), WScrollerKnobY::styleCls(), styler->fetchStyle("tlook_scrollerknoby"));
-		styler->override(styler->fetchStyle("tlook_section"), WScrollUp::styleCls(), styler->fetchStyle("tlook_scrollup"));
-		styler->override(styler->fetchStyle("tlook_section"), WScrollDown::styleCls(), styler->fetchStyle("tlook_scrolldown"));
+		styler->override(styler->fetchStyle("tlook_section"), Window::styleCls(), styler->fetchStyle("tlook_window"));
+		styler->override(styler->fetchStyle("tlook_section"), WindowHeader::styleCls(), styler->fetchStyle("tlook_windowheader"));
+		styler->override(styler->fetchStyle("tlook_section"), WindowBody::styleCls(), styler->fetchStyle("tlook_windowbody"));
+		styler->override(styler->fetchStyle("tlook_section"), Button::styleCls(), styler->fetchStyle("tlook_button"));
+		styler->override(styler->fetchStyle("tlook_section"), Checkbox::styleCls(), styler->fetchStyle("tlook_checkbox"));
+		styler->override(styler->fetchStyle("tlook_section"), ScrollerKnobY::styleCls(), styler->fetchStyle("tlook_scrollerknoby"));
+		styler->override(styler->fetchStyle("tlook_section"), ScrollUp::styleCls(), styler->fetchStyle("tlook_scrollup"));
+		styler->override(styler->fetchStyle("tlook_section"), ScrollDown::styleCls(), styler->fetchStyle("tlook_scrolldown"));
 
-		Form* overrider = parent->makeappend<Form>(styler->fetchStyle("tlook_section"));
+		Sheet* overrider = parent->emplace<Sheet>(styler->fetchStyle("tlook_section"));
 		createUiTestWindow(overrider);
 
 		return overrider;
 	}
 
-	Form* createUiTestMyGuiImageSkin(Form* parent)
+	Sheet* createUiTestMyGuiImageSkin(Sheet* parent)
 	{
 		Styler* styler = parent->uiWindow()->styler();
 
 		styler->dynamicStyle("mygui_window");
-		styler->fetchStyle("mygui_window")->inheritLayout(WWindow::styleCls());
+		styler->fetchStyle("mygui_window")->inheritLayout(Window::styleCls());
 
-		//declareStretchSkin(styler, "mygui_windowheader", WWindowHeader::styleCls(), "mygui_windowheader", 7, 10, 52, 4, 9, 17);
-		declareStretchSkin(styler, "mygui_windowheader", WWindowHeader::styleCls(), "mygui_windowheader_var", 7, 10, 29, 4, 32, 17);
+		//declareStretchSkin(styler, "mygui_windowheader", WindowHeader::styleCls(), "mygui_windowheader", 7, 10, 52, 4, 9, 17);
+		declareStretchSkin(styler, "mygui_windowheader", WindowHeader::styleCls(), "mygui_windowheader_var", 7, 10, 29, 4, 32, 17);
 		styler->fetchStyle("mygui_windowheader")->layout()->d_sizing[DIM_Y] = FIXED;
 		styler->fetchStyle("mygui_windowheader")->layout()->d_size[DIM_Y] = 30.f;
 		styler->fetchStyle("mygui_windowheader")->layout()->d_padding = BoxFloat(10.f, 4.f, 10.f, 4.f);
 
-		declareStretchSkin(styler, "mygui_windowbody", WWindowBody::styleCls(), "mygui_windowbody", 3, 3, 15, 14, 5, 5);
+		declareStretchSkin(styler, "mygui_windowbody", WindowBody::styleCls(), "mygui_windowbody", 3, 3, 15, 14, 5, 5);
 		styler->fetchStyle("mygui_windowbody")->skin()->mMargin = BoxFloat(0.f, -3.f, 0.f, 0.f);
 
 		declareStretchSkin(styler, "mygui_frame", DivX::styleCls(), "mygui_frame", 3, 3, 15, 14, 5, 5);
@@ -358,145 +332,140 @@ namespace mk
 		styler->dynamicStyle("mygui_typein");
 		styler->fetchStyle("mygui_typein")->skin()->mTextColour = Colour::White;
 		styler->fetchStyle("mygui_typein")->skin()->mPadding = DimFloat(4.f, 4.f);
-		declareStretchSkin(styler, "mygui_typein", WTypeIn::styleCls(), "mygui_editbox", 6, 6, 15, 12, 8, 8, true);
+		declareStretchSkin(styler, "mygui_typein", TypeIn::styleCls(), "mygui_editbox", 6, 6, 15, 12, 8, 8, true);
 		
 		styler->dynamicStyle("mygui_button");
 		styler->fetchStyle("mygui_button")->skin()->mTextColour = Colour::White;
 		styler->fetchStyle("mygui_button")->skin()->mPadding = DimFloat(8.f, 4.f);
-		declareStretchSkin(styler, "mygui_button", WButton::styleCls(), "mygui_button", 6, 6, 15, 12, 8, 8, true);
+		declareStretchSkin(styler, "mygui_button", Button::styleCls(), "mygui_button", 6, 6, 15, 12, 8, 8, true);
 
 		//styler->dynamicStyle("mygui_checkbox")->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
 		declareImageSkin(styler, "mygui_checkbox", Control::styleCls(), "mygui_checkbox");
 		styler->fetchStyle("mygui_checkbox")->decline(static_cast<WidgetState>(ACTIVATED | HOVERED))->mImage = "mygui_checkbox_activated_hovered.png";
 		styler->fetchStyle("mygui_checkbox")->decline(static_cast<WidgetState>(ACTIVATED | PRESSED))->mImage = "mygui_checkbox_activated_pressed.png";
 
-		declareImageSkin(styler, "mygui_scrollup", WScrollUp::styleCls(), "mygui_arrow_up");
-		declareImageSkin(styler, "mygui_scrolldown", WScrollDown::styleCls(), "mygui_arrow_down");
+		declareImageSkin(styler, "mygui_scrollup", ScrollUp::styleCls(), "mygui_arrow_up");
+		declareImageSkin(styler, "mygui_scrolldown", ScrollDown::styleCls(), "mygui_arrow_down");
 
-		declareImageSkin(styler, "mygui_closebutton", WCloseButton::styleCls(), "mygui_closebutton");
+		declareImageSkin(styler, "mygui_closebutton", CloseButton::styleCls(), "mygui_closebutton");
 
-		declareImageSkin(styler, "mygui_sliderknoby", WSliderKnobY::styleCls(), "mygui_sliderknoby");
-		declareImageSkin(styler, "mygui_sliderknobx", WSliderKnobX::styleCls(), "mygui_sliderknobx");
+		declareImageSkin(styler, "mygui_sliderknoby", SliderKnobY::styleCls(), "mygui_sliderknoby");
+		declareImageSkin(styler, "mygui_sliderknobx", SliderKnobX::styleCls(), "mygui_sliderknobx");
 		styler->fetchStyle("mygui_sliderknobx")->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
 
-		declareStretchSkin(styler, "mygui_sliderx", WSliderX::styleCls(), "mygui_sliderx_bis", 2, 1, 26, 17, 4, 3, true);
+		declareStretchSkin(styler, "mygui_sliderx", SliderX::styleCls(), "mygui_sliderx_bis", 2, 1, 26, 17, 4, 3, true);
 		styler->fetchStyle("mygui_sliderx")->layout()->d_padding = BoxFloat(1.f, 1.f, 0.f, 0.f);
 
-		/*declareStretchSkin(styler, "mygui_sliderknobx", WSliderKnobX::styleCls(), "mygui_sliderknobx", 2, 1, 2, 10, 3, 3, true);
+		/*declareStretchSkin(styler, "mygui_sliderknobx", SliderKnobX::styleCls(), "mygui_sliderknobx", 2, 1, 2, 10, 3, 3, true);
 		styler->fetchStyle("mygui_sliderknobx")->layout()->d_sizing = DimSizing(EXPAND, FIXED);
 		styler->fetchStyle("mygui_sliderknobx")->layout()->d_size[DIM_Y] = 14.f;*/
 
-		declareStretchSkin(styler, "mygui_scrollerknoby", WScrollerKnobY::styleCls(), "mygui_scrollerknoby", 5, 2, 2, 13, 7, 4, true);
+		declareStretchSkin(styler, "mygui_scrollerknoby", ScrollerKnobY::styleCls(), "mygui_scrollerknoby", 5, 2, 2, 13, 7, 4, true);
 
 		styler->dynamicStyle("mygui_section");
 		styler->fetchStyle("mygui_section")->inheritLayout(PartitionX::styleCls());
 
-		styler->override(styler->fetchStyle("mygui_section"), WWindow::styleCls(), styler->fetchStyle("mygui_window"));
-		styler->override(styler->fetchStyle("mygui_section"), WWindowHeader::styleCls(), styler->fetchStyle("mygui_windowheader"));
-		styler->override(styler->fetchStyle("mygui_section"), WWindowBody::styleCls(), styler->fetchStyle("mygui_windowbody"));
-		styler->override(styler->fetchStyle("mygui_section"), WExpandboxHeader::styleCls(), styler->fetchStyle("mygui_frame"));
-		styler->override(styler->fetchStyle("mygui_section"), WTypeIn::styleCls(), styler->fetchStyle("mygui_typein"));
-		styler->override(styler->fetchStyle("mygui_section"), WDropdown::styleCls(), styler->fetchStyle("mygui_typein"));
-		styler->override(styler->fetchStyle("mygui_section"), WButton::styleCls(), styler->fetchStyle("mygui_button"));
-		styler->override(styler->fetchStyle("mygui_section"), WCloseButton::styleCls(), styler->fetchStyle("mygui_closebutton"));
-		styler->override(styler->fetchStyle("mygui_section"), WCheckbox::styleCls(), styler->fetchStyle("mygui_checkbox"));
-		styler->override(styler->fetchStyle("mygui_section"), WScrollerKnobY::styleCls(), styler->fetchStyle("mygui_scrollerknoby"));
-		styler->override(styler->fetchStyle("mygui_section"), WScrollUp::styleCls(), styler->fetchStyle("mygui_scrollup"));
-		styler->override(styler->fetchStyle("mygui_section"), WScrollDown::styleCls(), styler->fetchStyle("mygui_scrolldown"));
-		styler->override(styler->fetchStyle("mygui_section"), WSliderX::styleCls(), styler->fetchStyle("mygui_sliderx"));
-		styler->override(styler->fetchStyle("mygui_section"), WSliderKnobX::styleCls(), styler->fetchStyle("mygui_sliderknobx"));
+		styler->override(styler->fetchStyle("mygui_section"), Window::styleCls(), styler->fetchStyle("mygui_window"));
+		styler->override(styler->fetchStyle("mygui_section"), WindowHeader::styleCls(), styler->fetchStyle("mygui_windowheader"));
+		styler->override(styler->fetchStyle("mygui_section"), WindowBody::styleCls(), styler->fetchStyle("mygui_windowbody"));
+		styler->override(styler->fetchStyle("mygui_section"), ExpandboxHeader::styleCls(), styler->fetchStyle("mygui_frame"));
+		styler->override(styler->fetchStyle("mygui_section"), TypeIn::styleCls(), styler->fetchStyle("mygui_typein"));
+		styler->override(styler->fetchStyle("mygui_section"), Dropdown::styleCls(), styler->fetchStyle("mygui_typein"));
+		styler->override(styler->fetchStyle("mygui_section"), Button::styleCls(), styler->fetchStyle("mygui_button"));
+		styler->override(styler->fetchStyle("mygui_section"), CloseButton::styleCls(), styler->fetchStyle("mygui_closebutton"));
+		styler->override(styler->fetchStyle("mygui_section"), Checkbox::styleCls(), styler->fetchStyle("mygui_checkbox"));
+		styler->override(styler->fetchStyle("mygui_section"), ScrollerKnobY::styleCls(), styler->fetchStyle("mygui_scrollerknoby"));
+		styler->override(styler->fetchStyle("mygui_section"), ScrollUp::styleCls(), styler->fetchStyle("mygui_scrollup"));
+		styler->override(styler->fetchStyle("mygui_section"), ScrollDown::styleCls(), styler->fetchStyle("mygui_scrolldown"));
+		styler->override(styler->fetchStyle("mygui_section"), SliderX::styleCls(), styler->fetchStyle("mygui_sliderx"));
+		styler->override(styler->fetchStyle("mygui_section"), SliderKnobX::styleCls(), styler->fetchStyle("mygui_sliderknobx"));
 
-		Form* overrider = parent->makeappend<Form>(styler->fetchStyle("mygui_section"));
+		Sheet* overrider = parent->emplace<Sheet>(styler->fetchStyle("mygui_section"));
 		createUiTestWindow(overrider);
 
 		return overrider;
 	}
 
-	Form* createUiTestInlineControls(Form* parent)
+	Sheet* createUiTestInlineControls(Sheet* parent)
 	{
-		Form* div = parent->makeappend<DivY>();
-		Form* line = div->makeappend<DivX>();
+		Sheet* page = parent;
+		//Page* page = parent->emplace<Page>("Inline Controls");
+		// @bug 280X : page inside page doesn't work @todo
 
-		line->makeappend<Label>("Hello");
-		line->makeappend<Label>("World");
+		DivX* line;
+		
+		line = page->emplace<DivX>();
 
-		line = parent->makeappend<DivX>();
+		line->emplace<Label>("Hello");
+		line->emplace<Label>("World");
 
-		line->makeappend<Button>("Banana");
-		line->makeappend<Button>("Apple");
-		line->makeappend<Button>("Corniflower");
+		line = page->emplace<DivX>();
 
-		line = parent->makeappend<DivX>();
+		line->emplace<Button>("Banana");
+		line->emplace<Button>("Apple");
+		line->emplace<Button>("Corniflower");
 
-		line->makeappend<Label>("Small buttons");
-		line->makeappend<Button>("Like this one");
-		line->makeappend<Label>("can fit within a text block.");
+		line = page->emplace<DivX>();
 
-		line = parent->makeappend<DivX>();
+		line->emplace<Label>("Small buttons");
+		line->emplace<Button>("Like this one");
+		line->emplace<Label>("can fit within a text block.");
 
-		line->makeappend<InputBool>("My", true);
-		line->makeappend<InputBool>("Tailor", true);
-		line->makeappend<InputBool>("Is", true);
-		line->makeappend<InputBool>("Rich", true);
+		line = page->emplace<DivX>();
 
-		line = parent->makeappend<DivX>();
+		line->emplace<InputBool>("My", true);
+		line->emplace<InputBool>("Tailor", true);
+		line->emplace<InputBool>("Is", true);
+		line->emplace<InputBool>("Rich", true);
 
-		line->makeappend<InputFloat>("X", 0.f);
-		line->makeappend<InputFloat>("Y", 0.f);
-		line->makeappend<InputFloat>("Z", 0.f);
+		line = page->emplace<DivX>();
 
-		return div;
+		line->emplace<InputFloat>("X", 0.f);
+		line->emplace<InputFloat>("Y", 0.f);
+		line->emplace<InputFloat>("Z", 0.f);
+
+		return page;
 	}
 
-	Form* createUiTestProgressDialog(Form* parent)
+	Sheet* createUiTestProgressDialog(Sheet* parent)
 	{
-		unique_ptr<Dialog> dialogpt = make_unique<Dialog>();
-		Dialog* dialog = dialogpt.get();
-		dialog->setName("Progress Dialog");
-		ProgressBar* bar = dialog->makeappend<ProgressBar>();
-		Window* window = parent->makeappend<Window>(std::move(dialogpt));
-		WProgressBar* wbar = bar->widget()->as<WProgressBar>();
-		wbar->setPercentage(0.57f);
-		dialog->makeappend<SliderFloat>("Set progress", AutoStat<float>(0.57f, 0.f, 1.f, 0.01f), [wbar](float val) { wbar->setPercentage(val); });
+		Window* window = parent->emplace<Window>("Progress Dialog");
+		Page* page = window->body()->emplace<Page>("Progress Dialog");
+		ProgressBar* bar = page->emplace<ProgressBarX>();
+		bar->setPercentage(0.57f);
+		page->emplace<SliderFloat>("Set progress", AutoStat<float>(0.57f, 0.f, 1.f, 0.01f), [bar](float val) { bar->setPercentage(val); });
 		return window;
 	}
 
-	Window* createUiTestWindow(Form* parent)
+	Window* createUiTestWindow(Sheet* parent)
 	{
-		unique_ptr<Form> boardpt = make_unique<ScrollDivY>();
-		boardpt->setName("kiUi v0.1");
+		Window* window = parent->emplace<Window>("kiUi v0.1");
+		Page* page = window->body()->emplace<Page>("kiUi v0.1");
 
-		Window* window = parent->makeappend<Window>(std::move(boardpt));
-		WWindow* wwindow = window->widget()->as<WWindow>();
+		page->emplace<Label>("kiui says hello.");
 
-		Form* board = window->child(0);
+		Expandbox* box;
 
-		board->setName("kiUi Test");
+		box = page->emplace<Expandbox>("Help");
+		//current->emplace<Textbox>("This window is being created by the ShowTestWindow() function. Please refer to the code for programming reference.\n\nUser Guide:");
 
-		board->makeappend<Label>("kiui says hello.");
+		box = page->emplace<Expandbox>("Window options");
 
-		Form* current;
+		box->emplace<InputBool>("titlebar", true, [window](bool on) { on ? window->showTitlebar() : window->hideTitlebar(); });
+		box->emplace<InputBool>("movable", true, [window](bool) { window->toggleMovable(); });
+		box->emplace<InputBool>("resizable", true, [window](bool) { window->toggleResizable(); });
+		box->emplace<InputBool>("closable", true, [window](bool) { window->toggleClosable(); });
 
-		current = board->makeappend<Expandbox>("Help");
-		current->makeappend<Textbox>("This window is being created by the ShowTestWindow() function. Please refer to the code for programming reference.\n\nUser Guide:");
+		box->emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [window](float alpha){ window->frame()->inkstyle()->mBackgroundColour.setA(alpha); });
 
-		current = board->makeappend<Expandbox>("Window options");
+		box = page->emplace<Expandbox>("Widgets");
+		createUiTestControls(box);
 
-		current->makeappend<InputBool>("titlebar", true, [wwindow](bool on) { on ? wwindow->showTitlebar() : wwindow->hideTitlebar(); });
-		current->makeappend<InputBool>("movable", true, [wwindow](bool) { wwindow->toggleMovable(); });
-		current->makeappend<InputBool>("resizable", true, [wwindow](bool) { wwindow->toggleResizable(); });
-		current->makeappend<InputBool>("closable", true, [wwindow](bool) { wwindow->toggleClosable(); });
+		box = page->emplace<Expandbox>("Table");
+		createUiTestTable(box);
 
-		current->makeappend<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [window](float alpha){ window->widget()->frame()->inkstyle()->mBackgroundColour.setA(alpha); });
-
-		current = board->makeappend<Expandbox>("Widgets");
-		createUiTestControls(current);
-
-		current = board->makeappend<Expandbox>("Table");
-		createUiTestTable(current);
-
-		current = board->makeappend<Expandbox>("Columns");
-		createUiTestTableAlt(current);
+		box = page->emplace<Expandbox>("Columns");
+		createUiTestTableAlt(box);
 
 		/*
 		if(ImGui::TreeNode("Style Editor"))
@@ -690,39 +659,40 @@ namespace mk
 
 	}
 
-	void pickSample(Form* root, const string& name)
+	void pickSample(Sheet* sheet, Widget* selected)
 	{
-		root->clear();
+		const string name = selected->label();
+		sheet->clear();
 
 		if(name == "Dockspace")
-			createUiTestDockspace(root);
+			createUiTestDockspace(sheet);
 		else if(name == "Window")
-			createUiTestWindow(root);
+			createUiTestWindow(sheet);
 		else if(name == "Tabs")
-			createUiTestTabs(root);
+			createUiTestTabs(sheet);
 		else if(name == "Table")
-			createUiTestTable(root);
+			createUiTestTable(sheet);
 		else if(name == "Tree")
-			createUiTestTree(root);
+			createUiTestTree(sheet);
 		else if(name == "Controls")
-			createUiTestControls(root);
+			createUiTestControls(sheet);
 		else if(name == "Skinned Window (Cegui)")
-			createUiTestCeguiImageSkin(root);
+			createUiTestCeguiImageSkin(sheet);
 		else if(name == "Skinned Window (MyGui)")
-			createUiTestMyGuiImageSkin(root);
+			createUiTestMyGuiImageSkin(sheet);
 		else if(name == "File Browser")
-			createUiTestFileBrowser(root);
+			createUiTestFileBrowser(sheet);
 		else if(name == "File Tree")
-			createUiTestFileTree(root);
+			createUiTestFileTree(sheet);
 		else if(name == "Progress Dialog")
-			createUiTestProgressDialog(root);
+			createUiTestProgressDialog(sheet);
 	}
 
-	void createOgTestUi(Form* root)
+	void createUiTest(Form* root)
 	{
-		Form* demoheader = root->makeappend<Header>();
-		Form* demobody = root->makeappend<PartitionX>();
-		demoheader->makeappend<Label>("Pick a demo sample : ");
-		demoheader->makeappend<Dropdown>(std::bind(&pickSample, demobody, std::placeholders::_1), StringVector({ "Dockspace", "Window", "Skinned Window (MyGui)", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" }));
+		Header* demoheader = root->sheet()->emplace<Header>();
+		PartitionX* demobody = root->sheet()->emplace<PartitionX>();
+		demoheader->emplace<Label>("Pick a demo sample : ");
+		demoheader->emplace<Dropdown>(std::bind(&pickSample, demobody, std::placeholders::_1), StringVector({ "Dockspace", "Window", "Skinned Window (MyGui)", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" }));
 	}
 }

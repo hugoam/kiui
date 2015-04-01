@@ -34,7 +34,7 @@ namespace mk
 		RootForm* rootForm() { return this; }
 
 		UiWindow* uiWindow() { return mWindow; }
-		RootSheet* sheet() { return mSheet.get(); }
+		RootSheet* rootSheet() { return mRootSheet; }
 
 		size_t lastTick() { return mLastTick; }
 
@@ -54,7 +54,7 @@ namespace mk
 		User* mUser;
 		UiWindow* mWindow;
 		size_t mLastTick;
-		unique_ptr<RootSheet> mSheet;
+		RootSheet* mRootSheet;
 		std::vector<FormUpdateObserver*> mObservers;
 	};
 }

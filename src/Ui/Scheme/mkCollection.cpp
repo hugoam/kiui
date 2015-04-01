@@ -8,16 +8,12 @@
 #include <Object/mkRef.h>
 #include <Object/mkStem.h>
 
-#include <Ui/Scheme/mkScheme.h>
-
 namespace mk
 {
 	Collection::Collection(Form* form, FormMapper mapper)
 		: mMapper(mapper)
 		, mForm(form)
-	{
-		form->scheme()->setCollection(this);
-	}
+	{}
 
 	void Collection::bind(Form* form)
 	{

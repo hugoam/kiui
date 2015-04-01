@@ -11,7 +11,7 @@
 #include <Ui/Frame/mkStripe.h>
 #include <Ui/Frame/mkLayer.h>
 
-#include <Ui/Widget/mkWScrollbar.h>
+#include <Ui/Widget/mkScrollbar.h>
 
 #include <Ui/mkUiWindow.h>
 #include <Ui/mkUiLayout.h>
@@ -23,7 +23,7 @@
 namespace mk
 {
 	RootSheet::RootSheet(UiWindow* window, Form* form, bool absolute)
-		: Sheet(styleCls(), form)
+		: Sheet(styleCls(), LAYER)
 		, mWindow(window)
 		, mLeftPressed(false)
 		, mActiveFrame(this)
@@ -31,19 +31,17 @@ namespace mk
 	{
 		if(absolute)
 		{
-			mFrame = make_unique<Layer>(this, 0);
+			mFrame = make_unique<Layer>(this, 0, mWindow->inkWindow()->screenTarget());
 			mFrame->as<Layer>()->bind();
+			mState = static_cast<WidgetState>(mState ^ BOUND);
 		}
+
+		mCursor = this->makeappend<Cursor>(this);
 	}
 
 	RootSheet::~RootSheet()
 	{
 		this->cleanup();
-	}
-
-	void RootSheet::build()
-	{
-		mCursor = this->makeappend<Cursor>();
 	}
 
 	void RootSheet::nextFrame(size_t tick, size_t delta)

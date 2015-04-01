@@ -13,13 +13,16 @@ namespace mk
 	class MK_UI_EXPORT Layer : public Stripe
 	{
 	public:
-		Layer(Widget* widget, size_t index, size_t zorder = 0);
+		Layer(Widget* widget, size_t zorder = 0, InkTarget* target = nullptr);
 		~Layer();
+
+		FrameType frameType() { return LAYER; }
 
 		InkLayer* inkLayer() { return d_inkLayer.get(); }
 		std::vector<Layer*>& layers() { return d_layers; }
 
 		void bind();
+
 		void bind(Stripe* parent);
 		void unbind();
 
@@ -30,9 +33,11 @@ namespace mk
 		Frame* pinpoint(float x, float y, bool opaque);
 
 	protected:
-		unique_ptr<InkLayer> d_inkLayer;
+		size_t d_zorder;
+		InkTarget* d_target;
 		std::vector<Layer*> d_layers;
 		Layer* d_parentLayer;
+		unique_ptr<InkLayer> d_inkLayer;
 	};
 }
 

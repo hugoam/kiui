@@ -17,7 +17,7 @@ namespace mk
 	class MK_UI_EXPORT _I_ Frame : public Object, public Typed<Frame>, public Uibox, public Updatable
 	{
 	public:
-		Frame(Widget* widget, size_t index);
+		Frame(Widget* widget);
 		~Frame();
 
 		enum Dirty
@@ -27,9 +27,12 @@ namespace mk
 			DIRTY_CONTENT,		// The content of the inkbox has changed
 			DIRTY_WIDGET,		// The content of the widget has changed
 			DIRTY_SKIN,			// The skin of the frame has changed
-			//DIRTY_FLOW,			// The flow of the frame has changed
-			DIRTY_VISIBILITY	// The visibility of the frame has changed
+			//DIRTY_FLOW,		// The flow of the frame has changed
+			DIRTY_VISIBLE,		// The visibility of the frame has changed
+			DIRTY_HIDE			// The visibility of the frame has changed
 		};
+
+		virtual FrameType frameType() { return FRAME; }
 
 		inline Widget* widget() { return d_widget; }
 		inline Stripe* parent() { return d_parent; }
@@ -67,8 +70,6 @@ namespace mk
 		void clip();
 
 		void wrap(Dimension dim);
-
-		FrameType frameType();
 
 		virtual void setVisible(bool visible);
 

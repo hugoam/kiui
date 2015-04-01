@@ -5,8 +5,8 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Form/mkWidgets.h>
 
-#include <Ui/Widget/mkWTextbox.h>
-#include <Ui/Widget/mkWProgressBar.h>
+#include <Ui/Widget/mkTextbox.h>
+#include <Ui/Widget/mkProgressBar.h>
 
 #include <Object/String/mkStringConvert.h>
 
@@ -14,90 +14,45 @@
 
 namespace mk
 {
-	Control::Control(SchemeMapper mapper)
-		: Form(styleCls(), "", mapper)
+	Control::Control(unique_ptr<Sheet> sheet)
+		: Form(styleCls(), std::move(sheet))
 	{}
 
-	WrapX::WrapX(SchemeMapper mapper)
-		: Form(styleCls(), "", mapper)
+	WrapX::WrapX()
+		: Sheet(styleCls())
 	{}
 
-	WrapY::WrapY(SchemeMapper mapper)
-		: Form(styleCls(), "", mapper)
+	WrapY::WrapY()
+		: Sheet(styleCls())
 	{}
 
-	DivX::DivX(SchemeMapper mapper)
-		: Form(styleCls(), "", mapper)
+	DivX::DivX()
+		: Sheet(styleCls())
 	{}
 
-	DivY::DivY(SchemeMapper mapper)
-		: Form(styleCls(), "", mapper)
+	DivY::DivY()
+		: Sheet(styleCls())
 	{}
 
-	ScrollDivY::ScrollDivY()
-		: Form(styleCls(), "", [this](){ return make_unique<ScrollSheet>(nullptr, this); })
+	PartitionX::PartitionX()
+		: Sheet(styleCls())
 	{}
 
-	PartitionX::PartitionX(SchemeMapper mapper)
-		: Form(styleCls(), "", mapper)
+	PartitionY::PartitionY()
+		: Sheet(styleCls())
 	{}
 
-	PartitionY::PartitionY(SchemeMapper mapper)
-		: Form(styleCls(), "", mapper)
+	Page::Page(const string& name, const string& dockid)
+		: ScrollSheet(styleCls())
+		, mName(name)
+		, mDockId(dockid)
 	{}
 
 	Dialog::Dialog()
-		: Form(styleCls())
+		: Sheet(styleCls())
 	{}
 
-	Header::Header(SchemeMapper mapper)
-		: Form(styleCls(), "", mapper)
+	Header::Header()
+		: Sheet(styleCls())
 	{}
-
-	Label::Label(Style* style, const string& label)
-		: Form(style ? style : styleCls(), label, [this](){ return make_unique<WLabel>(this); })
-	{
-		mType = cls();
-	}
-	
-	Label::Label(const string& label)
-		: Label(styleCls(), label)
-	{}
-
-	Textbox::Textbox(Style* style, const string& text)
-		: Form(style, text, [this, text](){ return make_unique<WTextbox>(this, text); })
-	{
-		mType = cls();
-	}
-
-	Textbox::Textbox(const string& text)
-		: Textbox(nullptr, text)
-	{}
-
-	Image::Image(Style* style, const string& image)
-		: Form(style ? style : styleCls())
-	{
-		mType = cls();
-		this->setImage(image);
-	}
-
-	Image::Image(const string& image)
-		: Image(nullptr, image)
-	{}
-
-	DynamicImage::DynamicImage(Style* style, unique_ptr<Image256> image)
-		: Form(style)
-		, mImage(std::move(image))
-	{
-		mType = cls();
-	}
-
-	DynamicImage::~DynamicImage()
-	{}
-
-	ProgressBar::ProgressBar()
-		: Form(nullptr, "", [](){ return make_unique<WProgressBarX>(); })
-	{
-		mType = cls();
-	}
 }

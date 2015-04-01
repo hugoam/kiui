@@ -5,23 +5,18 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Scheme/mkList.h>
 
-#include <Ui/Form/mkButton.h>
 #include <Ui/Form/mkWidgets.h>
 
 namespace mk
 {
-	WList::WList(Form* form)
-		: ScrollSheet(styleCls(), form)
-	{}
-
 	List::List(Style* style)
-		: Form(style ? style : styleCls(), "", [this](){ return make_unique<WList>(this); })
+		: ScrollSheet(style ? style : styleCls())
 	{
 		mType = cls();
 	}
 
 	Sequence::Sequence(Style* style)
-		: Form(style ? style : styleCls())
+		: Sheet(style ? style : styleCls())
 	{
 		mType = cls();
 	}
@@ -42,7 +37,6 @@ namespace mk
 
 	SortList::SortList(Style* style)
 		: List(style ? style : styleCls())
-		, Dropper(this)
 	{
 		mType = cls();
 	}

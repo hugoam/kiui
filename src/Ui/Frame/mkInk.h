@@ -31,13 +31,19 @@ namespace mk
 	class MK_UI_EXPORT InkLayer : public Object, public Typed<InkLayer>
 	{
 	public:
+		InkLayer(InkTarget* target) : mTarget(target) {}
 		virtual ~InkLayer() {}
+
+		InkTarget* target() { return mTarget; }
 
 		virtual unique_ptr<Inkbox> inkbox(Frame* frame) = 0;
 
 		virtual void show() = 0;
 		virtual void hide() = 0;
 		virtual void moveToTop() = 0;
+
+	protected:
+		InkTarget* mTarget;
 	};
 
 	class MK_UI_EXPORT Inkbox

@@ -32,8 +32,10 @@ namespace mk
 	class MK_UI_EXPORT Stripe : public Frame
 	{
 	public:
-		Stripe(Widget* widget, size_t index);
+		Stripe(Widget* widget);
 		~Stripe();
+
+		FrameType frameType() { return STRIPE; }
 
 		inline FrameVector& contents() { return d_contents; }
 		inline FlowSequence& sequence() { return d_sequence; }

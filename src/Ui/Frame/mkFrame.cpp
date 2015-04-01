@@ -25,16 +25,16 @@
 
 namespace mk
 {
-	Frame::Frame(Widget* widget, size_t index)
+	Frame::Frame(Widget* widget)
 		: Uibox(widget->style()->layout())
 		, d_widget(widget)
 		, d_parent(nullptr)
-		, d_dirty(DIRTY_VISIBILITY)
+		, d_dirty(DIRTY_VISIBLE)
 		, d_hidden(false)
 		, d_visible(true)
 		, d_clipPos(0.f, 0.f)
 		, d_clipSize(0.f, 0.f)
-		, d_index(index)
+		, d_index(0)
 		, d_wstyle(widget->style())
 		, d_inkstyle(d_wstyle->skin())
 	{
@@ -46,11 +46,6 @@ namespace mk
 
 	Frame::~Frame()
 	{}
-
-	FrameType Frame::frameType()
-	{
-		return d_widget->frameType();
-	}
 
 	Layer* Frame::layer()
 	{
@@ -147,7 +142,9 @@ namespace mk
 
 		switch(d_dirty)
 		{
-		case DIRTY_VISIBILITY:
+		case DIRTY_HIDE:
+			d_hidden ? d_parent->flowHidden(this) : d_parent->flowShown(this);
+		case DIRTY_VISIBLE:
 			d_visible ? d_inkbox->show() : d_inkbox->hide();
 		case DIRTY_SKIN:
 			d_inkbox->updateStyle();
@@ -255,19 +252,23 @@ namespace mk
 	void Frame::show()
 	{
 		d_hidden = false;
+		if(this->flow())
+			this->setDirty(DIRTY_HIDE);
 		if(!d_visible)
 			this->setVisible(true);
-		if(this->flow())
-			d_parent->flowShown(this);
+		//if(this->flow())
+		//	d_parent->flowShown(this);
 	}
 
 	void Frame::hide()
 	{
 		d_hidden = true;
+		if(this->flow())
+			this->setDirty(DIRTY_HIDE);
 		if(d_visible)
 			this->setVisible(false);
-		if(this->flow())
-			d_parent->flowHidden(this);
+		//if(this->flow())
+		//	d_parent->flowHidden(this);
 	}
 
 	void Frame::setVisible(bool visible)
@@ -277,11 +278,11 @@ namespace mk
 
 	void Frame::setVisible()
 	{
-		if(d_visible || !d_parent->visible() || d_hidden)
+		if(d_visible || d_hidden || (d_parent && !d_parent->visible()))
 			return;
 
 		d_visible = true;
-		this->setDirty(DIRTY_VISIBILITY);
+		this->setDirty(DIRTY_VISIBLE);
 	}
 
 	void Frame::setInvisible()
@@ -290,7 +291,7 @@ namespace mk
 			return;
 
 		d_visible = false;
-		this->setDirty(DIRTY_VISIBILITY);
+		this->setDirty(DIRTY_VISIBLE);
 	}
 
 	float Frame::calcAbsolute(Dimension dim)

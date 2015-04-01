@@ -10,8 +10,6 @@
 
 #include <Ui/Form/mkRootForm.h>
 
-#include <Ui/Scheme/mkScheme.h>
-
 #include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Widget/mkWidget.h>
@@ -21,15 +19,15 @@ namespace mk
 {
 	Lref Form::sNullString = lref(string(""));
 
-	Form::Form(Style* style, const string& label, SchemeMapper mapper)
+	Form::Form(Style* style, unique_ptr<Sheet> sheet)
 		: TypeObject(Form::cls())
 		, mParent(nullptr)
 		, mIndex(0)
 		, mStyle(style)
-		, mLabel(label)
-		, mUpdated(0)
-		, mScheme(this, mapper)
-		, mWidget(nullptr)
+		, mLabel()
+		//, mUpdated(0)
+		, mSheet(std::move(sheet))
+		, mWidget(mSheet.get())
 	{}
 
 	Form::~Form()
@@ -57,7 +55,7 @@ namespace mk
 	void Form::bind(Form* parent)
 	{
 		mParent = parent;
-		mParent->scheme()->append(this);
+		mParent->sheet()->vbind(mWidget);
 
 		for(auto& form : mContents)
 			form->bind(this);
@@ -65,7 +63,7 @@ namespace mk
 
 	void Form::destroy()
 	{
-		mParent->scheme()->remove(this);
+		mParent->sheet()->vunbind(mWidget);
 		mParent->remove(mIndex);
 	}
 
@@ -135,8 +133,8 @@ namespace mk
 
 	void Form::clear()
 	{
-		for(auto& pt : reverse_adapt(mContents))
-			mScheme.remove(pt.get());
+		for(auto& form : reverse_adapt(mContents))
+			mSheet->vunbind(form->widget());
 		mContents.clear();
 	}
 
@@ -189,5 +187,16 @@ namespace mk
 		{
 			return this->child(fromString<size_t>(search));
 		}
+	}
+
+	void Form::reset(unique_ptr<Sheet> sheet)
+	{
+		for(auto& form : mContents)
+			mSheet->vunbind(form->widget());
+
+		mSheet = std::move(sheet);
+
+		for(auto& form : mContents)
+			mSheet->vbind(form->widget());
 	}
 }

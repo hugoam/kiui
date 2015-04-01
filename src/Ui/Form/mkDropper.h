@@ -15,7 +15,7 @@ namespace mk
 	class MK_UI_EXPORT Dropper
 	{
 	public:
-		Dropper(Form* form);
+		Dropper();
 
 		virtual Form* swapdrop(Form* form, Dropper* source) = 0;
 		virtual bool candrop(Form* form, Dropper* source) = 0;

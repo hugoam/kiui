@@ -14,8 +14,6 @@
 
 #include <Ui/Nano/nanovg/nanovg.h>
 
-#include <cmath>
-
 namespace mk
 {
 	NVGcolor nvgColour(const Colour& colour)
@@ -239,9 +237,6 @@ namespace mk
 	{
 		int imgwidth, imgheight;
 		nvgImageSize(mCtx, image, &imgwidth, &imgheight);
-
-		if(mFrame->widget()->label() == "Corniflower")
-			int i = 0;
 
 		if(stretchwidth > 0.f)
 		{

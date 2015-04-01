@@ -7,8 +7,8 @@
 
 namespace mk
 {
-	Dropper::Dropper(Form* form)
-		: mForm(form)
+	Dropper::Dropper()
+		: mForm()
 	{}
 
 	void Dropper::drop(Form* form, size_t index)

@@ -12,19 +12,20 @@
 
 namespace mk
 {
-	MK_UI_EXPORT Dockspace* createUiTestDockspace(Form* parent);
-	MK_UI_EXPORT Tabber* createUiTestTabs(Form* parent);
-	MK_UI_EXPORT Table* createUiTestTable(Form* parent);
-	MK_UI_EXPORT Table* createUiTestTableAlt(Form* parent);
-	MK_UI_EXPORT Tree* createUiTestTree(Form* parent);
-	MK_UI_EXPORT Form* createUiTestInlineControls(Form* parent);
-	MK_UI_EXPORT Form* createUiTestControls(Form* parent);
-	MK_UI_EXPORT Form* createUiTestProgressDialog(Form* parent);
-	MK_UI_EXPORT Window* createUiTestWindow(Form* parent);
-	MK_UI_EXPORT Form* createUiTestFileBrowser(Form* parent);
-	MK_UI_EXPORT Form* createUiTestFileTree(Form* parent);
-	MK_UI_EXPORT Form* createUiTestMyGuiImageSkin(Form* parent);
-	MK_UI_EXPORT Form* createUiTestCeguiImageSkin(Form* parent);
+	MK_UI_EXPORT Dockspace* createUiTestDockspace(Sheet* parent);
+	MK_UI_EXPORT Tabber* createUiTestTabs(Sheet* parent);
+	MK_UI_EXPORT Table* createUiTestTable(Sheet* parent);
+	MK_UI_EXPORT Table* createUiTestTableAlt(Sheet* parent);
+	MK_UI_EXPORT Tree* createUiTestTree(Sheet* parent);
+	MK_UI_EXPORT Sheet* createUiTestInlineControls(Sheet* parent);
+	MK_UI_EXPORT Sheet* createUiTestControls(Sheet* parent);
+	MK_UI_EXPORT Sheet* createUiTestProgressDialog(Sheet* parent);
+	MK_UI_EXPORT Window* createUiTestWindow(Sheet* parent);
+	MK_UI_EXPORT Sheet* createUiTestFileBrowser(Sheet* parent);
+	MK_UI_EXPORT Sheet* createUiTestFileTree(Sheet* parent);
+	MK_UI_EXPORT Sheet* createUiTestMyGuiImageSkin(Sheet* parent);
+	MK_UI_EXPORT Sheet* createUiTestCeguiImageSkin(Sheet* parent);
+	MK_UI_EXPORT void createUiTest(Form* parent);
 }
 
 #endif // MK_UI_H_INCLUDED

@@ -11,146 +11,98 @@
 #include <Object/Util/mkMake.h>
 #include <Ui/mkUiForward.h>
 #include <Ui/Form/mkForm.h>
-#include <Ui/Form/mkButton.h>
-#include <Ui/Scheme/mkWWindow.h>
+#include <Ui/Scheme/mkWindow.h>
 #include <Ui/Scheme/mkList.h>
-#include <Ui/Scheme/mkWTabber.h>
-#include <Ui/Scheme/mkWDropdown.h>
-#include <Ui/Scheme/mkWRadioButton.h>
-
-#include <Ui/Form/mkFValue.h>
+#include <Ui/Scheme/mkTabber.h>
+#include <Ui/Scheme/mkDropdown.h>
+#include <Ui/Scheme/mkRadioButton.h>
 
 namespace mk
 {
 	class MK_UI_EXPORT Control : public Form, public Styled<Control>
 	{
 	public:
-		Control(SchemeMapper mapper = nullptr);
+		Control(unique_ptr<Sheet> sheet = nullptr);
 	};
 
-	class MK_UI_EXPORT _I_ WrapX : public Form, public Typed<WrapX, Form>, public Styled<WrapX>
+	class MK_UI_EXPORT _I_ WrapX : public Sheet, public Typed<WrapX, Sheet>, public Styled<WrapX>
 	{
 	public:
-		WrapX(SchemeMapper mapper = nullptr);
+		WrapX();
 
-		using Typed<WrapX, Form>::cls;
+		using Typed<WrapX, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT _I_ WrapY : public Form, public Typed<WrapY, Form>, public Styled<WrapY>
+	class MK_UI_EXPORT _I_ WrapY : public Sheet, public Typed<WrapY, Sheet>, public Styled<WrapY>
 	{
 	public:
-		WrapY(SchemeMapper mapper = nullptr);
+		WrapY();
 
-		using Typed<WrapY, Form>::cls;
+		using Typed<WrapY, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT _I_ DivX : public Form, public Typed<DivX, Form>, public Styled<DivX>
+	class MK_UI_EXPORT _I_ DivX : public Sheet, public Typed<DivX, Sheet>, public Styled<DivX>
 	{
 	public:
-		DivX(SchemeMapper mapper = nullptr);
+		DivX();
 
-		using Typed<DivX, Form>::cls;
+		using Typed<DivX, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT _I_ DivY : public Form, public Typed<DivY, Form>, public Styled<DivY>
+	class MK_UI_EXPORT _I_ DivY : public Sheet, public Typed<DivY, Sheet>, public Styled<DivY>
 	{
 	public:
-		DivY(SchemeMapper mapper = nullptr);
+		DivY();
 
-		using Typed<DivY, Form>::cls;
+		using Typed<DivY, Sheet>::cls;
 	};
-	
-	class MK_UI_EXPORT _I_ ScrollDivY : public Form, public Typed<ScrollDivY, Form>, public Styled<ScrollDivY>
+
+	class MK_UI_EXPORT _I_ PartitionX : public Sheet, public Typed<PartitionX, Sheet>, public Styled<PartitionX>
 	{
 	public:
-		ScrollDivY();
+		PartitionX();
 
-		using Typed<ScrollDivY, Form>::cls;
+		using Typed<PartitionX, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT _I_ PartitionX : public Form, public Typed<PartitionX, Form>, public Styled<PartitionX>
+	class MK_UI_EXPORT _I_ PartitionY : public Sheet, public Typed<PartitionY, Sheet>, public Styled<PartitionY>
 	{
 	public:
-		PartitionX(SchemeMapper mapper = nullptr);
+		PartitionY();
 
-		using Typed<PartitionX, Form>::cls;
+		using Typed<PartitionY, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT _I_ PartitionY : public Form, public Typed<PartitionY, Form>, public Styled<PartitionY>
+	class MK_UI_EXPORT _I_ Page : public ScrollSheet, public Typed<Page, Sheet>, public Styled<Page>
 	{
 	public:
-		PartitionY(SchemeMapper mapper = nullptr);
+		Page(const string& name, const string& dockid = "");
 
-		using Typed<PartitionY, Form>::cls;
+		const string& name() { return mName; }
+		const string& dockid() { return mDockId; }
+
+		using Typed<Page, Sheet>::cls;
+		using Styled<Page>::styleCls;
+
+	protected:
+		string mName;
+		string mDockId;
 	};
 
-	class MK_UI_EXPORT _I_ Dialog : public Form, public Typed<Dialog, Form>, public Styled<Dialog>
+	class MK_UI_EXPORT _I_ Dialog : public Sheet, public Typed<Dialog, Sheet>, public Styled<Dialog>
 	{
 	public:
 		Dialog();
 
-		using Typed<Dialog, Form>::cls;
+		using Typed<Dialog, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT _I_ Header : public Form, public Typed<Header, Form>, public Styled<Header>
+	class MK_UI_EXPORT _I_ Header : public Sheet, public Typed<Header, Sheet>, public Styled<Header>
 	{
 	public:
-		Header(SchemeMapper mapper = nullptr);
+		Header();
 
-		using Typed<Header, Form>::cls;
-	};
-
-	class MK_UI_EXPORT _I_ Label : public Form, public Typed<Label, Form>, public Styled<Label>
-	{
-	public:
-		Label(Style* style, const string& label);
-		Label(const string& label);
-
-		using Typed<Label, Form>::cls;
-	};
-
-	class MK_UI_EXPORT _I_ Textbox : public Form, public Typed<Textbox, Form>
-	{
-	public:
-		Textbox(Style* style, const string& text);
-		Textbox(const string& text);
-
-		using Typed<Textbox, Form>::cls;
-	};
-
-	class MK_UI_EXPORT _I_ Image : public Form, public Typed<Image, Form>, public Styled<Image>
-	{
-	public:
-		Image(Style* style, const string& image);
-		Image(const string& image);
-
-		using Typed<Image, Form>::cls;
-	};
-	
-	class MK_UI_EXPORT _I_ DynamicImage : public Form, public Typed<DynamicImage, Form>
-	{
-	public:
-		DynamicImage(Style* style, unique_ptr<Image256> image);
-		~DynamicImage();
-
-		Image256* imageData() { return mImage.get(); }
-
-		using Typed<DynamicImage, Form>::cls;
-
-	protected:
-		unique_ptr<Image256> mImage;
-	};
-
-	class MK_UI_EXPORT ProgressBar : public Form, public Typed<ProgressBar, Form>
-	{
-	public:
-		ProgressBar();
-
-		using Typed<ProgressBar, Form>::cls;
-
-	protected:
-		AutoStat<float> mStat;
-		Label* mValueLabel;
+		using Typed<Header, Sheet>::cls;
 	};
 }
 

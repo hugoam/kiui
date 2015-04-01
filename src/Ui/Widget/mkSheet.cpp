@@ -13,7 +13,7 @@
 
 #include <Ui/Form/mkWidgets.h>
 
-#include <Ui/Widget/mkWScrollbar.h>
+#include <Ui/Widget/mkScrollbar.h>
 #include <Ui/Widget/mkRootSheet.h>
 
 #include <Ui/mkUiWindow.h>
@@ -25,12 +25,22 @@
 
 namespace mk
 {
-	Sheet::Sheet(Style* style, Form* form)
-		: Widget(style, form)
+	Sheet::Sheet(Style* style, FrameType frameType)
+		: Widget(style, frameType)
 	{}
 
 	Sheet::~Sheet()
 	{}
+
+	/*unique_ptr<Sheet> Sheet::copy()
+	{
+		unique_ptr<Sheet> copy = this->clone();
+
+		for(size_t i = 0; i < mContents.size(); ++i)
+			copy->append(mContents[i]->clone());
+
+		return copy;
+	}*/
 
 	void Sheet::nextFrame(size_t tick, size_t delta)
 	{
@@ -38,6 +48,22 @@ namespace mk
 		
 		for(size_t i = 0; i < mContents.size(); ++i)
 			mContents[i]->nextFrame(tick, delta);
+	}
+
+	void Sheet::bind(Sheet* parent, size_t index)
+	{
+		Widget::bind(parent, index);
+
+		for(size_t i = 0; i < mContents.size(); ++i)
+			mContents[i]->bind(this, i);
+	}
+
+	void Sheet::rebind(Sheet* parent, size_t index)
+	{
+		Widget::rebind(parent, index);
+
+		//for(size_t i = 0; i < mContents.size(); ++i)
+		//	mContents[i]->rebind(this, i);
 	}
 
 	Widget* Sheet::append(unique_ptr<Widget> unique)
@@ -49,7 +75,8 @@ namespace mk
 	{
 		Widget* widget = unique.get();
 		mContents.insert(mContents.begin() + index, std::move(unique));
-		widget->parent() ? widget->rebind(this, index) : widget->bind(this, index);
+		if(mState & BOUND)
+			widget->parent() ? widget->rebind(this, index) : widget->bind(this, index);
 		return widget;
 	}
 
@@ -91,20 +118,17 @@ namespace mk
 			widget->cleanup();
 	}
 
-	ScrollSheet::ScrollSheet(Style* style, Form* form)
-		: Sheet(style, form)
+	ScrollSheet::ScrollSheet(Style* style)
+		: Sheet(style)
 		, mSheet(nullptr)
 		, mScrollbar(nullptr)
-	{}
+	{
+		mSheet = this->makeappend<Sheet>(DivY::styleCls());
+		mScrollbar = this->makeappend<Scrollbar>(mSheet->stripe());
+	}
 
 	ScrollSheet::~ScrollSheet()
 	{}
-
-	void ScrollSheet::build()
-	{
-		mSheet = this->makeappend<Sheet>(DivY::styleCls());
-		mScrollbar = this->makeappend<WScrollbar>(mSheet->stripe());
-	}
 
 	void ScrollSheet::nextFrame(size_t tick, size_t delta)
 	{
@@ -129,17 +153,12 @@ namespace mk
 		return mSheet->vrelease(widget);
 	}
 
-	GridSheet::GridSheet(Dimension dim, Style* style, Form* form)
-		: Sheet(style, form)
+	GridSheet::GridSheet(Dimension dim, Style* style)
+		: Sheet(style)
 		, mDim(dim)
 		, mResizing(nullptr)
 		, mHoverCursor(mDim == DIM_X ? ResizeCursorX::styleCls() : ResizeCursorY::styleCls())
 	{}
-
-	void GridSheet::build()
-	{
-		Sheet::build();
-	}
 
 	bool GridSheet::leftDragStart(float xPos, float yPos)
 	{
@@ -183,14 +202,13 @@ namespace mk
 		return true;
 	}
 
-	Cursor::Cursor()
-		: Widget(styleCls())
-	{}
-
-	void Cursor::build()
+	Cursor::Cursor(RootSheet* rootSheet)
+		: Widget(styleCls(), LAYER)
 	{
-		mTooltip = this->rootSheet()->makeappend<Tooltip>("");
-		mHovered = mParent;
+		mFrame = make_unique<Layer>(this, 15);
+
+		mTooltip = rootSheet->emplace<Tooltip>("");
+		mHovered = rootSheet;
 	}
 
 	void Cursor::nextFrame()
@@ -262,9 +280,11 @@ namespace mk
 	}
 
 	Tooltip::Tooltip(const string& label)
-		: Widget(styleCls())
+		: Widget(styleCls(), LAYER)
 		, mLabel(label)
-	{}
+	{
+		mFrame = make_unique<Layer>(this, 14);
+	}
 
 	Tooltip::~Tooltip()
 	{}

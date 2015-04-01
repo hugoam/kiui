@@ -41,8 +41,6 @@ namespace mk
 	class Image;
 	class DynamicImage;
 
-	class WDynamicImage;
-
 	class Dropper;
 
 	class Tooltip;
@@ -83,32 +81,31 @@ namespace mk
 	class Sheet;
 	class RootSheet;
 
-	class WLabel;
-	class WTitle;
-	class WIcon;
-	class WButton;
-	class WWrapButton;
-	class WToggle;
-	class WSlider;
-	class WSliderKnob;
-	class WScroller;
-	class WScrollbar;
-	class WInputBase;
+	class Label;
+	class Title;
+	class Icon;
+	class Button;
+	class WrapButton;
+	class Toggle;
+	class Slider;
+	class SliderKnob;
+	class Scroller;
+	class Scrollbar;
 
 	template <class T>
-	class WStatSlider;
+	class StatSlider;
 
-	class WDropdown;
-	class WDropdownBox;
+	class Dropdown;
+	class DropdownBox;
 
-	class WExpandbox;
+	class Expandbox;
 
-	class WTabber;
-	class WWindow;
+	class Tabber;
+	class Window;
 
-	class WDocksection;
-	class WDockline;
-	class WDockspace;
+	class Docksection;
+	class Dockline;
+	class Dockspace;
 
 	class Cursor;
 
@@ -120,11 +117,7 @@ namespace mk
 	class FMethodBind;
 	class FMethodCall;
 
-	class FValue;
-	class FBool;
-	class FInt;
-	class FFloat;
-	class FString;
+	class WValue;
 
 	class InputString;
 	class InputBool;
@@ -134,10 +127,8 @@ namespace mk
 	class SliderInt;
 	class SliderFloat;
 
-	template <class T>
-	class FStat;
-
 	class Hook;
+
 	class FObjectEdit;
 	class FStem;
 	class FMember;

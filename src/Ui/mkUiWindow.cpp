@@ -20,12 +20,12 @@
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 
-#include <Ui/Scheme/mkWTabber.h>
-#include <Ui/Scheme/mkWDropdown.h>
-#include <Ui/Widget/mkWButton.h>
-#include <Ui/Scheme/mkWWindow.h>
-#include <Ui/Widget/mkWTypeIn.h>
-#include <Ui/Widget/mkWContextMenu.h>
+#include <Ui/Scheme/mkTabber.h>
+#include <Ui/Scheme/mkDropdown.h>
+#include <Ui/Widget/mkButton.h>
+#include <Ui/Scheme/mkWindow.h>
+#include <Ui/Widget/mkTypeIn.h>
+#include <Ui/Widget/mkContextMenu.h>
 
 #include <Ui/Controller/mkController.h>
 
@@ -61,7 +61,7 @@ namespace mk
 		mHeight = float(renderWindow->height());
 
 		mRootForm = make_unique<RootForm>(this);
-		mRootSheet = mRootForm->sheet();
+		mRootSheet = mRootForm->rootSheet();
 
 		mRootSheet->frame()->setSize(mWidth, mHeight);
 
@@ -71,7 +71,7 @@ namespace mk
 	void UiWindow::init()
 	{
 		mStyler->prepare();
-		mRootSheet->build();
+		//mRootSheet->build();
 
 		//mRenderWindow->updateSize();
 	}

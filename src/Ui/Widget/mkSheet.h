@@ -21,18 +21,21 @@ namespace mk
 	class MK_UI_EXPORT _I_ Sheet : public Widget
 	{
 	public:
-		Sheet(Style* style, Form* form = nullptr);
+		Sheet(Style* style, FrameType frameType = STRIPE);
 		~Sheet();
 
 		void nextFrame(size_t tick, size_t delta);
-
-		FrameType frameType() { return STRIPE; }
 
 		inline Stripe* stripe() { return mFrame->as<Stripe>(); }
 		inline const std::vector<unique_ptr<Widget>>& contents() { return mContents; }
 		inline size_t count() { return mContents.size(); }
 
-		virtual Sheet* vaddwrapper(Widget* widget) { UNUSED(widget); return nullptr; }
+		void bind(Sheet* parent, size_t index);
+		void rebind(Sheet* parent, size_t index);
+
+		virtual Widget* vbind(Widget* widget) { return widget; }
+		virtual Widget* vunbind(Widget* widget) { return widget; }
+
 		virtual Widget* vappend(unique_ptr<Widget> widget) { return append(std::move(widget)); }
 		virtual unique_ptr<Widget> vrelease(Widget* widget) { return widget->unbind(); }
 
@@ -47,11 +50,12 @@ namespace mk
 		void cleanup();
 
 		template <class T, class... Args>
-		inline T* vmakeappend(Args&&... args)
+		inline T* emplace(Args&&... args)
 		{
 			return this->vappend(make_unique<T>(std::forward<Args>(args)...))->template as<T>();
 		}
 
+	protected:
 		template <class T, class... Args>
 		inline T* makeappend(Args&&... args)
 		{
@@ -68,30 +72,28 @@ namespace mk
 		std::vector<unique_ptr<Widget>> mContents;
 	};
 
-	class MK_UI_EXPORT _I_ ScrollSheet : public Sheet
+	class MK_UI_EXPORT _I_ ScrollSheet : public Sheet, public Typed<ScrollSheet, Sheet>, public Styled<ScrollSheet>
 	{
 	public:
-		ScrollSheet(Style* style, Form* form = nullptr);
+		ScrollSheet(Style* style);
 		~ScrollSheet();
-
-		void build();
 
 		void nextFrame(size_t tick, size_t delta);
 
 		Widget* vappend(unique_ptr<Widget> widget);
 		unique_ptr<Widget> vrelease(Widget* widget);
 
+		using Typed<ScrollSheet, Sheet>::cls;
+
 	protected:
 		Sheet* mSheet;
-		WScrollbar* mScrollbar;
+		Scrollbar* mScrollbar;
 	};
 
 	class MK_UI_EXPORT GridSheet : public Sheet
 	{
 	public:
-		GridSheet(Dimension dim, Style* style, Form* form = nullptr);
-
-		void build();
+		GridSheet(Dimension dim, Style* style);
 
 		Style* hoverCursor() { return mHoverCursor; }
 
@@ -110,13 +112,9 @@ namespace mk
 	class MK_UI_EXPORT _I_ Cursor : public Widget, public Typed<Cursor>, public Styled<Cursor>
 	{
 	public:
-		Cursor();
+		Cursor(RootSheet* rootSheet);
 
-		FrameType frameType() { return LAYER; }
-		size_t zorder() { return 15; }
 		Widget* hovered() { return mHovered; }
-
-		void build();
 
 		void nextFrame();
 		void setPosition(float x, float y);
@@ -180,8 +178,6 @@ namespace mk
 		~Tooltip();
 
 		const string& label() { return mLabel; }
-		FrameType frameType() { return LAYER; }
-		size_t zorder() { return 14; }
 
 		void setLabel(const string& label);
 

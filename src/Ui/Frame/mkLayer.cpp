@@ -17,15 +17,16 @@
 
 namespace mk
 {
-	Layer::Layer(Widget* widget, size_t index, size_t zorder)
-		: Stripe(widget, index)
-		, d_inkLayer(widget->inkTarget()->layer(this, zorder))
+	Layer::Layer(Widget* widget, size_t zorder, InkTarget* target)
+		: Stripe(widget)
+		, d_zorder(zorder)
+		, d_target(target)
 		, d_parentLayer(nullptr)
 	{}
 
 	Layer::~Layer()
 	{
-		d_inkbox.reset(); // destroy the inkbox before the layer
+		// d_inkbox.reset(); // destroy the inkbox before the layer // already handled in unbind()
 
 		if(d_parentLayer)
 			this->unbind();
@@ -33,14 +34,21 @@ namespace mk
 
 	void Layer::bind()
 	{
+		d_inkLayer = d_target->layer(this, d_zorder);
 		d_inkbox = d_inkLayer->inkbox(this);
 	}
 
 	void Layer::bind(Stripe* parent)
 	{
-		Frame::bind(parent);
 		d_parentLayer = parent->layer();
 		d_parentLayer->layers().push_back(this);
+
+		if(d_target)
+			d_inkLayer = d_target->layer(this, d_zorder);
+		else
+			d_inkLayer = d_parentLayer->inkLayer()->target()->layer(this, d_zorder);
+
+		Frame::bind(parent);
 	}
 
 	void Layer::unbind()
@@ -52,7 +60,7 @@ namespace mk
 
 	void Layer::nextFrame(size_t tick, size_t delta)
 	{
-		if(d_dirty >= DIRTY_VISIBILITY)
+		if(d_dirty >= DIRTY_VISIBLE)
 			d_visible ? d_inkLayer->show() : d_inkLayer->hide();
 
 		Stripe::nextFrame(tick, delta);

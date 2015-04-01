@@ -21,8 +21,8 @@ namespace mk
 {
 	enum _I_ WidgetState : unsigned int
 	{
-		NOSTATE = 0,
-		ENABLED = 1 << 0,
+		UNBOUND = 0,
+		BOUND = 1 << 0,
 		HOVERED = 1 << 1,
 		TRIGGERED = 1 << 2,
 		ACTIVATED = 1 << 3,
@@ -36,7 +36,7 @@ namespace mk
 	class MK_UI_EXPORT _I_ Widget : public TypeObject, public Typed<Widget>, public InputReceiver, public Updatable
 	{
 	public:
-		Widget(Style* style, Form* form = nullptr);
+		Widget(Style* style, FrameType frameType = FRAME);
 		~Widget();
 
 		_A_ inline Sheet* parent() { return mParent; }
@@ -47,33 +47,28 @@ namespace mk
 
 		void setStyle(Style* style);
 
-		virtual Sheet* clone(Sheet* parent);
+		virtual unique_ptr<Widget> clone() { return make_unique<Widget>(mStyle); }
 
 		virtual Style* fetchOverride(Style* style);
 
-		virtual FrameType frameType();
-		virtual size_t zorder() { return 0; }
-
-		virtual const string& name();
-		virtual const string& label();
-		virtual const string& image();
-		virtual const string& tooltip();
-		virtual Style* hoverCursor();
+		virtual const string& name() { return sNullString; }
+		virtual const string& label() { return sNullString; }
+		virtual const string& image(); // { return sNullString; }
+		virtual const string& tooltip() { return sNullString; }
+		virtual const string& dockid() { return sNullString; }
+		virtual Style* hoverCursor() { return nullptr; }
 
 		virtual RootSheet* rootSheet();
-		virtual InkTarget* inkTarget();
 
 		UiWindow* uiWindow();
-
-		virtual void build() {}
 
 		virtual void show();
 		virtual void hide();
 
 		virtual void cleanup();
 
-		void bind(Sheet* parent, size_t index);
-		void rebind(Sheet* parent, size_t index);
+		virtual void bind(Sheet* parent, size_t index);
+		virtual void rebind(Sheet* parent, size_t index);
 		
 		unique_ptr<Widget> unbind();
 		unique_ptr<Widget> extract();
@@ -81,9 +76,6 @@ namespace mk
 		void destroy();
 		void detach();
 
-		Widget* copy(Sheet* parent);
-
-		void reset(Form* form);
 		void reset(Style* style);
 
 		void nextFrame(size_t tick, size_t delta);

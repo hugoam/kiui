@@ -21,11 +21,8 @@ namespace mk
 		RootSheet(UiWindow* window, Form* form, bool absolute = true);
 		~RootSheet();
 
-		void build();
-
 		FrameType frameType() { return LAYER; }
 		UiWindow* uiWindow() { return mWindow; }
-		InkTarget* inkTarget() { return mWindow->inkWindow()->screenTarget(); }
 		RootSheet* rootSheet() { return this; }
 
 		Cursor* cursor() { return mCursor; }

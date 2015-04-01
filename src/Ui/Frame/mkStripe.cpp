@@ -15,13 +15,13 @@
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Form/mkForm.h>
 
-#include <Ui/Scheme/mkWTree.h>
+#include <Ui/Scheme/mkTree.h>
 
 namespace mk
 {
 
-	Stripe::Stripe(Widget* widget, size_t index)
-		: Frame(widget, index)
+	Stripe::Stripe(Widget* widget)
+		: Frame(widget)
 		, d_depth(d_style->d_layoutDim == DIM_X ? DIM_Y : DIM_X)
 		, d_length(d_style->d_layoutDim)
 		, d_cursor(0.f)

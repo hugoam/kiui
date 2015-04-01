@@ -12,7 +12,6 @@
 #include <Object/Util/mkUpdatable.h>
 #include <Object/Util/mkMake.h>
 #include <Ui/mkUiForward.h>
-#include <Ui/Scheme/mkScheme.h>
 #include <Ui/Style/mkStyle.h>
 
 #include <map>
@@ -33,7 +32,7 @@ namespace mk
 		typedef std::function<void(Form*)> Trigger;
 
 	public:
-		Form(Style* style, const string& label = "", SchemeMapper mapper = nullptr);
+		Form(Style* style, unique_ptr<Sheet> sheet);
 		~Form();
 
 		virtual void build() {}
@@ -41,13 +40,10 @@ namespace mk
 		UiWindow* uiWindow();
 		Form* parent() { return mParent; }
 		Id index() const { return mIndex; }
+		Sheet* sheet() { return mSheet.get(); }
 		Widget* widget() { return mWidget; }
 		bool container() { return mLabel.empty(); }
-		size_t updated() { return mUpdated; }
-
-		Scheme* scheme() { return &mScheme; }
-		void setScheme(unique_ptr<Scheme> scheme);
-		void setWidget(Widget* widget) { mWidget = widget; }
+		//size_t updated() { return mUpdated; }
 
 		Style* style() const { return mStyle; }
 		const string& label() const { return mLabel; }
@@ -85,6 +81,8 @@ namespace mk
 		void destroy(size_t index);
 		void remove(size_t index);
 
+		void reset(unique_ptr<Sheet> sheet);
+
 		Form* insert(unique_ptr<Form> form, size_t index);
 		Form* append(unique_ptr<Form> form);
 		unique_ptr<Form> release(size_t index);
@@ -120,13 +118,12 @@ namespace mk
 		Style* mStyle;
 		string mLabel;
 
-		size_t mUpdated;
-
-		Scheme mScheme;
-
-		Widget* mWidget;
+		//size_t mUpdated;
 
 		LrefDict mAttrs;
+
+		unique_ptr<Sheet> mSheet;
+		Widget* mWidget;
 
 		std::vector<unique_ptr<Form>> mContents;
 

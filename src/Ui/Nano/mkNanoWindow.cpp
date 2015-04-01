@@ -27,7 +27,8 @@
 namespace mk
 {
 	NanoLayer::NanoLayer(Frame* frame, NanoTarget* target, size_t index)
-		: mTarget(target)
+		: InkLayer(target)
+		, mTarget(target)
 		, mIndex(index)
 		, mVisible(true)
 		, mFrame(frame)

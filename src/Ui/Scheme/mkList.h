@@ -8,35 +8,28 @@
 /* mk headers */
 #include <Object/mkTyped.h>
 #include <Ui/mkUiForward.h>
-#include <Ui/Scheme/mkScheme.h>
 #include <Ui/Form/mkForm.h>
 #include <Ui/Form/mkDropper.h>
 #include <Ui/Widget/mkSheet.h>
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ WList : public ScrollSheet, public Typed<WList, Widget>, public Styled<WList>
-	{
-	public:
-		WList(Form* form);
-
-		using Typed<WList, Widget>::cls;
-	};
-
-	class MK_UI_EXPORT List : public Form, public Typed<List, Form>, public Styled<List>
+	class MK_UI_EXPORT List : public ScrollSheet, public Typed<List, Sheet>, public Styled<List>
 	{
 	public:
 		List(Style* style = nullptr);
 
-		using Typed<List, Form>::cls;
+		using Typed<List, Sheet>::cls;
+		using Styled<List>::styleCls;
 	};
 
-	class MK_UI_EXPORT Sequence : public Form, public Typed<Sequence, Form>, public Styled<Sequence>
+	class MK_UI_EXPORT Sequence : public Sheet, public Typed<Sequence, Sheet>, public Styled<Sequence>
 	{
 	public:
 		Sequence(Style* style = nullptr);
 
-		using Typed<Sequence, Form>::cls;
+		using Typed<Sequence, Sheet>::cls;
+		using Styled<Sequence>::styleCls;
 	};
 
 	class MK_UI_EXPORT LabelSequence : public Sequence

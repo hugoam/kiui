@@ -7,7 +7,6 @@
 
 #include <Ui/Form/mkForm.h>
 #include <Ui/Form/mkRootForm.h>
-#include <Ui/Form/mkButton.h>
 #include <Ui/Form/mkInput.h>
 #include <Ui/Form/mkWidgets.h>
 #include <Ui/Form/mkHook.h>
@@ -19,21 +18,21 @@
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Widget/mkRootSheet.h>
 
-#include <Ui/Widget/mkWButton.h>
-#include <Ui/Widget/mkWSlider.h>
-#include <Ui/Widget/mkWScrollbar.h>
-#include <Ui/Widget/mkWProgressBar.h>
-#include <Ui/Widget/mkWCheckbox.h>
-#include <Ui/Widget/mkWTypeIn.h>
-#include <Ui/Widget/mkWDirectory.h>
+#include <Ui/Widget/mkButton.h>
+#include <Ui/Widget/mkSlider.h>
+#include <Ui/Widget/mkScrollbar.h>
+#include <Ui/Widget/mkProgressBar.h>
+#include <Ui/Widget/mkCheckbox.h>
+#include <Ui/Widget/mkTypeIn.h>
+#include <Ui/Widget/mkDirectory.h>
 
-#include <Ui/Scheme/mkWDropdown.h>
-#include <Ui/Scheme/mkWRadioButton.h>
-#include <Ui/Scheme/mkWExpandbox.h>
-#include <Ui/Scheme/mkWTree.h>
-#include <Ui/Scheme/mkWTable.h>
-#include <Ui/Scheme/mkWTabber.h>
-#include <Ui/Scheme/mkWDockspace.h>
+#include <Ui/Scheme/mkDropdown.h>
+#include <Ui/Scheme/mkRadioButton.h>
+#include <Ui/Scheme/mkExpandbox.h>
+#include <Ui/Scheme/mkTree.h>
+#include <Ui/Scheme/mkTable.h>
+#include <Ui/Scheme/mkTabber.h>
+#include <Ui/Scheme/mkDockspace.h>
 
 #include <Ui/Frame/mkDimString.h>
 
