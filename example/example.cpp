@@ -15,8 +15,10 @@ int main(int argc, char *argv[])
 	glwindow->initContext();
 
 	mk::UiWindow* uiwindow = glwindow->uiWindow();
+	uiwindow->init();
+
 	mk::Form* root = uiwindow->rootForm();
-	createUiTestWindow(root);
+	createUiTest(root);
 
 	bool pursue = true;
 	while(pursue)
