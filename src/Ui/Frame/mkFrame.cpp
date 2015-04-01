@@ -20,6 +20,7 @@
 
 #include <Ui/Style/mkStyle.h>
 
+#include <cmath>
 #include <iostream>
 
 namespace mk
