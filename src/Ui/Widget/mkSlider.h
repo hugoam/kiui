@@ -128,7 +128,7 @@ namespace mk
 	public:
 		StatSlider(Lref& lref, std::function<void(T)> callback = nullptr, Dimension dim = DIM_X)
 			: WTypedInput<AutoStat<T>, T>(lref, nullptr, callback)
-			, mStat(this->mValue->ref<AutoStat<T>>())
+			, mStat(this->mValue->template ref<AutoStat<T>>())
 			, mDim(dim)
 		{
 			this->build();
@@ -136,7 +136,7 @@ namespace mk
 
 		StatSlider(AutoStat<T> value, std::function<void(T)> callback = nullptr, Dimension dim = DIM_X)
 			: WTypedInput<AutoStat<T>, T>(value, nullptr, callback)
-			, mStat(this->mValue->ref<AutoStat<T>>())
+			, mStat(this->mValue->template ref<AutoStat<T>>())
 			, mDim(dim)
 		{
 			this->build();
