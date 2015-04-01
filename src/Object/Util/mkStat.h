@@ -187,6 +187,8 @@ namespace mk
 			return *this;
 		}
 
+		operator T() const { return mValueRef; }
+
 		inline T value() const { return mValueRef; }
 
 		inline T min() const { return mDef.min(); }
