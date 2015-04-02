@@ -33,6 +33,8 @@ file(GLOB SOURCE_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/Object/*.cpp"
 add_definitions("-DOBJECT_EXPORT")
 add_definitions("-DUI_EXPORT")
 
+add_definitions("-DNANOVG_GLEW")
+
 if (MSVC)
 	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
 	include(CheckIncludeFiles)
