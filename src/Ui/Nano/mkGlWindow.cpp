@@ -4,13 +4,11 @@
 
 //#define NANOVG_GL_USE_UNIFORMBUFFER 1
 #ifdef NANOVG_GLEW
-#   include <Ui/Nano/nanovg/glew.h>
-#else
-#   if defined(_WIN32)
-#      include <windows.h>
-#   endif
-#   include <GL/gl.h>
-#   include <GL/glext.h>
+#include <Ui/Nano/nanovg/glew.h>
+#elif defined(KIUI_EMSCRIPTEN)
+#define GL_GLEXT_PROTOTYPES
+#include <GL/gl.h>
+#include <GL/glext.h>
 #endif
 
 #include <GLFW/glfw3.h>
@@ -126,7 +124,7 @@ namespace mk
 		double time = glfwGetTime();
 		if(time - prevtime >= 4.f)
 		{
-			std::cerr << "fps " << frames / (time - prevtime) << std::endl;
+			printf("fps %f\n", (frames / (time - prevtime)));
 			prevtime = time;
 			frames = 0;
 		}

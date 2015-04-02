@@ -15,17 +15,21 @@
 
 //#define NANOVG_GL_USE_UNIFORMBUFFER 1
 #ifdef NANOVG_GLEW
-#   include <Ui/Nano/nanovg/glew.h>
-#else
-#   if defined(_WIN32)
-#      include <windows.h>
-#   endif
-#   include <GL/gl.h>
-#   include <GL/glext.h>
+#include <Ui/Nano/nanovg/glew.h>
+#elif KIUI_EMSCRIPTEN
+#define GL_GLEXT_PROTOTYPES
+#include <GL/gl.h>
+#include <GL/glext.h>
 #endif
 
 #include <Ui/Nano/nanovg/nanovg.h>
+
+#if KIUI_EMSCRIPTEN
+#define NANOVG_GLES2_IMPLEMENTATION
+#else
 #define NANOVG_GL2_IMPLEMENTATION
+#endif
+
 #include <Ui/Nano/nanovg/nanovg_gl.h>
 
 namespace mk
@@ -124,8 +128,12 @@ namespace mk
 		, mRessourcePath(ressourcePath)
 		, mCtx(nullptr)
 	{
-		string fontPath = ressourcePath + "/fonts/DejaVuSans.ttf";
+#if NANOVG_GL2
 		mCtx = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+#elif NANOVG_GLES2
+		mCtx = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+#endif
+		string fontPath = ressourcePath + "/fonts/DejaVuSans.ttf";
 		nvgCreateFont(mCtx, "dejavu", fontPath.c_str());
 		nvgFontSize(mCtx, 14.0f);
 		nvgFontFace(mCtx, "dejavu");
@@ -144,7 +152,11 @@ namespace mk
 		for(auto& kv : sImages)
 			nvgDeleteImage(mCtx, kv.second);
 
+#if NANOVG_GL2
 		nvgDeleteGL2(mCtx);
+#elif NANOVG_GLES2
+		nvgDeleteGLES2(mCtx);
+#endif
 	}
 
 	void NanoWindow::nextFrame()

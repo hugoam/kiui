@@ -9,8 +9,6 @@
 
 #include <Ui/Widget/mkWidget.h>
 
-#include <iostream>
-
 namespace mk
 {
 	Style::Style(Type* type)
@@ -19,9 +17,7 @@ namespace mk
 		, mName()
 		, mLayout("", FLOW, _VOID, false, DimSizing(SHRINK, SHRINK), DimFloat(1.f, 1.f), DIM_Y)
 		, mSubskins()
-	{
-		std::cerr << "Init Style with Id " << mId << std::endl;
-	}
+	{}
 
 	Style::Style(const string& name)
 		: IdStruct(index<Style>(), cls())
