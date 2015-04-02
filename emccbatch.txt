@@ -2,4 +2,4 @@ emcc -DSTD_NO_MAKE_UNIQUE -Isrc/ -std=c++11 -o kiui.bc src/Object/mkTyped.cpp sr
 
 emcc -Isrc/ -o kiuic.bc src/Ui/Nano/nanovg/nanovg.c src/Ui/Nano/nanovg/glew.c
 
-emcc -s USE_GLFW=3 -o kiui.html kiuic.bc kiui.bc
+emcc -s USE_GLFW=3 --preload-file data/ -o kiui.html kiuic.bc kiui.bc

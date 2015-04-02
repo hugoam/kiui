@@ -9,9 +9,17 @@
 
 #include <Ui/Nano/mkGlWindow.h>
 
+#ifndef KIUI_EXAMPLE_RESSOURCE_PATH
+  #ifdef KIUI_EMSCRIPTEN
+    #define KIUI_EXAMPLE_RESSOURCE_PATH "."
+  #else
+    #define KIUI_EXAMPLE_RESSOURCE_PATH "../data/interface"
+  #endif
+#endif
+
 int main(int argc, char *argv[])
 {
-	std::unique_ptr<mk::GlWindow> glwindow = mk::make_unique<mk::GlWindow>(1200, 800, "mk UiEditApp", "../data/interface");
+	std::unique_ptr<mk::GlWindow> glwindow = mk::make_unique<mk::GlWindow>(1200, 800, "mk UiEditApp", KIUI_EXAMPLE_RESSOURCE_PATH);
 	glwindow->initContext();
 
 	mk::UiWindow* uiwindow = glwindow->uiWindow();
