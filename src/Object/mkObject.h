@@ -56,7 +56,7 @@ namespace mk
 		~IdObject();
 
 		template <class T>
-		Id index(Id id) { Id = id ? id : T::indexer()->alloc(); T::indexer()->insert(this, id); return id; }
+		Id index(Id id) { if(id == 0) id = T::indexer()->alloc(); T::indexer()->insert(this, id); return id; }
 
 		template <class T>
 		Id index() { Id id = T::indexer()->alloc(); T::indexer()->insert(this, id); return id; }
