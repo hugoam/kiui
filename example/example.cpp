@@ -9,12 +9,19 @@
 
 #include <Ui/Nano/mkGlWindow.h>
 
+#ifdef KIUI_EMSCRIPTEN
+#define KIUI_EXAMPLE_RESSOURCE_PATH "."
+#include <emscripten/emscripten.h>
+
+mk::GlWindow* gGlWindow;
+void iterate()
+{
+	gGlWindow->renderFrame();
+}
+#endif
+
 #ifndef KIUI_EXAMPLE_RESSOURCE_PATH
-  #ifdef KIUI_EMSCRIPTEN
-    #define KIUI_EXAMPLE_RESSOURCE_PATH "."
-  #else
-    #define KIUI_EXAMPLE_RESSOURCE_PATH "../data/interface"
-  #endif
+  #define KIUI_EXAMPLE_RESSOURCE_PATH "../data/interface"
 #endif
 
 int main(int argc, char *argv[])
@@ -28,7 +35,12 @@ int main(int argc, char *argv[])
 	mk::Form* root = uiwindow->rootForm();
 	createUiTest(root);
 
+#ifdef KIUI_EMSCRIPTEN
+	gGlWindow = glwindow.get();
+	emscripten_set_main_loop(iterate, 0, 1);
+#else
 	bool pursue = true;
-	while(pursue)
+	while (pursue)
 		pursue = glwindow->renderFrame();
+#endif
 }

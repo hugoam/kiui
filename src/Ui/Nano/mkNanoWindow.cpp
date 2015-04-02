@@ -121,7 +121,7 @@ namespace mk
 		, mCtx(nullptr)
 	{
 		string fontPath = ressourcePath + "/fonts/DejaVuSans.ttf";
-		mCtx = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES); // | NVG_DEBUG);
+		mCtx = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
 		nvgCreateFont(mCtx, "dejavu", fontPath.c_str());
 		nvgFontSize(mCtx, 14.0f);
 		nvgFontFace(mCtx, "dejavu");

@@ -14,6 +14,8 @@
 
 #include <Ui/Nano/nanovg/nanovg.h>
 
+#include <cmath>
+
 namespace mk
 {
 	NVGcolor nvgColour(const Colour& colour)
