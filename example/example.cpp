@@ -10,7 +10,7 @@
 #include <Ui/Nano/mkGlWindow.h>
 
 #ifdef KIUI_EMSCRIPTEN
-#define KIUI_EXAMPLE_RESSOURCE_PATH ""
+#define KIUI_EXAMPLE_RESSOURCE_PATH "/data"
 #include <emscripten/emscripten.h>
 
 mk::GlWindow* gGlWindow;
@@ -26,7 +26,12 @@ void iterate()
 
 int main(int argc, char *argv[])
 {
+#ifdef KIUI_EMSCRIPTEN
+	mk::GlWindow* glwindow = new mk::GlWindow(1200, 800, "mk UiEditApp", KIUI_EXAMPLE_RESSOURCE_PATH);
+	gGlWindow = glwindow;
+#else
 	std::unique_ptr<mk::GlWindow> glwindow = mk::make_unique<mk::GlWindow>(1200, 800, "mk UiEditApp", KIUI_EXAMPLE_RESSOURCE_PATH);
+#endif
 	glwindow->initContext();
 
 	mk::UiWindow* uiwindow = glwindow->uiWindow();
@@ -36,7 +41,6 @@ int main(int argc, char *argv[])
 	createUiTest(root);
 
 #ifdef KIUI_EMSCRIPTEN
-	gGlWindow = glwindow.get();
 	emscripten_set_main_loop(iterate, 0, 1);
 #else
 	bool pursue = true;
