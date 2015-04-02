@@ -10,7 +10,7 @@
 #include <Ui/Nano/mkGlWindow.h>
 
 #ifdef KIUI_EMSCRIPTEN
-#define KIUI_EXAMPLE_RESSOURCE_PATH "."
+#define KIUI_EXAMPLE_RESSOURCE_PATH ""
 #include <emscripten/emscripten.h>
 
 mk::GlWindow* gGlWindow;

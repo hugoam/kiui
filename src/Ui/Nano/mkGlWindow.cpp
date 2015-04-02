@@ -4,9 +4,10 @@
 
 //#define NANOVG_GL_USE_UNIFORMBUFFER 1
 #define GLEW_STATIC
-#define NANOVG_GLEW
 #ifdef NANOVG_GLEW
-#   include <Ui/Nano/nanovg/glew.h>
+#include <Ui/Nano/nanovg/glew.h>
+#elif defined KIUI_EMSCRIPTEN
+#include <GL/glew.h>
 #endif
 
 #include <GLFW/glfw3.h>
