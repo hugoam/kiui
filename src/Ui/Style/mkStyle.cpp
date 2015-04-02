@@ -9,18 +9,22 @@
 
 #include <Ui/Widget/mkWidget.h>
 
+#include <iostream>
+
 namespace mk
 {
 	Style::Style(Type* type)
-		: IdStruct(cls())
+		: IdStruct(index<Style>(), cls())
 		, mStyleType(type)
 		, mName()
 		, mLayout("", FLOW, _VOID, false, DimSizing(SHRINK, SHRINK), DimFloat(1.f, 1.f), DIM_Y)
 		, mSubskins()
-	{}
+	{
+		std::cerr << "Init Style with Id " << mId << std::endl;
+	}
 
 	Style::Style(const string& name)
-		: IdStruct(cls())
+		: IdStruct(index<Style>(), cls())
 		, mStyleType(nullptr)
 		, mName(name)
 		, mLayout("", FLOW, _VOID, false, DimSizing(SHRINK, SHRINK), DimFloat(1.f, 1.f), DIM_Y)

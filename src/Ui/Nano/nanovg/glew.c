@@ -30,8 +30,6 @@
 ** THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#define GLEW_STATIC
-
 #include <Ui/Nano/nanovg/glew.h>
 
 #if defined(_WIN32)

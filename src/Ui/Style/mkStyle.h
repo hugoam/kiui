@@ -24,14 +24,20 @@ namespace mk
 	{
 	public:
 		LayoutStyle(const string& name, Flow flow, Opacity opacity, bool div, DimSizing sizing = DimSizing(SHRINK, SHRINK), DimFloat span = DimFloat(1.f, 1.f), Dimension layoutDim = DIM_X, Overflow overflow = CLIP)
-			: IdStruct(cls())
+			: IdStruct(index<LayoutStyle>(), cls())
 			, d_name(name), d_flow(flow), d_opacity(opacity), d_div(div), d_layoutDim(layoutDim)
 			, d_overflow(overflow), d_span(span), d_size(0.f, 0.f), d_padding(0.f, 0.f, 0.f, 0.f), d_margin(0.f, 0.f), d_spacing(0.f, 0.f), d_pivot(FORWARD, FORWARD), d_updated(0)
 		{}
 
 		LayoutStyle()
-			: IdStruct(cls())
+			: IdStruct(index<LayoutStyle>(), cls())
 		{}
+
+		LayoutStyle(const LayoutStyle& other)
+			: IdStruct(index<LayoutStyle>(), cls())
+		{
+			*this = other;
+		}
 
 		LayoutStyle& operator=(const LayoutStyle&) = default;
 		void copy(LayoutStyle* other) { string name = d_name; *this = *other; d_name = name; }
@@ -63,16 +69,22 @@ namespace mk
 	{
 	public:
 		_C_ InkStyle(string name, Colour background, Colour text)
-			: IdStruct(cls())
+			: IdStruct(index<InkStyle>(), cls())
 			, mName(name), mEmpty(false), mBackgroundColour(background), mBorderColour(), mTextColour(text), mImageColour(1.f, 1.f, 1.f)
 			, mBorderWidth(0.f), mMargin(0.f, 0.f, 0.f, 0.f), mPadding(0.f, 0.f), mImage(""), mCornerRadius(0.f)
 		{}
 
 		InkStyle(string name = "")
-			: IdStruct(cls())
+			: IdStruct(index<InkStyle>(), cls())
 			, mBackgroundColour(Colour::Transparent), mTextColour(Colour::Transparent), mBorderColour(Colour::Transparent)
 			, mName(name), mEmpty(true)
 		{}
+
+		InkStyle(const InkStyle& other)
+			: IdStruct(index<InkStyle>(), cls())
+		{
+			*this = other;
+		}
 
 		InkStyle& operator=(const InkStyle&) = default;
 		void copy(InkStyle* other) { string name = mName; *this = *other; mName = name; }
@@ -143,13 +155,8 @@ namespace mk
 	class Styled
 	{
 	public:
-		static Style* styleCls() { return &sStyle; }
-
-		static Style sStyle;
+		static Style* styleCls() { static Style style(T::cls()); return &style; }
 	};
-
-	template <class T>
-	Style Styled<T>::sStyle(T::cls());
 }
 
 #endif // MK_STYLE_H_INCLUDED

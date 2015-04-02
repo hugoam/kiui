@@ -53,9 +53,13 @@ namespace mk
 	{
 	public:
 		IdObject(Id id, Type* type);
-		IdObject(Type* type);
-		IdObject(Id id);
 		~IdObject();
+
+		template <class T>
+		Id index(Id id) { Id = id ? id : T::indexer()->alloc(); T::indexer()->insert(this, id); return id; }
+
+		template <class T>
+		Id index() { Id id = T::indexer()->alloc(); T::indexer()->insert(this, id); return id; }
 
 		Id id() const { return mId; }
 
@@ -66,8 +70,7 @@ namespace mk
 	class MK_OBJECT_EXPORT IdStruct : public IdObject
 	{
 	public:
-		IdStruct(Type* type) : IdObject(type) {}
-		IdStruct(const IdStruct& other) : IdObject(other.type()) {}
+		IdStruct(Id id, Type* type) : IdObject(id, type) {}
 		IdStruct& operator=(const IdStruct&) { return *this; }
 	};
 

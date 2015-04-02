@@ -13,7 +13,7 @@ namespace mk
 	size_t Type::sTypeId = 0;
 
 	Type::Type(Type* base)
-		: IdObject(++sTypeId)
+		: IdObject(++sTypeId, Type::cls())
 		, mName()
 		, mBase(base)
 		, mProto(nullptr)
@@ -22,7 +22,7 @@ namespace mk
 	{}
 
 	Type::Type()
-		: IdObject(++sTypeId)
+		: IdObject(++sTypeId, Type::cls())
 		, mName()
 		, mBase(nullptr)
 		, mProto(nullptr)

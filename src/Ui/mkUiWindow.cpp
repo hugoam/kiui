@@ -59,6 +59,11 @@ namespace mk
 
 		mWidth = float(renderWindow->width());
 		mHeight = float(renderWindow->height());
+	}
+
+	void UiWindow::init()
+	{
+		mStyler->prepare();
 
 		mRootForm = make_unique<RootForm>(this);
 		mRootSheet = mRootForm->rootSheet();
@@ -66,14 +71,8 @@ namespace mk
 		mRootSheet->frame()->setSize(mWidth, mHeight);
 
 		mController = mRootSheet;
-	}
 
-	void UiWindow::init()
-	{
-		mStyler->prepare();
-		//mRootSheet->build();
-
-		//mRenderWindow->updateSize();
+		this->resize(mWidth, mHeight);
 	}
 
 	void UiWindow::resize(size_t width, size_t height)

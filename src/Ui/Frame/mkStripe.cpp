@@ -179,15 +179,15 @@ namespace mk
 
 		this->positionSequence();
 
-#if 1 // DEBUG
+#if 0 // DEBUG
 			Stripe* parent = d_parent;
 			while(parent)
 			{
-				printf("  ");
+				std::cerr << "  ";
 				parent = parent->parent();
 			}
 
-			printf("Stripe :: relayout %s name %s size %f , %f\n", d_widget->style()->name().c_str(), d_widget->name().c_str(), dsize(DIM_X), dsize(DIM_Y));
+			std::cerr << "Stripe :: relayout " << d_widget->style()->name() << " name " << d_widget->name() <<  " size " << dsize(DIM_X) << " , " << dsize(DIM_Y) << std::endl;
 #endif
 	}
 

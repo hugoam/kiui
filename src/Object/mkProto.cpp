@@ -10,7 +10,7 @@
 namespace mk
 {
 	Proto::Proto(Type* type)
-		: IdObject(cls())
+		: IdObject(index<Proto>(), cls())
 		, mType(type)
 		, mNumParts(0)
 		, mHashParts(MAX_TYPES) // Type::maxId() doesn't work because at the time Proto is instantiated not all types have been loaded

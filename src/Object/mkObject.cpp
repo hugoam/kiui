@@ -16,24 +16,8 @@ namespace mk
 
 	IdObject::IdObject(Id id, Type* type)
 		: TypeObject(type)
-		, mId(id ? id : mType->indexer()->alloc()) // @note this is due only to loading and creating using same constructor, one passing 0 as id // id
-	{
-		mType->indexer()->add(this);
-	}
-
-	IdObject::IdObject(Type* type)
-		: TypeObject(type)
-		, mId(mType->indexer()->alloc())
-	{
-		mType->indexer()->add(this);
-	}
-
-	IdObject::IdObject(Id id)
-		: TypeObject(Type::cls())
 		, mId(id)
-	{
-		Indexed<Type>::indexer()->add(this);
-	}
+	{}
 
 	IdObject::~IdObject()
 	{
