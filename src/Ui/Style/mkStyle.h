@@ -23,7 +23,7 @@ namespace mk
 	class MK_UI_EXPORT _I_ LayoutStyle : public IdStruct, public Indexed<LayoutStyle>
 	{
 	public:
-		LayoutStyle(const string& name, Flow flow, Clipping clipping, Opacity opacity, bool div, DimSizing sizing = DimSizing(SHRINK, SHRINK), DimFloat span = DimFloat(1.f, 1.f), Dimension layoutDim = DIM_X, Overflow overflow = OVERFLOW)
+		LayoutStyle(const string& name, Flow flow, Clipping clipping, Opacity opacity, bool div, DimSizing sizing = DimSizing(SHRINK, SHRINK), DimFloat span = DimFloat(1.f, 1.f), Dimension layoutDim = DIM_X, Overflow overflow = FLOWOVER)
 			: IdStruct(index<LayoutStyle>(), cls())
 			, d_name(name), d_flow(flow), d_clipping(clipping), d_opacity(opacity), d_div(div), d_layoutDim(layoutDim)
 			, d_overflow(overflow), d_span(span), d_size(0.f, 0.f), d_padding(0.f, 0.f, 0.f, 0.f), d_margin(0.f, 0.f), d_spacing(0.f, 0.f), d_pivot(FORWARD, FORWARD), d_updated(0)
