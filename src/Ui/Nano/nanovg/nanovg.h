@@ -536,6 +536,10 @@ float nvgTextBounds(NVGcontext* ctx, float x, float y, const char* string, const
 // Measured values are returned in local coordinate space.
 void nvgTextBoxBounds(NVGcontext* ctx, float x, float y, float breakRowWidth, const char* string, const char* end, float* bounds);
 
+// @ kiui
+int nvgTextGlyphIndex(NVGcontext* ctx, float x, float y, const char* string, const char* end, float atX);
+int nvgTextGlyphPosition(NVGcontext* ctx, float x, float y, const char* string, size_t index, NVGglyphPosition* position);
+
 // Calculates the glyph x positions of the specified text. If end is specified only the sub-string will be used.
 // Measured values are returned in local coordinate space.
 int nvgTextGlyphPositions(NVGcontext* ctx, float x, float y, const char* string, const char* end, NVGglyphPosition* positions, int maxPositions);

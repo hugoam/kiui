@@ -39,7 +39,7 @@ namespace mk
 		if(mWindow->dock())
 			mWindow->undock();
 
-		mWindow->frame()->layer()->setOpacity(_VOID);
+		mWindow->frame()->layer()->setOpacity(VOID);
 		mWindow->frame()->layer()->moveToTop();
 		return true;
 	}
@@ -68,7 +68,7 @@ namespace mk
 			}
 		}
 
-		mWindow->frame()->layer()->setOpacity(_OPAQUE);
+		mWindow->frame()->layer()->setOpacity(OPAQUE);
 		return true;
 	}
 
@@ -134,17 +134,22 @@ namespace mk
 		mHeader = this->makeappend<WindowHeader>(this);
 		mBody = this->makeappend<WindowBody>();
 		mFooter = this->makeappend<WindowSizer>(this);
-
-		/*if(!mDock)
-		{
-			float x = this->rootSheet()->frame()->dsize(DIM_X) / 2 - mFrame->dsize(DIM_X) / 2;
-			float y = this->rootSheet()->frame()->dsize(DIM_Y) / 2 - mFrame->dsize(DIM_Y) / 2;
-			mFrame->setPosition(x, y);
-		}*/
 	}
 
 	Window::~Window()
 	{}
+
+	void Window::bind(Sheet* parent, size_t index)
+	{
+		Sheet::bind(parent, index);
+
+		if(!mDock)
+		{
+			float x = this->rootSheet()->frame()->dsize(DIM_X) / 2 - mFrame->dsize(DIM_X) / 2;
+			float y = this->rootSheet()->frame()->dsize(DIM_Y) / 2 - mFrame->dsize(DIM_Y) / 2;
+			mFrame->setPosition(x, y);
+		}
+	}
 
 	void Window::toggleClosable()
 	{

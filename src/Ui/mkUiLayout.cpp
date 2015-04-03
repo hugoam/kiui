@@ -109,6 +109,7 @@ namespace mk
 		// Built-in Layouts
 
 		Cursor::styleCls()->layout()->d_flow = MANUAL;
+		Cursor::styleCls()->layout()->d_clipping = NOCLIP;
 		Cursor::styleCls()->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
 
 		PartitionX::styleCls()->layout()->d_layoutDim = DIM_X;
@@ -129,7 +130,7 @@ namespace mk
 		WrapX::styleCls()->layout()->d_layoutDim = DIM_X;
 		WrapX::styleCls()->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
 
-		Control::styleCls()->layout()->d_opacity = _OPAQUE;
+		Control::styleCls()->layout()->d_opacity = OPAQUE;
 		Control::styleCls()->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
 
 		Dialog::styleCls()->layout()->d_layoutDim = DIM_Y;
@@ -141,12 +142,12 @@ namespace mk
 		Caret::styleCls()->layout()->d_sizing = DimSizing(FIXED, FIXED);
 		
 		Window::styleCls()->layout()->d_flow = MANUAL;
-		Window::styleCls()->layout()->d_opacity = _OPAQUE;
+		Window::styleCls()->layout()->d_opacity = OPAQUE;
 		Window::styleCls()->layout()->d_layoutDim = DIM_Y;
 		Window::styleCls()->layout()->d_size = DimFloat(480.f, 350.f);
 		Window::styleCls()->layout()->d_sizing = DimSizing(FIXED, FIXED);
 
-		DockWindow::styleCls()->layout()->d_opacity = _OPAQUE;
+		DockWindow::styleCls()->layout()->d_opacity = OPAQUE;
 		DockWindow::styleCls()->layout()->d_sizing = DimSizing(EXPAND, EXPAND);
 		DockWindow::styleCls()->layout()->d_padding = BoxFloat(1.f);
 
@@ -158,7 +159,7 @@ namespace mk
 		styler->inheritLayout(StyleVector({ SliderKnobX::styleCls(), SliderKnobY::styleCls() }), Control::styleCls());
 		styler->inheritLayout(StyleVector({ ScrollerKnobX::styleCls(), ScrollerKnobY::styleCls(), ScrollUp::styleCls(), ScrollDown::styleCls() }), Control::styleCls());
 		styler->inheritLayout(StyleVector({ Dir::styleCls(), File::styleCls() }), Control::styleCls());
-		styler->inheritLayout(StyleVector({ Label::styleCls(), Icon::styleCls() }), Control::styleCls());
+		styler->inheritLayout(StyleVector({ Icon::styleCls() }), Control::styleCls());
 
 		styler->inheritLayout(StyleVector({ Label::styleCls(), Title::styleCls() }), WrapX::styleCls());
 		styler->inheritLayout(StyleVector({ NumberControls::styleCls(), DropdownHeader::styleCls() }), WrapX::styleCls());
@@ -188,7 +189,9 @@ namespace mk
 		styler->inheritLayout(StyleVector({ WValue::styleCls() }), DivX::styleCls());
 		styler->inheritLayout(StyleVector({ SliderX::styleCls() }), DivX::styleCls());
 		styler->inheritLayout(StyleVector({ SliderY::styleCls() }), DivY::styleCls());
+		styler->inheritLayout(StyleVector({ SliderDisplay::styleCls() }), PartitionX::styleCls());
 		styler->inheritLayout(StyleVector({ SliderInt::styleCls(), SliderFloat::styleCls() }), DivX::styleCls());
+
 		styler->inheritLayout(StyleVector({ InputInt::styleCls(), InputFloat::styleCls(), InputBool::styleCls(), InputText::styleCls(), InputDropdown::styleCls() }), DivX::styleCls());
 
 		styler->inheritLayout(StyleVector({ ScrollerX::styleCls() }), PartitionX::styleCls());
@@ -209,14 +212,14 @@ namespace mk
 		TreeNodeHeader::styleCls()->layout()->d_padding = BoxFloat(2.f, 2.f, 2.f, 2.f);
 		TreeNodeHeader::styleCls()->layout()->d_spacing = DimFloat(2.f, 2.f);
 
-		RootSheet::styleCls()->layout()->d_opacity = _OPAQUE;
+		RootSheet::styleCls()->layout()->d_opacity = OPAQUE;
 
-		TypeIn::styleCls()->layout()->d_opacity = _OPAQUE;
+		TypeIn::styleCls()->layout()->d_opacity = OPAQUE;
 		TypeIn::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
 
-		WindowHeader::styleCls()->layout()->d_opacity = _OPAQUE;
-		TableHead::styleCls()->layout()->d_opacity = _OPAQUE;
-		ColumnHeader::styleCls()->layout()->d_opacity = _VOID;
+		WindowHeader::styleCls()->layout()->d_opacity = OPAQUE;
+		TableHead::styleCls()->layout()->d_opacity = OPAQUE;
+		ColumnHeader::styleCls()->layout()->d_opacity = VOID;
 
 		Tree::styleCls()->layout()->d_overflow = SCROLL;
 		List::styleCls()->layout()->d_overflow = SCROLL;
@@ -240,16 +243,18 @@ namespace mk
 		ProgressFillerX::styleCls()->layout()->d_size[DIM_Y] = 20.f;
 		ProgressFillerY::styleCls()->layout()->d_size[DIM_X] = 20.f;
 
-		SliderX::styleCls()->layout()->d_weight = LIST;
-		SliderY::styleCls()->layout()->d_weight = LIST;
+		SliderDisplay::styleCls()->layout()->d_flow = MANUAL;
 
-		ScrollerX::styleCls()->layout()->d_weight = LIST;
-		ScrollerY::styleCls()->layout()->d_weight = LIST;
+		//SliderX::styleCls()->layout()->d_weight = LIST;
+		//SliderY::styleCls()->layout()->d_weight = LIST;
+
+		//ScrollerX::styleCls()->layout()->d_weight = LIST;
+		//ScrollerY::styleCls()->layout()->d_weight = LIST;
 
 		DocklineY::styleCls()->layout()->d_weight = LIST;
 		DocklineX::styleCls()->layout()->d_weight = LIST;
-		DocklineY::styleCls()->layout()->d_opacity = _OPAQUE;
-		DocklineX::styleCls()->layout()->d_opacity = _OPAQUE;
+		DocklineY::styleCls()->layout()->d_opacity = OPAQUE;
+		DocklineX::styleCls()->layout()->d_opacity = OPAQUE;
 		DocklineY::styleCls()->layout()->d_spacing = DimFloat(0.f, 5.f);
 		DocklineX::styleCls()->layout()->d_spacing = DimFloat(5.f, 0.f);
 
@@ -264,10 +269,11 @@ namespace mk
 		Table::styleCls()->layout()->d_layoutDim = DIM_Y;
 		Table::styleCls()->layout()->d_weight = TABLE;
 
-		TreeNodeHeader::styleCls()->layout()->d_opacity = _OPAQUE;
+		TreeNodeHeader::styleCls()->layout()->d_opacity = OPAQUE;
 		
 		DropdownBox::styleCls()->layout()->d_flow = MANUAL;
-		DropdownChoice::styleCls()->layout()->d_opacity = _OPAQUE;
+		DropdownBox::styleCls()->layout()->d_clipping = NOCLIP;
+		DropdownChoice::styleCls()->layout()->d_opacity = OPAQUE;
 
 		SliderKnobX::styleCls()->layout()->d_sizing = DimSizing(FIXED, FIXED);
 		SliderKnobY::styleCls()->layout()->d_sizing = DimSizing(FIXED, FIXED);
@@ -335,12 +341,13 @@ namespace mk
 		Label::styleCls()->inheritSkins(Label::styleCls());
 		Title::styleCls()->inheritSkins(Label::styleCls());
 		TypeIn::styleCls()->inheritSkins(Label::styleCls());
+		SliderDisplay::styleCls()->inheritSkins(Label::styleCls());
 
 		Button::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
 		Button::styleCls()->skin()->mTextColour = Colour::White;
 		Button::styleCls()->skin()->mPadding = DimFloat(2.f, 2.f);
-		Button::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::LightGrey;
-		Button::styleCls()->decline(ACTIVATED)->mBackgroundColour = Colour::Red;
+		Button::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
+		Button::styleCls()->decline(ACTIVATED)->mBackgroundColour = Colour::LightGrey;
 		Button::styleCls()->decline(static_cast<WidgetState>(ACTIVATED | HOVERED))->mBackgroundColour = Colour::Red;
 
 		ImgButton::styleCls()->inheritSkins(Button::styleCls());
@@ -411,11 +418,11 @@ namespace mk
 		DockWindow::styleCls()->skin()->mBackgroundColour = Colour::DarkGrey;
 		WindowHeader::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
 		WindowSizer::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
-		WindowSizer::styleCls()->layout()->d_opacity = _OPAQUE;
+		WindowSizer::styleCls()->layout()->d_opacity = OPAQUE;
 		WindowSizer::styleCls()->layout()->d_sizing = DimSizing(EXPAND, FIXED);
 		WindowSizer::styleCls()->layout()->d_size[DIM_Y] = 5.f;
 
-		Tab::styleCls()->skin()->mBackgroundColour = Colour::Red;
+		Tab::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
 		TabberHead::styleCls()->skin()->mBackgroundColour = Colour::Black;
 
 		ExpandboxHeader::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;

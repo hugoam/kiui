@@ -2403,6 +2403,90 @@ void nvgTextBox(NVGcontext* ctx, float x, float y, float breakRowWidth, const ch
 	state->textAlign = oldAlign;
 }
 
+int nvgTextGlyphIndex(NVGcontext* ctx, float x, float y, const char* string, const char* end, float atX)
+{
+	NVGstate* state = nvg__getState(ctx);
+	float scale = nvg__getFontScale(state) * ctx->devicePxRatio;
+	float invscale = 1.0f / scale;
+	FONStextIter iter, prevIter;
+	FONSquad q;
+	int npos = 0;
+
+	if(state->fontId == FONS_INVALID) return 0;
+
+	if(end == NULL)
+		end = string + strlen(string);
+
+	if(string == end)
+		return 0;
+
+	fonsSetSize(ctx->fs, state->fontSize*scale);
+	fonsSetSpacing(ctx->fs, state->letterSpacing*scale);
+	fonsSetBlur(ctx->fs, state->fontBlur*scale);
+	fonsSetAlign(ctx->fs, state->textAlign);
+	fonsSetFont(ctx->fs, state->fontId);
+
+	fonsTextIterInit(ctx->fs, &iter, x*scale, y*scale, string, end);
+	prevIter = iter;
+	while(fonsTextIterNext(ctx->fs, &iter, &q)) {
+		if(iter.prevGlyphIndex < 0 && nvg__allocTextAtlas(ctx)) { // can not retrieve glyph?
+			iter = prevIter;
+			fonsTextIterNext(ctx->fs, &iter, &q); // try again
+		}
+		if(iter.x * invscale > atX)
+			return npos;
+		prevIter = iter;
+		npos++;
+	}
+
+	return npos;
+}
+
+int nvgTextGlyphPosition(NVGcontext* ctx, float x, float y, const char* string, size_t index, NVGglyphPosition* position)
+{
+	NVGstate* state = nvg__getState(ctx);
+	float scale = nvg__getFontScale(state) * ctx->devicePxRatio;
+	float invscale = 1.0f / scale;
+	FONStextIter iter, prevIter;
+	FONSquad q;
+	int npos = 0;
+
+	if(state->fontId == FONS_INVALID) return 0;
+
+	const char* end = string + strlen(string);
+
+	if(string == end)
+		return 0;
+
+	fonsSetSize(ctx->fs, state->fontSize*scale);
+	fonsSetSpacing(ctx->fs, state->letterSpacing*scale);
+	fonsSetBlur(ctx->fs, state->fontBlur*scale);
+	fonsSetAlign(ctx->fs, state->textAlign);
+	fonsSetFont(ctx->fs, state->fontId);
+
+	fonsTextIterInit(ctx->fs, &iter, x*scale, y*scale, string, end);
+	prevIter = iter;
+	while(fonsTextIterNext(ctx->fs, &iter, &q)) {
+		if(iter.prevGlyphIndex < 0 && nvg__allocTextAtlas(ctx)) { // can not retrieve glyph?
+			iter = prevIter;
+			fonsTextIterNext(ctx->fs, &iter, &q); // try again
+		}
+		prevIter = iter;
+
+		if(npos == index)
+		{
+			position->str = iter.str;
+			position->x = iter.x * invscale;
+			position->minx = nvg__minf(iter.x, q.x0) * invscale;
+			position->maxx = nvg__maxf(iter.nextx, q.x1) * invscale;
+			return 1;
+		}
+		npos++;
+	}
+
+	return 0;
+}
+
 int nvgTextGlyphPositions(NVGcontext* ctx, float x, float y, const char* string, const char* end, NVGglyphPosition* positions, int maxPositions)
 {
 	NVGstate* state = nvg__getState(ctx);

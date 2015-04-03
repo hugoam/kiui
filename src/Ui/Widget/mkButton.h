@@ -15,7 +15,7 @@ namespace mk
 	class MK_UI_EXPORT Label : public Widget, public Styled<Label>
 	{
 	public:
-		Label(const string& label, Style* style = nullptr);
+		Label(const string& label, Style* style = nullptr, FrameType frameType = FRAME);
 
 		const string& label() { return mLabel; }
 		unique_ptr<Widget> clone() { return make_unique<Label>(mLabel, mStyle); }

@@ -120,6 +120,7 @@ namespace mk
 
 	void Widget::reset(Style* style)
 	{
+		mStyle = style;
 		mFrame->reset(style);
 	}
 
@@ -299,7 +300,7 @@ namespace mk
 		{
 			this->leftDragStart(this->rootSheet()->lastPressedX(), this->rootSheet()->lastPressedY());
 			this->toggleState(DRAGGED);
-			mFrame->setOpacity(_VOID);
+			mFrame->setOpacity(VOID);
 		}
 
 		return true;
@@ -328,7 +329,7 @@ namespace mk
 		{
 			this->leftDragEnd(xPos, yPos);
 			this->toggleState(DRAGGED);
-			mFrame->setOpacity(_OPAQUE);
+			mFrame->setOpacity(OPAQUE);
 		}
 		else if(button == LEFT_BUTTON)
 			this->leftClick(xPos, yPos);

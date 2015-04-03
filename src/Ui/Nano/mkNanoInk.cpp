@@ -161,15 +161,17 @@ namespace mk
 		else if(!mFrame->widget()->label().empty())
 		{
 			float bounds[4];
+			float height;
 
 			nvgTextBounds(mCtx, 0.f, 0.f, mFrame->widget()->label().c_str(), nullptr, bounds);
+			nvgTextMetrics(mCtx, nullptr, nullptr, &height);
 
 			float xoffset = mFrame->inkstyle()->mPadding[DIM_X] * 2.f;
 			float yoffset = mFrame->inkstyle()->mPadding[DIM_Y] * 2.f;
 
 			//std::cerr << "ink :: contentSize for " << mFrame->style()->name() << " : " << (dim == DIM_X ? " x " : " y ") << (dim == DIM_X ? bounds[2] - bounds[0] + xoffset : bounds[3] - bounds[1] + yoffset) << std::endl;
 
-			return dim == DIM_X ? bounds[2] - bounds[0] + xoffset : bounds[3] - bounds[1] + yoffset;
+			return dim == DIM_X ? bounds[2] - bounds[0] + xoffset : height + yoffset;
 		}
 		
 		return 0.f;
@@ -177,11 +179,17 @@ namespace mk
 
 	size_t NanoInk::caretIndex(float x, float y)
 	{
-		return 0;
+		return nvgTextGlyphIndex(mCtx, 0.f, 0.f, mFrame->widget()->label().c_str(), nullptr, x);
 	}
 
 	void NanoInk::caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight)
-	{}
+	{
+		NVGglyphPosition position;
+		nvgTextGlyphPosition(mCtx, 0.f, 0.f, mFrame->widget()->label().c_str(), index, &position);
+		caretX = mFrame->inkstyle()->mPadding[DIM_X] + position.x;
+		caretY = mFrame->inkstyle()->mPadding[DIM_Y] + 0.f;
+		nvgTextMetrics(mCtx, nullptr, nullptr, &caretHeight);
+	}
 
 	void NanoInk::updateContent()
 	{

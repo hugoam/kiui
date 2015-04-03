@@ -41,8 +41,8 @@ namespace mk
 		Widget* vappend(unique_ptr<Widget> widget);
 		unique_ptr<Widget> vrelease(Widget* widget);
 
-		void expand();
-		void collapse();
+		virtual void expand();
+		virtual void collapse();
 
 	protected:
 		string mTitle;

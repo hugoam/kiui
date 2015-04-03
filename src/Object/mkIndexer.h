@@ -22,7 +22,7 @@ namespace mk
 	template class MK_OBJECT_EXPORT Store<TypeObject>;
 #endif
 
-	class MK_OBJECT_EXPORT Indexer : /*public Stock, */public Store<TypeObject>
+	class MK_OBJECT_EXPORT Indexer : public Store<TypeObject>
 	{
 	public:
 		Indexer(Type* type) : mType(type), mCount(0), mObjects() { mType->setupIndexer(this); mObjects.emplace_back(nullptr); }

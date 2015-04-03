@@ -41,7 +41,8 @@ namespace mk
 		inline float doffset(Dimension dim) { return dsize(dim) + dmargin(dim); }
 
 		inline bool flow() { return d_style->d_flow == FLOW; }
-		inline bool opaque() { return d_opacity == _OPAQUE; }
+		inline bool clip() { return d_style->d_clipping == CLIP; }
+		inline bool opaque() { return d_opacity == OPAQUE; }
 
 		inline void setOpacity(Opacity opacity) { d_opacity = opacity; }
 

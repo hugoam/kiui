@@ -93,6 +93,8 @@ namespace mk
 		WindowBody* body() { return mBody; }
 		Docksection* dock() { return mDock; }
 
+		void bind(Sheet* parent, size_t index);
+
 		void toggleClosable();
 		void toggleMovable();
 		void toggleResizable();

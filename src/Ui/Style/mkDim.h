@@ -18,6 +18,12 @@
 #include <array>
 #include <map>
 
+#if defined _WIN32
+#undef OPAQUE
+#undef VOID
+#undef OVERFLOW
+#endif
+
 namespace mk
 {
 	enum _I_ Dimension : unsigned int
@@ -55,16 +61,22 @@ namespace mk
 		CAPPED = 4
 	};
 
+	enum _I_ Clipping : unsigned int
+	{
+		NOCLIP = 0,
+		CLIP = 1
+	};
+
 	enum _I_ Overflow : unsigned int
 	{
-		CLIP = 0,
+		OVERFLOW = 0,
 		SCROLL = 1
 	};
 
 	enum _I_ Opacity : unsigned int
 	{
-		_OPAQUE = 0,
-		_VOID = 1
+		OPAQUE = 0,
+		VOID = 1
 	};
 
 	enum _I_ Weight : unsigned int

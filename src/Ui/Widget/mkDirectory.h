@@ -82,6 +82,7 @@ namespace mk
 	public:
 		DirectoryNode(const string& path, const string& name, bool collapsed, bool load = true);
 
+		void expand();
 		void update();
 
 		using Typed<DirectoryNode>::cls;

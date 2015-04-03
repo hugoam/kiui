@@ -32,6 +32,8 @@
 
 #include <Ui/Nano/nanovg/nanovg_gl.h>
 
+#include <iostream>
+
 namespace mk
 {
 	NanoLayer::NanoLayer(Frame* frame, NanoTarget* target, size_t index)
@@ -44,6 +46,7 @@ namespace mk
 
 	NanoLayer::~NanoLayer()
 	{
+		std::cerr << "NanoLayer destroyed" << std::endl;
 		mTarget->removeLayer(this);
 	}
 
@@ -103,7 +106,9 @@ namespace mk
 	void NanoTarget::moveToTop(NanoLayer* layer)
 	{
 		this->removeLayer(layer);
+		++mZMax;
 		mLayers[mZMax].push_back(layer);
+		layer->setIndex(mZMax);
 	}
 
 	unique_ptr<InkLayer> NanoTarget::layer(Frame* frame, size_t z)
@@ -117,6 +122,13 @@ namespace mk
 	void NanoTarget::removeLayer(NanoLayer* layer)
 	{
 		mLayers[layer->index()].erase(std::remove(mLayers[layer->index()].begin(), mLayers[layer->index()].end(), layer), mLayers[layer->index()].end());
+		if(mLayers[layer->index()].size() == 0)
+		{
+			std::swap(mLayers[layer->index()], mLayers[mZMax-1]);
+			for(NanoLayer* moved : mLayers[layer->index()])
+				moved->setIndex(layer->index());
+			--mZMax;
+		}	
 	}
 
 	std::map<string, int> NanoWindow::sImages;

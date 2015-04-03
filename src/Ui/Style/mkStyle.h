@@ -23,9 +23,9 @@ namespace mk
 	class MK_UI_EXPORT _I_ LayoutStyle : public IdStruct, public Indexed<LayoutStyle>
 	{
 	public:
-		LayoutStyle(const string& name, Flow flow, Opacity opacity, bool div, DimSizing sizing = DimSizing(SHRINK, SHRINK), DimFloat span = DimFloat(1.f, 1.f), Dimension layoutDim = DIM_X, Overflow overflow = CLIP)
+		LayoutStyle(const string& name, Flow flow, Clipping clipping, Opacity opacity, bool div, DimSizing sizing = DimSizing(SHRINK, SHRINK), DimFloat span = DimFloat(1.f, 1.f), Dimension layoutDim = DIM_X, Overflow overflow = OVERFLOW)
 			: IdStruct(index<LayoutStyle>(), cls())
-			, d_name(name), d_flow(flow), d_opacity(opacity), d_div(div), d_layoutDim(layoutDim)
+			, d_name(name), d_flow(flow), d_clipping(clipping), d_opacity(opacity), d_div(div), d_layoutDim(layoutDim)
 			, d_overflow(overflow), d_span(span), d_size(0.f, 0.f), d_padding(0.f, 0.f, 0.f, 0.f), d_margin(0.f, 0.f), d_spacing(0.f, 0.f), d_pivot(FORWARD, FORWARD), d_updated(0)
 		{}
 
@@ -48,6 +48,7 @@ namespace mk
 		string d_name;
 
 		_A_ _M_ Flow d_flow;
+		_A_ _M_ Clipping d_clipping;
 		_A_ _M_ Overflow d_overflow;
 		_A_ _M_ Opacity d_opacity;
 		_A_ _M_ bool d_div;

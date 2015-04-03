@@ -9,17 +9,14 @@
 
 #include <Ui/Frame/mkInk.h>
 
-#include <algorithm>
-#include <iostream>
-
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Form/mkForm.h>
 
-#include <Ui/Scheme/mkTree.h>
+#include <algorithm>
+#include <iostream>
 
 namespace mk
 {
-
 	Stripe::Stripe(Widget* widget)
 		: Frame(widget)
 		, d_depth(d_style->d_layoutDim == DIM_X ? DIM_Y : DIM_X)
@@ -271,7 +268,7 @@ namespace mk
 		Frame::migrate(stripe);
 		
 		for(Frame* frame : d_contents)
-			if(!frame->layer())
+			if(frame->frameType() < LAYER)
 				frame->migrate(stripe);
 	}
 

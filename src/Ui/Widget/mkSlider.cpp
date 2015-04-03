@@ -19,6 +19,8 @@
 
 #include <Ui/mkUiWindow.h>
 
+#include <iostream>
+
 namespace mk
 {
 	SliderKnob::SliderKnob(Dimension dim, Style* style)
@@ -150,4 +152,8 @@ namespace mk
 		if(!mFixedKnob)
 			mButton->frame()->setSpanDim(mDim, mKnobLength);
 	}
+
+	SliderDisplay::SliderDisplay(const string& label)
+		: Label(label, styleCls())
+	{}
 }

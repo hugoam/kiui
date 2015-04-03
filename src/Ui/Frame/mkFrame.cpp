@@ -29,7 +29,7 @@ namespace mk
 		: Uibox(widget->style()->layout())
 		, d_widget(widget)
 		, d_parent(nullptr)
-		, d_dirty(DIRTY_VISIBLE)
+		, d_dirty(DIRTY_VISIBILITY)
 		, d_hidden(false)
 		, d_visible(true)
 		, d_clipPos(0.f, 0.f)
@@ -37,12 +37,7 @@ namespace mk
 		, d_index(0)
 		, d_wstyle(widget->style())
 		, d_inkstyle(d_wstyle->skin())
-	{
-		if(dfixed(DIM_X))
-			setSizeDim(DIM_X, d_style->d_size[DIM_X]);
-		if(dfixed(DIM_Y))
-			setSizeDim(DIM_Y, d_style->d_size[DIM_Y]);
- 	}
+	{}
 
 	Frame::~Frame()
 	{}
@@ -66,7 +61,7 @@ namespace mk
 
 		parent->insert(this, d_index);
 
-		this->setDirty(DIRTY_WIDGET);
+		this->setDirty(DIRTY_SKIN);
 	}
 
 	void Frame::wrap(Dimension dim)
@@ -82,9 +77,19 @@ namespace mk
 
 	void Frame::bind(Stripe* parent)
 	{
+		d_wstyle = d_widget->style();
+		d_style = d_wstyle->layout();
+		d_inkstyle = d_wstyle->skin();
+		
+		if(dfixed(DIM_X) && d_style->d_size[DIM_X])
+			setSizeDim(DIM_X, d_style->d_size[DIM_X]);
+		if(dfixed(DIM_Y) && d_style->d_size[DIM_Y])
+			setSizeDim(DIM_Y, d_style->d_size[DIM_Y]);
+
 		d_parent = parent;
 		d_inkbox = this->layer()->inkLayer()->inkbox(this);
 		this->setVisible(parent->visible());
+		this->updateState(d_widget->state());
 		this->wrap(DIM_X);
 		this->wrap(DIM_Y);
 	}
@@ -111,9 +116,9 @@ namespace mk
 		return d_parent->contents().at(d_index + 1);
 	}
 
-	void Frame::clip()
+	void Frame::updateClip()
 	{
-		if(!d_parent || !d_visible || !flow())
+		if(!d_parent || !d_visible || !clip())
 			return;
 
 		d_clipPos[DIM_X] = std::max(d_parent->d_clipPos[DIM_X] - d_position[DIM_X], 0.f);
@@ -142,9 +147,7 @@ namespace mk
 
 		switch(d_dirty)
 		{
-		case DIRTY_HIDE:
-			d_hidden ? d_parent->flowHidden(this) : d_parent->flowShown(this);
-		case DIRTY_VISIBLE:
+		case DIRTY_VISIBILITY:
 			d_visible ? d_inkbox->show() : d_inkbox->hide();
 		case DIRTY_SKIN:
 			d_inkbox->updateStyle();
@@ -154,7 +157,7 @@ namespace mk
 			this->updateSize();
 		case DIRTY_FRAME:
 			this->updatePosition();
-			this->clip();
+			this->updateClip();
 			d_inkbox->updateFrame();
 		case CLEAN:
 			break;
@@ -215,8 +218,10 @@ namespace mk
 
 		float delta = size - d_size[dim];
 		d_size[dim] = size;
-		d_clipSize[dim] = size;
 		this->setDirty(DIRTY_FRAME);
+
+		if(dexpand(dim) || !flow())
+			d_clipSize[dim] = size;
 
 		if(d_parent && flow() && (dshrink(dim) || dfixed(dim))) // Upward notification -> when shrinking
 			d_parent->flowSized(this, dim, delta);
@@ -252,23 +257,19 @@ namespace mk
 	void Frame::show()
 	{
 		d_hidden = false;
-		if(this->flow())
-			this->setDirty(DIRTY_HIDE);
 		if(!d_visible)
 			this->setVisible(true);
-		//if(this->flow())
-		//	d_parent->flowShown(this);
+		if(d_parent && this->flow())
+			d_parent->flowShown(this);
 	}
 
 	void Frame::hide()
 	{
 		d_hidden = true;
-		if(this->flow())
-			this->setDirty(DIRTY_HIDE);
 		if(d_visible)
 			this->setVisible(false);
-		//if(this->flow())
-		//	d_parent->flowHidden(this);
+		if(d_parent && this->flow())
+			d_parent->flowHidden(this);
 	}
 
 	void Frame::setVisible(bool visible)
@@ -282,7 +283,7 @@ namespace mk
 			return;
 
 		d_visible = true;
-		this->setDirty(DIRTY_VISIBLE);
+		this->setDirty(DIRTY_VISIBILITY);
 	}
 
 	void Frame::setInvisible()
@@ -291,7 +292,7 @@ namespace mk
 			return;
 
 		d_visible = false;
-		this->setDirty(DIRTY_VISIBLE);
+		this->setDirty(DIRTY_VISIBILITY);
 	}
 
 	float Frame::calcAbsolute(Dimension dim)

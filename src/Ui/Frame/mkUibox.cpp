@@ -21,7 +21,7 @@ namespace mk
 		, d_size(0.f, 0.f)
 		, d_span(0.f, 0.f)
 		, d_sizing(SHRINK, SHRINK)
-		, d_opacity(_VOID)
+		, d_opacity(VOID)
 		, d_style(nullptr)
 	{}
 

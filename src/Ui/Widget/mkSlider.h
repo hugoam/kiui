@@ -122,6 +122,15 @@ namespace mk
 		using Styled<SliderY>::styleCls;
 	};
 
+	class MK_UI_EXPORT SliderDisplay : public Label, public Typed<SliderDisplay>, public Styled < SliderDisplay >
+	{
+	public:
+		SliderDisplay(const string& label);
+
+		using Typed<SliderDisplay>::cls;
+		using Styled<SliderDisplay>::styleCls;
+	};
+
 	template <class T>
 	class StatSlider : public WTypedInput<AutoStat<T>, T>, public Typed<StatSlider<T>>//, public Styled<StatSlider<T>>
 	{
@@ -149,7 +158,7 @@ namespace mk
 			else
 				mSlider = this->template makeappend<SliderY>(std::bind(&StatSlider::onUpdate, this));
 
-			mDisplay = this->template makeappend<Label>(toString(mStat.value()));
+			mDisplay = this->template makeappend<SliderDisplay>(toString(mStat.value()));
 
 			this->updateSlider();
 		}
@@ -183,7 +192,7 @@ namespace mk
 		Dimension mDim;
 
 		Slider* mSlider;
-		Label* mDisplay;
+		SliderDisplay* mDisplay;
 	};
 
 	template class MK_UI_EXPORT _I_ StatSlider<float>;

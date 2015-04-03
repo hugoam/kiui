@@ -43,10 +43,15 @@ namespace mk
 		d_parentLayer = parent->layer();
 		d_parentLayer->layers().push_back(this);
 
+		bool migrate = bool(d_inkLayer);
+
 		if(d_target)
 			d_inkLayer = d_target->layer(this, d_zorder);
 		else
 			d_inkLayer = d_parentLayer->inkLayer()->target()->layer(this, d_zorder);
+
+		if(migrate)
+			this->migrate(this);
 
 		Frame::bind(parent);
 	}
@@ -60,7 +65,7 @@ namespace mk
 
 	void Layer::nextFrame(size_t tick, size_t delta)
 	{
-		if(d_dirty >= DIRTY_VISIBLE)
+		if(d_dirty >= DIRTY_VISIBILITY)
 			d_visible ? d_inkLayer->show() : d_inkLayer->hide();
 
 		Stripe::nextFrame(tick, delta);

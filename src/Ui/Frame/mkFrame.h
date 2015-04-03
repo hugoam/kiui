@@ -28,8 +28,7 @@ namespace mk
 			DIRTY_WIDGET,		// The content of the widget has changed
 			DIRTY_SKIN,			// The skin of the frame has changed
 			//DIRTY_FLOW,		// The flow of the frame has changed
-			DIRTY_VISIBLE,		// The visibility of the frame has changed
-			DIRTY_HIDE			// The visibility of the frame has changed
+			DIRTY_VISIBILITY,	// The visibility of the frame has changed
 		};
 
 		virtual FrameType frameType() { return FRAME; }
@@ -67,7 +66,7 @@ namespace mk
 		Frame* prev();
 		Frame* next();
 
-		void clip();
+		void updateClip();
 
 		void wrap(Dimension dim);
 

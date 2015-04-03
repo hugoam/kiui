@@ -18,8 +18,8 @@
 
 namespace mk
 {
-	Label::Label(const string& label, Style* style)
-		: Widget(style ? style : styleCls())
+	Label::Label(const string& label, Style* style, FrameType frameType)
+		: Widget(style ? style : styleCls(), frameType)
 		, mLabel(label)
 	{}
 

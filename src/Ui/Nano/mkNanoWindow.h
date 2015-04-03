@@ -24,6 +24,8 @@ namespace mk
 		size_t index() { return mIndex; }
 		bool visible() { return mVisible; }
 
+		void setIndex(size_t index) { mIndex = index; }
+
 		unique_ptr<Inkbox> inkbox(Frame* frame);
 
 		void show();
@@ -53,6 +55,7 @@ namespace mk
 
 		unique_ptr<InkLayer> layer(Frame* frame, size_t z);
 		void removeLayer(NanoLayer* layer);
+		void reindexLayers();
 
 		void moveToTop(NanoLayer* layer);
 		void nanodraw();

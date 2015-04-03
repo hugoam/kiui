@@ -104,8 +104,18 @@ namespace mk
 		: TreeNode("folder_20.png", name, collapsed)
 		, mPath(path)
 	{
+		mType = cls();
 		if(load)
 			this->update();
+	}
+
+	void DirectoryNode::expand()
+	{
+		Expandbox::expand();
+
+		for(auto& pt : mContainer->contents())
+			if(pt->type() == DirectoryNode::cls())
+				pt->as<DirectoryNode>()->update();
 	}
 
 	void DirectoryNode::update()

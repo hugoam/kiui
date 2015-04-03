@@ -39,7 +39,7 @@ namespace mk
 			mExpandButton = mHeader->emplace<ExpandboxToggle>(std::bind(&Expandbox::expand, this), std::bind(&Expandbox::collapse, this), !mCollapsed);
 			mTitleLabel = mHeader->emplace<Title>(mTitle);
 
-			//mContainer->hide();
+			mContainer->hide();
 		}
 	}
 
@@ -48,8 +48,8 @@ namespace mk
 
 	Widget* Expandbox::vappend(unique_ptr<Widget> widget)
 	{
-		//if(!mCollapsed && mContainer->frame()->hidden())
-		//	mContainer->show();
+		if(!mCollapsed && mContainer->frame()->hidden())
+			mContainer->show();
 		return mContainer->append(std::move(widget));
 	}
 
