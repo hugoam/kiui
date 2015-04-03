@@ -115,7 +115,7 @@ namespace mk
 		{
 			this->erase();
 		}
-		else if(c != 0 && mAllowedChars.size() == 0 || mAllowedChars.find(c) != string::npos)
+		else if(c != 0 && (mAllowedChars.size() == 0 || mAllowedChars.find(c) != string::npos))
 		{
 			if(c == '.' && mString.find('.') != string::npos)
 				return true;

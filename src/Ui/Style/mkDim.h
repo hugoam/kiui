@@ -21,7 +21,6 @@
 #if defined _WIN32
 #undef OPAQUE
 #undef VOID
-#undef OVERFLOW
 #endif
 
 namespace mk
@@ -69,7 +68,7 @@ namespace mk
 
 	enum _I_ Overflow : unsigned int
 	{
-		OVERFLOW = 0,
+		FLOWOVER = 0,
 		SCROLL = 1
 	};
 
