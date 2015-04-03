@@ -319,6 +319,9 @@ namespace mk
 
 	bool Widget::mouseReleased(float xPos, float yPos, MouseButton button)
 	{
+		if(!(mState & MODAL))
+			return true;
+
 		if(button == LEFT_BUTTON)
 		{
 			this->unmodal();
