@@ -45,6 +45,7 @@ namespace mk
 	template <> inline Type* typecls<Sizing>() { return Typed<Sizing>::cls(); }
 	template <> inline Type* typecls<Pivot>() { return Typed<Pivot>::cls(); }
 	template <> inline Type* typecls<Flow>() { return Typed<Flow>::cls(); }
+	template <> inline Type* typecls<Clipping>() { return Typed<Clipping>::cls(); }
 	template <> inline Type* typecls<Overflow>() { return Typed<Overflow>::cls(); }
 	template <> inline Type* typecls<BoxLayer>() { return Typed<BoxLayer>::cls(); }
 	template <> inline Type* typecls<Opacity>() { return Typed<Opacity>::cls(); }
@@ -56,6 +57,7 @@ namespace mk
 	template class MK_UI_EXPORT Typed<Sizing>;
 	template class MK_UI_EXPORT Typed<Pivot>;
 	template class MK_UI_EXPORT Typed<Flow>;
+	template class MK_UI_EXPORT Typed<Clipping>;
 	template class MK_UI_EXPORT Typed<Overflow>;
 	template class MK_UI_EXPORT Typed<BoxLayer>;
 	template class MK_UI_EXPORT Typed<Opacity>;

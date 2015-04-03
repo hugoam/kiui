@@ -32,8 +32,6 @@
 
 #include <Ui/Nano/nanovg/nanovg_gl.h>
 
-#include <iostream>
-
 namespace mk
 {
 	NanoLayer::NanoLayer(Frame* frame, NanoTarget* target, size_t index)
@@ -46,7 +44,6 @@ namespace mk
 
 	NanoLayer::~NanoLayer()
 	{
-		std::cerr << "NanoLayer destroyed" << std::endl;
 		mTarget->removeLayer(this);
 	}
 
