@@ -26,9 +26,9 @@ The style can be defined and tweaked separately by an artist. Style are defined 
 Usage
 ====
 ```C++
-UiWindow* uiwindow = new UiWindow();
+UiWindow uiwindow;
 
-Form* root = uiwindow->rootForm();
+Form* root = uiwindow.rootForm();
 Window* window = root->makeappend<Window>("Example window");
 
 Expandbox* expandbox = window->makeappend<Expandbox>("Collapsable box");
@@ -43,10 +43,10 @@ Nano
 kiUi comes with a light renderer / input system based on NanoVG and GLFW to quickly bootstrap a prototype application in a few lines of code.
 
 ```C++
-GlWindow* glwindow = new GlWindow(1200, 800, "mk UiEditApp");
-glwindow->initContext();
+GlWindow glwindow(1200, 800, "mk UiEditApp");
+glwindow.initContext();
 
-UiWindow* uiwindow = glwindow->uiWindow();
+UiWindow* uiwindow = glwindow.uiWindow();
 bool pursue = true;
 while(pursue)
     pursue = glwindow->renderFrame();
