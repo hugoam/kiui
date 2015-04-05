@@ -26,15 +26,13 @@ The style can be defined and tweaked separately by an artist. Style are defined 
 Usage
 ====
 ```C++
-UiWindow uiwindow;
+RootSheet& root = uiwindow.rootSheet();
+Window& window = root.emplace<Window>("Example window");
 
-Form* root = uiwindow.rootForm();
-Window* window = root->makeappend<Window>("Example window");
+Expandbox& expandbox = window.emplace<Expandbox>("Collapsable box");
 
-Expandbox* expandbox = window->makeappend<Expandbox>("Collapsable box");
-
-Label* label = expandbox->makeappend<Label>("kiUi says hello.");
-Button* button = expand->makeappend<Button>("Push me");
+Label& label = expandbox.emplace<Label>("kiUi says hello.");
+Button& button = expand.emplace<Button>("Push me");
 ```
 
 Nano
@@ -46,10 +44,10 @@ kiUi comes with a light renderer / input system based on NanoVG and GLFW to quic
 GlWindow glwindow(1200, 800, "mk UiEditApp");
 glwindow.initContext();
 
-UiWindow* uiwindow = glwindow.uiWindow();
+UiWindow& uiwindow = glwindow.uiWindow();
 bool pursue = true;
 while(pursue)
-    pursue = glwindow->renderFrame();
+    pursue = glwindow.renderFrame();
 ```
 
 Widgets
