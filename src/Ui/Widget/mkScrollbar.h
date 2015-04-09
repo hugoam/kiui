@@ -19,13 +19,14 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT Scroller : public Slider, public Styled<Scroller>
+	class MK_UI_EXPORT Scroller : public Slider, public Typed<Scroller, Slider>, public Styled<Scroller>
 	{
 	public:
 		Scroller(Dimension dim);
 
 		void sliderStep(float offset, bool ended);
 
+		using Typed<Scroller, Slider>::cls;
 		using Styled<Scroller>::styleCls;
 	};
 
@@ -41,39 +42,43 @@ namespace mk
 		ScrollerY();
 	};
 
-	class MK_UI_EXPORT ScrollerKnobX : public SliderKnob, public Styled<ScrollerKnobX>
+	class MK_UI_EXPORT ScrollerKnobX : public SliderKnob, public Typed<ScrollerKnobX, SliderKnob>, public Styled<ScrollerKnobX>
 	{
 	public:
 		ScrollerKnobX();
 
+		using Typed<ScrollerKnobX, SliderKnob>::cls;
 		using Styled<ScrollerKnobX>::styleCls;
 	};
 
-	class MK_UI_EXPORT ScrollerKnobY : public SliderKnob, public Styled<ScrollerKnobY>
+	class MK_UI_EXPORT ScrollerKnobY : public SliderKnob, public Typed<ScrollerKnobY, SliderKnob>, public Styled<ScrollerKnobY>
 	{
 	public:
 		ScrollerKnobY();
 
+		using Typed<ScrollerKnobY, SliderKnob>::cls;
 		using Styled<ScrollerKnobY>::styleCls;
 	};
 
-	class MK_UI_EXPORT ScrollUp : public Button, public Styled<ScrollUp>
+	class MK_UI_EXPORT ScrollUp : public Button, public Typed<ScrollUp, Button>, public Styled<ScrollUp>
 	{
 	public:
 		ScrollUp(const Trigger& trigger);
 
+		using Typed<ScrollUp, Button>::cls;
 		using Styled<ScrollUp>::styleCls;
 	};
 
-	class MK_UI_EXPORT ScrollDown : public Button, public Styled<ScrollDown>
+	class MK_UI_EXPORT ScrollDown : public Button, public Typed<ScrollDown, Button>, public Styled<ScrollDown>
 	{
 	public:
 		ScrollDown(const Trigger& trigger);
 
+		using Typed<ScrollDown, Button>::cls;
 		using Styled<ScrollDown>::styleCls;
 	};
 
-	class MK_UI_EXPORT _I_ Scrollbar : public Sheet, public Typed<Scrollbar>, public Styled<Scrollbar>
+	class MK_UI_EXPORT _I_ Scrollbar : public Sheet, public Typed<Scrollbar, Sheet>, public Styled<Scrollbar>
 	{
 	public:
 		Scrollbar(Stripe* sheet);
@@ -87,7 +92,7 @@ namespace mk
 		void scroll(float offset);
 		void nextFrame(size_t tick, size_t delta);
 
-		using Typed<Scrollbar>::cls;
+		using Typed<Scrollbar, Sheet>::cls;
 
 	protected:
 		Stripe* mSheet;

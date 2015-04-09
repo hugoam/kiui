@@ -27,7 +27,10 @@ namespace mk
 {
 	Sheet::Sheet(Style* style, FrameType frameType)
 		: Widget(style, frameType)
-	{}
+	{
+		if(!style->styleType() || !style->styleType()->upcast(cls()))
+			mType = cls();
+	}
 
 	Sheet::~Sheet()
 	{}
@@ -123,8 +126,9 @@ namespace mk
 		, mSheet(nullptr)
 		, mScrollbar(nullptr)
 	{
-		mSheet = this->makeappend<Sheet>(DivY::styleCls());
+		mSheet = this->makeappend<Sheet>(PartitionY::styleCls());
 		mScrollbar = this->makeappend<Scrollbar>(mSheet->stripe());
+		//mScrollbar->hide();
 	}
 
 	ScrollSheet::~ScrollSheet()

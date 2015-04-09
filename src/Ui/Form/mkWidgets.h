@@ -19,10 +19,10 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT Control : public Form, public Styled<Control>
+	class MK_UI_EXPORT Control : public Widget, public Styled<Control>
 	{
 	public:
-		Control(unique_ptr<Sheet> sheet = nullptr);
+		Control(Style* style = nullptr);
 	};
 
 	class MK_UI_EXPORT _I_ WrapX : public Sheet, public Typed<WrapX, Sheet>, public Styled<WrapX>
@@ -73,15 +73,15 @@ namespace mk
 		using Typed<PartitionY, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT _I_ Page : public ScrollSheet, public Typed<Page, Sheet>, public Styled<Page>
+	class MK_UI_EXPORT _I_ Page : public ScrollSheet, public Typed<Page, ScrollSheet>, public Styled<Page>
 	{
 	public:
-		Page(const string& name, const string& dockid = "");
+		Page(const string& name, const string& dockid = "", Style* style = nullptr);
 
 		const string& name() { return mName; }
 		const string& dockid() { return mDockId; }
 
-		using Typed<Page, Sheet>::cls;
+		using Typed<Page, ScrollSheet>::cls;
 		using Styled<Page>::styleCls;
 
 	protected:

@@ -129,12 +129,6 @@ namespace mk
 
 	class Hook;
 
-	class FObjectEdit;
-	class FStem;
-	class FMember;
-	class FPartEdit;
-	class FStore;
-
 	class NanoInk;
 	class NanoLayer;
 	class NanoTarget;

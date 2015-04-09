@@ -35,8 +35,9 @@ namespace mk
 		, d_clipPos(0.f, 0.f)
 		, d_clipSize(0.f, 0.f)
 		, d_index(0)
-		, d_wstyle(widget->style())
-		, d_inkstyle(d_wstyle->skin())
+		, d_style(widget->style())
+		, d_inkstyle(d_style->skin())
+		, d_styleStamp(0)
 	{}
 
 	Frame::~Frame()
@@ -54,19 +55,13 @@ namespace mk
 	{
 		Stripe* parent = d_parent;
 		d_parent->remove(this);
-
-		this->setStyle(style->layout());
-		d_wstyle = style;
-		d_inkstyle = style->skin();
-
+		this->updateStyle(style);
 		parent->insert(this, d_index);
-
-		this->setDirty(DIRTY_SKIN);
 	}
 
 	void Frame::wrap(Dimension dim)
 	{
-		if(d_style->d_sizing[dim] == WRAP)
+		if(d_layout->d_sizing[dim] == WRAP)
 		{
 			if(d_parent->d_sizing[dim] == EXPAND || d_parent->d_sizing[dim] == FIXED)
 				d_sizing[dim] = EXPAND;
@@ -75,16 +70,32 @@ namespace mk
 		}
 	}
 
+	void Frame::updateStyle(Style* style)
+	{
+		d_style = style;
+		d_layout = d_style->layout();
+		d_inkstyle = d_style->subskin(d_widget->state());
+		d_styleStamp = style->updated();
+
+		//d_size = style->d_size; // Caused a bug because we don't set the size through setSize, so the layout isn't updated
+		d_span = d_layout->d_span;
+		d_opacity = d_layout->d_opacity;
+		if(d_parent && d_parent->parent() && d_parent->parent()->layout()->d_weight != TABLE) // Caused a bug because a table rows children are set to expand manually
+			d_sizing = d_layout->d_sizing;
+
+		if(dfixed(DIM_X) && d_layout->d_size[DIM_X])
+			setSizeDim(DIM_X, d_layout->d_size[DIM_X]);
+		if(dfixed(DIM_Y) && d_layout->d_size[DIM_Y])
+			setSizeDim(DIM_Y, d_layout->d_size[DIM_Y]);
+
+		this->setDirty(DIRTY_SKIN);
+		if(d_parent)
+			d_parent->markRelayout();
+	}
+
 	void Frame::bind(Stripe* parent)
 	{
-		d_wstyle = d_widget->style();
-		d_style = d_wstyle->layout();
-		d_inkstyle = d_wstyle->skin();
-		
-		if(dfixed(DIM_X) && d_style->d_size[DIM_X])
-			setSizeDim(DIM_X, d_style->d_size[DIM_X]);
-		if(dfixed(DIM_Y) && d_style->d_size[DIM_Y])
-			setSizeDim(DIM_Y, d_style->d_size[DIM_Y]);
+		this->updateStyle(d_widget->style());
 
 		d_parent = parent;
 		d_inkbox = this->layer()->inkLayer()->inkbox(this);
@@ -116,6 +127,16 @@ namespace mk
 		return d_parent->contents().at(d_index + 1);
 	}
 
+	bool Frame::first()
+	{
+		return d_index == 0;
+	}
+
+	bool Frame::last()
+	{
+		return d_index == d_parent->sequence().size()-1;
+	}
+
 	void Frame::updateClip()
 	{
 		if(!d_parent || !d_visible || !clip())
@@ -142,8 +163,8 @@ namespace mk
 	{
 		UNUSED(tick); UNUSED(delta);
 
-		//if(d_style->d_updated == tick)
-		//	this->setStyle(d_style);
+		if(d_style->updated() > d_styleStamp)
+			this->reset(d_style);
 
 		switch(d_dirty)
 		{
@@ -190,11 +211,8 @@ namespace mk
 
 	void Frame::updateSize()
 	{
-		//if(!d_widget->label().empty() && this->container())
-		//	std::cerr << "WARNING : label of style " << d_widget->style() << " not fitted to text as it's a container" << std::endl;
-
-		if(!d_inkbox->visible())
-			return;
+		//if(!d_inkbox->visible()) // @note this is needed for gorilla, but not for nanovg, discuss
+		//	return;
 
 		if(dshrink(DIM_X) && (this->frameType() == FRAME || this->as<Stripe>()->sequence().size() == 0))
 			this->setSizeDim(DIM_X, d_inkbox->contentSize(DIM_X));
@@ -205,7 +223,7 @@ namespace mk
 	void Frame::updateState(WidgetState state)
 	{
 		InkStyle* inkstyle = d_inkstyle;
-		d_inkstyle = d_wstyle->subskin(state);
+		d_inkstyle = d_style->subskin(state);
 
 		if(d_inkstyle != inkstyle)
 			this->setDirty(DIRTY_SKIN);
@@ -317,6 +335,21 @@ namespace mk
 			return nullptr;
 		else
 			return this;
+	}
+
+	bool Frame::nextOffset(Dimension dim, float& pos, float seuil)
+	{
+		pos += d_parent->offset(this);
+		return pos > seuil;
+	}
+
+	bool Frame::prevOffset(Dimension dim, float& pos, float seuil)
+	{
+		if(pos + d_parent->offset(this) >= seuil)
+			return true;
+		
+		pos += d_parent->offset(this);
+		return false;
 	}
 
 	FrameSkin::FrameSkin(Frame* frame, ImageSkin* skin)

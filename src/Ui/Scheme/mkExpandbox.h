@@ -12,25 +12,31 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT ExpandboxHeader : public Sheet, public Styled<ExpandboxHeader>
+	class MK_UI_EXPORT ExpandboxHeader : public Sheet, public Typed<ExpandboxHeader, Sheet>, public Styled<ExpandboxHeader>
 	{
 	public:
 		ExpandboxHeader();
+
+		using Typed<ExpandboxHeader, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT ExpandboxBody : public Sheet, public Styled<ExpandboxBody>
+	class MK_UI_EXPORT ExpandboxBody : public Sheet, public Typed<ExpandboxBody, Sheet>, public Styled<ExpandboxBody>
 	{
 	public:
 		ExpandboxBody();
+
+		using Typed<ExpandboxBody, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT ExpandboxToggle : public Toggle, public Styled<ExpandboxToggle>
+	class MK_UI_EXPORT ExpandboxToggle : public Toggle, public Typed<ExpandboxToggle, Widget>, public Styled<ExpandboxToggle>
 	{
 	public:
 		ExpandboxToggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on);
+
+		using Typed<ExpandboxToggle, Widget>::cls;
 	};
 
-	class MK_UI_EXPORT Expandbox : public Sheet, public Styled<Expandbox>
+	class MK_UI_EXPORT Expandbox : public Sheet, public Typed<Expandbox, Sheet>, public Styled<Expandbox>
 	{
 	public:
 		Expandbox(const string& title, bool collapsed = false, bool build = true);
@@ -43,6 +49,8 @@ namespace mk
 
 		virtual void expand();
 		virtual void collapse();
+
+		using Typed<Expandbox, Sheet>::cls;
 
 	protected:
 		string mTitle;

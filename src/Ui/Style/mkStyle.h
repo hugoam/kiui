@@ -72,12 +72,13 @@ namespace mk
 		_C_ InkStyle(string name, Colour background, Colour text)
 			: IdStruct(index<InkStyle>(), cls())
 			, mName(name), mEmpty(false), mBackgroundColour(background), mBorderColour(), mTextColour(text), mImageColour(1.f, 1.f, 1.f)
-			, mBorderWidth(0.f), mMargin(0.f, 0.f, 0.f, 0.f), mPadding(0.f, 0.f), mImage(""), mCornerRadius(0.f)
+			, mBorderWidth(0.f), mMargin(0.f, 0.f, 0.f, 0.f), mPadding(0.f, 0.f), mImage(""), mCornerRadius(0.f), mWeakCorners(true)
 		{}
 
 		InkStyle(string name = "")
 			: IdStruct(index<InkStyle>(), cls())
 			, mBackgroundColour(Colour::Transparent), mTextColour(Colour::Transparent), mBorderColour(Colour::Transparent)
+			, mWeakCorners(true)
 			, mName(name), mEmpty(true)
 		{}
 
@@ -101,8 +102,10 @@ namespace mk
 		_A_ _M_ Colour mTextColour;
 		_A_ _M_ BoxFloat mBorderWidth;
 		_A_ _M_ BoxFloat mCornerRadius;
+		_A_ _M_ bool mWeakCorners;
 		_A_ _M_ BoxFloat mMargin;
 		_A_ _M_ DimFloat mPadding;
+		_A_ _M_ DimFloat mTopdownGradient;
 		_A_ _M_ string mImage;
 		_A_ _M_ ImageSkin mImageSkin;
 
@@ -134,13 +137,20 @@ namespace mk
 		_A_ const string& name() { return mName.empty() ? mStyleType->name() : mName; }
 		_A_ LayoutStyle* layout() { return &mLayout; }
 		_A_ InkStyle* skin() { return &mSkin; }
+		_A_ _M_ size_t updated() { return mUpdated; }
+
+		void setUpdated(size_t update) { mUpdated = update; }
 
 		Type* styleType() { return mStyleType; }
 		const StyleTable& subskins() { return mSubskins; }
 		
+		void reset();
+		InkStyle* decline(WidgetState state, InkStyle& original);
+
 		InkStyle* subskin(WidgetState state);
 		InkStyle* decline(WidgetState state);
 
+		void inherit(Style* base);
 		void inheritLayout(Style* base);
 		void inheritSkins(Style* base);
 
@@ -150,6 +160,7 @@ namespace mk
 		LayoutStyle mLayout;
 		InkStyle mSkin;
 		StyleTable mSubskins;
+		size_t mUpdated;
 	};
 
 	template <class T>

@@ -22,25 +22,37 @@ namespace mk
 	Colour Colour::Transparent(0.f, 0.f, 0.f, 0.f);
 
 	Colour::Colour(float r, float g, float b, float a)
-		: mR(r)
-		, mG(g)
-		, mB(b)
-		, mA(a)
-	{}
+#ifndef _MSC_VER
+		: mFloats{ r, g, b, a }
+#endif
+	{
+#ifdef _MSC_VER
+		mFloats[0] = r;
+		mFloats[1] = g;
+		mFloats[2] = b;
+		mFloats[3] = a;
+#endif
+	}
 
 	Colour::Colour(const Colour& col)
-		: mR(col.mR)
-		, mG(col.mG)
-		, mB(col.mB)
-		, mA(col.mA)
-	{}
+#ifndef _MSC_VER
+		: mFloats{ col.r(), col.g(), col.b(), col.a() }
+#endif
+	{
+#ifdef _MSC_VER
+		mFloats[0] = col.r();
+		mFloats[1] = col.g();
+		mFloats[2] = col.b();
+		mFloats[3] = col.a();
+#endif
+	}
 
 	Colour& Colour::operator=(const Colour& rhs)
 	{
-		mR = rhs.mR;
-		mG = rhs.mG;
-		mB = rhs.mB;
-		mA = rhs.mA;
+		mFloats[0] = rhs.r();
+		mFloats[1] = rhs.g();
+		mFloats[2] = rhs.b();
+		mFloats[3] = rhs.a();
 		return *this;
 	}
 }

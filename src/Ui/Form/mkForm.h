@@ -28,28 +28,17 @@ namespace mk
 
     class MK_UI_EXPORT _I_ Form : public TypeObject, public Typed<Form>, public Updatable
     {
-    public:
-		typedef std::function<void(Form*)> Trigger;
-
 	public:
-		Form(Style* style, unique_ptr<Sheet> sheet);
+		Form(unique_ptr<Sheet> sheet);
 		~Form();
-
-		virtual void build() {}
 
 		UiWindow* uiWindow();
 		Form* parent() { return mParent; }
 		Id index() const { return mIndex; }
-		Sheet* sheet() { return mSheet.get(); }
-		Widget* widget() { return mWidget; }
-		bool container() { return mLabel.empty(); }
-		//size_t updated() { return mUpdated; }
+		Sheet* sheet() { return mSheet; }
+		Sheet* container() { return mContainer; }
 
-		Style* style() const { return mStyle; }
-		const string& label() const { return mLabel; }
-		const string& image() const { return this->getAttr("image")->get<string>(); }
-		const string& name() const { return this->getAttr("name")->get<string>(); }
-		const string& tooltip() const { return this->getAttr("tooltip")->get<string>(); }
+		const string& name();
 
 		LrefDict& attrs() { return mAttrs; }
 		bool hasAttr(const string& name) { return mAttrs.find(name) != mAttrs.end(); }
@@ -60,20 +49,15 @@ namespace mk
 
 		void setIndex(size_t index) { mIndex = index; }
 
-		void setStyle(Style* style);
-		void setLabel(const string& label);
-		void setImage(const string& image) { this->setAttr("image", image); }
-		void setName(const string& name) { this->setAttr("name", name); }
-		void setTooltip(const string& tooltip) { this->setAttr("tooltip", tooltip); }
-
 		std::vector<unique_ptr<Form>>& contents() { return mContents; }
 
-		Form* child(size_t index) { return mContents.at(index).get(); }
+		Form* at(size_t index) { return mContents.at(index).get(); }
 
 		void nextFrame(size_t tick, size_t delta);
 
 		// Creation - removal
 		void bind(Form* parent);
+		void unbind();
 
 		void destroy();
 		void clear();
@@ -104,7 +88,7 @@ namespace mk
 		RootForm* rootForm();
 
 		template <class T, class... Args>
-		inline T* makeappend(Args&&... args)
+		inline T* emplace(Args&&... args)
 		{
 			return this->append(make_unique<T>(std::forward<Args>(args)...))->template as<T>();
 		}
@@ -115,15 +99,12 @@ namespace mk
 	protected:
 		Form* mParent;
 		size_t mIndex;
-		Style* mStyle;
-		string mLabel;
-
-		//size_t mUpdated;
 
 		LrefDict mAttrs;
 
-		unique_ptr<Sheet> mSheet;
-		Widget* mWidget;
+		unique_ptr<Sheet> mUniqueSheet;
+		Sheet* mSheet;
+		Sheet* mContainer;
 
 		std::vector<unique_ptr<Form>> mContents;
 

@@ -14,6 +14,8 @@
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkInk.h>
 
+#include <Ui/Style/mkStyleParser.h>
+
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Widget/mkRootSheet.h>

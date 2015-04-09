@@ -32,14 +32,14 @@ namespace mk
 			, mUpdate(0)
 		{}
 
-		void notifyUpdate() { ++mUpdate; if(mOnUpdate) mOnUpdate(mValue->get<T>()); this->updateValue(); }
+		void notifyUpdate() { ++mUpdate; if(mOnUpdate) mOnUpdate(mValue->get<T>()); }
 
 	protected:
 		std::function<void(T_Val)> mOnUpdate;
 		size_t mUpdate;
 	};
 
-	class MK_UI_EXPORT _I_ TypeIn : public Sheet, public Typed<TypeIn>, public Styled<TypeIn>
+	class MK_UI_EXPORT _I_ TypeIn : public Sheet, public Typed<TypeIn, Sheet>, public Styled<TypeIn>
 	{
 	public:
 		TypeIn(WValue* input, Style* style = nullptr);
@@ -51,8 +51,8 @@ namespace mk
 
 		void setAllowedChars(const string& chars);
 
-		void activated();
-		void deactivated();
+		void focused();
+		void unfocused();
 
 		void erase();
 		void insert(char c);
@@ -61,7 +61,7 @@ namespace mk
 		bool leftClick(float xPos, float yPos);
 		bool keyDown(KeyCode code, char c);
 
-		using Typed<TypeIn>::cls;
+		using Typed<TypeIn, Sheet>::cls;
 
 	protected:
 		WValue* mInput;
@@ -71,44 +71,32 @@ namespace mk
 		Caret* mCaret;
 	};
 
-	class MK_UI_EXPORT _I_ Textbox : public TypeIn, public Typed<Textbox>, public Styled<Textbox>
+	class MK_UI_EXPORT _I_ Textbox : public TypeIn, public Typed<Textbox, TypeIn>, public Styled<Textbox>
 	{
 	public:
 		Textbox(WValue* input);
 		Textbox(const string& text);
 
-		using Typed<Textbox>::cls;
+		using Typed<Textbox, TypeIn>::cls;
 		using Styled<Textbox>::styleCls;
 
 	protected:
 		string mString;
 	};
-	
-	class MK_UI_EXPORT NumberControls : public Sheet, public Styled<NumberControls>
-	{
-	public:
-		NumberControls(const Trigger& plus, Trigger minus);
-
-	protected:
-		Trigger mPlusTrigger;
-		Trigger mMinusTrigger;
-		Button* mPlus;
-		Button* mMinus;
-	};
 
 	template <class T>
-	class NumberInput : public WTypedInput<T>
+	class NumberInput : public WTypedInput<T>, public Typed<NumberInput<T>, WValue>, public Styled<NumberInput<T>>
 	{
 	public:
 		NumberInput(Lref& value, std::function<void(T)> callback = nullptr)
-			: WTypedInput<T>(value, nullptr, callback)
+			: WTypedInput<T>(value, styleCls(), callback)
 			, mStep(1)
 		{
 			this->build();
 		}
 
 		NumberInput(T value, std::function<void(T)> callback = nullptr)
-			: WTypedInput<T>(value, nullptr, callback)
+			: WTypedInput<T>(value, styleCls(), callback)
 			, mStep(1)
 		{
 			this->build();
@@ -117,7 +105,8 @@ namespace mk
 		void build()
 		{
 			mTypeIn = this->template makeappend<TypeIn>(this);
-			mControls = this->template makeappend<NumberControls>(std::bind(&NumberInput<T>::increment, this), std::bind(&NumberInput<T>::decrement, this));
+			mPlus = this->template makeappend<Button>("+", nullptr, std::bind(&NumberInput<T>::increment, this));
+			mMinus = this->template makeappend<Button>("-", nullptr, std::bind(&NumberInput<T>::decrement, this));
 
 			if(typecls<T>() == typecls<float>() || typecls<T>() == typecls<double>())
 				mTypeIn->setAllowedChars("1234567890.");
@@ -129,19 +118,23 @@ namespace mk
 		{
 			this->mValue->template set<T>(this->mValue->template get<T>() + mStep);
 			mTypeIn->updateString();
-			this->notifyUpdate();
+			this->updateValue();
 		}
 
 		void decrement()
 		{
 			this->mValue->template set<T>(this->mValue->template get<T>() - mStep);
 			mTypeIn->updateString();
-			this->notifyUpdate();
+			this->updateValue();
 		}
+
+		using Typed<NumberInput<T>, WValue>::cls;
+		using Styled<NumberInput<T>>::styleCls;
 
 	protected:
 		TypeIn* mTypeIn;
-		NumberControls* mControls;
+		Button* mPlus;
+		Button* mMinus;
 		T mStep;
 	};
 

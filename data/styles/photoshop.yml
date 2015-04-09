@@ -1,0 +1,9 @@
+Background :
+    background_colour : 0.325,0.325,0.325,1.0
+    
+Label :
+    text_colour : 1.0,1.0,1.0,1.0
+    skin_padding : 4.0,4.0
+
+Window :
+    inherit_skin : Background

@@ -14,13 +14,15 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT RadioChoice : public WrapButton, public Styled<RadioChoice>
+	class MK_UI_EXPORT RadioChoice : public WrapButton, public Typed<RadioChoice, Sheet>, public Styled<RadioChoice>
 	{
 	public:
 		RadioChoice(Widget* content, const Trigger& trigger);
+
+		using Typed<RadioChoice, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT RadioSwitch : public Sheet, public Styled<RadioSwitch>
+	class MK_UI_EXPORT RadioSwitch : public Sheet, public Typed<RadioSwitch, Sheet>, public Styled<RadioSwitch>
 	{
 	public:
 		RadioSwitch(const Trigger& onSelected, size_t active, StringVector labels = StringVector());
@@ -31,6 +33,8 @@ namespace mk
 		WrapButton* active() { return mActive; }
 
 		void activated(WrapButton* button);
+
+		using Typed<RadioSwitch, Sheet>::cls;
 
 	protected:
 		Trigger mOnSelected;

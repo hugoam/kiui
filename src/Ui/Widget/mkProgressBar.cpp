@@ -16,11 +16,11 @@
 
 namespace mk
 {
-	ProgressFillerX::ProgressFillerX()
+	FillerX::FillerX()
 		: Widget(styleCls())
 	{}
 
-	ProgressFillerY::ProgressFillerY()
+	FillerY::FillerY()
 		: Widget(styleCls())
 	{}
 
@@ -32,12 +32,12 @@ namespace mk
 	{
 		if(mDim == DIM_X)
 		{
-			mFiller = this->makeappend<ProgressFillerX>();
+			mFiller = this->makeappend<FillerX>();
 			mSpacer = this->makeappend<SpacerX>();
 		}
 		else
 		{
-			mFiller = this->makeappend<ProgressFillerY>();
+			mFiller = this->makeappend<FillerY>();
 			mSpacer = this->makeappend<SpacerY>();
 		}
 	}

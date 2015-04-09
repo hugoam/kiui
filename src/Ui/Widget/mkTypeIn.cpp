@@ -48,13 +48,13 @@ namespace mk
 		}
 	}
 
-	void TypeIn::activated()
+	void TypeIn::focused()
 	{
 		if(mCaret->frame()->hidden())
 			mCaret->show();
 	}
 
-	void TypeIn::deactivated()
+	void TypeIn::unfocused()
 	{
 		if(!mCaret->frame()->hidden())
 			mCaret->hide();
@@ -90,8 +90,8 @@ namespace mk
 	{
 		UNUSED(xPos); UNUSED(yPos);
 		mCaret->setIndex(mFrame->inkbox()->caretIndex(xPos - mFrame->dabsolute(DIM_X), yPos - mFrame->dabsolute(DIM_Y)));
-		if(!(mState & ACTIVATED))
-			this->activate();
+		if(!(mState & FOCUSED))
+			this->focus();
 		return true;
 	}
 
@@ -107,9 +107,8 @@ namespace mk
 		}
 		else if(code == KC_RETURN)
 		{
-			this->deactivate();
-			mInput->value()->setString(mString);
-			mInput->notifyUpdate();
+			this->unfocus();
+			mInput->setString(mString);
 		}
 		else if(code == KC_BACK)
 		{
@@ -123,8 +122,7 @@ namespace mk
 			this->insert(c);
 		}
 
-		mInput->value()->setString(mString);
-		mInput->notifyUpdate();
+		mInput->setString(mString);
 		this->markDirty();
 		
 		return true;
@@ -137,13 +135,4 @@ namespace mk
 	Textbox::Textbox(const string& text)
 		: TypeIn(nullptr)
 	{}
-
-	NumberControls::NumberControls(const Trigger& plus, Trigger minus)
-		: Sheet(styleCls())
-		, mPlusTrigger(plus)
-		, mMinusTrigger(minus)
-	{
-		mPlus = this->makeappend<Button>("+", nullptr, mPlusTrigger);
-		mMinus = this->makeappend<Button>("-", nullptr, mMinusTrigger);
-	}
 }

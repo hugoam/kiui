@@ -18,35 +18,48 @@ using namespace std::placeholders;
 
 namespace mk
 {
-	WValue::WValue(Lref& value, Style* style, bool edit)
-		: Sheet(style)
-		, mValue(value)
+	Value::Value(Lref& value, bool edit)
+		: mValue(value)
 		, mUpdate(0)
 		, mEdit(edit)
 	{}
 
-	WValue::WValue(Lref&& value, Style* style, bool edit)
-		: Sheet(style ? style : styleCls())
-		, mCopy(value)
+	Value::Value(Lref&& value, bool edit)
+		: mCopy(value)
 		, mValue(mCopy)
 		, mUpdate(0)
 		, mEdit(edit)
 	{}
 
-	void WValue::updateValue()
+	void Value::updateValue()
 	{
 		++mUpdate;
-		this->markDirty();
-		//this->updated();
+		this->notifyUpdate();
 	}
 
-	string WValue::getString()
+	string Value::getString()
 	{
 		return mValue->getString();
 	}
 
-	void WValue::setString(const string& value)
+	void Value::setString(const string& value)
 	{
 		mValue->setString(value);
+		this->updateValue();
+	}
+
+	WValue::WValue(Lref& value, Style* style, bool edit)
+		: Sheet(style)
+		, Value(value, edit)
+	{}
+
+	WValue::WValue(Lref&& value, Style* style, bool edit)
+		: Sheet(style ? style : styleCls())
+		, Value(std::move(value), edit)
+	{}
+
+	void WValue::notifyUpdate()
+	{
+		this->markDirty();
 	}
 }

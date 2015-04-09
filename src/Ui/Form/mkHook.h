@@ -9,14 +9,15 @@
 #include <Object/mkTyped.h>
 #include <Object/mkObjectForward.h>
 #include <Ui/Form/mkForm.h>
+#include <Ui/Widget/mkButton.h>
 
 namespace mk
 {
 	class MK_UI_EXPORT _I_ Hook : public Form
 	{
 	public:
-		Hook(Object* object, Type* type, Style* style = nullptr, const string& label = "", const string& image = "");//, const Trigger& trigger = nullptr);
-		Hook(TypeObject* object, Style* style = nullptr, const string& label = "", const string& image = "");//, const Trigger& trigger = nullptr);
+		Hook(Object* object, Type* type, Style* style = nullptr, const string& label = "", const string& image = "", const Button::Trigger& trigger = nullptr);
+		Hook(TypeObject* object, Style* style = nullptr, const string& label = "", const string& image = "", const Button::Trigger& trigger = nullptr);
 
 		Object* object() { return mObject; }
 		Type* objectType() { return mObjectType; }

@@ -13,20 +13,20 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT ProgressFillerX : public Widget, public Typed<ProgressFillerX>, public Styled<ProgressFillerX>
+	class MK_UI_EXPORT FillerX : public Widget, public Typed<FillerX, Widget>, public Styled<FillerX>
 	{
 	public:
-		ProgressFillerX();
+		FillerX();
 
-		using Typed<ProgressFillerX>::cls;
+		using Typed<FillerX, Widget>::cls;
 	};
 
-	class MK_UI_EXPORT ProgressFillerY : public Widget, public Typed<ProgressFillerY>, public Styled<ProgressFillerY>
+	class MK_UI_EXPORT FillerY : public Widget, public Typed<FillerY, Widget>, public Styled<FillerY>
 	{
 	public:
-		ProgressFillerY();
+		FillerY();
 
-		using Typed<ProgressFillerY>::cls;
+		using Typed<FillerY, Widget>::cls;
 	};
 
 	class MK_UI_EXPORT ProgressBar : public Sheet
@@ -47,16 +47,20 @@ namespace mk
 		Trigger mOnUpdated;
 	};
 
-	class MK_UI_EXPORT ProgressBarX : public ProgressBar, public Styled<ProgressBarX>
+	class MK_UI_EXPORT ProgressBarX : public ProgressBar, public Typed<ProgressBarX, Sheet>, public Styled<ProgressBarX>
 	{
 	public:
 		ProgressBarX();
+
+		using Typed<ProgressBarX, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT ProgressBarY : public ProgressBar, public Styled<ProgressBarY>
+	class MK_UI_EXPORT ProgressBarY : public ProgressBar, public Typed<ProgressBarY, Sheet>, public Styled<ProgressBarY>
 	{
 	public:
 		ProgressBarY();
+
+		using Typed<ProgressBarY, Sheet>::cls;
 	};
 }
 

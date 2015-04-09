@@ -19,8 +19,8 @@ namespace mk
 {
 	Stripe::Stripe(Widget* widget)
 		: Frame(widget)
-		, d_depth(d_style->d_layoutDim == DIM_X ? DIM_Y : DIM_X)
-		, d_length(d_style->d_layoutDim)
+		, d_depth(d_layout->d_layoutDim == DIM_X ? DIM_Y : DIM_X)
+		, d_length(d_layout->d_layoutDim)
 		, d_cursor(0.f)
 		, d_contents()
 		, d_sequence(d_contents)
@@ -29,7 +29,7 @@ namespace mk
 		, d_relayout(true)
 		, d_weights()
 	{
-		if(d_style->d_weights.size() > 0)
+		if(d_layout->d_weights.size() > 0)
 			this->initWeights();
 	}
 
@@ -108,7 +108,7 @@ namespace mk
 
 		for(Frame* frame : d_sequence)
 			if(!frame->dexpand(d_length) && !frame->hidden())
-				d_sequenceLength += frame->doffset(d_length) + (frame == d_contents[d_sequence.size()-1]/*d_sequence.back()*/ ? 0.f : d_style->d_spacing[d_length]);
+				d_sequenceLength += this->offset(frame);
 
 		this->updateLength();
 	}
@@ -127,13 +127,13 @@ namespace mk
 	void Stripe::updateLength()
 	{
 		if(dshrink(d_length))// || dwrap(d_length))
-			this->setSizeDim(d_length, d_sequenceLength + d_style->d_padding[d_length] + d_style->d_padding[d_length+2]);
+			this->setSizeDim(d_length, d_sequenceLength + d_layout->d_padding[d_length] + d_layout->d_padding[d_length+2]);
 	}
 
 	void Stripe::updateDepth()
 	{
 		if(dshrink(d_depth)) // || dwrap(d_depth))
-			this->setSizeDim(d_depth, d_maxDepth + d_style->d_padding[d_depth] + d_style->d_padding[d_depth+2]);
+			this->setSizeDim(d_depth, d_maxDepth + d_layout->d_padding[d_depth] + d_layout->d_padding[d_depth+2]);
 	}
 
 	void Stripe::expandDepth()
@@ -166,9 +166,9 @@ namespace mk
 
 		this->normalizeSpan();
 
-		if(d_style->d_weight == LIST && d_weights && d_weights->size() > 0)
+		if(d_layout->d_weight == LIST && d_weights && d_weights->size() > 0)
 			this->dispatchWeights();
-		else if(d_style->d_weight == TABLE)
+		else if(d_layout->d_weight == TABLE)
 			this->dispatchTableWeights();
 
 		this->expandDepth();
@@ -190,14 +190,14 @@ namespace mk
 
 	void Stripe::positionSequence()
 	{
-		float offset = -d_cursor + d_style->d_padding[d_length];
+		float offset = -d_cursor + d_layout->d_padding[d_length];
 
 		Frame* prev = nullptr;
 		for(Frame* frame : d_sequence)
 			if(!frame->hidden())
 			{
-				frame->setPositionDim(d_length, !prev ? offset : prev->dposition(d_length) + prev->dsize(d_length) + d_style->d_spacing[d_length]);
-				frame->setPositionDim(d_depth, d_style->d_padding[d_depth] + frame->dmargin(d_depth) / 2);
+				frame->setPositionDim(d_length, !prev ? offset : prev->dposition(d_length) + prev->dsize(d_length) + d_layout->d_spacing[d_length]);
+				frame->setPositionDim(d_depth, d_layout->d_padding[d_depth] + frame->dmargin(d_depth) / 2);
 				prev = frame;
 			}
 	}
@@ -205,7 +205,7 @@ namespace mk
 	void Stripe::initWeights()
 	{
 		d_weights = make_unique<std::vector<float>>();
-		*d_weights = d_style->d_weights;
+		*d_weights = d_layout->d_weights;
 	}
 
 	void Stripe::dispatchWeights()
@@ -238,9 +238,16 @@ namespace mk
 		Frame::nextFrame(tick, delta);
 	}
 
+	void Stripe::updateStyle(Style* style)
+	{
+		Frame::updateStyle(style);
+		this->updateLength();
+		this->updateDepth();
+	}
+
 	void Stripe::deepRelayout()
 	{
-		this->markRelayout();
+		d_relayout = true;
 
 		for(Frame* frame : d_contents)
 			if(frame->frameType() >= STRIPE)
@@ -275,7 +282,7 @@ namespace mk
 	void Stripe::flowShown(Frame* child)
 	{
 		if(d_sequence.size() > 1)
-			d_sequenceLength += d_style->d_spacing[d_length];
+			d_sequenceLength += d_layout->d_spacing[d_length];
 
 		if(!child->dexpand(d_length))
 			this->flowSizedLength(child, child->doffset(d_length));
@@ -287,7 +294,7 @@ namespace mk
 	void Stripe::flowHidden(Frame* child)
 	{
 		if(d_sequence.size() > 1)
-			d_sequenceLength -= d_style->d_spacing[d_length];
+			d_sequenceLength -= d_layout->d_spacing[d_length];
 
 		if(!child->dexpand(d_length))
 			this->flowSizedLength(child, -child->doffset(d_length));
@@ -368,19 +375,50 @@ namespace mk
 				frame->setSpanDimDirect(d_length, (1.f / span) * frame->dspan(d_length));
 	}
 
-	float Stripe::firstVisible()
+	bool Stripe::nextOffset(Dimension dim, float& pos, float seuil)
 	{
-		// Find first whole frame : broken because we only account for first level of children
+		if(d_length != dim)
+			return Frame::nextOffset(dim, pos, seuil);
 
-		float pos = 0.f;
+		pos += d_parent->offset(this);
+
+		if(pos < seuil)
+			return false;
+
+		pos -= d_parent->offset(this);
 		for(Frame* frame : d_sequence)
-		{
-			if(pos >= d_cursor)
-				break;
+			if(frame->nextOffset(dim, pos, seuil))
+				return true;
 
-			pos += frame->doffset(d_length);
-		}
+		return Frame::nextOffset(dim, pos, seuil);
+	}
 
-		return -pos + d_style->d_padding[d_length];
+	bool Stripe::prevOffset(Dimension dim, float& pos, float seuil)
+	{
+		if(d_length != dim)
+			return Frame::prevOffset(dim, pos, seuil);
+
+		if(pos + d_parent->offset(this) >= seuil)
+			for(Frame* frame : d_sequence)
+				if(frame->prevOffset(dim, pos, seuil))
+					return true;
+
+		return Frame::prevOffset(dim, pos, seuil);
+	}
+
+	void Stripe::cursorUp()
+	{
+		float pos = 0.f;
+		this->prevOffset(d_length, pos, d_cursor);
+		d_cursor = std::max(0.f, pos);
+		d_relayout = true;
+	}
+
+	void Stripe::cursorDown()
+	{
+		float pos = 0.f;
+		this->nextOffset(d_length, pos, d_cursor);
+		d_cursor = std::min(d_sequenceLength - d_clipSize[DIM_Y], pos);
+		d_relayout = true;
 	}
 }

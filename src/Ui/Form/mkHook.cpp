@@ -9,18 +9,18 @@
 
 namespace mk
 {
-	Hook::Hook(Object* object, Type* type, Style* style, const string& label, const string& image)//, const Trigger& trigger)
-		: Form(style, make_unique<Sheet>(style))
+	Hook::Hook(Object* object, Type* type, Style* style, const string& label, const string& image, const Button::Trigger& trigger)
+		: Form(make_unique<Sheet>(style))
 		, mObject(object)
 		, mObjectType(type)
 	{
 		if(!label.empty())
-			mSheet->emplace<Button>(label);
+			mSheet->emplace<Button>(label, nullptr, trigger);
 		else if(!image.empty())
-			mSheet->emplace<ImgButton>(image);
+			mSheet->emplace<ImgButton>(image, trigger);
 	}
 
-	Hook::Hook(TypeObject* object, Style* style, const string& label, const string& image) //, const Trigger& trigger)
-		: Hook(object, object->type(), style, label, image)//, trigger)
+	Hook::Hook(TypeObject* object, Style* style, const string& label, const string& image, const Button::Trigger& trigger)
+		: Hook(object, object->type(), style, label, image, trigger)
 	{}
 }

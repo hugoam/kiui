@@ -12,13 +12,15 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT Textbox : public Widget, public Styled<Textbox>
+	class MK_UI_EXPORT Textbox : public Widget, public Typed<Textbox, Widget>, public Styled<Textbox>
 	{
 	public:
 		Textbox(Lref& value);
 		Textbox(const string& text);
 
 		bool leftClick(float xPos, float yPos);
+
+		using Typed<Textbox, Widget>::cls;
 
 	protected:
 		Lref mLref;

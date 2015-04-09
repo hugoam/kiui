@@ -18,7 +18,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Sheet : public Widget
+	class MK_UI_EXPORT _I_ Sheet : public Widget, public Typed<Sheet>
 	{
 	public:
 		Sheet(Style* style, FrameType frameType = STRIPE);
@@ -30,11 +30,10 @@ namespace mk
 		inline const std::vector<unique_ptr<Widget>>& contents() { return mContents; }
 		inline size_t count() { return mContents.size(); }
 
+		inline Widget* at(size_t index) { return mContents.at(index).get(); }
+
 		void bind(Sheet* parent, size_t index);
 		void rebind(Sheet* parent, size_t index);
-
-		virtual Widget* vbind(Widget* widget) { return widget; }
-		virtual Widget* vunbind(Widget* widget) { return widget; }
 
 		virtual Widget* vappend(unique_ptr<Widget> widget) { return append(std::move(widget)); }
 		virtual unique_ptr<Widget> vrelease(Widget* widget) { return widget->unbind(); }
@@ -43,7 +42,6 @@ namespace mk
 		Widget* append(unique_ptr<Widget> widget);
 		unique_ptr<Widget> release(Widget* widget);
 		unique_ptr<Widget> release(size_t index);
-		Widget* at(size_t index) { return mContents.at(index).get(); }
 
 		void clear();
 
@@ -54,6 +52,8 @@ namespace mk
 		{
 			return this->vappend(make_unique<T>(std::forward<Args>(args)...))->template as<T>();
 		}
+
+		using Typed<Sheet>::cls;
 
 	protected:
 		template <class T, class... Args>
@@ -109,7 +109,7 @@ namespace mk
 		Style* mHoverCursor;
 	};
 
-	class MK_UI_EXPORT _I_ Cursor : public Widget, public Typed<Cursor>, public Styled<Cursor>
+	class MK_UI_EXPORT _I_ Cursor : public Widget, public Typed<Cursor, Widget>, public Styled<Cursor>
 	{
 	public:
 		Cursor(RootSheet* rootSheet);
@@ -125,7 +125,7 @@ namespace mk
 		void tooltipOn();
 		void tooltipOff();
 
-		using Typed<Cursor>::cls;
+		using Typed<Cursor, Widget>::cls;
 
 	protected:
 		bool mDirty;
@@ -152,7 +152,7 @@ namespace mk
 	class MK_UI_EXPORT CaretCursor : public Object, public Typed<CaretCursor>, public Styled<CaretCursor>
 	{};
 
-	class MK_UI_EXPORT _I_ Caret : public Widget, public Typed<Caret>, public Styled<Caret>
+	class MK_UI_EXPORT _I_ Caret : public Widget, public Typed<Caret, Widget>, public Styled<Caret>
 	{
 	public:
 		Caret(Frame* textFrame);
@@ -163,7 +163,7 @@ namespace mk
 
 		void nextFrame(size_t tick, size_t delta);
 
-		using Typed<Caret>::cls;
+		using Typed<Caret, Widget>::cls;
 
 	protected:
 		Frame* mTextFrame;
@@ -171,7 +171,7 @@ namespace mk
 		bool mDirty;
 	};
 
-	class MK_UI_EXPORT _I_ Tooltip : public Widget, public Typed<Tooltip>, public Styled<Tooltip>
+	class MK_UI_EXPORT _I_ Tooltip : public Widget, public Typed<Tooltip, Widget>, public Styled<Tooltip>
 	{
 	public:
 		Tooltip(const string& label);
@@ -181,7 +181,7 @@ namespace mk
 
 		void setLabel(const string& label);
 
-		using Typed<Tooltip>::cls;
+		using Typed<Tooltip, Widget>::cls;
 
 	protected:
 		string mLabel;

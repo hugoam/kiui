@@ -22,11 +22,9 @@ namespace mk
 	{
 	public:
 		Uibox(LayoutStyle* style);
-		Uibox();
 		~Uibox();
 
-		LayoutStyle* style() { return d_style; }
-		void setStyle(LayoutStyle* style);
+		LayoutStyle* layout() { return d_layout; }
 
 		inline DimFloat position() { return d_position; }
 
@@ -35,13 +33,11 @@ namespace mk
 		inline bool dexpand(Dimension dim) { return d_sizing[dim] >= EXPAND; }
 		inline bool dshrink(Dimension dim) { return d_sizing[dim] == SHRINK; }
 		inline bool dfixed(Dimension dim) { return d_sizing[dim] == FIXED; }
-		inline float dmargin(Dimension dim) { return d_style->d_margin[dim]; }
+		inline float dmargin(Dimension dim) { return d_layout->d_margin[dim]; }
 		inline float dspan(Dimension dim) { return d_span[dim]; }
 
-		inline float doffset(Dimension dim) { return dsize(dim) + dmargin(dim); }
-
-		inline bool flow() { return d_style->d_flow == FLOW; }
-		inline bool clip() { return d_style->d_clipping == CLIP; }
+		inline bool flow() { return d_layout->d_flow == FLOW; }
+		inline bool clip() { return d_layout->d_clipping == CLIP; }
 		inline bool opaque() { return d_opacity == OPAQUE; }
 
 		inline void setOpacity(Opacity opacity) { d_opacity = opacity; }
@@ -52,7 +48,7 @@ namespace mk
 		DimFloat d_span;
 		DimSizing d_sizing;
 		Opacity d_opacity;
-		LayoutStyle* d_style;
+		LayoutStyle* d_layout;
 	};
 }
 

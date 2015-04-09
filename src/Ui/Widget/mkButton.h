@@ -12,7 +12,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT Label : public Widget, public Styled<Label>
+	class MK_UI_EXPORT Label : public Widget, public Typed<Label, Widget>, public Styled<Label>
 	{
 	public:
 		Label(const string& label, Style* style = nullptr, FrameType frameType = FRAME);
@@ -22,19 +22,22 @@ namespace mk
 
 		void setLabel(const string& label);
 
+		using Typed<Label, Widget>::cls;
+
 	protected:
 		string mLabel;
 	};
 
-	class MK_UI_EXPORT Title : public Label, public Styled<Title>
+	class MK_UI_EXPORT Title : public Label, public Typed<Title, Widget>, public Styled<Title>
 	{
 	public:
 		Title(const string& label);
 
+		using Typed<Title, Widget>::cls;
 		using Styled<Title>::styleCls;
 	};
 
-	class MK_UI_EXPORT Icon :public Widget, public Styled<Icon>
+	class MK_UI_EXPORT Icon : public Widget, public Typed<Icon, Widget>, public Styled<Icon>
 	{
 	public:
 		Icon(const string& image, Style* style = nullptr);
@@ -42,6 +45,8 @@ namespace mk
 		const string& image() { return mImage; }
 
 		void setImage(const string& image);
+
+		using Typed<Icon, Widget>::cls;
 
 	protected:
 		string mImage;
@@ -88,7 +93,7 @@ namespace mk
 		Trigger mTriggerCtrl;
 	};
 
-	class MK_UI_EXPORT Button : public Widget, public WidgetTrigger<Button>, public Styled<Button>
+	class MK_UI_EXPORT Button : public Widget, public WidgetTrigger<Button>, public Typed<Button, Widget>, public Styled<Button>
 	{
 	public:
 		typedef WidgetTrigger<Button>::Trigger Trigger;
@@ -97,16 +102,20 @@ namespace mk
 		Button(const string& label, Style* style = nullptr, const Trigger& trigger = Trigger());
 
 		const string& label() { return mLabel; }
+		const string& tooltip() { return mTooltip; }
 
 		bool leftPressed(float x, float y);
 		bool leftClick(float x, float y);
 		bool rightClick(float x, float y);
 
+		using Typed<Button, Widget>::cls;
+
 	protected:
 		string mLabel;
+		string mTooltip;
 	};
 
-	class MK_UI_EXPORT ImgButton : public Button, public Styled<ImgButton>
+	class MK_UI_EXPORT ImgButton : public Button, public Typed<ImgButton, Button>, public Styled<ImgButton>
 	{
 	public:
 		typedef WidgetTrigger<Button>::Trigger Trigger;
@@ -115,11 +124,14 @@ namespace mk
 		ImgButton(const string& image, const Trigger& trigger = Trigger());
 
 		const string& image() { return mImage; }
+		const string& tooltip() { return mTooltip; }
 
+		using Typed<ImgButton, Button>::cls;
 		using Styled<ImgButton>::styleCls;
 
 	protected:
 		string mImage;
+		string mTooltip;
 	};
 
 	class MK_UI_EXPORT WrapButton : public Sheet, public WidgetTrigger<WrapButton>

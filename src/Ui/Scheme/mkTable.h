@@ -12,32 +12,32 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ TableHead : public GridSheet, public Typed<TableHead>, public Styled<TableHead>
+	class MK_UI_EXPORT _I_ TableHead : public GridSheet, public Typed<TableHead, Sheet>, public Styled<TableHead>
 	{
 	public:
 		TableHead();
 		
 		void gridResized(Widget* first, Widget* second);
 
-		using Typed<TableHead>::cls;
+		using Typed<TableHead, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT _I_ ColumnHeader : public Label, public Typed<ColumnHeader>, public Styled<ColumnHeader>
+	class MK_UI_EXPORT _I_ ColumnHeader : public Label, public Typed<ColumnHeader, Label>, public Styled<ColumnHeader>
 	{
 	public:
 		ColumnHeader(const string& label);
 
-		using Typed<ColumnHeader>::cls;
+		using Typed<ColumnHeader, Label>::cls;
 		using Styled<ColumnHeader>::styleCls;
 	};
 
-	class MK_UI_EXPORT _I_ Table : public Sheet, public Typed<Table>, public Styled<Table>
+	class MK_UI_EXPORT _I_ Table : public Sheet, public Typed<Table, Sheet>, public Styled<Table>
 	{
 	public:
 		Table(StringVector columns, std::vector<float> weights);
 		~Table();
 
-		using Typed<Table>::cls;
+		using Typed<Table, Sheet>::cls;
 
 	protected:
 		StringVector mColumns;

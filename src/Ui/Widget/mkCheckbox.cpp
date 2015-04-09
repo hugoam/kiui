@@ -29,12 +29,12 @@ namespace mk
 	void Checkbox::on()
 	{
 		mInput->value()->set<bool>(mOn);
-		mInput->notifyUpdate();
+		mInput->updateValue();
 	}
 
 	void Checkbox::off()
 	{
 		mInput->value()->set<bool>(mOn);
-		mInput->notifyUpdate();
+		mInput->updateValue();
 	}
 }

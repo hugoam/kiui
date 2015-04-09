@@ -20,46 +20,60 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT InputInt : public Sheet, public Styled<InputInt>
+	class MK_UI_EXPORT InputInt : public Sheet, public Typed<InputInt, Sheet>, public Styled<InputInt>
 	{
 	public:
 		InputInt(const string& label, int value, std::function<void(int)> callback = nullptr);
+
+		using Typed<InputInt, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT InputFloat : public Sheet, public Styled<InputFloat>
+	class MK_UI_EXPORT InputFloat : public Sheet, public Typed<InputFloat, Sheet>, public Styled<InputFloat>
 	{
 	public:
 		InputFloat(const string& label, float value, std::function<void(float)> callback = nullptr);
+
+		using Typed<InputFloat, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT InputBool : public Sheet, public Styled<InputBool>
+	class MK_UI_EXPORT InputBool : public Sheet, public Typed<InputBool, Sheet>, public Styled<InputBool>
 	{
 	public:
 		InputBool(const string& label, bool value, std::function<void(bool)> callback = nullptr);
+
+		using Typed<InputBool, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT InputText : public Sheet, public Styled<InputText>
+	class MK_UI_EXPORT InputText : public Sheet, public Typed<InputText, Sheet>, public Styled<InputText>
 	{
 	public:
 		InputText(const string& label, const string& text, std::function<void(string)> callback = nullptr, bool reverse = false);
+
+		using Typed<InputText, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT InputDropdown : public Sheet, public Styled<InputDropdown>
+	class MK_UI_EXPORT InputDropdown : public Sheet, public Typed<InputDropdown, Sheet>, public Styled<InputDropdown>
 	{
 	public:
 		InputDropdown(const string& label, StringVector choices, std::function<void(const string&)> callback = nullptr, bool reverse = false);
+
+		using Typed<InputDropdown, Sheet>::cls;
 	};
 	
-	class MK_UI_EXPORT SliderInt : public Sheet, public Styled<SliderInt>
+	class MK_UI_EXPORT SliderInt : public Sheet, public Typed<SliderInt, Sheet>, public Styled<SliderInt>
 	{
 	public:
 		SliderInt(const string& label, AutoStat<int> value, std::function<void(int)> callback = nullptr);
+
+		using Typed<SliderInt, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT SliderFloat : public Sheet, public Styled<SliderFloat>
+	class MK_UI_EXPORT SliderFloat : public Sheet, public Typed<SliderFloat, Sheet>, public Styled<SliderFloat>
 	{
 	public:
 		SliderFloat(const string& label, AutoStat<float> value, std::function<void(float)> callback = nullptr);
+
+		using Typed<SliderFloat, Sheet>::cls;
 	};
 }
 

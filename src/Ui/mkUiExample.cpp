@@ -15,7 +15,7 @@ namespace mk
 {
 	Dockspace* createUiTestDockspace(Sheet* root)
 	{
-		WMasterDockline::styleCls()->layout()->d_weights = { 0.2f, 0.6f, 0.2f };
+		MasterDockline::styleCls()->layout()->d_weights = { 0.2f, 0.6f, 0.2f };
 
 		Dockspace* dockspace = root->emplace<Dockspace>();
 
@@ -235,161 +235,15 @@ namespace mk
 	{
 		Window* window = parent->emplace<Window>("File Tree");
 		Tree* filetree = window->body()->emplace<Tree>();
-		filetree->emplace<DirectoryNode>("..", "..", false);
+		DirectoryNode* node = filetree->emplace<DirectoryNode>("..", "..", false);
+		node->update();
 		return window;
-	}
-
-	void declareImageSkin(Styler* styler, const string& name, Style* base, const string& image)
-	{
-		styler->dynamicStyle(name);
-		styler->fetchStyle(name)->inheritLayout(base);
-		styler->fetchStyle(name)->skin()->mImage = image + ".png";
-		styler->fetchStyle(name)->skin()->mEmpty = false;
-		styler->fetchStyle(name)->decline(HOVERED)->mImage = image + "_hovered.png";
-		styler->fetchStyle(name)->decline(PRESSED)->mImage = image + "_pressed.png";
-		styler->fetchStyle(name)->decline(ACTIVATED)->mImage = image + "_activated.png";
-	}
-
-	void declareStretchSkin(Styler* styler, const string& name, Style* base, const string& image, int a, int b, int c, int d, int e, int f, bool interact = false)
-	{
-		styler->dynamicStyle(name);
-		styler->fetchStyle(name)->inheritLayout(base);
-		styler->fetchStyle(name)->skin()->mImageSkin = ImageSkin(image + ".png", a, b, c, d, e, f);
-		styler->fetchStyle(name)->skin()->mEmpty = false;
-		if(interact)
-		{
-			styler->fetchStyle(name)->decline(HOVERED)->mImageSkin = ImageSkin(image + "_hovered.png", a, b, c, d, e, f);
-			styler->fetchStyle(name)->decline(PRESSED)->mImageSkin = ImageSkin(image + "_pressed.png", a, b, c, d, e, f);
-			styler->fetchStyle(name)->decline(ACTIVATED)->mImageSkin = ImageSkin(image + "_activated.png", a, b, c, d, e, f);
-		}
-	}
-
-	Sheet* createUiTestCeguiImageSkin(Sheet* parent)
-	{
-		Styler* styler = parent->uiWindow()->styler();
-
-		styler->dynamicStyle("tlook_window");
-		styler->fetchStyle("tlook_window")->inheritLayout(Window::styleCls());
-
-		declareStretchSkin(styler, "tlook_windowheader", WindowHeader::styleCls(), "tlook_windowheader", 15, 15, 34, 2, 53, 15);
-		styler->fetchStyle("tlook_windowheader")->layout()->d_sizing[DIM_Y] = FIXED;
-		styler->fetchStyle("tlook_windowheader")->layout()->d_size[DIM_Y] = 30.f;
-
-		declareStretchSkin(styler, "tlook_windowbody", WindowBody::styleCls(), "tlook_windowbody", 16, 16, 16, 16, 16, 16);
-		styler->fetchStyle("tlook_windowbody")->layout()->d_padding = BoxFloat(20.f, 10.f, 10.f, 10.f);
-		styler->fetchStyle("tlook_windowbody")->skin()->mMargin = BoxFloat(10.f, -5.f, 5.f, 0.f);
-
-		styler->dynamicStyle("tlook_button");
-		styler->fetchStyle("tlook_button")->skin()->mTextColour = Colour::White;
-		styler->fetchStyle("tlook_button")->skin()->mPadding = DimFloat(20.f, 8.f);
-		declareStretchSkin(styler, "tlook_button", Button::styleCls(), "tlook_button", 14, 6, 52, 20, 14, 6, true);
-
-		declareImageSkin(styler, "tlook_checkbox", Checkbox::styleCls(), "tlook_checkbox");
-
-		declareImageSkin(styler, "tlook_scrollup", ScrollUp::styleCls(), "tlook_arrow_up");
-		declareImageSkin(styler, "tlook_scrolldown", ScrollDown::styleCls(), "tlook_arrow_down");
-		declareStretchSkin(styler, "tlook_scrollerknoby", ScrollerKnobY::styleCls(), "tlook_scrollerknoby", 7, 11, 2, 22, 5, 11, true);
-		styler->fetchStyle("tlook_scrollerknoby")->layout()->d_sizing[DIM_X] = FIXED;
-		styler->fetchStyle("tlook_scrollerknoby")->layout()->d_size[DIM_X] = 14.f;
-
-		styler->dynamicStyle("tlook_section");
-		styler->fetchStyle("tlook_section")->inheritLayout(PartitionX::styleCls());
-
-		styler->override(styler->fetchStyle("tlook_section"), Window::styleCls(), styler->fetchStyle("tlook_window"));
-		styler->override(styler->fetchStyle("tlook_section"), WindowHeader::styleCls(), styler->fetchStyle("tlook_windowheader"));
-		styler->override(styler->fetchStyle("tlook_section"), WindowBody::styleCls(), styler->fetchStyle("tlook_windowbody"));
-		styler->override(styler->fetchStyle("tlook_section"), Button::styleCls(), styler->fetchStyle("tlook_button"));
-		styler->override(styler->fetchStyle("tlook_section"), Checkbox::styleCls(), styler->fetchStyle("tlook_checkbox"));
-		styler->override(styler->fetchStyle("tlook_section"), ScrollerKnobY::styleCls(), styler->fetchStyle("tlook_scrollerknoby"));
-		styler->override(styler->fetchStyle("tlook_section"), ScrollUp::styleCls(), styler->fetchStyle("tlook_scrollup"));
-		styler->override(styler->fetchStyle("tlook_section"), ScrollDown::styleCls(), styler->fetchStyle("tlook_scrolldown"));
-
-		Sheet* overrider = parent->emplace<Sheet>(styler->fetchStyle("tlook_section"));
-		createUiTestWindow(overrider);
-
-		return overrider;
-	}
-
-	Sheet* createUiTestMyGuiImageSkin(Sheet* parent)
-	{
-		Styler* styler = parent->uiWindow()->styler();
-
-		styler->dynamicStyle("mygui_window");
-		styler->fetchStyle("mygui_window")->inheritLayout(Window::styleCls());
-
-		//declareStretchSkin(styler, "mygui_windowheader", WindowHeader::styleCls(), "mygui_windowheader", 7, 10, 52, 4, 9, 17);
-		declareStretchSkin(styler, "mygui_windowheader", WindowHeader::styleCls(), "mygui_windowheader_var", 7, 10, 29, 4, 32, 17);
-		styler->fetchStyle("mygui_windowheader")->layout()->d_sizing[DIM_Y] = FIXED;
-		styler->fetchStyle("mygui_windowheader")->layout()->d_size[DIM_Y] = 30.f;
-		styler->fetchStyle("mygui_windowheader")->layout()->d_padding = BoxFloat(10.f, 4.f, 10.f, 4.f);
-
-		declareStretchSkin(styler, "mygui_windowbody", WindowBody::styleCls(), "mygui_windowbody", 3, 3, 15, 14, 5, 5);
-		styler->fetchStyle("mygui_windowbody")->skin()->mMargin = BoxFloat(0.f, -3.f, 0.f, 0.f);
-
-		declareStretchSkin(styler, "mygui_frame", DivX::styleCls(), "mygui_frame", 3, 3, 15, 14, 5, 5);
-		styler->fetchStyle("mygui_frame")->layout()->d_padding = BoxFloat(4.f, 4.f, 4.f, 4.f);
-
-		styler->dynamicStyle("mygui_typein");
-		styler->fetchStyle("mygui_typein")->skin()->mTextColour = Colour::White;
-		styler->fetchStyle("mygui_typein")->skin()->mPadding = DimFloat(4.f, 4.f);
-		declareStretchSkin(styler, "mygui_typein", TypeIn::styleCls(), "mygui_editbox", 6, 6, 15, 12, 8, 8, true);
-		
-		styler->dynamicStyle("mygui_button");
-		styler->fetchStyle("mygui_button")->skin()->mTextColour = Colour::White;
-		styler->fetchStyle("mygui_button")->skin()->mPadding = DimFloat(8.f, 4.f);
-		declareStretchSkin(styler, "mygui_button", Button::styleCls(), "mygui_button", 6, 6, 15, 12, 8, 8, true);
-
-		//styler->dynamicStyle("mygui_checkbox")->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
-		declareImageSkin(styler, "mygui_checkbox", Control::styleCls(), "mygui_checkbox");
-		styler->fetchStyle("mygui_checkbox")->decline(static_cast<WidgetState>(ACTIVATED | HOVERED))->mImage = "mygui_checkbox_activated_hovered.png";
-		styler->fetchStyle("mygui_checkbox")->decline(static_cast<WidgetState>(ACTIVATED | PRESSED))->mImage = "mygui_checkbox_activated_pressed.png";
-
-		declareImageSkin(styler, "mygui_scrollup", ScrollUp::styleCls(), "mygui_arrow_up");
-		declareImageSkin(styler, "mygui_scrolldown", ScrollDown::styleCls(), "mygui_arrow_down");
-
-		declareImageSkin(styler, "mygui_closebutton", CloseButton::styleCls(), "mygui_closebutton");
-
-		declareImageSkin(styler, "mygui_sliderknoby", SliderKnobY::styleCls(), "mygui_sliderknoby");
-		declareImageSkin(styler, "mygui_sliderknobx", SliderKnobX::styleCls(), "mygui_sliderknobx");
-		styler->fetchStyle("mygui_sliderknobx")->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
-
-		declareStretchSkin(styler, "mygui_sliderx", SliderX::styleCls(), "mygui_sliderx_bis", 2, 1, 26, 17, 4, 3, true);
-		styler->fetchStyle("mygui_sliderx")->layout()->d_padding = BoxFloat(1.f, 1.f, 0.f, 0.f);
-
-		/*declareStretchSkin(styler, "mygui_sliderknobx", SliderKnobX::styleCls(), "mygui_sliderknobx", 2, 1, 2, 10, 3, 3, true);
-		styler->fetchStyle("mygui_sliderknobx")->layout()->d_sizing = DimSizing(EXPAND, FIXED);
-		styler->fetchStyle("mygui_sliderknobx")->layout()->d_size[DIM_Y] = 14.f;*/
-
-		declareStretchSkin(styler, "mygui_scrollerknoby", ScrollerKnobY::styleCls(), "mygui_scrollerknoby", 5, 2, 2, 13, 7, 4, true);
-
-		styler->dynamicStyle("mygui_section");
-		styler->fetchStyle("mygui_section")->inheritLayout(PartitionX::styleCls());
-
-		styler->override(styler->fetchStyle("mygui_section"), Window::styleCls(), styler->fetchStyle("mygui_window"));
-		styler->override(styler->fetchStyle("mygui_section"), WindowHeader::styleCls(), styler->fetchStyle("mygui_windowheader"));
-		styler->override(styler->fetchStyle("mygui_section"), WindowBody::styleCls(), styler->fetchStyle("mygui_windowbody"));
-		styler->override(styler->fetchStyle("mygui_section"), ExpandboxHeader::styleCls(), styler->fetchStyle("mygui_frame"));
-		styler->override(styler->fetchStyle("mygui_section"), TypeIn::styleCls(), styler->fetchStyle("mygui_typein"));
-		styler->override(styler->fetchStyle("mygui_section"), Dropdown::styleCls(), styler->fetchStyle("mygui_typein"));
-		styler->override(styler->fetchStyle("mygui_section"), Button::styleCls(), styler->fetchStyle("mygui_button"));
-		styler->override(styler->fetchStyle("mygui_section"), CloseButton::styleCls(), styler->fetchStyle("mygui_closebutton"));
-		styler->override(styler->fetchStyle("mygui_section"), Checkbox::styleCls(), styler->fetchStyle("mygui_checkbox"));
-		styler->override(styler->fetchStyle("mygui_section"), ScrollerKnobY::styleCls(), styler->fetchStyle("mygui_scrollerknoby"));
-		styler->override(styler->fetchStyle("mygui_section"), ScrollUp::styleCls(), styler->fetchStyle("mygui_scrollup"));
-		styler->override(styler->fetchStyle("mygui_section"), ScrollDown::styleCls(), styler->fetchStyle("mygui_scrolldown"));
-		styler->override(styler->fetchStyle("mygui_section"), SliderX::styleCls(), styler->fetchStyle("mygui_sliderx"));
-		styler->override(styler->fetchStyle("mygui_section"), SliderKnobX::styleCls(), styler->fetchStyle("mygui_sliderknobx"));
-
-		Sheet* overrider = parent->emplace<Sheet>(styler->fetchStyle("mygui_section"));
-		createUiTestWindow(overrider);
-
-		return overrider;
 	}
 
 	Sheet* createUiTestInlineControls(Sheet* parent)
 	{
-		Sheet* page = parent;
-		//Page* page = parent->emplace<Page>("Inline Controls");
+		//Sheet* page = parent;
+		Page* page = parent->emplace<Page>("Inline Controls");
 		// @bug 280X : page inside page doesn't work @todo
 
 		DivX* line;
@@ -659,6 +513,21 @@ namespace mk
 
 	}
 
+	void switchTheme(Sheet* sheet, Widget* selected)
+	{
+		const string name = selected->label();
+		mk::StyleParser parser(sheet->uiWindow()->styler());
+
+		if(name == "Blendish")
+			parser.loadStyleSheet("../Data/interface/styles/blendish.yml");
+		else if(name == "Blendish Dark")
+			parser.loadStyleSheet("../Data/interface/styles/blendish_dark.yml");
+		else if(name == "MyGui")
+			parser.loadStyleSheet("../Data/interface/styles/mygui.yml");
+		else if(name == "Default")
+			parser.loadDefaultStyle();
+	}
+
 	void pickSample(Sheet* sheet, Widget* selected)
 	{
 		const string name = selected->label();
@@ -676,10 +545,6 @@ namespace mk
 			createUiTestTree(sheet);
 		else if(name == "Controls")
 			createUiTestControls(sheet);
-		else if(name == "Skinned Window (Cegui)")
-			createUiTestCeguiImageSkin(sheet);
-		else if(name == "Skinned Window (MyGui)")
-			createUiTestMyGuiImageSkin(sheet);
 		else if(name == "File Browser")
 			createUiTestFileBrowser(sheet);
 		else if(name == "File Tree")
@@ -693,6 +558,9 @@ namespace mk
 		Header* demoheader = root->sheet()->emplace<Header>();
 		PartitionX* demobody = root->sheet()->emplace<PartitionX>();
 		demoheader->emplace<Label>("Pick a demo sample : ");
-		demoheader->emplace<Dropdown>(std::bind(&pickSample, demobody, std::placeholders::_1), StringVector({ "Dockspace", "Window", "Skinned Window (MyGui)", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" }));
+		demoheader->emplace<Dropdown>(std::bind(&pickSample, demobody, std::placeholders::_1), StringVector({ "Dockspace", "Window", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" }));
+		demoheader->emplace<Label>("Switch theme : ");
+		Dropdown* dropdown = demoheader->emplace<Dropdown>(std::bind(&switchTheme, demobody, std::placeholders::_1), StringVector({ "Blendish", "Blendish Dark", "MyGui", "Default" }));
+		dropdown->frame()->setSpanDim(DIM_X, 0.3f);
 	}
 }

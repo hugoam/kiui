@@ -19,23 +19,17 @@ namespace mk
 {
 	Lref Form::sNullString = lref(string(""));
 
-	Form::Form(Style* style, unique_ptr<Sheet> sheet)
+	Form::Form(unique_ptr<Sheet> sheet)
 		: TypeObject(Form::cls())
 		, mParent(nullptr)
 		, mIndex(0)
-		, mStyle(style)
-		, mLabel()
-		//, mUpdated(0)
-		, mSheet(std::move(sheet))
-		, mWidget(mSheet.get())
+		, mUniqueSheet(std::move(sheet))
+		, mSheet(mUniqueSheet.get())
+		, mContainer(mUniqueSheet.get())
 	{}
 
 	Form::~Form()
 	{}
-
-	void Form::setStyle(Style* style) { mStyle = style; /*mUpdated = this->rootForm()->lastTick();*/ }
-
-	void Form::setLabel(const string& label) { mLabel = label; /*mUpdated = this->rootForm()->lastTick();*/ }
 
 	RootForm* Form::rootForm()
 	{
@@ -52,18 +46,26 @@ namespace mk
 		return rootForm()->uiWindow();
 	}
 
+	const string& Form::name()
+	{
+		return mSheet->name();
+	}
+
 	void Form::bind(Form* parent)
 	{
 		mParent = parent;
-		mParent->sheet()->vbind(mWidget);
-
-		for(auto& form : mContents)
-			form->bind(this);
+		mParent->container()->vappend(std::move(mUniqueSheet));
 	}
 
+	void Form::unbind()
+	{
+		mUniqueSheet.reset(mParent->container()->vrelease(mSheet).release()->as<Sheet>());
+		mParent = nullptr;
+	}
+	
 	void Form::destroy()
 	{
-		mParent->sheet()->vunbind(mWidget);
+		mParent->container()->vrelease(mSheet);
 		mParent->remove(mIndex);
 	}
 
@@ -74,9 +76,7 @@ namespace mk
 		form->mParent = this;
 		mContents.emplace(mContents.begin() + index, std::move(pt));
 		this->reindex(index);
-
-		if(mWidget)
-			form->bind(this);
+		form->bind(this);
 
 		return form;
 	}
@@ -88,8 +88,8 @@ namespace mk
 
 	unique_ptr<Form> Form::release(size_t pos)
 	{
-		if(mContents.at(pos)->widget())
-			mContents.at(pos)->widget()->detach();
+		//if(mContents.at(pos)->widget())
+		//	mContents.at(pos)->widget()->detach();
 
 		unique_ptr<Form> pointer = std::move(mContents[pos]);
 		mContents.erase(mContents.begin() + pos);
@@ -127,14 +127,13 @@ namespace mk
 		std::swap(mContents[from], mContents[to]);
 		this->reindex(from < to ? from : to);
 
-		if(mWidget)
-			mWidget->frame()->as<Stripe>()->move(from, to);
+		mSheet->stripe()->move(from, to);
 	}
 
 	void Form::clear()
 	{
 		for(auto& form : reverse_adapt(mContents))
-			mSheet->vunbind(form->widget());
+			mContainer->vrelease(form->sheet());
 		mContents.clear();
 	}
 
@@ -145,12 +144,12 @@ namespace mk
 
 	Form* Form::prev()
 	{
-		return mParent->child(mIndex - 1);
+		return mParent->at(mIndex - 1);
 	}
 
 	Form* Form::next()
 	{
-		return mParent->child(mIndex + 1);
+		return mParent->at(mIndex + 1);
 	}
 
 	bool Form::contains(Form* form)
@@ -179,24 +178,26 @@ namespace mk
 			string id = search.substr(0, pos);
 			string subsearch = search.substr(pos + 1);
 
-			Form* next = this->child(fromString<size_t>(id));
+			Form* next = this->at(fromString<size_t>(id));
 
 			return next->find(subsearch);
 		}
 		else
 		{
-			return this->child(fromString<size_t>(search));
+			return this->at(fromString<size_t>(search));
 		}
 	}
 
 	void Form::reset(unique_ptr<Sheet> sheet)
 	{
 		for(auto& form : mContents)
-			mSheet->vunbind(form->widget());
+			form->unbind();
 
-		mSheet = std::move(sheet);
+		mUniqueSheet = std::move(sheet);
+		mSheet = mUniqueSheet.get();
+		mContainer = mUniqueSheet.get();
 
 		for(auto& form : mContents)
-			mSheet->vbind(form->widget());
+			form->bind(this);
 	}
 }

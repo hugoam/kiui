@@ -96,6 +96,8 @@ namespace mk
 #endif
 		Dim() : Dim(T(), T()) {}
 
+		bool null() { return d_values[0] == T() && d_values[1] == T(); }
+
 		T operator [](size_t i) const { return d_values[i]; }
 		T& operator [](size_t i) { return d_values[i]; }
 
@@ -126,10 +128,10 @@ namespace mk
 #endif
 		BoxFloat(int x, int y, int z, int w) : BoxFloat(float(x), float(y), float(z), float(w)) {}
 		BoxFloat(float uniform) : BoxFloat(uniform, uniform, uniform, uniform) {}
-		BoxFloat() : BoxFloat(0.f) {}
+		BoxFloat() : BoxFloat(0.f) { d_null = true; }
 
 		float operator [](size_t i) const { return d_values[i]; }
-		float& operator [](size_t i) { return d_values[i]; }
+		float& operator [](size_t i) { d_null = false; return d_values[i]; }
 
 		_A_ _M_ float x() { return d_values[0]; }
 		_A_ _M_ float y() { return d_values[1]; }
@@ -139,10 +141,10 @@ namespace mk
 		bool uniform() { return d_uniform; }
 		bool null() { return d_null; }
 
-		void setX(float x) { d_values[0] = x; }
-		void setY(float y) { d_values[1] = y; }
-		void setZ(float z) { d_values[2] = z; }
-		void setW(float w) { d_values[3] = w; }
+		void setX(float x) { d_values[0] = x; d_null = false; }
+		void setY(float y) { d_values[1] = y; d_null = false; }
+		void setZ(float z) { d_values[2] = z; d_null = false; }
+		void setW(float w) { d_values[3] = w; d_null = false; }
 
 	protected:
 		std::array<float, 4> d_values;

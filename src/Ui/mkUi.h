@@ -23,8 +23,6 @@ namespace mk
 	MK_UI_EXPORT Window* createUiTestWindow(Sheet* parent);
 	MK_UI_EXPORT Sheet* createUiTestFileBrowser(Sheet* parent);
 	MK_UI_EXPORT Sheet* createUiTestFileTree(Sheet* parent);
-	MK_UI_EXPORT Sheet* createUiTestMyGuiImageSkin(Sheet* parent);
-	MK_UI_EXPORT Sheet* createUiTestCeguiImageSkin(Sheet* parent);
 	MK_UI_EXPORT void createUiTest(Form* parent);
 }
 

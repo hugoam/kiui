@@ -1,0 +1,128 @@
+Window :
+    empty : true
+
+Label :
+    text_colour : 1.0,1.0,1.0,1.0
+    skin_padding : 4.0,4.0
+    
+Title :
+    inherit_skin : Label
+    
+TabHeader :
+    inherit_skin : Label
+    
+WindowHeader :
+    inherit_skin : Label
+    image_skin : mygui_windowheader, 7, 10, 52, 4, 9, 17
+    image_skin : mygui_windowheader_var, 7, 10, 29, 4, 32, 17
+    sizing : EXPAND, FIXED
+    size : 0.0, 30.0
+    padding : 10.0, 4.0, 10.0, 4.0
+    
+WindowBody :
+    inherit_skin : Label
+    skin_margin : 0.0,-3.0,0.0, 0.0
+    image_skin : mygui_windowbody_black, 4, 4, 13, 12, 6, 6
+    padding : 10.0, 4.0, 10.0, 4.0
+    
+WindowSizer :
+    background_colour : 0.25,0.25,0.25,1.0
+    sizing : EXPAND, FIXED
+    size : 0.0,8.0
+    
+Frame :
+    padding : 4.0, 4.0, 4.0, 4.0
+    image_skin : mygui_frame_assym, 4, 4, 13, 12, 6, 6
+
+TypeIn :
+    inherit_skin : Label
+    text_colour : 1.0, 1.0, 1.0, 1.0
+    skin_padding : 4.0, 4.0
+    image_skin : mygui_editbox, 6, 6, 15, 12, 8, 8
+    decline_image_skin : hovered, pressed, focused
+
+Dropdown :
+    inherit_skin : TypeIn
+    
+DropdownToggle :
+    image : mygui_arrow_down
+    decline_image : hovered, pressed, activated
+    
+ColumnHeader :
+    inherit_skin : TypeIn
+    
+Button :
+    inherit_skin : Label
+    text_colour : 1.0, 1.0, 1.0, 1.0
+    skin_padding : 8.0, 4.0
+    image_skin : mygui_button, 6, 6, 15, 12, 8, 8
+    decline_image_skin : hovered, pressed, activated
+    
+Checkbox :
+    inherit : Icon
+    image : mygui_checkbox
+    decline_image : hovered, pressed, activated, activated|hovered, activated|pressed
+    
+ExpandboxToggle :
+    image : arrow_right_15
+    hovered :
+        image : arrow_right_15
+    pressed :
+        image : arrow_right_15
+    activated :
+        image : arrow_down_15
+    activated|hovered :
+        image : arrow_down_15
+        
+TreeNodeToggle :
+    inherit_skin : ExpandboxToggle
+    
+Expandbox :
+    inherit_skin : Frame
+    padding : 4.0, 4.0, 4.0, 4.0
+    
+ScrollUp :
+    image : mygui_arrow_up
+    decline_image : hovered, pressed, activated
+    
+ScrollDown :
+    image : mygui_arrow_down
+    decline_image : hovered, pressed, activated
+
+Scroller :
+    background_colour : 0.0, 0.0, 0.0, 1.0
+    padding : 2.0, 2.0, 1.0, 1.0
+    
+CloseButton :
+    inherit_skin : Label
+    image : mygui_closebutton
+    decline_image : hovered, pressed, activated
+
+SliderKnobY :
+    sizing : EXPAND, SHRINK
+    image : mygui_sliderknoby
+    decline_image : hovered, pressed, activated
+    
+SliderKnobX :
+    sizing : SHRINK, EXPAND
+    image : mygui_sliderknobx
+    decline_image : hovered, pressed, activated
+    
+FillerX :
+    background_colour : 0.0,0.75,1.0,0.6
+#    image_skin : mygui_button_hovered, 6, 6, 15, 12, 8, 8
+    
+ProgressFillerX :
+    inherit : FillerX
+    image_skin : mygui_button_activated, 6, 6, 15, 12, 8, 8
+    override : ProgressBarX, FillerX
+    
+SliderX :
+    inherit_skin : TypeIn
+    padding : 1.0, 1.0, 0.0, 0.0
+
+    
+ScrollerKnobY :
+    inherit_skin : Label
+    image_skin : mygui_scrollerknoby, 5, 2, 2, 13, 7, 4
+    decline_image_skin : hovered, pressed, activated

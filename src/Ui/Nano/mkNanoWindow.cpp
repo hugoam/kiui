@@ -68,7 +68,6 @@ namespace mk
 	void NanoLayer::moveToTop()
 	{
 		mTarget->moveToTop(this);
-		mIndex = mTarget->zmax();
 	}
 
 	void NanoLayer::nanodraw()
@@ -102,10 +101,11 @@ namespace mk
 
 	void NanoTarget::moveToTop(NanoLayer* layer)
 	{
+		size_t zmax = mZMax;
 		this->removeLayer(layer);
-		++mZMax;
 		mLayers[mZMax].push_back(layer);
 		layer->setIndex(mZMax);
+		mZMax = zmax;
 	}
 
 	unique_ptr<InkLayer> NanoTarget::layer(Frame* frame, size_t z)
@@ -119,7 +119,7 @@ namespace mk
 	void NanoTarget::removeLayer(NanoLayer* layer)
 	{
 		mLayers[layer->index()].erase(std::remove(mLayers[layer->index()].begin(), mLayers[layer->index()].end(), layer), mLayers[layer->index()].end());
-		if(mLayers[layer->index()].size() == 0)
+		if(mLayers[layer->index()].size() == 0 && mZMax > 0)
 		{
 			std::swap(mLayers[layer->index()], mLayers[mZMax-1]);
 			for(NanoLayer* moved : mLayers[layer->index()])

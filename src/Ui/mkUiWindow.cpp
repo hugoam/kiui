@@ -43,7 +43,8 @@ namespace mk
 		, mShutdownRequested(false)
 		, mUser(user)
 	{
-		setupUiLayout(mStyler.get());
+		mStyler->defaultLayout();
+		mStyler->defaultSkins();
 	}
 
 	UiWindow::~UiWindow()

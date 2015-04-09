@@ -32,11 +32,18 @@ namespace mk
 		~Styler();
 
 		void prepare();
+		void reset();
+
+		void setupTypes();
+
+		void defaultLayout();
+		void defaultSkins();
 
 		void inheritLayout(StyleVector names, Style* base);
 		void inheritSkins(StyleVector names, Style* base);
 
 		void override(Style* stem, Style* style, Style* overrider);
+		void override(const string& stem, const string& style, const string& overrider);
 
 		Style* fetchOverride(Style* style, Style* overrider);
 
@@ -50,8 +57,6 @@ namespace mk
 
 	class MK_UI_EXPORT EmptyStyle : public Object, public Typed<EmptyStyle>, public Styled<EmptyStyle>
 	{};
-
-	void setupUiLayout(Styler* styler);
 }
 
 #endif

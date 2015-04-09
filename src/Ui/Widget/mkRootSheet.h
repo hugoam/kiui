@@ -15,7 +15,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ RootSheet : public Sheet, public Typed<RootSheet>, public Styled<RootSheet>, public InputController
+	class MK_UI_EXPORT _I_ RootSheet : public Sheet, public Typed<RootSheet, Sheet>, public Styled<RootSheet>, public InputController
 	{
 	public:
 		RootSheet(UiWindow* window, Form* form, bool absolute = true);
@@ -53,8 +53,8 @@ namespace mk
 
 		virtual void transformCoordinates(float& xPos, float& yPos) { UNUSED(xPos); UNUSED(yPos); }
 
-		void activate(Widget* widget);
-		void deactivate(Widget* widget);
+		void focus(Widget* widget);
+		void unfocus(Widget* widget);
 
 		void contextOn(Widget* contextMenu);
 		void contextOff();
@@ -62,7 +62,7 @@ namespace mk
 		void modalOn(Widget* widget);
 		void modalOff();
 
-		using Typed<RootSheet>::cls;
+		using Typed<RootSheet, Sheet>::cls;
 
 	protected:
 		UiWindow* mWindow;

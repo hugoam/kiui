@@ -87,8 +87,8 @@ namespace mk
 		void activate();
 		void deactivate();
 
-		virtual void activated() {}
-		virtual void deactivated() {}
+		virtual void focused() {}
+		virtual void unfocused() {}
 
 		void hover();
 		void unhover();

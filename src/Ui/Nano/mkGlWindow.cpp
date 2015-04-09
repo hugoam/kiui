@@ -80,6 +80,7 @@ namespace mk
 
 		glfwSetWindowUserPointer(mGlWindow, this);
 		glfwSetKeyCallback(mGlWindow, [](GLFWwindow* w, int key, int scancode, int action, int mods) { static_cast<GlWindow*>(glfwGetWindowUserPointer(w))->injectKey(key, scancode, action, mods); });
+		glfwSetCharCallback(mGlWindow, [](GLFWwindow* w, unsigned int c) { static_cast<GlWindow*>(glfwGetWindowUserPointer(w))->injectChar(c); });
 		glfwSetMouseButtonCallback(mGlWindow, [](GLFWwindow* w, int button, int action, int mods) { static_cast<GlWindow*>(glfwGetWindowUserPointer(w))->injectMouseButton(button, action, mods); });
 		glfwSetCursorPosCallback(mGlWindow, [](GLFWwindow* w, double x, double y) { static_cast<GlWindow*>(glfwGetWindowUserPointer(w))->injectMouseMove(x, y); });
 
@@ -195,15 +196,14 @@ namespace mk
 	{
 		UNUSED(key); UNUSED(mods);
 		if(action == GLFW_PRESS)
-			mInput->dispatchKeyPressed((KeyCode) scancode, ' ');
+			mInput->dispatchKeyPressed((KeyCode) scancode, (char) 0);
 		else if(action == GLFW_RELEASE)
-			mInput->dispatchKeyReleased((KeyCode)scancode, ' ');
+			mInput->dispatchKeyReleased((KeyCode) scancode, (char) 0);
 	}
 
-	void GlWindow::injectChar(int codepoint, int mods)
+	void GlWindow::injectChar(unsigned int codepoint, int mods)
 	{
 		UNUSED(codepoint); UNUSED(mods);
-		//if(action == GLFW_PRESS)
-		//	mInput->keyPressed();
+		mInput->dispatchKeyPressed((KeyCode) 0, (char) codepoint);
 	}
 }

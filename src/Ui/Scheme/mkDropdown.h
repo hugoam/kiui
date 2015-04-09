@@ -14,38 +14,45 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT DropdownHeader : public Sheet, public Styled<DropdownHeader>
+	class MK_UI_EXPORT DropdownHeader : public WrapButton, public Typed<DropdownHeader, Sheet>, public Styled<DropdownHeader>
 	{
 	public:
-		DropdownHeader();
+		DropdownHeader(const Trigger& trigger);
+
+		using Typed<DropdownHeader, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT DropdownToggle : public Button, public Styled<DropdownToggle>
+	class MK_UI_EXPORT DropdownToggle : public Button, public Typed<DropdownToggle, Button>, public Styled<DropdownToggle>
 	{
 	public:
 		DropdownToggle(const Trigger& trigger);
 
+		using Typed<DropdownToggle, Button>::cls;
 		using Styled<DropdownToggle>::styleCls;
 	};
 
-	class MK_UI_EXPORT DropdownChoice : public WrapButton, public Styled < DropdownChoice >
+	class MK_UI_EXPORT DropdownChoice : public WrapButton, public Typed<DropdownChoice, Sheet>, public Styled<DropdownChoice>
 	{
 	public:
 		DropdownChoice(Widget* content, const Trigger& trigger);
+
+		using Typed<DropdownChoice, Sheet>::cls;
 	};
 
-	class MK_UI_EXPORT DropdownBox : public Sheet, public Styled<DropdownBox>
+	class MK_UI_EXPORT DropdownBox : public Sheet, public Typed<DropdownBox, Sheet>, public Styled<DropdownBox>
 	{
 	public:
 		DropdownBox(Dropdown* dropdown);
 
 		bool leftClick(float x, float y);
+		
+		using Typed<DropdownBox, Sheet>::cls;
 
 	protected:
 		Dropdown* mDropdown;
 	};
 
-	class MK_UI_EXPORT Dropdown : public Sheet, public Styled<Dropdown>
+	class MK_UI_EXPORT Dropdown : public Sheet, public Typed<Dropdown, Sheet>, public Styled<Dropdown>
 	{
 	public:
 		Dropdown(const Trigger& onSelected, StringVector choices = StringVector());
@@ -58,6 +65,8 @@ namespace mk
 		unique_ptr<Widget> vrelease(Widget* widget);
 
 		void selected(WrapButton* selected);
+
+		using Typed<Dropdown, Sheet>::cls;
 
 	protected:
 		Trigger mOnSelected;

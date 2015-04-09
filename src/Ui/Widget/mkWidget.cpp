@@ -28,7 +28,7 @@ namespace mk
 	string Widget::sNullString;
 
 	Widget::Widget(Style* style, FrameType frameType)
-		: TypeObject(cls())
+		: TypeObject(style->styleType())
 		, mParent(nullptr)
 		, mStyle(style)
 		, mFrame(nullptr)
@@ -221,28 +221,26 @@ namespace mk
 
 	void Widget::activate()
 	{
-		this->rootSheet()->activate(this);
 		this->toggleState(ACTIVATED);
-		this->activated();
 	}
 
 	void Widget::deactivate()
 	{
-		this->rootSheet()->deactivate(this);
 		this->toggleState(ACTIVATED);
-		this->deactivated();
 	}
 
 	void Widget::focus()
 	{
-		this->rootSheet()->activate(this);
+		this->rootSheet()->focus(this);
 		this->toggleState(FOCUSED);
+		this->focused();
 	}
 
 	void Widget::unfocus()
 	{
-		this->rootSheet()->deactivate(this);
+		this->rootSheet()->unfocus(this);
 		this->toggleState(FOCUSED);
+		this->unfocused();
 	}
 
 	void Widget::hover()
@@ -272,7 +270,7 @@ namespace mk
 	bool Widget::mouseEntered(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
-		//std::cerr << "HOVERED : " << mFrame->wstyle()->name() << std::endl;
+		//std::cerr << "HOVERED : " << mFrame->style()->name() << std::endl;
 		this->hover();
 		return true;
 	}
@@ -311,7 +309,8 @@ namespace mk
 		UNUSED(xPos); UNUSED(yPos);
 		if(button == LEFT_BUTTON)
 		{
-			this->modal();
+			if(!(mState & MODAL))
+				this->modal();
 			this->toggleState(PRESSED);
 		}
 		return true;

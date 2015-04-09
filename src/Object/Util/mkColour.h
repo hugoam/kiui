@@ -7,6 +7,7 @@
 
 /* mk headers */
 #include <Object/mkTyped.h>
+#include <Object/String/mkStringConvert.h>
 
 namespace mk
 {
@@ -18,21 +19,21 @@ namespace mk
 
 		Colour& operator=(const Colour&);
 
-		_A_ _M_ float r() const { return mR; }
-		_A_ _M_ float g() const { return mG; }
-		_A_ _M_ float b() const { return mB; }
-		_A_ _M_ float a() const { return mA; }
+		_A_ _M_ float r() const { return mFloats[0]; }
+		_A_ _M_ float g() const { return mFloats[1]; }
+		_A_ _M_ float b() const { return mFloats[2]; }
+		_A_ _M_ float a() const { return mFloats[3]; }
 
-		void setR(float r) { mR = r; }
-		void setG(float g) { mG = g; }
-		void setB(float b) { mB = b; }
-		void setA(float a) { mA = a; }
+		void setR(float r) { mFloats[0] = r; }
+		void setG(float g) { mFloats[1] = g; }
+		void setB(float b) { mFloats[2] = b; }
+		void setA(float a) { mFloats[3] = a; }
+
+		float operator [](size_t i) const { return mFloats[i]; }
+		float& operator [](size_t i) { return mFloats[i]; }
 
 	protected:
-		float mR;
-		float mG;
-		float mB;
-		float mA;
+		float mFloats[4];
 
 	public:
 		static Colour Black;
@@ -49,6 +50,9 @@ namespace mk
 		static Colour AlphaGrey;
 		static Colour Transparent;
 	};
+
+	template <> inline void fromString<Colour>(const string& str, Colour& vec) { string_to_fixed_vector<Colour, float>(str, vec); }
+	template <> inline void toString<Colour>(const Colour& val, string& str) { return fixed_vector_to_string<Colour, 4>(val, str); }
 }
 
 #endif // MK_COLOUR_H_INCLUDED

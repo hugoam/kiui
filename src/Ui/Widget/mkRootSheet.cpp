@@ -51,13 +51,13 @@ namespace mk
 		mCursor->nextFrame();
 	}
 
-	void RootSheet::activate(Widget* widget)
+	void RootSheet::focus(Widget* widget)
 	{
-		mActiveFrame->deactivate();
+		mActiveFrame->unfocus();
 		mActiveFrame = widget;
 	}
 
-	void RootSheet::deactivate(Widget* widget)
+	void RootSheet::unfocus(Widget* widget)
 	{
 		UNUSED(widget);
 		mActiveFrame = this;

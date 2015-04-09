@@ -25,14 +25,14 @@ namespace mk
 		: Sequence()
 	{
 		for(string& label : labels)
-			this->makeappend<Label>(label);
+			this->emplace<Label>(label);
 	}
 	
 	ButtonSequence::ButtonSequence(StringVector labels)
 		: Sequence()
 	{
 		for(string& label : labels)
-			this->makeappend<Button>(label);
+			this->emplace<Button>(label);
 	}
 
 	SortList::SortList(Style* style)

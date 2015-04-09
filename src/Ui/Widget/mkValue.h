@@ -23,11 +23,11 @@ namespace mk
 	class MK_UI_EXPORT ValueWidget : public HashDispatch<ValueWidget, Sheet*, WValue*>
 	{};
 
-	class MK_UI_EXPORT WValue : public Sheet, public Typed<WValue>, public Styled<WValue>
+	class MK_UI_EXPORT Value : public NonCopy
 	{
 	public:
-		WValue(Lref& lref, Style* style, bool edit = false);
-		WValue(Lref&& lref, Style* style, bool edit = false);
+		Value(Lref& lref, bool edit = false);
+		Value(Lref&& lref, bool edit = false);
 
 		Lref& value() { return mValue; }
 		size_t update() { return mUpdate; }
@@ -36,15 +36,24 @@ namespace mk
 		void setString(const string& value);
 
 		virtual void updateValue();
-		virtual void notifyUpdate() = 0;
-
-		using Typed<WValue>::cls;
+		virtual void notifyUpdate() {}
 
 	protected:
 		Lref mCopy;
 		Lref& mValue;
 		size_t mUpdate;
 		bool mEdit;
+	};
+
+	class MK_UI_EXPORT WValue : public Sheet, public Value, public Typed<WValue, Sheet>, public Styled<WValue>
+	{
+	public:
+		WValue(Lref& lref, Style* style, bool edit = false);
+		WValue(Lref&& lref, Style* style, bool edit = false);
+
+		void notifyUpdate();
+
+		using Typed<WValue, Sheet>::cls;
 	};
 }
 

@@ -41,7 +41,7 @@ namespace mk
 		inline size_t index() { return d_index; }
 
 		inline Inkbox* inkbox() { return d_inkbox.get(); }
-		inline Style* wstyle() { return d_wstyle; }
+		inline Style* style() { return d_style; }
 		inline InkStyle* inkstyle() { return d_inkstyle; }
 
 		void setIndex(size_t index) { d_index = index; }
@@ -66,9 +66,15 @@ namespace mk
 		Frame* prev();
 		Frame* next();
 
+		bool first();
+		bool last();
+
 		void updateClip();
 
 		void wrap(Dimension dim);
+
+		virtual bool nextOffset(Dimension dim, float& pos, float seuil);
+		virtual bool prevOffset(Dimension dim, float& pos, float seuil);
 
 		virtual void setVisible(bool visible);
 
@@ -82,6 +88,7 @@ namespace mk
 
 		void reset(Style* style);
 
+		virtual void updateStyle(Style* style);
 		void updatePosition();
 		void updateSize();
 
@@ -113,6 +120,8 @@ namespace mk
 		inline float top() { return dabsolute(DIM_Y); }
 		inline float bottom() { return dabsolute(DIM_Y) + dsize(DIM_Y); }
 
+		inline float doffset(Dimension dim) { return dsize(dim) + dmargin(dim); }
+
 		inline float dabsolute(Dimension dim) { return d_absolute[dim]; }
 		inline float dclippos(Dimension dim) { return d_clipPos[dim]; }
 		inline float dclipsize(Dimension dim) { return d_clipSize[dim]; }
@@ -133,8 +142,9 @@ namespace mk
 		DimFloat d_clipSize;
 		size_t d_index;
 
-		Style* d_wstyle;
+		Style* d_style;
 		InkStyle* d_inkstyle;
+		size_t d_styleStamp;
 
 		unique_ptr<Inkbox> d_inkbox;
 	};

@@ -15,9 +15,7 @@
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 
-#include <Ui/Form/mkHook.h>
-
-#include <Ui/mkUiWindow.h>
+#include <Ui/Widget/mkProgressBar.h>
 
 #include <iostream>
 
@@ -86,7 +84,8 @@ namespace mk
 	SliderX::SliderX(const Trigger& onUpdated)
 		: Slider(DIM_X, styleCls(), onUpdated)
 	{
-		mSpaceBefore = this->makeappend<SpacerX>();
+		//mSpaceBefore = this->makeappend<SpacerX>();
+		mSpaceBefore = this->makeappend<FillerX>();
 		mButton = this->makeappend<SliderKnobX>();
 		mSpaceAfter = this->makeappend<SpacerX>();
 
@@ -96,7 +95,8 @@ namespace mk
 	SliderY::SliderY(const Trigger& onUpdated)
 		: Slider(DIM_Y, styleCls(), onUpdated)
 	{
-		mSpaceBefore = this->makeappend<SpacerY>();
+		//mSpaceBefore = this->makeappend<SpacerY>();
+		mSpaceBefore = this->makeappend<FillerY>();
 		mButton = this->makeappend<SliderKnobY>();
 		mSpaceAfter = this->makeappend<SpacerY>();
 
@@ -105,7 +105,7 @@ namespace mk
 
 	void Slider::init()
 	{
-		if(mButton->frame()->style()->d_sizing[mDim] != EXPAND)
+		if(!mButton->frame()->dexpand(mDim))
 			mFixedKnob = true;
 	}
 

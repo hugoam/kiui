@@ -17,6 +17,8 @@ namespace mk
 		NanoInk(Frame* frame, NanoLayer* layer);
 		~NanoInk();
     
+		inline InkStyle* skin() { return mFrame->inkstyle(); }
+
 		void updateContent();
 		void updateFrame();
 		void updateStyle();
@@ -39,6 +41,7 @@ namespace mk
 	protected:
 		NVGcontext* mCtx;
 		NanoLayer* mLayer;
+		BoxFloat mCorners;
 		int mImage;
 		int mSkin;
 	};

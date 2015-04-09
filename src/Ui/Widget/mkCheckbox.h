@@ -11,7 +11,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Checkbox : public Toggle, public Typed<Checkbox>, public Styled<Checkbox>
+	class MK_UI_EXPORT _I_ Checkbox : public Toggle, public Typed<Checkbox, Widget>, public Styled<Checkbox>
 	{
 	public:
 		Checkbox(WValue* input, bool on);
@@ -19,7 +19,7 @@ namespace mk
 		void on();
 		void off();
 
-		using Typed<Checkbox>::cls;
+		using Typed<Checkbox, Widget>::cls;
 
 	protected:
 		WValue* mInput;

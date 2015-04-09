@@ -93,12 +93,12 @@ namespace mk
 
 	void Scrollbar::scrollup()
 	{
-
+		mSheet->cursorUp();
 	}
 
 	void Scrollbar::scrolldown()
 	{
-
+		mSheet->cursorDown();
 	}
 
 	void Scrollbar::scroll(float offset)

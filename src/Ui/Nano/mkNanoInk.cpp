@@ -18,9 +18,59 @@
 
 namespace mk
 {
+	inline float clamp(float v, float mn, float mx)
+	{
+		return (v > mx) ? mx : (v < mn) ? mn : v;
+	}
+
+	static float fminf(float a, float b)
+	{
+		return _isnan(a) ? b : (_isnan(b) ? a : ((a < b) ? a : b));
+	}
+
+	static float fmaxf(float a, float b)
+	{
+		return _isnan(a) ? b : (_isnan(b) ? a : ((a > b) ? a : b));
+	}
+
+	static double fmin(double a, double b)
+	{
+		return _isnan(a) ? b : (_isnan(b) ? a : ((a < b) ? a : b));
+	}
+
+	static double fmax(double a, double b)
+	{
+		return _isnan(a) ? b : (_isnan(b) ? a : ((a > b) ? a : b));
+	}
+
+	void nvgRoundedBox(NVGcontext *ctx, float x, float y, float w, float h, float cr0, float cr1, float cr2, float cr3)
+	{
+		float d;
+
+		w = fmaxf(0, w);
+		h = fmaxf(0, h);
+		d = fminf(w, h);
+
+		nvgMoveTo(ctx, x, y + h*0.5f);
+		nvgArcTo(ctx, x, y, x + w, y, fminf(cr0, d / 2));
+		nvgArcTo(ctx, x + w, y, x + w, y + h, fminf(cr1, d / 2));
+		nvgArcTo(ctx, x + w, y + h, x, y + h, fminf(cr2, d / 2));
+		nvgArcTo(ctx, x, y + h, x, y, fminf(cr3, d / 2));
+		nvgClosePath(ctx);
+	}
+
 	NVGcolor nvgColour(const Colour& colour)
 	{
 		return nvgRGBAf(colour.r(), colour.g(), colour.b(), colour.a());
+	}
+
+	NVGcolor nvgOffsetColour(const Colour& colour, float delta)
+	{
+		float offset = delta / 255.0f;
+		return nvgRGBAf(	clamp(colour.r() + offset, 0, 1),
+							clamp(colour.g() + offset, 0, 1),
+							clamp(colour.b() + offset, 0, 1),
+							colour.a());
 	}
 
 	NanoInk::NanoInk(Frame* frame, NanoLayer* layer)
@@ -47,21 +97,27 @@ namespace mk
 	{
 		//std::cerr << "ink :: draw " << mFrame->style()->name() << std::endl;
 
-		if(mFrame->inkstyle()->mEmpty || !mVisible || mFrame->dclip(DIM_Y) == Frame::HIDDEN || mFrame->dclip(DIM_X) == Frame::HIDDEN)
+		if(skin()->mEmpty || !mVisible || mFrame->dclip(DIM_Y) == Frame::HIDDEN || mFrame->dclip(DIM_X) == Frame::HIDDEN)
 			return;
 
 		//nvgSave(mCtx);
 
-		float left = floor(mFrame->dabsolute(DIM_X) + mFrame->dclippos(DIM_X) + mFrame->inkstyle()->mMargin[DIM_X]);
-		float top = floor(mFrame->dabsolute(DIM_Y) + mFrame->dclippos(DIM_Y) + mFrame->inkstyle()->mMargin[DIM_Y]);
+		float left = floor(mFrame->dabsolute(DIM_X) + mFrame->dclippos(DIM_X) + skin()->mMargin[DIM_X]);
+		float top = floor(mFrame->dabsolute(DIM_Y) + mFrame->dclippos(DIM_Y) + skin()->mMargin[DIM_Y]);
 
-		float width = floor(mFrame->dclipsize(DIM_X) - mFrame->inkstyle()->mMargin[DIM_X] - mFrame->inkstyle()->mMargin[DIM_X + 2]);
-		float height = floor(mFrame->dclipsize(DIM_Y) - mFrame->inkstyle()->mMargin[DIM_Y] - mFrame->inkstyle()->mMargin[DIM_Y + 2]);
+		float width = floor(mFrame->dclipsize(DIM_X) - skin()->mMargin[DIM_X] - skin()->mMargin[DIM_X + 2]);
+		float height = floor(mFrame->dclipsize(DIM_Y) - skin()->mMargin[DIM_Y] - skin()->mMargin[DIM_Y + 2]);
 
-		float pleft = left + mFrame->inkstyle()->mPadding[DIM_X];
-		float ptop = top + mFrame->inkstyle()->mPadding[DIM_Y];
-		float pwidth = width - 2.f * mFrame->inkstyle()->mPadding[DIM_X];
-		float pheight = height - 2.f * mFrame->inkstyle()->mPadding[DIM_Y];
+		float pleft = left + skin()->mPadding[DIM_X];
+		float ptop = top + skin()->mPadding[DIM_Y];
+		float pwidth = width - 2.f * skin()->mPadding[DIM_X];
+		float pheight = height - 2.f * skin()->mPadding[DIM_Y];
+
+		float c0 = mCorners.x();
+		float c1 = mCorners.y();
+		float c2 = mCorners.z();
+		float c3 = mCorners.w();
+
 
 		//float clipleft = left + mFrame->dclippos(DIM_X);
 		//float cliptop = top + mFrame->dclippos(DIM_Y);
@@ -75,22 +131,35 @@ namespace mk
 
 		nvgBeginPath(mCtx);
 
-		if(mFrame->inkstyle()->mCornerRadius.null())
+		if(mCorners.null())
 			nvgRect(mCtx, left, top, width, height);
 		else
-			//nvgRoundedRect4(mCtx, left, top, width, height, mFrame->inkstyle()->mCornerRadius.x(), mFrame->inkstyle()->mCornerRadius.y(), mFrame->inkstyle()->mCornerRadius.z(), mFrame->inkstyle()->mCornerRadius.w());
-			nvgRoundedRect(mCtx, left, top, width, height, mFrame->inkstyle()->mCornerRadius.x());
+			nvgRoundedBox(mCtx, left, top, width, height, c0, c1, c2, c3);
 
-		if(mFrame->inkstyle()->mBackgroundColour.a() != 0.f)
+		if(skin()->mBackgroundColour.a() != 0.f)
 		{
-			nvgFillColor(mCtx, nvgColour(mFrame->inkstyle()->mBackgroundColour));
+			if(skin()->mTopdownGradient.null())
+			{
+				nvgFillColor(mCtx, nvgColour(skin()->mBackgroundColour));
+			}
+			else
+			{
+				NVGcolor first = nvgOffsetColour(skin()->mBackgroundColour, skin()->mTopdownGradient.x());
+				NVGcolor second = nvgOffsetColour(skin()->mBackgroundColour, skin()->mTopdownGradient.y());
+				nvgFillPaint(mCtx, (height > width) ?
+					nvgLinearGradient(mCtx, left, top, left + width, top, first, second) :
+					nvgLinearGradient(mCtx, left, top, left, top + height, first, second));
+			}
 			nvgFill(mCtx);
 		}
 		
-		if(mFrame->inkstyle()->mBorderWidth.x() > 0.f)
+		if(skin()->mBorderWidth.x() > 0.f)
 		{
-			nvgStrokeWidth(mCtx, mFrame->inkstyle()->mBorderWidth.x() / 2.f);
-			nvgStrokeColor(mCtx, nvgColour(mFrame->inkstyle()->mBorderColour));
+			nvgBeginPath(mCtx);
+			nvgRoundedBox(mCtx, left + 0.5f, top + 0.5f, width - 1.f, height - 1.f, c0, c1, c2, c3);
+			//nvgRoundedRect(mCtx, left + 0.5f, top + 0.5f, width - 1.f, height - 1.f, skin()->mCornerRadius.x());
+			nvgStrokeWidth(mCtx, skin()->mBorderWidth.x());
+			nvgStrokeColor(mCtx, nvgColour(skin()->mBorderColour));
 			nvgStroke(mCtx);
 		}
 
@@ -99,15 +168,18 @@ namespace mk
 		{
 			NVGpaint imgPaint = nvgImagePattern(mCtx, pleft, ptop, pwidth, pheight, 0.0f / 180.0f*NVG_PI, mImage, 1.f);
 			nvgBeginPath(mCtx);
-			nvgRect(mCtx, left, top, width, height);
+			if(mCorners.null())
+				nvgRect(mCtx, left, top, width, height);
+			else
+				nvgRoundedBox(mCtx, left, top, width, height, c0, c1, c2, c3);
 			nvgFillPaint(mCtx, imgPaint);
 			nvgFill(mCtx);
 		}
 
 		// ImageSkin
-		if(!mFrame->inkstyle()->mImageSkin.null())
+		if(!skin()->mImageSkin.null())
 		{
-			ImageSkin& imgskin = mFrame->inkstyle()->mImageSkin;
+			ImageSkin& imgskin = skin()->mImageSkin;
 			FrameSkin fskin(mFrame, &imgskin);
 
 			// Borders
@@ -132,14 +204,15 @@ namespace mk
 			nvgFontSize(mCtx, 14.0f);
 			nvgFontFace(mCtx, "dejavu");
 
-			if(mFrame->dclip(DIM_X) || mFrame->dclip(DIM_Y))
+			//if(mFrame->dclip(DIM_X) || mFrame->dclip(DIM_Y)) 
+			// ^ @note this doesn't work because a frame is set to clipped only by its parent, and not when the label is larger than the frame itself
 				nvgScissor(mCtx, pleft, ptop, pwidth, pheight);
 
 			nvgTextAlign(mCtx, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
-			nvgFillColor(mCtx, nvgColour(mFrame->inkstyle()->mTextColour));
+			nvgFillColor(mCtx, nvgColour(skin()->mTextColour));
 			nvgText(mCtx, pleft, ptop, mFrame->widget()->label().c_str(), nullptr);
 
-			if(mFrame->dclip(DIM_X) || mFrame->dclip(DIM_Y))
+			//if(mFrame->dclip(DIM_X) || mFrame->dclip(DIM_Y))
 				nvgResetScissor(mCtx);
 		}
 
@@ -166,8 +239,8 @@ namespace mk
 			nvgTextBounds(mCtx, 0.f, 0.f, mFrame->widget()->label().c_str(), nullptr, bounds);
 			nvgTextMetrics(mCtx, nullptr, nullptr, &height);
 
-			float xoffset = mFrame->inkstyle()->mPadding[DIM_X] * 2.f;
-			float yoffset = mFrame->inkstyle()->mPadding[DIM_Y] * 2.f;
+			float xoffset = skin()->mPadding[DIM_X] * 2.f;
+			float yoffset = skin()->mPadding[DIM_Y] * 2.f;
 
 			//std::cerr << "ink :: contentSize for " << mFrame->style()->name() << " : " << (dim == DIM_X ? " x " : " y ") << (dim == DIM_X ? bounds[2] - bounds[0] + xoffset : bounds[3] - bounds[1] + yoffset) << std::endl;
 
@@ -186,8 +259,8 @@ namespace mk
 	{
 		NVGglyphPosition position;
 		nvgTextGlyphPosition(mCtx, 0.f, 0.f, mFrame->widget()->label().c_str(), index, &position);
-		caretX = mFrame->inkstyle()->mPadding[DIM_X] + position.x;
-		caretY = mFrame->inkstyle()->mPadding[DIM_Y] + 0.f;
+		caretX = skin()->mPadding[DIM_X] + position.x;
+		caretY = skin()->mPadding[DIM_Y] + 0.f;
 		nvgTextMetrics(mCtx, nullptr, nullptr, &caretHeight);
 	}
 
@@ -198,7 +271,7 @@ namespace mk
 
 	void NanoInk::updateStyle()
 	{
-		if(mFrame->inkstyle()->mEmpty)
+		if(skin()->mEmpty)
 			return;
 
 		const string& image = mFrame->widget()->image();
@@ -206,15 +279,17 @@ namespace mk
 		if(!image.empty())
 			mImage = fetchImage(image);
 
-		if(!mFrame->inkstyle()->mImageSkin.null())
+		if(!skin()->mImageSkin.null())
 		{
-			ImageSkin& imgskin = mFrame->inkstyle()->mImageSkin;
+			ImageSkin& imgskin = skin()->mImageSkin;
 
 			if(!imgskin.d_image.empty())
 			{
 				mSkin = fetchImage(imgskin.d_image);
 			}
 		}
+
+		mCorners = skin()->mCornerRadius;
 	}
 
 	int NanoInk::fetchImage(const string& image)
@@ -223,15 +298,33 @@ namespace mk
 		if(it != NanoWindow::sImages.end())
 			return (*it).second;
 
-		NanoWindow::sImages[image] = nvgCreateImage(mCtx, (mLayer->target()->window()->ressourcePath() + "/uisprites/" + image).c_str(), 0);
+		NanoWindow::sImages[image] = nvgCreateImage(mCtx, (mLayer->target()->window()->ressourcePath() + "/uisprites/" + image + ".png").c_str(), 0);
 		return NanoWindow::sImages[image];
 	}
 
 	void NanoInk::updateFrame()
 	{
-		if(mFrame->inkstyle()->mEmpty || !mVisible || mFrame->dsize(DIM_X) == 0.f || mFrame->dsize(DIM_X) == 0.f)
+		if(skin()->mEmpty || !mVisible || mFrame->dsize(DIM_X) == 0.f || mFrame->dsize(DIM_X) == 0.f)
 			return;
 
+		NanoInk* parent = static_cast<NanoInk*>(mFrame->parent()->inkbox());
+		if(parent->mCorners.null() || !skin()->mWeakCorners)
+			return;
+
+		if(mFrame->parent()->layoutDim() == DIM_X)
+		{
+			mCorners.setX(mFrame->first() ? parent->mCorners.x() : 0.f);
+			mCorners.setW(mFrame->first() ? parent->mCorners.w() : 0.f);
+			mCorners.setY(mFrame->last() ? parent->mCorners.y() : 0.f);
+			mCorners.setZ(mFrame->last() ? parent->mCorners.z() : 0.f);
+		}
+		else if(mFrame->parent()->layoutDim() == DIM_Y)
+		{
+			mCorners.setX(mFrame->first() ? parent->mCorners.x() : 0.f);
+			mCorners.setY(mFrame->first() ? parent->mCorners.y() : 0.f);
+			mCorners.setZ(mFrame->last() ? parent->mCorners.z() : 0.f);
+			mCorners.setW(mFrame->last() ? parent->mCorners.w() : 0.f);
+		}
 	}
 
 	void NanoInk::drawImage(int image, float left, float top, float width, float height)
@@ -250,13 +343,13 @@ namespace mk
 
 		if(stretchwidth > 0.f)
 		{
-			float ratio = stretchwidth / mFrame->inkstyle()->mImageSkin.d_fillWidth; //float(imgwidth);
+			float ratio = stretchwidth / skin()->mImageSkin.d_fillWidth; //float(imgwidth);
 			x *= ratio;
 			imgwidth *= ratio;
 		}
 		if(stretchheight > 0.f)
 		{
-			float ratio = stretchheight / mFrame->inkstyle()->mImageSkin.d_fillHeight; //float(imgheight);
+			float ratio = stretchheight / skin()->mImageSkin.d_fillHeight; //float(imgheight);
 			y *= ratio;
 			imgheight *= ratio;
 		}

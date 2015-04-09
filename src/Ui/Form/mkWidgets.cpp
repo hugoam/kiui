@@ -14,8 +14,8 @@
 
 namespace mk
 {
-	Control::Control(unique_ptr<Sheet> sheet)
-		: Form(styleCls(), std::move(sheet))
+	Control::Control(Style* style)
+		: Widget(style)
 	{}
 
 	WrapX::WrapX()
@@ -42,8 +42,8 @@ namespace mk
 		: Sheet(styleCls())
 	{}
 
-	Page::Page(const string& name, const string& dockid)
-		: ScrollSheet(styleCls())
+	Page::Page(const string& name, const string& dockid, Style* style)
+		: ScrollSheet(style ? style : styleCls())
 		, mName(name)
 		, mDockId(dockid)
 	{}

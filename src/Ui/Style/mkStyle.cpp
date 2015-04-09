@@ -17,6 +17,7 @@ namespace mk
 		, mName()
 		, mLayout("", FLOW, CLIP, VOID, false, DimSizing(SHRINK, SHRINK), DimFloat(1.f, 1.f), DIM_Y)
 		, mSubskins()
+		, mUpdated(0)
 	{}
 
 	Style::Style(const string& name)
@@ -24,11 +25,26 @@ namespace mk
 		, mStyleType(nullptr)
 		, mName(name)
 		, mLayout("", FLOW, CLIP, VOID, false, DimSizing(SHRINK, SHRINK), DimFloat(1.f, 1.f), DIM_Y)
+		, mSkin()
 		, mSubskins()
+		, mUpdated(0)
 	{}
 
 	Style::~Style()
 	{}
+
+	void Style::reset()
+	{
+		mLayout = LayoutStyle("", FLOW, CLIP, VOID, false, DimSizing(SHRINK, SHRINK), DimFloat(1.f, 1.f), DIM_Y);
+		mSkin = InkStyle();
+		mSubskins.clear();
+	}
+
+	void Style::inherit(Style* base)
+	{
+		this->inheritLayout(base);
+		this->inheritSkins(base);
+	}
 
 	void Style::inheritLayout(Style* base)
 	{
@@ -39,8 +55,8 @@ namespace mk
 	{
 		mSkin = *base->skin();
 
-		for(auto& subskin : base->subskins())
-			mSubskins.emplace_back(subskin.mState, subskin.mSkin);
+		for(auto& subskin : base->mSubskins)
+			this->decline(subskin.mState, subskin.mSkin);
 	}
 
 	InkStyle* Style::subskin(WidgetState state)
@@ -51,9 +67,21 @@ namespace mk
 		return &mSkin;
 	}
 
+	InkStyle* Style::decline(WidgetState state, InkStyle& original)
+	{
+		for(SubSkin& skin : reverse_adapt(mSubskins))
+			if(state == skin.mState)
+			{
+				skin.mSkin = original;
+				return &skin.mSkin;
+			}
+
+		mSubskins.emplace_back(state, original);
+		return &mSubskins.back().mSkin;
+	}
+
 	InkStyle* Style::decline(WidgetState state)
 	{
-		mSubskins.emplace_back(state, mSkin);
-		return &mSubskins.back().mSkin;
+		return decline(state, mSkin);
 	}
 }

@@ -17,7 +17,7 @@ namespace mk
 		: WrapButton(nullptr, styleCls())
 		, mName(name)
 	{
-		this->makeappend<Icon>("folder_20.png");
+		this->makeappend<Icon>("folder_20");
 		this->makeappend<Label>(mName);
 	}
 
@@ -36,7 +36,7 @@ namespace mk
 		: WrapButton(nullptr, styleCls())
 		, mName(name)
 	{
-		this->makeappend<Icon>("file_20.png");
+		this->makeappend<Icon>("file_20");
 		this->makeappend<Label>(mName);
 	}
 
@@ -97,16 +97,14 @@ namespace mk
 	}
 
 	FileNode::FileNode(const string& name)
-		: TreeNode("file_20.png", name, true)
+		: TreeNode("file_20", name, true)
 	{}
 
-	DirectoryNode::DirectoryNode(const string& path, const string& name, bool collapsed, bool load)
-		: TreeNode("folder_20.png", name, collapsed)
+	DirectoryNode::DirectoryNode(const string& path, const string& name, bool collapsed)
+		: TreeNode("folder_20", name, collapsed)
 		, mPath(path)
 	{
 		mType = cls();
-		if(load)
-			this->update();
 	}
 
 	void DirectoryNode::expand()
@@ -125,7 +123,11 @@ namespace mk
 
 		while((ent = readdir(dir)) != NULL)
 			if(ent->d_type & DT_DIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
-				this->emplace<DirectoryNode>(mPath + "/" + ent->d_name, ent->d_name, true, !mCollapsed);
+			{
+				DirectoryNode* node = this->emplace<DirectoryNode>(mPath + "/" + ent->d_name, ent->d_name, true);
+				if(!mCollapsed)
+					node->update();
+			}
 
 		rewinddir(dir);
 

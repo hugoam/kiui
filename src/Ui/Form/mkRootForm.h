@@ -25,7 +25,7 @@ namespace mk
 		virtual void formAltered(Form* form) = 0;
 	};
 
-	class MK_UI_EXPORT RootForm : public Form, public Typed<RootForm>
+	class MK_UI_EXPORT RootForm : public Form, public Typed<RootForm, Form>
 	{
 	public:
 		RootForm(UiWindow* window);
@@ -48,7 +48,7 @@ namespace mk
 
 		void nextFrame(size_t tick, size_t delta);
 
-		using Typed<RootForm>::cls;
+		using Typed<RootForm, Form>::cls;
 
 	protected:
 		User* mUser;

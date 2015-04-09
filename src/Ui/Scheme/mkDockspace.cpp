@@ -203,14 +203,14 @@ namespace mk
 		: Dockline(dockspace, dockline, DIM_Y, index, styleCls())
 	{}
 
-	WMasterDockline::WMasterDockline(Dockspace* dockspace)
+	MasterDockline::MasterDockline(Dockspace* dockspace)
 		: Dockline(dockspace, nullptr, DIM_X, 0, styleCls())
 	{}
 
 	Dockspace::Dockspace()
 		: Sheet(styleCls())
 	{
-		mMainLine = this->makeappend<WMasterDockline>(this);
+		mMainLine = this->makeappend<MasterDockline>(this);
 	}
 
 	Widget* Dockspace::vappend(unique_ptr<Widget> widget)

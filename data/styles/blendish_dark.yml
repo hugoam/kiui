@@ -1,0 +1,212 @@
+Label :
+    text_colour : 1.0,1.0,1.0,1.0
+    skin_padding : 4.0,4.0
+    
+Title :
+    inherit_skin : Label
+    
+Regular :
+    inherit_skin : Label
+    border_colour : 0.098,0.098,0.098,1.0
+    border_width : 1.0,1.0,1.0,1.0
+    corner_radius : 4.0,4.0,4.0,4.0
+    background_colour : 0.6,0.6,0.6,1.0
+    
+    focused :
+        #background_colour : 0.392,0.392,0.392,1.0
+        text_colour : 1.0,1.0,1.0,1.0
+        
+    activated :
+        text_colour : 1.0,1.0,1.0,1.0
+        
+Expandbox :
+    background_colour : 0.0,0.0,0.0,0.0
+    
+ExpandboxHeader :
+    inherit_skin : Label
+    padding : 4.0,4.0,4.0,4.0
+    background_colour : 0.0,0.0,0.0,0.0
+    
+ColumnHeader :
+    inherit_skin : Label
+    border_colour : 0.275,0.275,0.275,1.0
+    border_width : 1.0,1.0,1.0,1.0
+    
+TypeIn :
+    inherit_skin : Regular
+    topdown_gradient : 0.0,25.0
+    
+    focused :
+        topdown_gradient : 0.0,25.0
+    activated :
+        topdown_gradient : 0.0,25.0
+        
+Button :
+    inherit_skin : Regular
+    
+Option :
+    inherit_skin : Label
+    border_colour : 0.098,0.098,0.098,1.0
+    border_width : 1.0,1.0,1.0,1.0
+    corner_radius : 4.0,4.0,4.0,4.0
+    background_colour : 0.275,0.275,0.275,1.0
+    text_colour : 1.0,1.0,1.0,1.0
+    topdown_gradient : 15,-15
+    
+    hovered :
+        background_colour : 0.335,0.335,0.335,1.0
+        
+    pressed :
+        topdown_gradient : -15,15
+        background_colour : 0.337,0.502,0.761,1
+        
+    activated :
+        background_colour : 0.337,0.502,0.761,1
+        text_colour : 0.0,0.0,0.0,1.0
+        topdown_gradient : -15,15
+        
+    activated|hovered :
+        topdown_gradient : -15,15
+        background_colour : 0.337,0.502,0.761,1
+        
+Dropdown:
+    inherit_skin : Option
+    
+Checkbox :
+    inherit_skin : Option
+    
+RadioSwitch :
+    corner_radius : 4.0,4.0,4.0,4.0
+    
+RadioChoice :
+    inherit_skin : Option
+    corner_radius : 0.0,0.0,0.0,0.0
+    
+DropdownToggle :
+    border_colour : 0.098,0.098,0.098,1.0
+    border_width : 1.0,1.0,1.0,1.0
+    background_colour : 0.275,0.275,0.275,1.0
+    topdown_gradient : 15,-15
+    padding : 4.0,4.0
+    sizing : SHRINK, EXPAND
+    
+NumberField :
+    border_colour : 0.196,0.196,0.196,1.0
+    border_width : 1.0,1.0,1.0,1.0
+    background_colour : 0.706,0.706,0.706,1.0
+    #item_colour : 0.353,0.353,0.353,1.0
+    text_colour : 0.0,0.0,0.0,1.0
+    topdown_gradient : -20,0
+    
+    activated :
+        text_colour : 1.0,1.0,1.0,1.0
+        background_colour : 0.6,0.6,0.6,1.0
+        
+FillerX :
+    border_colour : 0.196,0.196,0.196,1.0
+    border_width : 1.0,1.0,1.0,1.0
+    background_colour : 0.447,0.447,0.447,1.0
+    topdown_gradient : 15,-5
+    
+SliderX :
+    inherit_skin : NumberField
+    corner_radius : 10.0,10.0,10.0,10.0
+        
+SliderKnobX :
+    background_colour : 0.0,0.0,0.0,0.0
+    
+SliderDisplay :
+    sizing : EXPAND, EXPAND
+
+Scroller :
+    border_width : 1.0,1.0,1.0,1.0
+    corner_radius : 6.0,6.0,6.0,6.0
+    border_colour : 0.196,0.196,0.196,1.0
+    background_colour : 0.314,0.314,0.314,0.706 
+    text_colour : 0.0,0.0,0.0,1.0
+    topdown_gradient : -15,15
+    
+ScrollerButton :
+    border_width : 1.0,1.0,1.0,1.0
+    corner_radius : 6.0,6.0,6.0,6.0
+    weak_corners : false
+    border_colour : 0.196,0.196,0.196,1.0
+    background_colour : 0.502,0.502,0.502,1.0
+    text_colour : 0.0,0.0,0.0,1.0
+    topdown_gradient : 5,-5
+    
+    activated :
+        background_colour : 0.542,0.542,0.542,1.0
+        
+    hovered :
+        background_colour : 0.542,0.542,0.542,1.0
+      
+Empty :
+    empty : true
+        
+Scrollbar :
+    inherit_skin : Empty
+    padding : 6.0,6.0,6.0,6.0
+    
+ScrollUp :
+    image : arrow_up_15
+    
+ScrollDown :
+    image : arrow_down_15
+    
+ScrollerKnobY :
+    inherit_skin : ScrollerButton
+
+Input<int> :
+    corner_radius : 4.0,4.0,4.0,4.0
+    
+Input<float> :
+    corner_radius : 4.0,4.0,4.0,4.0
+    
+DockWindow :
+    background_colour : 0.09,0.09,0.09,1.0
+    
+Window :
+    background_colour : 0.0,0.0,0.0,1.0
+    border_colour : 0.275,0.275,0.275,1.0
+    border_width : 1.0,1.0,1.0,1.0
+    corner_radius : 10.0,10.0,10.0,10.0
+    
+WindowHeader :
+    background_colour : 0.275,0.275,0.275,1.0
+    topdown_gradient : 15,-15
+    text_colour : 1.0,1.0,1.0,1.0
+    
+WindowBody :
+    padding : 10.0, 4.0, 4.0, 4.0
+    
+WindowSizer :
+    background_colour : 0.275,0.275,0.275,1.0
+    sizing : EXPAND, FIXED
+    size : 0.0,8.0
+    
+ExpandboxToggle :
+    image : arrow_right_15
+    hovered :
+        image : arrow_right_15
+    pressed :
+        image : arrow_right_15
+    activated :
+        image : arrow_down_15
+    activated|hovered :
+        image : arrow_down_15
+        
+TreeNodeToggle :
+    inherit_skin : ExpandboxToggle
+    
+Tooltip :
+    background_colour : 0.098,0.098,0.098,0.902
+    text_colour : 0.627,0.627,0.627,1.0
+    
+    activated :
+        text_colour : 1.0,1.0,1.0,1.0
+        background_colour : 0.176,0.176,0.176,0.902
+
+DropdownBox :
+    inherit_skin : Tooltip
+    

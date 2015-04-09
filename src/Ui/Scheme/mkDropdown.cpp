@@ -29,7 +29,7 @@ namespace mk
 		, mSelected(nullptr)
 		, mDown(false)
 	{
-		mHeader = this->makeappend<DropdownHeader>();
+		mHeader = this->makeappend<DropdownHeader>(std::bind(&Dropdown::dropdown, this));
 		mDropbox = this->makeappend<DropdownBox>(this);
 		mDropButton = this->makeappend<DropdownToggle>(std::bind(&Dropdown::dropdown, this));
 
@@ -63,8 +63,8 @@ namespace mk
 	void Dropdown::dropup()
 	{
 		mDropbox->hide();
-		mDropbox->unmodal();
-
+		if(mDropbox->state() & MODAL)
+			mDropbox->unmodal();
 		mDown = false;
 	}
 
@@ -95,8 +95,8 @@ namespace mk
 		mOnSelected(button->content());
 	}
 
-	DropdownHeader::DropdownHeader()
-		: Sheet(styleCls())
+	DropdownHeader::DropdownHeader(const Trigger& trigger)
+		: WrapButton(nullptr, styleCls(), trigger)
 	{}
 
 	DropdownToggle::DropdownToggle(const Trigger& trigger)

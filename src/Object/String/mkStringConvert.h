@@ -65,7 +65,8 @@ namespace mk
 			second = std::find(first, end, ',');
 			vec.push_back(fromString<typename T::value_type>(str.substr(first - str.begin(), second - first)));
 			
-			first = second + 1;
+			if(second != end)
+				first = second + 1;
 		}
 	}
 
@@ -110,7 +111,8 @@ namespace mk
 			vec[i] = fromString<T>(str.substr(first - str.begin(), second - first));
 
 			++i;
-			first = second + 1;
+			if(second != end)
+				first = second + 1;
 		}
 	}
 
@@ -161,7 +163,7 @@ namespace mk
 		static inline string to(const std::vector<T>& val) { return vector_to_string(val); }
 
 		static inline void from(const string& str, std::vector<T>& vec) { string_to_vector(str, vec); }
-		static inline std::vector<T> from(const string& str) { return string_to_vector<T>(str); }
+		static inline std::vector<T> from(const string& str) { return string_to_vector<std::vector<T>>(str); }
 	};
 
 

@@ -13,7 +13,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Docksection : public Tabber, public Typed<Docksection>, public Styled<Docksection>
+	class MK_UI_EXPORT _I_ Docksection : public Tabber, public Typed<Docksection, Tabber>, public Styled<Docksection>
 	{
 	public:
 		Docksection(Dockline* dockline, size_t index, Style* style);
@@ -33,7 +33,7 @@ namespace mk
 		Docksection* docktarget(Dimension dim, bool after);
 		Docksection* docktarget(float x, float y);
 
-		using Typed<Docksection>::cls;
+		using Typed<Docksection, Tabber>::cls;
 		using Styled<Docksection>::styleCls;
 
 	protected:
@@ -41,7 +41,7 @@ namespace mk
 		size_t mIndex;
 	};
 
-	class MK_UI_EXPORT _I_ Dockline : public GridSheet, public Typed<Dockline>
+	class MK_UI_EXPORT _I_ Dockline : public GridSheet, public Typed<Dockline, Sheet>
 	{
 	public:
 		Dockline(Dockspace* dockspace, Dockline* dockline, Dimension dim, size_t index, Style* style);
@@ -63,7 +63,7 @@ namespace mk
 		Docksection* findOrCreateSection(const string& dockid, Style* style = nullptr);
 		Docksection* findSection(const string& dockid);
 
-		using Typed<Dockline>::cls;
+		using Typed<Dockline, Sheet>::cls;
 
 	protected:
 		Dockspace* mDockspace;
@@ -71,31 +71,31 @@ namespace mk
 		size_t mIndex;
 	};
 
-	class MK_UI_EXPORT _I_ DocklineX : public Dockline, public Typed<DocklineX>, public Styled<DocklineX>
+	class MK_UI_EXPORT _I_ DocklineX : public Dockline, public Typed<DocklineX, Dockline>, public Styled<DocklineX>
 	{
 	public:
 		DocklineX(Dockspace* dockspace, Dockline* dockline, size_t index);
 
-		using Typed<DocklineX>::cls;
+		using Typed<DocklineX, Dockline>::cls;
 	};
 
-	class MK_UI_EXPORT _I_ DocklineY : public Dockline, public Typed<DocklineY>, public Styled<DocklineY>
+	class MK_UI_EXPORT _I_ DocklineY : public Dockline, public Typed<DocklineY, Dockline>, public Styled<DocklineY>
 	{
 	public:
 		DocklineY(Dockspace* dockspace, Dockline* dockline, size_t index);
 
-		using Typed<DocklineY>::cls;
+		using Typed<DocklineY, Dockline>::cls;
 	};
 
-	class MK_UI_EXPORT _I_ WMasterDockline : public Dockline, public Typed<WMasterDockline>, public Styled<WMasterDockline>
+	class MK_UI_EXPORT _I_ MasterDockline : public Dockline, public Typed<MasterDockline, Dockline>, public Styled<MasterDockline>
 	{
 	public:
-		WMasterDockline(Dockspace* dockspace);
+		MasterDockline(Dockspace* dockspace);
 
-		using Typed<WMasterDockline>::cls;
+		using Typed<MasterDockline, Dockline>::cls;
 	};
 
-	class MK_UI_EXPORT _I_ Dockspace : public Sheet, public Typed<Dockspace>, public Styled<Dockspace>
+	class MK_UI_EXPORT _I_ Dockspace : public Sheet, public Typed<Dockspace, Sheet>, public Styled<Dockspace>
 	{
 	public:
 		Dockspace();
@@ -107,10 +107,10 @@ namespace mk
 		Widget* vappend(unique_ptr<Widget> widget);
 		//unique_ptr<Widget> vrelease(Widget* widget);
 
-		using Typed<Dockspace>::cls;
+		using Typed<Dockspace, Sheet>::cls;
 
 	protected:
-		WMasterDockline* mMainLine;
+		MasterDockline* mMainLine;
 	};
 }
 

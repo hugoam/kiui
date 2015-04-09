@@ -31,11 +31,10 @@ namespace mk
 	TreeNode::TreeNode(const string& image, const string& title, bool collapsed, Object* object)
 		: Expandbox(title, collapsed, false)
 		, mImage(image)
+		, mObject(object)
 	{
 		mType = cls();
 		mStyle = styleCls();
-
-		//mParent->as<Tree>()->addNode(mObject, this);
 
 		mHeader = this->makeappend<TreeNodeHeader>(std::bind(&TreeNode::selected, this));
 		mContainer = this->makeappend<TreeNodeBody>();
@@ -59,6 +58,8 @@ namespace mk
 		if(mContainer->count() == 0)
 			mExpandButton->toggleState(DISABLED);
 
+		this->tree()->addNode(widget->as<TreeNode>());
+
 		return Expandbox::vappend(std::move(widget));
 	}
 
@@ -67,23 +68,29 @@ namespace mk
 		if(mContainer->count() == 1)
 			mExpandButton->toggleState(DISABLED);
 
+		this->tree()->removeNode(widget->as<TreeNode>());
+
 		return Expandbox::vrelease(widget);
 	}
 
-	void TreeNode::selected()
+	Tree* TreeNode::tree()
 	{
 		Sheet* parent = mParent;
 		while(parent->type() != Tree::cls())
 			parent = parent->parent();
-
-		parent->as<Tree>()->select(this);
+		return parent->as<Tree>();
 	}
 
-	Tree::Tree(const Trigger& trigger)
+	void TreeNode::selected()
+	{
+		this->tree()->select(this);
+	}
+
+	Tree::Tree(const std::function<void(TreeNode*)>& onSelected)
 		: ScrollSheet(styleCls())
 		, mRootNode(nullptr)
 		, mSelected(nullptr)
-		, mOnSelected(trigger)
+		, mOnSelected(onSelected)
 	{
 		mType = cls();
 	}
@@ -91,14 +98,19 @@ namespace mk
 	Tree::~Tree()
 	{}
 
-	void Tree::addNode(Object* object, TreeNode* node)
+	TreeNode* Tree::node(Object* object)
 	{
-		mNodes[object] = node;
+		return mNodes[object];
 	}
 
-	void Tree::removeNode(Object* object, TreeNode* node)
+	void Tree::addNode(TreeNode* node)
 	{
-		mNodes.erase(object);
+		mNodes[node->object()] = node;
+	}
+
+	void Tree::removeNode(TreeNode* node)
+	{
+		mNodes.erase(node->object());
 	}
 
 	void Tree::select(Object* object)

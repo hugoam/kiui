@@ -29,14 +29,14 @@ namespace mk
 		, mActiveIndex(active)
 	{
 		for(string& label : labels)
-			this->makeappend<Label>(label);
+			this->emplace<Label>(label);
 	}
 
 	Sheet* RadioSwitch::vappend(unique_ptr<Widget> widget)
 	{
 		WrapButton* button = this->makeappend<RadioChoice>(widget.get(), std::bind(&RadioSwitch::activated, this, _1));
 		button->append(std::move(widget));
-		if(button->frame()->index() == mActiveIndex)
+		if(mContents.size() - 1 == mActiveIndex)
 		{
 			mActive = button;
 			mActive->activate();
@@ -55,6 +55,7 @@ namespace mk
 			mActive->deactivate();
 		mActive = button;
 		mActive->activate();
-		mOnSelected(button->content());
+		if(mOnSelected)
+			mOnSelected(button->content());
 	}
 }

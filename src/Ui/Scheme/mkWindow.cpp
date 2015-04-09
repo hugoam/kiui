@@ -29,7 +29,7 @@ namespace mk
 		, mTooltip("Drag me")
 	{
 		mTitle = this->makeappend<Label>(mWindow->name());
-		this->makeappend<Widget>(DivX::styleCls());
+		this->makeappend<DivX>();
 		mCloseButton = mWindow->closable() ? this->makeappend<CloseButton>(std::bind(&Window::close, mWindow)) : nullptr;
 	}
 
@@ -243,5 +243,11 @@ namespace mk
 		if(!mDock)
 			mFrame->as<Layer>()->moveToTop();
 		return true;
+	}
+
+	WindowForm::WindowForm(unique_ptr<Form> content, const string& title, bool closable, bool dockable, const Widget::Trigger& onClose)
+		: Form(make_unique<Window>(title, closable, dockable, onClose))
+	{
+		this->append(std::move(content));
 	}
 }
