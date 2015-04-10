@@ -13,6 +13,7 @@
 #include <Object/String/mkString.h>
 
 #include <memory>
+#include <algorithm>
 #include <sstream>
 
 namespace mk
