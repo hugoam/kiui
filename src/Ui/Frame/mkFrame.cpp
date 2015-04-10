@@ -164,7 +164,7 @@ namespace mk
 		UNUSED(tick); UNUSED(delta);
 
 		if(d_style->updated() > d_styleStamp)
-			this->reset(d_style);
+			this->updateStyle(d_style);
 
 		switch(d_dirty)
 		{

@@ -561,6 +561,5 @@ namespace mk
 		demoheader->emplace<Dropdown>(std::bind(&pickSample, demobody, std::placeholders::_1), StringVector({ "Dockspace", "Window", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" }));
 		demoheader->emplace<Label>("Switch theme : ");
 		Dropdown* dropdown = demoheader->emplace<Dropdown>(std::bind(&switchTheme, demobody, std::placeholders::_1), StringVector({ "Blendish", "Blendish Dark", "MyGui", "Default" }));
-		dropdown->frame()->setSpanDim(DIM_X, 0.3f);
 	}
 }

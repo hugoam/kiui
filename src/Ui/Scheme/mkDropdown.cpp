@@ -46,6 +46,7 @@ namespace mk
 	{
 		WrapButton* button = mDropbox->emplace<DropdownChoice>(widget.get(), std::bind(&Dropdown::selected, this, _1));
 		button->append(std::move(widget));
+
 		if(mSelected == nullptr)
 		{
 			mSelected = button;
@@ -103,9 +104,15 @@ namespace mk
 		: Button("", styleCls(), trigger)
 	{}
 
+	DropdownLabel::DropdownLabel(const string& label)
+		: Label(label)
+	{}
+
 	DropdownChoice::DropdownChoice(Widget* content, const Trigger& trigger)
 		: WrapButton(content, styleCls(), trigger)
-	{}
+	{
+		content->setStyle(DropdownLabel::styleCls());
+	}
 
 	DropdownBox::DropdownBox(Dropdown* dropdown)
 		: Sheet(styleCls(), LAYER)

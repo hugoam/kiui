@@ -56,6 +56,8 @@ namespace mk
 
 	void Styler::reset()
 	{
+		mOverrides.clear();
+
 		for(Object* object : Style::indexer()->objects())
 			if(object)
 				object->as<Style>()->reset();
@@ -201,6 +203,7 @@ namespace mk
 		TreeNodeBody::cls()->setupName("TreeNodeBody");
 
 		Dropdown::cls()->setupName("Dropdown");
+		DropdownLabel::cls()->setupName("DropdownLabel");
 		DropdownHeader::cls()->setupName("DropdownHeader");
 		DropdownBox::cls()->setupName("DropdownBox");
 
@@ -268,7 +271,7 @@ namespace mk
 		this->inheritLayout(StyleVector({ Dir::styleCls(), File::styleCls() }), Control::styleCls());
 		this->inheritLayout(StyleVector({ Icon::styleCls() }), Control::styleCls());
 
-		this->inheritLayout(StyleVector({ Label::styleCls(), Title::styleCls() }), WrapX::styleCls());
+		this->inheritLayout(StyleVector({ Label::styleCls(), Title::styleCls(), DropdownLabel::styleCls() }), WrapX::styleCls());
 		this->inheritLayout(StyleVector({ Input<bool>::styleCls() }), WrapX::styleCls());
 
 		this->inheritLayout(StyleVector({ Table::styleCls(), DropdownBox::styleCls(), }), DivY::styleCls());
@@ -458,6 +461,7 @@ namespace mk
 		Title::styleCls()->inheritSkins(Label::styleCls());
 		TypeIn::styleCls()->inheritSkins(Label::styleCls());
 		SliderDisplay::styleCls()->inheritSkins(Label::styleCls());
+		DropdownLabel::styleCls()->inheritSkins(Label::styleCls());
 
 		Button::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
 		Button::styleCls()->skin()->mTextColour = Colour::White;

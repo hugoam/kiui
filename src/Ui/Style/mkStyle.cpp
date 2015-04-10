@@ -38,6 +38,7 @@ namespace mk
 		mLayout = LayoutStyle("", FLOW, CLIP, VOID, false, DimSizing(SHRINK, SHRINK), DimFloat(1.f, 1.f), DIM_Y);
 		mSkin = InkStyle();
 		mSubskins.clear();
+		++mUpdated;
 	}
 
 	void Style::inherit(Style* base)

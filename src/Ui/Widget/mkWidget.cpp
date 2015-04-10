@@ -115,7 +115,8 @@ namespace mk
 
 	void Widget::setStyle(Style* style)
 	{
-		this->reset(style);
+		mStyle = style;
+		//this->reset(style);
 	}
 
 	void Widget::reset(Style* style)

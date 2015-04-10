@@ -31,6 +31,15 @@ namespace mk
 		using Styled<DropdownToggle>::styleCls;
 	};
 
+	class MK_UI_EXPORT DropdownLabel : public Label, public Typed<DropdownLabel, Label>, public Styled<DropdownLabel>
+	{
+	public:
+		DropdownLabel(const string& label);
+
+		using Typed<DropdownLabel, Label>::cls;
+		using Styled<DropdownLabel>::styleCls;
+	};
+
 	class MK_UI_EXPORT DropdownChoice : public WrapButton, public Typed<DropdownChoice, Sheet>, public Styled<DropdownChoice>
 	{
 	public:

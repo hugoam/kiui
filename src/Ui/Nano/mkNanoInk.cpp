@@ -274,20 +274,13 @@ namespace mk
 		if(skin()->mEmpty)
 			return;
 
-		const string& image = mFrame->widget()->image();
-
-		if(!image.empty())
-			mImage = fetchImage(image);
+		if(!mFrame->widget()->image().empty())
+			mImage = fetchImage(mFrame->widget()->image());
+		else
+			mImage = 0;
 
 		if(!skin()->mImageSkin.null())
-		{
-			ImageSkin& imgskin = skin()->mImageSkin;
-
-			if(!imgskin.d_image.empty())
-			{
-				mSkin = fetchImage(imgskin.d_image);
-			}
-		}
+			mSkin = fetchImage(skin()->mImageSkin.d_image);
 
 		mCorners = skin()->mCornerRadius;
 	}
