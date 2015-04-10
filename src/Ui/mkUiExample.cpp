@@ -11,6 +11,12 @@
 
 #include <cfloat>
 
+#ifdef KIUI_EMSCRIPTEN
+#define EXAMPLE_DATA_PATH "/data"
+#else
+#define EXAMPLE_DATA_PATH "../data/interface"
+#endif
+
 namespace mk
 {
 	Dockspace* createUiTestDockspace(Sheet* root)
@@ -519,11 +525,11 @@ namespace mk
 		mk::StyleParser parser(sheet->uiWindow()->styler());
 
 		if(name == "Blendish")
-			parser.loadStyleSheet("../Data/interface/styles/blendish.yml");
+			parser.loadStyleSheet(EXAMPLE_DATA_PATH "/styles/blendish.yml");
 		else if(name == "Blendish Dark")
-			parser.loadStyleSheet("../Data/interface/styles/blendish_dark.yml");
+			parser.loadStyleSheet(EXAMPLE_DATA_PATH "/styles/blendish_dark.yml");
 		else if(name == "MyGui")
-			parser.loadStyleSheet("../Data/interface/styles/mygui.yml");
+			parser.loadStyleSheet(EXAMPLE_DATA_PATH "/styles/mygui.yml");
 		else if(name == "Default")
 			parser.loadDefaultStyle();
 	}
