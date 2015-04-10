@@ -20,16 +20,16 @@ namespace mk
 	{};
 
 	template <class T>
-	inline T fromString(const string& str) { T val; fromString<T>(str, val); return val; }
-
-	template <class T>
 	inline void fromString(const string& str, T& val) { StringConverter<T>::from(str, val); }
 
 	template <class T>
-	inline string toString(const T& val) { string str; toString<T>(val, str); return str; }
+	inline T fromString(const string& str) { T val; fromString<T>(str, val); return val; }
 
 	template <class T>
 	inline void toString(const T& val, string& str) { return StringConverter<T>::to(val, str); }
+
+	template <class T>
+	inline string toString(const T& val) { string str; toString<T>(val, str); return str; }
 
 	// string - string conversion
 	template <> inline string fromString<string>(const string& str) { return str; }
