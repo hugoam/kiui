@@ -3,6 +3,7 @@ Label :
     skin_padding : 4.0,4.0
     
 WhiteLabel :
+    inherit : Label
     text_colour : 1.0,1.0,1.0,1.0
     skin_padding : 4.0,4.0
     
@@ -69,12 +70,26 @@ TypeIn :
     focused :
         text_colour : 0.0,0.0,0.0,1.0
 
+Header : 
+    background_colour : 0.447,0.447,0.447,1.0
+    
+DockWindow :
+    background_colour : 0.447,0.447,0.447,1.0
+    
+Tab :
+    background_colour : 0.447,0.447,0.447,1.0
+    
+Page :
+    background_colour : 0.447,0.447,0.447,1.0
+    
 Window :
     background_colour : 0.447,0.447,0.447,1.0
     corner_radius : 10.0,10.0,10.0,10.0
     
 WindowHeader :
-    background_colour : 0.6,0.6,0.6,1.0
+    background_colour : 0.275,0.275,0.275,1.0
+    topdown_gradient : 15,-15
+    text_colour : 1.0,1.0,1.0,1.0
     
 WindowSizer :
     background_colour : 0.6,0.6,0.6,1.0
@@ -101,6 +116,8 @@ Dropdown:
     
 Checkbox :
     inherit_skin : Toggle
+    sizing : FIXED, FIXED
+    size : 16.0,16.0
     
 RadioSwitch :
     corner_radius : 4.0,4.0,4.0,4.0
@@ -109,15 +126,8 @@ RadioChoice :
     inherit_skin : Toggle
     corner_radius : 0.0,0.0,0.0,0.0
     
-DropdownToggle :
-    inherit_skin : Blendish
-    background_colour : 0.275,0.275,0.275,1.0
-    padding : 4.0,4.0
-    sizing : SHRINK, EXPAND
-    
 FillerX :
-    border_colour : 0.196,0.196,0.196,1.0
-    border_width : 1.0,1.0,1.0,1.0
+    inherit_skin : Blendish
     background_colour : 0.447,0.447,0.447,1.0
     topdown_gradient : 15,-5
     
@@ -172,10 +182,24 @@ Input<int> :
 Input<float> :
     corner_radius : 4.0,4.0,4.0,4.0
     
-
+ExpandboxToggle :
+    image : arrow_right_15
+    hovered :
+        image : arrow_right_15
+    pressed :
+        image : arrow_right_15
+    activated :
+        image : arrow_down_15
+    activated|hovered :
+        image : arrow_down_15
+        
+TreeNodeToggle :
+    inherit_skin : ExpandboxToggle
+    
 Tooltip :
     background_colour : 0.098,0.098,0.098,0.902
     text_colour : 0.627,0.627,0.627,1.0
+    skin_padding : 4.0,4.0
     
     activated :
         text_colour : 1.0,1.0,1.0,1.0
@@ -183,29 +207,18 @@ Tooltip :
 
 DropdownBox :
     inherit_skin : Tooltip
-
-WhiteLabel :
-    override : DropdownBox, Label
-
-BlendishMenuItem :
-    border_colour : 0.0,0.0,0.0,1.0
-    background_colour : 0.0,0.0,0.0,0.0
-    #item_colour : 0.675,0.675,0.675,0.502
-    text_colour : 0.627,0.627,0.627,1.0
-    topdown_gradient : 38,0
     
-    activated :
-        text_colour : 1.0,1.0,1.0,1.0
-        background_colour : 0.337,0.502,0.761,1.0
-        
-BlendishNode :
-    border_colour : 0.0,0.0,0.0,1.0
-    background_colour : 0.608,0.608,0.608,0.627
-    #wire_colour : 0.0,0.0,0.0,1.0
+DropdownLabel :
+    inherit : WhiteLabel
     
-    activated :
-        border_colour : 0.945,0.345,0,1.0
-        #wire_colour : 1.0,1.0,1.0,1.0
-        
-    focused :
-        border_colour : 1.0,0.667,0.251,1.0
+DropdownToggle :
+    image : blendish_updown
+    margin : 2.0,0.0
+    skin_padding : 1.0,2.0
+    sizing : SHRINK, EXPAND
+    
+DropdownChoice :
+    hovered :
+        background_colour : 0.337,0.502,0.761,1
+        topdown_gradient : -15,15
+        text_colour : 0.0,0.0,0.0,1.0
