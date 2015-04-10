@@ -72,20 +72,26 @@ namespace mk
 
 	void Frame::updateStyle(Style* style)
 	{
+		bool fixedX = dfixed(DIM_X);
+		bool fixedY = dfixed(DIM_Y);
+
 		d_style = style;
 		d_layout = d_style->layout();
 		d_inkstyle = d_style->subskin(d_widget->state());
 		d_styleStamp = style->updated();
 
 		//d_size = style->d_size; // Caused a bug because we don't set the size through setSize, so the layout isn't updated
-		d_span = d_layout->d_span;
+		if(d_span.null())
+			d_span = d_layout->d_span;
 		d_opacity = d_layout->d_opacity;
-		if(d_parent && d_parent->parent() && d_parent->parent()->layout()->d_weight != TABLE) // Caused a bug because a table rows children are set to expand manually
-			d_sizing = d_layout->d_sizing;
+		d_sizing = d_layout->d_sizing;
 
-		if(dfixed(DIM_X) && d_layout->d_size[DIM_X])
+		if(d_parent && d_parent->parent() && d_parent->parent()->layout()->d_weight == TABLE) // Caused a bug because a table rows children are set to expand manually
+			d_sizing = DimSizing(EXPAND, SHRINK);
+
+		if(!fixedX && dfixed(DIM_X) && d_layout->d_size[DIM_X])
 			setSizeDim(DIM_X, d_layout->d_size[DIM_X]);
-		if(dfixed(DIM_Y) && d_layout->d_size[DIM_Y])
+		if(!fixedY && dfixed(DIM_Y) && d_layout->d_size[DIM_Y])
 			setSizeDim(DIM_Y, d_layout->d_size[DIM_Y]);
 
 		this->setDirty(DIRTY_SKIN);

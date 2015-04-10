@@ -30,8 +30,6 @@ namespace mk
 		mSpaceBefore = this->makeappend<SpacerX>();
 		mButton = this->makeappend<ScrollerKnobY>();
 		mSpaceAfter = this->makeappend<SpacerX>();
-
-		Slider::init();
 	}
 
 	ScrollerY::ScrollerY()
@@ -40,8 +38,6 @@ namespace mk
 		mSpaceBefore = this->makeappend<SpacerY>();
 		mButton = this->makeappend<ScrollerKnobY>();
 		mSpaceAfter = this->makeappend<SpacerY>();
-
-		Slider::init();
 	}
 
 	ScrollerKnobX::ScrollerKnobX()

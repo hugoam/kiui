@@ -9,7 +9,10 @@ WhiteLabel :
     
 Title :
     inherit_skin : Label
-
+    
+SliderDisplay :
+    inherit_skin : Label
+    
 Blendish :
     inherit_skin : Label
     border_colour : 0.146,0.146,0.146,1.0
@@ -59,6 +62,27 @@ NumberField :
         text_colour : 1.0,1.0,1.0,1.0
         background_colour : 0.6,0.6,0.6,1.0
         
+        
+TabHeader :
+    inherit_skin : Label
+    background_colour : 0.407,0.407,0.407,1.0
+    border_width : 0.0,0.0,0.0,0.0
+    corner_radius : 4.0,4.0,0.0,0.0
+    topdown_gradient : 0,-30
+    
+    pressed :
+        background_colour : 0.392,0.392,0.392,1
+        topdown_gradient : -15,15
+        
+    activated :
+        background_colour : 0.337,0.502,0.761,1
+        topdown_gradient : -15,15
+        
+    hovered :
+        background_colour : 0.65,0.65,0.65,1.0
+        border_width : 0.0,0.0,0.0,0.0
+        corner_radius : 4.0,4.0,0.0,0.0
+    
 TableHead :
     inherit_skin : NumberField
     corner_radius : 0.0,0.0,0.0,0.0
@@ -82,6 +106,9 @@ Tab :
 Page :
     background_colour : 0.447,0.447,0.447,1.0
     
+Tree : 
+    background_colour : 0.447,0.447,0.447,1.0
+    
 Window :
     background_colour : 0.447,0.447,0.447,1.0
     corner_radius : 10.0,10.0,10.0,10.0
@@ -90,6 +117,9 @@ WindowHeader :
     background_colour : 0.275,0.275,0.275,1.0
     topdown_gradient : 15,-15
     text_colour : 1.0,1.0,1.0,1.0
+    
+WindowBody :
+    padding : 10.0, 4.0, 4.0, 4.0
     
 WindowSizer :
     background_colour : 0.6,0.6,0.6,1.0
@@ -118,7 +148,17 @@ Checkbox :
     inherit_skin : Toggle
     sizing : FIXED, FIXED
     size : 16.0,16.0
+    skin_padding : 0.0,0.0
     
+    activated :
+        image : blendish_check
+        background_colour : 0.275,0.275,0.275,1.0
+        topdown_gradient : -15,15
+                
+    activated|hovered :
+        image : blendish_check
+        background_colour : 0.275,0.275,0.275,1.0
+        
 RadioSwitch :
     corner_radius : 4.0,4.0,4.0,4.0
     

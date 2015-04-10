@@ -34,6 +34,7 @@ namespace mk
 
 	void Layer::bind()
 	{
+		this->updateStyle(d_widget->style());
 		d_inkLayer = d_target->layer(this, d_zorder);
 		d_inkbox = d_inkLayer->inkbox(this);
 	}

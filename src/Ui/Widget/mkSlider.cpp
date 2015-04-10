@@ -78,7 +78,6 @@ namespace mk
 		: Sheet(style ? style : styleCls())
 		, mDim(dim)
 		, mOnUpdated(onUpdated)
-		, mFixedKnob(false)
 	{}
 	
 	SliderX::SliderX(const Trigger& onUpdated)
@@ -88,8 +87,6 @@ namespace mk
 		mSpaceBefore = this->makeappend<FillerX>();
 		mButton = this->makeappend<SliderKnobX>();
 		mSpaceAfter = this->makeappend<SpacerX>();
-
-		Slider::init();
 	}
 
 	SliderY::SliderY(const Trigger& onUpdated)
@@ -99,14 +96,6 @@ namespace mk
 		mSpaceBefore = this->makeappend<FillerY>();
 		mButton = this->makeappend<SliderKnobY>();
 		mSpaceAfter = this->makeappend<SpacerY>();
-
-		Slider::init();
-	}
-
-	void Slider::init()
-	{
-		if(!mButton->frame()->dexpand(mDim))
-			mFixedKnob = true;
 	}
 
 	void Slider::offsetChange(float offset, bool ended)
@@ -149,7 +138,7 @@ namespace mk
 		mSpaceBefore->frame()->setSpanDim(mDim, mVal - mMin);
 		mSpaceAfter->frame()->setSpanDim(mDim, mMax - mVal);
 
-		if(!mFixedKnob)
+		if(mButton->frame()->dexpand(mDim))
 			mButton->frame()->setSpanDim(mDim, mKnobLength);
 	}
 

@@ -10,9 +10,7 @@ namespace mk
 	Uibox::Uibox(LayoutStyle* style)
 		: d_position(0.f, 0.f)
 		, d_size(0.f, 0.f)
-		, d_span(style->d_span)
-		, d_sizing(style->d_sizing)
-		, d_opacity(style->d_opacity)
+		, d_sizing(SHRINK, SHRINK)
 		, d_layout(style)
 	{}
 

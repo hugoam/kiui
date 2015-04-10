@@ -127,3 +127,9 @@ DropdownBox :
     
 DropdownLabel :
     inherit_skin : Label
+    
+DropdownChoice :
+    hovered :
+        background_colour : 0.337,0.502,0.761,1
+        topdown_gradient : -15,15
+        text_colour : 0.0,0.0,0.0,1.0

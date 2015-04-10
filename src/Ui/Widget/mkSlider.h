@@ -76,8 +76,6 @@ namespace mk
 	public:
 		Slider(Dimension dim = DIM_X, Style* style = nullptr, const Trigger& onUpdated = nullptr);
 
-		void init();
-
 		Widget* spaceBefore() { return mSpaceBefore; }
 		SliderKnob* slider() { return mButton; }
 		Widget* spaceAfter() { return mSpaceAfter; }
@@ -107,7 +105,6 @@ namespace mk
 		float mVal;
 		float mStepLength;
 		float mKnobLength;
-		bool mFixedKnob;
 
 		float mNumSteps;
 		int mStep;
