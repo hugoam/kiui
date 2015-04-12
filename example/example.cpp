@@ -21,7 +21,7 @@ void iterate()
 #endif
 
 #ifndef KIUI_EXAMPLE_RESSOURCE_PATH
-  #define KIUI_EXAMPLE_RESSOURCE_PATH "../data/interface"
+  #define KIUI_EXAMPLE_RESSOURCE_PATH "../data"
 #endif
 
 int main(int argc, char *argv[])
