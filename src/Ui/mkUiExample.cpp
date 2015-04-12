@@ -12,9 +12,11 @@
 #include <cfloat>
 
 #ifdef KIUI_EMSCRIPTEN
-#define EXAMPLE_DATA_PATH "/data"
-#else
-#define EXAMPLE_DATA_PATH "../data/interface"
+#define KIUI_EXAMPLE_RESSOURCE_PATH "/data"
+#endif
+
+#ifndef KIUI_EXAMPLE_RESSOURCE_PATH
+#define KIUI_EXAMPLE_RESSOURCE_PATH "../data"
 #endif
 
 namespace mk
@@ -525,11 +527,11 @@ namespace mk
 		mk::StyleParser parser(sheet->uiWindow()->styler());
 
 		if(name == "Blendish")
-			parser.loadStyleSheet(EXAMPLE_DATA_PATH "/styles/blendish.yml");
+			parser.loadStyleSheet(KIUI_EXAMPLE_RESSOURCE_PATH "/styles/blendish.yml");
 		else if(name == "Blendish Dark")
-			parser.loadStyleSheet(EXAMPLE_DATA_PATH "/styles/blendish_dark.yml");
+			parser.loadStyleSheet(KIUI_EXAMPLE_RESSOURCE_PATH "/styles/blendish_dark.yml");
 		else if(name == "MyGui")
-			parser.loadStyleSheet(EXAMPLE_DATA_PATH "/styles/mygui.yml");
+			parser.loadStyleSheet(KIUI_EXAMPLE_RESSOURCE_PATH "/styles/mygui.yml");
 		else if(name == "Default")
 			parser.loadDefaultStyle();
 	}
