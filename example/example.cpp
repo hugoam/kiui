@@ -27,10 +27,10 @@ void iterate()
 int main(int argc, char *argv[])
 {
 #ifdef KIUI_EMSCRIPTEN
-	mk::GlWindow* glwindow = new mk::GlWindow(1200, 800, "mk UiEditApp", KIUI_EXAMPLE_RESSOURCE_PATH);
+	mk::GlWindow* glwindow = new mk::GlWindow(1200, 800, "kiUi demo", KIUI_EXAMPLE_RESSOURCE_PATH);
 	gGlWindow = glwindow;
 #else
-	std::unique_ptr<mk::GlWindow> glwindow = mk::make_unique<mk::GlWindow>(1200, 800, "mk UiEditApp", KIUI_EXAMPLE_RESSOURCE_PATH);
+	std::unique_ptr<mk::GlWindow> glwindow = mk::make_unique<mk::GlWindow>(1200, 800, "kiUi demo", KIUI_EXAMPLE_RESSOURCE_PATH);
 #endif
 	glwindow->initContext();
 
