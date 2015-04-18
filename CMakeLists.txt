@@ -34,4 +34,4 @@ if (KIUI_BUILD_EXAMPLE)
     add_subdirectory(example)
 endif()
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION data)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION kiui/data)
