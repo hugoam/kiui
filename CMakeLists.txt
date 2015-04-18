@@ -26,8 +26,12 @@ find_package(OpenGL)
 find_package(GLFW)
 
 add_definitions(-DKIUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}/data")
-		
+
 add_subdirectory(src)
-add_subdirectory(example)
+
+set(KIUI_BUILD_EXAMPLE yes CACHE BOOL "Build example kiui app")
+if (KIUI_BUILD_EXAMPLE)
+    add_subdirectory(example)
+endif()
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION kiui/data)
