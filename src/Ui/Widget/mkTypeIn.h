@@ -90,7 +90,7 @@ namespace mk
 			, mMinus(this->template makeappend<Button>("-", std::bind(&NumberInput<T>::decrement, this)))
 			, mStep(1)
 		{
-			mStyle = &cls();
+			this->mStyle = &cls();
 			this->build();
 		}
 
@@ -101,7 +101,7 @@ namespace mk
 			, mMinus(this->template makeappend<Button>("-", std::bind(&NumberInput<T>::decrement, this)))
 			, mStep(1)
 		{
-			mStyle = &cls();
+			this->mStyle = &cls();
 			this->build();
 		}
 

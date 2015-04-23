@@ -10,7 +10,7 @@
 #include <Ui/Nano/mkGlWindow.h>
 
 #ifdef KIUI_EMSCRIPTEN
-#define KIUI_EXAMPLE_RESSOURCE_PATH "/data"
+#define KIUI_EXAMPLE_RESSOURCE_PATH "/data/"
 #include <emscripten/emscripten.h>
 
 mk::GlWindow* gGlWindow;
@@ -21,7 +21,7 @@ void iterate()
 #endif
 
 #ifndef KIUI_EXAMPLE_RESSOURCE_PATH
-  #define KIUI_EXAMPLE_RESSOURCE_PATH "../data"
+  #define KIUI_EXAMPLE_RESSOURCE_PATH "../data/"
 #endif
 
 int main(int argc, char *argv[])
@@ -30,14 +30,14 @@ int main(int argc, char *argv[])
 	mk::GlWindow* glwindow = new mk::GlWindow(1200, 800, "kiUi demo", KIUI_EXAMPLE_RESSOURCE_PATH);
 	gGlWindow = glwindow;
 #else
-	std::unique_ptr<mk::GlWindow> glwindow = mk::make_unique<mk::GlWindow>(1200, 800, "kiUi demo", KIUI_EXAMPLE_RESSOURCE_PATH);
+	mk::GlWindow glwindow(1200, 800, "kiUi demo", KIUI_EXAMPLE_RESSOURCE_PATH);
 #endif
-	glwindow->initContext();
+	glwindow.initContext();
 
-	mk::UiWindow* uiwindow = glwindow->uiWindow();
-	uiwindow->init();
+	mk::UiWindow& uiwindow = glwindow.uiWindow();
+	uiwindow.init();
 
-	mk::Form* root = uiwindow->rootForm();
+	mk::Form& root = uiwindow.rootForm();
 	createUiTest(root);
 
 #ifdef KIUI_EMSCRIPTEN
@@ -45,6 +45,6 @@ int main(int argc, char *argv[])
 #else
 	bool pursue = true;
 	while (pursue)
-		pursue = glwindow->renderFrame();
+		pursue = glwindow.renderFrame();
 #endif
 }
