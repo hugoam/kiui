@@ -1,6 +1,9 @@
+Clear :
+    text_colour : 1.0,1.0,1.0,1.0
+
 Label :
     text_colour : 1.0,1.0,1.0,1.0
-    skin_padding : 4.0,4.0
+    skin_padding : 4.0,4.0,4.0,4.0
     
 Title :
     inherit_skin : Label
@@ -84,7 +87,7 @@ TypeIn :
     topdown_gradient : 0.0,25.0
     
     focused :
-        text_colour : 0.0,0.0,0.0,1.0
+        text_colour : 1.0,1.0,1.0,1.0
         
 DockWindow :
     background_colour : 0.09,0.09,0.09,1.0
@@ -99,21 +102,28 @@ WindowHeader :
     background_colour : 0.275,0.275,0.275,1.0
     topdown_gradient : 15,-15
     text_colour : 1.0,1.0,1.0,1.0
+    padding : 4.0,2.0,4.0,2.0
+    align : CENTER, CENTER
     
 WindowBody :
     padding : 10.0, 4.0, 4.0, 4.0
     
 WindowSizer :
     background_colour : 0.275,0.275,0.275,1.0
-    sizing : EXPAND, FIXED
     size : 0.0,8.0
+    
+CloseButton :
+    inherit_skin : Clear
+    skin_padding : 2.0,2.0,2.0,2.0
+    image : close_15
+    hovered :
+        background_colour : 1.0,0.0,0.0,1.0
     
 Expandbox :
     background_colour : 0.0,0.0,0.0,0.0
     
 ExpandboxHeader :
     inherit_skin : Label
-    padding : 4.0,4.0,4.0,4.0
     background_colour : 0.0,0.0,0.0,0.0
     
 ColumnHeader :
@@ -124,11 +134,13 @@ ColumnHeader :
 Dropdown:
     inherit_skin : Toggle
     
+Typedown:
+    inherit_skin : TypeIn
+    
 Checkbox :
     inherit_skin : Toggle
-    sizing : FIXED, FIXED
     size : 16.0,16.0
-    skin_padding : 0.0,0.0
+    skin_padding : 0.0,0.0,0.0,0.0
     
     activated :
         image : blendish_check
@@ -145,7 +157,7 @@ RadioSwitch :
 RadioChoice :
     inherit_skin : Toggle
     corner_radius : 0.0,0.0,0.0,0.0
-
+    
 FillerX :
     inherit_skin : Blendish
     background_colour : 0.447,0.447,0.447,1.0
@@ -159,7 +171,7 @@ SliderKnobX :
     background_colour : 0.0,0.0,0.0,0.0
     
 SliderDisplay :
-    sizing : EXPAND, EXPAND
+    align : CENTER, CENTER
 
 Scroller :
     inherit_skin : Blendish
@@ -179,18 +191,17 @@ ScrollerButton :
         
     hovered :
         background_colour : 0.542,0.542,0.542,1.0
-      
-Empty :
-    empty : true
         
 Scrollbar :
-    inherit_skin : Empty
+    inherit_skin : Clear
     padding : 6.0,6.0,6.0,6.0
     
 ScrollUp :
+    inherit_skin : Clear
     image : arrow_up_15
     
 ScrollDown :
+    inherit_skin : Clear
     image : arrow_down_15
     
 ScrollerKnobY :
@@ -201,13 +212,13 @@ Input<int> :
     
 Input<float> :
     corner_radius : 4.0,4.0,4.0,4.0
-     
+    
+Caret :
+    background_colour : 1.0,1.0,1.0,1.0
+    
 ExpandboxToggle :
+    inherit_skin : Clear
     image : arrow_right_15
-    hovered :
-        image : arrow_right_15
-    pressed :
-        image : arrow_right_15
     activated :
         image : arrow_down_15
     activated|hovered :
@@ -231,10 +242,10 @@ DropdownLabel :
     inherit_skin : Label
     
 DropdownToggle :
+    inherit_skin : Clear
     image : blendish_updown
     margin : 2.0,0.0
-    skin_padding : 1.0,2.0
-    sizing : SHRINK, EXPAND
+    skin_padding : 1.0,2.0,1.0,2.0
     
 DropdownChoice :
     hovered :

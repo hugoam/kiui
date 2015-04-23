@@ -1,0 +1,117 @@
+Clear :
+    text_colour : 1.0,1.0,1.0,1.0
+    
+Label :
+    text_colour : 1.0,1.0,1.0,1.0
+    text_size : 14.0
+    skin_padding : 6.0,6.0,6.0,6.0
+    align : LEFT, CENTER
+    
+Frame :
+    image_skin : tbb/window, 16, 16, 16, 16, 12
+    
+Container :
+    image_skin : tbb/container, 12, 12, 12, 12, 6
+    
+Window :
+    image_skin : tbb/window, 16, 16, 16, 16, 12
+    
+DockWindow :
+    image_skin : tbb/window, 16, 16, 16, 16, 12
+    
+WindowHeader :
+    padding : 10.0,2.0,10.0,2.0
+    image_skin : tbb/window_mover_overlay, 7, 7, 7, 7, 3
+    align : LEFT, CENTER
+    
+WindowBody :
+    padding : 10.0,4.0,4.0,4.0
+    
+Tabber :
+    inherit_skin : Frame
+    
+Tab :
+    inherit_skin : Container
+    
+TabHeader :
+    inherit_skin : Label
+    image_skin : tbb/tab_button_top_inactive, 12, 12, 12, 12, 6
+    activated :
+        image_skin : tbb/tab_button_top_active, 12, 12, 12, 12, 6
+    
+Expandbox :
+    copy_skin : Container
+    
+ExpandboxHeader :
+    copy_skin : WindowHeader
+    
+ExpandboxToggle :
+    image : tbb/toggle_section_icon_up
+    skin_padding : 6.0,0.0,6.0,0.0
+    activated :
+        image : tbb/toggle_section_icon_down
+        
+Checkbox :
+    inherit_skin : Clear
+    image : tbb/checkbox
+    pressed :
+        overlay : tbb/checkbox_pressed
+    activated :
+        overlay : tbb/checkbox_activated
+    
+CloseButton :
+    image : tbb/window_close
+    decline_image : pressed
+    
+Button :
+    copy_skin : Label
+    skin_padding : 8.0,4.0,8.0,4.0
+    image_skin : tbb/button, 12, 12, 12, 12, 7
+    decline_image_skin : pressed
+    
+Dropdown :
+    copy_skin : Button
+    
+DropdownBox :
+    copy_skin : Frame
+    
+DropdownToggle :
+    image : tbb/arrow_down
+    
+TypeIn :
+    inherit_skin : Label
+    image_skin : tbb/editfield, 12, 12, 12, 12, 4
+    
+Typedown :
+    copy_skin : TypeIn
+    
+ScrollUp :
+    image : tbb/empty
+    
+ScrollDown :
+    image : tbb/empty
+
+Scrollbar :
+    padding : 4.0,4.0,4.0,4.0
+    
+Scroller :
+    size : 13.0,0.0
+    image_skin : tbb/scroll_bg_y, 11, 11, 11, 11, 5
+    
+ScrollerKnobY :
+    size : 13.0,0.0
+    image_skin : tbb/scroll_fg_y, 11, 11, 11, 11, 5
+    
+SliderX :
+    image_skin : tbb/slider_bg_x, 9, 9, 9, 9
+    
+SliderKnobX :
+    inherit_skin : Clear
+    image : tbb/slider_handle
+    
+DropdownChoice :
+    inherit_skin : Clear
+    hovered :
+        image_skin : tbb/item_hover, 7, 7, 7, 7
+#    activated :
+#        image_skin : tbb/item_selected, 7, 7, 7, 7
