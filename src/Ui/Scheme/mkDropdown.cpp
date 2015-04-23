@@ -135,8 +135,12 @@ namespace mk
 
 	void DropdownHeader::update(Widget* choice)
 	{
-		if(mInput)
+		if(mInput && (mInput->typeIn().state() & FOCUSED))
+		{
+			mInput->typeIn().unfocus();
 			mInput->hide();
+		}
+
 		if(mContent)
 			this->release(*mContent);
 		mContent = &this->append(choice->clone());

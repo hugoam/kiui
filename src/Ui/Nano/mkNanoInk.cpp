@@ -293,7 +293,7 @@ namespace mk
 
 			return dim == DIM_X ? float(width) + xoffset : float(height) + yoffset;
 		}
-		else if(!mFrame.widget().label().empty())
+		else if(skin().textColour().a() != 0.f)
 		{
 			float bounds[4];
 			float height;

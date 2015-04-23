@@ -27,9 +27,9 @@ namespace mk
 		if(mName == ".")
 			return;
 		if(mName == "..")
-			mParent->parent()->as<Directory>().moveOut();
+			mParent->as<Directory>().moveOut();
 		else
-			mParent->parent()->as<Directory>().moveIn(mName);
+			mParent->as<Directory>().moveIn(mName);
 			
 	}
 
