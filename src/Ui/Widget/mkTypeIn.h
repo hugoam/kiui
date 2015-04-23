@@ -214,7 +214,7 @@ namespace mk
 
 		TypeIn& typeIn() { return mTypeIn; }
 
-		void notifyUpdate() { mTypeIn.updateString(); if(mOnUpdate) mOnUpdate(mValue->get<string>()); }
+		void notifyUpdate() { mTypeIn.updateString(); if(this->mOnUpdate) this->mOnUpdate(this->mValue->get<string>()); }
 
 	protected:
 		TypeIn& mTypeIn;
