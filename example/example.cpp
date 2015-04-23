@@ -26,12 +26,7 @@ void iterate()
 
 int main(int argc, char *argv[])
 {
-#ifdef KIUI_EMSCRIPTEN
-	mk::GlWindow* glwindow = new mk::GlWindow(1200, 800, "kiUi demo", KIUI_EXAMPLE_RESSOURCE_PATH);
-	gGlWindow = glwindow;
-#else
 	mk::GlWindow glwindow(1200, 800, "kiUi demo", KIUI_EXAMPLE_RESSOURCE_PATH);
-#endif
 	glwindow.initContext();
 
 	mk::UiWindow& uiwindow = glwindow.uiWindow();
@@ -41,6 +36,7 @@ int main(int argc, char *argv[])
 	createUiTest(root);
 
 #ifdef KIUI_EMSCRIPTEN
+	gGlWindow = &glwindow;
 	emscripten_set_main_loop(iterate, 0, 1);
 #else
 	bool pursue = true;

@@ -12,6 +12,8 @@
 #include <Ui/mkUiForward.h>
 #include <Ui/Frame/mkUibox.h>
 
+#include <cmath>
+
 namespace mk
 {
 	class MK_UI_EXPORT _I_ Frame : public Object, public Uibox, public Updatable
