@@ -157,7 +157,7 @@ Typedown:
     inherit_skin : TypeIn
     
 Checkbox :
-    inherit_skin : Toggle
+    copy_skin : Toggle
     size : 16.0,16.0
     skin_padding : 0.0,0.0,0.0,0.0
     

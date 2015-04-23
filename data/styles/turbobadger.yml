@@ -113,5 +113,5 @@ DropdownChoice :
     inherit_skin : Clear
     hovered :
         image_skin : tbb/item_hover, 7, 7, 7, 7
-#    activated :
-#        image_skin : tbb/item_selected, 7, 7, 7, 7
+    activated :
+        image_skin : tbb/item_selected, 7, 7, 7, 7

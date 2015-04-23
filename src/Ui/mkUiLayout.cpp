@@ -359,6 +359,8 @@ namespace mk
 
 		Caret::cls().skin().mBackgroundColour = Colour::White;
 
+		Textbox::cls().skin().mTextWrap = true;
+
 		Page::cls().layout().d_spacing = DimFloat(4.f, 6.f);
 		ExpandboxBody::cls().layout().d_spacing = DimFloat(4.f, 6.f);
 

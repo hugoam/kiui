@@ -434,10 +434,10 @@ namespace mk
 
 	void NanoInk::updateFrame()
 	{
-		if(skin().mEmpty || !mVisible || mFrame.dsize(DIM_X) == 0.f || mFrame.dsize(DIM_X) == 0.f)
+		if(skin().mEmpty || !mVisible || mFrame.dsize(DIM_X) == 0.f || mFrame.dsize(DIM_Y) == 0.f)
 			return;
 
-		if(!mFrame.widget().label().empty())
+		if(!mFrame.widget().label().empty() && skin().textWrap())
 		{
 			mTextRows.clear();
 
@@ -456,6 +456,13 @@ namespace mk
 			}
 
 			mTextRows.pop_back();
+		}
+		else if(!mFrame.widget().label().empty())
+		{
+			mTextRows.resize(1);
+			mTextRows[0].start = mFrame.widget().label().c_str();
+			mTextRows[0].end = mTextRows[0].start + mFrame.widget().label().size();
+			mTextRows[0].width = this->contentSize(DIM_X);
 		}
 
 		NanoInk& parent = static_cast<NanoInk&>(mFrame.parent()->inkbox());

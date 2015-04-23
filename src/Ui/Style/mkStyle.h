@@ -111,7 +111,7 @@ namespace mk
 		_C_ InkStyle()
 			: IdStruct(index<InkStyle>(), cls())
 			, mEmpty(true), mBackgroundColour(Colour::Transparent), mBorderColour(Colour::Transparent), mTextColour(Colour::Transparent), mImageColour(Colour::Transparent)
-			, mTextFont("dejavu"), mTextSize(14.f)
+			, mTextFont("dejavu"), mTextSize(14.f), mTextWrap(false)
 			, mAlign(DimAlign(LEFT, LEFT)), mBorderWidth(0.f), mImage(""), mCornerRadius(), mWeakCorners(true)
 		{}
 
@@ -131,6 +131,7 @@ namespace mk
 			mTextColour.copy(other.mTextColour, inherit);
 			mTextFont.copy(other.mTextFont, inherit);
 			mTextSize.copy(other.mTextSize, inherit);
+			mTextWrap.copy(other.mTextWrap, inherit);
 			mBorderWidth.copy(other.mBorderWidth, inherit);
 			mCornerRadius.copy(other.mCornerRadius, inherit);
 			mWeakCorners.copy(other.mWeakCorners, inherit);
@@ -150,6 +151,7 @@ namespace mk
 		_A_ Colour& textColour() { return mTextColour.val; }
 		_A_ const string& textFont() { return mTextFont.val; }
 		_A_ float textSize() { return mTextSize.val; }
+		_A_ bool textWrap() { return mTextWrap.val; }
 		_A_ BoxFloat& borderWidth() { return mBorderWidth.val; }
 		_A_ BoxFloat& cornerRadius() { return mCornerRadius.val; }
 		_A_ bool weakCorners() const { return mWeakCorners.val; }
@@ -168,6 +170,7 @@ namespace mk
 		StyleAttr<Colour> mTextColour;
 		StyleAttr<string> mTextFont;
 		StyleAttr<float> mTextSize;
+		StyleAttr<bool> mTextWrap;
 		StyleAttr<BoxFloat> mBorderWidth;
 		StyleAttr<BoxFloat> mCornerRadius;
 		StyleAttr<bool> mWeakCorners;

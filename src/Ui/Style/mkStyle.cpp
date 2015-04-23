@@ -94,7 +94,10 @@ namespace mk
 		mSkin.copy(base.skin(), true);
 
 		for(auto& subskin : base.mSubskins)
+		{
+			this->copy(subskin.mState, mSkin, false);
 			this->copy(subskin.mState, subskin.mSkin, true);
+		}
 	}
 
 	void Style::copySkins(Style& base)
