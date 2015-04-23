@@ -11,25 +11,43 @@
 #include <Ui/Form/mkForm.h>
 #include <Ui/Form/mkDropper.h>
 #include <Ui/Widget/mkSheet.h>
+#include <Ui/Widget/mkTypeIn.h>
 
 namespace mk
 {
-	class MK_UI_EXPORT List : public ScrollSheet, public Typed<List, Sheet>, public Styled<List>
+	class MK_UI_EXPORT List : public ScrollSheet
 	{
 	public:
-		List(Style* style = nullptr);
+		List();
 
-		using Typed<List, Sheet>::cls;
-		using Styled<List>::styleCls;
+		static StyleType& cls() { static StyleType ty(ScrollSheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT Sequence : public Sheet, public Typed<Sequence, Sheet>, public Styled<Sequence>
+	class MK_UI_EXPORT FilterList : public ScrollSheet
 	{
 	public:
-		Sequence(Style* style = nullptr);
+		FilterList(FrameType frameType = STRIPE);
 
-		using Typed<Sequence, Sheet>::cls;
-		using Styled<Sequence>::styleCls;
+		void updateFilter(const string& filter);
+		bool fitsFilter(const string& filter, const string& value);
+
+		static StyleType& cls() { static StyleType ty(ScrollSheet::cls()); return ty; }
+	};
+
+	class MK_UI_EXPORT FilterInput : public Input<string>
+	{
+	public:
+		FilterInput(FilterList& list, std::function<void(string)> callback = nullptr);
+
+		void filterOn();
+		void filterOff();
+
+		void notifyUpdate();
+
+		static StyleType& cls() { static StyleType ty(Input<string>::cls()); return ty; }
+
+	protected:
+		FilterList& mList;
 	};
 
 	class MK_UI_EXPORT LabelSequence : public Sequence
@@ -44,10 +62,10 @@ namespace mk
 		ButtonSequence(StringVector labels = StringVector());
 	};
 
-	class MK_UI_EXPORT SortList : public List, public Typed<SortList, List>, public Dropper
+	class MK_UI_EXPORT SortList : public List, public Dropper
 	{
 	public:
-		SortList(Style* style);
+		SortList();
 
 		Form* swapdrop(Form* form, Dropper* source) { UNUSED(form); UNUSED(source); return nullptr; }
 		bool candrop(Form* form, Dropper* source) { UNUSED(form); UNUSED(source); return false; }
@@ -56,7 +74,7 @@ namespace mk
 
 		virtual void moved(size_t from, size_t to) { UNUSED(from); UNUSED(to); }
 
-		using Typed<SortList, List>::cls;
+		static StyleType& cls() { static StyleType ty(List::cls()); return ty; }
 	};
 }
 

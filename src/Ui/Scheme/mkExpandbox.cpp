@@ -15,29 +15,36 @@
 namespace mk
 {
 	ExpandboxHeader::ExpandboxHeader()
-		: Sheet(styleCls())
-	{}
+		: Sequence()
+	{
+		mStyle = &cls();
+	}
 
 	ExpandboxBody::ExpandboxBody()
-		: Sheet(styleCls())
-	{}
+		: Sheet()
+	{
+		mStyle = &cls();
+	}
 
 	ExpandboxToggle::ExpandboxToggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on)
-		: Toggle(styleCls(), triggerOn, triggerOff, on)
-	{}
+		: Toggle(triggerOn, triggerOff, on)
+	{
+		mStyle = &cls();
+	}
 
 	Expandbox::Expandbox(const string& title, bool collapsed, bool build)
-		: Sheet(styleCls())
+		: Sheet()
 		, mTitle(title)
 		, mCollapsed(collapsed)
 	{
+		mStyle = &cls();
 		if(build)
 		{
-			mHeader = this->makeappend<ExpandboxHeader>();
-			mContainer = this->makeappend<ExpandboxBody>();
+			mHeader = &this->makeappend<ExpandboxHeader>();
+			mContainer = &this->makeappend<ExpandboxBody>();
 
-			mExpandButton = mHeader->emplace<ExpandboxToggle>(std::bind(&Expandbox::expand, this), std::bind(&Expandbox::collapse, this), !mCollapsed);
-			mTitleLabel = mHeader->emplace<Title>(mTitle);
+			mExpandButton = &mHeader->emplace<ExpandboxToggle>(std::bind(&Expandbox::expand, this), std::bind(&Expandbox::collapse, this), !mCollapsed);
+			mTitleLabel = &mHeader->emplace<Title>(mTitle);
 
 			mContainer->hide();
 		}
@@ -46,14 +53,14 @@ namespace mk
 	Expandbox::~Expandbox()
 	{}
 
-	Widget* Expandbox::vappend(unique_ptr<Widget> widget)
+	Widget& Expandbox::vappend(unique_ptr<Widget> widget)
 	{
-		if(!mCollapsed && mContainer->frame()->hidden())
+		if(!mCollapsed && mContainer->frame().hidden())
 			mContainer->show();
 		return mContainer->append(std::move(widget));
 	}
 
-	unique_ptr<Widget> Expandbox::vrelease(Widget* widget)
+	unique_ptr<Widget> Expandbox::vrelease(Widget& widget)
 	{
 		return mContainer->release(widget);
 	}

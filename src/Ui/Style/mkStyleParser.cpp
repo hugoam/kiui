@@ -17,15 +17,16 @@ namespace mk
 {
 	template <> Flow fromString<Flow>(const string& str) { if(str == "FLOW") return FLOW; else if(str == "MANUAL") return MANUAL; return FLOW; }
 	template <> Clipping fromString<Clipping>(const string& str) { if(str == "NOCLIP") return NOCLIP; else if(str == "CLIP") return CLIP; return NOCLIP; }
-	template <> Overflow fromString<Overflow>(const string& str) { if(str == "FLOWOVER") return FLOWOVER; else if(str == "SCROLL") return SCROLL; return FLOWOVER; }
 	template <> Opacity fromString<Opacity>(const string& str) { if(str == "OPAQUE") return OPAQUE; else if(str == "VOID") return VOID; return OPAQUE; }
 	template <> Dimension fromString<Dimension>(const string& str) { if(str == "DIM_X") return DIM_X; else if(str == "DIM_Y") return DIM_Y; return DIM_X; }
-	template <> Sizing fromString<Sizing>(const string& str) { if(str == "FIXED") return FIXED; else if(str == "SHRINK") return SHRINK; else if(str == "EXPAND") return EXPAND; else if(str == "WRAP") return WRAP; return FIXED; }
+	template <> Sizing fromString<Sizing>(const string& str) { if(str == "FIXED") return FIXED; else if(str == "SHRINK") return SHRINK; else if(str == "EXPAND") return EXPAND; return FIXED; }
+	template <> Align fromString<Align>(const string& str) { if(str == "CENTER") return CENTER; else if(str == "LEFT") return LEFT; else if(str == "RIGHT") return RIGHT; return LEFT; }
 	template <> Pivot fromString<Pivot>(const string& str) { if(str == "FORWARD") return FORWARD; else if(str == "REVERSE") return REVERSE; return FORWARD; }
 	template <> Weight fromString<Weight>(const string& str) { if(str == "LIST") return LIST; else if(str == "TABLE") return TABLE; return LIST; }
 
 	template <> DimSizing fromString<DimSizing>(const string& str) { std::vector<string> dimStr = splitString(str, ","); return DimSizing(fromString<Sizing>(dimStr[0]), fromString<Sizing>(dimStr[1])); }
 	template <> DimPivot fromString<DimPivot>(const string& str) { std::vector<string> dimStr = splitString(str, ","); return DimPivot(fromString<Pivot>(dimStr[0]), fromString<Pivot>(dimStr[1])); }
+	template <> DimAlign fromString<DimAlign>(const string& str) { std::vector<string> dimStr = splitString(str, ","); return DimAlign(fromString<Align>(dimStr[0]), fromString<Align>(dimStr[1])); }
 
 	template <> inline void fromString<DimFloat>(const string& str, DimFloat& vec) { string_to_fixed_vector<DimFloat, float>(str, vec); }
 	template <> inline void toString<DimFloat>(const DimFloat& val, string& str) { return fixed_vector_to_string<DimFloat, 2>(val, str); }
@@ -70,7 +71,7 @@ namespace mk
 		yaml_parser_t mParser;
 	};
 
-	StyleParser::StyleParser(Styler* styler)
+	StyleParser::StyleParser(Styler& styler)
 		: mStyler(styler)
 		, mState(IN_DOCUMENT)
 		, mKeyState(IN_KEY_DEFINITION)
@@ -82,17 +83,14 @@ namespace mk
 
 	void StyleParser::loadDefaultStyle()
 	{
-		mStyler->reset();
-		mStyler->defaultLayout();
-		mStyler->defaultSkins();
-		mStyler->prepare();
+		mStyler.reset();
+		mStyler.defaultSkins();
+		mStyler.prepare();
 	}
 
 	void StyleParser::loadStyleSheet(const string& path)
 	{
-		mStyler->reset();
-		mStyler->defaultLayout();
-		mStyler->prepare();
+		mStyler.reset();
 
 		yaml_event_t event;
 		yaml_token_t token;
@@ -144,15 +142,17 @@ namespace mk
 			done = (token.type == YAML_STREAM_END_TOKEN);
 			yaml_token_delete(&token);
 		}
+
+		mStyler.prepare();
 	}
 
 	void StyleParser::startStyle(const string& name)
 	{
 		mState = IN_STYLE_DEFINITION;
-		mStyle = mStyler->dynamicStyle(name);
+		mStyle = &mStyler.dynamicStyle(name);
 		mStyle->setUpdated(mStyle->updated() + 1);
-		mSkin = mStyle->skin();
-		mStyle->skin()->mEmpty = false;
+		mSkin = &mStyle->skin();
+		mStyle->skin().mEmpty = false;
 	}
 
 	void StyleParser::startSubskin(const string& name)
@@ -160,7 +160,7 @@ namespace mk
 		mState = IN_SUBSKIN_DEFINITION;
 		string clean = replaceAll(name, " ", "");
 		WidgetState state = fromString<WidgetState>(clean);
-		mSkin = mStyle->decline(state);
+		mSkin = &mStyle->decline(state);
 	}
 
 	void StyleParser::declineImage(const string& strStates)
@@ -170,7 +170,7 @@ namespace mk
 		{
 			WidgetState state = fromString<WidgetState>(strState);
 			string suffix = "_" + replaceAll(strState, "|", "_");
-			mStyle->decline(state)->mImage = mSkin->mImage + suffix;
+			mStyle->decline(state).mImage = mSkin->image() + suffix;
 		}
 	}
 	
@@ -181,9 +181,9 @@ namespace mk
 		{
 			WidgetState state = fromString<WidgetState>(strState);
 			string suffix = "_" + replaceAll(strState, "|", "_");
-			InkStyle* inkstyle = mStyle->decline(state);
-			inkstyle->mImageSkin = mSkin->mImageSkin;
-			inkstyle->mImageSkin.d_image += suffix;
+			InkStyle& inkstyle = mStyle->decline(state);
+			inkstyle.mImageSkin = mSkin->mImageSkin;
+			inkstyle.mImageSkin.val.setImage(mSkin->mImageSkin.val.d_image + suffix);
 		}
 	}
 
@@ -193,40 +193,40 @@ namespace mk
 		std::vector<string> values = splitString(value, ",");
 
 		if(key == "inherit")
-			mStyle->inherit(mStyler->fetchStyle(value));
+			mStyle->rebase(*mStyler.fetchStyle(value));
 		if(key == "inherit_skin")
-			mStyle->inheritSkins(mStyler->fetchStyle(value));
+			mStyle->rebaseSkins(*mStyler.fetchStyle(value));
+		if(key == "copy_skin")
+			mStyle->copySkins(*mStyler.fetchStyle(value));
 		else if(key == "override")
-			mStyler->override(values[0], values[1], mStyle->name());
+			mStyler.override(values[0], values[1], mStyle->name());
 
 		else if(key == "flow")
-			mStyle->layout()->d_flow = fromString<Flow>(value); // FLOW | MANUAL
+			mStyle->layout().d_flow = fromString<Flow>(value); // FLOW | MANUAL
 		else if(key == "clipping")
-			mStyle->layout()->d_clipping = fromString<Clipping>(value); // NOCLIP | CLIP
-		else if(key == "overflow")
-			mStyle->layout()->d_overflow = fromString<Overflow>(value); // FLOWOVER | SCROLL
+			mStyle->layout().d_clipping = fromString<Clipping>(value); // NOCLIP | CLIP
 		else if(key == "opacity")
-			mStyle->layout()->d_opacity = fromString<Opacity>(value); // OPAQUE | VOID
+			mStyle->layout().d_opacity = fromString<Opacity>(value); // OPAQUE | VOID
 		else if(key == "layout_dim")
-			mStyle->layout()->d_layoutDim = fromString<Dimension>(value); // DIM_X | DIM_Y
-		else if(key == "sizing")
-			mStyle->layout()->d_sizing = fromString<DimSizing>(value); // FIXED | SHRINK | EXPAND | WRAP
+			mStyle->layout().d_layoutDim = fromString<Dimension>(value); // DIM_X | DIM_Y
+		else if(key == "need")
+			mStyle->layout().d_space = fromString<Space>(value); // BLOCK | SPACE | BOARD
 		else if(key == "span")
-			mStyle->layout()->d_span = fromString<DimFloat>(value); // 1.0, 1.0
+			mStyle->layout().d_span = fromString<DimFloat>(value); // 1.0, 1.0
 		else if(key == "size")
-			mStyle->layout()->d_size = fromString<DimFloat>(value); // 123.0, 123.0
+			mStyle->layout().d_size = fromString<DimFloat>(value); // 123.0, 123.0
 		else if(key == "padding")
-			mStyle->layout()->d_padding = fromString<BoxFloat>(value); // left, right, top, bottom
+			mStyle->layout().d_padding = fromString<BoxFloat>(value); // left, right, top, bottom
 		else if(key == "margin")
-			mStyle->layout()->d_margin = fromString<DimFloat>(value); // x, y
+			mStyle->layout().d_margin = fromString<DimFloat>(value); // x, y
 		else if(key == "spacing")
-			mStyle->layout()->d_spacing = fromString<DimFloat>(value); // x, y
+			mStyle->layout().d_spacing = fromString<DimFloat>(value); // x, y
 		else if(key == "pivot")
-			mStyle->layout()->d_pivot = fromString<DimPivot>(value);// FORWARD | REVERSE
+			mStyle->layout().d_pivot = fromString<DimPivot>(value);// FORWARD | REVERSE
 		else if(key == "weight")
-			mStyle->layout()->d_weight = fromString<Weight>(value); // LIST | TABLE
+			mStyle->layout().d_weight = fromString<Weight>(value); // LIST | TABLE
 		else if(key == "weights")
-			mStyle->layout()->d_weights = fromString<std::vector<float>>(value); // : 0.3, 0.4, 0.3
+			mStyle->layout().d_weights = fromString<std::vector<float>>(value); // : 0.3, 0.4, 0.3
 
 		else if(key == "empty")
 			mSkin->mEmpty = (value == "false" ? false : true);
@@ -238,24 +238,32 @@ namespace mk
 			mSkin->mImageColour = fromString<Colour>(value); // r, g, b, a
 		else if(key == "text_colour")
 			mSkin->mTextColour = fromString<Colour>(value); // r, g, b, a
+		else if(key == "text_size")
+			mSkin->mTextSize = fromString<float>(value); // 0.0
+		else if(key == "text_colour")
+			mSkin->mTextFont = value; // fontname
 		else if(key == "border_width")
 			mSkin->mBorderWidth = fromString<BoxFloat>(value); // top, right, bottom, left
 		else if(key == "corner_radius")
 			mSkin->mCornerRadius = fromString<BoxFloat>(value); // topleft, topright, bottomright, bottomleft
 		else if(key == "weak_corners")
 			mSkin->mWeakCorners = (value == "false" ? false : true); // true | false
+		else if(key == "align")
+			mSkin->mAlign = fromString<DimAlign>(value); // x, y
+		else if(key == "skin_padding")
+			mSkin->mPadding = fromString<BoxFloat>(value); // left, right, top, bottom
 		else if(key == "skin_margin")
 			mSkin->mMargin = fromString<BoxFloat>(value); // x, y, z, w
-		else if(key == "skin_padding")
-			mSkin->mPadding = fromString<DimFloat>(value); // x, y
 		else if(key == "topdown_gradient")
 			mSkin->mTopdownGradient = fromString<DimFloat>(value); // top, down
 		else if(key == "image")
 			mSkin->mImage = value; // image.png
+		else if(key == "overlay")
+			mSkin->mOverlay = value; // image.png
 		else if(key == "image_skin")
 			mSkin->mImageSkin = ImageSkin(values[0],	fromString<int>(values[1]), fromString<int>(values[2]),
 														fromString<int>(values[3]), fromString<int>(values[4]),
-														fromString<int>(values[5]), fromString<int>(values[6])); // : image.png
+														values.size() > 5 ? fromString<int>(values[5]) : 0); // : image.png
 		else if(key == "decline_image")
 			this->declineImage(value);
 		else if(key == "decline_image_skin")

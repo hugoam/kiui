@@ -39,17 +39,19 @@ namespace mk
 	public:
 		_C_ Proto(Type* type);
 
-		void init(Type* stem, std::vector<Type*> parts) { mStem = stem; for(Type* type : parts) addPart(type); }
+		void init(Type* stem, std::vector<Type*> parts) { mStem = stem; for(Type* type : parts) addPart(*type); }
 
 		_A_ Type* prototype() { return mType; }
 		_A_ Type* stem() { return mStem; }
 		_A_ const std::vector<Type*>& parts() const { return mParts; }
 		_A_ Id id() const { return mId; }
 
-		inline void addPart(Type* type) { mHashParts[type->id()].type = type; mHashParts[type->id()].index = mNumParts++; mParts.push_back(type); }
-		inline bool hasPart(Type* type) { return (mHashParts[type->id()].type != 0); }
-		inline int partIndex(Type* type) { return mHashParts[type->id()].index; }
+		inline void addPart(Type& type) { mHashParts[type.id()].type = &type; mHashParts[type.id()].index = mNumParts++; mParts.push_back(&type); }
+		inline bool hasPart(Type& type) { return (mHashParts[type.id()].type != 0); }
+		inline int partIndex(Type& type) { return mHashParts[type.id()].index; }
 		inline size_t numParts() { return mNumParts; }
+
+		static Type& cls() { static Type ty; return ty; }
 
 	protected:
 		Type* mType;
@@ -83,6 +85,8 @@ namespace mk
 	{
 	public:
 		TPrototype(Stem* stem) : Part(T::cls(), stem) {}
+
+		static Type& cls() { static Type ty; return ty; }
 	};
 }
 

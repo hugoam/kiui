@@ -15,18 +15,19 @@
 #include <Ui/Frame/mkStripe.h>
 
 #include <memory>
+#include <deque>
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Sheet : public Widget, public Typed<Sheet>
+	class MK_UI_EXPORT _I_ Sheet : public Widget
 	{
 	public:
-		Sheet(Style* style, FrameType frameType = STRIPE);
+		Sheet(FrameType frameType = STRIPE);
 		~Sheet();
 
 		void nextFrame(size_t tick, size_t delta);
 
-		inline Stripe* stripe() { return mFrame->as<Stripe>(); }
+		inline Stripe& stripe() { return mFrame->as<Stripe>(); }
 		inline const std::vector<unique_ptr<Widget>>& contents() { return mContents; }
 		inline size_t count() { return mContents.size(); }
 
@@ -35,12 +36,12 @@ namespace mk
 		void bind(Sheet* parent, size_t index);
 		void rebind(Sheet* parent, size_t index);
 
-		virtual Widget* vappend(unique_ptr<Widget> widget) { return append(std::move(widget)); }
-		virtual unique_ptr<Widget> vrelease(Widget* widget) { return widget->unbind(); }
+		virtual Widget& vappend(unique_ptr<Widget> widget) { return append(std::move(widget)); }
+		virtual unique_ptr<Widget> vrelease(Widget& widget) { return widget.unbind(); }
 
-		Widget* insert(unique_ptr<Widget> widget, size_t index);
-		Widget* append(unique_ptr<Widget> widget);
-		unique_ptr<Widget> release(Widget* widget);
+		Widget& insert(unique_ptr<Widget> widget, size_t index);
+		Widget& append(unique_ptr<Widget> widget);
+		unique_ptr<Widget> release(Widget& widget);
 		unique_ptr<Widget> release(size_t index);
 
 		void clear();
@@ -48,111 +49,150 @@ namespace mk
 		void cleanup();
 
 		template <class T, class... Args>
-		inline T* emplace(Args&&... args)
+		inline T& emplace(Args&&... args)
 		{
-			return this->vappend(make_unique<T>(std::forward<Args>(args)...))->template as<T>();
+			return this->vappend(make_unique<T>(std::forward<Args>(args)...)).template as<T>();
 		}
 
-		using Typed<Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
 
 	protected:
 		template <class T, class... Args>
-		inline T* makeappend(Args&&... args)
+		inline T& makeappend(Args&&... args)
 		{
-			return this->append(make_unique<T>(std::forward<Args>(args)...))->template as<T>();
+			return this->append(make_unique<T>(std::forward<Args>(args)...)).template as<T>();
 		}
 
 		template <class T, class... Args>
-		inline T* makeinsert(size_t index, Args&&... args)
+		inline T& makeinsert(size_t index, Args&&... args)
 		{
-			return this->insert(make_unique<T>(std::forward<Args>(args)...), index)->template as<T>();
+			return this->insert(make_unique<T>(std::forward<Args>(args)...), index).template as<T>();
 		}
 
 	protected:
 		std::vector<unique_ptr<Widget>> mContents;
 	};
 
-	class MK_UI_EXPORT _I_ ScrollSheet : public Sheet, public Typed<ScrollSheet, Sheet>, public Styled<ScrollSheet>
+	class MK_UI_EXPORT _I_ LayerSheet : public Sheet
 	{
 	public:
-		ScrollSheet(Style* style);
+		LayerSheet();
+
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+	};
+
+	class MK_UI_EXPORT _I_ Board : public Sheet
+	{
+	public:
+		Board();
+
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+	};
+
+	class MK_UI_EXPORT _I_ WrapSheet : public Sheet
+	{
+	public:
+		WrapSheet();
+
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+	};
+
+	class MK_UI_EXPORT _I_ ScrollSheet : public Sheet
+	{
+	public:
+		ScrollSheet(FrameType frameType = STRIPE);
 		~ScrollSheet();
 
 		void nextFrame(size_t tick, size_t delta);
 
-		Widget* vappend(unique_ptr<Widget> widget);
-		unique_ptr<Widget> vrelease(Widget* widget);
-
-		using Typed<ScrollSheet, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 
 	protected:
-		Sheet* mSheet;
-		Scrollbar* mScrollbar;
+		ScrollArea& mScrollArea;
 	};
 
 	class MK_UI_EXPORT GridSheet : public Sheet
 	{
 	public:
-		GridSheet(Dimension dim, Style* style);
+		GridSheet(Dimension dim);
 
-		Style* hoverCursor() { return mHoverCursor; }
+		Style* hoverCursor() { return &mHoverCursor; }
 
 		bool leftDragStart(float xPos, float yPos);
 		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
 		bool leftDragEnd(float xPos, float yPos);
 
-		virtual void gridResized(Widget* first, Widget* second) { UNUSED(first); UNUSED(second); }
+		virtual void gridResized(Widget& first, Widget& second) { UNUSED(first); UNUSED(second); }
+
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 
 	protected:
 		Dimension mDim;
 		Widget* mResizing;
-		Style* mHoverCursor;
+		Style& mHoverCursor;
 	};
 
-	class MK_UI_EXPORT _I_ Cursor : public Widget, public Typed<Cursor, Widget>, public Styled<Cursor>
+	class MK_UI_EXPORT _I_ Cursor : public Widget
 	{
 	public:
-		Cursor(RootSheet* rootSheet);
-
-		Widget* hovered() { return mHovered; }
+		Cursor(RootSheet& rootSheet);
 
 		void nextFrame();
 		void setPosition(float x, float y);
 
-		void hover(Widget* hovered);
-		void unhover(Widget* hovered);
+		void hover(Widget& hovered);
+		void unhover();
 
 		void tooltipOn();
 		void tooltipOff();
 
-		using Typed<Cursor, Widget>::cls;
+		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
 
 	protected:
 		bool mDirty;
 		Widget* mHovered;
-		Tooltip* mTooltip;
+		std::vector<Widget*> mUnderHover;
+		Tooltip& mTooltip;
 		Clock mTooltipClock;
 	};
 
-	class MK_UI_EXPORT ResizeCursorX : public Object, public Typed<ResizeCursorX>, public Styled<ResizeCursorX>
-	{};
+	class MK_UI_EXPORT ResizeCursorX : public Object
+	{
+	public:
+		static StyleType& cls() { static StyleType ty(Cursor::cls()); return ty; }
+	};
 
-	class MK_UI_EXPORT ResizeCursorY : public Object, public Typed<ResizeCursorY>, public Styled<ResizeCursorY>
-	{};
+	class MK_UI_EXPORT ResizeCursorY
+	{
+	public:
+		static StyleType& cls() { static StyleType ty(Cursor::cls()); return ty; }
+	};
 
-	class MK_UI_EXPORT MoveCursor : public Object, public Typed<MoveCursor>, public Styled<MoveCursor>
-	{};
+	class MK_UI_EXPORT MoveCursor : public Object
+	{
+	public:
+		static StyleType& cls() { static StyleType ty(Cursor::cls()); return ty; }
+	};
 
-	class MK_UI_EXPORT ResizeCursorDiagLeft : public Object, public Typed<ResizeCursorDiagLeft>, public Styled<ResizeCursorDiagLeft>
-	{};
+	class MK_UI_EXPORT ResizeCursorDiagLeft : public Object
+	{
+	public:
+		static StyleType& cls() { static StyleType ty(Cursor::cls()); return ty; }
+	};
 
-	class MK_UI_EXPORT ResizeCursorDiagRight : public Object, public Typed<ResizeCursorDiagRight>, public Styled<ResizeCursorDiagRight>
-	{};
+	class MK_UI_EXPORT ResizeCursorDiagRight : public Object
+	{
+	public:
+		static StyleType& cls() { static StyleType ty(Cursor::cls()); return ty; }
+	};
 
-	class MK_UI_EXPORT CaretCursor : public Object, public Typed<CaretCursor>, public Styled<CaretCursor>
-	{};
+	class MK_UI_EXPORT CaretCursor : public Object
+	{
+	public:
+		static StyleType& cls() { static StyleType ty(Cursor::cls()); return ty; }
+	};
 
-	class MK_UI_EXPORT _I_ Caret : public Widget, public Typed<Caret, Widget>, public Styled<Caret>
+	class MK_UI_EXPORT _I_ Caret : public Widget
 	{
 	public:
 		Caret(Frame* textFrame);
@@ -160,10 +200,14 @@ namespace mk
 		size_t index() { return mIndex; }
 
 		void setIndex(size_t index) { mIndex = index; mDirty = true; }
+		
+		void moveTo(size_t index);
+		void moveRight();
+		void moveLeft();
 
 		void nextFrame(size_t tick, size_t delta);
 
-		using Typed<Caret, Widget>::cls;
+		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
 
 	protected:
 		Frame* mTextFrame;
@@ -171,7 +215,7 @@ namespace mk
 		bool mDirty;
 	};
 
-	class MK_UI_EXPORT _I_ Tooltip : public Widget, public Typed<Tooltip, Widget>, public Styled<Tooltip>
+	class MK_UI_EXPORT _I_ Tooltip : public Widget
 	{
 	public:
 		Tooltip(const string& label);
@@ -181,10 +225,18 @@ namespace mk
 
 		void setLabel(const string& label);
 
-		using Typed<Tooltip, Widget>::cls;
+		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
 
 	protected:
 		string mLabel;
+	};
+
+	class MK_UI_EXPORT Sequence : public Sheet
+	{
+	public:
+		Sequence();
+
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 	};
 }
 

@@ -22,9 +22,11 @@
 namespace mk
 {
 	Checkbox::Checkbox(WValue* input, bool on)
-		: Toggle(styleCls(), std::bind(&Checkbox::on, this), std::bind(&Checkbox::off, this), on)
+		: Toggle(std::bind(&Checkbox::on, this), std::bind(&Checkbox::off, this), on)
 		, mInput(input)
-	{}
+	{
+		mStyle = &cls();
+	}
 
 	void Checkbox::on()
 	{

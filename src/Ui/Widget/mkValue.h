@@ -20,7 +20,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT ValueWidget : public HashDispatch<ValueWidget, Sheet*, WValue*>
+	class MK_UI_EXPORT ValueWidget : public HashDispatch<ValueWidget, Sheet*, WValue&>
 	{};
 
 	class MK_UI_EXPORT Value : public NonCopy
@@ -45,15 +45,15 @@ namespace mk
 		bool mEdit;
 	};
 
-	class MK_UI_EXPORT WValue : public Sheet, public Value, public Typed<WValue, Sheet>, public Styled<WValue>
+	class MK_UI_EXPORT WValue : public Sheet, public Value
 	{
 	public:
-		WValue(Lref& lref, Style* style, bool edit = false);
-		WValue(Lref&& lref, Style* style, bool edit = false);
+		WValue(Lref& lref, bool edit = false);
+		WValue(Lref&& lref, bool edit = false);
 
 		void notifyUpdate();
 
-		using Typed<WValue, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 	};
 }
 

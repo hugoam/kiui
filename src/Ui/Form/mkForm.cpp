@@ -24,31 +24,29 @@ namespace mk
 		, mParent(nullptr)
 		, mIndex(0)
 		, mUniqueSheet(std::move(sheet))
-		, mSheet(mUniqueSheet.get())
+		, mSheet(*mUniqueSheet.get())
 		, mContainer(mUniqueSheet.get())
 	{}
 
 	Form::~Form()
 	{}
 
-	RootForm* Form::rootForm()
+	RootForm& Form::rootForm()
 	{
 		if(mParent)
 			return mParent->rootForm();
-		else if(mType == RootForm::cls())
+		else if(mType == &RootForm::cls())
 			return this->as<RootForm>();
-		else
-			return nullptr;
 	}
 
-	UiWindow* Form::uiWindow()
+	UiWindow& Form::uiWindow()
 	{
-		return rootForm()->uiWindow();
+		return rootForm().uiWindow();
 	}
 
 	const string& Form::name()
 	{
-		return mSheet->name();
+		return mSheet.name();
 	}
 
 	void Form::bind(Form* parent)
@@ -59,7 +57,7 @@ namespace mk
 
 	void Form::unbind()
 	{
-		mUniqueSheet.reset(mParent->container()->vrelease(mSheet).release()->as<Sheet>());
+		mUniqueSheet.reset(static_cast<Sheet*>(mParent->container()->vrelease(mSheet).release()));
 		mParent = nullptr;
 	}
 	
@@ -89,7 +87,7 @@ namespace mk
 	unique_ptr<Form> Form::release(size_t pos)
 	{
 		//if(mContents.at(pos)->widget())
-		//	mContents.at(pos)->widget()->detach();
+		//	mContents.at(pos)->widget().detach();
 
 		unique_ptr<Form> pointer = std::move(mContents[pos]);
 		mContents.erase(mContents.begin() + pos);
@@ -127,7 +125,7 @@ namespace mk
 		std::swap(mContents[from], mContents[to]);
 		this->reindex(from < to ? from : to);
 
-		mSheet->stripe()->move(from, to);
+		mSheet.stripe().move(from, to);
 	}
 
 	void Form::clear()
@@ -162,7 +160,7 @@ namespace mk
 
 	Form* Form::findParent(Type* type)
 	{
-		if(this->type() == type)
+		if(&this->type() == type)
 			return this;
 		else if(mParent)
 			return mParent->findParent(type);
@@ -190,7 +188,7 @@ namespace mk
 
 	void Form::reset(unique_ptr<Sheet> sheet)
 	{
-		for(auto& form : mContents)
+		/*for(auto& form : mContents)
 			form->unbind();
 
 		mUniqueSheet = std::move(sheet);
@@ -198,6 +196,6 @@ namespace mk
 		mContainer = mUniqueSheet.get();
 
 		for(auto& form : mContents)
-			form->bind(this);
+			form->bind(this);*/
 	}
 }

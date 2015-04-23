@@ -23,22 +23,31 @@ namespace mk
 	template <class T>
 	class Any;
 
+	class MK_OBJECT_EXPORT None
+	{
+	public:
+		template <class T>
+		operator T() { return T(); }
+
+		static Type& cls() { static Type ty; return ty; }
+	};
+
 	class MK_OBJECT_EXPORT Ref
 	{
 	public:
-		Ref(Type* type) : mType(type), mObject(nullptr), mUpdate(0) {}
-		Ref(Object* object, Type* type) : mType(type), mObject(object), mUpdate(0) {}
+		Ref(Type& type) : mType(type), mObject(nullptr), mUpdate(0) {}
+		Ref(Object& object, Type& type) : mType(type), mObject(&object), mUpdate(0) {}
 		virtual ~Ref() {}
 
 		inline Object* object() const { return mObject; }
 		inline Object*& objectref() { return mObject; }
-		inline Type* type() const { return mType; }
-		inline Imprint* imprint() const { return mType->imprint(); }
-		inline bool null() const { return mType == nullptr; }
+		inline Type& type() const { return mType; }
+		inline Imprint* imprint() const { return mType.imprint(); }
+		inline bool null() const { return &mType == &None::cls(); }
 		inline void setobject(Object* object) { mObject = object; ++mUpdate; }
 		inline size_t update() { return mUpdate; }
 
-		virtual unique_ptr<Ref> clone() const { return make_unique<Ref>(mObject, mType); };
+		virtual unique_ptr<Ref> clone() const { return make_unique<Ref>(*mObject, mType); };
 
 		virtual void setString(const string& value) { UNUSED(value); }
 		virtual string getString() { return ""; }
@@ -72,7 +81,7 @@ namespace mk
 
 	protected:
 		Object* mObject;
-		Type* mType;
+		Type& mType;
 		size_t mUpdate;
 	};
 
@@ -104,18 +113,11 @@ namespace mk
 		T mContent;
 	};
 
-	class MK_OBJECT_EXPORT None
-	{
-	public:
-		template <class T>
-		operator T() { return T(); }
-	};
-
 	template <>
 	class MK_OBJECT_EXPORT Any<None> : public Ref
 	{
 	public:
-		Any() : Ref(static_cast<Type*>(nullptr)) {}
+		Any() : Ref(None::cls()) {}
 
 		unique_ptr<Ref> clone() const { return make_unique<Any<None>>(); }
 	};
@@ -136,8 +138,8 @@ namespace mk
 	{
 	public:
 		Lref(unique_ptr<Ref> ref) : mRef(std::move(ref)) {}
-		Lref(TypeObject* object) : mRef(make_unique<Ref>(object, object->type())) {}
-		Lref(Object* object, Type* type) : mRef(make_unique<Ref>(object, type)) {}
+		Lref(TypeObject& object) : mRef(make_unique<Ref>(object, object.type())) {}
+		Lref(Object& object, Type& type) : mRef(make_unique<Ref>(object, type)) {}
 		Lref() : mRef(make_unique<Any<None>>()) {}
 
 		Lref(Lref&& ref) : mRef(std::move(ref.mRef)) {}

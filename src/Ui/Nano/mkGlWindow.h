@@ -16,13 +16,13 @@ namespace mk
 	class MK_UI_EXPORT GlWindow : public RenderWindow, public InputWindow
 	{
 	public:
-		GlWindow(size_t width, size_t height, string title, string ressourcePath);
+		GlWindow(size_t width, size_t height, string title, string resourcePath);
 		~GlWindow();
 
-		UiWindow* uiWindow() { return mUiWindow.get(); }
+		UiWindow& uiWindow() { return *mUiWindow.get(); }
 
 		void initContext();
-		void initInput(InputDispatcher* dispatcher, size_t windowHnd);
+		void initInput(InputDispatcher& dispatcher, size_t windowHnd);
 
 		bool renderFrame();
 
@@ -36,7 +36,7 @@ namespace mk
 		void resize(size_t width, size_t height);
 
 	protected:
-		string mRessourcePath;
+		string mResourcePath;
 		unique_ptr<NanoWindow> mNanoWindow;
 		unique_ptr<UiWindow> mUiWindow;
 

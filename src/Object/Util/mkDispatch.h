@@ -27,45 +27,46 @@ namespace mk
 	class HashDispatch
 	{
 	public:
-		static void branch(Type* type, const std::function<R (C, Lref&)>& func)
+		static void branch(Type& type, const std::function<R (C, Lref&)>& func)
 		{
-			if(mDispatcher.size() < type->id()+1)
-				mDispatcher.resize(type->id()+51);
+			if(mDispatcher.size() < type.id()+1)
+				mDispatcher.resize(type.id()+51);
 				
-			mDispatcher[type->id()] = func;
+			mDispatcher[type.id()] = func;
 		}
 
 		static R dispatch(C context, Lref& ref)
 		{
-			return mDispatcher[ref->type()->id()](context, ref);
+			return mDispatcher[ref->type().id()](context, ref);
 		}
 
 		static R dispatchup(C context, Lref& ref)
 		{
 			// Slower dispatch, but we check the bases for relevant entries in the dispatcher
-			Type* type = ref->type();
-			for(; type->base() != 0; type = type->base())
-				if(check(type))
+			Type* type = &ref->type();
+			for(; type->base() != nullptr; type = type->base())
+				if(check(*type))
 					break;
 			return mDispatcher[type->id()](context, ref);
 		}
 
-		static bool check(Type* type)
+		static bool check(Type& type)
 		{
-			if(type->id() > mDispatcher.size())
+			if(type.id() > mDispatcher.size())
 				return false;
-			return (bool) mDispatcher[type->id()];
+			return (bool) mDispatcher[type.id()];
 		}
 
-		static bool checkup(Type* type)
+		static bool checkup(Type& type)
 		{
-			while(type->base() != 0)
+			Type* base = &type;
+			while(base->base() != nullptr)
 			{
-				if(check(type))
+				if(check(*base))
 					return true;
-				type = type->base();
+				base = base->base();
 			}
-			return check(type);
+			return check(*base);
 		}
 
 		typedef C Context;

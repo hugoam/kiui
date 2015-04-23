@@ -35,12 +35,14 @@ namespace mk
 {
 	std::map<string, std::function<unique_ptr<Widget>(Form*)>> UiWindow::sDispatch;
 
-	UiWindow::UiWindow(User* user)
-		: mStyler(make_unique<Styler>())
+	UiWindow::UiWindow(const string& resourcePath, User* user)
+		: mResourcePath(resourcePath)
+		, mStyler(make_unique<Styler>())
 		, mController(nullptr)
 		, mShiftPressed(false)
 		, mCtrlPressed(false)
 		, mShutdownRequested(false)
+		, mRootSheet(nullptr)
 		, mUser(user)
 	{
 		mStyler->defaultLayout();
@@ -52,24 +54,24 @@ namespace mk
 		//mRootSheet->clear();
 	}
 
-	void UiWindow::setup(RenderWindow* renderWindow, InkWindow* inkWindow, InputWindow* inputWindow)
+	void UiWindow::setup(RenderWindow& renderWindow, InkWindow& inkWindow, InputWindow* inputWindow)
 	{
-		mRenderWindow = renderWindow;
-		mInkWindow = inkWindow;
+		mRenderWindow = &renderWindow;
+		mInkWindow = &inkWindow;
 		mInputWindow = inputWindow;
 
-		mWidth = float(renderWindow->width());
-		mHeight = float(renderWindow->height());
+		mWidth = float(renderWindow.width());
+		mHeight = float(renderWindow.height());
 	}
 
 	void UiWindow::init()
 	{
 		mStyler->prepare();
 
-		mRootForm = make_unique<RootForm>(this);
-		mRootSheet = mRootForm->rootSheet();
+		mRootForm = make_unique<RootForm>(*this);
+		mRootSheet = &mRootForm->rootSheet();
 
-		mRootSheet->frame()->setSize(mWidth, mHeight);
+		mRootSheet->frame().setSize(mWidth, mHeight);
 
 		mController = mRootSheet;
 
@@ -85,7 +87,7 @@ namespace mk
 			mInputWindow->resize(width, height);
 
 		if(mRootSheet)
-			mRootSheet->frame()->setSize(float(width), float(height));
+			mRootSheet->frame().setSize(float(width), float(height));
 	}
 
 	bool UiWindow::nextFrame()

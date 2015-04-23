@@ -7,9 +7,8 @@
 
 /* mk */
 #include <Object/mkObjectForward.h>
-#include <Object/mkObject.h>
-#include <Object/mkTyped.h>
 #include <Object/Util/mkNonCopy.h>
+#include <Object/Util/mkMake.h>
 
 /* Standard */
 #include <vector>
@@ -25,14 +24,14 @@ namespace mk
 
 		Proto* proto() { return mProto; }
 
-		void addPart(Type* type, Part* part);
-		bool hasPart(Type* type);
-		Part* part(Type* type);
+		void addPart(Type& type, Part* part);
+		bool hasPart(Type& type);
+		Part* part(Type& type);
 
-		void pushPlug(unique_ptr<Part> part, Type* type);
-		void removePlug(Type* type);
+		void pushPlug(unique_ptr<Part> part, Type& type);
+		void removePlug(Type& type);
 		void removePlug(void* plug);
-		Part* plug(Type* type);
+		Part* plug(Type& type);
 
 		std::vector<Part*>& parts() { return mParts; }
 

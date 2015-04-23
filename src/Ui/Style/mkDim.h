@@ -37,6 +37,13 @@ namespace mk
 		REVERSE = 1
 	};
 
+	enum _I_ Align : unsigned int
+	{
+		CENTER = 0,
+		LEFT = 1,
+		RIGHT = 2
+	};
+
 	enum _I_ FrameType : unsigned int
 	{
 		FRAME = 0,
@@ -48,16 +55,26 @@ namespace mk
 	enum _I_ Flow : unsigned int
 	{
 		FLOW = 0,
-		MANUAL = 1
+		MANUAL = 1,
+		FLOAT_DEPTH = 2,
+		FLOAT_LENGTH = 3
+	};
+
+	enum _I_ Space : unsigned int
+	{
+		AUTO = 0,
+		BLOCK = 1,
+		WRAP = 2,
+		DIV = 3,
+		SPACE = 4,
+		BOARD = 5
 	};
 
 	enum _I_ Sizing : unsigned int
 	{
 		FIXED = 0,
 		SHRINK = 1,
-		EXPAND = 2,
-		WRAP = 3,
-		CAPPED = 4
+		EXPAND = 2
 	};
 
 	enum _I_ Clipping : unsigned int
@@ -66,16 +83,11 @@ namespace mk
 		CLIP = 1
 	};
 
-	enum _I_ Overflow : unsigned int
-	{
-		FLOWOVER = 0,
-		SCROLL = 1
-	};
-
 	enum _I_ Opacity : unsigned int
 	{
 		OPAQUE = 0,
-		VOID = 1
+		GLASSY = 1,
+		VOID = 2
 	};
 
 	enum _I_ Weight : unsigned int
@@ -96,7 +108,7 @@ namespace mk
 #endif
 		Dim() : Dim(T(), T()) {}
 
-		bool null() { return d_values[0] == T() && d_values[1] == T(); }
+		bool null() const { return d_values[0] == T() && d_values[1] == T(); }
 
 		T operator [](size_t i) const { return d_values[i]; }
 		T& operator [](size_t i) { return d_values[i]; }
@@ -105,46 +117,53 @@ namespace mk
 		std::array<T, 2> d_values;
 	};
 
-	class _I_ DimFloat : public Struct, public Dim<float>, public Typed<DimFloat>
+	class _I_ DimFloat : public Struct, public Dim<float>
 	{
 	public:
 		_C_ DimFloat(float x, float y) : Dim(x, y) {}
 		DimFloat() : Dim() {}
 
-		_A_ _M_ float x() { return d_values[0]; }
-		_A_ _M_ float y() { return d_values[1]; }
+		_A_ _M_ float x() const { return d_values[0]; }
+		_A_ _M_ float y() const { return d_values[1]; }
 
 		void setX(float x) { d_values[0] = x; }
 		void setY(float y) { d_values[1] = y; }
+
+		static Type& cls() { static Type ty; return ty; }
 	};
 
-	class _I_ BoxFloat : public Struct, public Typed<BoxFloat>
+	class _I_ BoxFloat : public Struct
 	{
 	public:
 #ifndef _MSC_VER
-		_C_ BoxFloat(float x, float y, float z, float w) : d_values{{ x, y, z, w }}, d_uniform(false), d_null(false) {}
+		_C_ BoxFloat(float x0, float y0, float x1, float y1) : d_values{{ x0, y0, x1, y1 }}, d_uniform(false), d_null(cnull()) {}
 #else
-		_C_ BoxFloat(float x, float y, float z, float w) : d_values(std::array<float, 4>{ x, y, z, w }), d_uniform(false), d_null(false) {}
+		_C_ BoxFloat(float x0, float y0, float x1, float y1) : d_values(std::array<float, 4>{ x0, y0, x1, y1 }), d_uniform(false), d_null(cnull()) {}
 #endif
-		BoxFloat(int x, int y, int z, int w) : BoxFloat(float(x), float(y), float(z), float(w)) {}
+		BoxFloat(int x0, int y0, int x1, int y1) : BoxFloat(float(x0), float(y0), float(x1), float(y1)) {}
 		BoxFloat(float uniform) : BoxFloat(uniform, uniform, uniform, uniform) {}
 		BoxFloat() : BoxFloat(0.f) { d_null = true; }
 
 		float operator [](size_t i) const { return d_values[i]; }
 		float& operator [](size_t i) { d_null = false; return d_values[i]; }
 
-		_A_ _M_ float x() { return d_values[0]; }
-		_A_ _M_ float y() { return d_values[1]; }
-		_A_ _M_ float z() { return d_values[2]; }
-		_A_ _M_ float w() { return d_values[3]; }
+		_A_ _M_ float x0() const { return d_values[0]; }
+		_A_ _M_ float y0() const { return d_values[1]; }
+		_A_ _M_ float x1() const { return d_values[2]; }
+		_A_ _M_ float y1() const { return d_values[3]; }
 
-		bool uniform() { return d_uniform; }
-		bool null() { return d_null; }
+		bool uniform() const { return d_uniform; }
+		bool null() const { return d_null; }
+		bool cnull() const { return (d_values[0] == 0.f && d_values[1] == 0.f && d_values[2] == 0.f && d_values[3] == 0.f); }
 
-		void setX(float x) { d_values[0] = x; d_null = false; }
-		void setY(float y) { d_values[1] = y; d_null = false; }
-		void setZ(float z) { d_values[2] = z; d_null = false; }
-		void setW(float w) { d_values[3] = w; d_null = false; }
+		void assign(float x0, float y0, float x1, float y1) { d_values[0] = x0; d_values[1] = y0; d_values[2] = x1; d_values[3] = y1; }
+
+		void setX0(float x0) { d_values[0] = x0; d_null = cnull(); }
+		void setY0(float y0) { d_values[1] = y0; d_null = cnull(); }
+		void setX1(float x1) { d_values[2] = x1; d_null = cnull(); }
+		void setY1(float y1) { d_values[3] = y1; d_null = cnull(); }
+
+		static Type& cls() { static Type ty; return ty; }
 
 	protected:
 		std::array<float, 4> d_values;
@@ -152,7 +171,7 @@ namespace mk
 		bool d_null;
 	};
 
-	class _I_ DimSizing : public Struct, public Dim<Sizing>, public Typed<DimSizing>
+	class _I_ DimSizing : public Struct, public Dim<Sizing>
 	{
 	public:
 		_C_ DimSizing(Sizing x, Sizing y) : Dim(x, y) {}
@@ -163,9 +182,26 @@ namespace mk
 
 		void setX(Sizing x) { d_values[0] = x; }
 		void setY(Sizing y) { d_values[0] = y; }
+
+		static Type& cls() { static Type ty; return ty; }
 	};
 
-	class _I_ DimPivot : public Struct, public Dim<Pivot>, public Typed<DimPivot>
+	class _I_ DimAlign : public Struct, public Dim<Align>
+	{
+	public:
+		_C_ DimAlign(Align x, Align y) : Dim(x, y) {}
+		DimAlign() : Dim() {}
+
+		_A_ _M_ Align x() { return d_values[0]; }
+		_A_ _M_ Align y() { return d_values[1]; }
+
+		void setX(Align x) { d_values[0] = x; }
+		void setY(Align y) { d_values[0] = y; }
+
+		static Type& cls() { static Type ty; return ty; }
+	};
+
+	class _I_ DimPivot : public Struct, public Dim<Pivot>
 	{
 	public:
 		_C_ DimPivot(Pivot x, Pivot y) : Dim(x, y) {}
@@ -176,6 +212,8 @@ namespace mk
 
 		void setX(Pivot x) { d_values[0] = x; }
 		void setY(Pivot y) { d_values[0] = y; }
+
+		static Type& cls() { static Type ty; return ty; }
 	};
 }
 

@@ -13,72 +13,78 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ DockWindow : public Object, public Typed<DockWindow>, public Styled<DockWindow>
-	{};
-
-	class MK_UI_EXPORT _I_ ShrinkWindow : public Object, public Typed<ShrinkWindow>, public Styled<ShrinkWindow>
-	{};
-
-	class MK_UI_EXPORT _I_ WindowHeader : public Sheet, public Typed<WindowHeader, Sheet>, public Styled<WindowHeader>
+	class MK_UI_EXPORT _I_ DockWindow : public Object
 	{
 	public:
-		WindowHeader(Window* window);
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+	};
 
-		Style* hoverCursor() { return MoveCursor::styleCls(); }
+	class MK_UI_EXPORT _I_ ShrinkWindow : public Object
+	{
+	public:
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+	};
+
+	class MK_UI_EXPORT _I_ WindowHeader : public Sequence
+	{
+	public:
+		WindowHeader(Window& window);
+
+		Style* hoverCursor() { return &MoveCursor::cls(); }
 		const string& tooltip() { return mTooltip; }
 
-		Label* title() { return mTitle; }
+		Label& title() { return mTitle; }
 		Button* closeButton() { return mCloseButton; }
 
 		bool leftDragStart(float xPos, float yPos);
 		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
 		bool leftDragEnd(float xPos, float yPos);
 
-		using Typed<WindowHeader, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
 
 	protected:
-		Window* mWindow;
-		Label* mTitle;
+		Window& mWindow;
+		Label& mTitle;
+		Widget& mSpacer;
 		Button* mCloseButton;
 		string mTooltip;
 	};
 
-	class MK_UI_EXPORT _I_ WindowSizer : public Sheet, public Typed<WindowSizer, Sheet>, public Styled<WindowSizer>
+	class MK_UI_EXPORT _I_ WindowSizer : public Sheet
 	{
 	public:
-		WindowSizer(Window* window);
+		WindowSizer(Window& window);
 
-		Style* hoverCursor() { return ResizeCursorDiagRight::styleCls(); }
+		Style* hoverCursor() { return &ResizeCursorDiagRight::cls(); }
 
 		bool leftDragStart(float xPos, float yPos);
 		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
 		bool leftDragEnd(float xPos, float yPos);
 
-		using Typed<WindowSizer, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 
 	protected:
-		Window* mWindow;
+		Window& mWindow;
 		bool mResizeLeft;
 	};
 
-	class MK_UI_EXPORT _I_ WindowBody : public Sheet, public Typed<WindowBody, Sheet>, public Styled<WindowBody>
+	class MK_UI_EXPORT _I_ WindowBody : public Sheet
 	{
 	public:
 		WindowBody();
 
-		using Typed<WindowBody, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ CloseButton : public Button, public Typed<CloseButton, Button>, public Styled<CloseButton>
+	class MK_UI_EXPORT _I_ CloseButton : public Button
 	{
 	public:
 		CloseButton(const Trigger& trigger);
 
-		using Typed<CloseButton, Button>::cls;
-		using Styled<CloseButton>::styleCls;
+		static StyleType& cls() { static StyleType ty(Button::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT Window : public Sheet, public Typed<Window, Sheet>, public Styled<Window>
+	class MK_UI_EXPORT Window : public LayerSheet
 	{
 	public:
 		Window(const string& title, bool closable = true, bool dockable = false, const Trigger& onClose = nullptr, Docksection* dock = nullptr);
@@ -90,7 +96,7 @@ namespace mk
 		bool movable() { return mMovable; }
 		bool closable() { return mClosable; }
 		
-		WindowBody* body() { return mBody; }
+		WindowBody& body() { return mBody; }
 		Docksection* dock() { return mDock; }
 
 		void bind(Sheet* parent, size_t index);
@@ -104,10 +110,10 @@ namespace mk
 		bool leftClick(float x, float y);
 		bool rightClick(float x, float y);
 
-		Widget* vappend(unique_ptr<Widget> widget);
-		//unique_ptr<Widget> vrelease(Widget* widget);
+		Widget& vappend(unique_ptr<Widget> widget);
+		//unique_ptr<Widget> vrelease(Widget& widget);
 
-		void dock(Docksection* docksection);
+		void dock(Docksection& docksection);
 		void undock();
 
 		void docked();
@@ -115,7 +121,7 @@ namespace mk
 
 		void close();
 
-		using Typed<Window, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(LayerSheet::cls()); return ty; }
 
 	protected:
 		string mName;
@@ -125,9 +131,9 @@ namespace mk
 		bool mSizable;
 		Widget* mContent;
 		Trigger mOnClose;
-		WindowHeader* mHeader;
-		WindowBody* mBody;
-		WindowSizer* mFooter;
+		WindowHeader& mHeader;
+		WindowBody& mBody;
+		WindowSizer& mFooter;
 
 		Docksection* mDock;
 	};

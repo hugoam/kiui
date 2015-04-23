@@ -22,7 +22,7 @@ namespace mk
 	class Library : public Pool<T>
 	{
 	public:
-		Library() : Pool() { T::cls()->setupLibrary(this); }
+		Library() : Pool() { T::cls().setupLibrary(this); }
 	};
 
 	template <class T>

@@ -20,20 +20,15 @@
 
 namespace mk
 {
-	/*Textbox::Textbox(Lref& value)
-		: Widget(styleCls())
-		, mValue(value)
-	{}
+	Textbox::Textbox(WValue* input)
+		: TypeIn(input)
+	{
+		mStyle = &cls();
+	}
 
 	Textbox::Textbox(const string& text)
-		: Widget(styleCls(), form)
-		, mLref(lref(text))
-		, mValue(mLref)
-	{}
-
-	bool Textbox::leftClick(float xPos, float yPos)
+		: TypeIn(nullptr, text)
 	{
-		UNUSED(xPos); UNUSED(yPos);
-		return true;
-	}*/
+		mStyle = &cls();
+	}
 }

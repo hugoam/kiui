@@ -17,43 +17,44 @@
 namespace mk
 {
 	FillerX::FillerX()
-		: Widget(styleCls())
-	{}
+		: Widget()
+	{
+		mStyle = &cls();
+	}
 
 	FillerY::FillerY()
-		: Widget(styleCls())
-	{}
+		: Widget()
+	{
+		mStyle = &cls();
+	}
 
-	ProgressBar::ProgressBar(Dimension dim, Style* style, const Trigger& onUpdated)
-		: Sheet(style)
+	ProgressBar::ProgressBar(Dimension dim, const Trigger& onUpdated)
+		: Sheet()
 		, mDim(dim)
 		, mPercentage(0.f)
 		, mOnUpdated(onUpdated)
+		, mFiller(mDim == DIM_X ? (Widget&) this->makeappend<FillerX>() : (Widget&) this->makeappend<FillerY>())
+		, mSpacer(mDim == DIM_X ? (Widget&) this->makeappend<SpacerX>() : (Widget&) this->makeappend<SpacerY>())
 	{
-		if(mDim == DIM_X)
-		{
-			mFiller = this->makeappend<FillerX>();
-			mSpacer = this->makeappend<SpacerX>();
-		}
-		else
-		{
-			mFiller = this->makeappend<FillerY>();
-			mSpacer = this->makeappend<SpacerY>();
-		}
+		mStyle = &cls();
 	}
 
 	void ProgressBar::setPercentage(float percentage)
 	{
 		mPercentage = percentage;
-		mFiller->frame()->setSpanDim(mDim, percentage);
-		mSpacer->frame()->setSpanDim(mDim, 1.f - percentage);
+		mFiller.frame().setSpanDim(mDim, percentage);
+		mSpacer.frame().setSpanDim(mDim, 1.f - percentage);
 	}
 
 	ProgressBarX::ProgressBarX()
-		: ProgressBar(DIM_X, styleCls())
-	{}
+		: ProgressBar(DIM_X)
+	{
+		mStyle = &cls();
+	}
 
 	ProgressBarY::ProgressBarY()
-		: ProgressBar(DIM_Y, styleCls())
-	{}
+		: ProgressBar(DIM_Y)
+	{
+		mStyle = &cls();
+	}
 }

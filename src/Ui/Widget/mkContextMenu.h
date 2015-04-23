@@ -11,13 +11,13 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT WContextMenu : public Sheet, public Typed<WContextMenu, Sheet>, public Styled<WContextMenu>
+	class MK_UI_EXPORT ContextMenu : public Sheet
 	{
 	public:
-		WContextMenu();
-		~WContextMenu();
+		ContextMenu();
+		~ContextMenu();
 
-		using Typed<WContextMenu, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 	};
 }
 

@@ -17,33 +17,37 @@ using namespace std::placeholders;
 namespace mk
 {
 	TableHead::TableHead()
-		: GridSheet(DIM_X, styleCls())
-	{}
-
-	void TableHead::gridResized(Widget* first, Widget* second)
+		: GridSheet(DIM_X)
 	{
-		mParent->stripe()->weights()[first->frame()->index()] = first->frame()->dspan(DIM_X);
-		mParent->stripe()->weights()[second->frame()->index()] = second->frame()->dspan(DIM_X);
-		mParent->stripe()->markRelayout();
+		mStyle = &cls();
+	}
+
+	void TableHead::gridResized(Widget& first, Widget& second)
+	{
+		mParent->stripe().weights()[first.frame().index()] = first.frame().dspan(DIM_X);
+		mParent->stripe().weights()[second.frame().index()] = second.frame().dspan(DIM_X);
+		mParent->stripe().markRelayout();
 	}
 
 	ColumnHeader::ColumnHeader(const string& label)
-		: Label(label, styleCls())
-	{}
+		: Label(label)
+	{
+		mStyle = &cls();
+	}
 
 	Table::Table(StringVector columns, std::vector<float> weights)
-		: Sheet(styleCls())
+		: Sheet()
 		, mColumns(columns)
 		, mWeights(weights)
+		, mHead(this->makeappend<TableHead>())
 	{
-		mHead = this->makeappend<TableHead>();
-
+		mStyle = &cls();
 		for(string& name : mColumns)
-			mHead->emplace<ColumnHeader>(name);
+			mHead.emplace<ColumnHeader>(name);
 
-		this->stripe()->initWeights();
+		this->stripe().initWeights();
 		for(float& weight : mWeights)
-			this->stripe()->weights().push_back(weight);
+			this->stripe().weights().push_back(weight);
 	}
 
 	Table::~Table()

@@ -26,17 +26,19 @@ namespace mk
 
 	typedef std::vector<std::unique_ptr<Form>> UniqueFormVector;
 
-    class MK_UI_EXPORT _I_ Form : public TypeObject, public Typed<Form>, public Updatable
+    class MK_UI_EXPORT _I_ Form : public TypeObject, public Updatable
     {
 	public:
 		Form(unique_ptr<Sheet> sheet);
 		~Form();
 
-		UiWindow* uiWindow();
+		UiWindow& uiWindow();
 		Form* parent() { return mParent; }
 		Id index() const { return mIndex; }
-		Sheet* sheet() { return mSheet; }
+		Sheet& sheet() { return mSheet; }
 		Sheet* container() { return mContainer; }
+
+		static Type& cls() { static Type ty; return ty; }
 
 		const string& name();
 
@@ -85,7 +87,7 @@ namespace mk
 		Form* findParent(Type* type);
 
 		// Specialization
-		RootForm* rootForm();
+		RootForm& rootForm();
 
 		template <class T, class... Args>
 		inline T* emplace(Args&&... args)
@@ -103,7 +105,7 @@ namespace mk
 		LrefDict mAttrs;
 
 		unique_ptr<Sheet> mUniqueSheet;
-		Sheet* mSheet;
+		Sheet& mSheet;
 		Sheet* mContainer;
 
 		std::vector<unique_ptr<Form>> mContents;

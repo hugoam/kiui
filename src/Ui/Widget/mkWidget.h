@@ -33,23 +33,23 @@ namespace mk
 		MODAL = 1 << 8
 	};
 
-	class MK_UI_EXPORT _I_ Widget : public TypeObject, public Typed<Widget>, public InputReceiver, public Updatable
+	class MK_UI_EXPORT _I_ Widget : public TypeObject, public InputReceiver, public Updatable
 	{
 	public:
-		Widget(Style* style, FrameType frameType = FRAME);
+		Widget(FrameType frameType = FRAME);
 		~Widget();
 
 		_A_ inline Sheet* parent() { return mParent; }
-		_A_ inline Frame* frame() { return mFrame.get(); }
+		_A_ inline Frame& frame() { return *mFrame.get(); }
 		_A_ inline Form* form() { return mForm; }
 		_A_ inline WidgetState state() { return mState; }
-		_A_ _M_ inline Style* style() { return mStyle; }
+		_A_ _M_ inline Style& style() { return *mStyle; }
 
 		void setStyle(Style* style);
 
-		virtual unique_ptr<Widget> clone() { return make_unique<Widget>(mStyle); }
+		virtual unique_ptr<Widget> clone() { return make_unique<Widget>(); }
 
-		virtual Style* fetchOverride(Style* style);
+		virtual Style& fetchOverride(Style& style);
 
 		virtual const string& name() { return sNullString; }
 		virtual const string& label() { return sNullString; }
@@ -58,9 +58,11 @@ namespace mk
 		virtual const string& dockid() { return sNullString; }
 		virtual Style* hoverCursor() { return nullptr; }
 
-		virtual RootSheet* rootSheet();
+		virtual const string& contentlabel() { return this->label(); }
 
-		UiWindow* uiWindow();
+		virtual RootSheet& rootSheet();
+
+		UiWindow& uiWindow();
 
 		virtual void show();
 		virtual void hide();
@@ -103,8 +105,8 @@ namespace mk
 
 		virtual Widget* pinpoint(float x, float y, bool modal = false);
 
-		Widget* prev();
-		Widget* next();
+		Widget& prev();
+		Widget& next();
 
 		bool contains(Widget* widget);
 
@@ -141,7 +143,9 @@ namespace mk
 		bool leftDrag(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return true; };
 		bool leftDragEnd(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
 
-		typedef std::function<void(Widget*)> Trigger;
+		typedef std::function<void(Widget&)> Trigger;
+
+		static StyleType& cls() { static StyleType ty; return ty; }
 
 	protected:
 		Sheet* mParent;
@@ -152,6 +156,14 @@ namespace mk
 		Form* mForm;
 
 		static string sNullString;
+	};
+
+	class MK_UI_EXPORT Control : public Widget
+	{
+	public:
+		Control();
+
+		static StyleType& cls() { static StyleType ty; return ty; }
 	};
 }
 

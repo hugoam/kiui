@@ -18,10 +18,12 @@
 
 namespace mk
 {
-	Label::Label(const string& label, Style* style, FrameType frameType)
-		: Widget(style ? style : styleCls(), frameType)
+	Label::Label(const string& label, FrameType frameType)
+		: Widget(frameType)
 		, mLabel(label)
-	{}
+	{
+		mStyle = &cls();
+	}
 
 	void Label::setLabel(const string& label)
 	{
@@ -30,13 +32,17 @@ namespace mk
 	}
 
 	Title::Title(const string& label)
-		: Label(label, styleCls())
-	{}
+		: Label(label)
+	{
+		mStyle = &cls();
+	}
 
-	Icon::Icon(const string& image, Style* style)
-		: Widget(style ? style : styleCls())
+	Icon::Icon(const string& image)
+		: Widget()
 		, mImage(image)
-	{}
+	{
+		mStyle = &cls();
+	}
 
 	void Icon::setImage(const string& image)
 	{
@@ -44,11 +50,13 @@ namespace mk
 		mFrame->setDirty(Frame::DIRTY_WIDGET);
 	}
 
-	Button::Button(const string& label, Style* style, const Trigger& trigger)
-		: Widget(style ? style : styleCls())
+	Button::Button(const string& label, const Trigger& trigger)
+		: Control()
 		, WidgetTrigger(trigger)
 		, mLabel(label)
-	{}
+	{
+		mStyle = &cls();
+	}
 
 	bool Button::leftPressed(float x, float y)
 	{
@@ -60,9 +68,9 @@ namespace mk
 	bool Button::leftClick(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
-		if(uiWindow()->ctrlPressed())
+		if(uiWindow().ctrlPressed())
 			this->triggerCtrl();
-		else if(uiWindow()->shiftPressed())
+		else if(uiWindow().shiftPressed())
 			this->triggerShift();
 		else
 			this->trigger();
@@ -79,15 +87,17 @@ namespace mk
 	}
 
 	ImgButton::ImgButton(const string& image, const Trigger& trigger)
-		: Button("", styleCls(), trigger)
+		: Button("", trigger)
 		, mImage(image)
 	{}
 
-	WrapButton::WrapButton(Widget* content, Style* style, const Trigger& trigger)
-		: Sheet(style)
+	WrapButton::WrapButton(Widget* content, const Trigger& trigger)
+		: Sheet()
 		, WidgetTrigger(trigger)
 		, mContent(content)
-	{}
+	{
+		mStyle = &cls();
+	}
 
 	Widget* WrapButton::content()
 	{
@@ -104,9 +114,9 @@ namespace mk
 	bool WrapButton::leftClick(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
-		if(uiWindow()->ctrlPressed())
+		if(uiWindow().ctrlPressed())
 			this->triggerCtrl();
-		else if(uiWindow()->shiftPressed())
+		else if(uiWindow().shiftPressed())
 			this->triggerShift();
 		else
 			this->trigger();
@@ -122,12 +132,13 @@ namespace mk
 		return true;
 	}
 
-	Toggle::Toggle(Style* style, const Trigger& triggerOn, const Trigger& triggerOff, bool on)
-		: Widget(style)
+	Toggle::Toggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on)
+		: Control()
 		, mTriggerOn(triggerOn)
 		, mTriggerOff(triggerOff)
 		, mOn(on)
 	{
+		mStyle = &cls();
 		if(mOn)
 			this->toggleState(ACTIVATED);
 	}

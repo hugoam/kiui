@@ -21,7 +21,7 @@ namespace mk
 	class MK_UI_EXPORT Uibox
 	{
 	public:
-		Uibox(LayoutStyle* style);
+		Uibox();
 		~Uibox();
 
 		LayoutStyle* layout() { return d_layout; }
@@ -30,15 +30,14 @@ namespace mk
 
 		inline float dposition(Dimension dim) { return d_position[dim]; }
 		inline float dsize(Dimension dim) { return d_size[dim]; }
-		inline bool dexpand(Dimension dim) { return d_sizing[dim] >= EXPAND; }
+		inline bool dexpand(Dimension dim) { return d_sizing[dim] == EXPAND; }
 		inline bool dshrink(Dimension dim) { return d_sizing[dim] == SHRINK; }
 		inline bool dfixed(Dimension dim) { return d_sizing[dim] == FIXED; }
-		inline float dmargin(Dimension dim) { return d_layout->d_margin[dim]; }
 		inline float dspan(Dimension dim) { return d_span[dim]; }
 
 		inline bool flow() { return d_layout->d_flow == FLOW; }
 		inline bool clip() { return d_layout->d_clipping == CLIP; }
-		inline bool opaque() { return d_opacity == OPAQUE; }
+		inline bool opaque() { return d_opacity <= GLASSY; }
 
 		inline void setOpacity(Opacity opacity) { d_opacity = opacity; }
 
@@ -46,6 +45,7 @@ namespace mk
 		DimFloat d_position;
 		DimFloat d_size;
 		DimFloat d_span;
+		Space d_space;
 		DimSizing d_sizing;
 		Opacity d_opacity;
 		LayoutStyle* d_layout;

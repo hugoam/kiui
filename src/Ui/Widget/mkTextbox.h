@@ -7,25 +7,20 @@
 
 /* mk */
 #include <Ui/mkUiForward.h>
-#include <Ui/Widget/mkWidget.h>
-#include <Object/mkRef.h>
+#include <Ui/Widget/mkTypeIn.h>
 
 namespace mk
 {
-	class MK_UI_EXPORT Textbox : public Widget, public Typed<Textbox, Widget>, public Styled<Textbox>
+	class MK_UI_EXPORT _I_ Textbox : public TypeIn
 	{
 	public:
-		Textbox(Lref& value);
+		Textbox(WValue* input);
 		Textbox(const string& text);
 
-		bool leftClick(float xPos, float yPos);
-
-		using Typed<Textbox, Widget>::cls;
+		static StyleType& cls() { static StyleType ty(TypeIn::cls()); return ty; }
 
 	protected:
-		Lref mLref;
-		Lref& mValue;
-		string mText;
+		string mString;
 	};
 }
 

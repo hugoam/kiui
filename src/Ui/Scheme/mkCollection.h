@@ -37,8 +37,8 @@ namespace mk
 
 		virtual void binded(Form* form) { UNUSED(form); }
 
-		void add(Object* object, Type* type, size_t index);
-		void remove(Object* object, Type* type);
+		void add(Object& object, Type& type, size_t index);
+		void remove(Object& object, Type& type);
 		void clear();
 
 		Form* mappedForm(Object* object) { return mMapping[object]; }
@@ -56,8 +56,8 @@ namespace mk
 
 		void binded(Form* form);
 
-		void handleAdd(Object* object, Type* type);
-		void handleRemove(Object* object, Type* type);
+		void handleAdd(Object& object, Type& type);
+		void handleRemove(Object& object, Type& type);
 		bool handleClear();
 
 	protected:
@@ -73,8 +73,8 @@ namespace mk
 
 		void binded(Form* form);
 
-		void handleAdd(TypeObject* object);
-		void handleRemove(TypeObject* object);
+		void handleAdd(TypeObject& object);
+		void handleRemove(TypeObject& object);
 		bool handleClear();
 
 	protected:

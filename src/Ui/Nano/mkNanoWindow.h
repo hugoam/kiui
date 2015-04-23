@@ -16,31 +16,28 @@ namespace mk
 	class MK_UI_EXPORT NanoLayer : public InkLayer
 	{
 	public:
-		NanoLayer(Frame* frame, NanoTarget* target, size_t index);
+		NanoLayer(Frame& frame, NanoTarget& target, size_t index);
 		~NanoLayer();
 
-		NanoTarget* target() { return mTarget; }
+		NanoTarget& target() { return mTarget; }
 
-		size_t index() { return mIndex; }
 		bool visible() { return mVisible; }
 
-		void setIndex(size_t index) { mIndex = index; }
-
-		unique_ptr<Inkbox> inkbox(Frame* frame);
+		unique_ptr<Inkbox> createInkbox(Frame& frame);
 
 		void show();
 		void hide();
 
 		void moveToTop();
+
 		void nanodraw();
 
-		void draw(Frame* frame);
+		void draw(Frame& frame);
 
 	protected:
-		NanoTarget* mTarget;
-		size_t mIndex;
+		NanoTarget& mTarget;
 		bool mVisible;
-		Frame* mFrame;
+		Frame& mFrame;
 
 		std::vector<Frame*> mOrdered;
 	};
@@ -48,22 +45,16 @@ namespace mk
 	class MK_UI_EXPORT NanoTarget : public InkTarget
 	{
 	public:
-		NanoTarget(NanoWindow* window);
+		NanoTarget(NanoWindow& window);
 
-		NanoWindow* window() { return mWindow; }
-		size_t zmax() { return mZMax; }
+		NanoWindow& window() { return mWindow; }
 
-		unique_ptr<InkLayer> layer(Frame* frame, size_t z);
-		void removeLayer(NanoLayer* layer);
-		void reindexLayers();
+		unique_ptr<InkLayer> createLayer(Frame& frame, size_t z);
 
-		void moveToTop(NanoLayer* layer);
 		void nanodraw();
 
 	protected:
-		NanoWindow* mWindow;
-		size_t mZMax;
-		std::vector<std::vector<NanoLayer*>> mLayers;
+		NanoWindow& mWindow;
 	};
 
 	class MK_UI_EXPORT NanoGl
@@ -75,14 +66,14 @@ namespace mk
 	class MK_UI_EXPORT NanoWindow : public InkWindow
 	{
 	public:
-		NanoWindow(size_t width, size_t height, float pixelRatio, string ressourcePath);
+		NanoWindow(size_t width, size_t height, float pixelRatio, string resourcePath);
 		~NanoWindow();
 
 		void nextFrame();
 
-		InkTarget* screenTarget();
+		InkTarget& screenTarget();
 
-		string ressourcePath() { return mRessourcePath; }
+		string resourcePath() { return mResourcePath; }
 		NVGcontext* ctx() { return mCtx; }
 		
 		static std::map<string, int> sImages;
@@ -91,7 +82,7 @@ namespace mk
 		size_t mWidth;
 		size_t mHeight;
 		float mPixelRatio;
-		string mRessourcePath;
+		string mResourcePath;
 		unique_ptr<NanoGl> mNanoGl;
 
 		NVGcontext* mCtx;

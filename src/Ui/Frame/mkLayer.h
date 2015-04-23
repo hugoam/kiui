@@ -13,12 +13,12 @@ namespace mk
 	class MK_UI_EXPORT Layer : public Stripe
 	{
 	public:
-		Layer(Widget* widget, size_t zorder = 0, InkTarget* target = nullptr);
+		Layer(Widget& widget, size_t zorder = 0, InkTarget* target = nullptr);
 		~Layer();
 
 		FrameType frameType() { return LAYER; }
 
-		InkLayer* inkLayer() { return d_inkLayer.get(); }
+		InkLayer& inkLayer() { return *d_inkLayer.get(); }
 		std::vector<Layer*>& layers() { return d_layers; }
 
 		void bind();

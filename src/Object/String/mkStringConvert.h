@@ -180,8 +180,8 @@ namespace mk
 	template <> inline Part* fromString<Part*>(const string& str) { UNUSED(str); return nullptr; }
 	template <> inline void fromString<Part*>(const string& str, Part*& val) { UNUSED(str); UNUSED(val); }
 
-	template <> inline string toString<Part*>(Part* const& part) { return StringConverter<Id>::to(part->stem()->id()); }
-	template <> inline void toString<Part*>(Part* const& part, string& str) { StringConverter<Id>::to(part->stem()->id(), str); }
+	template <> inline string toString<Part*>(Part* const& part) { return StringConverter<Id>::to(part->stem().id()); }
+	template <> inline void toString<Part*>(Part* const& part, string& str) { StringConverter<Id>::to(part->stem().id(), str); }
 }
 
 #endif // MK_STRINGCONVERT_H_INCLUDED

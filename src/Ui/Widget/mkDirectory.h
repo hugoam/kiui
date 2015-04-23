@@ -15,33 +15,33 @@ struct dirent;
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Dir : public WrapButton, public Typed<Dir, Sheet>, public Styled<Dir>
+	class MK_UI_EXPORT _I_ Dir : public WrapButton
 	{
 	public:
 		Dir(const string& name);
 
 		void trigger();
 
-		using Typed<Dir, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(WrapButton::cls()); return ty; }
 
 	protected:
 		string mName;
 	};
 
-	class MK_UI_EXPORT _I_ File : public WrapButton, public Typed<File, Sheet>, public Styled<File>
+	class MK_UI_EXPORT _I_ File : public WrapButton
 	{
 	public:
 		File(const string& name);
 
 		void trigger();
 
-		using Typed<File, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(WrapButton::cls()); return ty; }
 
 	protected:
 		string mName;
 	};
 
-	class MK_UI_EXPORT _I_ Directory : public ScrollSheet, public Typed<Directory, Sheet>, public Styled<Directory>
+	class MK_UI_EXPORT _I_ Directory : public ScrollSheet
 	{
 	public:
 		Directory(const string& path);
@@ -52,34 +52,33 @@ namespace mk
 		void moveIn(const string& name);
 		void moveOut();
 
-		using Typed<Directory, Sheet>::cls;
-		using Styled<Directory>::styleCls;
+		static StyleType& cls() { static StyleType ty(ScrollSheet::cls()); return ty; }
 
 	protected:
 		string mPath;
 	};
 
-	class MK_UI_EXPORT _I_ FileBrowser : public Sheet, public Typed<FileBrowser, Sheet>, public Styled<FileBrowser>
+	class MK_UI_EXPORT _I_ FileBrowser : public Sheet
 	{
 	public:
 		FileBrowser(const string& path);
 
-		using Typed<FileBrowser, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 
 	protected:
 		string mPath;
-		Directory* mDirectory;
+		Directory& mDirectory;
 	};
 
-	class MK_UI_EXPORT _I_ FileNode : public TreeNode, public Typed<FileNode, TreeNode>
+	class MK_UI_EXPORT _I_ FileNode : public TreeNode
 	{
 	public:
 		FileNode(const string& name);
 
-		using Typed<FileNode, TreeNode>::cls;
+		static StyleType& cls() { static StyleType ty(TreeNode::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ DirectoryNode : public TreeNode, public Typed<DirectoryNode, TreeNode>
+	class MK_UI_EXPORT _I_ DirectoryNode : public TreeNode
 	{
 	public:
 		DirectoryNode(const string& path, const string& name, bool collapsed);
@@ -87,7 +86,7 @@ namespace mk
 		void expand();
 		void update();
 
-		using Typed<DirectoryNode, TreeNode>::cls;
+		static StyleType& cls() { static StyleType ty(TreeNode::cls()); return ty; }
 
 	protected:
 		string mPath;

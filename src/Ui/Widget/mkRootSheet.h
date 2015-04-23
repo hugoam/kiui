@@ -15,15 +15,15 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ RootSheet : public Sheet, public Typed<RootSheet, Sheet>, public Styled<RootSheet>, public InputController
+	class MK_UI_EXPORT _I_ RootSheet : public Sheet, public InputController
 	{
 	public:
-		RootSheet(UiWindow* window, Form* form, bool absolute = true);
+		RootSheet(UiWindow& window, Form* form, bool absolute = true);
 		~RootSheet();
 
 		FrameType frameType() { return LAYER; }
-		UiWindow* uiWindow() { return mWindow; }
-		RootSheet* rootSheet() { return this; }
+		UiWindow& uiWindow() { return mWindow; }
+		RootSheet& rootSheet() { return *this; }
 
 		Cursor* cursor() { return mCursor; }
 
@@ -62,10 +62,10 @@ namespace mk
 		void modalOn(Widget* widget);
 		void modalOff();
 
-		using Typed<RootSheet, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 
 	protected:
-		UiWindow* mWindow;
+		UiWindow& mWindow;
 
 		Cursor* mCursor;
 

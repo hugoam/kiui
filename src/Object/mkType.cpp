@@ -9,26 +9,27 @@
 
 namespace mk
 {
-	Type Type::sType;
 	size_t Type::sTypeId = 0;
-
-	Type::Type(Type* base)
-		: IdObject(++sTypeId, Type::cls())
-		, mName()
-		, mBase(base)
-		, mProto(nullptr)
-		, mIndexer(nullptr)
-		, mLibrary(nullptr)
-	{}
 
 	Type::Type()
 		: IdObject(++sTypeId, Type::cls())
 		, mName()
-		, mBase(nullptr)
 		, mProto(nullptr)
-		, mIndexer(Indexed<Type>::indexer())
+		, mBase(nullptr)
+		, mIndexer(nullptr)
 		, mLibrary(nullptr)
-	{}
+	{
+		Indexed<Type>::indexer().insert(*this, mId);
+
+		if(mId == 0)
+			mIndexer = &Indexed<Type>::indexer();
+	}
+
+	Type::Type(Type& base)
+		: Type()
+	{
+		mBase = &base;
+	}
 	
 	Type::~Type()
 	{

@@ -22,21 +22,22 @@
 
 namespace mk
 {
-	RootSheet::RootSheet(UiWindow* window, Form* form, bool absolute)
-		: Sheet(styleCls(), LAYER)
+	RootSheet::RootSheet(UiWindow& window, Form* form, bool absolute)
+		: Sheet(LAYER)
 		, mWindow(window)
 		, mLeftPressed(false)
 		, mActiveFrame(this)
 		, mController(this)
 	{
+		mStyle = &cls();
 		if(absolute)
 		{
-			mFrame = make_unique<Layer>(this, 0, mWindow->inkWindow()->screenTarget());
-			mFrame->as<Layer>()->bind();
+			mFrame = make_unique<Layer>(*this, 0, &mWindow.inkWindow().screenTarget());
+			mFrame->as<Layer>().bind();
 			mState = static_cast<WidgetState>(mState ^ BOUND);
 		}
 
-		mCursor = this->makeappend<Cursor>(this);
+		mCursor = &this->makeappend<Cursor>(*this);
 	}
 
 	RootSheet::~RootSheet()
@@ -66,7 +67,7 @@ namespace mk
 	void RootSheet::contextOn(Widget* contextMenu)
 	{
 		mContextMenu = contextMenu;
-		mContextMenu->frame()->setPosition(mLastX, mLastY);
+		mContextMenu->frame().setPosition(mLastX, mLastY);
 	}
 
 	void RootSheet::contextOff()
@@ -78,14 +79,14 @@ namespace mk
 	{
 		mModals.push_back(widget);
 		if(mParent)
-			mParent->rootSheet()->modalOn(this);
+			mParent->rootSheet().modalOn(this);
 	}
 
 	void RootSheet::modalOff()
 	{
 		mModals.pop_back();
 		if(mParent)
-			mParent->rootSheet()->modalOff();
+			mParent->rootSheet().modalOff();
 	}
 
 	void RootSheet::takeControl(Controller* controller)
@@ -162,9 +163,6 @@ namespace mk
 
 		while(receiver != this && !receiver->mouseMoved(xPos, yPos, xDif, yDif))
 			receiver = receiver->propagateMouse(xPos, yPos);
-
-		if(receiver == this)
-			mCursor->hovered()->mouseLeaved(xPos, yPos);
 
 		return true;
 	}

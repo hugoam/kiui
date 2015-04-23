@@ -15,6 +15,11 @@
 
 namespace mk
 {
+	inline size_t globalTick()
+	{
+		return size_t(clock() / TICK_INTERVAL);
+	}
+
 	class MK_OBJECT_EXPORT Time
 	{
 	public:
@@ -34,7 +39,7 @@ namespace mk
 		inline int seconds() { return int(value) % 60; }
 	};
 
-	class MK_OBJECT_EXPORT TimeSpan : public Struct, public Typed<TimeSpan>
+	class MK_OBJECT_EXPORT TimeSpan : public Struct
 	{
 	public:
 		TimeSpan(Time s, Time e) : start(s), end(e) {}
@@ -46,6 +51,8 @@ namespace mk
 
 		Time start;
 		Time end;
+
+		static Type& cls() { static Type ty; return ty; }
 	};
 
 	class MK_OBJECT_EXPORT Timer

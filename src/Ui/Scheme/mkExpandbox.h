@@ -12,31 +12,31 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT ExpandboxHeader : public Sheet, public Typed<ExpandboxHeader, Sheet>, public Styled<ExpandboxHeader>
+	class MK_UI_EXPORT ExpandboxHeader : public Sequence
 	{
 	public:
 		ExpandboxHeader();
 
-		using Typed<ExpandboxHeader, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT ExpandboxBody : public Sheet, public Typed<ExpandboxBody, Sheet>, public Styled<ExpandboxBody>
+	class MK_UI_EXPORT ExpandboxBody : public Sheet
 	{
 	public:
 		ExpandboxBody();
 
-		using Typed<ExpandboxBody, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT ExpandboxToggle : public Toggle, public Typed<ExpandboxToggle, Widget>, public Styled<ExpandboxToggle>
+	class MK_UI_EXPORT ExpandboxToggle : public Toggle
 	{
 	public:
 		ExpandboxToggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on);
 
-		using Typed<ExpandboxToggle, Widget>::cls;
+		static StyleType& cls() { static StyleType ty(Toggle::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT Expandbox : public Sheet, public Typed<Expandbox, Sheet>, public Styled<Expandbox>
+	class MK_UI_EXPORT Expandbox : public Sheet
 	{
 	public:
 		Expandbox(const string& title, bool collapsed = false, bool build = true);
@@ -44,13 +44,13 @@ namespace mk
 
 		Sheet* header() { return mHeader; }
 
-		Widget* vappend(unique_ptr<Widget> widget);
-		unique_ptr<Widget> vrelease(Widget* widget);
+		Widget& vappend(unique_ptr<Widget> widget);
+		unique_ptr<Widget> vrelease(Widget& widget);
 
 		virtual void expand();
 		virtual void collapse();
 
-		using Typed<Expandbox, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 
 	protected:
 		string mTitle;

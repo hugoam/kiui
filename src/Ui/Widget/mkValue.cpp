@@ -48,15 +48,19 @@ namespace mk
 		this->updateValue();
 	}
 
-	WValue::WValue(Lref& value, Style* style, bool edit)
-		: Sheet(style)
+	WValue::WValue(Lref& value, bool edit)
+		: Sheet()
 		, Value(value, edit)
-	{}
+	{
+		mStyle = &cls();
+	}
 
-	WValue::WValue(Lref&& value, Style* style, bool edit)
-		: Sheet(style ? style : styleCls())
+	WValue::WValue(Lref&& value, bool edit)
+		: Sheet()
 		, Value(std::move(value), edit)
-	{}
+	{
+		mStyle = &cls();
+	}
 
 	void WValue::notifyUpdate()
 	{

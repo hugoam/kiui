@@ -20,60 +20,60 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT InputInt : public Sheet, public Typed<InputInt, Sheet>, public Styled<InputInt>
+	class MK_UI_EXPORT InputInt : public Sequence
 	{
 	public:
 		InputInt(const string& label, int value, std::function<void(int)> callback = nullptr);
 
-		using Typed<InputInt, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT InputFloat : public Sheet, public Typed<InputFloat, Sheet>, public Styled<InputFloat>
+	class MK_UI_EXPORT InputFloat : public Sequence
 	{
 	public:
 		InputFloat(const string& label, float value, std::function<void(float)> callback = nullptr);
 
-		using Typed<InputFloat, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT InputBool : public Sheet, public Typed<InputBool, Sheet>, public Styled<InputBool>
+	class MK_UI_EXPORT InputBool : public Sequence
 	{
 	public:
 		InputBool(const string& label, bool value, std::function<void(bool)> callback = nullptr);
 
-		using Typed<InputBool, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT InputText : public Sheet, public Typed<InputText, Sheet>, public Styled<InputText>
+	class MK_UI_EXPORT InputText : public Sequence
 	{
 	public:
 		InputText(const string& label, const string& text, std::function<void(string)> callback = nullptr, bool reverse = false);
 
-		using Typed<InputText, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT InputDropdown : public Sheet, public Typed<InputDropdown, Sheet>, public Styled<InputDropdown>
+	class MK_UI_EXPORT InputDropdown : public Sequence
 	{
 	public:
-		InputDropdown(const string& label, StringVector choices, std::function<void(const string&)> callback = nullptr, bool reverse = false);
+		InputDropdown(const string& label, StringVector choices, std::function<void(const string&)> callback = nullptr, bool textinput = false, bool reverse = false);
 
-		using Typed<InputDropdown, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
 	};
 	
-	class MK_UI_EXPORT SliderInt : public Sheet, public Typed<SliderInt, Sheet>, public Styled<SliderInt>
+	class MK_UI_EXPORT SliderInt : public Sequence
 	{
 	public:
 		SliderInt(const string& label, AutoStat<int> value, std::function<void(int)> callback = nullptr);
 
-		using Typed<SliderInt, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT SliderFloat : public Sheet, public Typed<SliderFloat, Sheet>, public Styled<SliderFloat>
+	class MK_UI_EXPORT SliderFloat : public Sequence
 	{
 	public:
 		SliderFloat(const string& label, AutoStat<float> value, std::function<void(float)> callback = nullptr);
 
-		using Typed<SliderFloat, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
 	};
 }
 

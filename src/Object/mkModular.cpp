@@ -14,7 +14,7 @@ namespace mk
 	class Modular::Plug : public NonCopy
 	{
 	public:
-		Plug(unique_ptr<Part> p, Type* t) : part(std::move(p)), type(t) {}
+		Plug(unique_ptr<Part> p, Type& t) : part(std::move(p)), type(&t) {}
 		Plug(Plug&& other) : part(std::move(other.part)), type(other.type) {}
 
 		Plug& operator=(Plug&& other) { part = std::move(other.part); type = other.type; return *this; }
@@ -34,29 +34,29 @@ namespace mk
 			mParts.pop_back();
 	}
 
-	void Modular::addPart(Type* type, Part* part)
+	void Modular::addPart(Type& type, Part* part)
 	{
 		mParts[mProto->partIndex(type)] = part;
 	}
 
-	bool Modular::hasPart(Type* type)
+	bool Modular::hasPart(Type& type)
 	{
 		return mProto->hasPart(type);
 	}
 
-	Part* Modular::part(Type* type)
+	Part* Modular::part(Type& type)
 	{
 		return mParts[mProto->partIndex(type)];
 	}
 
-	void Modular::pushPlug(unique_ptr<Part> part, Type* type)
+	void Modular::pushPlug(unique_ptr<Part> part, Type& type)
 	{
 		mPlugs.emplace_back(std::move(part), type);
 	}
 
-	void Modular::removePlug(Type* type)
+	void Modular::removePlug(Type& type)
 	{
-		mPlugs.erase(std::remove_if(mPlugs.begin(), mPlugs.end(), [type](const Plug& p) { return p.type == type; }), mPlugs.end());
+		mPlugs.erase(std::remove_if(mPlugs.begin(), mPlugs.end(), [&type](const Plug& p) { return p.type == &type; }), mPlugs.end());
 	}
 
 	void Modular::removePlug(void* plug)
@@ -64,10 +64,10 @@ namespace mk
 		mPlugs.erase(std::remove_if(mPlugs.begin(), mPlugs.end(), [plug](const Plug& p) { return p.part.get() == plug; }), mPlugs.end());
 	}
 
-	Part* Modular::plug(Type* type)
+	Part* Modular::plug(Type& type)
 	{
 		for(Plug& plug : mPlugs)
-			if(plug.type == type)
+			if(plug.type == &type)
 				return plug.part.get();
 
 		return nullptr;

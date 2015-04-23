@@ -32,23 +32,26 @@ namespace mk
 	class MK_UI_EXPORT Stripe : public Frame
 	{
 	public:
-		Stripe(Widget* widget);
+		Stripe(Widget& widget);
 		~Stripe();
 
 		FrameType frameType() { return STRIPE; }
 
 		inline FrameVector& contents() { return d_contents; }
 		inline FlowSequence& sequence() { return d_sequence; }
+		inline float& floatDepth() { return d_floatDepth; }
+		inline float& floatLength() { return d_sequenceLength; }
 
 		inline float sequenceLength() { return d_sequenceLength; }
 		inline Dimension layoutDim() { return d_layout->d_layoutDim; }
 		inline bool overflow() { return d_sequenceLength > dclipsize(d_length); }
 		inline float cursor() { return d_cursor; }
-		inline float spacing() { return d_layout->d_spacing[d_length]; }
+		inline float spacing() { return d_layout->spacing()[d_length]; }
 		
 		inline std::vector<float>& weights() { return *d_weights.get(); }
 
-		inline float offset(Frame* frame) { return frame->dsize(d_length) + frame->dmargin(d_length) + (frame->index() != d_sequence.size()-1 ? this->spacing() : 0.f); }
+		inline float offset(Frame* frame) { return frame->dsize(d_length) + frame->layout()->margin()[d_length] + (frame->index() != d_sequence.size()-1 ? this->spacing() : 0.f); }
+		inline float offset(Frame* frame, Dimension dim) { return dim == d_length ? offset(frame) : frame->doffset(d_length); }
 
 		void setCursor(float cursor) { d_cursor = cursor; d_relayout = true; }
 
@@ -65,7 +68,7 @@ namespace mk
 		void markDirty(Dirty dirty);
 		void setVisible(bool visible);
 
-		void migrate(Stripe* stripe);
+		void migrate(Stripe& stripe);
 
 		void markRelayout() { d_relayout = true; }
 
@@ -85,12 +88,14 @@ namespace mk
 		void cursorUp();
 		void cursorDown();
 
-		bool nextOffset(Dimension dim, float& pos, float seuil);
-		bool prevOffset(Dimension dim, float& pos, float seuil);
+		bool nextOffset(Dimension dim, float& pos, float seuil, bool top = false);
+		bool prevOffset(Dimension dim, float& pos, float seuil, bool top = false);
 
 		void nextFrame(size_t tick, size_t delta);
 
-		void updateStyle(Style* style);
+		void updateSpace();
+		void updateStyle();
+		void updateSizing();
 
 		void deepRelayout();
 
@@ -98,8 +103,8 @@ namespace mk
 		void dispatchWeights();
 		void dispatchTableWeights();
 
-		inline float dspace(Dimension dim) { return d_size[dim] - d_layout->d_padding[dim] - d_layout->d_padding[dim+2]; }
-		inline float dpivotposition(Dimension dim, Frame* frame) { return d_layout->d_pivot[dim] ? dsize(dim) - frame->dsize(dim) - frame->dposition(dim) : frame->dposition(dim); }
+		inline float dspace(Dimension dim) { return d_size[dim] - d_layout->padding()[dim] - d_layout->padding()[dim + 2] - (dim == d_length ? 0.f : d_floatDepth); }
+		inline float dpivotposition(Dimension dim, Frame* frame) { return d_layout->pivot()[dim] ? dsize(dim) - frame->dsize(dim) - frame->dposition(dim) : frame->dposition(dim); }
 
 		Frame* pinpoint(float x, float y, bool opaque);
 
@@ -128,6 +133,8 @@ namespace mk
 		FlowSequence d_sequence;
 
 		float d_sequenceLength;
+		float d_floatDepth;
+		float d_freeSpace;
 		float d_maxDepth;
 
 		bool d_relayout;

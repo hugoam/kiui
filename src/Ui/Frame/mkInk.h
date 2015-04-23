@@ -7,6 +7,7 @@
 
 /* mk Front */
 #include <Object/mkIndexer.h>
+#include <Object/Util/mkNonCopy.h>
 #include <Ui/mkUiForward.h>
 #include <Ui/Input/mkInputDispatcher.h>
 #include <Ui/Form/mkForm.h>
@@ -15,45 +16,73 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT InkWindow : public Object, public Typed<InkWindow>
+	class MK_UI_EXPORT InkWindow : public Object
 	{
 	public:
-		virtual InkTarget* screenTarget() = 0;
+		virtual InkTarget& screenTarget() = 0;
 		//virtual InkTarget* spaceTarget(Camera* camera, int width, int height) = 0;
+
+		static Type& cls() { static Type ty; return ty; }
 	};
 
-	class MK_UI_EXPORT InkTarget : public Object, public Typed<InkTarget>
+	class MK_UI_EXPORT InkTarget : public Object
 	{
 	public:
-		virtual unique_ptr<InkLayer> layer(Frame* frame, size_t z = 0) = 0;
-	};
-	
-	class MK_UI_EXPORT InkLayer : public Object, public Typed<InkLayer>
-	{
-	public:
-		InkLayer(InkTarget* target) : mTarget(target) {}
-		virtual ~InkLayer() {}
+		InkTarget() : mZMax(0), mLayers(16) {}
 
-		InkTarget* target() { return mTarget; }
+		size_t zmax() { return mZMax; }
 
-		virtual unique_ptr<Inkbox> inkbox(Frame* frame) = 0;
+		unique_ptr<InkLayer> addLayer(Frame& frame, size_t z);
+		void removeLayer(InkLayer& layer);
+		void moveToTop(InkLayer& layer);
 
-		virtual void show() = 0;
-		virtual void hide() = 0;
-		virtual void moveToTop() = 0;
+		static Type& cls() { static Type ty; return ty; }
 
 	protected:
-		InkTarget* mTarget;
-	};
+		virtual unique_ptr<InkLayer> createLayer(Frame& frame, size_t z) = 0;
 
-	class MK_UI_EXPORT Inkbox
+	protected:
+		size_t mZMax;
+		std::vector<std::vector<InkLayer*>> mLayers;
+	};
+	
+	class MK_UI_EXPORT InkLayer : public Object
 	{
 	public:
-		Inkbox(Frame* frame) : mFrame(frame), mVisible(frame->visible()) {}
+		InkLayer(InkTarget& target, size_t index) : mTarget(target), mIndex(index) {}
+		virtual ~InkLayer() { mTarget.removeLayer(*this); }
+
+		InkTarget& target() { return mTarget; }
+		size_t index() { return mIndex; }
+		void setIndex(size_t index) { mIndex = index; this->moved(index); }
+
+		void moveToTop() { mTarget.moveToTop(*this); }
+
+		virtual unique_ptr<Inkbox> createInkbox(Frame& frame) = 0;
+
+		virtual void moved(size_t index) { UNUSED(index); }
+		virtual void show() = 0;
+		virtual void hide() = 0;
+
+		static Type& cls() { static Type ty; return ty; }
+
+	protected:
+		InkTarget& mTarget;
+		size_t mIndex;
+	};
+
+	class MK_UI_EXPORT Inkbox : public NonCopy
+	{
+	public:
+		Inkbox(Frame& frame) : mFrame(frame), mVisible(frame.visible()), mSelectFirst(0), mSelectSecond(0) {}
 		virtual ~Inkbox() {}
 
-		Frame* frame() { return mFrame; }
+		Frame& frame() { return mFrame; }
 		bool visible() { return mVisible; }
+		size_t selectStart() { return mSelectFirst < mSelectSecond ? mSelectFirst : mSelectSecond; }
+		size_t selectEnd() { return mSelectSecond > mSelectFirst ? mSelectSecond : mSelectFirst; }
+
+		inline InkStyle& skin() { return mFrame.inkstyle(); }
 
 		virtual void show() = 0;
 		virtual void hide() = 0;
@@ -62,13 +91,19 @@ namespace mk
 		virtual void updateStyle() = 0;
 		virtual void updateFrame() = 0;
 
+		void selectCaret(size_t index) { mSelectFirst = index; mSelectSecond = index; }
+		void selectFirst(size_t start) { mSelectFirst = start; mSelectSecond = start; }
+		void selectSecond(size_t end) { mSelectSecond = end; }
+
 		virtual float contentSize(Dimension dim) = 0;
 		virtual size_t caretIndex(float x, float y) = 0;
 		virtual void caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight) = 0;
 
 	protected:
-		Frame* mFrame;
+		Frame& mFrame;
 		bool mVisible;
+		size_t mSelectFirst;
+		size_t mSelectSecond;
 	};
 }
 

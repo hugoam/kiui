@@ -60,7 +60,7 @@ namespace mk
 		KC_V           = 0x2F,
 		KC_B           = 0x30,
 		KC_N           = 0x31,
-		KC_M_           = 0x32,
+		KC_M           = 0x32,
 		KC_COMMA       = 0x33,
 		KC_PERIOD      = 0x34,    // . on main keyboard
 		KC_SLASH       = 0x35,    // / on main keyboard

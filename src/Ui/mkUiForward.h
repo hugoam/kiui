@@ -20,7 +20,6 @@ namespace mk
 	enum FrameType : unsigned int;
 	enum Sizing : unsigned int;
 	enum Flow : unsigned int;
-	enum Overflow : unsigned int;
 	enum BoxLayer : unsigned int;
 	enum Opacity : unsigned int;
 
@@ -91,6 +90,7 @@ namespace mk
 	class SliderKnob;
 	class Scroller;
 	class Scrollbar;
+	class ScrollArea;
 
 	template <class T>
 	class StatSlider;

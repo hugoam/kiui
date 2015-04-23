@@ -8,6 +8,7 @@
 /* mk */
 #include <Object/mkObjectForward.h>
 #include <Object/Iterable/mkIterable.h>
+#include <Object/Util/mkNonCopy.h>
 #include <Object/mkTyped.h>
 
 /* Standard */
@@ -22,24 +23,24 @@ namespace mk
 	template class MK_OBJECT_EXPORT Store<TypeObject>;
 #endif
 
-	class MK_OBJECT_EXPORT Indexer : public Store<TypeObject>
+	class MK_OBJECT_EXPORT Indexer : public Store<TypeObject>, public NonCopy
 	{
 	public:
-		Indexer(Type* type) : mType(type), mCount(0), mObjects() { mType->setupIndexer(this); mObjects.emplace_back(nullptr); }
+		Indexer(Type& type) : mType(type), mCount(0), mObjects() { mType.setupIndexer(this); mObjects.emplace_back(nullptr); }
 		~Indexer() {}
 
 		std::vector<IdObject*>& objects() { return mObjects; }
 
 		size_t vsize() const { return size(); }
 		void vclear() { clear(); }
-		Type* sequenceType() const { return mType; }
-		void vadd(TypeObject* object) { this->add(object->as<IdObject>()); }
-		size_t vindex(Object* object) { return object->as<IdObject>()->id(); }
-		size_t vindex(TypeObject* object) { return object->as<IdObject>()->id(); }
+		Type& sequenceType() const { return mType; }
+		void vadd(TypeObject& object) { this->add(object.as<IdObject>()); }
+		size_t vindex(Object& object) { return object.as<IdObject>().id(); }
+		size_t vindex(TypeObject& object) { return object.as<IdObject>().id(); }
 
-		void add(IdObject* object) { if(object->id() >= mObjects.size()) mObjects.resize(object->id() + 1); mObjects[object->id()] = object; ++mCount; }
-		void insert(IdObject* object, Id id) { if(id >= mObjects.size()) mObjects.resize(id + 1); mObjects[id] = object; ++mCount; }
-		void remove(IdObject* object) { mObjects[object->id()] = nullptr; --mCount; }
+		void add(IdObject& object) { if(object.id() >= mObjects.size()) mObjects.resize(object.id() + 1); mObjects[object.id()] = &object; ++mCount; }
+		void insert(IdObject& object, Id id) { if(id >= mObjects.size()) mObjects.resize(id + 1); mObjects[id] = &object; ++mCount; }
+		void remove(IdObject& object) { mObjects[object.id()] = nullptr; --mCount; }
 		IdObject* at(Id id) { if(id < mObjects.size()) return mObjects[id]; else return nullptr; }
 		Id alloc() { return mObjects.size(); }
 
@@ -64,17 +65,17 @@ namespace mk
 		}
 
 	protected:
-		Type* mType;
+		Type& mType;
 		std::vector<IdObject*> mObjects;
 		size_t mCount;
 		std::vector<StoreObserver<TypeObject>*> mObservers;
 	};
 
 	template <class T, class I = void>
-	class Indexed : public Typed<T, I>
+	class Indexed
 	{
 	public:
-		static inline Indexer* indexer() { static Indexer ind(T::cls()); return &ind; } //return &sIndexer; }
+		static inline Indexer& indexer() { static Indexer ind(T::cls()); return ind; } //return &sIndexer; }
 	};
 }
 

@@ -7,26 +7,6 @@
 
 #include <Ui/mkUiWindow.h>
 
-#include <Object/String/mkString.h>
-#include <Object/Util/mkMake.h>
-
-#include <Ui/Widget/mkWidget.h>
-#include <Ui/Widget/mkSheet.h>
-#include <Ui/Widget/mkRootSheet.h>
-
-#include <Ui/Frame/mkInk.h>
-#include <Ui/Frame/mkFrame.h>
-#include <Ui/Frame/mkStripe.h>
-
-#include <Ui/Scheme/mkTabber.h>
-#include <Ui/Scheme/mkDropdown.h>
-#include <Ui/Widget/mkButton.h>
-#include <Ui/Scheme/mkWindow.h>
-#include <Ui/Widget/mkTypeIn.h>
-#include <Ui/Widget/mkContextMenu.h>
-
-#include <Ui/Controller/mkController.h>
-
 #include <Ui/mkUiTypes.h>
 
 #include <iostream>
@@ -43,14 +23,18 @@ namespace mk
 	{
 		this->setupTypes();
 
-		mOverrides.resize(InkStyle::indexer()->size());
+		mOverrides.resize(1000);
 
-		for(Object* object : InkStyle::indexer()->objects())
+		for(Object* object : Style::indexer().objects())
+			if(object)
+				object->as<Style>().inherit();
+
+		for(Object* object : InkStyle::indexer().objects())
 			if(object)
 			{
-				InkStyle* ink = object->as<InkStyle>();
-				if(ink->mBackgroundColour.a() > 0.f || ink->mTextColour.a() > 0.f || ink->mBorderColour.a() > 0.f || !ink->mImage.empty())
-					ink->mEmpty = false;
+				InkStyle& ink = object->as<InkStyle>();
+				if(ink.backgroundColour().a() > 0.f || ink.textColour().a() > 0.f || ink.borderColour().a() > 0.f || !ink.image().empty())
+					ink.mEmpty = false;
 			}
 	}
 
@@ -58,362 +42,328 @@ namespace mk
 	{
 		mOverrides.clear();
 
-		for(Object* object : Style::indexer()->objects())
+		for(Object* object : Style::indexer().objects())
 			if(object)
-				object->as<Style>()->reset();
+				object->as<Style>().reset();
+
+		this->defaultLayout();
+		//this->defaultSkins();
+
+		this->prepare();
 	}
 
-	void Styler::inheritLayout(StyleVector styles, Style* base)
+	Style* Styler::fetchOverride(Style& style, Style& overrider)
 	{
-		for(Style* style : styles)
-			style->inheritLayout(base);
-	}
-
-	void Styler::inheritSkins(StyleVector styles, Style* base)
-	{
-		for(Style* style : styles)
-			style->inheritSkins(base);
-	}
-
-	Style* Styler::fetchOverride(Style* style, Style* overrider)
-	{
-		if(mOverrides[overrider->id()].size() > 0)
-			for(StyleOverride& override : mOverrides[overrider->id()])
-				if(override.mStyle == style)
-					return override.mOverride;
+		if(mOverrides[overrider.id()].size() > 0)
+			for(StyleOverride& override : mOverrides[overrider.id()])
+				if(&override.mStyle == &style)
+					return &override.mOverride;
 
 		return nullptr;
 	}
 
-	void Styler::override(Style* stem, Style* overrideWhat, Style* overrideWith)
+	void Styler::override(Style& stem, Style& overrideWhat, Style& overrideWith)
 	{
-		if(mOverrides.size() <= stem->id())
-			mOverrides.resize(stem->id() + 1);
+		if(mOverrides.size() <= stem.id())
+			mOverrides.resize(stem.id() + 1);
 
-		mOverrides[stem->id()].emplace_back();
-		mOverrides[stem->id()].back().mStyle = overrideWhat;
-		mOverrides[stem->id()].back().mOverride = overrideWith;
+		mOverrides[stem.id()].emplace_back(overrideWhat, overrideWith);
 	}
 
 	void Styler::override(const string& stem, const string& style, const string& overrider)
 	{
-		this->override(this->fetchStyle(stem), this->fetchStyle(style), this->fetchStyle(overrider));
+		this->override(*this->fetchStyle(stem), *this->fetchStyle(style), *this->fetchStyle(overrider));
 	}
 
-	Style* Styler::dynamicStyle(const string& name)
+	Style& Styler::dynamicStyle(const string& name)
 	{
 		if(this->fetchStyle(name) == nullptr)
 			mDynamicStyles.emplace_back(make_unique<Style>(name));
-		return this->fetchStyle(name);
+		return *this->fetchStyle(name);
 	}
 
 	Style* Styler::fetchStyle(const string& name)
 	{
-		for(Object* object : Style::indexer()->objects())
-			if(object && object->as<Style>()->name() == name)
-				return object->as<Style>();
+		for(Object* object : Style::indexer().objects())
+			if(object && object->as<Style>().name() == name)
+				return &object->as<Style>();
 		return nullptr;
 	}
 
 	void Styler::setupTypes()
 	{
-		RootSheet::cls()->setupName("RootSheet");
+		RootSheet::cls().setupName("RootSheet");
 
-		ScrollSheet::cls()->setupName("ScrollSheet");
-		Page::cls()->setupName("Page");
+		ScrollSheet::cls().setupName("ScrollSheet");
+		Page::cls().setupName("Page");
 
-		Cursor::cls()->setupName("Cursor");
+		Cursor::cls().setupName("Cursor");
 
-		SliderKnob::cls()->setupName("SliderKnob");
-		CloseButton::cls()->setupName("CloseButton");
+		SliderKnob::cls().setupName("SliderKnob");
+		CloseButton::cls().setupName("CloseButton");
 
-		DropdownToggle::cls()->setupName("DropdownToggle");
+		DropdownToggle::cls().setupName("DropdownToggle");
 
-		Label::cls()->setupName("Label");
-		Title::cls()->setupName("Title");
-		Icon::cls()->setupName("Icon");
-		SliderDisplay::cls()->setupName("SliderDisplay");
+		Label::cls().setupName("Label");
+		Title::cls().setupName("Title");
+		Icon::cls().setupName("Icon");
+		SliderDisplay::cls().setupName("SliderDisplay");
 
-		Button::cls()->setupName("Button");
-		ImgButton::cls()->setupName("ImgButton");
-		TabHeader::cls()->setupName("TabHeader");
-		ColumnHeader::cls()->setupName("ColumnHeader");
-		DropdownChoice::cls()->setupName("DropdownChoice");
-		RadioChoice::cls()->setupName("RadioChoice");
+		Button::cls().setupName("Button");
+		ImgButton::cls().setupName("ImgButton");
+		TabHeader::cls().setupName("TabHeader");
+		ColumnHeader::cls().setupName("ColumnHeader");
+		DropdownChoice::cls().setupName("DropdownChoice");
+		RadioChoice::cls().setupName("RadioChoice");
 
-		Dir::cls()->setupName("Dir");
-		File::cls()->setupName("File");
-		Directory::cls()->setupName("Directory");
+		SpacerX::cls().setupName("SpacerX");
+		SpacerY::cls().setupName("SpacerY");
 
-		ProgressBarX::cls()->setupName("ProgressBarX");
-		FillerX::cls()->setupName("FillerX");
-		FillerY::cls()->setupName("FillerY");
+		Dir::cls().setupName("Dir");
+		File::cls().setupName("File");
+		Directory::cls().setupName("Directory");
 
-		Slider::cls()->setupName("Slider");
-		SliderX::cls()->setupName("SliderX");
-		SliderY::cls()->setupName("SliderY");
-		SliderKnobX::cls()->setupName("SliderKnobX");
-		SliderKnobY::cls()->setupName("SliderKnobY");
+		ProgressBarX::cls().setupName("ProgressBarX");
+		FillerX::cls().setupName("FillerX");
+		FillerY::cls().setupName("FillerY");
 
-		ProgressBarX::cls()->setupName("ProgressBarX");
-		ProgressBarY::cls()->setupName("ProgressBarY");
+		Slider::cls().setupName("Slider");
+		SliderX::cls().setupName("SliderX");
+		SliderY::cls().setupName("SliderY");
+		SliderKnobX::cls().setupName("SliderKnobX");
+		SliderKnobY::cls().setupName("SliderKnobY");
 
-		Scrollbar::cls()->setupName("Scrollbar");
-		Scroller::cls()->setupName("Scroller");
-		ScrollUp::cls()->setupName("ScrollUp");
-		ScrollDown::cls()->setupName("ScrollDown");
-		ScrollerKnobX::cls()->setupName("ScrollerKnobX");
-		ScrollerKnobY::cls()->setupName("ScrollerKnobY");
+		ProgressBarX::cls().setupName("ProgressBarX");
+		ProgressBarY::cls().setupName("ProgressBarY");
 
-		DocklineX::cls()->setupName("DocklineX");
-		DocklineY::cls()->setupName("DocklineY");
+		Scrollbar::cls().setupName("Scrollbar");
+		Scroller::cls().setupName("Scroller");
+		ScrollUp::cls().setupName("ScrollUp");
+		ScrollDown::cls().setupName("ScrollDown");
+		ScrollerKnobX::cls().setupName("ScrollerKnobX");
+		ScrollerKnobY::cls().setupName("ScrollerKnobY");
 
-		Tooltip::cls()->setupName("Tooltip");
-		Caret::cls()->setupName("Caret");
+		DocklineX::cls().setupName("DocklineX");
+		DocklineY::cls().setupName("DocklineY");
 
-		TypeIn::cls()->setupName("TypeIn");
-		Checkbox::cls()->setupName("Checkbox");
+		Tooltip::cls().setupName("Tooltip");
+		Caret::cls().setupName("Caret");
 
-		Dialog::cls()->setupName("Dialog");
-		Header::cls()->setupName("Header");
+		TypeIn::cls().setupName("TypeIn");
+		Checkbox::cls().setupName("Checkbox");
 
-		List::cls()->setupName("List");
+		Dialog::cls().setupName("Dialog");
+		Header::cls().setupName("Header");
 
-		Window::cls()->setupName("Window");
-		DockWindow::cls()->setupName("DockWindow");
-		WindowHeader::cls()->setupName("WindowHeader");
-		WindowBody::cls()->setupName("WindowBody");
-		WindowSizer::cls()->setupName("WindowSizer");
+		List::cls().setupName("List");
 
-		Table::cls()->setupName("Table");
-		TableHead::cls()->setupName("TableHead");
+		Window::cls().setupName("Window");
+		DockWindow::cls().setupName("DockWindow");
+		WindowHeader::cls().setupName("WindowHeader");
+		WindowBody::cls().setupName("WindowBody");
+		WindowSizer::cls().setupName("WindowSizer");
 
-		Tab::cls()->setupName("Tab");
-		Tabber::cls()->setupName("Tabber");
-		TabberHead::cls()->setupName("TabberHead");
+		Table::cls().setupName("Table");
+		TableHead::cls().setupName("TableHead");
 
-		Expandbox::cls()->setupName("Expandbox");
-		ExpandboxToggle::cls()->setupName("ExpandboxToggle");
-		ExpandboxHeader::cls()->setupName("ExpandboxHeader");
-		ExpandboxBody::cls()->setupName("ExpandboxBody");
+		Tab::cls().setupName("Tab");
+		Tabber::cls().setupName("Tabber");
+		TabberHead::cls().setupName("TabberHead");
 
-		Tree::cls()->setupName("Tree");
-		TreeNodeToggle::cls()->setupName("TreeNodeToggle");
-		TreeNodeHeader::cls()->setupName("TreeNodeHeader");
-		TreeNodeBody::cls()->setupName("TreeNodeBody");
+		Expandbox::cls().setupName("Expandbox");
+		ExpandboxToggle::cls().setupName("ExpandboxToggle");
+		ExpandboxHeader::cls().setupName("ExpandboxHeader");
+		ExpandboxBody::cls().setupName("ExpandboxBody");
 
-		Dropdown::cls()->setupName("Dropdown");
-		DropdownLabel::cls()->setupName("DropdownLabel");
-		DropdownHeader::cls()->setupName("DropdownHeader");
-		DropdownBox::cls()->setupName("DropdownBox");
+		Tree::cls().setupName("Tree");
+		TreeNodeToggle::cls().setupName("TreeNodeToggle");
+		TreeNodeHeader::cls().setupName("TreeNodeHeader");
+		TreeNodeBody::cls().setupName("TreeNodeBody");
 
-		RadioSwitch::cls()->setupName("RadioSwitch");
+		Dropdown::cls().setupName("Dropdown");
+		Typedown::cls().setupName("Typedown");
+		DropdownLabel::cls().setupName("DropdownLabel");
+		DropdownHeader::cls().setupName("DropdownHeader");
+		DropdownBox::cls().setupName("DropdownBox");
 
-		Input<int>::cls()->setupName("Input<int>");
-		Input<float>::cls()->setupName("Input<float>");
+		RadioSwitch::cls().setupName("RadioSwitch");
+
+		Input<int>::cls().setupName("Input<int>");
+		Input<float>::cls().setupName("Input<float>");
 	}
 
 	void Styler::defaultLayout()
 	{
 		// Built-in Layouts
 
-		Cursor::styleCls()->layout()->d_flow = MANUAL;
-		Cursor::styleCls()->layout()->d_clipping = NOCLIP;
-		Cursor::styleCls()->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
+		Cursor::cls().layout().d_flow = MANUAL;
+		Cursor::cls().layout().d_clipping = NOCLIP;
 
-		PartitionX::styleCls()->layout()->d_layoutDim = DIM_X;
-		PartitionX::styleCls()->layout()->d_sizing = DimSizing(EXPAND, EXPAND);
+		Tooltip::cls().layout().d_flow = MANUAL;
+		Tooltip::cls().layout().d_clipping = NOCLIP;
 
-		PartitionY::styleCls()->layout()->d_layoutDim = DIM_Y;
-		PartitionY::styleCls()->layout()->d_sizing = DimSizing(EXPAND, EXPAND);
+		ContextMenu::cls().layout().d_flow = MANUAL;
+		ContextMenu::cls().layout().d_clipping = NOCLIP;
 
-		DivX::styleCls()->layout()->d_layoutDim = DIM_X;
-		DivX::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
+		Control::cls().layout().d_opacity = OPAQUE;
 
-		DivY::styleCls()->layout()->d_layoutDim = DIM_Y;
-		DivY::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
+		Dialog::cls().layout().d_layoutDim = DIM_Y;
+		Dialog::cls().layout().d_padding = BoxFloat(25.f, 12.f, 25.f, 12.f);
+		Dialog::cls().layout().d_spacing = DimFloat(6.f, 6.f);
 
-		WrapY::styleCls()->layout()->d_layoutDim = DIM_Y;
-		WrapY::styleCls()->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
+		Caret::cls().layout().d_flow = MANUAL;
 
-		WrapX::styleCls()->layout()->d_layoutDim = DIM_X;
-		WrapX::styleCls()->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
+		Window::cls().layout().d_flow = MANUAL;
+		Window::cls().layout().d_opacity = OPAQUE;
+		Window::cls().layout().d_layoutDim = DIM_Y;
+		Window::cls().layout().d_size = DimFloat(480.f, 350.f);
 
-		Control::styleCls()->layout()->d_opacity = OPAQUE;
-		Control::styleCls()->layout()->d_sizing = DimSizing(SHRINK, SHRINK);
-
-		Dialog::styleCls()->layout()->d_layoutDim = DIM_Y;
-		Dialog::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
-		Dialog::styleCls()->layout()->d_padding = BoxFloat(25.f, 12.f, 25.f, 12.f);
-		Dialog::styleCls()->layout()->d_spacing = DimFloat(6.f, 6.f);
-
-		Caret::styleCls()->layout()->d_flow = MANUAL;
-		Caret::styleCls()->layout()->d_sizing = DimSizing(FIXED, FIXED);
-
-		Window::styleCls()->layout()->d_flow = MANUAL;
-		Window::styleCls()->layout()->d_opacity = OPAQUE;
-		Window::styleCls()->layout()->d_layoutDim = DIM_Y;
-		Window::styleCls()->layout()->d_size = DimFloat(480.f, 350.f);
-		Window::styleCls()->layout()->d_sizing = DimSizing(FIXED, FIXED);
-
-		DockWindow::styleCls()->layout()->d_opacity = OPAQUE;
-		DockWindow::styleCls()->layout()->d_sizing = DimSizing(EXPAND, EXPAND);
-		DockWindow::styleCls()->layout()->d_padding = BoxFloat(1.f);
+		DockWindow::cls().layout().d_opacity = OPAQUE;
 
 		// Layouts
 
-		this->inheritLayout(StyleVector({ Button::styleCls(), Checkbox::styleCls() }), Control::styleCls());
-		this->inheritLayout(StyleVector({ ColumnHeader::styleCls(), TabHeader::styleCls(), RadioChoice::styleCls() }), Control::styleCls());
-		this->inheritLayout(StyleVector({ TreeNodeToggle::styleCls(), ExpandboxToggle::styleCls(), DropdownToggle::styleCls(), CloseButton::styleCls() }), Control::styleCls());
-		this->inheritLayout(StyleVector({ SliderKnobX::styleCls(), SliderKnobY::styleCls() }), Control::styleCls());
-		this->inheritLayout(StyleVector({ ScrollerKnobX::styleCls(), ScrollerKnobY::styleCls(), ScrollUp::styleCls(), ScrollDown::styleCls() }), Control::styleCls());
-		this->inheritLayout(StyleVector({ DropdownHeader::styleCls() }), Control::styleCls());
-		this->inheritLayout(StyleVector({ Dir::styleCls(), File::styleCls() }), Control::styleCls());
-		this->inheritLayout(StyleVector({ Icon::styleCls() }), Control::styleCls());
+		WrapButton::cls().layout().d_opacity = OPAQUE;
+		WrapButton::cls().layout().d_layoutDim = DIM_X;
 
-		this->inheritLayout(StyleVector({ Label::styleCls(), Title::styleCls(), DropdownLabel::styleCls() }), WrapX::styleCls());
-		this->inheritLayout(StyleVector({ Input<bool>::styleCls() }), WrapX::styleCls());
+		WrapSheet::cls().layout().d_space = WRAP;
 
-		this->inheritLayout(StyleVector({ Table::styleCls(), DropdownBox::styleCls(), }), DivY::styleCls());
-		this->inheritLayout(StyleVector({ RadioSwitch::styleCls() }), DivX::styleCls());
-		this->inheritLayout(StyleVector({ Dropdown::styleCls(), DropdownChoice::styleCls(), }), DivX::styleCls());
-		this->inheritLayout(StyleVector({ Expandbox::styleCls(), ExpandboxBody::styleCls() }), DivY::styleCls());
-		this->inheritLayout(StyleVector({ TreeNode::styleCls(), TreeNodeBody::styleCls() }), DivY::styleCls());
-		this->inheritLayout(StyleVector({ TabberHead::styleCls(), TableHead::styleCls(), WindowHeader::styleCls(), ExpandboxHeader::styleCls(), TreeNodeHeader::styleCls() }), DivX::styleCls());
-		this->inheritLayout(StyleVector({ Sequence::styleCls(), Header::styleCls() }), DivX::styleCls());
+		Board::cls().layout().d_space = BOARD;
+		Dockspace::cls().layout().d_space = BOARD;
+		Docksection::cls().layout().d_space = BOARD;
+		ScrollSheet::cls().layout().d_space = BOARD;
+		Page::cls().layout().d_space = BOARD;
+		WindowBody::cls().layout().d_space = BOARD;
+		Tabber::cls().layout().d_space = BOARD;
+		TabberBody::cls().layout().d_space = BOARD;
+		Tab::cls().layout().d_space = BOARD;
+		Tree::cls().layout().d_space = BOARD;
+		List::cls().layout().d_space = BOARD;
+		DockWindow::cls().layout().d_space = BOARD;
+		Window::cls().layout().d_space = BOARD;
+		Textbox::cls().layout().d_space = BOARD;
 
-		this->inheritLayout(StyleVector({ SpacerX::styleCls(), SpacerY::styleCls() }), PartitionX::styleCls());
-		this->inheritLayout(StyleVector({ DocklineX::styleCls(), ScrollSheet::styleCls() }), PartitionX::styleCls());
-		this->inheritLayout(StyleVector({ Page::styleCls() }), PartitionX::styleCls());
+		ScrollArea::cls().layout().d_space = SPACE;
+		ScrollArea::cls().layout().d_flow = FLOAT_DEPTH;
+		ScrollArea::cls().layout().d_layoutDim = DIM_X;
+		ScrollArea::cls().layout().d_pivot = DimPivot(REVERSE, REVERSE);
 
-		this->inheritLayout(StyleVector({ Dockspace::styleCls(), Docksection::styleCls(), DocklineY::styleCls() }), PartitionY::styleCls());
-		this->inheritLayout(StyleVector({ WindowBody::styleCls(), Tabber::styleCls(), TabberBody::styleCls(), Tab::styleCls(), Tree::styleCls(), List::styleCls() }), PartitionY::styleCls());
+		Scroller::cls().layout().d_space = BOARD;
 
-		this->inheritLayout(StyleVector({ Tooltip::styleCls(), WContextMenu::styleCls() }), Cursor::styleCls());
+		Caret::cls().layout().d_space = BLOCK;
+		Caret::cls().layout().d_size = DimFloat(1.f, 1.f);
 
-		this->inheritLayout(StyleVector({ ResizeCursorX::styleCls(), ResizeCursorY::styleCls(), CaretCursor::styleCls() }), Cursor::styleCls());
-		this->inheritLayout(StyleVector({ ResizeCursorDiagLeft::styleCls(), ResizeCursorDiagRight::styleCls(), MoveCursor::styleCls() }), Cursor::styleCls());
+		DropdownHeader::cls().layout().d_space = SPACE;
+		DropdownBox::cls().layout().d_space = SPACE;
 
-		this->inheritLayout(StyleVector({ TypeIn::styleCls() }), DivX::styleCls());
-		this->inheritLayout(StyleVector({ WValue::styleCls() }), DivX::styleCls());
-		this->inheritLayout(StyleVector({ Input<int>::styleCls(), Input<float>::styleCls() }), DivX::styleCls());
+		SliderDisplay::cls().layout().d_space = BOARD;
 
-		this->inheritLayout(StyleVector({ SliderX::styleCls() }), DivX::styleCls());
-		this->inheritLayout(StyleVector({ SliderY::styleCls() }), DivY::styleCls());
-		this->inheritLayout(StyleVector({ SliderDisplay::styleCls() }), PartitionX::styleCls());
-		this->inheritLayout(StyleVector({ SliderInt::styleCls(), SliderFloat::styleCls() }), DivX::styleCls());
+		Input<bool>::cls().layout().d_space = BLOCK;
 
-		this->inheritLayout(StyleVector({ InputInt::styleCls(), InputFloat::styleCls(), InputBool::styleCls(), InputText::styleCls(), InputDropdown::styleCls() }), DivX::styleCls());
+		TableHead::cls().layout().d_layoutDim = DIM_X;
 
-		this->inheritLayout(StyleVector({ ScrollerX::styleCls() }), PartitionX::styleCls());
-		this->inheritLayout(StyleVector({ ScrollerY::styleCls() }), PartitionY::styleCls());
+		RadioSwitch::cls().layout().d_layoutDim = DIM_X;
+		Sequence::cls().layout().d_layoutDim = DIM_X;
+		Header::cls().layout().d_layoutDim = DIM_X;
+		Dropdown::cls().layout().d_layoutDim = DIM_X;
 
-		this->inheritLayout(StyleVector({ RootSheet::styleCls() }), PartitionY::styleCls());
+		SliderX::cls().layout().d_layoutDim = DIM_X;
+		SliderY::cls().layout().d_layoutDim = DIM_Y;
 
-		File::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
-		Dir::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
+		ScrollerX::cls().layout().d_layoutDim = DIM_X;
+		ScrollerY::cls().layout().d_layoutDim = DIM_Y;
 
-		Icon::styleCls()->skin()->mEmpty = false;
-		Dir::styleCls()->layout()->d_layoutDim = DIM_X;
-		File::styleCls()->layout()->d_layoutDim = DIM_X;
-		Dir::styleCls()->layout()->d_padding = BoxFloat(2.f, 2.f, 2.f, 2.f);
-		Dir::styleCls()->layout()->d_spacing = DimFloat(2.f, 2.f);
-		File::styleCls()->layout()->d_padding = BoxFloat(2.f, 2.f, 2.f, 2.f);
-		File::styleCls()->layout()->d_spacing = DimFloat(2.f, 2.f);
-		TreeNodeHeader::styleCls()->layout()->d_padding = BoxFloat(2.f, 2.f, 2.f, 2.f);
-		TreeNodeHeader::styleCls()->layout()->d_spacing = DimFloat(2.f, 2.f);
+		Icon::cls().skin().mEmpty = false;
 
-		RootSheet::styleCls()->layout()->d_opacity = OPAQUE;
+		Dir::cls().layout().d_layoutDim = DIM_X;
+		File::cls().layout().d_layoutDim = DIM_X;
 
-		TypeIn::styleCls()->layout()->d_opacity = OPAQUE;
-		TypeIn::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
+		Dir::cls().layout().d_padding = BoxFloat(2.f, 2.f, 2.f, 2.f);
+		Dir::cls().layout().d_spacing = DimFloat(2.f, 2.f);
+		File::cls().layout().d_padding = BoxFloat(2.f, 2.f, 2.f, 2.f);
+		File::cls().layout().d_spacing = DimFloat(2.f, 2.f);
+		TreeNodeHeader::cls().layout().d_padding = BoxFloat(2.f, 2.f, 2.f, 2.f);
+		TreeNodeHeader::cls().layout().d_spacing = DimFloat(2.f, 2.f);
 
-		WindowHeader::styleCls()->layout()->d_opacity = OPAQUE;
-		WindowSizer::styleCls()->layout()->d_opacity = OPAQUE;
-		TableHead::styleCls()->layout()->d_opacity = OPAQUE;
-		ColumnHeader::styleCls()->layout()->d_opacity = VOID;
+		RootSheet::cls().layout().d_opacity = OPAQUE;
 
-		Tree::styleCls()->layout()->d_overflow = SCROLL;
-		List::styleCls()->layout()->d_overflow = SCROLL;
+		DropdownToggle::cls().layout().d_opacity = GLASSY;
 
-		Tree::styleCls()->layout()->d_layoutDim = DIM_X;
-		List::styleCls()->layout()->d_layoutDim = DIM_X;
-		Directory::styleCls()->layout()->d_layoutDim = DIM_X;
-		List::styleCls()->layout()->d_layoutDim = DIM_X;
+		WValue::cls().layout().d_layoutDim = DIM_X;
 
-		List::styleCls()->layout()->d_sizing = DimSizing(CAPPED, CAPPED);
+		TypeIn::cls().layout().d_opacity = OPAQUE;
+		TypeIn::cls().layout().d_layoutDim = DIM_X;
+		TypeIn::cls().layout().d_space = SPACE;
 
-		Directory::styleCls()->inheritLayout(List::styleCls());
+		WindowHeader::cls().layout().d_opacity = OPAQUE;
+		WindowSizer::cls().layout().d_opacity = OPAQUE;
+		GridSheet::cls().layout().d_opacity = OPAQUE;
 
-		DropdownHeader::styleCls()->layout()->d_sizing[DIM_X] = EXPAND;
+		SpacerX::cls().layout().d_space = SPACE;
+		SpacerX::cls().layout().d_layoutDim = DIM_X;
+		SpacerY::cls().layout().d_space = SPACE;
+		SpacerY::cls().layout().d_layoutDim = DIM_Y;
 
-		ProgressBarX::styleCls()->layout()->d_sizing = DimSizing(EXPAND, SHRINK);
-		ProgressBarX::styleCls()->layout()->d_layoutDim = DIM_X;
-		ProgressBarY::styleCls()->layout()->d_sizing = DimSizing(SHRINK, EXPAND);
-		ProgressBarY::styleCls()->layout()->d_layoutDim = DIM_Y;
+		ProgressBarX::cls().layout().d_layoutDim = DIM_X;
+		ProgressBarY::cls().layout().d_layoutDim = DIM_Y;
 
-		FillerX::styleCls()->layout()->d_sizing = DimSizing(EXPAND, FIXED);
-		FillerY::styleCls()->layout()->d_sizing = DimSizing(FIXED, EXPAND);
-		FillerX::styleCls()->layout()->d_size[DIM_Y] = 20.f;
-		FillerY::styleCls()->layout()->d_size[DIM_X] = 20.f;
+		FillerX::cls().layout().d_size = DimFloat(0.f, 20.f);
+		FillerY::cls().layout().d_size = DimFloat(20.f, 0.f);
 
-		SliderDisplay::styleCls()->layout()->d_flow = MANUAL;
+		SliderDisplay::cls().layout().d_flow = MANUAL;
 
-		//SliderX::styleCls()->layout()->d_weight = LIST;
-		//SliderY::styleCls()->layout()->d_weight = LIST;
+		Dockline::cls().layout().d_weight = LIST;
+		Dockline::cls().layout().d_space = BOARD;
+		DocklineY::cls().layout().d_spacing = DimFloat(0.f, 5.f);
+		DocklineY::cls().layout().d_layoutDim = DIM_Y;
+		DocklineX::cls().layout().d_spacing = DimFloat(5.f, 0.f);
+		DocklineX::cls().layout().d_layoutDim = DIM_X;
 
-		//ScrollerX::styleCls()->layout()->d_weight = LIST;
-		//ScrollerY::styleCls()->layout()->d_weight = LIST;
+		ExpandboxBody::cls().layout().d_padding = BoxFloat(12.f, 2.f, 0.f, 2.f);
 
-		DocklineY::styleCls()->layout()->d_weight = LIST;
-		DocklineX::styleCls()->layout()->d_weight = LIST;
-		DocklineY::styleCls()->layout()->d_opacity = OPAQUE;
-		DocklineX::styleCls()->layout()->d_opacity = OPAQUE;
-		DocklineY::styleCls()->layout()->d_spacing = DimFloat(0.f, 5.f);
-		DocklineX::styleCls()->layout()->d_spacing = DimFloat(5.f, 0.f);
+		TreeNodeBody::cls().layout().d_padding = BoxFloat(24.f, 2.f, 0.f, 2.f);
 
-		MasterDockline::styleCls()->inheritLayout(DocklineX::styleCls());
+		Table::cls().layout().d_spacing = DimFloat(0.f, 2.f);
+		Table::cls().layout().d_layoutDim = DIM_Y;
+		Table::cls().layout().d_weight = TABLE;
 
-		ExpandboxBody::styleCls()->layout()->d_spacing = DimFloat(0.f, 2.f);
-		ExpandboxBody::styleCls()->layout()->d_padding = BoxFloat(12.f, 2.f, 0.f, 2.f);
+		ColumnHeader::cls().layout().d_space = SPACE;
 
-		TreeNodeBody::styleCls()->layout()->d_padding = BoxFloat(24.f, 2.f, 0.f, 2.f);
+		TreeNodeHeader::cls().layout().d_opacity = OPAQUE;
 
-		Table::styleCls()->layout()->d_spacing = DimFloat(0.f, 2.f);
-		Table::styleCls()->layout()->d_layoutDim = DIM_Y;
-		Table::styleCls()->layout()->d_weight = TABLE;
+		DropdownBox::cls().layout().d_flow = MANUAL;
+		DropdownBox::cls().layout().d_clipping = NOCLIP;
+		DropdownChoice::cls().layout().d_opacity = OPAQUE;
 
-		TreeNodeHeader::styleCls()->layout()->d_opacity = OPAQUE;
+		Scrollbar::cls().layout().d_layoutDim = DIM_Y;
 
-		DropdownBox::styleCls()->layout()->d_flow = MANUAL;
-		DropdownBox::styleCls()->layout()->d_clipping = NOCLIP;
-		DropdownChoice::styleCls()->layout()->d_opacity = OPAQUE;
+		Tab::cls().layout().d_padding = BoxFloat(0.f, 4.f, 0.f, 0.f);
 
-		SliderKnobX::styleCls()->layout()->d_sizing = DimSizing(FIXED, EXPAND);
-		SliderKnobY::styleCls()->layout()->d_sizing = DimSizing(EXPAND, FIXED);
-		SliderKnobX::styleCls()->layout()->d_size = DimFloat(8.f, 18.f);
-		SliderKnobY::styleCls()->layout()->d_size = DimFloat(18.f, 8.f);
+		Header::cls().layout().d_padding = BoxFloat(6.f);
 
-		ScrollerKnobX::styleCls()->layout()->d_sizing = DimSizing(EXPAND, EXPAND);
-		ScrollerKnobY::styleCls()->layout()->d_sizing = DimSizing(EXPAND, EXPAND);
+		EmptyStyle::cls().skin().mEmpty = true;
 
-		Scrollbar::styleCls()->layout()->d_sizing = DimSizing(SHRINK, EXPAND);
-		Scrollbar::styleCls()->layout()->d_layoutDim = DIM_Y;
+		Cursor::cls().skin().mImage = "mousepointer";
 
-		Tab::styleCls()->layout()->d_padding = BoxFloat(0.f, 4.f, 0.f, 0.f);
+		ResizeCursorX::cls().skin().mImage = "resize_h_20";
+		ResizeCursorX::cls().skin().mPadding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
+		ResizeCursorY::cls().skin().mImage = "resize_v_20";
+		ResizeCursorY::cls().skin().mPadding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
+		MoveCursor::cls().skin().mImage = "move_20";
+		MoveCursor::cls().skin().mPadding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
+		ResizeCursorDiagLeft::cls().skin().mImage = "resize_diag_left_20";
+		ResizeCursorDiagLeft::cls().skin().mPadding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
+		ResizeCursorDiagRight::cls().skin().mImage = "resize_diag_right_20";
+		ResizeCursorDiagRight::cls().skin().mPadding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
+		CaretCursor::cls().skin().mImage = "caret_white";
+		CaretCursor::cls().skin().mPadding = BoxFloat(-4.f, -9.f, +4.f, +9.f);
 
-		Header::styleCls()->layout()->d_padding = BoxFloat(6.f, 6.f, 6.f, 6.f);
+		Caret::cls().skin().mBackgroundColour = Colour::White;
 
-		EmptyStyle::styleCls()->skin()->mEmpty = true;
+		Page::cls().layout().d_spacing = DimFloat(4.f, 6.f);
+		ExpandboxBody::cls().layout().d_spacing = DimFloat(4.f, 6.f);
 
-		Cursor::styleCls()->skin()->mImage = "mousepointer";
-
-		ResizeCursorX::styleCls()->skin()->mImage = "resize_h_20";
-		ResizeCursorY::styleCls()->skin()->mImage = "resize_v_20";
-		MoveCursor::styleCls()->skin()->mImage = "move_20";
-		ResizeCursorDiagLeft::styleCls()->skin()->mImage = "resize_diag_left_20";
-		ResizeCursorDiagRight::styleCls()->skin()->mImage = "resize_diag_right_20";
-		CaretCursor::styleCls()->skin()->mImage = "caret_white";
+		this->override(Scroller::cls(), SliderKnobX::cls(), ScrollerKnobX::cls());
+		this->override(Scroller::cls(), SliderKnobY::cls(), ScrollerKnobY::cls());
 	}
 
 	void Styler::defaultSkins()
@@ -424,144 +374,137 @@ namespace mk
 
 		// Skins
 
-		TableHead::styleCls()->layout()->d_spacing[DIM_X] = 1.f;
+		TableHead::cls().layout().d_spacing = DimFloat(1.f, 0.f);
 
-		WindowBody::styleCls()->layout()->d_padding = BoxFloat(4.f);
+		WindowBody::cls().layout().d_padding = BoxFloat(4.f);
 
-		Checkbox::styleCls()->layout()->d_sizing = DimSizing(FIXED, FIXED);
-		Checkbox::styleCls()->layout()->d_size = DimFloat(16.f, 16.f);
+		Checkbox::cls().layout().d_size = DimFloat(16.f, 16.f);
 
-		SliderKnob::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
-		SliderKnob::styleCls()->skin()->mCornerRadius = 3.f;
-		SliderKnob::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
 
-		CloseButton::styleCls()->skin()->mImage = "close_15";
-		CloseButton::styleCls()->skin()->mPadding = DimFloat(4.f, 4.f);
-		CloseButton::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
+		SliderKnobX::cls().layout().d_size = DimFloat(8.f, 0.f);
+		SliderKnobY::cls().layout().d_size = DimFloat(0.f, 8.f);
 
-		DropdownToggle::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
-		DropdownToggle::styleCls()->skin()->mImage = "arrow_down_15";
-		DropdownToggle::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
+		SliderKnob::cls().skin().mBackgroundColour = Colour::LightGrey;
+		SliderKnob::cls().skin().mCornerRadius = 3.f;
+		SliderKnob::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
 
-		ExpandboxToggle::styleCls()->skin()->mImage = "arrow_right_15";
-		ExpandboxToggle::styleCls()->decline(ACTIVATED)->mImage = "arrow_down_15";
-		ExpandboxToggle::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
-		ExpandboxToggle::styleCls()->decline(DISABLED)->mImage = "empty_15";
-		ExpandboxToggle::styleCls()->decline(static_cast<WidgetState>(ACTIVATED | HOVERED))->mImage = "arrow_down_15";
-		ExpandboxToggle::styleCls()->subskin(static_cast<WidgetState>(ACTIVATED | HOVERED))->mBackgroundColour = Colour::Red;
+		SliderDisplay::cls().skin().mAlign = DimAlign(CENTER, CENTER);
 
-		TreeNodeToggle::styleCls()->inheritSkins(ExpandboxToggle::styleCls());
-		EmptyTreeNodeToggle::styleCls()->inheritLayout(TreeNodeToggle::styleCls());
-		EmptyTreeNodeToggle::styleCls()->inheritSkins(TreeNodeToggle::styleCls());
+		CloseButton::cls().skin().mImage = "close_15";
+		CloseButton::cls().skin().mPadding = BoxFloat(4.f);
+		CloseButton::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
 
-		Label::styleCls()->skin()->mTextColour = Colour::White;
-		Label::styleCls()->skin()->mPadding = DimFloat(2.f, 2.f);
+		DropdownToggle::cls().skin().mBackgroundColour = Colour::MidGrey;
+		DropdownToggle::cls().skin().mImage = "arrow_down_15";
+		DropdownToggle::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
+
+		ExpandboxToggle::cls().skin().mImage = "arrow_right_15";
+		ExpandboxToggle::cls().decline(ACTIVATED).mImage = "arrow_down_15";
+		ExpandboxToggle::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
+		ExpandboxToggle::cls().decline(DISABLED).mImage = "empty_15";
+		ExpandboxToggle::cls().decline(static_cast<WidgetState>(ACTIVATED | HOVERED)).mImage = "arrow_down_15";
+		ExpandboxToggle::cls().subskin(static_cast<WidgetState>(ACTIVATED | HOVERED)).mBackgroundColour = Colour::Red;
+
+		TreeNodeToggle::cls().copySkins(ExpandboxToggle::cls());
+
+		Label::cls().skin().mTextColour = Colour::White;
+		Label::cls().skin().mPadding = BoxFloat(2.f);
 		
-		Label::styleCls()->inheritSkins(Label::styleCls());
-		Title::styleCls()->inheritSkins(Label::styleCls());
-		TypeIn::styleCls()->inheritSkins(Label::styleCls());
-		SliderDisplay::styleCls()->inheritSkins(Label::styleCls());
-		DropdownLabel::styleCls()->inheritSkins(Label::styleCls());
+		TypeIn::cls().skin().mTextColour = Colour::White;
+		TypeIn::cls().skin().mPadding = BoxFloat(2.f);
 
-		Button::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
-		Button::styleCls()->skin()->mTextColour = Colour::White;
-		Button::styleCls()->skin()->mPadding = DimFloat(2.f, 2.f);
-		Button::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
-		Button::styleCls()->decline(ACTIVATED)->mBackgroundColour = Colour::LightGrey;
-		Button::styleCls()->decline(static_cast<WidgetState>(ACTIVATED | HOVERED))->mBackgroundColour = Colour::Red;
+		Button::cls().skin().mBackgroundColour = Colour::MidGrey;
+		Button::cls().skin().mTextColour = Colour::White;
+		Button::cls().skin().mPadding = BoxFloat(2.f);
+		Button::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
+		Button::cls().decline(ACTIVATED).mBackgroundColour = Colour::LightGrey;
+		Button::cls().decline(static_cast<WidgetState>(ACTIVATED | HOVERED)).mBackgroundColour = Colour::Red;
 
-		ImgButton::styleCls()->inheritSkins(Button::styleCls());
-		ImgButton::styleCls()->skin()->mBackgroundColour = Colour::Transparent;
+		ImgButton::cls().skin().mBackgroundColour = Colour::Transparent;
 
-		//Toggle::styleCls()->inheritSkins(Button::styleCls());
-		TabHeader::styleCls()->inheritSkins(Button::styleCls());
-		ColumnHeader::styleCls()->inheritSkins(Button::styleCls());
-		DropdownChoice::styleCls()->inheritSkins(Button::styleCls());
-		RadioChoice::styleCls()->inheritSkins(Button::styleCls());
+		CloseButton::cls().skin().mBackgroundColour = Colour::Transparent;
+		DropdownToggle::cls().skin().mBackgroundColour = Colour::Transparent;
 
-		Dir::styleCls()->inheritSkins(ImgButton::styleCls());
-		File::styleCls()->inheritSkins(ImgButton::styleCls());
-		TreeNodeHeader::styleCls()->inheritSkins(ImgButton::styleCls());
+		//Toggle::cls().copySkins(Button::cls());
+		WrapButton::cls().copySkins(Button::cls());
 
-		ProgressBarX::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
-		ProgressBarX::styleCls()->skin()->mBorderColour = Colour::White;
-		ProgressBarX::styleCls()->skin()->mBorderWidth = 0.5f;
-		ProgressBarX::styleCls()->layout()->d_padding = BoxFloat(1.f, 1.f, 1.f, 1.f);
+		EmptyStyle::cls().skin().mBackgroundColour = Colour::Transparent;
+		DropdownHeader::cls().copySkins(EmptyStyle::cls());
 
-		FillerX::styleCls()->skin()->mBackgroundColour = Colour(0.05f, 0.65f, 1.f, 0.6f);
-		FillerY::styleCls()->skin()->mBackgroundColour = Colour(0.05f, 0.65f, 1.f, 0.6f);
+		Dir::cls().copySkins(ImgButton::cls());
+		File::cls().copySkins(ImgButton::cls());
+		TreeNodeHeader::cls().copySkins(ImgButton::cls());
 
-		SliderKnobX::styleCls()->inheritSkins(SliderKnob::styleCls());
-		SliderKnobY::styleCls()->inheritSkins(SliderKnob::styleCls());
+		ProgressBarX::cls().skin().mBackgroundColour = Colour::LightGrey;
+		ProgressBarX::cls().skin().mBorderColour = Colour::White;
+		ProgressBarX::cls().skin().mBorderWidth = 0.5f;
+		ProgressBarX::cls().layout().d_padding = BoxFloat(1.f, 1.f, 1.f, 1.f);
 
-		ScrollerKnobX::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
-		ScrollerKnobY::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
+		FillerX::cls().skin().mBackgroundColour = Colour(0.05f, 0.65f, 1.f, 0.6f);
+		FillerY::cls().skin().mBackgroundColour = Colour(0.05f, 0.65f, 1.f, 0.6f);
 
-		ScrollerKnobX::styleCls()->skin()->mMargin = BoxFloat(0.f, 4.f, 0.f, 4.f);
-		ScrollerKnobY::styleCls()->skin()->mMargin = BoxFloat(4.f, 0.f, 4.f, 0.f);
+		ScrollerKnob::cls().skin().mBackgroundColour = Colour::LightGrey;
+		ScrollerKnob::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
+		ScrollerKnob::cls().decline(PRESSED).mBackgroundColour = Colour::Red;
 
-		ScrollerKnobX::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
-		ScrollerKnobY::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
+		ScrollerKnobX::cls().skin().mMargin = BoxFloat(0.f, 4.f, 0.f, 4.f);
+		ScrollerKnobY::cls().skin().mMargin = BoxFloat(4.f, 0.f, 4.f, 0.f);
 
-		Scrollbar::styleCls()->skin()->mBackgroundColour = Colour::Black;
+		Scrollbar::cls().skin().mBackgroundColour = Colour::Black;
 
-		Slider::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
-		Slider::styleCls()->skin()->mCornerRadius = 3.f;
+		Slider::cls().skin().mBackgroundColour = Colour::MidGrey;
+		Slider::cls().skin().mCornerRadius = 3.f;
 
-		SliderX::styleCls()->inheritSkins(Slider::styleCls());
-		SliderY::styleCls()->inheritSkins(Slider::styleCls());
+		ScrollUp::cls().skin().mImage = "arrow_up_15";
+		ScrollUp::cls().skin().mBackgroundColour = Colour::Transparent;
+		ScrollUp::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
 
-		ScrollUp::styleCls()->skin()->mImage = "arrow_up_15";
-		ScrollUp::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
+		ScrollDown::cls().skin().mImage = "arrow_down_15";
+		ScrollDown::cls().skin().mBackgroundColour = Colour::Transparent;
+		ScrollDown::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
 
-		ScrollDown::styleCls()->skin()->mImage = "arrow_down_15";
-		ScrollDown::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
+		Scroller::cls().skin().mBackgroundColour = Colour::Transparent;
 
-		Scroller::styleCls()->skin()->mBackgroundColour = Colour::Black;
+		Dialog::cls().skin().mBackgroundColour = Colour::DarkGrey;
 
-		DropdownHeader::styleCls()->inheritSkins(EmptyStyle::styleCls());
-		DocklineX::styleCls()->inheritSkins(EmptyStyle::styleCls());
-		DocklineY::styleCls()->inheritSkins(EmptyStyle::styleCls());
+		Tooltip::cls().skin().mPadding = BoxFloat(4.f);
+		Tooltip::cls().skin().mTextColour = Colour::White;
+		Tooltip::cls().skin().mBackgroundColour = Colour::MidGrey;
 
-		Dialog::styleCls()->skin()->mBackgroundColour = Colour::DarkGrey;
+		Tree::cls().skin().mBackgroundColour = Colour::Black;
+		List::cls().skin().mBackgroundColour = Colour::Black;
 
-		Tooltip::styleCls()->skin()->mPadding = DimFloat(4.f, 4.f);
-		Tooltip::styleCls()->skin()->mTextColour = Colour::White;
-		Tooltip::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
+		Window::cls().skin().mBackgroundColour = Colour::AlphaGrey;
+		DockWindow::cls().skin().mBackgroundColour = Colour::DarkGrey;
+		WindowHeader::cls().skin().mBackgroundColour = Colour::LightGrey;
+		WindowSizer::cls().skin().mBackgroundColour = Colour::LightGrey;
+		WindowSizer::cls().layout().d_size = DimFloat(0.f, 5.f);
 
-		Tree::styleCls()->skin()->mBackgroundColour = Colour::Black;
-		List::styleCls()->skin()->mBackgroundColour = Colour::Black;
+		Tab::cls().skin().mBackgroundColour = Colour::LightGrey;
+		TabberHead::cls().skin().mBackgroundColour = Colour::Black;
 
-		Window::styleCls()->skin()->mBackgroundColour = Colour::AlphaGrey;
-		DockWindow::styleCls()->skin()->mBackgroundColour = Colour::DarkGrey;
-		WindowHeader::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
-		WindowSizer::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
-		WindowSizer::styleCls()->layout()->d_sizing = DimSizing(EXPAND, FIXED);
-		WindowSizer::styleCls()->layout()->d_size[DIM_Y] = 5.f;
+		ExpandboxHeader::cls().skin().mBackgroundColour = Colour::LightGrey;
+		ExpandboxHeader::cls().decline(ACTIVATED).mBackgroundColour = Colour::Red;
 
-		Tab::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
-		TabberHead::styleCls()->skin()->mBackgroundColour = Colour::Black;
+		ColumnHeader::cls().skin().mBackgroundColour = Colour::MidGrey;
 
-		ExpandboxHeader::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
-		ExpandboxHeader::styleCls()->decline(ACTIVATED)->mBackgroundColour = Colour::Red;
+		Header::cls().skin().mBackgroundColour = Colour::DarkGrey;
 
-		//ExpandboxBody::styleCls()->skin()->mBackgroundColour = Colour::DarkGrey;
+		//ExpandboxBody::cls().skin().mBackgroundColour = Colour::DarkGrey;
 
-		TreeNodeBody::styleCls()->skin()->mBackgroundColour = Colour::Transparent;
+		TreeNodeBody::cls().skin().mBackgroundColour = Colour::Transparent;
 
-		Caret::styleCls()->skin()->mBackgroundColour = Colour::Black;
+		Caret::cls().skin().mBackgroundColour = Colour::Black;
 
-		TypeIn::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
-		TypeIn::styleCls()->skin()->mCornerRadius = BoxFloat(3.f, 3.f, 3.f, 3.f);
-		TypeIn::styleCls()->decline(ACTIVATED)->mBackgroundColour = Colour::Red;
+		TypeIn::cls().skin().mBackgroundColour = Colour::LightGrey;
+		TypeIn::cls().skin().mCornerRadius = BoxFloat(3.f, 3.f, 3.f, 3.f);
+		TypeIn::cls().decline(ACTIVATED).mBackgroundColour = Colour::Red;
 
-		Dropdown::styleCls()->inheritSkins(TypeIn::styleCls());
-		DropdownBox::styleCls()->skin()->mBackgroundColour = Colour::LightGrey;
+		Dropdown::cls().copySkins(TypeIn::cls());
+		DropdownBox::cls().skin().mBackgroundColour = Colour::LightGrey;
 
-		Checkbox::styleCls()->skin()->mBackgroundColour = Colour::MidGrey;
-		Checkbox::styleCls()->decline(HOVERED)->mBackgroundColour = Colour::Red;
-		Checkbox::styleCls()->decline(ACTIVATED)->mBackgroundColour = Colour::LightGrey;
-
-		this->override(Table::styleCls(), List::styleCls(), DivX::styleCls());
+		Checkbox::cls().skin().mBackgroundColour = Colour::MidGrey;
+		Checkbox::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
+		Checkbox::cls().decline(ACTIVATED).mBackgroundColour = Colour::LightGrey;
 	}
 }

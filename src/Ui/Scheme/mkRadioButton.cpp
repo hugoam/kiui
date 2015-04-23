@@ -19,43 +19,46 @@ using namespace std::placeholders;
 namespace mk
 {
 	RadioChoice::RadioChoice(Widget* content, const Trigger& trigger)
-		: WrapButton(content, styleCls(), trigger)
-	{}
+		: WrapButton(content, trigger)
+	{
+		mStyle = &cls();
+	}
 
 	RadioSwitch::RadioSwitch(const Trigger& onSelected, size_t active, StringVector labels)
-		: Sheet(styleCls())
+		: Sheet()
 		, mOnSelected(onSelected)
 		, mActive(nullptr)
 		, mActiveIndex(active)
 	{
+		mStyle = &cls();
 		for(string& label : labels)
 			this->emplace<Label>(label);
 	}
 
-	Sheet* RadioSwitch::vappend(unique_ptr<Widget> widget)
+	Widget& RadioSwitch::vappend(unique_ptr<Widget> widget)
 	{
-		WrapButton* button = this->makeappend<RadioChoice>(widget.get(), std::bind(&RadioSwitch::activated, this, _1));
-		button->append(std::move(widget));
+		WrapButton& button = this->makeappend<RadioChoice>(widget.get(), std::bind(&RadioSwitch::activated, this, _1));
+		button.append(std::move(widget));
 		if(mContents.size() - 1 == mActiveIndex)
 		{
-			mActive = button;
+			mActive = &button;
 			mActive->activate();
 		}
 		return button;
 	}
 
-	unique_ptr<Widget> RadioSwitch::vrelease(Widget* widget)
+	unique_ptr<Widget> RadioSwitch::vrelease(Widget& widget)
 	{
-		return widget->extract();
+		return widget.extract();
 	}
 
-	void RadioSwitch::activated(WrapButton* button)
+	void RadioSwitch::activated(WrapButton& button)
 	{
 		if(mActive)
 			mActive->deactivate();
-		mActive = button;
+		mActive = &button;
 		mActive->activate();
 		if(mOnSelected)
-			mOnSelected(button->content());
+			mOnSelected(*button.content());
 	}
 }

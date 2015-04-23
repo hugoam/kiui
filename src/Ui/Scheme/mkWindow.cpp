@@ -16,6 +16,7 @@
 #include <Ui/Frame/mkLayer.h>
 
 #include <Ui/Widget/mkRootSheet.h>
+#include <Ui/Widget/mkSlider.h>
 
 #include <iostream>
 
@@ -23,66 +24,70 @@ using namespace std::placeholders;
 
 namespace mk
 {
-	WindowHeader::WindowHeader(Window* window)
-		: Sheet(styleCls())
+	WindowHeader::WindowHeader(Window& window)
+		: Sequence()
 		, mWindow(window)
 		, mTooltip("Drag me")
+		, mTitle(this->makeappend<Label>(mWindow.name()))
+		, mSpacer(this->makeappend<SpacerX>())
 	{
-		mTitle = this->makeappend<Label>(mWindow->name());
-		this->makeappend<DivX>();
-		mCloseButton = mWindow->closable() ? this->makeappend<CloseButton>(std::bind(&Window::close, mWindow)) : nullptr;
+		mStyle = &cls();
+		if(mWindow.closable())
+			mCloseButton = &this->makeappend<CloseButton>(std::bind(&Window::close, &mWindow));
 	}
 
 	bool WindowHeader::leftDragStart(float xPos, float yPos)
 	{
 		UNUSED(xPos); UNUSED(yPos);
-		if(mWindow->dock())
-			mWindow->undock();
+		if(mWindow.dock())
+			mWindow.undock();
 
-		mWindow->frame()->layer()->setOpacity(VOID);
-		mWindow->frame()->layer()->moveToTop();
+		mWindow.frame().layer().setOpacity(VOID);
+		mWindow.frame().layer().moveToTop();
 		return true;
 	}
 
 	bool WindowHeader::leftDrag(float xPos, float yPos, float xDif, float yDif)
 	{
 		UNUSED(xPos); UNUSED(yPos);
-		if(mWindow->movable())
-			mWindow->frame()->setPosition(mWindow->frame()->dposition(DIM_X) + xDif, mWindow->frame()->dposition(DIM_Y) + yDif);
+		if(mWindow.movable())
+			mWindow.frame().setPosition(mWindow.frame().dposition(DIM_X) + xDif, mWindow.frame().dposition(DIM_Y) + yDif);
 
 		return true;
 	}
 
 	bool WindowHeader::leftDragEnd(float xPos, float yPos)
 	{
-		if(mWindow->dockable())
+		if(mWindow.dockable())
 		{
-			Widget* widget = this->rootSheet()->pinpoint(xPos, yPos);
-			while(widget && widget->type() != Docksection::cls())
+			Widget* widget = this->rootSheet().pinpoint(xPos, yPos);
+			while(widget && &widget->type() != &Docksection::cls())
 				widget = widget->parent();
 
 			if(widget)
 			{
-				Docksection* section = widget->as<Docksection>()->docktarget(xPos, yPos);
-				mWindow->dock(section);
+				Docksection& section = widget->as<Docksection>().docktarget(xPos, yPos);
+				mWindow.dock(section);
 			}
 		}
 
-		mWindow->frame()->layer()->setOpacity(OPAQUE);
+		mWindow.frame().layer().setOpacity(OPAQUE);
 		return true;
 	}
 
-	WindowSizer::WindowSizer(Window* window)
-		: Sheet(styleCls())
+	WindowSizer::WindowSizer(Window& window)
+		: Sheet()
 		, mWindow(window)
 		, mResizeLeft(false)
-	{}
+	{
+		mStyle = &cls();
+	}
 
 	bool WindowSizer::leftDragStart(float xPos, float yPos)
 	{
 		UNUSED(yPos);
-		mWindow->frame()->as<Layer>()->moveToTop();
-		if(xPos - mWindow->frame()->dabsolute(DIM_X) > mWindow->frame()->dsize(DIM_X) * 0.5f)
+		mWindow.frame().as<Layer>().moveToTop();
+		if(xPos - mWindow.frame().dabsolute(DIM_X) > mWindow.frame().dsize(DIM_X) * 0.5f)
 			mResizeLeft = false;
 		else
 			mResizeLeft = true;
@@ -94,12 +99,12 @@ namespace mk
 		UNUSED(xPos); UNUSED(yPos);
 		if(mResizeLeft)
 		{
-			mWindow->frame()->setPositionDim(DIM_X, mWindow->frame()->dposition(DIM_X) + xDif);
-			mWindow->frame()->setSize(std::max(10.f, mWindow->frame()->dsize(DIM_X) - xDif), std::max(25.f, mWindow->frame()->dsize(DIM_Y) + yDif));
+			mWindow.frame().setPositionDim(DIM_X, mWindow.frame().dposition(DIM_X) + xDif);
+			mWindow.frame().setSize(std::max(10.f, mWindow.frame().dsize(DIM_X) - xDif), std::max(25.f, mWindow.frame().dsize(DIM_Y) + yDif));
 		}
 		else
 		{
-			mWindow->frame()->setSize(std::max(10.f, mWindow->frame()->dsize(DIM_X) + xDif), std::max(25.f, mWindow->frame()->dsize(DIM_Y) + yDif));
+			mWindow.frame().setSize(std::max(10.f, mWindow.frame().dsize(DIM_X) + xDif), std::max(25.f, mWindow.frame().dsize(DIM_Y) + yDif));
 		}
 		return true;
 	}
@@ -111,15 +116,19 @@ namespace mk
 	}
 
 	WindowBody::WindowBody()
-		: Sheet(styleCls())
-	{}
+		: Sheet()
+	{
+		mStyle = &cls();
+	}
 
 	CloseButton::CloseButton(const Trigger& trigger)
-		: Button("", styleCls(), trigger)
-	{}
+		: Button("", trigger)
+	{
+		mStyle = &cls();
+	}
 
 	Window::Window(const string& title, bool closable, bool dockable, const Trigger& onClose, Docksection* dock)
-		: Sheet(dock ? DockWindow::styleCls() : Window::styleCls(), LAYER)
+		: LayerSheet()
 		, mName(title)
 		, mClosable(closable)
 		, mDockable(dockable)
@@ -128,12 +137,11 @@ namespace mk
 		, mContent(nullptr)
 		, mOnClose(onClose)
 		, mDock(dock)
+		, mHeader(this->makeappend<WindowHeader>(*this))
+		, mBody(this->makeappend<WindowBody>())
+		, mFooter(this->makeappend<WindowSizer>(*this))
 	{
-		mFrame = make_unique<Layer>(this, 0);
-
-		mHeader = this->makeappend<WindowHeader>(this);
-		mBody = this->makeappend<WindowBody>();
-		mFooter = this->makeappend<WindowSizer>(this);
+		mStyle = dock ? &DockWindow::cls() : &Window::cls();
 	}
 
 	Window::~Window()
@@ -145,15 +153,15 @@ namespace mk
 
 		if(!mDock)
 		{
-			float x = this->rootSheet()->frame()->dsize(DIM_X) / 2 - mFrame->dsize(DIM_X) / 2;
-			float y = this->rootSheet()->frame()->dsize(DIM_Y) / 2 - mFrame->dsize(DIM_Y) / 2;
+			float x = this->rootSheet().frame().dsize(DIM_X) / 2 - mFrame->dsize(DIM_X) / 2;
+			float y = this->rootSheet().frame().dsize(DIM_Y) / 2 - mFrame->dsize(DIM_Y) / 2;
 			mFrame->setPosition(x, y);
 		}
 	}
 
 	void Window::toggleClosable()
 	{
-		mHeader->closeButton()->frame()->visible() ? mHeader->closeButton()->hide() : mHeader->closeButton()->show();
+		mHeader.closeButton()->frame().visible() ? mHeader.closeButton()->hide() : mHeader.closeButton()->show();
 	}
 
 	void Window::toggleMovable()
@@ -164,17 +172,17 @@ namespace mk
 	void Window::toggleResizable()
 	{
 		mSizable = !mSizable;
-		mSizable ? mFooter->show() : mFooter->hide();
+		mSizable ? mFooter.show() : mFooter.hide();
 	}
 
 	void Window::showTitlebar()
 	{
-		mHeader->show();
+		mHeader.show();
 	}
 
 	void Window::hideTitlebar()
 	{
-		mHeader->hide();
+		mHeader.hide();
 	}
 
 	const string& Window::name()
@@ -182,58 +190,58 @@ namespace mk
 		return mContent ? mContent->name() : mName;
 	}
 
-	void Window::dock(Docksection* docksection)
+	void Window::dock(Docksection& docksection)
 	{
 		std::cerr << ">>>>>>>>>>>  Window :: dock" << std::endl;
 		this->docked();
-		mDock = docksection;
-		docksection->dock(this);
+		mDock = &docksection;
+		docksection.dock(*this);
 	}
 
 	void Window::docked()
 	{
-		this->reset(DockWindow::styleCls());
+		this->reset(&DockWindow::cls());
 		if(mSizable)
-			mFooter->hide();
+			mFooter.hide();
 	}
 
 	void Window::undock()
 	{
 		std::cerr << ">>>>>>>>>>>  Window :: undock" << std::endl;
-		mDock->undock(this);
+		mDock->undock(*this);
 		mDock = nullptr;
 		this->undocked();
 	}
 
 	void Window::undocked()
 	{
-		this->reset(Window::styleCls());
+		this->reset(&Window::cls());
 		if(mSizable)
-			mFooter->show();
+			mFooter.show();
 
 		mFrame->setPosition(mFrame->dabsolute(DIM_X), mFrame->dabsolute(DIM_Y));
-		mFrame->as<Layer>()->moveToTop();
+		mFrame->as<Layer>().moveToTop();
 	}
 	
 	void Window::close()
 	{
 		if(mOnClose)
-			mOnClose(this);
+			mOnClose(*this);
 		this->destroy();
 	}
 
-	Widget* Window::vappend(unique_ptr<Widget> widget)
+	Widget& Window::vappend(unique_ptr<Widget> widget)
 	{
-		mHeader->title()->setLabel(widget->name());
+		mHeader.title().setLabel(widget->name());
 		mContent = widget.get();
-		return mBody->append(std::move(widget));
+		return mBody.append(std::move(widget));
 	}
 
 	bool Window::leftClick(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
 		if(!mDock)
-			mFrame->as<Layer>()->moveToTop();
+			mFrame->as<Layer>().moveToTop();
 		return true;
 	}
 
@@ -241,7 +249,7 @@ namespace mk
 	{
 		UNUSED(x); UNUSED(y);
 		if(!mDock)
-			mFrame->as<Layer>()->moveToTop();
+			mFrame->as<Layer>().moveToTop();
 		return true;
 	}
 

@@ -20,7 +20,7 @@
 namespace mk
 {
 	template <class T>
-	class StatDef : public Struct, public Typed<Struct>
+	class StatDef : public Struct
 	{
 	public:
 		StatDef(T min = T(), T max = T(), T step = T())
@@ -53,6 +53,8 @@ namespace mk
 			if(value > mMax)
 				value = mMax;
 		}
+
+		static Type& cls() { static Type ty; return ty; }
 
 	protected:
 		T mMin;
@@ -158,7 +160,7 @@ namespace mk
 	};
 
 	template <class T>
-	class AutoStat : public Struct, public Typed<AutoStat<T>>
+	class AutoStat : public Struct
 	{
 	public:
 		AutoStat(T value = T(), T min = T(), T max = T(), T step = T())
@@ -202,6 +204,8 @@ namespace mk
 
 		const StatDef<T>& vdef() const { return mDef; }
 
+		static Type& cls() { static Type ty; return ty; }
+
 	protected:
 		T mValue;
 		T& mValueRef;
@@ -211,7 +215,7 @@ namespace mk
 	template class MK_OBJECT_EXPORT AutoStat<int>;
 	template class MK_OBJECT_EXPORT AutoStat<float>;
 
-	class MK_OBJECT_EXPORT _I_ _S_ Ratio : public Struct, public Typed<Ratio>, public DefStat<float, Ratio>
+	class MK_OBJECT_EXPORT _I_ _S_ Ratio : public Struct, public DefStat<float, Ratio>
 	{
 	public:
 		_C_ Ratio(float value = 0.f) : DefStat<float, Ratio>(value) {}
@@ -221,12 +225,12 @@ namespace mk
 		_A_ _M_ float value() const { return DefStat<float, Ratio>::value(); }
 		void setValue(float value) { DefStat<float, Ratio>::modify(value); }
 
-		const StatDef<float>& def() const { return mDef; }
+		const StatDef<float>& def() const { static StatDef<float> df(0.f, 1.f, 0.01f); return df; }
 
-		static StatDef<float> mDef;
+		static Type& cls() { static Type ty; return ty; }
 	};
 
-	class MK_OBJECT_EXPORT _I_ _S_ Gauge : public Struct, public Typed<Gauge>, public DefStat<float, Gauge>
+	class MK_OBJECT_EXPORT _I_ _S_ Gauge : public Struct, public DefStat<float, Gauge>
 	{
 	public:
 		_C_ Gauge(float value = 0.f) : DefStat<float, Gauge>(value) {}
@@ -236,9 +240,9 @@ namespace mk
 		_A_ _M_ float value() const { return DefStat<float, Gauge>::value(); }
 		void setValue(float value) { DefStat<float, Gauge>::modify(value); }
 
-		const StatDef<float>& def() const { return mDef; }
+		const StatDef<float>& def() const { static StatDef<float> df(0.f, FLT_MAX, 1.f); return df; }
 
-		static StatDef<float> mDef;
+		static Type& cls() { static Type ty; return ty; }
 	};
 }
 

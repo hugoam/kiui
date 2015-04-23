@@ -34,40 +34,37 @@
 
 namespace mk
 {
-	NanoLayer::NanoLayer(Frame* frame, NanoTarget* target, size_t index)
-		: InkLayer(target)
+	NanoLayer::NanoLayer(Frame& frame, NanoTarget& target, size_t index)
+		: InkLayer(target, index)
 		, mTarget(target)
-		, mIndex(index)
 		, mVisible(true)
 		, mFrame(frame)
 	{}
 
 	NanoLayer::~NanoLayer()
-	{
-		mTarget->removeLayer(this);
-	}
+	{}
 
-	unique_ptr<Inkbox> NanoLayer::inkbox(Frame* frame)
+	unique_ptr<Inkbox> NanoLayer::createInkbox(Frame& frame)
 	{
-		return make_unique<NanoInk>(frame, this);
+		return make_unique<NanoInk>(frame, *this);
 	}
 
 	void NanoLayer::show()
 	{
 		mVisible = true;
-		mFrame->inkbox()->show();
+		mFrame.inkbox().show();
 		//this->moveToTop();
 	}
 
 	void NanoLayer::hide()
 	{
 		mVisible = false;
-		mFrame->inkbox()->hide();
+		mFrame.inkbox().hide();
 	}
 
 	void NanoLayer::moveToTop()
 	{
-		mTarget->moveToTop(this);
+		mTarget.moveToTop(*this);
 	}
 
 	void NanoLayer::nanodraw()
@@ -75,66 +72,39 @@ namespace mk
 		this->draw(mFrame);
 	}
 
-	void NanoLayer::draw(Frame* frame)
+	void NanoLayer::draw(Frame& frame)
 	{
-		static_cast<NanoInk*>(frame->inkbox())->nanodraw();
+		static_cast<NanoInk&>(frame.inkbox()).nanodraw();
 
-		if(frame->frameType() >= STRIPE)
-			for(Frame* subframe : frame->as<Stripe>()->contents())
-				this->draw(subframe);
+		if(frame.frameType() >= STRIPE)
+			for(Frame* subframe : frame.as<Stripe>().contents())
+				this->draw(*subframe);
 	}
 
-	NanoTarget::NanoTarget(NanoWindow* window)
+	NanoTarget::NanoTarget(NanoWindow& window)
 		: mWindow(window)
-		, mZMax(0)
-	{
-		mLayers.resize(16);
-	}
+	{}
 
 	void NanoTarget::nanodraw()
 	{
 		for(auto& layers : mLayers)
-			for(NanoLayer* layer : layers)
-				if(layer->visible())
-					layer->nanodraw();
+			for(InkLayer* layer : layers)
+				if(layer->as<NanoLayer>().visible())
+					layer->as<NanoLayer>().nanodraw();
 	}
 
-	void NanoTarget::moveToTop(NanoLayer* layer)
+	unique_ptr<InkLayer> NanoTarget::createLayer(Frame& frame, size_t z)
 	{
-		size_t zmax = mZMax;
-		this->removeLayer(layer);
-		mLayers[mZMax].push_back(layer);
-		layer->setIndex(mZMax);
-		mZMax = zmax;
-	}
-
-	unique_ptr<InkLayer> NanoTarget::layer(Frame* frame, size_t z)
-	{
-		if(z == 0) z = mZMax++;
-		unique_ptr<NanoLayer> layer = make_unique<NanoLayer>(frame, this, z);
-		mLayers[z].push_back(layer.get());
-		return std::move(layer);
-	}
-
-	void NanoTarget::removeLayer(NanoLayer* layer)
-	{
-		mLayers[layer->index()].erase(std::remove(mLayers[layer->index()].begin(), mLayers[layer->index()].end(), layer), mLayers[layer->index()].end());
-		if(mLayers[layer->index()].size() == 0 && mZMax > 0)
-		{
-			std::swap(mLayers[layer->index()], mLayers[mZMax-1]);
-			for(NanoLayer* moved : mLayers[layer->index()])
-				moved->setIndex(layer->index());
-			--mZMax;
-		}	
+		return make_unique<NanoLayer>(frame, *this, z);
 	}
 
 	std::map<string, int> NanoWindow::sImages;
 
-	NanoWindow::NanoWindow(size_t width, size_t height, float pixelRatio, string ressourcePath)
+	NanoWindow::NanoWindow(size_t width, size_t height, float pixelRatio, string resourcePath)
 		: mWidth(width)
 		, mHeight(height)
 		, mPixelRatio(pixelRatio)
-		, mRessourcePath(ressourcePath)
+		, mResourcePath(resourcePath)
 		, mCtx(nullptr)
 	{
 #if NANOVG_GL2
@@ -142,7 +112,7 @@ namespace mk
 #elif NANOVG_GLES2
 		mCtx = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
 #endif
-		string fontPath = ressourcePath + "/fonts/DejaVuSans.ttf";
+		string fontPath = resourcePath + "interface/fonts/DejaVuSans.ttf";
 		nvgCreateFont(mCtx, "dejavu", fontPath.c_str());
 		nvgFontSize(mCtx, 14.0f);
 		nvgFontFace(mCtx, "dejavu");
@@ -153,7 +123,7 @@ namespace mk
 			return;
 		}
 
-		mScreenTarget = make_unique<NanoTarget>(this);
+		mScreenTarget = make_unique<NanoTarget>(*this);
 	}
 
 	NanoWindow::~NanoWindow()
@@ -177,8 +147,8 @@ namespace mk
 		nvgEndFrame(mCtx);
 	}
 
-	InkTarget* NanoWindow::screenTarget()
+	InkTarget& NanoWindow::screenTarget()
 	{
-		return mScreenTarget.get();
+		return *mScreenTarget.get();
 	}
 }

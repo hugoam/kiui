@@ -19,90 +19,35 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT Control : public Widget, public Styled<Control>
+	class MK_UI_EXPORT _I_ Page : public ScrollSheet
 	{
 	public:
-		Control(Style* style = nullptr);
-	};
-
-	class MK_UI_EXPORT _I_ WrapX : public Sheet, public Typed<WrapX, Sheet>, public Styled<WrapX>
-	{
-	public:
-		WrapX();
-
-		using Typed<WrapX, Sheet>::cls;
-	};
-
-	class MK_UI_EXPORT _I_ WrapY : public Sheet, public Typed<WrapY, Sheet>, public Styled<WrapY>
-	{
-	public:
-		WrapY();
-
-		using Typed<WrapY, Sheet>::cls;
-	};
-
-	class MK_UI_EXPORT _I_ DivX : public Sheet, public Typed<DivX, Sheet>, public Styled<DivX>
-	{
-	public:
-		DivX();
-
-		using Typed<DivX, Sheet>::cls;
-	};
-
-	class MK_UI_EXPORT _I_ DivY : public Sheet, public Typed<DivY, Sheet>, public Styled<DivY>
-	{
-	public:
-		DivY();
-
-		using Typed<DivY, Sheet>::cls;
-	};
-
-	class MK_UI_EXPORT _I_ PartitionX : public Sheet, public Typed<PartitionX, Sheet>, public Styled<PartitionX>
-	{
-	public:
-		PartitionX();
-
-		using Typed<PartitionX, Sheet>::cls;
-	};
-
-	class MK_UI_EXPORT _I_ PartitionY : public Sheet, public Typed<PartitionY, Sheet>, public Styled<PartitionY>
-	{
-	public:
-		PartitionY();
-
-		using Typed<PartitionY, Sheet>::cls;
-	};
-
-	class MK_UI_EXPORT _I_ Page : public ScrollSheet, public Typed<Page, ScrollSheet>, public Styled<Page>
-	{
-	public:
-		Page(const string& name, const string& dockid = "", Style* style = nullptr);
+		Page(const string& name, const string& dockid = "");
 
 		const string& name() { return mName; }
 		const string& dockid() { return mDockId; }
 
-		using Typed<Page, ScrollSheet>::cls;
-		using Styled<Page>::styleCls;
+		static StyleType& cls() { static StyleType ty(ScrollSheet::cls()); return ty; }
 
 	protected:
 		string mName;
 		string mDockId;
 	};
 
-	class MK_UI_EXPORT _I_ Dialog : public Sheet, public Typed<Dialog, Sheet>, public Styled<Dialog>
+	class MK_UI_EXPORT _I_ Dialog : public Sheet
 	{
 	public:
 		Dialog();
 
-		using Typed<Dialog, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ Header : public Sheet, public Typed<Header, Sheet>, public Styled<Header>
+	class MK_UI_EXPORT _I_ Header : public Sheet
 	{
 	public:
 		Header();
 
-		using Typed<Header, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 	};
 }
 

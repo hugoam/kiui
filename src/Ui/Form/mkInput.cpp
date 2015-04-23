@@ -19,28 +19,28 @@ using namespace std::placeholders;
 namespace mk
 {
 	InputInt::InputInt(const string& label, int value, std::function<void(int)> callback)
-		: Sheet(styleCls())
+		: Sequence()
 	{
 		this->makeappend<Input<int>>(value, callback);
 		this->makeappend<Label>(label);
 	}
 
 	InputFloat::InputFloat(const string& label, float value, std::function<void(float)> callback)
-		: Sheet(styleCls())
+		: Sequence()
 	{
 		this->makeappend<Input<float>>(value, callback);
 		this->makeappend<Label>(label);
 	}
 
 	InputBool::InputBool(const string& label, bool value, std::function<void(bool)> callback)
-		: Sheet(styleCls())
+		: Sequence()
 	{
 		this->makeappend<Input<bool>>(value, callback);
 		this->makeappend<Label>(label);
 	}
 
 	InputText::InputText(const string& label, const string& text, std::function<void(string)> callback, bool reverse)
-		: Sheet(styleCls())
+		: Sequence()
 	{
 		this->makeappend<Input<string>>(text, callback);
 		this->makeappend<Label>(label);
@@ -49,10 +49,14 @@ namespace mk
 		//	this->move(0, 1);
 	}
 
-	InputDropdown::InputDropdown(const string& label, StringVector choices, std::function<void(const string&)> callback, bool reverse)
-		: Sheet(styleCls())
+	InputDropdown::InputDropdown(const string& label, StringVector choices, std::function<void(const string&)> callback, bool textinput, bool reverse)
+		: Sequence()
 	{
-		this->makeappend<Dropdown>([callback](Widget* widget) { callback(widget->label()); }, choices);
+		if(textinput)
+			this->makeappend<Typedown>([callback](Widget& widget) { callback(widget.label()); }, choices);
+		else
+			this->makeappend<Dropdown>([callback](Widget& widget) { callback(widget.label()); }, choices);
+
 		this->makeappend<Label>(label);
 
 		//if(reverse)
@@ -60,14 +64,14 @@ namespace mk
 	}
 
 	SliderInt::SliderInt(const string& label, AutoStat<int> value, std::function<void(int)> callback)
-		: Sheet(styleCls())
+		: Sequence()
 	{
 		this->makeappend<StatSlider<int>>(value, callback),
 		this->makeappend<Label>(label);
 	}
 
 	SliderFloat::SliderFloat(const string& label, AutoStat<float> value, std::function<void(float)> callback)
-		: Sheet(styleCls())
+		: Sequence()
 	{
 		this->makeappend<StatSlider<float>>(value, callback);
 		this->makeappend<Label>(label);
@@ -76,10 +80,10 @@ namespace mk
 	//unique_ptr<Form> dispatchStoreForm(Form* member, Lref& lref, Stock* store) { return make_unique<FStore>(member, member->as<FMember>()->dmember()); }
 
 	template <class T_Val, class T_Widget>
-	WValue* valueWidget(Sheet* parent, Lref& lref, T_Val val) { UNUSED(val); return parent->emplace<T_Widget>(lref); }
+	WValue& valueWidget(Sheet* parent, Lref& lref, T_Val val) { UNUSED(val); return parent->emplace<T_Widget>(lref); }
 
 	template <class T_Val, class T_Widget>
-	WValue* statValueWidget(Sheet* parent, Lref& valref, T_Val val)
+	WValue& statValueWidget(Sheet* parent, Lref& valref, T_Val val)
 	{
 		/*if(parent->hasAttr("stat"))
 		{

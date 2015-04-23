@@ -12,68 +12,67 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT TabHeader : public Button, public Typed<TabHeader, Button>, public Styled<TabHeader>
+	class MK_UI_EXPORT TabHeader : public Button
 	{
 	public:
 		TabHeader(const string& label, const Trigger& trigger);
 
-		using Typed<TabHeader, Button>::cls;
-		using Styled<TabHeader>::styleCls;
+		static StyleType& cls() { static StyleType ty(Button::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ Tab : public Sheet, public Typed<Tab, Sheet>, public Styled<Tab>
+	class MK_UI_EXPORT _I_ Tab : public Sheet
 	{
 	public:
-		Tab(Button* header, bool active);
+		Tab(Button& header, bool active);
 
-		unique_ptr<Widget> vrelease(Widget* widget);
+		unique_ptr<Widget> vrelease(Widget& widget);
 
-		Button* header() { return mHeader; }
+		Button& header() { return mHeader; }
 
-		using Typed<Tab, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 
 	protected:
-		Button* mHeader;
+		Button& mHeader;
 		bool mActive;
 	};
 
-	class MK_UI_EXPORT _I_ TabberHead : public Sheet, public Typed<TabberHead, Sheet>, public Styled<TabberHead>
+	class MK_UI_EXPORT _I_ TabberHead : public Sequence
 	{
 	public:
 		TabberHead();
 
-		using Typed<TabberHead, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ TabberBody : public Sheet, public Typed<TabberBody, Sheet>, public Styled<TabberBody>
+	class MK_UI_EXPORT _I_ TabberBody : public Sheet
 	{
 	public:
 		TabberBody();
 
-		using Typed<TabberBody, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT Tabber : public Sheet, public Typed<Tabber, Sheet>, public Styled<Tabber>
+	class MK_UI_EXPORT Tabber : public Sheet
 	{
 	public:
-		Tabber(Style* style = nullptr, bool downtabs = false);
+		Tabber(bool downtabs = false);
 		~Tabber();
 
 		void select(size_t index);
 
-		Widget* vappend(unique_ptr<Widget> widget);
-		unique_ptr<Widget> vrelease(Widget* widget);
+		Widget& vappend(unique_ptr<Widget> widget);
+		unique_ptr<Widget> vrelease(Widget& widget);
 
-		void headerClicked(Button* button);
+		void headerClicked(Button& button);
 
-		void showTab(Tab* tab);
+		void showTab(Tab& tab);
 		void showTab(size_t index);
 
-		using Typed<Tabber, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 
 	protected:
-		Sheet* mHeaders;
-		Sheet* mTabs;
+		TabberHead& mHeaders;
+		TabberBody& mTabs;
 		Tab* mCurrentTab;
 		bool mDownTabs;
 	};

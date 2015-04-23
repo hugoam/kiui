@@ -14,10 +14,10 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Frame : public Object, public Typed<Frame>, public Uibox, public Updatable
+	class MK_UI_EXPORT _I_ Frame : public Object, public Uibox, public Updatable
 	{
 	public:
-		Frame(Widget* widget);
+		Frame(Widget& widget);
 		~Frame();
 
 		enum Dirty
@@ -33,21 +33,21 @@ namespace mk
 
 		virtual FrameType frameType() { return FRAME; }
 
-		inline Widget* widget() { return d_widget; }
+		inline Widget& widget() { return d_widget; }
 		inline Stripe* parent() { return d_parent; }
 		inline Dirty dirty() { return d_dirty; }
 		inline bool hidden() { return d_hidden; }
 		inline bool visible() { return d_visible; }
 		inline size_t index() { return d_index; }
 
-		inline Inkbox* inkbox() { return d_inkbox.get(); }
-		inline Style* style() { return d_style; }
-		inline InkStyle* inkstyle() { return d_inkstyle; }
+		inline Inkbox& inkbox() { return *d_inkbox.get(); }
+		inline Style& style() { return *d_style; }
+		inline InkStyle& inkstyle() { return *d_inkstyle; }
 
 		void setIndex(size_t index) { d_index = index; }
 		void setDirty(Dirty dirty) { if(dirty > d_dirty) d_dirty = dirty; }
 
-		Layer* layer();
+		Layer& layer();
 
 		virtual void bind(Stripe* parent);
 		virtual void unbind();
@@ -60,7 +60,7 @@ namespace mk
 
 		//void moveToTop();
 
-		void transfer(Stripe* stripe, size_t index);
+		void transfer(Stripe& stripe, size_t index);
 		void remove();
 
 		Frame* prev();
@@ -70,11 +70,10 @@ namespace mk
 		bool last();
 
 		void updateClip();
+		void updateClip(Dimension dim);
 
-		void wrap(Dimension dim);
-
-		virtual bool nextOffset(Dimension dim, float& pos, float seuil);
-		virtual bool prevOffset(Dimension dim, float& pos, float seuil);
+		virtual bool nextOffset(Dimension dim, float& pos, float seuil, bool top = false);
+		virtual bool prevOffset(Dimension dim, float& pos, float seuil, bool top = false);
 
 		virtual void setVisible(bool visible);
 
@@ -82,13 +81,18 @@ namespace mk
 
 		virtual Frame* pinpoint(float x, float y, bool opaque);
 
-		virtual void migrate(Stripe* stripe);
+		virtual void migrate(Stripe& stripe);
 
 		virtual void nextFrame(size_t tick, size_t delta);
 
-		void reset(Style* style);
+		void resetStyle();
 
-		virtual void updateStyle(Style* style);
+		void updateSizing(Dimension dim);
+		void updateFixed(Dimension dim);
+
+		virtual void updateSpace();
+		virtual void updateSizing();
+		virtual void updateStyle();
 		void updatePosition();
 		void updateSize();
 
@@ -120,7 +124,20 @@ namespace mk
 		inline float top() { return dabsolute(DIM_Y); }
 		inline float bottom() { return dabsolute(DIM_Y) + dsize(DIM_Y); }
 
-		inline float doffset(Dimension dim) { return dsize(dim) + dmargin(dim); }
+		inline float width() { return dsize(DIM_X); }
+		inline float height() { return dsize(DIM_Y); }
+
+		inline float cleft() { return floor(dabsolute(DIM_X) + dclippos(DIM_X) + d_inkstyle->margin().x0()); }
+		inline float ctop() { return floor(dabsolute(DIM_Y) + dclippos(DIM_Y) + d_inkstyle->margin().y0()); }
+		inline float cwidth() { return floor(dclipsize(DIM_X) - d_inkstyle->margin().x0() - d_inkstyle->margin().x1()); }
+		inline float cheight() { return floor(dclipsize(DIM_Y) - d_inkstyle->margin().y0() - d_inkstyle->margin().y1()); }
+
+		inline float pleft() { return left() + d_inkstyle->padding().x0(); }
+		inline float ptop() { return top() + d_inkstyle->padding().y0(); }
+		inline float pwidth() { return width() - d_inkstyle->padding().x0() - d_inkstyle->padding().x1(); }
+		inline float pheight() { return height() - d_inkstyle->padding().y0() - d_inkstyle->padding().y1(); }
+
+		inline float doffset(Dimension dim) { return dsize(dim) + d_layout->margin()[dim]; }
 
 		inline float dabsolute(Dimension dim) { return d_absolute[dim]; }
 		inline float dclippos(Dimension dim) { return d_clipPos[dim]; }
@@ -128,11 +145,13 @@ namespace mk
 
 		bool inside(float x, float y);
 
+		static Type& cls() { static Type ty; return ty; }
+
 	public:
 		virtual void resized(Dimension dim) { UNUSED(dim); }
 
 	protected:
-		Widget* d_widget;
+		Widget& d_widget;
 		Stripe* d_parent;
 		Dirty d_dirty;
 		bool d_hidden;
@@ -147,31 +166,6 @@ namespace mk
 		size_t d_styleStamp;
 
 		unique_ptr<Inkbox> d_inkbox;
-	};
-
-	class MK_UI_EXPORT FrameSkin
-	{
-	public:
-		FrameSkin(Frame* frame, ImageSkin* skin);
-
-		Frame* d_frame;
-		ImageSkin* d_skin;
-
-		std::vector<BoxFloat> mRects;
-
-		float d_left;
-		float d_top;
-
-		float d_inleft;
-		float d_intop;
-		float d_inright;
-		float d_inbottom;
-
-		float d_inwidth;
-		float d_inheight;
-
-		float d_outtop;
-		float d_outleft;
 	};
 }
 

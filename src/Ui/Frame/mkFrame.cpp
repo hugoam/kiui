@@ -23,10 +23,12 @@
 #include <cmath>
 #include <iostream>
 
+#include <Ui/Widget/mkSheet.h>
+
 namespace mk
 {
-	Frame::Frame(Widget* widget)
-		: Uibox(widget->style()->layout())
+	Frame::Frame(Widget& widget)
+		: Uibox()
 		, d_widget(widget)
 		, d_parent(nullptr)
 		, d_dirty(DIRTY_VISIBILITY)
@@ -35,15 +37,15 @@ namespace mk
 		, d_clipPos(0.f, 0.f)
 		, d_clipSize(0.f, 0.f)
 		, d_index(0)
-		, d_style(widget->style())
-		, d_inkstyle(d_style->skin())
+		, d_style(nullptr)
+		, d_inkstyle(nullptr)
 		, d_styleStamp(0)
 	{}
 
 	Frame::~Frame()
 	{}
 
-	Layer* Frame::layer()
+	Layer& Frame::layer()
 	{
 		if(this->frameType() < LAYER)
 			return d_parent->layer();
@@ -51,64 +53,88 @@ namespace mk
 			return this->as<Layer>();	
 	}
 
-	void Frame::reset(Style* style)
+	void Frame::resetStyle()
 	{
 		Stripe* parent = d_parent;
 		d_parent->remove(this);
-		this->updateStyle(style);
 		parent->insert(this, d_index);
 	}
 
-	void Frame::wrap(Dimension dim)
+	void Frame::updateSizing(Dimension dim)
 	{
-		if(d_layout->d_sizing[dim] == WRAP)
-		{
-			if(d_parent->d_sizing[dim] == EXPAND || d_parent->d_sizing[dim] == FIXED)
-				d_sizing[dim] = EXPAND;
-			if(d_parent->d_sizing[dim] == SHRINK)
-				d_sizing[dim] = SHRINK;
-		}
+		if(d_space == BLOCK)
+			d_sizing[dim] = SHRINK;
+		else if(d_space == WRAP)
+			d_sizing[dim] = d_parent->d_sizing[dim];
+		else if(d_space == BOARD)
+			d_sizing[dim] = EXPAND;
+		else if(d_parent && ((d_space == SPACE && d_parent->layoutDim() == dim) || (d_space == DIV && d_parent->layoutDim() != dim)))
+			d_sizing[dim] = EXPAND;
+		else if(d_parent && ((d_space == SPACE && d_parent->layoutDim() != dim) || (d_space == DIV && d_parent->layoutDim() == dim)))
+			d_sizing[dim] = SHRINK;
 	}
 
-	void Frame::updateStyle(Style* style)
+	void Frame::updateSpace()
 	{
-		bool fixedX = dfixed(DIM_X);
-		bool fixedY = dfixed(DIM_Y);
+		if(!d_widget.image().empty() || !d_widget.label().empty())
+			d_space = BLOCK;
+		else
+			d_space = BOARD;
+	}
 
-		d_style = style;
-		d_layout = d_style->layout();
-		d_inkstyle = d_style->subskin(d_widget->state());
-		d_styleStamp = style->updated();
+	void Frame::updateStyle()
+	{
+		d_style = &d_widget.fetchOverride(d_widget.style());
+		d_layout = &d_style->layout();
+		d_inkstyle = &d_style->subskin(d_widget.state());
+		d_styleStamp = d_style->updated();
 
-		//d_size = style->d_size; // Caused a bug because we don't set the size through setSize, so the layout isn't updated
+		d_opacity = d_layout->d_opacity;
 		if(d_span.null())
 			d_span = d_layout->d_span;
-		d_opacity = d_layout->d_opacity;
-		d_sizing = d_layout->d_sizing;
 
-		if(d_parent && d_parent->parent() && d_parent->parent()->layout()->d_weight == TABLE) // Caused a bug because a table rows children are set to expand manually
-			d_sizing = DimSizing(EXPAND, SHRINK);
-
-		if(!fixedX && dfixed(DIM_X) && d_layout->d_size[DIM_X])
-			setSizeDim(DIM_X, d_layout->d_size[DIM_X]);
-		if(!fixedY && dfixed(DIM_Y) && d_layout->d_size[DIM_Y])
-			setSizeDim(DIM_Y, d_layout->d_size[DIM_Y]);
+		this->updateSizing();
 
 		this->setDirty(DIRTY_SKIN);
 		if(d_parent)
 			d_parent->markRelayout();
 	}
 
+	void Frame::updateSizing()
+	{
+		if(d_layout->d_space != AUTO)
+			d_space = d_layout->d_space;
+		else
+			this->updateSpace();
+
+		this->updateSizing(DIM_X);
+		this->updateSizing(DIM_Y);
+
+		this->updateFixed(DIM_X);
+		this->updateFixed(DIM_Y);
+
+		if(d_parent && d_parent->parent() && d_parent->parent()->layout()->d_weight == TABLE) // @kludge if this is not done the table layout is fucked up because elements are set back to SHRINK and their size is wrongly substracted from sequencelength
+			d_sizing[DIM_X] = EXPAND;
+	}
+
+	void Frame::updateFixed(Dimension dim)
+	{
+		if(d_layout->size()[dim])
+		{
+			d_sizing[dim] = FIXED;
+			if(d_layout->d_space != BOARD || d_size[dim] == 0.f)
+				this->setSizeDim(dim, d_layout->size()[dim]);
+		}
+	}
+
 	void Frame::bind(Stripe* parent)
 	{
-		this->updateStyle(d_widget->style());
-
 		d_parent = parent;
-		d_inkbox = this->layer()->inkLayer()->inkbox(this);
+		this->updateStyle();
+		d_inkbox = this->layer().inkLayer().createInkbox(*this);
+
 		this->setVisible(parent->visible());
-		this->updateState(d_widget->state());
-		this->wrap(DIM_X);
-		this->wrap(DIM_Y);
+		this->updateState(d_widget.state());
 	}
 	
 	void Frame::unbind()
@@ -148,14 +174,8 @@ namespace mk
 		if(!d_parent || !d_visible || !clip())
 			return;
 
-		d_clipPos[DIM_X] = std::max(d_parent->d_clipPos[DIM_X] - d_position[DIM_X], 0.f);
-		d_clipPos[DIM_Y] = std::max(d_parent->d_clipPos[DIM_Y] - d_position[DIM_Y], 0.f);
-
-		d_clipSize[DIM_X] = std::min(dsize(DIM_X), d_parent->d_clipPos[DIM_X] + d_parent->d_clipSize[DIM_X] - d_position[DIM_X]) - d_clipPos[DIM_X];
-		d_clipSize[DIM_Y] = std::min(dsize(DIM_Y), d_parent->d_clipPos[DIM_Y] + d_parent->d_clipSize[DIM_Y] - d_position[DIM_Y]) - d_clipPos[DIM_Y];
-
-		d_clipSize[DIM_X] = std::max(d_clipSize[DIM_X], 0.f);
-		d_clipSize[DIM_Y] = std::max(d_clipSize[DIM_Y], 0.f);
+		this->updateClip(DIM_X);
+		this->updateClip(DIM_Y);
 
 		bool clipped = !d_inkbox->visible(); // We are visible, so the inkbox not visible means we were clipped
 
@@ -165,12 +185,19 @@ namespace mk
 			d_inkbox->show();
 	}
 
+	void Frame::updateClip(Dimension dim)
+	{
+		d_clipPos[dim] = std::max(d_parent->d_clipPos[dim] - d_position[dim], 0.f);
+		d_clipSize[dim] = std::min(d_size[dim], d_parent->d_clipPos[dim] + d_parent->d_clipSize[dim] - d_position[dim]) - d_clipPos[dim];
+		d_clipSize[dim] = std::max(d_clipSize[dim], 0.f);
+	}
+
 	void Frame::nextFrame(size_t tick, size_t delta)
 	{
 		UNUSED(tick); UNUSED(delta);
 
 		if(d_style->updated() > d_styleStamp)
-			this->updateStyle(d_style);
+			this->updateStyle();
 
 		switch(d_dirty)
 		{
@@ -193,43 +220,46 @@ namespace mk
 		d_dirty = CLEAN;
 	}
 
-	void Frame::transfer(Stripe* stripe, size_t index)
+	void Frame::transfer(Stripe& stripe, size_t index)
 	{
-		stripe->insert(this, index);
+		stripe.insert(this, index);
 		this->migrate(stripe);
 	}
 
-	void Frame::migrate(Stripe* stripe)
+	void Frame::migrate(Stripe& stripe)
 	{
 		UNUSED(stripe);
 		if(this->frameType() == LAYER)
 			return;
 
-		d_inkbox = this->layer()->inkLayer()->inkbox(this);
-		this->setDirty(DIRTY_WIDGET);
+		d_inkbox = this->layer().inkLayer().createInkbox(*this);
+		this->setDirty(DIRTY_VISIBILITY);
 	}
 
 	void Frame::updatePosition()
 	{
+		if(d_layout->d_flow == FLOAT_DEPTH)
+			this->setPositionDim(DIM_X, d_parent->dsize(DIM_X) - d_size[DIM_X]);
+
 		d_absolute[DIM_X] = this->calcAbsolute(DIM_X);
 		d_absolute[DIM_Y] = this->calcAbsolute(DIM_Y);
 	}
 
 	void Frame::updateSize()
 	{
-		//if(!d_inkbox->visible()) // @note this is needed for gorilla, but not for nanovg, discuss
-		//	return;
+		if(!d_inkbox->visible()) // @note this is needed for gorilla, but not for nanovg, discuss
+			return;
 
-		if(dshrink(DIM_X) && (this->frameType() == FRAME || this->as<Stripe>()->sequence().size() == 0))
+		if(dshrink(DIM_X) && (this->frameType() == FRAME || this->as<Stripe>().sequence().size() == 0))
 			this->setSizeDim(DIM_X, d_inkbox->contentSize(DIM_X));
-		if(dshrink(DIM_Y) && (this->frameType() == FRAME || this->as<Stripe>()->sequence().size() == 0)) // !this->container())
+		if(dshrink(DIM_Y) && (this->frameType() == FRAME || this->as<Stripe>().sequence().size() == 0)) // !this->container())
 			this->setSizeDim(DIM_Y, d_inkbox->contentSize(DIM_Y));
 	}
 
 	void Frame::updateState(WidgetState state)
 	{
 		InkStyle* inkstyle = d_inkstyle;
-		d_inkstyle = d_style->subskin(state);
+		d_inkstyle = &d_style->subskin(state);
 
 		if(d_inkstyle != inkstyle)
 			this->setDirty(DIRTY_SKIN);
@@ -247,8 +277,13 @@ namespace mk
 		if(dexpand(dim) || !flow())
 			d_clipSize[dim] = size;
 
-		if(d_parent && flow() && (dshrink(dim) || dfixed(dim))) // Upward notification -> when shrinking
+		if(d_parent && flow() && d_widget.state() & BOUND && (dshrink(dim) || dfixed(dim))) // Upward notification -> when shrinking
 			d_parent->flowSized(this, dim, delta);
+
+		if(d_parent && d_layout->d_flow == FLOAT_DEPTH && dim != d_parent->layoutDim())
+				d_parent->floatDepth() += delta;
+		if(d_parent && d_layout->d_flow == FLOAT_LENGTH && dim == d_parent->layoutDim())
+				d_parent->floatLength() += delta;
 
 		//if(dexpand(dim)) // Downward notification -> when expanding
 		this->resized(dim);
@@ -343,40 +378,18 @@ namespace mk
 			return this;
 	}
 
-	bool Frame::nextOffset(Dimension dim, float& pos, float seuil)
+	bool Frame::nextOffset(Dimension dim, float& pos, float seuil, bool top)
 	{
-		pos += d_parent->offset(this);
+		pos += d_parent->offset(this, dim);
 		return pos > seuil;
 	}
 
-	bool Frame::prevOffset(Dimension dim, float& pos, float seuil)
+	bool Frame::prevOffset(Dimension dim, float& pos, float seuil, bool top)
 	{
-		if(pos + d_parent->offset(this) >= seuil)
+		if(pos + d_parent->offset(this, dim) >= seuil)
 			return true;
 		
-		pos += d_parent->offset(this);
+		pos += d_parent->offset(this, dim);
 		return false;
-	}
-
-	FrameSkin::FrameSkin(Frame* frame, ImageSkin* skin)
-		: d_frame(frame)
-		, d_skin(skin)
-	{
-		d_left = floor(frame->dabsolute(DIM_X) + frame->inkstyle()->mMargin[DIM_X]);
-		d_top = floor(frame->dabsolute(DIM_Y) + frame->inkstyle()->mMargin[DIM_Y]);
-
-		float width = floor(frame->dsize(DIM_X) - frame->inkstyle()->mMargin[DIM_X] - frame->inkstyle()->mMargin[DIM_X + 2]);
-		float height = floor(frame->dsize(DIM_Y) - frame->inkstyle()->mMargin[DIM_Y] - frame->inkstyle()->mMargin[DIM_Y + 2]);
-
-		d_inleft = d_left + d_skin->d_leftIn;
-		d_inright = d_left + width - d_skin->d_rightIn;
-		d_intop = d_top + d_skin->d_topIn;
-		d_inbottom = d_top + height - d_skin->d_bottomIn;
-
-		d_outtop = d_top - d_skin->d_topOut;
-		d_outleft = d_left - d_skin->d_leftOut;
-
-		d_inwidth = d_inright - d_inleft;
-		d_inheight = d_inbottom - d_intop;
 	}
 }

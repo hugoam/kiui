@@ -11,155 +11,176 @@
 
 #include <cfloat>
 
-#ifdef KIUI_EMSCRIPTEN
-#define KIUI_EXAMPLE_RESSOURCE_PATH "/data"
-#endif
-
-#ifndef KIUI_EXAMPLE_RESSOURCE_PATH
-#define KIUI_EXAMPLE_RESSOURCE_PATH "../data"
-#endif
-
 namespace mk
 {
-	Dockspace* createUiTestDockspace(Sheet* root)
+	Sheet& createUiTestTextEditor(Sheet& parent)
 	{
-		MasterDockline::styleCls()->layout()->d_weights = { 0.2f, 0.6f, 0.2f };
+		Window& window = parent.emplace<Window>("Text Editor");
+		Page& page = window.body().emplace<Page>("Text Editor");
+		Sequence& buttons = page.emplace<Sequence>();
+		buttons.emplace<Button>("Open File");
+		buttons.emplace<Button>("Undo");
+		buttons.emplace<Button>("Redo");
+		page.emplace<Textbox>("This is an example text editor field\n You can use it as any common editor");
+		return window;
+	}
 
-		Dockspace* dockspace = root->emplace<Dockspace>();
+	Dockspace& createUiTestDockspace(Sheet& parent)
+	{
+		MasterDockline::cls().layout().d_weights = { 0.2f, 0.6f, 0.2f };
 
-		Page* dock0 = dockspace->emplace<Page>("Dock 0", "0.0");
+		Dockspace& dockspace = parent.emplace<Dockspace>();
+
+		Page& dock0 = dockspace.emplace<Page>("Dock 0", "0.0");
 		createUiTestControls(dock0);
 
-		Page* dock1 = dockspace->emplace<Page>("Dock 1", "0.1");
+		Page& dock1 = dockspace.emplace<Page>("Dock 1", "0.1");
 		createUiTestInlineControls(dock1);
 
-		Page* dock2 = dockspace->emplace<Page>("Dock 2", "0.2");
+		Page& dock2 = dockspace.emplace<Page>("Dock 2", "0.2");
 		createUiTestTable(dock2);
 
 		return dockspace;
 	}
 
-	Tabber* createUiTestTabs(Sheet* root)
+	Tabber& createUiTestTabs(Sheet& root)
 	{
-		Tabber* tabber = root->emplace<Tabber>();
+		Tabber& tabber = root.emplace<Tabber>();
 
-		Page* tab0 = tabber->emplace<Page>("Tab 0");
+		Page& tab0 = tabber.emplace<Page>("Tab 0");
 		createUiTestTable(tab0);
 
-		Page* tab1 = tabber->emplace<Page>("Tab 1");
+		Page& tab1 = tabber.emplace<Page>("Tab 1");
 		createUiTestInlineControls(tab1);
 
-		Page* tab2 = tabber->emplace<Page>("Tab 2");
+		Page& tab2 = tabber.emplace<Page>("Tab 2");
 		createUiTestControls(tab2);
 
 		return tabber;
 	}
 
-	Table* createUiTestTable(Sheet* parent)
+	Table& createUiTestTable(Sheet& parent)
 	{
-		Table* table = parent->emplace<Table>(StringVector({ "ID", "Name", "Path", "Flags" }), std::vector<float>({ 0.25f, 0.25f, 0.25f, 0.25f }));
+		Table& table = parent.emplace<Table>(StringVector({ "ID", "Name", "Path", "Flags" }), std::vector<float>({ 0.25f, 0.25f, 0.25f, 0.25f }));
 
-		table->emplace<LabelSequence>(StringVector({ "0000", "Robert", "/path/robert", "...." }));
-		table->emplace<LabelSequence>(StringVector({ "0001", "Stephanie", "/path/stephanie", "line 1" }));
-		table->emplace<LabelSequence>(StringVector({ "0002", "C64", "/path/computer", "...." }));
+		table.emplace<LabelSequence>(StringVector({ "0000", "Robert", "/path/robert", "...." }));
+		table.emplace<LabelSequence>(StringVector({ "0001", "Stephanie", "/path/stephanie", "line 1" }));
+		table.emplace<LabelSequence>(StringVector({ "0002", "C64", "/path/computer", "...." }));
 
 		return table;
 	}
 
-	Table* createUiTestTableAlt(Sheet* parent)
+	Table& createUiTestTableAlt(Sheet& parent)
 	{
-		Table* table = parent->emplace<Table>(StringVector({ "Column 0", "Column 1", "Column 3" }), std::vector<float>({ 0.33f, 0.33f, 0.33f }));
+		Table& table0 = parent.emplace<Table>(StringVector({ "Column 0", "Column 1", "Column 3" }), std::vector<float>({ 0.33f, 0.33f, 0.33f }));
 
-		table->emplace<LabelSequence>(StringVector({ "Hello", "kiUi", "World!" }));
-		table->emplace<ButtonSequence>(StringVector({ "Banana", "Apple", "Corniflower" }));
-		table->emplace<RadioSwitch>(nullptr, 0, StringVector({ "radio a", "radio b", "radio b" }));
+		table0.emplace<LabelSequence>(StringVector({ "Hello", "kiUi", "World!" }));
+		table0.emplace<ButtonSequence>(StringVector({ "Banana", "Apple", "Corniflower" }));
+		table0.emplace<RadioSwitch>(nullptr, 0, StringVector({ "radio a", "radio b", "radio b" }));
 
-		Sequence* line = table->emplace<Sequence>();
+		Sequence& line0 = table0.emplace<Sequence>();
 
-		Expandbox* box0 = line->emplace<Expandbox>("Category A");
-		box0->emplace<Label>("Blah blah blah");
+		Expandbox& box0 = line0.emplace<Expandbox>("Category A");
+		box0.emplace<Label>("Blah blah blah");
 		
-		Expandbox* box1 = line->emplace<Expandbox>("Category B");
-		box1->emplace<Label>("Blah blah blah");
+		Expandbox& box1 = line0.emplace<Expandbox>("Category B");
+		box1.emplace<Label>("Blah blah blah");
 
-		Expandbox* box2 = line->emplace<Expandbox>("Category C");
-		box2->emplace<Label>("Blah blah blah");
+		Expandbox& box2 = line0.emplace<Expandbox>("Category C");
+		box2.emplace<Label>("Blah blah blah");
 
 
-		table = parent->emplace<Table>(StringVector({ "Left", "Right" }), std::vector<float>({ 0.5f, 0.5f }));
+		Table& table1 = parent.emplace<Table>(StringVector({ "Left", "Right" }), std::vector<float>({ 0.5f, 0.5f }));
 
-		line = table->emplace<Sequence>();
+		Sequence& line1 = table1.emplace<Sequence>();
 
-		line->emplace<InputFloat>("Red", 0.05f);
-		line->emplace<InputFloat>("Blue", 0.05f);
+		line1.emplace<InputFloat>("Red", 0.05f);
+		line1.emplace<InputFloat>("Blue", 0.05f);
 
-		line = table->emplace<Sequence>();
+		Sequence& line2 = table1.emplace<Sequence>();
 
-		line->emplace<Textbox>("The quick brown fox jumps over the lazy dog.");
-		line->emplace<Textbox>("The quick brown fox jumps over the lazy dog.");
+		line2.emplace<Textbox>("The quick brown fox jumps over the lazy dog.");
+		line2.emplace<Textbox>("The quick brown fox jumps over the lazy dog.");
 
-		line = table->emplace<Sequence>();
+		Sequence& line3 = table1.emplace<Sequence>();
 
-		line->emplace<Label>("Hello Left");
-		line->emplace<Label>("Hello Right");
+		line3.emplace<Label>("Hello Left");
+		line3.emplace<Label>("Hello Right");
 
-		return table;
+		return table0;
 	}
 
-	Tree* createUiTestTree(Sheet* parent)
+	Tree& createUiTestTree(Sheet& parent)
 	{
-		Tree* tree = parent->emplace<Tree>();
+		Tree& tree0 = parent.emplace<Tree>();
 
-		TreeNode* node = tree->emplace<TreeNode>("", "Tree");
+		TreeNode& node = tree0.emplace<TreeNode>("", "Tree");
 
 		for(size_t i = 0; i < 5; i++)
 		{
-			TreeNode* innernode = node->emplace<TreeNode>("", "Child " + toString(i), true);
-			TreeNode* innestnode = innernode;
+			TreeNode& innernode = node.emplace<TreeNode>("", "Child " + toString(i), true);
+			TreeNode* innestnode = &innernode;
 			for(size_t j = 0; j < 5; j++)
 			{
-				innestnode = innestnode->emplace<TreeNode>("", "Child " + toString(i) + " : " + toString(j), true);
+				innestnode = &innestnode->emplace<TreeNode>("", "Child " + toString(i) + " : " + toString(j), true);
 			}
 		}
 
 		for(size_t i = 0; i < 5; i++)
 		{
-			TreeNode* innernode = node->emplace<TreeNode>("", "Child " + toString(5+i));
+			TreeNode& innernode = node.emplace<TreeNode>("", "Child " + toString(5+i));
 
-			innernode->emplace<Label>("Blah blah");
-			innernode->emplace<Button>("Print");
+			innernode.emplace<Label>("Blah blah");
+			innernode.emplace<Button>("Print");
 		}
 
-		return tree;
+		return tree0;
 	}
 
-	Tree* createUiTestTableTree(Sheet* parent)
+	Tree& createUiTestTableTree(Sheet& parent)
 	{
-		Tree* tree = parent->emplace<Tree>();
+		Tree& tree = parent.emplace<Tree>();
 
-		TreeNode* node = tree->emplace<TreeNode>("", "Inside a tree...");
+		TreeNode& node0 = tree.emplace<TreeNode>("", "Inside a tree...");
 
-		node = node->emplace<TreeNode>("", "node 1 (with borders)");
+		TreeNode& node1 = node0.emplace<TreeNode>("", "node 1 (with borders)");
 
-		TreeNode* tablenode = node->emplace<TreeNode>("", "Table Node 0");
+		TreeNode& tablenode0 = node1.emplace<TreeNode>("", "Table Node 0");
 		
-		tablenode->emplace<Label>("aaa");
-		tablenode->emplace<Label>("bbb");
-		tablenode->emplace<Label>("ccc");
-		tablenode->emplace<Label>("ddd");
+		tablenode0.emplace<Label>("aaa");
+		tablenode0.emplace<Label>("bbb");
+		tablenode0.emplace<Label>("ccc");
+		tablenode0.emplace<Label>("ddd");
 
-		tablenode = node->emplace<TreeNode>("", "Table Node 1");
+		TreeNode& tablenode1 = node1.emplace<TreeNode>("", "Table Node 1");
 
-		tablenode->emplace<Label>("eee");
-		tablenode->emplace<Label>("fff");
-		tablenode->emplace<Label>("ggg");
-		tablenode->emplace<Label>("hhh");
+		tablenode1.emplace<Label>("eee");
+		tablenode1.emplace<Label>("fff");
+		tablenode1.emplace<Label>("ggg");
+		tablenode1.emplace<Label>("hhh");
 
 		return tree;
 	}
 
-	Textbox* createUiTestMarkupText(Sheet* parent)
+	Textbox* createUiTestMarkupText(Sheet& parent)
 	{
+		parent.emplace<Textbox>("This is a long paragraph. The text should automatically wrap on the edge of the window. The current implementation follows simple rules that works for English and possibly other languages.");
+		parent.emplace<SliderFloat>("Wrap width", AutoStat<float>(200.f, -20.f, 600.f, 0.1f), [](float width){ });
+		
+		/*ImGui::Text("Test paragraph 1:");
+		ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetCursorScreenPos() + ImVec2(wrap_width, 0.0f), ImGui::GetCursorScreenPos() + ImVec2(wrap_width + 10, ImGui::GetTextLineHeight()), 0xFFFF00FF);
+		ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + wrap_width);
+		ImGui::Text("lazy dog. This paragraph is made to fit within %.0f pixels. The quick brown fox jumps over the lazy dog.", wrap_width);
+		ImGui::GetWindowDrawList()->AddRect(ImGui::GetItemBoxMin(), ImGui::GetItemBoxMax(), 0xFF00FFFF);
+		ImGui::PopTextWrapPos();
+		ImGui::Text("Test paragraph 2:");
+		ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetCursorScreenPos() + ImVec2(wrap_width, 0.0f), ImGui::GetCursorScreenPos() + ImVec2(wrap_width + 10, ImGui::GetTextLineHeight()), 0xFFFF00FF);
+		ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + wrap_width);
+		ImGui::Text("aaaaaaaa bbbbbbbb, cccccccc,dddddddd. eeeeeeee ffffffff. gggggggg!hhhhhhhh");
+		ImGui::GetWindowDrawList()->AddRect(ImGui::GetItemBoxMin(), ImGui::GetItemBoxMax(), 0xFF00FFFF);
+		ImGui::PopTextWrapPos();
+		ImGui::TreePop();*/
+
 		return nullptr;
 
 		/*if(ImGui::TreeNode("Colored Text"))
@@ -168,63 +189,30 @@ namespace mk
 			ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Pink");
 			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Yellow");
 			ImGui::TreePop();
-		}
-		if(ImGui::TreeNode("Word Wrapping"))
-		{
-			// Using shortcut. You can use PushTextWrapPos()/PopTextWrapPos() for more flexibility.
-			ImGui::TextWrapped("This is a long paragraph. The text should automatically wrap on the edge of the window. The current implementation follows simple rules that works for English and possibly other languages.");
-			ImGui::Spacing();
-			static float wrap_width = 200.0f;
-			ImGui::SliderFloat("Wrap width", &wrap_width, -20, 600, "%.0f");
-			ImGui::Text("Test paragraph 1:");
-			ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetCursorScreenPos() + ImVec2(wrap_width, 0.0f), ImGui::GetCursorScreenPos() + ImVec2(wrap_width + 10, ImGui::GetTextLineHeight()), 0xFFFF00FF);
-			ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + wrap_width);
-			ImGui::Text("lazy dog. This paragraph is made to fit within %.0f pixels. The quick brown fox jumps over the lazy dog.", wrap_width);
-			ImGui::GetWindowDrawList()->AddRect(ImGui::GetItemBoxMin(), ImGui::GetItemBoxMax(), 0xFF00FFFF);
-			ImGui::PopTextWrapPos();
-			ImGui::Text("Test paragraph 2:");
-			ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetCursorScreenPos() + ImVec2(wrap_width, 0.0f), ImGui::GetCursorScreenPos() + ImVec2(wrap_width + 10, ImGui::GetTextLineHeight()), 0xFFFF00FF);
-			ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + wrap_width);
-			ImGui::Text("aaaaaaaa bbbbbbbb, cccccccc,dddddddd. eeeeeeee ffffffff. gggggggg!hhhhhhhh");
-			ImGui::GetWindowDrawList()->AddRect(ImGui::GetItemBoxMin(), ImGui::GetItemBoxMax(), 0xFF00FFFF);
-			ImGui::PopTextWrapPos();
-			ImGui::TreePop();
-		}
-		if(ImGui::TreeNode("UTF-8 Text"))
-		{
-			// UTF-8 test (need a suitable font, try extra_fonts/mplus* files for example)
-			// Most compiler appears to support UTF-8 in source code (with Visual Studio you need to save your file as 'UTF-8 without signature')
-			// However for the sake for maximum portability here we are *not* including raw UTF-8 character in this source file, instead we encode the string with hexadecimal constants.
-			// In your own application please be reasonable and use UTF-8 in the source or get the data from external files! :)
-			ImGui::TextWrapped("(CJK text will only appears if the font supports it. Please check in the extra_fonts/ folder if you intend to use non-ASCII characters. Note that characters values are preserved even if the font cannot be displayed, so you can safely copy & paste garbled characters.)");
-			ImGui::Text("Hiragana: \xe3\x81\x8b\xe3\x81\x8d\xe3\x81\x8f\xe3\x81\x91\xe3\x81\x93 (kakikukeko)");
-			ImGui::Text("Kanjis: \xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e (nihongo)");
-			static char buf[32] = "\xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e";
-			ImGui::InputText("UTF-8 input", buf, IM_ARRAYSIZE(buf));
-			ImGui::TreePop();
 		}*/
 	}
 
-	Sheet* createUiTestControls(Sheet* parent)
+	Sheet& createUiTestControls(Sheet& parent)
 	{
-		Table* table = parent->emplace<Table>(StringVector({ "input", "label" }), std::vector<float>({ 0.7f, 0.3f }));
+		Table& table = parent.emplace<Table>(StringVector({ "input", "label" }), std::vector<float>({ 0.7f, 0.3f }));
 
-		table->emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {});
+		table.emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {});
+		table.emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {}, true);
 
-		table->emplace<InputText>("string input", "Hello, world!");
-		table->emplace<InputInt>("int input", 123);
-		table->emplace<InputFloat>("float input", 0.001f);
+		table.emplace<InputText>("string input", "Hello, world!");
+		table.emplace<InputInt>("int input", 123);
+		table.emplace<InputFloat>("float input", 0.001f);
 
-		table->emplace<SliderInt>("int 0..3", AutoStat<int>(2, 0, 3, 1));
-		table->emplace<SliderInt>("int -100..100", AutoStat<int>(0, -100, 100, 1));
+		table.emplace<SliderInt>("int 0..3", AutoStat<int>(2, 0, 3, 1));
+		table.emplace<SliderInt>("int -100..100", AutoStat<int>(0, -100, 100, 1));
 
-		table->emplace<SliderFloat>("float input", AutoStat<float>(1.123f, 0.0f, 2.0f, 0.001f));
-		table->emplace<SliderFloat>("log float", AutoStat<float>(0.f, 0.0f, 10.0f, 1.f));
-		//table->emplace<SliderFloat>("signed log float", AutoStat<float>(0.f, -10.0f, 10.0f, 1.f));
-		//table->emplace<SliderFloat>("unbound float", AutoStat<float>(123456789.0f, -FLT_MAX, FLT_MAX, 1.f));
+		table.emplace<SliderFloat>("float input", AutoStat<float>(1.123f, 0.0f, 2.0f, 0.001f));
+		table.emplace<SliderFloat>("log float", AutoStat<float>(0.f, 0.0f, 10.0f, 1.f));
+		//table.emplace<SliderFloat>("signed log float", AutoStat<float>(0.f, -10.0f, 10.0f, 1.f));
+		//table.emplace<SliderFloat>("unbound float", AutoStat<float>(123456789.0f, -FLT_MAX, FLT_MAX, 1.f));
 
-		// table->emplace<SliderAngle>("angle", 0.f);
-		// table->emplace<FVector3>("slider float3", 0.0f, 1.0f);
+		// table.emplace<SliderAngle>("angle", 0.f);
+		// table.emplace<FVector3>("slider float3", 0.0f, 1.0f);
 
 		// ImGui::ColorEdit3("color 1", col1);
 		// ImGui::ColorEdit4("color 2", col2);
@@ -232,102 +220,98 @@ namespace mk
 		return table;
 	}
 
-	Sheet* createUiTestFileBrowser(Sheet* parent)
+	Sheet& createUiTestFileBrowser(Sheet& parent)
 	{
-		Window* window = parent->emplace<Window>("File Browser");
-		Sheet* filebrowser = window->body()->emplace<Directory>("..");
+		Window& window = parent.emplace<Window>("File Browser");
+		window.body().emplace<Directory>("..");
 		return window;
 	}
 
-	Sheet* createUiTestFileTree(Sheet* parent)
+	Sheet& createUiTestFileTree(Sheet& parent)
 	{
-		Window* window = parent->emplace<Window>("File Tree");
-		Tree* filetree = window->body()->emplace<Tree>();
-		DirectoryNode* node = filetree->emplace<DirectoryNode>("..", "..", false);
-		node->update();
+		Window& window = parent.emplace<Window>("File Tree");
+		Tree& filetree = window.body().emplace<Tree>();
+		DirectoryNode& node = filetree.emplace<DirectoryNode>("..", "..", false);
+		node.update();
 		return window;
 	}
 
-	Sheet* createUiTestInlineControls(Sheet* parent)
+	Sheet& createUiTestInlineControls(Sheet& parent)
 	{
-		//Sheet* page = parent;
-		Page* page = parent->emplace<Page>("Inline Controls");
+		//Sheet& page = parent;
+		Page& page = parent.emplace<Page>("Inline Controls");
 		// @bug 280X : page inside page doesn't work @todo
 
-		DivX* line;
-		
-		line = page->emplace<DivX>();
+		Sequence& line0 = page.emplace<Sequence>();
 
-		line->emplace<Label>("Hello");
-		line->emplace<Label>("World");
+		line0.emplace<Label>("Hello");
+		line0.emplace<Label>("World");
 
-		line = page->emplace<DivX>();
+		Sequence& line1 = page.emplace<Sequence>();
 
-		line->emplace<Button>("Banana");
-		line->emplace<Button>("Apple");
-		line->emplace<Button>("Corniflower");
+		line1.emplace<Button>("Banana");
+		line1.emplace<Button>("Apple");
+		line1.emplace<Button>("Corniflower");
 
-		line = page->emplace<DivX>();
+		Sequence& line2 = page.emplace<Sequence>();
 
-		line->emplace<Label>("Small buttons");
-		line->emplace<Button>("Like this one");
-		line->emplace<Label>("can fit within a text block.");
+		line2.emplace<Label>("Small buttons");
+		line2.emplace<Button>("Like this one");
+		line2.emplace<Label>("can fit within a text block.");
 
-		line = page->emplace<DivX>();
+		Sequence& line3 = page.emplace<Sequence>();
 
-		line->emplace<InputBool>("My", true);
-		line->emplace<InputBool>("Tailor", true);
-		line->emplace<InputBool>("Is", true);
-		line->emplace<InputBool>("Rich", true);
+		line3.emplace<InputBool>("My", true);
+		line3.emplace<InputBool>("Tailor", true);
+		line3.emplace<InputBool>("Is", true);
+		line3.emplace<InputBool>("Rich", true);
 
-		line = page->emplace<DivX>();
+		Sequence& line4 = page.emplace<Sequence>();
 
-		line->emplace<InputFloat>("X", 0.f);
-		line->emplace<InputFloat>("Y", 0.f);
-		line->emplace<InputFloat>("Z", 0.f);
+		line4.emplace<InputFloat>("X", 0.f);
+		line4.emplace<InputFloat>("Y", 0.f);
+		line4.emplace<InputFloat>("Z", 0.f);
 
 		return page;
 	}
 
-	Sheet* createUiTestProgressDialog(Sheet* parent)
+	Sheet& createUiTestProgressDialog(Sheet& parent)
 	{
-		Window* window = parent->emplace<Window>("Progress Dialog");
-		Page* page = window->body()->emplace<Page>("Progress Dialog");
-		ProgressBar* bar = page->emplace<ProgressBarX>();
-		bar->setPercentage(0.57f);
-		page->emplace<SliderFloat>("Set progress", AutoStat<float>(0.57f, 0.f, 1.f, 0.01f), [bar](float val) { bar->setPercentage(val); });
+		Window& window = parent.emplace<Window>("Progress Dialog");
+		Page& page = window.body().emplace<Page>("Progress Dialog");
+		ProgressBar& bar = page.emplace<ProgressBarX>();
+		bar.setPercentage(0.57f);
+		page.emplace<SliderFloat>("Set progress", AutoStat<float>(0.57f, 0.f, 1.f, 0.01f), [&bar](float val) { bar.setPercentage(val); });
 		return window;
 	}
 
-	Window* createUiTestWindow(Sheet* parent)
+	Window& createUiTestWindow(Sheet& parent)
 	{
-		Window* window = parent->emplace<Window>("kiUi v0.1");
-		Page* page = window->body()->emplace<Page>("kiUi v0.1");
+		Window& window = parent.emplace<Window>("kiUi v0.1");
+		Page& page = window.body().emplace<Page>("kiUi v0.1");
 
-		page->emplace<Label>("kiui says hello.");
+		page.emplace<Label>("kiui says hello.");
 
-		Expandbox* box;
+		Expandbox& box0 = page.emplace<Expandbox>("Help");
+		box0.emplace<Textbox>("This window is being created by the ShowTestWindow() function. Please refer to the code for programming reference.\n\nUser Guide:");
 
-		box = page->emplace<Expandbox>("Help");
-		//current->emplace<Textbox>("This window is being created by the ShowTestWindow() function. Please refer to the code for programming reference.\n\nUser Guide:");
+		Expandbox& box1 = page.emplace<Expandbox>("Window options");
 
-		box = page->emplace<Expandbox>("Window options");
+		box1.emplace<InputBool>("titlebar", true, [&window](bool on) { on ? window.showTitlebar() : window.hideTitlebar(); });
+		box1.emplace<InputBool>("movable", true, [&window](bool) { window.toggleMovable(); });
+		box1.emplace<InputBool>("resizable", true, [&window](bool) { window.toggleResizable(); });
+		box1.emplace<InputBool>("closable", true, [&window](bool) { window.toggleClosable(); });
 
-		box->emplace<InputBool>("titlebar", true, [window](bool on) { on ? window->showTitlebar() : window->hideTitlebar(); });
-		box->emplace<InputBool>("movable", true, [window](bool) { window->toggleMovable(); });
-		box->emplace<InputBool>("resizable", true, [window](bool) { window->toggleResizable(); });
-		box->emplace<InputBool>("closable", true, [window](bool) { window->toggleClosable(); });
+		box1.emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha){ window.frame().inkstyle().mBackgroundColour.val.setA(alpha); });
 
-		box->emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [window](float alpha){ window->frame()->inkstyle()->mBackgroundColour.setA(alpha); });
+		Expandbox& box2 = page.emplace<Expandbox>("Widgets");
+		createUiTestControls(box2);
 
-		box = page->emplace<Expandbox>("Widgets");
-		createUiTestControls(box);
+		Expandbox& box3 = page.emplace<Expandbox>("Table");
+		createUiTestTable(box3);
 
-		box = page->emplace<Expandbox>("Table");
-		createUiTestTable(box);
-
-		box = page->emplace<Expandbox>("Columns");
-		createUiTestTableAlt(box);
+		Expandbox& box4 = page.emplace<Expandbox>("Columns");
+		createUiTestTableAlt(box4);
 
 		/*
 		if(ImGui::TreeNode("Style Editor"))
@@ -521,30 +505,36 @@ namespace mk
 
 	}
 
-	void switchTheme(Sheet* sheet, Widget* selected)
+	void switchUiTheme(Sheet& sheet, Widget& selected)
 	{
-		const string name = selected->label();
-		mk::StyleParser parser(sheet->uiWindow()->styler());
+		const string name = selected.label();
+		mk::StyleParser parser(sheet.uiWindow().styler());
 
 		if(name == "Blendish")
-			parser.loadStyleSheet(KIUI_EXAMPLE_RESSOURCE_PATH "/styles/blendish.yml");
+			parser.loadStyleSheet(sheet.uiWindow().resourcePath() + "interface/styles/blendish.yml");
 		else if(name == "Blendish Dark")
-			parser.loadStyleSheet(KIUI_EXAMPLE_RESSOURCE_PATH "/styles/blendish_dark.yml");
+			parser.loadStyleSheet(sheet.uiWindow().resourcePath() + "interface/styles/blendish_dark.yml");
+		else if(name == "TurboBadger")
+			parser.loadStyleSheet(sheet.uiWindow().resourcePath() + "interface/styles/turbobadger.yml");
 		else if(name == "MyGui")
-			parser.loadStyleSheet(KIUI_EXAMPLE_RESSOURCE_PATH "/styles/mygui.yml");
+			parser.loadStyleSheet(sheet.uiWindow().resourcePath() + "interface/styles/mygui.yml");
+		else if(name == "Photoshop")
+			parser.loadStyleSheet(sheet.uiWindow().resourcePath() + "interface/styles/photoshop.yml");
 		else if(name == "Default")
 			parser.loadDefaultStyle();
 	}
 
-	void pickSample(Sheet* sheet, Widget* selected)
+	void pickUiSample(Sheet& sheet, Widget& selected)
 	{
-		const string name = selected->label();
-		sheet->clear();
+		const string name = selected.label();
+		sheet.clear();
 
 		if(name == "Dockspace")
 			createUiTestDockspace(sheet);
 		else if(name == "Window")
 			createUiTestWindow(sheet);
+		else if(name == "Text Editor")
+			createUiTestTextEditor(sheet);
 		else if(name == "Tabs")
 			createUiTestTabs(sheet);
 		else if(name == "Table")
@@ -561,13 +551,13 @@ namespace mk
 			createUiTestProgressDialog(sheet);
 	}
 
-	void createUiTest(Form* root)
+	void createUiTest(Form& root)
 	{
-		Header* demoheader = root->sheet()->emplace<Header>();
-		PartitionX* demobody = root->sheet()->emplace<PartitionX>();
-		demoheader->emplace<Label>("Pick a demo sample : ");
-		demoheader->emplace<Dropdown>(std::bind(&pickSample, demobody, std::placeholders::_1), StringVector({ "Dockspace", "Window", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" }));
-		demoheader->emplace<Label>("Switch theme : ");
-		Dropdown* dropdown = demoheader->emplace<Dropdown>(std::bind(&switchTheme, demobody, std::placeholders::_1), StringVector({ "Blendish", "Blendish Dark", "MyGui", "Default" }));
+		Header& demoheader = root.sheet().emplace<Header>();
+		Board& demobody = root.sheet().emplace<Board>();
+		demoheader.emplace<Label>("Pick a demo sample : ");
+		demoheader.emplace<Dropdown>(std::bind(&pickUiSample, std::ref(demobody), std::placeholders::_1), StringVector({ "Dockspace", "Window", "Text Editor", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" }));
+		demoheader.emplace<Label>("Switch theme : ");
+		demoheader.emplace<Dropdown>(std::bind(&switchUiTheme, std::ref(demobody), std::placeholders::_1), StringVector({ "Blendish", "Blendish Dark", "TurboBadger", "MyGui", "Photoshop", "Default" }));
 	}
 }

@@ -14,45 +14,29 @@
 
 namespace mk
 {
-	Control::Control(Style* style)
-		: Widget(style)
-	{}
+	Control::Control()
+		: Widget()
+	{
+		mStyle = &cls();
+	}
 
-	WrapX::WrapX()
-		: Sheet(styleCls())
-	{}
-
-	WrapY::WrapY()
-		: Sheet(styleCls())
-	{}
-
-	DivX::DivX()
-		: Sheet(styleCls())
-	{}
-
-	DivY::DivY()
-		: Sheet(styleCls())
-	{}
-
-	PartitionX::PartitionX()
-		: Sheet(styleCls())
-	{}
-
-	PartitionY::PartitionY()
-		: Sheet(styleCls())
-	{}
-
-	Page::Page(const string& name, const string& dockid, Style* style)
-		: ScrollSheet(style ? style : styleCls())
+	Page::Page(const string& name, const string& dockid)
+		: ScrollSheet()
 		, mName(name)
 		, mDockId(dockid)
-	{}
+	{
+		mStyle = &cls();
+	}
 
 	Dialog::Dialog()
-		: Sheet(styleCls())
-	{}
+		: Sheet()
+	{
+		mStyle = &cls();
+	}
 
 	Header::Header()
-		: Sheet(styleCls())
-	{}
+		: Sheet()
+	{
+		mStyle = &cls();
+	}
 }

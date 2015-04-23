@@ -15,34 +15,37 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ TreeNodeHeader : public WrapButton, public Typed<TreeNodeHeader, Sheet>, public Styled<TreeNodeHeader>
+	class MK_UI_EXPORT _I_ TreeNodeHeader : public WrapButton
 	{
 	public:
 		TreeNodeHeader(const Trigger& trigger);
 
-		using Typed<TreeNodeHeader, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(WrapButton::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ TreeNodeBody : public Sheet, public Typed<TreeNodeBody, Sheet>, public Styled<TreeNodeBody>
+	class MK_UI_EXPORT _I_ TreeNodeBody : public Sheet
 	{
 	public:
 		TreeNodeBody();
 
-		using Typed<TreeNodeBody, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ TreeNodeToggle : public Toggle, public Typed<TreeNodeToggle, Widget>, public Styled<TreeNodeToggle>
+	class MK_UI_EXPORT _I_ TreeNodeToggle : public Toggle
 	{
 	public:
 		TreeNodeToggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on);
 
-		using Typed<TreeNodeToggle, Widget>::cls;
+		static StyleType& cls() { static StyleType ty(Toggle::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT EmptyTreeNodeToggle : public Object, public Typed<EmptyTreeNodeToggle>, public Styled<EmptyTreeNodeToggle>
-	{};
+	class MK_UI_EXPORT EmptyTreeNodeToggle : public Object
+	{
+	public:
+		static StyleType& cls() { static StyleType ty(TreeNodeToggle::cls()); return ty; }
+	};
 
-	class MK_UI_EXPORT _I_ TreeNode : public Expandbox, public Typed<TreeNode, Expandbox>, public Styled<TreeNode>
+	class MK_UI_EXPORT _I_ TreeNode : public Expandbox
 	{
 	public:
 		TreeNode(const string& image, const string& title, bool collapsed = false, Object* object = nullptr);
@@ -51,13 +54,12 @@ namespace mk
 		Object* object() { return mObject; }
 		Tree* tree();
 
-		Widget* vappend(unique_ptr<Widget> widget);
-		unique_ptr<Widget> vrelease(Widget* widget);
+		Widget& vappend(unique_ptr<Widget> widget);
+		unique_ptr<Widget> vrelease(Widget& widget);
 
 		void selected();
 
-		using Typed<TreeNode, Expandbox>::cls;
-		using Styled<TreeNode>::styleCls;
+		static StyleType& cls() { static StyleType ty(Expandbox::cls()); return ty; }
 
 	protected:
 		string mImage;
@@ -73,7 +75,7 @@ namespace mk
 	{
 	public:
 		AutoLeafNode(T* object)
-			: TreeNode("", T::cls()->name() + " " + object->name(), false, object)
+			: TreeNode("", T::cls().name() + " " + object->name(), false, object)
 			, mObject(object)
 		{}
 
@@ -86,7 +88,7 @@ namespace mk
 	{
 	public:
 		AutoNode(T* object)
-			: TreeNode("", object->type()->name() + " " + object->name(), false, object)
+			: TreeNode("", object->type().name() + " " + object->name(), false, object)
 			, VectorObserver<unique_ptr<T_Child>, T_Child>(object->contents())
 			, mObject(object)
 		{}
@@ -111,7 +113,7 @@ namespace mk
 		T* mObject;
 	};
 
-	class MK_UI_EXPORT _I_ Tree : public ScrollSheet, public Typed<Tree, Sheet>, public Styled<Tree>
+	class MK_UI_EXPORT _I_ Tree : public ScrollSheet
 	{
 	public:
 		Tree(const std::function<void (TreeNode*)>& onSelected = nullptr);
@@ -122,11 +124,10 @@ namespace mk
 		TreeNode* node(Object* object);
 		void select(Object* object);
 
-		void addNode(TreeNode* node);
-		void removeNode(TreeNode* node);
+		void addNode(TreeNode& node);
+		void removeNode(TreeNode& node);
 
-		using Typed<Tree, Sheet>::cls;
-		using Styled<Tree>::styleCls;
+		static StyleType& cls() { static StyleType ty(ScrollSheet::cls()); return ty; }
 
 	protected:
 		TreeNode* mRootNode;

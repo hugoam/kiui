@@ -25,16 +25,16 @@ namespace mk
 		virtual void formAltered(Form* form) = 0;
 	};
 
-	class MK_UI_EXPORT RootForm : public Form, public Typed<RootForm, Form>
+	class MK_UI_EXPORT RootForm : public Form
 	{
 	public:
-		RootForm(UiWindow* window);
+		RootForm(UiWindow& window);
 		~RootForm();
 
-		RootForm* rootForm() { return this; }
+		RootForm& rootForm() { return *this; }
 
-		UiWindow* uiWindow() { return mWindow; }
-		RootSheet* rootSheet() { return mRootSheet; }
+		UiWindow& uiWindow() { return mWindow; }
+		RootSheet& rootSheet() { return mRootSheet; }
 
 		size_t lastTick() { return mLastTick; }
 
@@ -48,13 +48,13 @@ namespace mk
 
 		void nextFrame(size_t tick, size_t delta);
 
-		using Typed<RootForm, Form>::cls;
+		static Type& cls() { static Type ty(Form::cls()); return ty; }
 
 	protected:
 		User* mUser;
-		UiWindow* mWindow;
+		UiWindow& mWindow;
 		size_t mLastTick;
-		RootSheet* mRootSheet;
+		RootSheet& mRootSheet;
 		std::vector<FormUpdateObserver*> mObservers;
 	};
 }

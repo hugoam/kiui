@@ -14,27 +14,27 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT RadioChoice : public WrapButton, public Typed<RadioChoice, Sheet>, public Styled<RadioChoice>
+	class MK_UI_EXPORT RadioChoice : public WrapButton
 	{
 	public:
 		RadioChoice(Widget* content, const Trigger& trigger);
 
-		using Typed<RadioChoice, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(WrapButton::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT RadioSwitch : public Sheet, public Typed<RadioSwitch, Sheet>, public Styled<RadioSwitch>
+	class MK_UI_EXPORT RadioSwitch : public Sheet
 	{
 	public:
 		RadioSwitch(const Trigger& onSelected, size_t active, StringVector labels = StringVector());
 
-		Sheet* vappend(unique_ptr<Widget> widget);
-		unique_ptr<Widget> vrelease(Widget* widget);
+		Widget& vappend(unique_ptr<Widget> widget);
+		unique_ptr<Widget> vrelease(Widget& widget);
 
 		WrapButton* active() { return mActive; }
 
-		void activated(WrapButton* button);
+		void activated(WrapButton& button);
 
-		using Typed<RadioSwitch, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 
 	protected:
 		Trigger mOnSelected;

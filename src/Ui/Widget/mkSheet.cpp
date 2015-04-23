@@ -25,11 +25,10 @@
 
 namespace mk
 {
-	Sheet::Sheet(Style* style, FrameType frameType)
-		: Widget(style, frameType)
+	Sheet::Sheet(FrameType frameType)
+		: Widget(frameType)
 	{
-		if(!style->styleType() || !style->styleType()->upcast(cls()))
-			mType = cls();
+		mStyle = &cls();
 	}
 
 	Sheet::~Sheet()
@@ -69,26 +68,26 @@ namespace mk
 		//	mContents[i]->rebind(this, i);
 	}
 
-	Widget* Sheet::append(unique_ptr<Widget> unique)
+	Widget& Sheet::append(unique_ptr<Widget> unique)
 	{
 		return this->insert(std::move(unique), mContents.size());
 	}
 
-	Widget* Sheet::insert(unique_ptr<Widget> unique, size_t index)
+	Widget& Sheet::insert(unique_ptr<Widget> unique, size_t index)
 	{
-		Widget* widget = unique.get();
+		Widget& widget = *unique.get();
 		mContents.insert(mContents.begin() + index, std::move(unique));
 		if(mState & BOUND)
-			widget->parent() ? widget->rebind(this, index) : widget->bind(this, index);
+			widget.parent() ? widget.rebind(this, index) : widget.bind(this, index);
 		return widget;
 	}
 
-	unique_ptr<Widget> Sheet::release(Widget* widget)
+	unique_ptr<Widget> Sheet::release(Widget& widget)
 	{
-		widget->detach();
+		widget.detach();
 
 		size_t pos = 0;
-		while(mContents[pos].get() != widget)
+		while(mContents[pos].get() != &widget)
 			++pos;
 
 		unique_ptr<Widget> pointer = std::move(mContents[pos]);
@@ -121,13 +120,30 @@ namespace mk
 			widget->cleanup();
 	}
 
-	ScrollSheet::ScrollSheet(Style* style)
-		: Sheet(style)
-		, mSheet(nullptr)
-		, mScrollbar(nullptr)
+	LayerSheet::LayerSheet()
+		: Sheet(LAYER)
 	{
-		mSheet = this->makeappend<Sheet>(PartitionY::styleCls());
-		mScrollbar = this->makeappend<Scrollbar>(mSheet->stripe());
+		mStyle = &cls();
+		mFrame = make_unique<Layer>(*this, 0);
+	}
+
+	Board::Board()
+		: Sheet()
+	{
+		mStyle = &cls();
+	}
+
+	WrapSheet::WrapSheet()
+		: Sheet()
+	{
+		mStyle = &cls();
+	}
+
+	ScrollSheet::ScrollSheet(FrameType frameType)
+		: Sheet(frameType)
+		, mScrollArea(this->makeappend<ScrollArea>(*this))
+	{
+		mStyle = &cls();
 		//mScrollbar->hide();
 	}
 
@@ -136,43 +152,35 @@ namespace mk
 
 	void ScrollSheet::nextFrame(size_t tick, size_t delta)
 	{
-		if(mSheet->stripe()->cursor() > 0.f && mSheet->stripe()->sequenceLength() - mSheet->stripe()->cursor() < mFrame->dsize(DIM_Y))
-			mSheet->stripe()->setCursor(mSheet->stripe()->sequenceLength() - mFrame->dsize(DIM_Y));
+		if(this->stripe().cursor() > 0.f && this->stripe().sequenceLength() - this->stripe().cursor() < mFrame->dsize(DIM_Y))
+			this->stripe().setCursor(this->stripe().sequenceLength() - mFrame->dsize(DIM_Y));
 
 		Sheet::nextFrame(tick, delta);
 
-		if(mSheet->stripe()->overflow() && mScrollbar->frame()->hidden())
-			mScrollbar->show();
-		else if(!mSheet->stripe()->overflow() && !mScrollbar->frame()->hidden())
-			mScrollbar->hide();
+		if(this->stripe().overflow() && mScrollArea.scrollbar().frame().hidden())
+			mScrollArea.scrollbar().show();
+		else if(!this->stripe().overflow() && !mScrollArea.scrollbar().frame().hidden())
+			mScrollArea.scrollbar().hide();
 	}
 
-	Widget* ScrollSheet::vappend(unique_ptr<Widget> widget)
-	{
-		return mSheet->vappend(std::move(widget));
-	}
-
-	unique_ptr<Widget> ScrollSheet::vrelease(Widget* widget)
-	{
-		return mSheet->vrelease(widget);
-	}
-
-	GridSheet::GridSheet(Dimension dim, Style* style)
-		: Sheet(style)
+	GridSheet::GridSheet(Dimension dim)
+		: Sheet()
 		, mDim(dim)
 		, mResizing(nullptr)
-		, mHoverCursor(mDim == DIM_X ? ResizeCursorX::styleCls() : ResizeCursorY::styleCls())
-	{}
+		, mHoverCursor(mDim == DIM_X ? ResizeCursorX::cls() : ResizeCursorY::cls())
+	{
+		mStyle = &cls();
+	}
 
 	bool GridSheet::leftDragStart(float xPos, float yPos)
 	{
 		float pos = mDim == DIM_X ? xPos : yPos;
 		mResizing = nullptr;
 
-		for(Frame* frame : mFrame->as<Stripe>()->sequence())
+		for(Frame* frame : mFrame->as<Stripe>().sequence())
 			if(frame->dabsolute(mDim) >= pos)
 			{
-				mResizing = frame->widget();
+				mResizing = &frame->widget();
 				break;
 			}
 
@@ -186,14 +194,14 @@ namespace mk
 		if(!mResizing)
 			return true;
 
-		Widget* prev = mResizing->prev();
-		Widget* next = mResizing;
+		Widget& prev = mResizing->prev();
+		Widget& next = *mResizing;
 
-		float pixspan = 1.f / mFrame->as<Stripe>()->dsize(mDim);
+		float pixspan = 1.f / mFrame->as<Stripe>().dsize(mDim);
 		float offset = mDim == DIM_X ? xDif * pixspan : yDif * pixspan;
 
-		prev->frame()->setSpanDim(mDim, std::max(0.01f, prev->frame()->dspan(mDim) + offset));
-		next->frame()->setSpanDim(mDim, std::max(0.01f, next->frame()->dspan(mDim) - offset));
+		prev.frame().setSpanDim(mDim, std::max(0.01f, prev.frame().dspan(mDim) + offset));
+		next.frame().setSpanDim(mDim, std::max(0.01f, next.frame().dspan(mDim) - offset));
 
 		this->gridResized(prev, next);
 
@@ -206,30 +214,34 @@ namespace mk
 		return true;
 	}
 
-	Cursor::Cursor(RootSheet* rootSheet)
-		: Widget(styleCls(), LAYER)
+	Cursor::Cursor(RootSheet& rootSheet)
+		: Widget(LAYER)
+		, mTooltip(rootSheet.emplace<Tooltip>(""))
 	{
-		mFrame = make_unique<Layer>(this, 15);
+		mStyle = &cls();
+		mFrame = make_unique<Layer>(*this, 15);
 
-		mTooltip = rootSheet->emplace<Tooltip>("");
-		mHovered = rootSheet;
+		mHovered = &rootSheet;
 	}
 
 	void Cursor::nextFrame()
 	{
-		if(mTooltipClock.read() > 0.5f && !mTooltip->frame()->visible() && !mHovered->tooltip().empty())
+		if(mTooltipClock.read() > 0.5f && !mTooltip.frame().visible() && !mHovered->tooltip().empty())
 			this->tooltipOn();
 
 		if(mDirty)
 		{
-			mFrame->inkbox()->updateFrame();
+			mFrame->inkbox().updateFrame();
 			mDirty = false;
 		}
 	}
 
 	void Cursor::setPosition(float x, float y)
 	{
-		if(mTooltip->frame()->visible())
+		if(!mHovered->frame().inside(x, y))
+			this->unhover();
+
+		if(mTooltip.frame().visible())
 			this->tooltipOff();
 		mTooltipClock.step();
 		mFrame->setPosition(x, y);
@@ -238,56 +250,86 @@ namespace mk
 
 	void Cursor::tooltipOn()
 	{
-		mTooltip->setLabel(mHovered->tooltip());
-		mTooltip->frame()->setPosition(mFrame->dposition(DIM_X), mFrame->dposition(DIM_Y) + mFrame->dsize(DIM_Y));
-		mTooltip->show();
+		mTooltip.setLabel(mHovered->tooltip());
+		mTooltip.frame().setPosition(mFrame->dposition(DIM_X), mFrame->dposition(DIM_Y) + mFrame->dsize(DIM_Y));
+		mTooltip.show();
 	}
 
 	void Cursor::tooltipOff()
 	{
-		mTooltip->setLabel("");
-		mTooltip->hide();
+		mTooltip.setLabel("");
+		mTooltip.hide();
 	}
 
-	void Cursor::hover(Widget* widget)
+	void Cursor::hover(Widget& widget)
 	{
-		mHovered = widget;
-		if(widget->hoverCursor())
-			this->reset(widget->hoverCursor());
+		if(widget.contains(mHovered))
+		{
+			mUnderHover.push_back(&widget);
+			return;
+		}
+
+		this->unhover();
+		mHovered = &widget;
+		if(widget.hoverCursor())
+			this->reset(widget.hoverCursor());
 	}
 
-	void Cursor::unhover(Widget* widget)
+	void Cursor::unhover()
 	{
-		mHovered = mParent;
-		if(widget->hoverCursor())
-			this->reset(styleCls());
+		if(mHovered->hoverCursor())
+			this->reset(&cls());
+		mHovered->unhover();
+		mHovered = &this->rootSheet();
+
+		for(Widget* widget : mUnderHover)
+			widget->unhover();
+		mUnderHover.clear();
 	}
 
 	Caret::Caret(Frame* textFrame)
-		: Widget(styleCls())
+		: Widget()
 		, mTextFrame(textFrame)
 		, mIndex(0)
 		, mDirty(false)
-	{}
+	{
+		mStyle = &cls();
+	}
 
 	void Caret::nextFrame(size_t tick, size_t delta)
 	{
 		Widget::nextFrame(tick, delta);
 
-		if(mDirty && mTextFrame->inkbox()->visible())
+		if(mDirty && mTextFrame->inkbox().visible())
 		{
 			float caretX, caretY, caretHeight;
-			mTextFrame->inkbox()->caretCoords(mIndex, caretX, caretY, caretHeight);
+			mTextFrame->inkbox().caretCoords(mIndex, caretX, caretY, caretHeight);
 			mFrame->setPosition(caretX, caretY);
 			mFrame->setSize(1.f, caretHeight);
+			mDirty = false;
 		}
 	}
 
+	void Caret::moveRight()
+	{
+		mIndex = mIndex + 1;
+		mTextFrame->inkbox().selectCaret(mIndex);
+		mDirty = true;
+	}
+
+	void Caret::moveLeft()
+	{
+		mIndex = mIndex - 1;
+		mTextFrame->inkbox().selectCaret(mIndex);
+		mDirty = true;
+	}
+
 	Tooltip::Tooltip(const string& label)
-		: Widget(styleCls(), LAYER)
+		: Widget(LAYER)
 		, mLabel(label)
 	{
-		mFrame = make_unique<Layer>(this, 14);
+		mStyle = &cls();
+		mFrame = make_unique<Layer>(*this, 14);
 	}
 
 	Tooltip::~Tooltip()

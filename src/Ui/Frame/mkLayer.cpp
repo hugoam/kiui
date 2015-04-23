@@ -17,7 +17,7 @@
 
 namespace mk
 {
-	Layer::Layer(Widget* widget, size_t zorder, InkTarget* target)
+	Layer::Layer(Widget& widget, size_t zorder, InkTarget* target)
 		: Stripe(widget)
 		, d_zorder(zorder)
 		, d_target(target)
@@ -34,25 +34,27 @@ namespace mk
 
 	void Layer::bind()
 	{
-		this->updateStyle(d_widget->style());
-		d_inkLayer = d_target->layer(this, d_zorder);
-		d_inkbox = d_inkLayer->inkbox(this);
+		this->updateStyle();
+		d_inkLayer = d_target->addLayer(*this, d_zorder);
+		d_inkbox = d_inkLayer->createInkbox(*this);
 	}
 
 	void Layer::bind(Stripe* parent)
 	{
-		d_parentLayer = parent->layer();
+		d_parentLayer = &parent->layer();
 		d_parentLayer->layers().push_back(this);
 
 		bool migrate = bool(d_inkLayer);
 
+		unique_ptr<InkLayer> oldLayer = std::move(d_inkLayer);
+
 		if(d_target)
-			d_inkLayer = d_target->layer(this, d_zorder);
+			d_inkLayer = d_target->addLayer(*this, d_zorder);
 		else
-			d_inkLayer = d_parentLayer->inkLayer()->target()->layer(this, d_zorder);
+			d_inkLayer = d_parentLayer->inkLayer().target().addLayer(*this, d_zorder);
 
 		if(migrate)
-			this->migrate(this);
+			this->migrate(*this);
 
 		Frame::bind(parent);
 	}

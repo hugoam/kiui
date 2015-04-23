@@ -8,21 +8,20 @@
 /* mk */
 #include <Ui/mkUiForward.h>
 #include <Ui/Frame/mkInk.h>
+#include <Ui/Nano/nanovg/nanovg.h>
 
 namespace mk
 {
 	class NanoInk : public Inkbox
 	{
 	public:
-		NanoInk(Frame* frame, NanoLayer* layer);
+		NanoInk(Frame& frame, NanoLayer& layer);
 		~NanoInk();
-    
-		inline InkStyle* skin() { return mFrame->inkstyle(); }
 
 		void updateContent();
 		void updateFrame();
 		void updateStyle();
-
+		
 		void show();
 		void hide();
 
@@ -32,18 +31,22 @@ namespace mk
 
 		int fetchImage(const string& image);
 		void drawImage(int image, float x, float y, float w, float h);
-		void drawSkinImage(int image, float x, float y, float w, float h, float xoff = 0.f, float yoff = 0.f, float stretchwidth = 0.f, float stretchheight = 0.f);
+		void drawSkinImage(ImageSkin::Section section, float x, float y, float w, float h);
 
 		void splitImageSkin(int image);
+
+		void setupText();
 
 		void nanodraw();
 
 	protected:
 		NVGcontext* mCtx;
-		NanoLayer* mLayer;
+		NanoLayer& mLayer;
 		BoxFloat mCorners;
 		int mImage;
+		int mOverlay;
 		int mSkin;
+		std::vector<NVGtextRow> mTextRows;
 	};
 
 }

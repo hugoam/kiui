@@ -27,9 +27,9 @@ namespace mk
 		virtual void vclear() = 0;
 
 		virtual T* vat(size_t pos) = 0;
-		virtual size_t vindex(T* object) = 0;
+		virtual size_t vindex(T& object) = 0;
 
-		virtual Type* sequenceType() const = 0;
+		virtual Type& sequenceType() const = 0;
 
 		virtual void vadd(T*) {}
 	};
@@ -39,13 +39,13 @@ namespace mk
 	{
 	public:
 		virtual size_t vsize() const = 0;
-		virtual void viterateobj(const std::function<void(Object*, Type*)>& callback) = 0;
+		virtual void viterateobj(const std::function<void(Object&, Type&)>& callback) = 0;
 		virtual void vclear() = 0;
 
 		virtual Object* vobjectat(size_t pos) = 0;
-		virtual size_t vindex(Object* object) = 0;
+		virtual size_t vindex(Object& object) = 0;
 
-		virtual Type* sequenceType() const = 0;
+		virtual Type& sequenceType() const = 0;
 
 		virtual void vadd(Object* object) { UNUSED(object); }
 	};
@@ -58,9 +58,11 @@ namespace mk
 		virtual void removeObserver(StoreObserver<T>* observer) = 0;
 	};
 
-	class MK_OBJECT_EXPORT Stock : public Object, public Typed<Stock>, public Iterable<Object>
+	class MK_OBJECT_EXPORT Stock : public Object, public Iterable<Object>
 	{
 	public:
+		static Type& cls() { static Type ty; return ty; }
+
 		//virtual void vremoveobj(Object* object) = 0;
 		//virtual void vaddobj(unique_ptr<Object>) = 0;
 	};

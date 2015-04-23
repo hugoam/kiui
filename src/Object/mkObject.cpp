@@ -10,11 +10,11 @@
 
 namespace mk
 {
-	TypeObject::TypeObject(Type* type)
-		: mType(type)
+	TypeObject::TypeObject(Type& type)
+		: mType(&type)
 	{}
 
-	IdObject::IdObject(Id id, Type* type)
+	IdObject::IdObject(Id id, Type& type)
 		: TypeObject(type)
 		, mId(id)
 	{}
@@ -22,6 +22,6 @@ namespace mk
 	IdObject::~IdObject()
 	{
 		if(mType->indexer())
-			mType->indexer()->remove(this);
+			mType->indexer()->remove(*this);
 	}
 }

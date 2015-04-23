@@ -25,20 +25,22 @@ namespace mk
 	class MK_UI_EXPORT UiWindow : public InputDispatcher
 	{
 	public:
-		UiWindow(User* user = nullptr);
+		UiWindow(const string& resourcePath = "", User* user = nullptr);
 		~UiWindow();
 
-		void setup(RenderWindow* renderWindow, InkWindow* inkWindow, InputWindow* inputWindow);
+		void setup(RenderWindow& renderWindow, InkWindow& inkWindow, InputWindow* inputWindow);
 		void init();
 
-		RenderWindow* renderWindow() { return mRenderWindow; }
-		InkWindow* inkWindow() { return mInkWindow; }
-		RootSheet* rootSheet() { return mRootSheet; }
-		RootForm* rootForm() { return mRootForm.get(); }
+		const string& resourcePath() { return mResourcePath; }
+
+		RenderWindow& renderWindow() { return *mRenderWindow; }
+		InkWindow& inkWindow() { return *mInkWindow; }
+		RootSheet& rootSheet() { return *mRootSheet; }
+		RootForm& rootForm() { return *mRootForm.get(); }
 
 		User* user() { return mUser; }
 
-		Styler* styler() { return mStyler.get(); }
+		Styler& styler() { return *mStyler.get(); }
 
 		void resize(size_t width, size_t height);
 
@@ -63,6 +65,8 @@ namespace mk
 		static std::map<string, std::function<unique_ptr<Widget>(Form*)>> sDispatch;
 
 	protected:
+		string mResourcePath;
+
 		float mWidth;
 		float mHeight;
 

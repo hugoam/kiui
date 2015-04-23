@@ -14,7 +14,7 @@ namespace mk
 	class MK_UI_EXPORT InputWindow
 	{
 	public:
-		virtual void initInput(InputDispatcher* dispatcher, size_t wndHandle) = 0;
+		virtual void initInput(InputDispatcher& dispatcher, size_t wndHandle) = 0;
 		virtual void resize(size_t width, size_t height) = 0;
 	};
 

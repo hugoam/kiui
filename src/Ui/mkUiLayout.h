@@ -17,10 +17,15 @@
 
 namespace mk
 {
-	struct MK_UI_EXPORT StyleOverride
+	struct MK_UI_EXPORT StyleOverride : public NonCopy
 	{
-		Style* mStyle;
-		Style* mOverride;
+	public:
+		StyleOverride(Style& style, Style& overrider) : mStyle(style), mOverride(overrider) {}
+		StyleOverride(StyleOverride&& other) : mStyle(other.mStyle), mOverride(other.mOverride) {}
+		//StyleOverride& operator=(StyleOverride&&other) { mStyle = other.mStyle; mOverride = other.mOverride; return *this; }
+
+		Style& mStyle;
+		Style& mOverride;
 	};
 
 	typedef std::map<WidgetState, string> InkIdMap;
@@ -39,15 +44,12 @@ namespace mk
 		void defaultLayout();
 		void defaultSkins();
 
-		void inheritLayout(StyleVector names, Style* base);
-		void inheritSkins(StyleVector names, Style* base);
-
-		void override(Style* stem, Style* style, Style* overrider);
+		void override(Style& stem, Style& style, Style& overrider);
 		void override(const string& stem, const string& style, const string& overrider);
 
-		Style* fetchOverride(Style* style, Style* overrider);
+		Style* fetchOverride(Style& style, Style& overrider);
 
-		Style* dynamicStyle(const string& name);
+		Style& dynamicStyle(const string& name);
 		Style* fetchStyle(const string& name);
 
 	protected:
@@ -55,8 +57,11 @@ namespace mk
 		std::vector<std::vector<StyleOverride>> mOverrides;
 	};
 
-	class MK_UI_EXPORT EmptyStyle : public Object, public Typed<EmptyStyle>, public Styled<EmptyStyle>
-	{};
+	class MK_UI_EXPORT EmptyStyle : public Object
+	{
+	public:
+		static StyleType& cls() { static StyleType ty; return ty; }
+	};
 }
 
 #endif

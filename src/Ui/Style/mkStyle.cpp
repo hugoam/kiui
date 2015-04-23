@@ -9,22 +9,41 @@
 
 #include <Ui/Widget/mkWidget.h>
 
+#include <Ui/Form/mkInput.h>
+
 namespace mk
 {
-	Style::Style(Type* type)
+	StyleType::StyleType()
+		: Type()
+		, Style(*this, nullptr)
+	{}
+
+	StyleType::StyleType(StyleType& base)
+		: Type(*base.styleType())
+		, Style(*this, &base)
+	{}
+
+	Style::Style(Type& type, Style* base)
 		: IdStruct(index<Style>(), cls())
-		, mStyleType(type)
-		, mName()
-		, mLayout("", FLOW, CLIP, VOID, false, DimSizing(SHRINK, SHRINK), DimFloat(1.f, 1.f), DIM_Y)
+		, mStyleType(&type)
+		, mBase(base)
+		, mBaseSkin(base)
+		, mName(type.name())
+		, mLayout()
 		, mSubskins()
 		, mUpdated(0)
-	{}
+	{
+		if(mBase)
+			this->inherit();
+	}
 
 	Style::Style(const string& name)
 		: IdStruct(index<Style>(), cls())
 		, mStyleType(nullptr)
+		, mBase(nullptr)
+		, mBaseSkin(nullptr)
 		, mName(name)
-		, mLayout("", FLOW, CLIP, VOID, false, DimSizing(SHRINK, SHRINK), DimFloat(1.f, 1.f), DIM_Y)
+		, mLayout()
 		, mSkin()
 		, mSubskins()
 		, mUpdated(0)
@@ -35,54 +54,81 @@ namespace mk
 
 	void Style::reset()
 	{
-		mLayout = LayoutStyle("", FLOW, CLIP, VOID, false, DimSizing(SHRINK, SHRINK), DimFloat(1.f, 1.f), DIM_Y);
+		mLayout = LayoutStyle();
 		mSkin = InkStyle();
 		mSubskins.clear();
 		++mUpdated;
 	}
 
-	void Style::inherit(Style* base)
+	void Style::rebase(Style& base)
 	{
-		this->inheritLayout(base);
-		this->inheritSkins(base);
+		mBase = &base;
+		mBaseSkin = &base;
+		this->inherit();
 	}
 
-	void Style::inheritLayout(Style* base)
+	void Style::rebaseSkins(Style& base)
 	{
-		mLayout = *base->layout();
+		mBaseSkin = &base;
+		this->inherit();
 	}
 
-	void Style::inheritSkins(Style* base)
+	void Style::inherit()
 	{
-		mSkin = *base->skin();
+		if(mBase)
+			this->inheritLayout(*mBase);
+		if(mBaseSkin)
+			this->inheritSkins(*mBaseSkin);
 
-		for(auto& subskin : base->mSubskins)
-			this->decline(subskin.mState, subskin.mSkin);
+		//for(auto& subskin : mSubskins) @todo : why doesn't this behave correctly when enabled
+		//	subskin.mSkin.copy(mSkin, true);
 	}
 
-	InkStyle* Style::subskin(WidgetState state)
+	void Style::inheritLayout(Style& base)
+	{
+		mLayout.copy(base.layout(), true);
+	}
+
+	void Style::inheritSkins(Style& base)
+	{
+		mSkin.copy(base.skin(), true);
+
+		for(auto& subskin : base.mSubskins)
+			this->copy(subskin.mState, subskin.mSkin, true);
+	}
+
+	void Style::copySkins(Style& base)
+	{
+		mSkin.copy(base.skin(), false);
+
+		for(auto& subskin : base.mSubskins)
+			this->copy(subskin.mState, subskin.mSkin, false);
+	}
+
+	InkStyle& Style::subskin(WidgetState state)
 	{
 		for(SubSkin& skin : reverse_adapt(mSubskins))
 			if((state & skin.mState) == skin.mState)
-				return &skin.mSkin;
-		return &mSkin;
+				return skin.mSkin;
+		return mSkin;
 	}
 
-	InkStyle* Style::decline(WidgetState state, InkStyle& original)
+	InkStyle& Style::copy(WidgetState state, InkStyle& original, bool inherit)
 	{
 		for(SubSkin& skin : reverse_adapt(mSubskins))
 			if(state == skin.mState)
 			{
-				skin.mSkin = original;
-				return &skin.mSkin;
+				skin.mSkin.copy(original, inherit);
+				return skin.mSkin;
 			}
 
-		mSubskins.emplace_back(state, original);
-		return &mSubskins.back().mSkin;
+		mSubskins.emplace_back(state);
+		mSubskins.back().mSkin.copy(original, inherit);
+		return mSubskins.back().mSkin;
 	}
 
-	InkStyle* Style::decline(WidgetState state)
+	InkStyle& Style::decline(WidgetState state)
 	{
-		return decline(state, mSkin);
+		return this->copy(state, mSkin, false);
 	}
 }

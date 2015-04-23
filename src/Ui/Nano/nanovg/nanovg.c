@@ -2442,7 +2442,7 @@ int nvgTextGlyphIndex(NVGcontext* ctx, float x, float y, const char* string, con
 	return npos;
 }
 
-int nvgTextGlyphPosition(NVGcontext* ctx, float x, float y, const char* string, size_t index, NVGglyphPosition* position)
+int nvgTextGlyphPosition(NVGcontext* ctx, float x, float y, const char* string, const char* end, size_t index, NVGglyphPosition* position)
 {
 	NVGstate* state = nvg__getState(ctx);
 	float scale = nvg__getFontScale(state) * ctx->devicePxRatio;
@@ -2453,10 +2453,22 @@ int nvgTextGlyphPosition(NVGcontext* ctx, float x, float y, const char* string, 
 
 	if(state->fontId == FONS_INVALID) return 0;
 
-	const char* end = string + strlen(string);
+	if(end == NULL)
+		end = string + strlen(string);
 
 	if(string == end)
+	{
+		position->x = 0.f;
 		return 0;
+	}
+
+	if(index == end - string)
+	{
+		float bounds[4];
+		nvgTextBounds(ctx, x, y, string, end, &bounds[0]);
+		position->x = bounds[2] - bounds[0];
+		return 1;
+	}
 
 	fonsSetSize(ctx->fs, state->fontSize*scale);
 	fonsSetSpacing(ctx->fs, state->letterSpacing*scale);
@@ -2473,14 +2485,14 @@ int nvgTextGlyphPosition(NVGcontext* ctx, float x, float y, const char* string, 
 		}
 		prevIter = iter;
 
+		position->str = iter.str;
+		position->x = iter.x * invscale;
+		position->minx = nvg__minf(iter.x, q.x0) * invscale;
+		position->maxx = nvg__maxf(iter.nextx, q.x1) * invscale;
+
 		if(npos == index)
-		{
-			position->str = iter.str;
-			position->x = iter.x * invscale;
-			position->minx = nvg__minf(iter.x, q.x0) * invscale;
-			position->maxx = nvg__maxf(iter.nextx, q.x1) * invscale;
 			return 1;
-		}
+
 		npos++;
 	}
 

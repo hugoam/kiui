@@ -28,7 +28,7 @@ namespace mk
 	class MK_UI_EXPORT StyleParser
 	{
 	public:
-		StyleParser(Styler* styler);
+		StyleParser(Styler& styler);
 		~StyleParser();
 
 		void loadDefaultStyle();
@@ -42,7 +42,7 @@ namespace mk
 		void declineImageSkin(const string& states);
 
 	protected:
-		Styler* mStyler;
+		Styler& mStyler;
 		ParserState mState;
 		ParserKeyState mKeyState;
 		Style* mStyle;
@@ -62,7 +62,6 @@ namespace mk
 
 		flow : FLOW | MANUAL
 		clipping : NOCLIP | CLIP
-		overflow : FLOWOVER | SCROLL
 		opacity : OPAQUE | VOID
 		layout_dim : DIM_X | DIM_Y
 		sizing : FIXED | SHRINK | EXPAND | WRAP, idem

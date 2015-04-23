@@ -18,13 +18,13 @@
 
 namespace mk
 {
-	RootForm::RootForm(UiWindow* uiWindow)
+	RootForm::RootForm(UiWindow& uiWindow)
 		: Form(make_unique<RootSheet>(uiWindow, this))
 		, mWindow(uiWindow)
 		, mLastTick(0)
-		, mRootSheet(mSheet->as<RootSheet>())
+		, mRootSheet(mSheet.as<RootSheet>())
 	{
-		mType = cls();
+		mType = &cls();
 	}
 
 	RootForm::~RootForm()

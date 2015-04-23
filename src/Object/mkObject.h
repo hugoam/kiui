@@ -21,10 +21,10 @@ namespace mk
 		virtual ~Object() {}
 
 		template <class T> 
-		inline T* as() { return static_cast<T*>(this); }
+		inline T& as() { return static_cast<T&>(*this); }
 
 		template <class T>
-		inline const T* as() const { return static_cast<const T*>(this); }
+		inline const T& as() const { return static_cast<const T&>(*this); }
 
 		Object(const Object&) = delete;
 		Object& operator=(const Object&) = delete;
@@ -41,10 +41,11 @@ namespace mk
 	class MK_OBJECT_EXPORT TypeObject : public Object
 	{
 	public:
-		TypeObject(Type* type);
+		TypeObject(Type& type);
 
-		Type* type() const { return mType; }
-
+		Type& type() { return *mType; }
+		const Type& type() const { return *mType; }
+		
 	protected:
 		Type* mType;
 	};
@@ -52,14 +53,14 @@ namespace mk
 	class MK_OBJECT_EXPORT IdObject : public TypeObject
 	{
 	public:
-		IdObject(Id id, Type* type);
+		IdObject(Id id, Type& type);
 		~IdObject();
 
 		template <class T>
-		Id index(Id id) { if(id == 0) id = T::indexer()->alloc(); T::indexer()->insert(this, id); return id; }
+		Id index(Id id) { if(id == 0) id = T::indexer().alloc(); T::indexer().insert(*this, id); return id; }
 
 		template <class T>
-		Id index() { Id id = T::indexer()->alloc(); T::indexer()->insert(this, id); return id; }
+		Id index() { Id id = T::indexer().alloc(); T::indexer().insert(*this, id); return id; }
 
 		Id id() const { return mId; }
 
@@ -70,7 +71,7 @@ namespace mk
 	class MK_OBJECT_EXPORT IdStruct : public IdObject
 	{
 	public:
-		IdStruct(Id id, Type* type) : IdObject(id, type) {}
+		IdStruct(Id id, Type& type) : IdObject(id, type) {}
 		IdStruct& operator=(const IdStruct&) { return *this; }
 	};
 

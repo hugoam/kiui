@@ -16,14 +16,15 @@
 
 namespace mk
 {
-	WContextMenu::WContextMenu()
-		: Sheet(styleCls())
+	ContextMenu::ContextMenu()
+		: Sheet()
 	{
-		this->rootSheet()->contextOn(this);
+		mStyle = &cls();
+		this->rootSheet().contextOn(this);
 	}
 
-	WContextMenu::~WContextMenu()
+	ContextMenu::~ContextMenu()
 	{
-		this->rootSheet()->contextOff();
+		this->rootSheet().contextOff();
 	}
 }

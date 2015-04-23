@@ -7,18 +7,68 @@
 
 #include <Ui/Form/mkWidgets.h>
 
+#include <iostream>
+
 namespace mk
 {
-	List::List(Style* style)
-		: ScrollSheet(style ? style : styleCls())
+	List::List()
+		: ScrollSheet()
 	{
-		mType = cls();
+		mStyle = &cls();
 	}
 
-	Sequence::Sequence(Style* style)
-		: Sheet(style ? style : styleCls())
+	FilterList::FilterList(FrameType frameType)
+		: ScrollSheet(frameType)
 	{
-		mType = cls();
+		mStyle = &cls();
+	}
+
+	void FilterList::updateFilter(const string& filter)
+	{
+		for(auto& pt : mContents)
+		{
+			bool fit = fitsFilter(filter, pt->contentlabel());
+			if(fit && pt->frame().hidden())
+				pt->show();
+			else if(!fit && !pt->frame().hidden())
+				pt->hide();
+		}
+	}
+
+	bool FilterList::fitsFilter(const string& filter, const string& value)
+	{
+		for(size_t i = 0; i < filter.size(); ++i)
+			if(filter[i] != value[i])
+				return false;
+
+		return true;
+	}
+
+	FilterInput::FilterInput(FilterList& list, std::function<void(string)> callback)
+		: Input<string>("", callback)
+		, mList(list)
+	{}
+
+	void FilterInput::filterOn()
+	{
+		mList.updateFilter(mValue->ref<string>());
+	}
+
+	void FilterInput::filterOff()
+	{
+		mList.updateFilter("");
+	}
+
+	void FilterInput::notifyUpdate()
+	{
+		Input<string>::notifyUpdate();
+		mList.updateFilter(mValue->ref<string>());
+	}
+
+	Sequence::Sequence()
+		: Sheet()
+	{
+		mStyle = &cls();
 	}
 
 	LabelSequence::LabelSequence(StringVector labels)
@@ -35,10 +85,11 @@ namespace mk
 			this->emplace<Button>(label);
 	}
 
-	SortList::SortList(Style* style)
-		: List(style ? style : styleCls())
+	SortList::SortList()
+		: List()
 	{
-		mType = cls();
+		mStyle = &cls();
+		mType = &cls();
 	}
 
 	/*void SortList::move(Form* form, size_t index)

@@ -27,8 +27,8 @@ namespace mk
 	{
 	public:
 		virtual bool handleClear() { return false; }
-		virtual void handleAdd(Object* object, Type* type) = 0;
-		virtual void handleRemove(Object* object, Type* type) = 0;
+		virtual void handleAdd(Object& object, Type* type) = 0;
+		virtual void handleRemove(Object& object, Type* type) = 0;
 	};
 
 	template <class T>

@@ -7,11 +7,12 @@
 
 namespace mk
 {
-	Uibox::Uibox(LayoutStyle* style)
+	Uibox::Uibox()
 		: d_position(0.f, 0.f)
 		, d_size(0.f, 0.f)
+		, d_space(WRAP)
 		, d_sizing(SHRINK, SHRINK)
-		, d_layout(style)
+		, d_layout(nullptr)
 	{}
 
 	Uibox::~Uibox()

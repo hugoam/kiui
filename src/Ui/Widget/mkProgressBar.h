@@ -13,54 +13,56 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT FillerX : public Widget, public Typed<FillerX, Widget>, public Styled<FillerX>
+	class MK_UI_EXPORT FillerX : public Widget
 	{
 	public:
 		FillerX();
 
-		using Typed<FillerX, Widget>::cls;
+		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT FillerY : public Widget, public Typed<FillerY, Widget>, public Styled<FillerY>
+	class MK_UI_EXPORT FillerY : public Widget
 	{
 	public:
 		FillerY();
 
-		using Typed<FillerY, Widget>::cls;
+		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT ProgressBar : public Sheet
 	{
 	public:
-		ProgressBar(Dimension dim = DIM_X, Style* style = nullptr, const Trigger& onUpdated = nullptr);
+		ProgressBar(Dimension dim = DIM_X, const Trigger& onUpdated = nullptr);
 
 		float percentage() { return mPercentage; }
 		void setPercentage(float percentage);
 
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+
 	protected:
 		Dimension mDim;
-		Widget* mFiller;
-		Widget* mSpacer;
+		Widget& mFiller;
+		Widget& mSpacer;
 
 		float mPercentage;
 
 		Trigger mOnUpdated;
 	};
 
-	class MK_UI_EXPORT ProgressBarX : public ProgressBar, public Typed<ProgressBarX, Sheet>, public Styled<ProgressBarX>
+	class MK_UI_EXPORT ProgressBarX : public ProgressBar
 	{
 	public:
 		ProgressBarX();
 
-		using Typed<ProgressBarX, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT ProgressBarY : public ProgressBar, public Typed<ProgressBarY, Sheet>, public Styled<ProgressBarY>
+	class MK_UI_EXPORT ProgressBarY : public ProgressBar
 	{
 	public:
 		ProgressBarY();
 
-		using Typed<ProgressBarY, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 	};
 }
 

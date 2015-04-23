@@ -14,9 +14,10 @@
 namespace mk
 {
 	Dir::Dir(const string& name)
-		: WrapButton(nullptr, styleCls())
+		: WrapButton(nullptr)
 		, mName(name)
 	{
+		mStyle = &cls();
 		this->makeappend<Icon>("folder_20");
 		this->makeappend<Label>(mName);
 	}
@@ -26,16 +27,17 @@ namespace mk
 		if(mName == ".")
 			return;
 		if(mName == "..")
-			mParent->parent()->as<Directory>()->moveOut();
+			mParent->parent()->as<Directory>().moveOut();
 		else
-			mParent->parent()->as<Directory>()->moveIn(mName);
+			mParent->parent()->as<Directory>().moveIn(mName);
 			
 	}
 
 	File::File(const string& name)
-		: WrapButton(nullptr, styleCls())
+		: WrapButton(nullptr)
 		, mName(name)
 	{
+		mStyle = &cls();
 		this->makeappend<Icon>("file_20");
 		this->makeappend<Label>(mName);
 	}
@@ -44,9 +46,11 @@ namespace mk
 	{}
 
 	Directory::Directory(const string& path)
-		: ScrollSheet(styleCls())
+		: ScrollSheet()
 		, mPath(path)
 	{
+		mStyle = &cls();
+
 		char buffer[PATH_MAX];
 		mPath = replaceAll(mPath, "/", "\\");
 
@@ -74,7 +78,7 @@ namespace mk
 	void Directory::setLocation(const string& path)
 	{
 		mPath = path;
-		mSheet->clear();
+		this->clear();
 		this->update();
 	}
 
@@ -90,21 +94,25 @@ namespace mk
 	}
 
 	FileBrowser::FileBrowser(const string& path)
-		: Sheet(styleCls())
+		: Sheet()
 		, mPath(path)
+		, mDirectory(this->makeappend<Directory>(mPath))
 	{
-		mDirectory = this->makeappend<Directory>(mPath);
+		mStyle = &cls();
 	}
 
 	FileNode::FileNode(const string& name)
 		: TreeNode("file_20", name, true)
-	{}
+	{
+		mStyle = &cls();
+	}
 
 	DirectoryNode::DirectoryNode(const string& path, const string& name, bool collapsed)
 		: TreeNode("folder_20", name, collapsed)
 		, mPath(path)
 	{
-		mType = cls();
+		mStyle = &cls();
+		mType = &cls();
 	}
 
 	void DirectoryNode::expand()
@@ -112,8 +120,8 @@ namespace mk
 		Expandbox::expand();
 
 		for(auto& pt : mContainer->contents())
-			if(pt->type() == DirectoryNode::cls())
-				pt->as<DirectoryNode>()->update();
+			if(&pt->type() == &DirectoryNode::cls())
+				pt->as<DirectoryNode>().update();
 	}
 
 	void DirectoryNode::update()
@@ -124,9 +132,9 @@ namespace mk
 		while((ent = readdir(dir)) != NULL)
 			if(ent->d_type & DT_DIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
 			{
-				DirectoryNode* node = this->emplace<DirectoryNode>(mPath + "/" + ent->d_name, ent->d_name, true);
+				DirectoryNode& node = this->emplace<DirectoryNode>(mPath + "/" + ent->d_name, ent->d_name, true);
 				if(!mCollapsed)
-					node->update();
+					node.update();
 			}
 
 		rewinddir(dir);

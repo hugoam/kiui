@@ -25,7 +25,9 @@ namespace mk
 	class MK_OBJECT_EXPORT _I_ Type : public IdObject
 	{
 	public:
-		Type(Type* base);
+		Type();
+		Type(Type& base);
+		Type(const string& name);
 		~Type();
 
 		_A_ Id id() const { return IdObject::id(); }
@@ -48,12 +50,12 @@ namespace mk
 
 		bool upcast(Type* type);
 
-		static Type* cls() { return &sType; }
+		static Type& cls() { static Type ty; return ty; }
 
 		static size_t maxId() { return sTypeId; }
 
 	private:
-		Type();
+		//Type();
 
 	protected:
 		string mName;
@@ -65,7 +67,6 @@ namespace mk
 		Indexer* mIndexer;
 		AbstractPool* mLibrary;
 
-		static Type sType;
 		static size_t sTypeId;
 	};
 }

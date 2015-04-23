@@ -21,21 +21,21 @@ namespace mk
 		this->binded(form);
 	}
 
-	void Collection::add(Object* object, Type* type, size_t index)
+	void Collection::add(Object& object, Type& type, size_t index)
 	{
 		Lref ref(object, type);
 		unique_ptr<Form> form = mMapper(ref);
-		mMapping[object] = form.get();
+		mMapping[&object] = form.get();
 		if(index > mForm->contents().size())
 			index = mForm->contents().size(); // @Warning, this should ultimately be removed, it's a kludge for collections with holes in their indexes
 		mForm->insert(std::move(form), index);
 	}
 
-	void Collection::remove(Object* object, Type* type)
+	void Collection::remove(Object& object, Type& type)
 	{
 		UNUSED(type);
-		mForm->release(mMapping[object]->index());
-		mMapping.erase(object);
+		mForm->release(mMapping[&object]->index());
+		mMapping.erase(&object);
 	}
 
 	void Collection::clear()
@@ -56,15 +56,15 @@ namespace mk
 	{
 		UNUSED(form);
 		if(mFill)
-			mStore->viterateobj([this](Object* object, Type* type){ this->handleAdd(object, type); });
+			mStore->viterateobj([this](Object& object, Type& type){ this->handleAdd(object, type); });
 	}
 
-	void ObjectCollection::handleAdd(Object* object, Type* type)
+	void ObjectCollection::handleAdd(Object& object, Type& type)
 	{
 		this->add(object, type, mStore->vindex(object));
 	}
 
-	void ObjectCollection::handleRemove(Object* object, Type* type)
+	void ObjectCollection::handleRemove(Object& object, Type& type)
 	{
 		this->remove(object, type);
 	}
@@ -93,14 +93,14 @@ namespace mk
 		mStore->addObserver(this);
 	}
 
-	void MetaCollection::handleAdd(TypeObject* object)
+	void MetaCollection::handleAdd(TypeObject& object)
 	{
-		this->add(object, object->type(), mStore->vindex(object));
+		this->add(object, object.type(), mStore->vindex(object));
 	}
 
-	void MetaCollection::handleRemove(TypeObject* object)
+	void MetaCollection::handleRemove(TypeObject& object)
 	{
-		this->remove(object, object->type());
+		this->remove(object, object.type());
 	}
 
 	bool MetaCollection::handleClear()

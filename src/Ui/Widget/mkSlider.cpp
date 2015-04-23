@@ -21,8 +21,8 @@
 
 namespace mk
 {
-	SliderKnob::SliderKnob(Dimension dim, Style* style)
-		: Button("", style)
+	SliderKnob::SliderKnob(Dimension dim)
+		: Button("")
 		, mDim(dim)
 		, mStartPos(0.f)
 		, mStartOffset(0.f)
@@ -46,61 +46,68 @@ namespace mk
 	bool SliderKnob::leftDrag(float xPos, float yPos, float xDif, float yDif)
 	{
 		UNUSED(xDif); UNUSED(yDif);
-		mParent->as<Slider>()->offsetChange(offset(mDim == DIM_X ? xPos : yPos), false);
+		mParent->as<Slider>().offsetChange(offset(mDim == DIM_X ? xPos : yPos), false);
 		return true;
 	}
 
 	bool SliderKnob::leftDragEnd(float xPos, float yPos)
 	{
-		mParent->as<Slider>()->offsetChange(offset(mDim == DIM_X ? xPos : yPos), true);
+		mParent->as<Slider>().offsetChange(offset(mDim == DIM_X ? xPos : yPos), true);
 		toggleState(ACTIVATED);
 		return true;
 	}
 
 	SliderKnobX::SliderKnobX()
-		: SliderKnob(DIM_X, styleCls())
-	{}
+		: SliderKnob(DIM_X)
+	{
+		mStyle = &cls();
+	}
 
 	SliderKnobY::SliderKnobY()
-		: SliderKnob(DIM_Y, styleCls())
-	{}
+		: SliderKnob(DIM_Y)
+	{
+		mStyle = &cls();
+	}
 
 	SpacerX::SpacerX()
-		: Widget(styleCls())
-	{}
+		: Widget()
+	{
+		mStyle = &cls();
+	}
 
 	SpacerY::SpacerY()
-		: Widget(styleCls())
-	{}
+		: Widget()
+	{
+		mStyle = &cls();
+	}
 
 
-	Slider::Slider(Dimension dim, Style* style, const Trigger& onUpdated)
-		: Sheet(style ? style : styleCls())
+	Slider::Slider(Dimension dim, const Trigger& onUpdated)
+		: Sheet()
 		, mDim(dim)
 		, mOnUpdated(onUpdated)
-	{}
+		, mSpaceBefore(dim == DIM_X ? (Widget&) this->makeappend<FillerX>() : (Widget&) this->makeappend<FillerY>())
+		, mButton(dim == DIM_X ? (SliderKnob&) this->makeappend<SliderKnobX>() : (SliderKnob&) this->makeappend<SliderKnobY>())
+		, mSpaceAfter(dim == DIM_X ? (Widget&) this->makeappend<SpacerX>() : (Widget&) this->makeappend<SpacerY>())
+	{
+		mStyle = &cls();
+	}
 	
 	SliderX::SliderX(const Trigger& onUpdated)
-		: Slider(DIM_X, styleCls(), onUpdated)
+		: Slider(DIM_X, onUpdated)
 	{
-		//mSpaceBefore = this->makeappend<SpacerX>();
-		mSpaceBefore = this->makeappend<FillerX>();
-		mButton = this->makeappend<SliderKnobX>();
-		mSpaceAfter = this->makeappend<SpacerX>();
+		mStyle = &cls();
 	}
 
 	SliderY::SliderY(const Trigger& onUpdated)
-		: Slider(DIM_Y, styleCls(), onUpdated)
+		: Slider(DIM_Y, onUpdated)
 	{
-		//mSpaceBefore = this->makeappend<SpacerY>();
-		mSpaceBefore = this->makeappend<FillerY>();
-		mButton = this->makeappend<SliderKnobY>();
-		mSpaceAfter = this->makeappend<SpacerY>();
+		mStyle = &cls();
 	}
 
 	void Slider::offsetChange(float offset, bool ended)
 	{
-		int step = int(round(offset / (mFrame->dsize(mDim) - mButton->frame()->dsize(mDim)) * (mNumSteps - 1.f)));
+		int step = int(round(offset / (mFrame->dsize(mDim) - mButton.frame().dsize(mDim)) * (mNumSteps - 1.f)));
 		if(step != mStep)
 		{
 			mStep = step;
@@ -135,14 +142,16 @@ namespace mk
 		if(!(mState & BOUND))
 			return;
 
-		mSpaceBefore->frame()->setSpanDim(mDim, mVal - mMin);
-		mSpaceAfter->frame()->setSpanDim(mDim, mMax - mVal);
+		mSpaceBefore.frame().setSpanDim(mDim, mVal - mMin);
+		mSpaceAfter.frame().setSpanDim(mDim, mMax - mVal);
 
-		if(mButton->frame()->dexpand(mDim))
-			mButton->frame()->setSpanDim(mDim, mKnobLength);
+		if(mButton.frame().dexpand(mDim))
+			mButton.frame().setSpanDim(mDim, mKnobLength);
 	}
 
 	SliderDisplay::SliderDisplay(const string& label)
-		: Label(label, styleCls())
-	{}
+		: Label(label)
+	{
+		mStyle = &cls();
+	}
 }

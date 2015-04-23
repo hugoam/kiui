@@ -17,10 +17,10 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT SliderKnob : public Button, public Typed<SliderKnob, Button>, public Styled<SliderKnob>
+	class MK_UI_EXPORT SliderKnob : public Button
 	{
 	public:
-		SliderKnob(Dimension dim = DIM_X, Style* style = nullptr);
+		SliderKnob(Dimension dim = DIM_X);
 
 		float offset(float pos);
 
@@ -28,8 +28,7 @@ namespace mk
 		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
 		bool leftDragEnd(float xPos, float yPos);
 
-		using Typed<SliderKnob, Button>::cls;
-		using Styled<SliderKnob>::styleCls;
+		static StyleType& cls() { static StyleType ty(Button::cls()); return ty; }
 
 	protected:
 		Dimension mDim;
@@ -37,48 +36,46 @@ namespace mk
 		float mStartOffset;
 	};
 
-	class MK_UI_EXPORT SpacerX : public Widget, public Typed<SpacerX, Widget>, public Styled<SpacerX>
+	class MK_UI_EXPORT SpacerX : public Widget
 	{
 	public:
 		SpacerX();
 
-		using Typed<SpacerX, Widget>::cls;
+		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT SpacerY : public Widget, public Typed<SpacerY, Widget>, public Styled<SpacerY>
+	class MK_UI_EXPORT SpacerY : public Widget
 	{
 	public:
 		SpacerY();
 
-		using Typed<SpacerY, Widget>::cls;
+		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT SliderKnobX : public SliderKnob, public Typed<SliderKnobX, SliderKnob>, public Styled<SliderKnobX>
+	class MK_UI_EXPORT SliderKnobX : public SliderKnob
 	{
 	public:
 		SliderKnobX();
 
-		using Typed<SliderKnobX, SliderKnob>::cls;
-		using Styled<SliderKnobX>::styleCls;
+		static StyleType& cls() { static StyleType ty(SliderKnob::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT SliderKnobY : public SliderKnob, public Typed<SliderKnobY, SliderKnob>, public Styled<SliderKnobY>
+	class MK_UI_EXPORT SliderKnobY : public SliderKnob
 	{
 	public:
 		SliderKnobY();
 
-		using Typed<SliderKnobY, SliderKnob>::cls;
-		using Styled<SliderKnobY>::styleCls;
+		static StyleType& cls() { static StyleType ty(SliderKnob::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT Slider : public Sheet, public Typed<Slider, Sheet>, public Styled<Slider>
+	class MK_UI_EXPORT Slider : public Sheet
 	{
 	public:
-		Slider(Dimension dim = DIM_X, Style* style = nullptr, const Trigger& onUpdated = nullptr);
+		Slider(Dimension dim = DIM_X, const Trigger& onUpdated = nullptr);
 
-		Widget* spaceBefore() { return mSpaceBefore; }
-		SliderKnob* slider() { return mButton; }
-		Widget* spaceAfter() { return mSpaceAfter; }
+		Widget& spaceBefore() { return mSpaceBefore; }
+		SliderKnob& slider() { return mButton; }
+		Widget& spaceAfter() { return mSpaceAfter; }
 
 		float val() { return mVal; }
 
@@ -90,15 +87,15 @@ namespace mk
 		
 		void updateKnob();
 
-		virtual void sliderStep(float value, bool ended) { UNUSED(value); UNUSED(ended); mOnUpdated(this); }
+		virtual void sliderStep(float value, bool ended) { UNUSED(value); UNUSED(ended); mOnUpdated(*this); }
 
-		using Typed<Slider, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 
 	protected:
 		Dimension mDim;
-		Widget* mSpaceBefore;
-		SliderKnob* mButton;
-		Widget* mSpaceAfter;
+		Widget& mSpaceBefore;
+		SliderKnob& mButton;
+		Widget& mSpaceAfter;
 
 		float mMin;
 		float mMax;
@@ -112,90 +109,81 @@ namespace mk
 		Trigger mOnUpdated;
 	};
 
-	class MK_UI_EXPORT SliderX : public Slider, public Typed<SliderX, Slider>, public Styled<SliderX>
+	class MK_UI_EXPORT SliderX : public Slider
 	{
 	public:
 		SliderX(const Trigger& onUpdated = Trigger());
 
-		using Typed<SliderX, Slider>::cls;
-		using Styled<SliderX>::styleCls;
+		static StyleType& cls() { static StyleType ty(Slider::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT SliderY : public Slider, public Typed<SliderY, Slider>, public Styled<SliderY>
+	class MK_UI_EXPORT SliderY : public Slider
 	{
 	public:
 		SliderY(const Trigger& onUpdated = Trigger());
 
-		using Typed<SliderY, Slider>::cls;
-		using Styled<SliderY>::styleCls;
+		static StyleType& cls() { static StyleType ty(Slider::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT SliderDisplay : public Label, public Typed<SliderDisplay, Label>, public Styled<SliderDisplay>
+	class MK_UI_EXPORT SliderDisplay : public Label
 	{
 	public:
 		SliderDisplay(const string& label);
 
-		using Typed<SliderDisplay, Label>::cls;
-		using Styled<SliderDisplay>::styleCls;
+		static StyleType& cls() { static StyleType ty(Label::cls()); return ty; }
 	};
 
 	template <class T>
-	class StatSlider : public WTypedInput<AutoStat<T>, T>, public Typed<StatSlider<T>, WValue>//, public Styled<StatSlider<T>>
+	class StatSlider : public WTypedInput<AutoStat<T>, T>
 	{
 	public:
 		StatSlider(Lref& lref, std::function<void(T)> callback = nullptr, Dimension dim = DIM_X)
-			: WTypedInput<AutoStat<T>, T>(lref, nullptr, callback)
+			: WTypedInput<AutoStat<T>, T>(lref, callback)
 			, mStat(this->mValue->template ref<AutoStat<T>>())
 			, mDim(dim)
+			, mDisplay(this->template makeappend<SliderDisplay>(toString(mStat.value())))
+			, mSlider(mDim == DIM_X ? (Slider&) this->template makeappend<SliderX>(std::bind(&StatSlider::updateStat, this))
+									: (Slider&) this->template makeappend<SliderY>(std::bind(&StatSlider::updateStat, this)))
 		{
-			this->build();
+			this->updateSlider();
 		}
 
 		StatSlider(AutoStat<T> value, std::function<void(T)> callback = nullptr, Dimension dim = DIM_X)
-			: WTypedInput<AutoStat<T>, T>(value, nullptr, callback)
+			: WTypedInput<AutoStat<T>, T>(value, callback)
 			, mStat(this->mValue->template ref<AutoStat<T>>())
 			, mDim(dim)
+			, mDisplay(this->template makeappend<SliderDisplay>(toString(mStat.value())))
+			, mSlider(mDim == DIM_X ? (Slider&) this->template makeappend<SliderX>(std::bind(&StatSlider::updateStat, this))
+									: (Slider&) this->template makeappend<SliderY>(std::bind(&StatSlider::updateStat, this)))
 		{
-			this->build();
-		}
-
-		void build()
-		{
-			if(mDim == DIM_X)
-				mSlider = this->template makeappend<SliderX>(std::bind(&StatSlider::updateStat, this));
-			else
-				mSlider = this->template makeappend<SliderY>(std::bind(&StatSlider::updateStat, this));
-
-			mDisplay = this->template makeappend<SliderDisplay>(toString(mStat.value()));
-
 			this->updateSlider();
 		}
 
 		void updateSlider()
 		{
-			mSlider->resetMetrics(float(mStat.min()), float(mStat.max()), float(mStat.value()), float(mStat.step()));
-			mSlider->updateKnob();
-			mDisplay->setLabel(toString(mStat.value()));
+			mSlider.resetMetrics(float(mStat.min()), float(mStat.max()), float(mStat.value()), float(mStat.step()));
+			mSlider.updateKnob();
+			mDisplay.setLabel(toString(mStat.value()));
 		}
 
 		void updateStat()
 		{
-			mStat.modify(T(mSlider->val()));
+			mStat.modify(T(mSlider.val()));
 			this->updateValue();
-			mDisplay->setLabel(toString(mStat.value()));
+			mDisplay.setLabel(toString(mStat.value()));
 		}
 
 		void notifyUpdate() { ++this->mUpdate; if(this->mOnUpdate) this->mOnUpdate(mStat.value()); }
 
-		using Typed<StatSlider<T>, WValue>::cls;
+		static StyleType& cls() { static StyleType ty(WValue::cls()); return ty; }
 
 	protected:
 		AutoStat<T>& mStat;
 
 		Dimension mDim;
 
-		Slider* mSlider;
-		SliderDisplay* mDisplay;
+		Slider& mSlider;
+		SliderDisplay& mDisplay;
 	};
 
 	template class MK_UI_EXPORT _I_ StatSlider<float>;

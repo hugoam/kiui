@@ -26,7 +26,10 @@
 #include <Ui/Widget/mkProgressBar.h>
 #include <Ui/Widget/mkCheckbox.h>
 #include <Ui/Widget/mkTypeIn.h>
+#include <Ui/Widget/mkTextbox.h>
 #include <Ui/Widget/mkDirectory.h>
+
+#include <Ui/Widget/mkContextMenu.h>
 
 #include <Ui/Scheme/mkDropdown.h>
 #include <Ui/Scheme/mkRadioButton.h>
@@ -43,29 +46,17 @@
 
 namespace mk
 {
-	template <> inline Type* typecls<Dimension>() { return Typed<Dimension>::cls(); }
-	template <> inline Type* typecls<Sizing>() { return Typed<Sizing>::cls(); }
-	template <> inline Type* typecls<Pivot>() { return Typed<Pivot>::cls(); }
-	template <> inline Type* typecls<Flow>() { return Typed<Flow>::cls(); }
-	template <> inline Type* typecls<Clipping>() { return Typed<Clipping>::cls(); }
-	template <> inline Type* typecls<Overflow>() { return Typed<Overflow>::cls(); }
-	template <> inline Type* typecls<BoxLayer>() { return Typed<BoxLayer>::cls(); }
-	template <> inline Type* typecls<Opacity>() { return Typed<Opacity>::cls(); }
-	template <> inline Type* typecls<Weight>() { return Typed<Weight>::cls(); }
-	template <> inline Type* typecls<FrameType>() { return Typed<FrameType>::cls(); }
-	template <> inline Type* typecls<WidgetState>() { return Typed<WidgetState>::cls(); }
-
-	template class MK_UI_EXPORT Typed<Dimension>;
-	template class MK_UI_EXPORT Typed<Sizing>;
-	template class MK_UI_EXPORT Typed<Pivot>;
-	template class MK_UI_EXPORT Typed<Flow>;
-	template class MK_UI_EXPORT Typed<Clipping>;
-	template class MK_UI_EXPORT Typed<Overflow>;
-	template class MK_UI_EXPORT Typed<BoxLayer>;
-	template class MK_UI_EXPORT Typed<Opacity>;
-	template class MK_UI_EXPORT Typed<Weight>;
-	template class MK_UI_EXPORT Typed<FrameType>;
-	template class MK_UI_EXPORT Typed<WidgetState>;
+	template <> inline Type& typecls<Dimension>() { static Type ty; return ty; }
+	template <> inline Type& typecls<Sizing>() { static Type ty; return ty; }
+	template <> inline Type& typecls<Pivot>() { static Type ty; return ty; }
+	template <> inline Type& typecls<Flow>() { static Type ty; return ty; }
+	template <> inline Type& typecls<Space>() { static Type ty; return ty; }
+	template <> inline Type& typecls<Clipping>() { static Type ty; return ty; }
+	template <> inline Type& typecls<BoxLayer>() { static Type ty; return ty; }
+	template <> inline Type& typecls<Opacity>() { static Type ty; return ty; }
+	template <> inline Type& typecls<Weight>() { static Type ty; return ty; }
+	template <> inline Type& typecls<FrameType>() { static Type ty; return ty; }
+	template <> inline Type& typecls<WidgetState>() { static Type ty; return ty; }
 }
 
 #endif // MK_UITYPES_H_INCLUDED

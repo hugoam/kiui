@@ -9,81 +9,109 @@
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Widget/mkButton.h>
 #include <Ui/Form/mkForm.h>
+#include <Ui/Scheme/mkList.h>
 
 #include <functional>
 
 namespace mk
 {
-	class MK_UI_EXPORT DropdownHeader : public WrapButton, public Typed<DropdownHeader, Sheet>, public Styled<DropdownHeader>
+	class MK_UI_EXPORT DropdownHeader : public WrapButton
 	{
 	public:
-		DropdownHeader(const Trigger& trigger);
+		DropdownHeader(Dropdown& dropdown, bool input);
 
-		using Typed<DropdownHeader, Sheet>::cls;
+		Style* hoverCursor() { return mInput ? &CaretCursor::cls() : nullptr; }
+		FilterInput* input() { return mInput; }
+
+		void click();
+
+		void onInput(string value);
+		void update(Widget* choice);
+
+		static StyleType& cls() { static StyleType ty(WrapButton::cls()); return ty; }
+
+	protected:
+		Dropdown& mDropdown;
+		FilterInput* mInput;
 	};
 
-	class MK_UI_EXPORT DropdownToggle : public Button, public Typed<DropdownToggle, Button>, public Styled<DropdownToggle>
+	class MK_UI_EXPORT DropdownToggle : public Button
 	{
 	public:
-		DropdownToggle(const Trigger& trigger);
+		DropdownToggle(Dropdown& dropdown);
 
-		using Typed<DropdownToggle, Button>::cls;
-		using Styled<DropdownToggle>::styleCls;
+		void click();
+
+		static StyleType& cls() { static StyleType ty(Button::cls()); return ty; }
+
+	protected:
+		Dropdown& mDropdown;
 	};
 
-	class MK_UI_EXPORT DropdownLabel : public Label, public Typed<DropdownLabel, Label>, public Styled<DropdownLabel>
+	class MK_UI_EXPORT DropdownLabel : public Label
 	{
 	public:
 		DropdownLabel(const string& label);
 
-		using Typed<DropdownLabel, Label>::cls;
-		using Styled<DropdownLabel>::styleCls;
+		static StyleType& cls() { static StyleType ty(Label::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT DropdownChoice : public WrapButton, public Typed<DropdownChoice, Sheet>, public Styled<DropdownChoice>
+	class MK_UI_EXPORT DropdownChoice : public WrapButton
 	{
 	public:
 		DropdownChoice(Widget* content, const Trigger& trigger);
 
-		using Typed<DropdownChoice, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(WrapButton::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT DropdownBox : public Sheet, public Typed<DropdownBox, Sheet>, public Styled<DropdownBox>
+	class MK_UI_EXPORT DropdownBox : public FilterList
 	{
 	public:
-		DropdownBox(Dropdown* dropdown);
+		DropdownBox(Dropdown& dropdown);
 
 		bool leftClick(float x, float y);
 		
-		using Typed<DropdownBox, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(FilterList::cls()); return ty; }
 
 	protected:
-		Dropdown* mDropdown;
+		Dropdown& mDropdown;
 	};
 
-	class MK_UI_EXPORT Dropdown : public Sheet, public Typed<Dropdown, Sheet>, public Styled<Dropdown>
+	class MK_UI_EXPORT Dropdown : public Sheet
 	{
 	public:
-		Dropdown(const Trigger& onSelected, StringVector choices = StringVector());
+		Dropdown(const Trigger& onSelected, StringVector choices = StringVector(), bool input = false);
 		~Dropdown();
 
-		void dropdown();
+		DropdownBox& dropbox() { return mDropbox; }
+		DropdownHeader& header() { return mHeader; }
+		bool down() { return mDown; }
+
+		void dropdown(bool modal = true);
 		void dropup();
 
-		Sheet* vappend(std::unique_ptr<Widget> widget);
-		unique_ptr<Widget> vrelease(Widget* widget);
+		Widget& vappend(std::unique_ptr<Widget> widget);
+		unique_ptr<Widget> vrelease(Widget& widget);
 
-		void selected(WrapButton* selected);
+		void selected(WrapButton& selected);
 
-		using Typed<Dropdown, Sheet>::cls;
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
 
 	protected:
 		Trigger mOnSelected;
-		Sheet* mHeader;
-		Button* mDropButton;
-		DropdownBox* mDropbox;
+		DropdownBox& mDropbox;
+		DropdownHeader& mHeader;
+		DropdownToggle& mToggle;
 		WrapButton* mSelected;
 		bool mDown;
+	};
+
+	class MK_UI_EXPORT Typedown : public Dropdown
+	{
+	public:
+		Typedown(const Trigger& onSelected, StringVector choices = StringVector());
+
+		static StyleType& cls() { static StyleType ty(Dropdown::cls()); return ty; }
 	};
 }
 

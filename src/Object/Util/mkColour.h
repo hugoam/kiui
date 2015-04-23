@@ -11,7 +11,7 @@
 
 namespace mk
 {
-	class MK_OBJECT_EXPORT _I_ _S_ Colour : public Struct, public Typed<Colour>
+	class MK_OBJECT_EXPORT _I_ _S_ Colour : public Struct
 	{
 	public:
 		_C_ Colour(float r = 0.f, float g = 0.f, float b = 0.f, float a = 1.f);
@@ -31,6 +31,8 @@ namespace mk
 
 		float operator [](size_t i) const { return mFloats[i]; }
 		float& operator [](size_t i) { return mFloats[i]; }
+
+		static Type& cls() { static Type ty; return ty; }
 
 	protected:
 		float mFloats[4];
