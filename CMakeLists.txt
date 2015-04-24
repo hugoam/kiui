@@ -25,7 +25,7 @@ endif ()
 find_package(OpenGL)
 find_package(GLFW)
 
-add_definitions(-DKIUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}/data")
+add_definitions(-DKIUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}/data/")
 
 add_subdirectory(src)
 
