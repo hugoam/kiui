@@ -16,6 +16,7 @@
 namespace mk
 {
 	template <> Flow fromString<Flow>(const string& str) { if(str == "FLOW") return FLOW; else if(str == "MANUAL") return MANUAL; return FLOW; }
+	template <> Space fromString<Space>(const string& str) { if(str == "AUTO") return AUTO; if(str == "BLOCK") return BLOCK; else if(str == "WRAP") return WRAP; else if(str == "DIV") return DIV; else if(str == "SPACE") return SPACE; else if(str == "BOARD") return BOARD; return AUTO; }
 	template <> Clipping fromString<Clipping>(const string& str) { if(str == "NOCLIP") return NOCLIP; else if(str == "CLIP") return CLIP; return NOCLIP; }
 	template <> Opacity fromString<Opacity>(const string& str) { if(str == "OPAQUE") return OPAQUE; else if(str == "VOID") return VOID; return OPAQUE; }
 	template <> Dimension fromString<Dimension>(const string& str) { if(str == "DIM_X") return DIM_X; else if(str == "DIM_Y") return DIM_Y; return DIM_X; }
@@ -207,6 +208,8 @@ namespace mk
 			mStyle->layout().d_clipping = fromString<Clipping>(value); // NOCLIP | CLIP
 		else if(key == "opacity")
 			mStyle->layout().d_opacity = fromString<Opacity>(value); // OPAQUE | VOID
+		else if(key == "space")
+			mStyle->layout().d_space = fromString<Space>(value); // AUTO | BLOCK | WRAP | DIV | SPACE | BOARD
 		else if(key == "layout_dim")
 			mStyle->layout().d_layoutDim = fromString<Dimension>(value); // DIM_X | DIM_Y
 		else if(key == "need")

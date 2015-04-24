@@ -27,7 +27,7 @@ WindowBody :
     image_skin : mygui/windowbody_black, 4, 4, 6, 6
     padding : 10.0, 4.0, 10.0, 4.0
     
-WindowSizer :
+WindowFooter :
     background_colour : 0.25,0.25,0.25,1.0
     size : 0.0,8.0
     

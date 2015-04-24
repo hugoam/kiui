@@ -161,7 +161,10 @@ namespace mk
 		DockWindow::cls().setupName("DockWindow");
 		WindowHeader::cls().setupName("WindowHeader");
 		WindowBody::cls().setupName("WindowBody");
+		WindowFooter::cls().setupName("WindowFooter");
 		WindowSizer::cls().setupName("WindowSizer");
+		WindowSizerLeft::cls().setupName("WindowSizerLeft");
+		WindowSizerRight::cls().setupName("WindowSizerRight");
 
 		Table::cls().setupName("Table");
 		TableHead::cls().setupName("TableHead");
@@ -296,6 +299,8 @@ namespace mk
 
 		WindowHeader::cls().layout().d_opacity = OPAQUE;
 		WindowSizer::cls().layout().d_opacity = OPAQUE;
+		WindowFooter::cls().layout().d_layoutDim = DIM_X;
+
 		GridSheet::cls().layout().d_opacity = OPAQUE;
 
 		SpacerX::cls().layout().d_space = SPACE;
@@ -479,8 +484,8 @@ namespace mk
 		Window::cls().skin().mBackgroundColour = Colour::AlphaGrey;
 		DockWindow::cls().skin().mBackgroundColour = Colour::DarkGrey;
 		WindowHeader::cls().skin().mBackgroundColour = Colour::LightGrey;
-		WindowSizer::cls().skin().mBackgroundColour = Colour::LightGrey;
-		WindowSizer::cls().layout().d_size = DimFloat(0.f, 5.f);
+		WindowFooter::cls().skin().mBackgroundColour = Colour::LightGrey;
+		WindowFooter::cls().layout().d_size = DimFloat(0.f, 5.f);
 
 		Tab::cls().skin().mBackgroundColour = Colour::LightGrey;
 		TabberHead::cls().skin().mBackgroundColour = Colour::Black;

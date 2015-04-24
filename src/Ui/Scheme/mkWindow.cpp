@@ -75,10 +75,10 @@ namespace mk
 		return true;
 	}
 
-	WindowSizer::WindowSizer(Window& window)
-		: Sheet()
+	WindowSizer::WindowSizer(Window& window, bool left)
+		: Widget()
 		, mWindow(window)
-		, mResizeLeft(false)
+		, mResizeLeft(left)
 	{
 		mStyle = &cls();
 	}
@@ -87,10 +87,6 @@ namespace mk
 	{
 		UNUSED(yPos);
 		mWindow.frame().as<Layer>().moveToTop();
-		if(xPos - mWindow.frame().dabsolute(DIM_X) > mWindow.frame().dsize(DIM_X) * 0.5f)
-			mResizeLeft = false;
-		else
-			mResizeLeft = true;
 		return true;
 	}
 
@@ -114,6 +110,26 @@ namespace mk
 		UNUSED(xPos); UNUSED(yPos);
 		return true;
 	}
+
+	WindowSizerLeft::WindowSizerLeft(Window& window)
+		: WindowSizer(window, true)
+	{
+		mStyle = &cls();
+	}
+
+	WindowSizerRight::WindowSizerRight(Window& window)
+		: WindowSizer(window, false)
+	{
+		mStyle = &cls();
+	}
+
+	WindowFooter::WindowFooter(Window& window)
+		: Sheet()
+		, mFirstSizer(this->makeappend<WindowSizerLeft>(window))
+		, mSecondSizer(this->makeappend<WindowSizerRight>(window))
+	{
+		mStyle = &cls();
+	};
 
 	WindowBody::WindowBody()
 		: Sheet()
@@ -139,7 +155,7 @@ namespace mk
 		, mDock(dock)
 		, mHeader(this->makeappend<WindowHeader>(*this))
 		, mBody(this->makeappend<WindowBody>())
-		, mFooter(this->makeappend<WindowSizer>(*this))
+		, mFooter(this->makeappend<WindowFooter>(*this))
 	{
 		mStyle = dock ? &DockWindow::cls() : &Window::cls();
 	}

@@ -50,10 +50,10 @@ namespace mk
 		string mTooltip;
 	};
 
-	class MK_UI_EXPORT _I_ WindowSizer : public Sheet
+	class MK_UI_EXPORT _I_ WindowSizer : public Widget
 	{
 	public:
-		WindowSizer(Window& window);
+		WindowSizer(Window& window, bool left);
 
 		Style* hoverCursor() { return &ResizeCursorDiagRight::cls(); }
 
@@ -61,11 +61,39 @@ namespace mk
 		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
 		bool leftDragEnd(float xPos, float yPos);
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
 
 	protected:
 		Window& mWindow;
 		bool mResizeLeft;
+	};
+
+	class MK_UI_EXPORT _I_ WindowSizerLeft : public WindowSizer
+	{
+	public:
+		WindowSizerLeft(Window& window);
+
+		static StyleType& cls() { static StyleType ty(WindowSizer::cls()); return ty; }
+	};
+
+	class MK_UI_EXPORT _I_ WindowSizerRight : public WindowSizer
+	{
+	public:
+		WindowSizerRight(Window& window);
+
+		static StyleType& cls() { static StyleType ty(WindowSizer::cls()); return ty; }
+	};
+
+	class MK_UI_EXPORT _I_ WindowFooter : public Sheet
+	{
+	public:
+		WindowFooter(Window& window);
+
+		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+
+	protected:
+		WindowSizer& mFirstSizer;
+		WindowSizer& mSecondSizer;
 	};
 
 	class MK_UI_EXPORT _I_ WindowBody : public Sheet
@@ -133,7 +161,7 @@ namespace mk
 		Trigger mOnClose;
 		WindowHeader& mHeader;
 		WindowBody& mBody;
-		WindowSizer& mFooter;
+		WindowFooter& mFooter;
 
 		Docksection* mDock;
 	};

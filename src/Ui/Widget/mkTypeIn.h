@@ -186,12 +186,14 @@ namespace mk
 		Input(Lref& value, std::function<void(bool)> callback = nullptr)
 			: WTypedInput<bool>(value, callback)
 		{
+			this->mStyle = &cls();
 			this->makeappend<Checkbox>(this, mValue->get<bool>());
 		}
 
 		Input(bool value, std::function<void(bool)> callback = nullptr)
 			: WTypedInput<bool>(value, callback)
 		{
+			this->mStyle = &cls();
 			this->makeappend<Checkbox>(this, mValue->get<bool>());
 		}
 

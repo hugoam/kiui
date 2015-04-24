@@ -24,6 +24,19 @@ WindowHeader :
     image_skin : tbb/window_mover_overlay, 7, 7, 7, 7, 3
     align : LEFT, CENTER
     
+WindowFooter :
+    flow : MANUAL
+    space : BOARD
+    pivot : FORWARD, REVERSE
+    
+WindowSizerLeft :
+    opacity : VOID
+    
+WindowSizerRight :
+    image : tbb/resizer
+    align : RIGHT, RIGHT
+    space : SPACE
+    
 WindowBody :
     padding : 10.0,4.0,4.0,4.0
     
