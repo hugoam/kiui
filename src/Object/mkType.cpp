@@ -9,10 +9,16 @@
 
 namespace mk
 {
-	size_t Type::sTypeId = 0;
+	size_t Type::sTypeId = 1;
+
+	Type::Type(int)
+		: IdObject(0, *this)
+	{
+		mIndexer = &Indexed<Type>::indexer();
+	}
 
 	Type::Type()
-		: IdObject(++sTypeId, Type::cls())
+		: IdObject(sTypeId++, Type::cls())
 		, mName()
 		, mProto(nullptr)
 		, mBase(nullptr)
@@ -20,9 +26,6 @@ namespace mk
 		, mLibrary(nullptr)
 	{
 		Indexed<Type>::indexer().insert(*this, mId);
-
-		if(mId == 0)
-			mIndexer = &Indexed<Type>::indexer();
 	}
 
 	Type::Type(Type& base)

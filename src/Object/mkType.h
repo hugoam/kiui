@@ -50,12 +50,12 @@ namespace mk
 
 		bool upcast(Type* type);
 
-		static Type& cls() { static Type ty; return ty; }
+		static Type& cls() { static Type ty(0); return ty; }
 
 		static size_t maxId() { return sTypeId; }
 
 	private:
-		//Type();
+		Type(int);
 
 	protected:
 		string mName;
