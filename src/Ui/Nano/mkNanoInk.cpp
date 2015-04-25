@@ -97,14 +97,8 @@ namespace mk
 	{
 		//std::cerr << "ink :: draw " << mFrame.style()->name() << std::endl;
 
-		if(mFrame.style().name() == "SelectList")
-			int i = 0;
-
 		if(skin().mEmpty || !mVisible || mFrame.dclip(DIM_Y) == Frame::HIDDEN || mFrame.dclip(DIM_X) == Frame::HIDDEN)
 			return;
-
-		if(mFrame.style().name() == "SelectList")
-			int i = 0;
 
 		float left = mFrame.cleft();
 		float top = mFrame.ctop();

@@ -112,7 +112,7 @@ namespace mk
 			: IdStruct(index<InkStyle>(), cls())
 			, mEmpty(true), mBackgroundColour(Colour::Transparent), mBorderColour(Colour::Transparent), mTextColour(Colour::Transparent), mImageColour(Colour::Transparent)
 			, mTextFont("dejavu"), mTextSize(14.f), mTextWrap(false)
-			, mAlign(DimAlign(LEFT, CENTER)), mBorderWidth(0.f), mImage(""), mCornerRadius(), mWeakCorners(true)
+			, mAlign(DimAlign(LEFT, LEFT)), mBorderWidth(0.f), mImage(""), mCornerRadius(), mWeakCorners(true)
 		{}
 
 		InkStyle(const InkStyle& other)

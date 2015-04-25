@@ -17,7 +17,7 @@ TabHeader :
 WindowHeader :
     inherit_skin : Label
     image_skin : mygui/windowheader, 7, 10, 9, 17
-    image_skin : mygui/windowheader_var, 7, 10, 32, 17
+    image_skin : mygui/windowheader_darker, 7, 10, 32, 17
     size : 0.0, 30.0
     padding : 10.0, 4.0, 10.0, 4.0
     
@@ -42,10 +42,11 @@ TypeIn :
 
 Dropdown :
     inherit_skin : TypeIn
+    align : LEFT, CENTER
     
 DropdownToggle :
     inherit_skin : Clear
-    skin_margin : 4.0,4.0
+    skin_padding : 4.0,4.0,4.0,4.0
     image : mygui/arrow_down
     decline_image : hovered, pressed, activated
     

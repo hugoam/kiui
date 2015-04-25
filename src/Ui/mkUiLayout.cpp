@@ -264,6 +264,8 @@ namespace mk
 		Page::cls().layout().d_spacing = DimFloat(4.f, 6.f);
 		ExpandboxBody::cls().layout().d_spacing = DimFloat(4.f, 6.f);
 
+		Sequence::cls().skin().mAlign = DimAlign(LEFT, CENTER);
+
 		this->override(Scroller::cls(), SliderKnobX::cls(), ScrollerKnobX::cls());
 		this->override(Scroller::cls(), SliderKnobY::cls(), ScrollerKnobY::cls());
 	}
