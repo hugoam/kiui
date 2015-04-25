@@ -138,7 +138,7 @@ Typedown:
     inherit_skin : TypeIn
     
 Checkbox :
-    inherit_skin : Toggle
+    copy_skin : Toggle
     size : 16.0,16.0
     skin_padding : 0.0,0.0,0.0,0.0
     
@@ -168,7 +168,8 @@ SliderX :
     corner_radius : 10.0,10.0,10.0,10.0
         
 SliderKnobX :
-    background_colour : 0.0,0.0,0.0,0.0
+    inherit_skin : Clear
+    flow : MANUAL
     
 SliderDisplay :
     align : CENTER, CENTER

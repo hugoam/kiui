@@ -10,9 +10,6 @@ WhiteLabel :
     text_colour : 1.0,1.0,1.0,1.0
     skin_padding : 4.0,4.0,4.0,4.0
     
-Title :
-    inherit_skin : Label
-    
 SliderDisplay :
     inherit_skin : Label
     
@@ -187,8 +184,8 @@ SliderX :
     corner_radius : 10.0,10.0,10.0,10.0
         
 SliderKnobX :
-    size : 5.0,0.0
-    background_colour : 0.0,0.0,0.0,0.0
+    inherit_skin : Clear
+    flow : MANUAL
     
 SliderDisplay :
     align : CENTER, CENTER
