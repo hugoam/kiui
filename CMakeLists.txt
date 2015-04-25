@@ -25,7 +25,11 @@ endif ()
 find_package(OpenGL)
 find_package(GLFW)
 
-add_definitions(-DKIUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}/data/")
+if (WIN32)
+    add_definitions(-DKIUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}data/")
+else ()
+    add_definitions(-DKIUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}kiui/data/")
+endif ()
 
 add_subdirectory(src)
 
@@ -34,4 +38,8 @@ if (KIUI_BUILD_EXAMPLE)
     add_subdirectory(example)
 endif()
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION kiui/data)
+if (WIN32)
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION data)
+else ()
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/ DESTINATION kiui/data)
+endif ()
