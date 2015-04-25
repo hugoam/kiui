@@ -13,9 +13,12 @@ namespace mk
 
 	Type::Type(int)
 		: IdObject(0, *this)
-	{
-		mIndexer = &Indexed<Type>::indexer();
-	}
+		, mName("Type")
+		, mProto(nullptr)
+		, mBase(nullptr)
+		, mIndexer(nullptr)
+		, mLibrary(nullptr)
+	{}
 
 	Type::Type()
 		: IdObject(sTypeId++, Type::cls())
