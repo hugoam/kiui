@@ -28,7 +28,7 @@ namespace mk
 		void onInput(string value);
 		void update(Widget* choice);
 
-		static StyleType& cls() { static StyleType ty(WrapButton::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("DropdownHeader", WrapButton::cls()); return ty; }
 
 	protected:
 		Dropdown& mDropdown;
@@ -42,7 +42,7 @@ namespace mk
 
 		void click();
 
-		static StyleType& cls() { static StyleType ty(Button::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("DropdownToggle", Button::cls()); return ty; }
 
 	protected:
 		Dropdown& mDropdown;
@@ -53,25 +53,25 @@ namespace mk
 	public:
 		DropdownLabel(const string& label);
 
-		static StyleType& cls() { static StyleType ty(Label::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("DropdownLabel", Label::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT DropdownChoice : public WrapButton
 	{
 	public:
-		DropdownChoice(Widget* content, const Trigger& trigger);
+		DropdownChoice(unique_ptr<Widget> content, const Trigger& trigger);
 
-		static StyleType& cls() { static StyleType ty(WrapButton::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("DropdownChoice", WrapButton::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT DropdownBox : public FilterList
+	class MK_UI_EXPORT DropdownBox : public List
 	{
 	public:
 		DropdownBox(Dropdown& dropdown);
 
 		bool leftClick(float x, float y);
 		
-		static StyleType& cls() { static StyleType ty(FilterList::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("DropdownBox", List::cls()); return ty; }
 
 	protected:
 		Dropdown& mDropdown;
@@ -95,7 +95,7 @@ namespace mk
 
 		void selected(WrapButton& selected);
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Dropdown", Sheet::cls()); return ty; }
 
 	protected:
 		Trigger mOnSelected;
@@ -111,7 +111,7 @@ namespace mk
 	public:
 		Typedown(const Trigger& onSelected, StringVector choices = StringVector());
 
-		static StyleType& cls() { static StyleType ty(Dropdown::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Typedown", Dropdown::cls()); return ty; }
 	};
 }
 

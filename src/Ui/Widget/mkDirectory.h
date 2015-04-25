@@ -22,7 +22,7 @@ namespace mk
 
 		void trigger();
 
-		static StyleType& cls() { static StyleType ty(WrapButton::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Dir", WrapButton::cls()); return ty; }
 
 	protected:
 		string mName;
@@ -35,7 +35,7 @@ namespace mk
 
 		void trigger();
 
-		static StyleType& cls() { static StyleType ty(WrapButton::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("File", WrapButton::cls()); return ty; }
 
 	protected:
 		string mName;
@@ -52,7 +52,7 @@ namespace mk
 		void moveIn(const string& name);
 		void moveOut();
 
-		static StyleType& cls() { static StyleType ty(ScrollSheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Directory", ScrollSheet::cls()); return ty; }
 
 	protected:
 		string mPath;
@@ -63,7 +63,7 @@ namespace mk
 	public:
 		FileBrowser(const string& path);
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("FileBrowser", Sheet::cls()); return ty; }
 
 	protected:
 		string mPath;
@@ -75,7 +75,7 @@ namespace mk
 	public:
 		FileNode(const string& name);
 
-		static StyleType& cls() { static StyleType ty(TreeNode::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("FileNode", TreeNode::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ DirectoryNode : public TreeNode
@@ -86,7 +86,7 @@ namespace mk
 		void expand();
 		void update();
 
-		static StyleType& cls() { static StyleType ty(TreeNode::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("DirectoryNode", TreeNode::cls()); return ty; }
 
 	protected:
 		string mPath;

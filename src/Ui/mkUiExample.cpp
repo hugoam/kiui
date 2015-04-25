@@ -13,6 +13,86 @@
 
 namespace mk
 {
+	const char* girl_names[] =
+	{
+		"Maja", "Alice", "Julia", "Linnéa", "Wilma", "Ella", "Elsa", "Emma", "Alva", "Olivia", "Molly", "Ebba", "Klara", "Nellie", "Agnes",
+		"Isabelle", "Ida", "Elin", "Ellen", "Moa", "Emilia", "Nova", "Alma", "Saga", "Amanda", "Isabella", "Lilly", "Alicia", "Astrid",
+		"Matilda", "Tuva", "Tilde", "Stella", "Felicia", "Elvira", "Tyra", "Hanna", "Sara", "Vera", "Thea", "Freja", "Lova", "Selma",
+		"Meja", "Signe", "Ester", "Lovisa", "Ellie", "Lea", "Tilda", "Tindra", "Sofia", "Nora", "Nathalie", "Leia", "Filippa", "Siri",
+		"Emelie", "Inez", "Edith", "Stina", "Liv", "Lisa", "Linn", "Tove", "Emmy", "Livia", "Jasmine", "Evelina", "Cornelia", "Märta",
+		"Svea", "Ingrid", "My", "Rebecca", "Joline", "Mira", "Ronja", "Hilda", "Melissa", "Anna", "Frida", "Maria", "Iris", "Josefine",
+		"Elise", "Elina", "Greta", "Vilda", "Minna", "Lina", "Hedda", "Nicole", "Kajsa", "Majken", "Sofie", "Annie", "Juni", "Novalie", "Hedvig", 0
+	};
+
+	const char* boy_names[] =
+	{
+		"Oscar", "William", "Lucas", "Elias", "Alexander", "Hugo", "Oliver", "Theo", "Liam", "Leo", "Viktor", "Erik", "Emil",
+		"Isak", "Axel", "Filip", "Anton", "Gustav", "Edvin", "Vincent", "Arvid", "Albin", "Ludvig", "Melvin", "Noah", "Charlie", "Max",
+		"Elliot", "Viggo", "Alvin", "Alfred", "Theodor", "Adam", "Olle", "Wilmer", "Benjamin", "Simon", "Nils", "Noel", "Jacob", "Leon",
+		"Rasmus", "Kevin", "Linus", "Casper", "Gabriel", "Jonathan", "Milo", "Melker", "Felix", "Love", "Ville", "Sebastian", "Sixten",
+		"Carl", "Malte", "Neo", "David", "Joel", "Adrian", "Valter", "Josef", "Jack", "Hampus", "Samuel", "Mohammed", "Alex", "Tim",
+		"Daniel", "Vilgot", "Wilhelm", "Harry", "Milton", "Maximilian", "Robin", "Sigge", "Måns", "Eddie", "Elton", "Vidar", "Hjalmar",
+		"Loke", "Elis", "August", "John", "Hannes", "Sam", "Frank", "Svante", "Marcus", "Mio", "Otto", "Ali", "Johannes", "Fabian",
+		"Ebbe", "Aron", "Julian", "Elvin", "Ivar", 0
+	};
+
+	Sheet& createUiTestCustomList(Sheet& parent)
+	{
+		Window& window = parent.emplace<Window>("Customized list items");
+		Page& page = window.body().emplace<Page>("List and filter");
+		SelectList& list = page.emplace<SelectList>();
+
+		class CustomElement : public Sequence
+		{
+		public:
+			CustomElement(const string& name)
+				: Sequence()
+				, mLabel(this->build(name))
+			{}
+
+			Label& build(const string& name)
+			{
+				this->emplace<Checkbox>(nullptr, false);
+				this->emplace<Icon>("tbb/icon48");
+				Sheet& sheet = this->emplace<Sheet>();
+				Label& label = sheet.emplace<Label>(name);
+				sheet.emplace<Label>("Male");
+				this->emplace<CloseButton>([this](Button&){ this->parent()->parent()->vrelease(*this); });
+				return label;
+			}
+
+			const string& contentlabel() { return mLabel.label(); }
+
+		protected:
+			Label& mLabel;
+		};
+
+		for(int i = 0; boy_names[i]; i++)
+			list.emplace<CustomElement>(boy_names[i]);
+
+		FilterInput& input = page.emplace<FilterInput>(list);
+
+		window.frame().setSize(250.f, 300.f);
+		return window;
+	}
+
+	Sheet& createUiTestFilteredList(Sheet& parent)
+	{
+		Window& window = parent.emplace<Window>("List and filter");
+		Page& page = window.body().emplace<Page>("List and filter");
+		SelectList& list = page.emplace<SelectList>();
+
+		for(int i = 0; boy_names[i]; i++)
+			list.emplace<Label>(boy_names[i]);
+		for(int i = 0; girl_names[i]; i++)
+			list.emplace<Label>(boy_names[i]);
+
+		FilterInput& input = page.emplace<FilterInput>(list);
+
+		window.frame().setSize(130.f, 300.f);
+		return window;
+	}
+
 	Sheet& createUiTestTextEditor(Sheet& parent)
 	{
 		Window& window = parent.emplace<Window>("Text Editor");
@@ -527,12 +607,18 @@ namespace mk
 	void pickUiSample(Sheet& sheet, Widget& selected)
 	{
 		const string name = selected.label();
-		sheet.clear();
+		
+		if(sheet.stripe().sequence().size() > 0)
+			sheet.clear();
 
 		if(name == "Dockspace")
 			createUiTestDockspace(sheet);
 		else if(name == "Window")
 			createUiTestWindow(sheet);
+		else if(name == "Filtered List")
+			createUiTestFilteredList(sheet);
+		else if(name == "Custom List")
+			createUiTestCustomList(sheet);
 		else if(name == "Text Editor")
 			createUiTestTextEditor(sheet);
 		else if(name == "Tabs")
@@ -556,7 +642,7 @@ namespace mk
 		Header& demoheader = root.sheet().emplace<Header>();
 		Board& demobody = root.sheet().emplace<Board>();
 		demoheader.emplace<Label>("Pick a demo sample : ");
-		demoheader.emplace<Dropdown>(std::bind(&pickUiSample, std::ref(demobody), std::placeholders::_1), StringVector({ "Dockspace", "Window", "Text Editor", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" }));
+		demoheader.emplace<Dropdown>(std::bind(&pickUiSample, std::ref(demobody), std::placeholders::_1), StringVector({ "Dockspace", "Window", "Text Editor", "Filtered List", "Custom List", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" }));
 		demoheader.emplace<Label>("Switch theme : ");
 		demoheader.emplace<Dropdown>(std::bind(&switchUiTheme, std::ref(demobody), std::placeholders::_1), StringVector({ "Blendish", "Blendish Dark", "TurboBadger", "MyGui", "Photoshop", "Default" }));
 	}

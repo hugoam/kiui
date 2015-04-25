@@ -39,8 +39,6 @@ namespace mk
 		void prepare();
 		void reset();
 
-		void setupTypes();
-
 		void defaultLayout();
 		void defaultSkins();
 
@@ -60,7 +58,7 @@ namespace mk
 	class MK_UI_EXPORT EmptyStyle : public Object
 	{
 	public:
-		static StyleType& cls() { static StyleType ty; return ty; }
+		static StyleType& cls() { static StyleType ty("Empty"); return ty; }
 	};
 }
 

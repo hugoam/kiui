@@ -28,6 +28,7 @@ namespace mk
 		Type();
 		Type(Type& base);
 		Type(const string& name);
+		Type(const string& name, Type& base);
 		~Type();
 
 		_A_ Id id() const { return IdObject::id(); }

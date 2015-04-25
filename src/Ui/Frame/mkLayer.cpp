@@ -62,8 +62,11 @@ namespace mk
 	void Layer::unbind()
 	{
 		Frame::unbind();
-		d_parentLayer->layers().erase(std::remove(d_parentLayer->layers().begin(), d_parentLayer->layers().end(), this), d_parentLayer->layers().end());
-		d_parentLayer = nullptr;
+		if(d_parentLayer)
+		{
+			d_parentLayer->layers().erase(std::remove(d_parentLayer->layers().begin(), d_parentLayer->layers().end(), this), d_parentLayer->layers().end());
+			d_parentLayer = nullptr;
+		}
 	}
 
 	void Layer::nextFrame(size_t tick, size_t delta)
@@ -90,7 +93,7 @@ namespace mk
 	{
 		Frame* result = nullptr;
 		for(Layer* layer : reverse_adapt(d_layers))
-			if(layer->visible())
+			if(layer->visible() && layer->frameType() != LAYER3D)
 			{
 				result = layer->pinpoint(x, y, opaque);
 				if(result)
@@ -100,4 +103,8 @@ namespace mk
 		result = Stripe::pinpoint(x, y, opaque);
 		return result;
 	}
+
+	Layer3D::Layer3D(Widget& widget, size_t zorder, InkTarget* target)
+		: Layer(widget, zorder, target)
+	{}
 }

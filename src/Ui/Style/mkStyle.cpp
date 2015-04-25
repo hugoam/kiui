@@ -13,13 +13,13 @@
 
 namespace mk
 {
-	StyleType::StyleType()
-		: Type()
+	StyleType::StyleType(const string& name)
+		: Type(name)
 		, Style(*this, nullptr)
 	{}
 
-	StyleType::StyleType(StyleType& base)
-		: Type(*base.styleType())
+	StyleType::StyleType(const string& name, StyleType& base)
+		: Type(name, *base.styleType())
 		, Style(*this, &base)
 	{}
 

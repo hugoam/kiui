@@ -92,10 +92,16 @@ namespace mk
 		return unique;
 	}
 
-	void Widget::destroy()
+	void Widget::remove()
 	{
 		this->cleanup();
 		mParent->as<Sheet>().vrelease(*this);
+	}
+
+	void Widget::destroy()
+	{
+		this->cleanup();
+		mParent->as<Sheet>().release(*this);
 	}
 
 	void Widget::detach()

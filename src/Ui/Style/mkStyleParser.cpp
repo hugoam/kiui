@@ -266,10 +266,14 @@ namespace mk
 		else if(key == "image_skin")
 			mSkin->mImageSkin = ImageSkin(values[0],	fromString<int>(values[1]), fromString<int>(values[2]),
 														fromString<int>(values[3]), fromString<int>(values[4]),
-														values.size() > 5 ? fromString<int>(values[5]) : 0); // : image.png
+														values.size() > 5 ? fromString<int>(values[5]) : 0,
+														values.size() > 6 ? fromString<Dimension>(values[6]) : DIM_0); // : image.png
 		else if(key == "decline_image")
 			this->declineImage(value);
 		else if(key == "decline_image_skin")
 			this->declineImageSkin(value);
+
+		if(mStyle->name() == "Checkbox" && key == "image")
+			int i = 0;
 	}
 }

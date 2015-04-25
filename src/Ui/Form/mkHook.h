@@ -22,7 +22,7 @@ namespace mk
 		Object* object() { return mObject; }
 		Type* objectType() { return mObjectType; }
 
-		static StyleType& cls() { static StyleType ty; return ty; }
+		static StyleType& cls() { static StyleType ty("Hook"); return ty; }
 
 	protected:
 		Object* mObject;

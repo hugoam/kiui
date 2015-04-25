@@ -19,7 +19,7 @@ namespace mk
 		void on();
 		void off();
 
-		static StyleType& cls() { static StyleType ty(Toggle::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Checkbox", Toggle::cls()); return ty; }
 
 	protected:
 		WValue* mInput;

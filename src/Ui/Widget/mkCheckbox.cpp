@@ -30,13 +30,19 @@ namespace mk
 
 	void Checkbox::on()
 	{
-		mInput->value()->set<bool>(mOn);
-		mInput->updateValue();
+		if(mInput)
+		{
+			mInput->value()->set<bool>(mOn);
+			mInput->updateValue();
+		}
 	}
 
 	void Checkbox::off()
 	{
-		mInput->value()->set<bool>(mOn);
-		mInput->updateValue();
+		if(mInput)
+		{
+			mInput->value()->set<bool>(mOn);
+			mInput->updateValue();
+		}
 	}
 }

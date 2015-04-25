@@ -184,7 +184,7 @@ namespace mk
 				parent = parent->parent();
 			}
 
-			printf("Stripe :: relayout %s name %s size %f , %f\n", d_widget.style()->name().c_str(), d_widget.name().c_str(), dsize(DIM_X), dsize(DIM_Y));
+			printf("Stripe :: relayout %s size %f , %f\n", d_widget.style().name().c_str(), dsize(DIM_X), dsize(DIM_Y));
 #endif
 	}
 
@@ -257,6 +257,8 @@ namespace mk
 		else if(!flow())
 			d_space = BLOCK;
 		else if(d_length == d_parent->d_length && d_length == DIM_X) // @idea : make this distinction depend on a space Scarcity property (which by default would be Scarce for Y containers and Ample for X containers)
+			d_space = SPACE;
+		else if(d_length != d_parent->d_length && d_parent->d_length == DIM_X)
 			d_space = SPACE;
 		else
 			d_space = DIV;
@@ -388,7 +390,7 @@ namespace mk
 
 		Frame* target;
 		for(Frame* frame : reverse_adapt(d_contents))
-			if(frame->visible())
+			if(frame->visible() && frame->frameType() != LAYER3D)
 			{
 				target = frame->pinpoint(x, y, opaque);
 				if(target)

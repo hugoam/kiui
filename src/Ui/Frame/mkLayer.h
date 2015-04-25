@@ -39,6 +39,14 @@ namespace mk
 		Layer* d_parentLayer;
 		unique_ptr<InkLayer> d_inkLayer;
 	};
+
+	class MK_UI_EXPORT Layer3D : public Layer
+	{
+	public:
+		Layer3D(Widget& widget, size_t zorder = 0, InkTarget* target = nullptr);
+
+		FrameType frameType() { return LAYER3D; }
+	};
 }
 
 

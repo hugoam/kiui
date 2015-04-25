@@ -27,7 +27,7 @@ namespace mk
 		const string& name() { return mName; }
 		const string& dockid() { return mDockId; }
 
-		static StyleType& cls() { static StyleType ty(ScrollSheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Page", ScrollSheet::cls()); return ty; }
 
 	protected:
 		string mName;
@@ -39,7 +39,7 @@ namespace mk
 	public:
 		Dialog();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Dialog", Sheet::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ Header : public Sheet
@@ -47,7 +47,7 @@ namespace mk
 	public:
 		Header();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Header", Sheet::cls()); return ty; }
 	};
 }
 

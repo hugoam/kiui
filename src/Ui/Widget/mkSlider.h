@@ -28,7 +28,7 @@ namespace mk
 		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
 		bool leftDragEnd(float xPos, float yPos);
 
-		static StyleType& cls() { static StyleType ty(Button::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("SliderKnob", Button::cls()); return ty; }
 
 	protected:
 		Dimension mDim;
@@ -41,7 +41,7 @@ namespace mk
 	public:
 		SpacerX();
 
-		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("SpacerX", Widget::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT SpacerY : public Widget
@@ -49,7 +49,7 @@ namespace mk
 	public:
 		SpacerY();
 
-		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("SpacerY", Widget::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT SliderKnobX : public SliderKnob
@@ -57,7 +57,7 @@ namespace mk
 	public:
 		SliderKnobX();
 
-		static StyleType& cls() { static StyleType ty(SliderKnob::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("SliderKnobX", SliderKnob::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT SliderKnobY : public SliderKnob
@@ -65,7 +65,7 @@ namespace mk
 	public:
 		SliderKnobY();
 
-		static StyleType& cls() { static StyleType ty(SliderKnob::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("SliderKnobY", SliderKnob::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT Slider : public Sheet
@@ -89,7 +89,7 @@ namespace mk
 
 		virtual void sliderStep(float value, bool ended) { UNUSED(value); UNUSED(ended); mOnUpdated(*this); }
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Slider", Sheet::cls()); return ty; }
 
 	protected:
 		Dimension mDim;
@@ -114,7 +114,7 @@ namespace mk
 	public:
 		SliderX(const Trigger& onUpdated = Trigger());
 
-		static StyleType& cls() { static StyleType ty(Slider::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("SliderX", Slider::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT SliderY : public Slider
@@ -122,7 +122,7 @@ namespace mk
 	public:
 		SliderY(const Trigger& onUpdated = Trigger());
 
-		static StyleType& cls() { static StyleType ty(Slider::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("SliderY", Slider::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT SliderDisplay : public Label
@@ -130,7 +130,7 @@ namespace mk
 	public:
 		SliderDisplay(const string& label);
 
-		static StyleType& cls() { static StyleType ty(Label::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("SliderDisplay", Label::cls()); return ty; }
 	};
 
 	template <class T>
@@ -175,7 +175,7 @@ namespace mk
 
 		void notifyUpdate() { ++this->mUpdate; if(this->mOnUpdate) this->mOnUpdate(mStat.value()); }
 
-		static StyleType& cls() { static StyleType ty(WValue::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("StatSlider<" + typecls<T>().name() + ">", WValue::cls()); return ty; }
 
 	protected:
 		AutoStat<T>& mStat;

@@ -28,7 +28,7 @@ namespace mk
 		StyleAttr(const T& v) : val(v), set(false) {}
 		StyleAttr(const StyleAttr& other) : val(other.val), set(other.set) {}
 
-		operator T() const { return val; }
+		operator const T&() const { return val; }
 		StyleAttr& operator=(const T& v) { val = v; set = true; return *this; }
 		StyleAttr& operator=(const StyleAttr& other) { val = other.val; set = other.set; return *this; }
 
@@ -72,18 +72,18 @@ namespace mk
 			d_weights.copy(other.d_weights.val, inherit);
 		}
 
-		_A_ Flow flow() const { return d_flow; }
-		_A_ Clipping clipping() const { return d_clipping; }
-		_A_ Opacity opacity() const { return d_opacity; }
-		_A_ Space div() const { return d_space; }
-		_A_ Dimension layoutDim() const { return d_layoutDim; }
+		_A_ Flow flow() const { return d_flow.val; }
+		_A_ Clipping clipping() const { return d_clipping.val; }
+		_A_ Opacity opacity() const { return d_opacity.val; }
+		_A_ Space div() const { return d_space.val; }
+		_A_ Dimension layoutDim() const { return d_layoutDim.val; }
 		_A_ DimFloat& span() { return d_span.val; }
 		_A_ DimFloat& size() { return d_size.val; }
 		_A_ BoxFloat& padding() { return d_padding.val; }
 		_A_ DimFloat& margin() { return d_margin.val; }
 		_A_ DimFloat& spacing() { return d_spacing.val; }
 		_A_ DimPivot& pivot() { return d_pivot.val; }
-		_A_ Weight weight() const { return d_weight; }
+		_A_ Weight weight() const { return d_weight.val; }
 		_A_ const std::vector<float>& weights() { return d_weights.val; }
 
 		StyleAttr<Flow> d_flow;
@@ -112,7 +112,7 @@ namespace mk
 			: IdStruct(index<InkStyle>(), cls())
 			, mEmpty(true), mBackgroundColour(Colour::Transparent), mBorderColour(Colour::Transparent), mTextColour(Colour::Transparent), mImageColour(Colour::Transparent)
 			, mTextFont("dejavu"), mTextSize(14.f), mTextWrap(false)
-			, mAlign(DimAlign(LEFT, LEFT)), mBorderWidth(0.f), mImage(""), mCornerRadius(), mWeakCorners(true)
+			, mAlign(DimAlign(LEFT, CENTER)), mBorderWidth(0.f), mImage(""), mCornerRadius(), mWeakCorners(true)
 		{}
 
 		InkStyle(const InkStyle& other)
@@ -248,8 +248,8 @@ namespace mk
 	class MK_UI_EXPORT StyleType : public Type, public Style
 	{
 	public:
-		StyleType();
-		StyleType(StyleType& base);
+		StyleType(const string& name);
+		StyleType(const string& name, StyleType& base);
 
 		using Type::name;
 	};

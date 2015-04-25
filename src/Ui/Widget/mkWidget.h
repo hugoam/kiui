@@ -75,6 +75,7 @@ namespace mk
 		unique_ptr<Widget> unbind();
 		unique_ptr<Widget> extract();
 
+		void remove();
 		void destroy();
 		void detach();
 
@@ -145,7 +146,7 @@ namespace mk
 
 		typedef std::function<void(Widget&)> Trigger;
 
-		static StyleType& cls() { static StyleType ty; return ty; }
+		static StyleType& cls() { static StyleType ty("Widget"); return ty; }
 
 	protected:
 		Sheet* mParent;
@@ -163,7 +164,7 @@ namespace mk
 	public:
 		Control();
 
-		static StyleType& cls() { static StyleType ty; return ty; }
+		static StyleType& cls() { static StyleType ty("Control"); return ty; }
 	};
 }
 

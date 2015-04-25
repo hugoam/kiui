@@ -19,7 +19,7 @@ namespace mk
 	public:
 		RadioChoice(Widget* content, const Trigger& trigger);
 
-		static StyleType& cls() { static StyleType ty(WrapButton::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("RadioChoice", WrapButton::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT RadioSwitch : public Sheet
@@ -34,7 +34,7 @@ namespace mk
 
 		void activated(WrapButton& button);
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("RadioSwitch", Sheet::cls()); return ty; }
 
 	protected:
 		Trigger mOnSelected;

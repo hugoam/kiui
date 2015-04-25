@@ -28,7 +28,8 @@ namespace mk
 	enum _I_ Dimension : unsigned int
 	{
 		DIM_X = 0,
-		DIM_Y = 1
+		DIM_Y = 1,
+		DIM_0 = 2
 	};
 
 	enum _I_ Pivot : unsigned int

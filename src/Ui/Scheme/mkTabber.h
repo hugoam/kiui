@@ -17,7 +17,7 @@ namespace mk
 	public:
 		TabHeader(const string& label, const Trigger& trigger);
 
-		static StyleType& cls() { static StyleType ty(Button::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("TabHeader", Button::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ Tab : public Sheet
@@ -29,7 +29,7 @@ namespace mk
 
 		Button& header() { return mHeader; }
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Tab", Sheet::cls()); return ty; }
 
 	protected:
 		Button& mHeader;
@@ -41,7 +41,7 @@ namespace mk
 	public:
 		TabberHead();
 
-		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("TabberHead", Sequence::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ TabberBody : public Sheet
@@ -49,7 +49,7 @@ namespace mk
 	public:
 		TabberBody();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("TabberBody", Sheet::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT Tabber : public Sheet
@@ -68,7 +68,7 @@ namespace mk
 		void showTab(Tab& tab);
 		void showTab(size_t index);
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Tabber", Sheet::cls()); return ty; }
 
 	protected:
 		TabberHead& mHeaders;

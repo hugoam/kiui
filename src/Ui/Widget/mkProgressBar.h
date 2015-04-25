@@ -18,7 +18,7 @@ namespace mk
 	public:
 		FillerX();
 
-		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("FillerX", Widget::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT FillerY : public Widget
@@ -26,7 +26,7 @@ namespace mk
 	public:
 		FillerY();
 
-		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("FillerY", Widget::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT ProgressBar : public Sheet
@@ -37,7 +37,7 @@ namespace mk
 		float percentage() { return mPercentage; }
 		void setPercentage(float percentage);
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ProgressBar", Sheet::cls()); return ty; }
 
 	protected:
 		Dimension mDim;
@@ -54,7 +54,7 @@ namespace mk
 	public:
 		ProgressBarX();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ProgressBarX", Sheet::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT ProgressBarY : public ProgressBar
@@ -62,7 +62,7 @@ namespace mk
 	public:
 		ProgressBarY();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ProgressBarY", Sheet::cls()); return ty; }
 	};
 }
 

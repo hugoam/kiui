@@ -20,7 +20,7 @@ namespace mk
 	public:
 		TreeNodeHeader(const Trigger& trigger);
 
-		static StyleType& cls() { static StyleType ty(WrapButton::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("TreeNodeHeader", WrapButton::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ TreeNodeBody : public Sheet
@@ -28,7 +28,7 @@ namespace mk
 	public:
 		TreeNodeBody();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("TreeNodeBody", Sheet::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ TreeNodeToggle : public Toggle
@@ -36,13 +36,13 @@ namespace mk
 	public:
 		TreeNodeToggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on);
 
-		static StyleType& cls() { static StyleType ty(Toggle::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("TreeNodeToggle", Toggle::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT EmptyTreeNodeToggle : public Object
 	{
 	public:
-		static StyleType& cls() { static StyleType ty(TreeNodeToggle::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("EmptyTreeNodeToggle", TreeNodeToggle::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ TreeNode : public Expandbox
@@ -59,7 +59,7 @@ namespace mk
 
 		void selected();
 
-		static StyleType& cls() { static StyleType ty(Expandbox::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("TreeNode", Expandbox::cls()); return ty; }
 
 	protected:
 		string mImage;
@@ -127,7 +127,7 @@ namespace mk
 		void addNode(TreeNode& node);
 		void removeNode(TreeNode& node);
 
-		static StyleType& cls() { static StyleType ty(ScrollSheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Tree", ScrollSheet::cls()); return ty; }
 
 	protected:
 		TreeNode* mRootNode;

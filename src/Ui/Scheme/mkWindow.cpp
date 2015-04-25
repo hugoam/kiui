@@ -243,7 +243,7 @@ namespace mk
 	{
 		if(mOnClose)
 			mOnClose(*this);
-		this->destroy();
+		this->remove();
 	}
 
 	Widget& Window::vappend(unique_ptr<Widget> widget)

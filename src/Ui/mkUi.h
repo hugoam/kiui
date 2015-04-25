@@ -14,6 +14,8 @@ namespace mk
 {
 	MK_UI_EXPORT void switchUiTheme(Sheet& sheet, Widget& selected);
 	MK_UI_EXPORT void pickUiSample(Sheet& sheet, Widget& selected);
+	MK_UI_EXPORT Sheet& createUiTestCustomList(Sheet& parent);
+	MK_UI_EXPORT Sheet& createUiTestFilteredList(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestTextEditor(Sheet& parent);
 	MK_UI_EXPORT Dockspace& createUiTestDockspace(Sheet& parent);
 	MK_UI_EXPORT Tabber& createUiTestTabs(Sheet& parent);

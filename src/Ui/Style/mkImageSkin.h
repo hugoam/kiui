@@ -39,13 +39,14 @@ namespace mk
 		};
 
 	public:
-		ImageSkin(string image, int left, int top, int right, int bottom, int margin = 0)
+		ImageSkin(string image, int left, int top, int right, int bottom, int margin = 0, Dimension stretch = DIM_0)
 			: d_image(image)
 			, d_top(top), d_right(right), d_bottom(bottom), d_left(left)
 			, d_margin(margin)
 			, d_prepared(false)
 			, d_images(9)
 			, d_coords(9)
+			, d_stretch(stretch)
 		{
 			this->setImage(image);
 		}
@@ -107,6 +108,7 @@ namespace mk
 		_A_ _M_ int d_bottom;
 		_A_ _M_ int d_left;
 		_A_ _M_ int d_margin;
+		_A_ _M_ Dimension d_stretch;
 
 		int d_width;
 		int d_height;

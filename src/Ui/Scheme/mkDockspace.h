@@ -33,7 +33,7 @@ namespace mk
 		Docksection& docktarget(Dimension dim, bool after);
 		Docksection& docktarget(float x, float y);
 
-		static StyleType& cls() { static StyleType ty(Tabber::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Docksection", Tabber::cls()); return ty; }
 
 	protected:
 		Dockline* mDockline;
@@ -60,7 +60,7 @@ namespace mk
 		Dockline& findLine(std::vector<string>& ids);
 		Docksection& findOrCreateSection(const string& dockid);
 
-		static StyleType& cls() { static StyleType ty(GridSheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Dockline", GridSheet::cls()); return ty; }
 
 	protected:
 		Dockspace& mDockspace;
@@ -73,7 +73,7 @@ namespace mk
 	public:
 		DocklineX(Dockspace& dockspace, Dockline* dockline, size_t index);
 
-		static StyleType& cls() { static StyleType ty(Dockline::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("DocklineX", Dockline::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ DocklineY : public Dockline
@@ -81,7 +81,7 @@ namespace mk
 	public:
 		DocklineY(Dockspace& dockspace, Dockline* dockline, size_t index);
 
-		static StyleType& cls() { static StyleType ty(Dockline::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("DocklineY", Dockline::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ MasterDockline : public DocklineX
@@ -89,7 +89,7 @@ namespace mk
 	public:
 		MasterDockline(Dockspace& dockspace);
 
-		static StyleType& cls() { static StyleType ty(DocklineX::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("MasterDockline", DocklineX::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ Dockspace : public Sheet
@@ -104,7 +104,7 @@ namespace mk
 		Widget& vappend(unique_ptr<Widget> widget);
 		//unique_ptr<Widget> vrelease(Widget& widget);
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Dockspace", Sheet::cls()); return ty; }
 
 	protected:
 		MasterDockline& mMainLine;

@@ -99,6 +99,12 @@ namespace mk
 		mStyle = &cls();
 	}
 
+	WrapButton::WrapButton(unique_ptr<Widget> content, const Trigger& trigger)
+		: WrapButton(content.get(), trigger)
+	{
+		this->append(std::move(content));
+	}
+
 	Widget* WrapButton::content()
 	{
 		return mContents[0].get();

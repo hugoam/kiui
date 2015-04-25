@@ -45,9 +45,7 @@ namespace mk
 
 	Widget& Dropdown::vappend(std::unique_ptr<Widget> widget)
 	{
-		WrapButton& button = mDropbox.emplace<DropdownChoice>(widget.get(), std::bind(&Dropdown::selected, this, _1));
-		button.append(std::move(widget));
-
+		WrapButton& button = mDropbox.emplace<DropdownChoice>(std::move(widget), std::bind(&Dropdown::selected, this, _1));
 		if(mSelected == nullptr)
 			this->selected(button);
 
@@ -164,15 +162,15 @@ namespace mk
 		: Label(label)
 	{}
 
-	DropdownChoice::DropdownChoice(Widget* content, const Trigger& trigger)
-		: WrapButton(content, trigger)
+	DropdownChoice::DropdownChoice(unique_ptr<Widget> content, const Trigger& trigger)
+		: WrapButton(std::move(content), trigger)
 	{
 		mStyle = &cls();
 		//content->setStyle(DropdownLabel::cls());
 	}
 
 	DropdownBox::DropdownBox(Dropdown& dropdown)
-		: FilterList(LAYER)
+		: List(LAYER)
 		, mDropdown(dropdown)
 	{
 		mStyle = &cls();

@@ -17,7 +17,7 @@ namespace mk
 		ContextMenu();
 		~ContextMenu();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ContextMenu", Sheet::cls()); return ty; }
 	};
 }
 

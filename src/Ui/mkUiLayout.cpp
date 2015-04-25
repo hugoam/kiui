@@ -21,8 +21,6 @@ namespace mk
 
 	void Styler::prepare()
 	{
-		this->setupTypes();
-
 		mOverrides.resize(1000);
 
 		for(Object* object : Style::indexer().objects())
@@ -33,7 +31,7 @@ namespace mk
 			if(object)
 			{
 				InkStyle& ink = object->as<InkStyle>();
-				if(ink.backgroundColour().a() > 0.f || ink.textColour().a() > 0.f || ink.borderColour().a() > 0.f || !ink.image().empty())
+				if(ink.backgroundColour().a() > 0.f || ink.textColour().a() > 0.f || ink.borderColour().a() > 0.f || !ink.image().empty() || !ink.imageSkin().null())
 					ink.mEmpty = false;
 			}
 	}
@@ -90,111 +88,6 @@ namespace mk
 		return nullptr;
 	}
 
-	void Styler::setupTypes()
-	{
-		RootSheet::cls().setupName("RootSheet");
-
-		ScrollSheet::cls().setupName("ScrollSheet");
-		Page::cls().setupName("Page");
-
-		Cursor::cls().setupName("Cursor");
-
-		SliderKnob::cls().setupName("SliderKnob");
-		CloseButton::cls().setupName("CloseButton");
-
-		DropdownToggle::cls().setupName("DropdownToggle");
-
-		Label::cls().setupName("Label");
-		Title::cls().setupName("Title");
-		Icon::cls().setupName("Icon");
-		SliderDisplay::cls().setupName("SliderDisplay");
-
-		Button::cls().setupName("Button");
-		ImgButton::cls().setupName("ImgButton");
-		TabHeader::cls().setupName("TabHeader");
-		ColumnHeader::cls().setupName("ColumnHeader");
-		DropdownChoice::cls().setupName("DropdownChoice");
-		RadioChoice::cls().setupName("RadioChoice");
-
-		SpacerX::cls().setupName("SpacerX");
-		SpacerY::cls().setupName("SpacerY");
-
-		Dir::cls().setupName("Dir");
-		File::cls().setupName("File");
-		Directory::cls().setupName("Directory");
-
-		ProgressBarX::cls().setupName("ProgressBarX");
-		FillerX::cls().setupName("FillerX");
-		FillerY::cls().setupName("FillerY");
-
-		Slider::cls().setupName("Slider");
-		SliderX::cls().setupName("SliderX");
-		SliderY::cls().setupName("SliderY");
-		SliderKnobX::cls().setupName("SliderKnobX");
-		SliderKnobY::cls().setupName("SliderKnobY");
-
-		ProgressBarX::cls().setupName("ProgressBarX");
-		ProgressBarY::cls().setupName("ProgressBarY");
-
-		Scrollbar::cls().setupName("Scrollbar");
-		Scroller::cls().setupName("Scroller");
-		ScrollUp::cls().setupName("ScrollUp");
-		ScrollDown::cls().setupName("ScrollDown");
-		ScrollerKnobX::cls().setupName("ScrollerKnobX");
-		ScrollerKnobY::cls().setupName("ScrollerKnobY");
-
-		DocklineX::cls().setupName("DocklineX");
-		DocklineY::cls().setupName("DocklineY");
-
-		Tooltip::cls().setupName("Tooltip");
-		Caret::cls().setupName("Caret");
-
-		TypeIn::cls().setupName("TypeIn");
-		Checkbox::cls().setupName("Checkbox");
-
-		Dialog::cls().setupName("Dialog");
-		Header::cls().setupName("Header");
-
-		List::cls().setupName("List");
-
-		Window::cls().setupName("Window");
-		DockWindow::cls().setupName("DockWindow");
-		WindowHeader::cls().setupName("WindowHeader");
-		WindowBody::cls().setupName("WindowBody");
-		WindowFooter::cls().setupName("WindowFooter");
-		WindowSizer::cls().setupName("WindowSizer");
-		WindowSizerLeft::cls().setupName("WindowSizerLeft");
-		WindowSizerRight::cls().setupName("WindowSizerRight");
-
-		Table::cls().setupName("Table");
-		TableHead::cls().setupName("TableHead");
-
-		Tab::cls().setupName("Tab");
-		Tabber::cls().setupName("Tabber");
-		TabberHead::cls().setupName("TabberHead");
-
-		Expandbox::cls().setupName("Expandbox");
-		ExpandboxToggle::cls().setupName("ExpandboxToggle");
-		ExpandboxHeader::cls().setupName("ExpandboxHeader");
-		ExpandboxBody::cls().setupName("ExpandboxBody");
-
-		Tree::cls().setupName("Tree");
-		TreeNodeToggle::cls().setupName("TreeNodeToggle");
-		TreeNodeHeader::cls().setupName("TreeNodeHeader");
-		TreeNodeBody::cls().setupName("TreeNodeBody");
-
-		Dropdown::cls().setupName("Dropdown");
-		Typedown::cls().setupName("Typedown");
-		DropdownLabel::cls().setupName("DropdownLabel");
-		DropdownHeader::cls().setupName("DropdownHeader");
-		DropdownBox::cls().setupName("DropdownBox");
-
-		RadioSwitch::cls().setupName("RadioSwitch");
-
-		Input<int>::cls().setupName("Input<int>");
-		Input<float>::cls().setupName("Input<float>");
-	}
-
 	void Styler::defaultLayout()
 	{
 		// Built-in Layouts
@@ -249,6 +142,8 @@ namespace mk
 		ScrollArea::cls().layout().d_flow = FLOAT_DEPTH;
 		ScrollArea::cls().layout().d_layoutDim = DIM_X;
 		ScrollArea::cls().layout().d_pivot = DimPivot(REVERSE, REVERSE);
+
+		Scrollbar::cls().layout().d_space = DIV;
 
 		Scroller::cls().layout().d_space = BOARD;
 
@@ -416,6 +311,7 @@ namespace mk
 
 		Label::cls().skin().mTextColour = Colour::White;
 		Label::cls().skin().mPadding = BoxFloat(2.f);
+		Title::cls().skin().mTextSize = 18.f;
 		
 		TypeIn::cls().skin().mTextColour = Colour::White;
 		TypeIn::cls().skin().mPadding = BoxFloat(2.f);
@@ -480,6 +376,7 @@ namespace mk
 
 		Tree::cls().skin().mBackgroundColour = Colour::Black;
 		List::cls().skin().mBackgroundColour = Colour::Black;
+		SelectList::cls();
 
 		Window::cls().skin().mBackgroundColour = Colour::AlphaGrey;
 		DockWindow::cls().skin().mBackgroundColour = Colour::DarkGrey;

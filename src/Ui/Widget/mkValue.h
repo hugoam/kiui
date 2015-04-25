@@ -53,7 +53,7 @@ namespace mk
 
 		void notifyUpdate();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("WValue", Sheet::cls()); return ty; }
 	};
 }
 

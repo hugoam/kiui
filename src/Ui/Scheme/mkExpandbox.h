@@ -17,7 +17,7 @@ namespace mk
 	public:
 		ExpandboxHeader();
 
-		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ExpandboxHeader", Sequence::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT ExpandboxBody : public Sheet
@@ -25,7 +25,7 @@ namespace mk
 	public:
 		ExpandboxBody();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ExpandboxBody", Sheet::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT ExpandboxToggle : public Toggle
@@ -33,7 +33,7 @@ namespace mk
 	public:
 		ExpandboxToggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on);
 
-		static StyleType& cls() { static StyleType ty(Toggle::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ExpandboxToggle", Toggle::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT Expandbox : public Sheet
@@ -50,7 +50,7 @@ namespace mk
 		virtual void expand();
 		virtual void collapse();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Expandbox", Sheet::cls()); return ty; }
 
 	protected:
 		string mTitle;

@@ -19,7 +19,7 @@ namespace mk
 		
 		void gridResized(Widget& first, Widget& second);
 
-		static StyleType& cls() { static StyleType ty(GridSheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("TableHead", GridSheet::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ ColumnHeader : public Label
@@ -27,7 +27,7 @@ namespace mk
 	public:
 		ColumnHeader(const string& label);
 
-		static StyleType& cls() { static StyleType ty(Label::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ColumnHeader", Label::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ Table : public Sheet
@@ -36,7 +36,7 @@ namespace mk
 		Table(StringVector columns, std::vector<float> weights);
 		~Table();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Table", Sheet::cls()); return ty; }
 
 	protected:
 		StringVector mColumns;

@@ -17,7 +17,7 @@ namespace mk
 		Textbox(WValue* input);
 		Textbox(const string& text);
 
-		static StyleType& cls() { static StyleType ty(TypeIn::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Textbox", TypeIn::cls()); return ty; }
 
 	protected:
 		string mString;

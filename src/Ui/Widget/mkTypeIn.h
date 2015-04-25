@@ -68,7 +68,7 @@ namespace mk
 		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
 		bool leftDragEnd(float xPos, float yPos);
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("TypeIn", Sheet::cls()); return ty; }
 
 	protected:
 		WValue* mInput;
@@ -127,7 +127,7 @@ namespace mk
 			this->updateValue();
 		}
 
-		static StyleType& cls() { static StyleType ty(WValue::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("NumberInput<" + typecls<T>().name() + ">", WValue::cls()); return ty; }
 
 	protected:
 		TypeIn& mTypeIn;
@@ -197,7 +197,7 @@ namespace mk
 			this->makeappend<Checkbox>(this, mValue->get<bool>());
 		}
 
-		static StyleType& cls() { static StyleType ty(WValue::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Input<bool>", WValue::cls()); return ty; }
 	};
 
 	template <>

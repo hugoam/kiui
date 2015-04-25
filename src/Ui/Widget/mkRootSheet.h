@@ -62,7 +62,7 @@ namespace mk
 		void modalOn(Widget* widget);
 		void modalOff();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("RootSheet", Sheet::cls()); return ty; }
 
 	protected:
 		UiWindow& mWindow;

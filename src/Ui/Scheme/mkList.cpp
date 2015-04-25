@@ -9,23 +9,55 @@
 
 #include <iostream>
 
+using namespace std::placeholders;
+
 namespace mk
 {
-	List::List()
-		: ScrollSheet()
-	{
-		mStyle = &cls();
-	}
-
-	FilterList::FilterList(FrameType frameType)
+	List::List(FrameType frameType)
 		: ScrollSheet(frameType)
 	{
 		mStyle = &cls();
 	}
 
-	void FilterList::updateFilter(const string& filter)
+	SelectList::SelectList()
+		: List()
 	{
-		for(auto& pt : mContents)
+		mStyle = &cls();
+	}
+
+	Widget& SelectList::vappend(std::unique_ptr<Widget> widget)
+	{
+		return this->makeappend<WrapButton>(std::move(widget), std::bind(&SelectList::selected, this, _1));
+	}
+
+	unique_ptr<Widget> SelectList::vrelease(Widget& widget)
+	{
+		return widget.extract();
+	}
+
+	void SelectList::selected(WrapButton& selected)
+	{
+		selected.toggleState(ACTIVATED);
+	}
+
+	FilterInput::FilterInput(Sheet& list, std::function<void(string)> callback)
+		: Input<string>("", callback)
+		, mList(list)
+	{}
+
+	void FilterInput::filterOn()
+	{
+		this->updateFilter(mValue->ref<string>());
+	}
+
+	void FilterInput::filterOff()
+	{
+		this->updateFilter("");
+	}
+
+	void FilterInput::updateFilter(const string& filter)
+	{
+		for(auto& pt : mList.contents())
 		{
 			bool fit = fitsFilter(filter, pt->contentlabel());
 			if(fit && pt->frame().hidden())
@@ -35,7 +67,7 @@ namespace mk
 		}
 	}
 
-	bool FilterList::fitsFilter(const string& filter, const string& value)
+	bool FilterInput::fitsFilter(const string& filter, const string& value)
 	{
 		for(size_t i = 0; i < filter.size(); ++i)
 			if(filter[i] != value[i])
@@ -44,25 +76,10 @@ namespace mk
 		return true;
 	}
 
-	FilterInput::FilterInput(FilterList& list, std::function<void(string)> callback)
-		: Input<string>("", callback)
-		, mList(list)
-	{}
-
-	void FilterInput::filterOn()
-	{
-		mList.updateFilter(mValue->ref<string>());
-	}
-
-	void FilterInput::filterOff()
-	{
-		mList.updateFilter("");
-	}
-
 	void FilterInput::notifyUpdate()
 	{
 		Input<string>::notifyUpdate();
-		mList.updateFilter(mValue->ref<string>());
+		this->updateFilter(mValue->ref<string>());
 	}
 
 	Sequence::Sequence()

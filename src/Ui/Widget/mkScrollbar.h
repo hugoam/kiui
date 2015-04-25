@@ -26,7 +26,7 @@ namespace mk
 
 		void sliderStep(float offset, bool ended);
 
-		static StyleType& cls() { static StyleType ty(Slider::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Scroller", Slider::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT ScrollerX : public Scroller
@@ -46,7 +46,7 @@ namespace mk
 	public:
 		ScrollerKnob(Dimension dim);
 
-		static StyleType& cls() { static StyleType ty(SliderKnob::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ScrollerKnob", SliderKnob::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT ScrollerKnobX : public ScrollerKnob
@@ -54,7 +54,7 @@ namespace mk
 	public:
 		ScrollerKnobX();
 
-		static StyleType& cls() { static StyleType ty(ScrollerKnob::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ScrollerKnobX", ScrollerKnob::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT ScrollerKnobY : public ScrollerKnob
@@ -62,7 +62,7 @@ namespace mk
 	public:
 		ScrollerKnobY();
 
-		static StyleType& cls() { static StyleType ty(ScrollerKnob::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ScrollerKnobY", ScrollerKnob::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT ScrollUp : public Button
@@ -70,7 +70,7 @@ namespace mk
 	public:
 		ScrollUp(const Trigger& trigger);
 
-		static StyleType& cls() { static StyleType ty(Button::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ScrollUp", Button::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT ScrollDown : public Button
@@ -78,7 +78,7 @@ namespace mk
 	public:
 		ScrollDown(const Trigger& trigger);
 
-		static StyleType& cls() { static StyleType ty(Button::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ScrollDown", Button::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ Scrollbar : public Sheet
@@ -95,7 +95,7 @@ namespace mk
 		void scroll(float offset);
 		void nextFrame(size_t tick, size_t delta);
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Scrollbar", Sheet::cls()); return ty; }
 
 	protected:
 		Sheet& mSheet;
@@ -111,7 +111,7 @@ namespace mk
 
 		Scrollbar& scrollbar() { return mScrollbar; }
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ScrollArea", Sheet::cls()); return ty; }
 
 	protected:
 		Scrollbar& mScrollbar;

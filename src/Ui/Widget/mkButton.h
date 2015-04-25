@@ -22,7 +22,7 @@ namespace mk
 
 		void setLabel(const string& label);
 
-		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Label", Widget::cls()); return ty; }
 
 	protected:
 		string mLabel;
@@ -33,7 +33,7 @@ namespace mk
 	public:
 		Title(const string& label);
 
-		static StyleType& cls() { static StyleType ty(Label::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Title", Label::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT Icon : public Widget
@@ -45,7 +45,7 @@ namespace mk
 
 		void setImage(const string& image);
 
-		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Icon", Widget::cls()); return ty; }
 
 	protected:
 		string mImage;
@@ -98,7 +98,7 @@ namespace mk
 		bool leftClick(float x, float y);
 		bool rightClick(float x, float y);
 
-		static StyleType& cls() { static StyleType ty(Control::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Button", Control::cls()); return ty; }
 
 	protected:
 		string mLabel;
@@ -116,7 +116,7 @@ namespace mk
 		const string& image() { return mImage; }
 		const string& tooltip() { return mTooltip; }
 
-		static StyleType& cls() { static StyleType ty(Button::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ImgButton", Button::cls()); return ty; }
 
 	protected:
 		string mImage;
@@ -130,6 +130,7 @@ namespace mk
 
 	public:
 		WrapButton(Widget* content, const Trigger& trigger = Trigger());
+		WrapButton(unique_ptr<Widget> content, const Trigger& trigger = Trigger());
 
 		Widget* content();
 
@@ -139,7 +140,7 @@ namespace mk
 
 		const string& contentlabel() { return mContent->contentlabel(); }
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("WrapButton", Sheet::cls()); return ty; }
 
 	protected:
 		Widget* mContent;
@@ -157,7 +158,7 @@ namespace mk
 
 		bool leftClick(float x, float y);
 
-		static StyleType& cls() { static StyleType ty(Control::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Toggle", Control::cls()); return ty; }
 
 	protected:
 		Trigger mTriggerOn;

@@ -30,7 +30,7 @@ namespace mk
 
 	float SliderKnob::offset(float pos)
 	{
-		float length = mFrame->parent()->dsize(mDim) - mFrame->dsize(mDim);
+		float length = mFrame->parent()->dsize(mDim) - (mFrame->flow() ? mFrame->dsize(mDim) : 0.f);
 		float offset = std::min(length, std::max(0.f, mStartOffset + pos - mStartPos));
 		return offset;
 	}
@@ -38,7 +38,7 @@ namespace mk
 	bool SliderKnob::leftDragStart(float xPos, float yPos)
 	{
 		mStartPos = mDim == DIM_X ? xPos : yPos;
-		mStartOffset = mFrame->dposition(mDim);
+		mStartOffset = mFrame->flow() ? mFrame->dposition(mDim) : (mStartPos - mFrame->parent()->dabsolute(mDim));
 		toggleState(ACTIVATED);
 		return true;
 	}
@@ -107,7 +107,8 @@ namespace mk
 
 	void Slider::offsetChange(float offset, bool ended)
 	{
-		int step = int(round(offset / (mFrame->dsize(mDim) - mButton.frame().dsize(mDim)) * (mNumSteps - 1.f)));
+		float length = mFrame->dsize(mDim) - (mButton.frame().flow() ? mButton.frame().dsize(mDim) : 0.f);
+		int step = int(round(offset / length * (mNumSteps - 1.f)));
 		if(step != mStep)
 		{
 			mStep = step;

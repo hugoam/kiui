@@ -16,13 +16,13 @@ namespace mk
 	class MK_UI_EXPORT _I_ DockWindow : public Object
 	{
 	public:
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("DockWindow", Sheet::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ ShrinkWindow : public Object
 	{
 	public:
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ShrinkWindow", Sheet::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ WindowHeader : public Sequence
@@ -40,7 +40,7 @@ namespace mk
 		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
 		bool leftDragEnd(float xPos, float yPos);
 
-		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("WindowHeader", Sequence::cls()); return ty; }
 
 	protected:
 		Window& mWindow;
@@ -61,7 +61,7 @@ namespace mk
 		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
 		bool leftDragEnd(float xPos, float yPos);
 
-		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("WindowSizer", Widget::cls()); return ty; }
 
 	protected:
 		Window& mWindow;
@@ -73,7 +73,7 @@ namespace mk
 	public:
 		WindowSizerLeft(Window& window);
 
-		static StyleType& cls() { static StyleType ty(WindowSizer::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("WindowSizerLeft", WindowSizer::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ WindowSizerRight : public WindowSizer
@@ -81,7 +81,7 @@ namespace mk
 	public:
 		WindowSizerRight(Window& window);
 
-		static StyleType& cls() { static StyleType ty(WindowSizer::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("WindowSizerRight", WindowSizer::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ WindowFooter : public Sheet
@@ -89,7 +89,7 @@ namespace mk
 	public:
 		WindowFooter(Window& window);
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("WindowFooter", Sheet::cls()); return ty; }
 
 	protected:
 		WindowSizer& mFirstSizer;
@@ -101,7 +101,7 @@ namespace mk
 	public:
 		WindowBody();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("WindowBody", Sheet::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ CloseButton : public Button
@@ -109,7 +109,7 @@ namespace mk
 	public:
 		CloseButton(const Trigger& trigger);
 
-		static StyleType& cls() { static StyleType ty(Button::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("CloseButton", Button::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT Window : public LayerSheet
@@ -149,7 +149,7 @@ namespace mk
 
 		void close();
 
-		static StyleType& cls() { static StyleType ty(LayerSheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Window", LayerSheet::cls()); return ty; }
 
 	protected:
 		string mName;

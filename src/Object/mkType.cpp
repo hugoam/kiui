@@ -33,7 +33,19 @@ namespace mk
 	{
 		mBase = &base;
 	}
-	
+
+	Type::Type(const string& name)
+		: Type()
+	{
+		mName = name;
+	}
+
+	Type::Type(const string& name, Type& base)
+		: Type(base)
+	{
+		mName = name;
+	}
+
 	Type::~Type()
 	{
 		mIndexer = nullptr;

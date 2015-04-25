@@ -16,8 +16,6 @@
 
 #include <cmath>
 
-#include <Ui/Widget/mkSheet.h>
-
 namespace mk
 {
 	inline float clamp(float v, float mn, float mx)
@@ -99,10 +97,14 @@ namespace mk
 	{
 		//std::cerr << "ink :: draw " << mFrame.style()->name() << std::endl;
 
+		if(mFrame.style().name() == "SelectList")
+			int i = 0;
+
 		if(skin().mEmpty || !mVisible || mFrame.dclip(DIM_Y) == Frame::HIDDEN || mFrame.dclip(DIM_X) == Frame::HIDDEN)
 			return;
 
-		//nvgSave(mCtx);
+		if(mFrame.style().name() == "SelectList")
+			int i = 0;
 
 		float left = mFrame.cleft();
 		float top = mFrame.ctop();
@@ -145,9 +147,6 @@ namespace mk
 
 		// Rect
 
-		if(mFrame.dclip(DIM_X) || mFrame.dclip(DIM_Y))
-			nvgScissor(mCtx, left, top, width, height);
-
 		nvgBeginPath(mCtx);
 
 		if(mCorners.null())
@@ -182,6 +181,23 @@ namespace mk
 			nvgStroke(mCtx);
 		}
 
+		// ImageSkin
+		if(!skin().imageSkin().null())
+		{
+			const ImageSkin& imgskin = skin().mImageSkin;
+			float margin = skin().imageSkin().d_margin * 2.f;
+
+			if(imgskin.d_stretch == DIM_X)
+				imgskin.stretchCoords(width + margin, imgskin.d_height, [this, left, ctop](ImageSkin::Section s, int x, int y, int w, int h){ this->drawSkinImage(s, float(left + x), float(ctop + y), float(w), float(h)); });
+			else if(imgskin.d_stretch == DIM_Y)
+				imgskin.stretchCoords(imgskin.d_width, height + margin, [this, cleft, top](ImageSkin::Section s, int x, int y, int w, int h){ this->drawSkinImage(s, float(cleft + x), float(top + y), float(w), float(h)); });
+			else
+				imgskin.stretchCoords(width + margin, height + margin, [this, left, top](ImageSkin::Section s, int x, int y, int w, int h){ this->drawSkinImage(s, float(left + x), float(top + y), float(w), float(h)); });
+		}
+
+		if(mFrame.dclip(DIM_X) || mFrame.dclip(DIM_Y)) 
+			nvgScissor(mCtx, left, top, width, height);
+
 		// Image
 		if(mImage || mOverlay)
 		{
@@ -205,22 +221,14 @@ namespace mk
 			}
 		}
 
-		// ImageSkin
-		if(!skin().imageSkin().null())
-		{
-			const ImageSkin& imgskin = skin().mImageSkin;
-			float margin = skin().imageSkin().d_margin * 2.f;
-			imgskin.stretchCoords(width + margin, height + margin, [this, left, top](ImageSkin::Section s, int x, int y, int w, int h){ this->drawSkinImage(s, float(left + x), float(top + y), float(w), float(h)); });
-		}
-
 		// Caption
 		if(!mFrame.widget().label().empty() && !(pwidth <= 0.f || pheight <= 0.f))
 		{
-			this->setupText();
-
 			//if(mFrame.dclip(DIM_X) || mFrame.dclip(DIM_Y)) 
 			// ^ @note this doesn't work because a frame is set to clipped only by its parent, and not when the label is larger than the frame itself
 			nvgScissor(mCtx, left, top, width, height);
+
+			this->setupText();
 
 			float lineh = 0.f;
 			nvgTextMetrics(mCtx, NULL, NULL, &lineh);
@@ -271,14 +279,11 @@ namespace mk
 			nvgText(mCtx, cleft, ctop, mFrame.widget().label().c_str(), nullptr);
 			*/
 
-			//if(mFrame.dclip(DIM_X) || mFrame.dclip(DIM_Y))
-				nvgResetScissor(mCtx);
+			nvgResetScissor(mCtx);
 		}
 
 		if(mFrame.dclip(DIM_X) || mFrame.dclip(DIM_Y))
 			nvgResetScissor(mCtx);
-		
-		//nvgRestore(mCtx);
 	}
 
 	float NanoInk::contentSize(Dimension dim)
@@ -307,6 +312,13 @@ namespace mk
 			//std::cerr << "ink :: contentSize for " << mFrame.style()->name() << " : " << (dim == DIM_X ? " x " : " y ") << (dim == DIM_X ? bounds[2] - bounds[0] + xoffset : bounds[3] - bounds[1] + yoffset) << std::endl;
 
 			return dim == DIM_X ? bounds[2] - bounds[0] + xoffset : height + yoffset;
+		}
+		else if(!skin().imageSkin().null())
+		{
+			if(skin().imageSkin().d_stretch == DIM_X)
+				return skin().imageSkin().d_height;
+			else if(skin().imageSkin().d_stretch == DIM_Y)
+				return skin().imageSkin().d_width;
 		}
 		
 		return 0.f;

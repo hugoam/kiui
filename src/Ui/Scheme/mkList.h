@@ -18,36 +18,41 @@ namespace mk
 	class MK_UI_EXPORT List : public ScrollSheet
 	{
 	public:
-		List();
+		List(FrameType frameType = STRIPE);
 
-		static StyleType& cls() { static StyleType ty(ScrollSheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("List", ScrollSheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT FilterList : public ScrollSheet
+	class MK_UI_EXPORT SelectList : public List
 	{
 	public:
-		FilterList(FrameType frameType = STRIPE);
+		SelectList();
 
-		void updateFilter(const string& filter);
-		bool fitsFilter(const string& filter, const string& value);
+		Widget& vappend(std::unique_ptr<Widget> widget);
+		unique_ptr<Widget> vrelease(Widget& widget);
 
-		static StyleType& cls() { static StyleType ty(ScrollSheet::cls()); return ty; }
+		void selected(WrapButton& selected);
+
+		static StyleType& cls() { static StyleType ty("SelectList", List::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT FilterInput : public Input<string>
 	{
 	public:
-		FilterInput(FilterList& list, std::function<void(string)> callback = nullptr);
+		FilterInput(Sheet& list, std::function<void(string)> callback = nullptr);
 
 		void filterOn();
 		void filterOff();
 
 		void notifyUpdate();
 
-		static StyleType& cls() { static StyleType ty(Input<string>::cls()); return ty; }
+		void updateFilter(const string& filter);
+		bool fitsFilter(const string& filter, const string& value);
+
+		static StyleType& cls() { static StyleType ty("FilterInput", Input<string>::cls()); return ty; }
 
 	protected:
-		FilterList& mList;
+		Sheet& mList;
 	};
 
 	class MK_UI_EXPORT LabelSequence : public Sequence
@@ -74,7 +79,7 @@ namespace mk
 
 		virtual void moved(size_t from, size_t to) { UNUSED(from); UNUSED(to); }
 
-		static StyleType& cls() { static StyleType ty(List::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("SortList", List::cls()); return ty; }
 	};
 }
 

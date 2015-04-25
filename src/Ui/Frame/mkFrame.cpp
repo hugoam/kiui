@@ -53,6 +53,9 @@ namespace mk
 
 	void Frame::resetStyle()
 	{
+		if(!d_parent)
+			return;
+
 		Stripe* parent = d_parent;
 		d_parent->remove(this);
 		parent->insert(this, d_index);
@@ -195,7 +198,8 @@ namespace mk
 		UNUSED(tick); UNUSED(delta);
 
 		if(d_style->updated() > d_styleStamp)
-			this->updateStyle();
+			this->resetStyle();
+			//this->updateStyle();
 
 		switch(d_dirty)
 		{

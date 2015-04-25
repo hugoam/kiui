@@ -54,7 +54,7 @@ namespace mk
 			return this->vappend(make_unique<T>(std::forward<Args>(args)...)).template as<T>();
 		}
 
-		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Sheet", Widget::cls()); return ty; }
 
 	protected:
 		template <class T, class... Args>
@@ -78,7 +78,7 @@ namespace mk
 	public:
 		LayerSheet();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("LayerSheet", Sheet::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ Board : public Sheet
@@ -86,7 +86,7 @@ namespace mk
 	public:
 		Board();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Board", Sheet::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ WrapSheet : public Sheet
@@ -94,7 +94,7 @@ namespace mk
 	public:
 		WrapSheet();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("WrapSheet", Sheet::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ ScrollSheet : public Sheet
@@ -105,7 +105,7 @@ namespace mk
 
 		void nextFrame(size_t tick, size_t delta);
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ScrollSheet", Sheet::cls()); return ty; }
 
 	protected:
 		ScrollArea& mScrollArea;
@@ -124,7 +124,7 @@ namespace mk
 
 		virtual void gridResized(Widget& first, Widget& second) { UNUSED(first); UNUSED(second); }
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("GridSheet", Sheet::cls()); return ty; }
 
 	protected:
 		Dimension mDim;
@@ -146,7 +146,7 @@ namespace mk
 		void tooltipOn();
 		void tooltipOff();
 
-		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Cursor", Widget::cls()); return ty; }
 
 	protected:
 		bool mDirty;
@@ -159,37 +159,37 @@ namespace mk
 	class MK_UI_EXPORT ResizeCursorX : public Object
 	{
 	public:
-		static StyleType& cls() { static StyleType ty(Cursor::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ResizeCursorX", Cursor::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT ResizeCursorY
 	{
 	public:
-		static StyleType& cls() { static StyleType ty(Cursor::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ResizeCursorY", Cursor::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT MoveCursor : public Object
 	{
 	public:
-		static StyleType& cls() { static StyleType ty(Cursor::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("MoveCursor", Cursor::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT ResizeCursorDiagLeft : public Object
 	{
 	public:
-		static StyleType& cls() { static StyleType ty(Cursor::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ResizeCursorDiagLeft", Cursor::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT ResizeCursorDiagRight : public Object
 	{
 	public:
-		static StyleType& cls() { static StyleType ty(Cursor::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ResizeCursorDiagRight", Cursor::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT CaretCursor : public Object
 	{
 	public:
-		static StyleType& cls() { static StyleType ty(Cursor::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("CaretCursor", Cursor::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ Caret : public Widget
@@ -207,7 +207,7 @@ namespace mk
 
 		void nextFrame(size_t tick, size_t delta);
 
-		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Caret", Widget::cls()); return ty; }
 
 	protected:
 		Frame* mTextFrame;
@@ -225,7 +225,7 @@ namespace mk
 
 		void setLabel(const string& label);
 
-		static StyleType& cls() { static StyleType ty(Widget::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Tooltip", Widget::cls()); return ty; }
 
 	protected:
 		string mLabel;
@@ -236,7 +236,7 @@ namespace mk
 	public:
 		Sequence();
 
-		static StyleType& cls() { static StyleType ty(Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Sequence", Sheet::cls()); return ty; }
 	};
 }
 

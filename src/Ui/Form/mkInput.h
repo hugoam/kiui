@@ -25,7 +25,7 @@ namespace mk
 	public:
 		InputInt(const string& label, int value, std::function<void(int)> callback = nullptr);
 
-		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("InputInt", Sequence::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT InputFloat : public Sequence
@@ -33,7 +33,7 @@ namespace mk
 	public:
 		InputFloat(const string& label, float value, std::function<void(float)> callback = nullptr);
 
-		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("InputFloat", Sequence::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT InputBool : public Sequence
@@ -41,7 +41,7 @@ namespace mk
 	public:
 		InputBool(const string& label, bool value, std::function<void(bool)> callback = nullptr);
 
-		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("InputBool", Sequence::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT InputText : public Sequence
@@ -49,7 +49,7 @@ namespace mk
 	public:
 		InputText(const string& label, const string& text, std::function<void(string)> callback = nullptr, bool reverse = false);
 
-		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("InputText", Sequence::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT InputDropdown : public Sequence
@@ -57,7 +57,7 @@ namespace mk
 	public:
 		InputDropdown(const string& label, StringVector choices, std::function<void(const string&)> callback = nullptr, bool textinput = false, bool reverse = false);
 
-		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("InputDropdown", Sequence::cls()); return ty; }
 	};
 	
 	class MK_UI_EXPORT SliderInt : public Sequence
@@ -65,7 +65,7 @@ namespace mk
 	public:
 		SliderInt(const string& label, AutoStat<int> value, std::function<void(int)> callback = nullptr);
 
-		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("SliderInt", Sequence::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT SliderFloat : public Sequence
@@ -73,7 +73,7 @@ namespace mk
 	public:
 		SliderFloat(const string& label, AutoStat<float> value, std::function<void(float)> callback = nullptr);
 
-		static StyleType& cls() { static StyleType ty(Sequence::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("SliderFloat", Sequence::cls()); return ty; }
 	};
 }
 
