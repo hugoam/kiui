@@ -26,9 +26,9 @@ find_package(OpenGL)
 find_package(GLFW)
 
 if (WIN32)
-    add_definitions(-DKIUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}data/")
+    add_definitions(-DKIUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}/data/")
 else ()
-    add_definitions(-DKIUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}kiui/data/")
+    add_definitions(-DKIUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}/kiui/data/")
 endif ()
 
 add_subdirectory(src)
