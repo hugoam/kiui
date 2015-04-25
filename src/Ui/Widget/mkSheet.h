@@ -105,6 +105,8 @@ namespace mk
 
 		void nextFrame(size_t tick, size_t delta);
 
+		void clear();
+
 		static StyleType& cls() { static StyleType ty("ScrollSheet", Sheet::cls()); return ty; }
 
 	protected:

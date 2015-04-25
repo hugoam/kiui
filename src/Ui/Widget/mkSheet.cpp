@@ -163,6 +163,15 @@ namespace mk
 			mScrollArea.scrollbar().hide();
 	}
 
+	void ScrollSheet::clear()
+	{
+		while(mContents.size() > 1)
+		{
+			mContents.back()->detach();
+			mContents.pop_back();
+		}
+	}
+
 	GridSheet::GridSheet(Dimension dim)
 		: Sheet()
 		, mDim(dim)
