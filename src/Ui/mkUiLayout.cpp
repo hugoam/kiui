@@ -92,13 +92,13 @@ namespace mk
 	{
 		// Built-in Layouts
 
-		Cursor::cls().layout().d_flow = MANUAL;
+		Cursor::cls().layout().d_flow = OVERLAY;
 		Cursor::cls().layout().d_clipping = NOCLIP;
 
-		Tooltip::cls().layout().d_flow = MANUAL;
+		Tooltip::cls().layout().d_flow = OVERLAY;
 		Tooltip::cls().layout().d_clipping = NOCLIP;
 
-		ContextMenu::cls().layout().d_flow = MANUAL;
+		ContextMenu::cls().layout().d_flow = OVERLAY;
 		ContextMenu::cls().layout().d_clipping = NOCLIP;
 
 		Control::cls().layout().d_opacity = OPAQUE;
@@ -107,9 +107,9 @@ namespace mk
 		Dialog::cls().layout().d_padding = BoxFloat(25.f, 12.f, 25.f, 12.f);
 		Dialog::cls().layout().d_spacing = DimFloat(6.f, 6.f);
 
-		Caret::cls().layout().d_flow = MANUAL;
+		Caret::cls().layout().d_flow = OVERLAY;
 
-		Window::cls().layout().d_flow = MANUAL;
+		Window::cls().layout().d_flow = OVERLAY;
 		Window::cls().layout().d_opacity = OPAQUE;
 		Window::cls().layout().d_layoutDim = DIM_Y;
 		Window::cls().layout().d_size = DimFloat(480.f, 350.f);
@@ -151,7 +151,11 @@ namespace mk
 		Caret::cls().layout().d_size = DimFloat(1.f, 1.f);
 
 		DropdownHeader::cls().layout().d_space = SPACE;
-		DropdownBox::cls().layout().d_space = SPACE;
+
+		DropdownList::cls().layout().d_space = SPACE;
+
+		Menu::cls().layout().d_space = BLOCK;
+		MenuList::cls().layout().d_space = BLOCK;
 
 		SliderDisplay::cls().layout().d_space = BOARD;
 
@@ -166,6 +170,8 @@ namespace mk
 
 		SliderX::cls().layout().d_layoutDim = DIM_X;
 		SliderY::cls().layout().d_layoutDim = DIM_Y;
+
+		SliderKnob::cls().layout().d_flow = OVERLAY;
 
 		ScrollerX::cls().layout().d_layoutDim = DIM_X;
 		ScrollerY::cls().layout().d_layoutDim = DIM_Y;
@@ -209,7 +215,7 @@ namespace mk
 		FillerX::cls().layout().d_size = DimFloat(0.f, 20.f);
 		FillerY::cls().layout().d_size = DimFloat(20.f, 0.f);
 
-		SliderDisplay::cls().layout().d_flow = MANUAL;
+		SliderDisplay::cls().layout().d_flow = OVERLAY;
 
 		Dockline::cls().layout().d_weight = LIST;
 		Dockline::cls().layout().d_space = BOARD;
@@ -230,9 +236,13 @@ namespace mk
 
 		TreeNodeHeader::cls().layout().d_opacity = OPAQUE;
 
-		DropdownBox::cls().layout().d_flow = MANUAL;
-		DropdownBox::cls().layout().d_clipping = NOCLIP;
 		DropdownChoice::cls().layout().d_opacity = OPAQUE;
+
+		DropdownList::cls().layout().d_flow = OVERLAY;
+		DropdownList::cls().layout().d_clipping = NOCLIP;
+
+		MenuList::cls().layout().d_flow = OVERLAY;
+		MenuList::cls().layout().d_clipping = NOCLIP;
 
 		Scrollbar::cls().layout().d_layoutDim = DIM_Y;
 
@@ -264,7 +274,10 @@ namespace mk
 		Page::cls().layout().d_spacing = DimFloat(4.f, 6.f);
 		ExpandboxBody::cls().layout().d_spacing = DimFloat(4.f, 6.f);
 
-		Sequence::cls().skin().mAlign = DimAlign(LEFT, CENTER);
+		WrapButton::cls().skin().mAlign = DimAlign(LEFT, CENTER);
+
+		ScrollerKnob::cls().layout().d_sizing = DimSizing(FIXED, MANUAL);
+		FillerX::cls().layout().d_sizing = DimSizing(MANUAL, FIXED);
 
 		this->override(Scroller::cls(), SliderKnobX::cls(), ScrollerKnobX::cls());
 		this->override(Scroller::cls(), SliderKnobY::cls(), ScrollerKnobY::cls());
@@ -407,7 +420,7 @@ namespace mk
 		TypeIn::cls().decline(ACTIVATED).mBackgroundColour = Colour::Red;
 
 		Dropdown::cls().copySkins(TypeIn::cls());
-		DropdownBox::cls().skin().mBackgroundColour = Colour::LightGrey;
+		DropdownList::cls().skin().mBackgroundColour = Colour::LightGrey;
 
 		Checkbox::cls().skin().mBackgroundColour = Colour::MidGrey;
 		Checkbox::cls().decline(HOVERED).mBackgroundColour = Colour::Red;

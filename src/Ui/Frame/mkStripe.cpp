@@ -44,6 +44,8 @@ namespace mk
 
 		if(frame->flow())
 			index = std::min(d_sequence.size(), index);
+		else
+			index = std::max(d_sequence.size(), index);
 
 		d_contents.insert(d_contents.begin() + index, frame);
 		this->reindex(index);
@@ -58,12 +60,13 @@ namespace mk
 		d_contents.erase(d_contents.begin() + frame->index());
 		this->reindex(frame->index());
 
-		if(frame->flow())
+		if(frame->index() < d_sequence.size())
 			this->removeFlow(frame);
 	}
 
 	void Stripe::clear()
 	{
+		d_sequence.size() = 0;
 		d_contents.clear();
 		d_relayout = true;
 	}
@@ -105,7 +108,7 @@ namespace mk
 
 		for(Frame* frame : d_sequence)
 			if(!frame->dexpand(d_depth) && !frame->hidden())
-				d_sequenceLength += this->offset(frame);
+				d_sequenceLength += this->offsetLength(frame);
 
 		this->updateLength();
 	}
@@ -191,7 +194,6 @@ namespace mk
 	void Stripe::positionSequence()
 	{
 		float offset = -d_cursor + d_layout->padding()[d_length];
-		float perpOffset = 0.f;
 
 		if(d_inkstyle->align()[d_length] == CENTER)
 			offset += d_freeSpace / 2.f;
@@ -202,13 +204,7 @@ namespace mk
 		for(Frame* frame : d_sequence)
 			if(!frame->hidden())
 			{
-				if(d_inkstyle->align()[d_depth] == CENTER)
-					perpOffset = (dspace(d_depth) - frame->doffset(d_depth)) / 2.f;
-				else if(d_inkstyle->align()[d_length] == RIGHT)
-					perpOffset = (dspace(d_depth) - frame->doffset(d_depth));
-
 				frame->setPositionDim(d_length, !prev ? offset : prev->dposition(d_length) + prev->dsize(d_length) + d_layout->spacing()[d_length]);
-				frame->setPositionDim(d_depth, perpOffset + d_layout->padding()[d_depth] + frame->layout()->margin()[d_depth] / 2);
 				prev = frame;
 			}
 	}
@@ -373,6 +369,36 @@ namespace mk
 			this->flowSizedDepth(child, delta);
 	}
 
+	void Stripe::floatShown(Frame* child)
+	{
+		if(child->layout()->d_flow == FLOAT_DEPTH)
+			this->floatSizedDepth(child, child->doffset(d_depth));
+		else if(child->layout()->d_flow == FLOAT_LENGTH)
+			this->floatSizedLength(child, child->doffset(d_length));
+	}
+
+	void Stripe::floatHidden(Frame* child)
+	{
+		if(child->layout()->d_flow == FLOAT_DEPTH)
+			this->floatSizedDepth(child, -child->doffset(d_depth));
+		else if(child->layout()->d_flow == FLOAT_LENGTH)
+			this->floatSizedLength(child, -child->doffset(d_length));
+	}
+
+	void Stripe::floatSizedLength(Frame* child, float delta)
+	{
+		UNUSED(child);
+		d_sequenceLength += delta;
+		d_relayout = true;
+	}
+
+	void Stripe::floatSizedDepth(Frame* child, float delta)
+	{
+		UNUSED(child);
+		d_floatDepth += delta;
+		d_relayout = true;
+	}
+
 	void Stripe::resized(Dimension dim)
 	{
 		UNUSED(dim);
@@ -418,17 +444,17 @@ namespace mk
 		if(d_length != dim)
 			return Frame::nextOffset(dim, pos, seuil);
 
-		pos += d_parent->offset(this);
+		pos += d_parent->offsetLength(this);
 
 		if(pos < seuil && !top)
 			return false;
 
-		pos -= d_parent->offset(this);
+		pos -= d_parent->offsetLength(this);
 		for(Frame* frame : d_sequence)
 			if(frame->nextOffset(dim, pos, seuil))
 				return true;
 
-		pos -= d_parent->offset(this);
+		pos -= d_parent->offsetLength(this);
 		return Frame::nextOffset(dim, pos, seuil);
 	}
 
@@ -437,7 +463,7 @@ namespace mk
 		if(d_length != dim)
 			return Frame::prevOffset(dim, pos, seuil);
 
-		if(top || pos + d_parent->offset(this) >= seuil)
+		if(top || pos + d_parent->offsetLength(this) >= seuil)
 			for(Frame* frame : d_sequence)
 				if(frame->prevOffset(dim, pos, seuil))
 					return true;

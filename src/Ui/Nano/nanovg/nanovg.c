@@ -2046,18 +2046,59 @@ void nvgRoundedRect(NVGcontext* ctx, float x, float y, float w, float h, float r
 
 static float clamprad(float r, float d) { return nvg__minf(r, nvg__absf(d)*0.5f) * nvg__signf(d); }
 
+void nvgRoundedFittedRect4(NVGcontext* ctx, float x, float y, float w, float h, float r0, float r1, float r2, float r3)
+{
+	float wmax = nvg__maxf(r0, r3) + nvg__maxf(r1, r2);
+	float hmax = nvg__maxf(r0, r1) + nvg__maxf(r2, r3);
+	float wcrop = wmax - w;
+	float hcrop = hmax - h;
+
+	if(hcrop > 0.f)
+	{
+		w -= hcrop * 2.f;
+		x += hcrop;
+		wcrop = wmax - w;
+	}
+
+	if(wcrop > 0.f)
+	{
+		h -= wcrop * 2.f;
+		y += wcrop;
+		hcrop = hmax - h;
+	}
+
+	nvgRoundedRect4(ctx, x, y, w, h, r0, r1, r2, r3);
+}
+
 void nvgRoundedRect4(NVGcontext* ctx, float x, float y, float w, float h, float r0, float r1, float r2, float r3)
 {
+	float wmax = nvg__maxf(r0, r3) + nvg__maxf(r1, r2);
+	float hmax = nvg__maxf(r0, r1) + nvg__maxf(r2, r3);
+	float wcrop = wmax - w;
+	float hcrop = hmax - h;
+
+	float r0h = r0 - ((hcrop > 0.f) ? hcrop * r0 / hmax : 0.f);
+	float r0w = r0 - ((wcrop > 0.f) ? wcrop * r0 / wmax : 0.f);
+
+	float r1h = r1 - ((hcrop > 0.f) ? hcrop * r1 / hmax : 0.f);
+	float r1w = r1 - ((wcrop > 0.f) ? wcrop * r1 / wmax : 0.f);
+
+	float r2h = r2 - ((hcrop > 0.f) ? hcrop * r2 / hmax : 0.f);
+	float r2w = r2 - ((wcrop > 0.f) ? wcrop * r2 / wmax : 0.f);
+
+	float r3h = r3 - ((hcrop > 0.f) ? hcrop * r3 / hmax : 0.f);
+	float r3w = r3 - ((wcrop > 0.f) ? wcrop * r3 / wmax : 0.f);
+
 	float vals[] = {
-		NVG_MOVETO, x, y+clamprad(r0,h),
-		NVG_LINETO, x, y+h-clamprad(r1,h),
-		NVG_BEZIERTO, x, y+h-clamprad(r1,h)*(1-NVG_KAPPA90), x+clamprad(r0,w)*(1-NVG_KAPPA90), y+h, x+clamprad(r0,w), y+h,
-		NVG_LINETO, x+w-clamprad(r1,w), y+h,
-		NVG_BEZIERTO, x+w-clamprad(r1,w)*(1-NVG_KAPPA90), y+h, x+w, y+h-clamprad(r1,h)*(1-NVG_KAPPA90), x+w, y+h-clamprad(r1,h),
-		NVG_LINETO, x+w, y+clamprad(r0,h),
-		NVG_BEZIERTO, x+w, y+clamprad(r0,h)*(1-NVG_KAPPA90), x+w-clamprad(r1,w)*(1-NVG_KAPPA90), y, x+w-clamprad(r1,w), y,
-		NVG_LINETO, x+clamprad(r0,w), y,
-		NVG_BEZIERTO, x+clamprad(r0,w)*(1-NVG_KAPPA90), y, x, y+clamprad(r0,h)*(1-NVG_KAPPA90), x, y+clamprad(r0,h),
+		NVG_MOVETO, x, y+r0h,
+		NVG_LINETO, x, y+h-r3h,
+		NVG_BEZIERTO, x, y+h-r3h*(1-NVG_KAPPA90), x+r3w*(1-NVG_KAPPA90), y+h, x+r3w, y+h,
+		NVG_LINETO, x+w-r2w, y+h,
+		NVG_BEZIERTO, x+w-r2w*(1-NVG_KAPPA90), y+h, x+w, y+h-r2h*(1-NVG_KAPPA90), x+w, y+h-r2h,
+		NVG_LINETO, x+w, y+r1h,
+		NVG_BEZIERTO, x+w, y+r1h*(1-NVG_KAPPA90), x+w-r1w*(1-NVG_KAPPA90), y, x+w-r1w, y,
+		NVG_LINETO, x+r0w, y,
+		NVG_BEZIERTO, x+r0w*(1-NVG_KAPPA90), y, x, y+r0h*(1-NVG_KAPPA90), x, y+r0h,
 		NVG_CLOSE
 	};
 	nvg__appendCommands(ctx, vals, NVG_COUNTOF(vals));

@@ -32,10 +32,12 @@ namespace mk
 		inline float dsize(Dimension dim) { return d_size[dim]; }
 		inline bool dexpand(Dimension dim) { return d_sizing[dim] == EXPAND; }
 		inline bool dshrink(Dimension dim) { return d_sizing[dim] == SHRINK; }
+		inline bool dmanual(Dimension dim) { return d_sizing[dim] == MANUAL; }
 		inline bool dfixed(Dimension dim) { return d_sizing[dim] == FIXED; }
 		inline float dspan(Dimension dim) { return d_span[dim]; }
 
 		inline bool flow() { return d_layout->d_flow == FLOW; }
+		inline bool floats() { return d_layout->d_flow == FLOAT_DEPTH || d_layout->d_flow == FLOAT_LENGTH; }
 		inline bool clip() { return d_layout->d_clipping == CLIP; }
 		inline bool opaque() { return d_opacity <= GLASSY; }
 

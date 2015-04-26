@@ -56,9 +56,9 @@ namespace mk
 	enum _I_ Flow : unsigned int
 	{
 		FLOW = 0,
-		MANUAL = 1,
-		FLOAT_DEPTH = 2,
-		FLOAT_LENGTH = 3
+		OVERLAY = 1,
+		FLOAT_DEPTH = 3,
+		FLOAT_LENGTH = 4
 	};
 
 	enum _I_ Space : unsigned int
@@ -75,7 +75,8 @@ namespace mk
 	{
 		FIXED = 0,
 		SHRINK = 1,
-		EXPAND = 2
+		EXPAND = 2,
+		MANUAL = 3,
 	};
 
 	enum _I_ Clipping : unsigned int

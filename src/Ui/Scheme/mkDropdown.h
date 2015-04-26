@@ -64,14 +64,14 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("DropdownChoice", WrapButton::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT DropdownBox : public List
+	class MK_UI_EXPORT DropdownList : public List
 	{
 	public:
-		DropdownBox(Dropdown& dropdown);
+		DropdownList(Dropdown& dropdown);
 
 		bool leftClick(float x, float y);
 		
-		static StyleType& cls() { static StyleType ty("DropdownBox", List::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("DropdownList", List::cls()); return ty; }
 
 	protected:
 		Dropdown& mDropdown;
@@ -83,7 +83,7 @@ namespace mk
 		Dropdown(const Trigger& onSelected, StringVector choices = StringVector(), bool input = false);
 		~Dropdown();
 
-		DropdownBox& dropbox() { return mDropbox; }
+		DropdownList& dropbox() { return mList; }
 		DropdownHeader& header() { return mHeader; }
 		bool down() { return mDown; }
 
@@ -99,7 +99,7 @@ namespace mk
 
 	protected:
 		Trigger mOnSelected;
-		DropdownBox& mDropbox;
+		DropdownList& mList;
 		DropdownHeader& mHeader;
 		DropdownToggle& mToggle;
 		WrapButton* mSelected;
@@ -112,6 +112,39 @@ namespace mk
 		Typedown(const Trigger& onSelected, StringVector choices = StringVector());
 
 		static StyleType& cls() { static StyleType ty("Typedown", Dropdown::cls()); return ty; }
+	};
+
+	class MK_UI_EXPORT MenuList : public List
+	{
+	public:
+		MenuList(Menu& menu);
+
+		bool leftClick(float x, float y);
+
+		static StyleType& cls() { static StyleType ty("MenuList", List::cls()); return ty; }
+
+	protected:
+		Menu& mMenu;
+	};
+
+	class MK_UI_EXPORT Menu : public Sheet
+	{
+	public:
+		Menu(const string& label, bool submenu = false);
+
+		void dropdown();
+		void dropup();
+
+		Widget& vappend(std::unique_ptr<Widget> widget);
+		unique_ptr<Widget> vrelease(Widget& widget);
+
+		static StyleType& cls() { static StyleType ty("Menu", Dropdown::cls()); return ty; }
+
+	protected:
+		bool mSubmenu;
+		Button& mButton;
+		MenuList& mList;
+		bool mDown;
 	};
 }
 

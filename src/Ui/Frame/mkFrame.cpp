@@ -63,7 +63,9 @@ namespace mk
 
 	void Frame::updateSizing(Dimension dim)
 	{
-		if(d_space == BLOCK)
+		if(d_layout->sizing()[dim])
+			d_sizing[dim] = d_layout->sizing()[dim];
+		else if(d_space == BLOCK)
 			d_sizing[dim] = SHRINK;
 		else if(d_space == WRAP)
 			d_sizing[dim] = d_parent->d_sizing[dim];
@@ -198,8 +200,10 @@ namespace mk
 		UNUSED(tick); UNUSED(delta);
 
 		if(d_style->updated() > d_styleStamp)
+		{
 			this->resetStyle();
-			//this->updateStyle();
+			return;
+		}
 
 		switch(d_dirty)
 		{
@@ -242,6 +246,8 @@ namespace mk
 	{
 		if(d_layout->d_flow == FLOAT_DEPTH)
 			this->setPositionDim(DIM_X, d_parent->dsize(DIM_X) - d_size[DIM_X]);
+		else if(flow() && d_parent)
+			d_parent->positionDepth(this);
 
 		d_absolute[DIM_X] = this->calcAbsolute(DIM_X);
 		d_absolute[DIM_Y] = this->calcAbsolute(DIM_Y);
@@ -249,8 +255,8 @@ namespace mk
 
 	void Frame::updateSize()
 	{
-		if(!d_inkbox->visible()) // @note this is needed for gorilla, but not for nanovg, discuss
-			return;
+		//if(!d_inkbox->visible()) // @note this is needed for gorilla, but not for nanovg, discuss
+		//	return;
 
 		if(dshrink(DIM_X) && (this->frameType() == FRAME || this->as<Stripe>().sequence().size() == 0))
 			this->setSizeDim(DIM_X, d_inkbox->contentSize(DIM_X));
@@ -282,10 +288,10 @@ namespace mk
 		if(d_parent && flow() && d_widget.state() & BOUND && (dshrink(dim) || dfixed(dim))) // Upward notification -> when shrinking
 			d_parent->flowSized(this, dim, delta);
 
-		if(d_parent && d_layout->d_flow == FLOAT_DEPTH && dim != d_parent->layoutDim())
-				d_parent->floatDepth() += delta;
-		if(d_parent && d_layout->d_flow == FLOAT_LENGTH && dim == d_parent->layoutDim())
-				d_parent->floatLength() += delta;
+		if(d_parent && d_visible && d_widget.state() & BOUND && d_layout->d_flow == FLOAT_DEPTH && dim != d_parent->layoutDim())
+			d_parent->floatSizedDepth(this, delta);
+		if(d_parent && d_visible && d_widget.state() & BOUND && d_layout->d_flow == FLOAT_LENGTH && dim == d_parent->layoutDim())
+			d_parent->floatSizedLength(this, delta);
 
 		//if(dexpand(dim)) // Downward notification -> when expanding
 		this->resized(dim);
@@ -322,6 +328,8 @@ namespace mk
 			this->setVisible(true);
 		if(d_parent && this->flow())
 			d_parent->flowShown(this);
+		if(d_parent && this->floats())
+			d_parent->floatShown(this);
 	}
 
 	void Frame::hide()
@@ -331,6 +339,8 @@ namespace mk
 			this->setVisible(false);
 		if(d_parent && this->flow())
 			d_parent->flowHidden(this);
+		if(d_parent && this->floats())
+			d_parent->floatHidden(this);
 	}
 
 	void Frame::setVisible(bool visible)

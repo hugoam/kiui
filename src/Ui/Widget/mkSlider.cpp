@@ -30,7 +30,7 @@ namespace mk
 
 	float SliderKnob::offset(float pos)
 	{
-		float length = mFrame->parent()->dsize(mDim) - (mFrame->flow() ? mFrame->dsize(mDim) : 0.f);
+		float length = mFrame->parent()->dsize(mDim) - (mFrame->dexpand(mDim) ? 0.f : mFrame->dsize(mDim));
 		float offset = std::min(length, std::max(0.f, mStartOffset + pos - mStartPos));
 		return offset;
 	}
@@ -38,7 +38,7 @@ namespace mk
 	bool SliderKnob::leftDragStart(float xPos, float yPos)
 	{
 		mStartPos = mDim == DIM_X ? xPos : yPos;
-		mStartOffset = mFrame->flow() ? mFrame->dposition(mDim) : (mStartPos - mFrame->parent()->dabsolute(mDim));
+		mStartOffset = mFrame->dexpand(mDim) ? (mStartPos - mFrame->parent()->dabsolute(mDim)) : mFrame->dposition(mDim);
 		toggleState(ACTIVATED);
 		return true;
 	}
@@ -86,9 +86,8 @@ namespace mk
 		: Sheet()
 		, mDim(dim)
 		, mOnUpdated(onUpdated)
-		, mSpaceBefore(dim == DIM_X ? (Widget&) this->makeappend<FillerX>() : (Widget&) this->makeappend<FillerY>())
+		, mFiller(dim == DIM_X ? (Widget&) this->makeappend<FillerX>() : (Widget&) this->makeappend<FillerY>())
 		, mButton(dim == DIM_X ? (SliderKnob&) this->makeappend<SliderKnobX>() : (SliderKnob&) this->makeappend<SliderKnobY>())
-		, mSpaceAfter(dim == DIM_X ? (Widget&) this->makeappend<SpacerX>() : (Widget&) this->makeappend<SpacerY>())
 	{
 		mStyle = &cls();
 	}
@@ -105,10 +104,25 @@ namespace mk
 		mStyle = &cls();
 	}
 
+	void Slider::nextFrame(size_t tick, size_t delta)
+	{
+		if(mFrame->dirty() >= Frame::DIRTY_FRAME)
+			this->updateKnob();
+
+		Sheet::nextFrame(tick, delta);
+	}
+
+	float Slider::length()
+	{
+		if(mButton.frame().dexpand(mDim))
+			return mFrame->dsize(mDim);
+		else
+			return mFrame->dsize(mDim) - mButton.frame().dsize(mDim);
+	}
+
 	void Slider::offsetChange(float offset, bool ended)
 	{
-		float length = mFrame->dsize(mDim) - (mButton.frame().flow() ? mButton.frame().dsize(mDim) : 0.f);
-		int step = int(round(offset / length * (mNumSteps - 1.f)));
+		int step = int(round(offset / this->length() * (mNumSteps - 1.f)));
 		if(step != mStep)
 		{
 			mStep = step;
@@ -140,14 +154,19 @@ namespace mk
 
 	void Slider::updateKnob()
 	{
-		if(!(mState & BOUND))
+		if(!(mState & BOUND) || !mFrame->visible())
 			return;
 
-		mSpaceBefore.frame().setSpanDim(mDim, mVal - mMin);
-		mSpaceAfter.frame().setSpanDim(mDim, mMax - mVal);
+		if(mStyle->name() == "Scroller")
+			int i = 0;
 
-		if(mButton.frame().dexpand(mDim))
-			mButton.frame().setSpanDim(mDim, mKnobLength);
+		float pos = (mVal - mMin) / (mMax - mMin) * this->length();		
+		mFiller.frame().setSizeDim(mDim, pos);
+		mButton.frame().setPositionDim(mDim, pos);
+		mButton.frame().parent()->positionDepth(&mButton.frame());
+
+		if(mButton.frame().dmanual(mDim))
+			mButton.frame().setSizeDim(mDim, std::max(mFrame->dsize(mDim == DIM_X ? DIM_Y : DIM_X), mKnobLength / (mKnobLength + mMax - mMin) * mFrame->dsize(mDim)));
 	}
 
 	SliderDisplay::SliderDisplay(const string& label)

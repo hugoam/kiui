@@ -20,6 +20,23 @@
 
 namespace mk
 {
+	class MK_UI_EXPORT Shadow
+	{
+	public:
+		Shadow(float xpos, float ypos, float blur, float spread, Colour colour = Colour::Black)
+			: d_xpos(xpos), d_ypos(ypos), d_blur(blur), d_spread(spread), d_radius(spread + blur), d_colour(colour), d_null(false)
+		{}
+		Shadow() : d_null(true) {}
+
+		float d_xpos;
+		float d_ypos;
+		float d_blur;
+		float d_spread;
+		float d_radius;
+		Colour d_colour;
+		bool d_null;
+	};
+
 	template <class T>
 	class StyleAttr
 	{
@@ -68,6 +85,7 @@ namespace mk
 			d_margin.copy(other.d_margin.val, inherit);
 			d_spacing.copy(other.d_spacing.val, inherit);
 			d_pivot.copy(other.d_pivot.val, inherit);
+			d_sizing.copy(other.d_sizing.val, inherit);
 			d_weight.copy(other.d_weight.val, inherit);
 			d_weights.copy(other.d_weights.val, inherit);
 		}
@@ -82,6 +100,7 @@ namespace mk
 		_A_ BoxFloat& padding() { return d_padding.val; }
 		_A_ DimFloat& margin() { return d_margin.val; }
 		_A_ DimFloat& spacing() { return d_spacing.val; }
+		_A_ DimSizing& sizing() { return d_sizing.val; }
 		_A_ DimPivot& pivot() { return d_pivot.val; }
 		_A_ Weight weight() const { return d_weight.val; }
 		_A_ const std::vector<float>& weights() { return d_weights.val; }
@@ -96,6 +115,7 @@ namespace mk
 		StyleAttr<BoxFloat> d_padding;
 		StyleAttr<DimFloat> d_margin;
 		StyleAttr<DimFloat> d_spacing;
+		StyleAttr<DimSizing> d_sizing;
 		StyleAttr<DimPivot> d_pivot;
 		StyleAttr<Weight> d_weight;
 		StyleAttr<std::vector<float>> d_weights;
@@ -141,7 +161,9 @@ namespace mk
 			mTopdownGradient.copy(other.mTopdownGradient, inherit);
 			mImage.copy(other.mImage, inherit);
 			mOverlay.copy(other.mOverlay, inherit);
+			mTile.copy(other.mTile, inherit);
 			mImageSkin.copy(other.mImageSkin, inherit);
+			mShadow.copy(other.mShadow, inherit);
 		}
 
 		_A_ bool empty() const { return mEmpty; }
@@ -161,7 +183,9 @@ namespace mk
 		_A_ DimFloat& topdownGradient() { return mTopdownGradient.val; }
 		_A_ const string& image() const { return mImage.val; }
 		_A_ const string& overlay() const { return mOverlay.val; }
+		_A_ const string& tile() const { return mTile.val; }
 		_A_ ImageSkin& imageSkin() { return mImageSkin.val; }
+		_A_ Shadow& shadow() { return mShadow.val; }
 
 		bool mEmpty;
 		StyleAttr<Colour> mBackgroundColour;
@@ -180,7 +204,9 @@ namespace mk
 		StyleAttr<DimFloat> mTopdownGradient;
 		StyleAttr<string> mImage;
 		StyleAttr<string> mOverlay;
+		StyleAttr<string> mTile;
 		StyleAttr<ImageSkin> mImageSkin;
+		StyleAttr<Shadow> mShadow;
 
 		static Type& cls() { static Type ty; return ty; }
 	};

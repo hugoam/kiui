@@ -29,7 +29,7 @@ namespace mk
 		size_t caretIndex(float x, float y);
 		void caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight);
 
-		int fetchImage(const string& image);
+		int fetchImage(const string& image, bool tile = false);
 		void drawImage(int image, float x, float y, float w, float h);
 		void drawSkinImage(ImageSkin::Section section, float x, float y, float w, float h);
 
@@ -45,6 +45,7 @@ namespace mk
 		BoxFloat mCorners;
 		int mImage;
 		int mOverlay;
+		int mTile;
 		int mSkin;
 		std::vector<NVGtextRow> mTextRows;
 	};

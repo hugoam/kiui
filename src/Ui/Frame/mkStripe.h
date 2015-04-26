@@ -50,8 +50,22 @@ namespace mk
 		
 		inline std::vector<float>& weights() { return *d_weights.get(); }
 
-		inline float offset(Frame* frame) { return frame->dsize(d_length) + frame->layout()->margin()[d_length] + (frame->index() != d_sequence.size()-1 ? this->spacing() : 0.f); }
-		inline float offset(Frame* frame, Dimension dim) { return dim == d_length ? offset(frame) : frame->doffset(d_length); }
+		inline float offsetLength(Frame* frame) { return frame->dsize(d_length) + frame->layout()->margin()[d_length] + (frame->index() != d_sequence.size()-1 ? this->spacing() : 0.f); }
+		inline float offset(Frame* frame, Dimension dim) { return dim == d_length ? offsetLength(frame) : frame->doffset(d_length); }
+
+		inline float offsetDepth(Frame* frame)
+		{
+			if(d_inkstyle->align()[d_depth] == CENTER)
+				return (dspace(d_depth) - frame->doffset(d_depth)) / 2.f;
+			else if(d_inkstyle->align()[d_depth] == RIGHT)
+				return (dspace(d_depth) - frame->doffset(d_depth));
+			return 0.f;
+		}
+
+		inline void positionDepth(Frame* frame)
+		{
+			frame->setPositionDim(d_depth, this->offsetDepth(frame) + d_layout->padding()[d_depth] + frame->layout()->margin()[d_depth] / 2);
+		}
 
 		void setCursor(float cursor) { d_cursor = cursor; d_relayout = true; }
 
@@ -80,6 +94,12 @@ namespace mk
 		void flowSizedLength(Frame* child, float delta);
 		void flowSizedDepth(Frame* child, float delta);
 		void flowSized(Frame* child, Dimension dim, float delta);
+
+		void floatHidden(Frame* child);
+		void floatShown(Frame* child);
+
+		void floatSizedLength(Frame* child, float delta);
+		void floatSizedDepth(Frame* child, float delta);
 
 		void normalizeSpan();
 

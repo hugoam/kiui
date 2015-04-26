@@ -29,12 +29,12 @@ namespace mk
 		, mOnSelected(onSelected)
 		, mSelected(nullptr)
 		, mDown(false)
-		, mDropbox(this->makeappend<DropdownBox>(*this))
+		, mList(this->makeappend<DropdownList>(*this))
 		, mHeader(this->makeappend<DropdownHeader>(*this, input))
 		, mToggle(this->makeappend<DropdownToggle>(*this))
 	{
 		mStyle = &cls();
-		mDropbox.hide();
+		mList.hide();
 
 		for(string& choice : choices)
 			this->emplace<Label>(choice);
@@ -45,7 +45,7 @@ namespace mk
 
 	Widget& Dropdown::vappend(std::unique_ptr<Widget> widget)
 	{
-		WrapButton& button = mDropbox.emplace<DropdownChoice>(std::move(widget), std::bind(&Dropdown::selected, this, _1));
+		WrapButton& button = mList.emplace<DropdownChoice>(std::move(widget), std::bind(&Dropdown::selected, this, _1));
 		if(mSelected == nullptr)
 			this->selected(button);
 
@@ -59,23 +59,23 @@ namespace mk
 
 	void Dropdown::dropup()
 	{
-		mDropbox.hide();
-		if(mDropbox.state() & MODAL)
-			mDropbox.unmodal();
+		mList.hide();
+		if(mList.state() & MODAL)
+			mList.unmodal();
 		mDown = false;
 	}
 
 	void Dropdown::dropdown(bool modal)
 	{
-		if(mDropbox.count() == 0)
+		if(mList.count() == 0)
 			return;
 
-		mDropbox.show();
+		mList.show();
 		if(modal)
-			mDropbox.modal();
+			mList.modal();
 
-		mDropbox.frame().as<Layer>().moveToTop();
-		mDropbox.frame().setPositionDim(DIM_Y, mFrame->dsize(DIM_Y));
+		mList.frame().as<Layer>().moveToTop();
+		mList.frame().setPositionDim(DIM_Y, mFrame->dsize(DIM_Y));
 
 		mDown = true;
 	}
@@ -169,7 +169,7 @@ namespace mk
 		//content->setStyle(DropdownLabel::cls());
 	}
 
-	DropdownBox::DropdownBox(Dropdown& dropdown)
+	DropdownList::DropdownList(Dropdown& dropdown)
 		: List(LAYER)
 		, mDropdown(dropdown)
 	{
@@ -177,7 +177,7 @@ namespace mk
 		mFrame = make_unique<Layer>(*this, 0);
 	}
 
-	bool DropdownBox::leftClick(float x, float y)
+	bool DropdownList::leftClick(float x, float y)
 	{
 		UNUSED(x); UNUSED(y);
 		mDropdown.dropup();
@@ -188,5 +188,63 @@ namespace mk
 		: Dropdown(onSelected, choices, true)
 	{
 		mStyle = &cls();
+	}
+
+	MenuList::MenuList(Menu& menu)
+		: List(LAYER)
+		, mMenu(menu)
+	{
+		mStyle = &cls();
+		mFrame = make_unique<Layer>(*this, 0);
+	}
+
+	bool MenuList::leftClick(float x, float y)
+	{
+		UNUSED(x); UNUSED(y);
+		mMenu.dropup();
+		return true;
+	}
+
+	Menu::Menu(const string& label, bool submenu)
+		: Sheet()
+		, mSubmenu(submenu)
+		, mButton(this->makeappend<Button>(label, std::bind(&Menu::dropdown, this)))
+		, mList(this->makeappend<MenuList>(*this))
+		, mDown(false)
+	{
+		mStyle = &cls();
+		mList.hide();
+	}
+
+	Widget& Menu::vappend(std::unique_ptr<Widget> widget)
+	{
+		return mList.append(std::move(widget));
+	}
+
+	unique_ptr<Widget> Menu::vrelease(Widget& widget)
+	{
+		return mList.release(widget);
+	}
+
+	void Menu::dropdown()
+	{
+		mList.show();
+		mList.modal();
+
+		mList.frame().as<Layer>().moveToTop();
+		if(!mSubmenu)
+			mList.frame().setPositionDim(DIM_Y, mFrame->dsize(DIM_Y));
+		else if(mSubmenu)
+			mList.frame().setPositionDim(DIM_X, mFrame->dsize(DIM_X));
+
+		mDown = true;
+	}
+
+	void Menu::dropup()
+	{
+		mList.hide();
+		if(mList.state() & MODAL)
+			mList.unmodal();
+		mDown = false;
 	}
 }

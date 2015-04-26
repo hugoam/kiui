@@ -45,18 +45,20 @@ namespace mk
 
 	void nvgRoundedBox(NVGcontext *ctx, float x, float y, float w, float h, float cr0, float cr1, float cr2, float cr3)
 	{
-		float d;
+		nvgRoundedRect4(ctx, x, y, w, h, cr0, cr1, cr2, cr3);
+
+		/*float d;
 
 		w = fmaxf(0, w);
 		h = fmaxf(0, h);
 		d = fminf(w, h);
 
 		nvgMoveTo(ctx, x, y + h*0.5f);
-		nvgArcTo(ctx, x, y, x + w, y, fminf(cr0, d / 2));
-		nvgArcTo(ctx, x + w, y, x + w, y + h, fminf(cr1, d / 2));
-		nvgArcTo(ctx, x + w, y + h, x, y + h, fminf(cr2, d / 2));
-		nvgArcTo(ctx, x, y + h, x, y, fminf(cr3, d / 2));
-		nvgClosePath(ctx);
+		nvgArcTo(ctx, x, y, x + w, y, cr0);
+		nvgArcTo(ctx, x + w, y, x + w, y + h, cr1);
+		nvgArcTo(ctx, x + w, y + h, x, y + h, cr2);
+		nvgArcTo(ctx, x, y + h, x, y, cr3);
+		nvgClosePath(ctx);*/
 	}
 
 	NVGcolor nvgColour(const Colour& colour)
@@ -78,6 +80,8 @@ namespace mk
 		, mCtx(layer.target().window().ctx())
 		, mLayer(layer)
 		, mImage(0)
+		, mOverlay(0)
+		, mTile(0)
 	{}
 
 	NanoInk::~NanoInk()
@@ -97,7 +101,9 @@ namespace mk
 	{
 		//std::cerr << "ink :: draw " << mFrame.style()->name() << std::endl;
 
-		if(skin().mEmpty || !mVisible || mFrame.dclip(DIM_Y) == Frame::HIDDEN || mFrame.dclip(DIM_X) == Frame::HIDDEN)
+		InkStyle& skin = this->skin();
+
+		if(skin.mEmpty || !mVisible || mFrame.dclip(DIM_Y) == Frame::HIDDEN || mFrame.dclip(DIM_X) == Frame::HIDDEN)
 			return;
 
 		float left = mFrame.cleft();
@@ -110,26 +116,34 @@ namespace mk
 		float pwidth = mFrame.pwidth();
 		float pheight = mFrame.pheight();
 
-		float contentWidth = contentSize(DIM_X) - skin().padding()[DIM_X] - skin().padding()[DIM_X + 2];
-		float contentHeight = contentSize(DIM_Y) - skin().padding()[DIM_Y] - skin().padding()[DIM_Y + 2];
+#if 0 // DEBUG
+		nvgBeginPath(mCtx);
+		nvgRect(mCtx, left + 0.5f, top + 0.5f, width - 1.f, height - 1.f);
+		nvgStrokeWidth(mCtx, 1.f);
+		nvgStrokeColor(mCtx, nvgColour(Colour::Red));
+		nvgStroke(mCtx);
+#endif
+
+		float contentWidth = contentSize(DIM_X) - skin.padding()[DIM_X] - skin.padding()[DIM_X + 2];
+		float contentHeight = contentSize(DIM_Y) - skin.padding()[DIM_Y] - skin.padding()[DIM_Y + 2];
 
 		float cleft = pleft;
 		NVGalign halign = NVG_ALIGN_LEFT;
-		if(skin().align()[DIM_X] == CENTER)
+		if(skin.align()[DIM_X] == CENTER)
 		{
 			halign = NVG_ALIGN_CENTER;
 			cleft = pleft + pwidth / 2.f - contentWidth / 2.f;
 		}
-		else if(skin().align()[DIM_X] == RIGHT)
+		else if(skin.align()[DIM_X] == RIGHT)
 		{
 			halign = NVG_ALIGN_RIGHT;
 			cleft = pleft + pwidth - contentWidth;
 		}
 
 		float ctop = ptop;
-		if(skin().align()[DIM_Y] == CENTER)
+		if(skin.align()[DIM_Y] == CENTER)
 			ctop = ptop + pheight / 2.f - contentHeight / 2.f;
-		else if(skin().align()[DIM_Y] == RIGHT)
+		else if(skin.align()[DIM_Y] == RIGHT)
 			ctop = ptop + pheight - contentHeight;
 
 		float c0 = mCorners.x0();
@@ -138,6 +152,22 @@ namespace mk
 		float c3 = mCorners.y1();
 
 		//std::cerr << "ink :: draw " << mFrame.style()->name() << " at " << left << " , " << top << " size " << width << " , " << height << std::endl;
+
+		// Shadow
+		if(!skin.shadow().d_null)
+		{
+			const Shadow& shadow = skin.shadow();
+			NVGpaint shadowPaint = nvgBoxGradient(mCtx, left + shadow.d_xpos - shadow.d_spread, top + shadow.d_ypos - shadow.d_spread, width + shadow.d_spread * 2.f, height + shadow.d_spread * 2.f, c0 + shadow.d_spread, shadow.d_blur, nvgRGBA(0, 0, 0, 128), nvgRGBA(0, 0, 0, 0));
+			nvgBeginPath(mCtx);
+			nvgRect(mCtx, left + shadow.d_xpos - shadow.d_radius, top + shadow.d_ypos - shadow.d_radius, width + shadow.d_radius * 2.f, height + shadow.d_radius * 2.f);
+			if(mCorners.null())
+				nvgRect(mCtx, left, top, width, height);
+			else
+				nvgRoundedBox(mCtx, left, top, width, height, c0, c1, c2, c3);
+			nvgPathWinding(mCtx, NVG_HOLE);
+			nvgFillPaint(mCtx, shadowPaint);
+			nvgFill(mCtx);
+		}
 
 		// Rect
 
@@ -148,16 +178,16 @@ namespace mk
 		else
 			nvgRoundedBox(mCtx, left, top, width, height, c0, c1, c2, c3);
 
-		if(skin().backgroundColour().a() != 0.f)
+		if(skin.backgroundColour().a() != 0.f)
 		{
-			if(skin().topdownGradient().null())
+			if(skin.topdownGradient().null())
 			{
-				nvgFillColor(mCtx, nvgColour(skin().mBackgroundColour));
+				nvgFillColor(mCtx, nvgColour(skin.mBackgroundColour));
 			}
 			else
 			{
-				NVGcolor first = nvgOffsetColour(skin().backgroundColour(), skin().topdownGradient().x());
-				NVGcolor second = nvgOffsetColour(skin().backgroundColour(), skin().topdownGradient().y());
+				NVGcolor first = nvgOffsetColour(skin.backgroundColour(), skin.topdownGradient().x());
+				NVGcolor second = nvgOffsetColour(skin.backgroundColour(), skin.topdownGradient().y());
 				nvgFillPaint(mCtx, (height > width) ?
 					nvgLinearGradient(mCtx, left, top, left + width, top, first, second) :
 					nvgLinearGradient(mCtx, left, top, left, top + height, first, second));
@@ -165,21 +195,20 @@ namespace mk
 			nvgFill(mCtx);
 		}
 		
-		if(skin().borderWidth().x0() > 0.f)
+		if(skin.borderWidth().x0() > 0.f)
 		{
 			nvgBeginPath(mCtx);
 			nvgRoundedBox(mCtx, left + 0.5f, top + 0.5f, width - 1.f, height - 1.f, c0, c1, c2, c3);
-			//nvgRoundedRect(mCtx, left + 0.5f, top + 0.5f, width - 1.f, height - 1.f, skin().mCornerRadius.x());
-			nvgStrokeWidth(mCtx, skin().borderWidth().x0());
-			nvgStrokeColor(mCtx, nvgColour(skin().borderColour()));
+			nvgStrokeWidth(mCtx, skin.borderWidth().x0());
+			nvgStrokeColor(mCtx, nvgColour(skin.borderColour()));
 			nvgStroke(mCtx);
 		}
 
 		// ImageSkin
-		if(!skin().imageSkin().null())
+		if(!skin.imageSkin().null())
 		{
-			const ImageSkin& imgskin = skin().mImageSkin;
-			float margin = skin().imageSkin().d_margin * 2.f;
+			const ImageSkin& imgskin = skin.mImageSkin;
+			float margin = skin.imageSkin().d_margin * 2.f;
 
 			if(imgskin.d_stretch == DIM_X)
 				imgskin.stretchCoords(width + margin, imgskin.d_height, [this, left, ctop](ImageSkin::Section s, int x, int y, int w, int h){ this->drawSkinImage(s, float(left + x), float(ctop + y), float(w), float(h)); });
@@ -213,6 +242,21 @@ namespace mk
 				nvgFillPaint(mCtx, imgPaint);
 				nvgFill(mCtx);
 			}
+		}
+
+		if(mTile)
+		{
+			nvgBeginPath(mCtx);
+			if(mCorners.null())
+				nvgRect(mCtx, left, top, width, height);
+			else
+				nvgRoundedBox(mCtx, left, top, width, height, c0, c1, c2, c3);
+
+			int imgw, imgh;
+			nvgImageSize(mCtx, mTile, &imgw, &imgh);
+			NVGpaint imgPaint = nvgImagePattern(mCtx, left, top, imgw, imgh, 0.0f / 180.0f*NVG_PI, mTile, 1.f);
+			nvgFillPaint(mCtx, imgPaint);
+			nvgFill(mCtx);
 		}
 
 		// Caption
@@ -263,7 +307,7 @@ namespace mk
 					}
 				}
 
-				nvgFillColor(mCtx, nvgColour(skin().mTextColour));
+				nvgFillColor(mCtx, nvgColour(skin.mTextColour));
 				nvgText(mCtx, x, y, row.start, row.end);
 					
 				y += lineh;
@@ -297,6 +341,7 @@ namespace mk
 			float bounds[4];
 			float height;
 
+			this->setupText();
 			nvgTextBounds(mCtx, 0.f, 0.f, mFrame.widget().label().c_str(), nullptr, bounds);
 			nvgTextMetrics(mCtx, nullptr, nullptr, &height);
 
@@ -408,6 +453,11 @@ namespace mk
 		else
 			mOverlay = 0;
 
+		if(!skin().tile().empty())
+			mTile = fetchImage(skin().tile(), true);
+		else
+			mTile = 0;
+
 		if(!skin().imageSkin().null())
 		{
 			mSkin = fetchImage(skin().imageSkin().d_image);
@@ -421,13 +471,13 @@ namespace mk
 		}
 	}
 
-	int NanoInk::fetchImage(const string& image)
+	int NanoInk::fetchImage(const string& image, bool tile)
 	{
 		auto it = NanoWindow::sImages.find(image);
 		if(it != NanoWindow::sImages.end())
 			return (*it).second;
 
-		NanoWindow::sImages[image] = nvgCreateImage(mCtx, (mLayer.target().window().resourcePath() + "interface/uisprites/" + image + ".png").c_str(), 0);
+		NanoWindow::sImages[image] = nvgCreateImage(mCtx, (mLayer.target().window().resourcePath() + "interface/uisprites/" + image + ".png").c_str(), tile ? (NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY) : 0);
 		return NanoWindow::sImages[image];
 	}
 
@@ -472,22 +522,24 @@ namespace mk
 		}
 
 		NanoInk& parent = static_cast<NanoInk&>(mFrame.parent()->inkbox());
-		if(parent.mCorners.null() || !skin().mWeakCorners)
+		if(parent.mCorners.null() || !skin().mWeakCorners || !mFrame.flow())
 			return;
 
 		if(mFrame.parent()->layoutDim() == DIM_X)
 		{
-			mCorners.setX0(mFrame.first() ? parent.mCorners.x0() : 0.f);
-			mCorners.setY1(mFrame.first() ? parent.mCorners.y1() : 0.f);
-			mCorners.setY0(mFrame.last() ? parent.mCorners.y0() : 0.f);
-			mCorners.setX1(mFrame.last() ? parent.mCorners.x1() : 0.f);
+			mCorners.setX0(fmaxf(0.f, parent.mCorners.x0() - mFrame.dposition(DIM_X)));
+			mCorners.setY1(fmaxf(0.f, parent.mCorners.y1() - mFrame.dposition(DIM_X)));
+
+			mCorners.setY0(fmaxf(0.f, parent.mCorners.y0() - (mFrame.parent()->dsize(DIM_X) - (mFrame.dposition(DIM_X) + mFrame.dsize(DIM_X)))));
+			mCorners.setX1(fmaxf(0.f, parent.mCorners.x1() - (mFrame.parent()->dsize(DIM_X) - (mFrame.dposition(DIM_X) + mFrame.dsize(DIM_X)))));
 		}
 		else if(mFrame.parent()->layoutDim() == DIM_Y)
 		{
-			mCorners.setX0(mFrame.first() ? parent.mCorners.x0() : 0.f);
-			mCorners.setY0(mFrame.first() ? parent.mCorners.y0() : 0.f);
-			mCorners.setX1(mFrame.last() ? parent.mCorners.x1() : 0.f);
-			mCorners.setY1(mFrame.last() ? parent.mCorners.y1() : 0.f);
+			mCorners.setX0(fmaxf(0.f, parent.mCorners.x0() - mFrame.dposition(DIM_Y)));
+			mCorners.setY0(fmaxf(0.f, parent.mCorners.y0() - mFrame.dposition(DIM_Y)));
+
+			mCorners.setX1(fmaxf(0.f, parent.mCorners.x1() - (mFrame.parent()->dsize(DIM_Y) - (mFrame.dposition(DIM_Y) + mFrame.dsize(DIM_Y)))));
+			mCorners.setY1(fmaxf(0.f, parent.mCorners.y1() - (mFrame.parent()->dsize(DIM_Y) - (mFrame.dposition(DIM_Y) + mFrame.dsize(DIM_Y)))));
 		}
 	}
 

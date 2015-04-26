@@ -73,11 +73,14 @@ namespace mk
 	public:
 		Slider(Dimension dim = DIM_X, const Trigger& onUpdated = nullptr);
 
-		Widget& spaceBefore() { return mSpaceBefore; }
+		Widget& filler() { return mFiller; }
 		SliderKnob& slider() { return mButton; }
-		Widget& spaceAfter() { return mSpaceAfter; }
 
 		float val() { return mVal; }
+
+		float length();
+
+		void nextFrame(size_t tick, size_t delta);
 
 		void updateMetrics(float min, float max, float val, float stepLength, float knobLength = 0.f);
 		void resetMetrics(float min, float max, float val, float stepLength, float knobLength = 0.f);
@@ -93,9 +96,8 @@ namespace mk
 
 	protected:
 		Dimension mDim;
-		Widget& mSpaceBefore;
+		Widget& mFiller;
 		SliderKnob& mButton;
-		Widget& mSpaceAfter;
 
 		float mMin;
 		float mMax;

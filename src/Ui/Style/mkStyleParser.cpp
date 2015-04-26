@@ -15,12 +15,12 @@
 
 namespace mk
 {
-	template <> Flow fromString<Flow>(const string& str) { if(str == "FLOW") return FLOW; else if(str == "MANUAL") return MANUAL; return FLOW; }
+	template <> Flow fromString<Flow>(const string& str) { if(str == "FLOW") return FLOW; else if(str == "OVERLAY") return OVERLAY; return FLOW; }
 	template <> Space fromString<Space>(const string& str) { if(str == "AUTO") return AUTO; if(str == "BLOCK") return BLOCK; else if(str == "WRAP") return WRAP; else if(str == "DIV") return DIV; else if(str == "SPACE") return SPACE; else if(str == "BOARD") return BOARD; return AUTO; }
 	template <> Clipping fromString<Clipping>(const string& str) { if(str == "NOCLIP") return NOCLIP; else if(str == "CLIP") return CLIP; return NOCLIP; }
 	template <> Opacity fromString<Opacity>(const string& str) { if(str == "OPAQUE") return OPAQUE; else if(str == "VOID") return VOID; return OPAQUE; }
 	template <> Dimension fromString<Dimension>(const string& str) { if(str == "DIM_X") return DIM_X; else if(str == "DIM_Y") return DIM_Y; return DIM_X; }
-	template <> Sizing fromString<Sizing>(const string& str) { if(str == "FIXED") return FIXED; else if(str == "SHRINK") return SHRINK; else if(str == "EXPAND") return EXPAND; return FIXED; }
+	template <> Sizing fromString<Sizing>(const string& str) { if(str == "FIXED") return FIXED; else if(str == "MANUAL") return MANUAL; else if(str == "SHRINK") return SHRINK; else if(str == "EXPAND") return EXPAND; return FIXED; }
 	template <> Align fromString<Align>(const string& str) { if(str == "CENTER") return CENTER; else if(str == "LEFT") return LEFT; else if(str == "RIGHT") return RIGHT; return LEFT; }
 	template <> Pivot fromString<Pivot>(const string& str) { if(str == "FORWARD") return FORWARD; else if(str == "REVERSE") return REVERSE; return FORWARD; }
 	template <> Weight fromString<Weight>(const string& str) { if(str == "LIST") return LIST; else if(str == "TABLE") return TABLE; return LIST; }
@@ -203,7 +203,7 @@ namespace mk
 			mStyler.override(values[0], values[1], mStyle->name());
 
 		else if(key == "flow")
-			mStyle->layout().d_flow = fromString<Flow>(value); // FLOW | MANUAL
+			mStyle->layout().d_flow = fromString<Flow>(value); // FLOW | OVERLAY | FLOAT
 		else if(key == "clipping")
 			mStyle->layout().d_clipping = fromString<Clipping>(value); // NOCLIP | CLIP
 		else if(key == "opacity")
@@ -263,11 +263,18 @@ namespace mk
 			mSkin->mImage = value; // image.png
 		else if(key == "overlay")
 			mSkin->mOverlay = value; // image.png
+		else if(key == "tile")
+			mSkin->mTile = value; // image.png
 		else if(key == "image_skin")
 			mSkin->mImageSkin = ImageSkin(values[0],	fromString<int>(values[1]), fromString<int>(values[2]),
 														fromString<int>(values[3]), fromString<int>(values[4]),
 														values.size() > 5 ? fromString<int>(values[5]) : 0,
 														values.size() > 6 ? fromString<Dimension>(values[6]) : DIM_0); // : image.png
+		else if(key == "shadow")
+			mSkin->mShadow = Shadow(	fromString<float>(values[0]), fromString<float>(values[1]),
+										fromString<float>(values[2]), fromString<float>(values[3])); // : xoffset, yoffset, blur, spread
+		else if(key == "shadow_colour")
+			mSkin->mShadow.val.d_colour = fromString<Colour>(value);
 		else if(key == "decline_image")
 			this->declineImage(value);
 		else if(key == "decline_image_skin")

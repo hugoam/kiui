@@ -54,38 +54,6 @@ namespace mk
 		class Impl;
 		unique_ptr<Impl> mPimpl;
 	};
-
-	/*
-	styleid :
-	    inherit : parentid
-		override : parentid, overridenid
-
-		flow : FLOW | MANUAL
-		clipping : NOCLIP | CLIP
-		opacity : OPAQUE | VOID
-		layout_dim : DIM_X | DIM_Y
-		sizing : FIXED | SHRINK | EXPAND | WRAP, idem
-		span : 1.0, 1.0
-		size : 123.0, 321.0
-		padding : left, right, top, bottom
-		margin : x, y
-		spacing : x, y
-		pivot : FORWARD | REVERSE, idem
-		weight : LIST | TABLE
-		weights : 0.3, 0.4, 0.3
-
-		background_colour : r, g, b, a
-		border_colour : r, g, b, a
-		image_colour : r, g, b, a
-		text_colour : r, g, b, a
-		border_width : top, right, bottom, left
-		corner_radius : topleft, topright, bottomright, bottomleft
-		margin : x, y
-		padding : x, y
-		image : image.png
-		image_skin : image.png
-	*/
-
 }
 
 #endif // MK_STYLEPARSER_H_INCLUDED

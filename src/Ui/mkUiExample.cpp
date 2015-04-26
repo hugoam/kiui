@@ -48,7 +48,9 @@ namespace mk
 			CustomElement(const string& name)
 				: Sequence()
 				, mLabel(this->build(name))
-			{}
+			{
+				mStyle = &cls();
+			}
 
 			Label& build(const string& name)
 			{
@@ -63,9 +65,13 @@ namespace mk
 
 			const string& contentlabel() { return mLabel.label(); }
 
+			static StyleType& cls() { static StyleType ty("CustomElement", Sequence::cls()); return ty; }
+
 		protected:
 			Label& mLabel;
 		};
+
+		CustomElement::cls().skin().mAlign = DimAlign(LEFT, CENTER);
 
 		for(int i = 0; boy_names[i]; i++)
 			list.emplace<CustomElement>(boy_names[i]);
@@ -93,11 +99,36 @@ namespace mk
 		return window;
 	}
 
+	Sheet& createUiTestScrollList(Sheet& parent)
+	{
+		Window& window = parent.emplace<Window>("Scroll List");
+		Page& page = window.body().emplace<Page>("Scroll List");
+		Sequence& sequence = page.emplace<Sequence>();
+
+		List& list0 = sequence.emplace<List>();
+		for(int i = 0; i < 100; i++)
+			list0.emplace<Label>("Element " + toString(i));
+
+		List& list1 = sequence.emplace<List>();
+		for(int i = 0; i < 100; i++)
+			list1.emplace<Button>("Element " + toString(i));
+
+		window.frame().setSize(400.f, 600.f);
+		return window;
+	}
+
 	Sheet& createUiTestTextEditor(Sheet& parent)
 	{
 		Window& window = parent.emplace<Window>("Text Editor");
 		Page& page = window.body().emplace<Page>("Text Editor");
 		Sequence& buttons = page.emplace<Sequence>();
+		Menu& menu = buttons.emplace<Menu>("Menu");
+		menu.emplace<Button>("Redo");
+		menu.emplace<Button>("Undo");
+		Menu& submenu = menu.emplace<Menu>("Set Font", true);
+		submenu.emplace<Button>("Arial");
+		submenu.emplace<Button>("Myriad");
+
 		buttons.emplace<Button>("Open File");
 		buttons.emplace<Button>("Undo");
 		buttons.emplace<Button>("Redo");
@@ -105,8 +136,10 @@ namespace mk
 		return window;
 	}
 
-	Dockspace& createUiTestDockspace(Sheet& parent)
+	Sheet& createUiTestDockspace(Sheet& parent)
 	{
+		parent.clear();
+
 		MasterDockline::cls().layout().d_weights = { 0.2f, 0.6f, 0.2f };
 
 		Dockspace& dockspace = parent.emplace<Dockspace>();
@@ -123,9 +156,11 @@ namespace mk
 		return dockspace;
 	}
 
-	Tabber& createUiTestTabs(Sheet& root)
+	Sheet& createUiTestTabs(Sheet& parent)
 	{
-		Tabber& tabber = root.emplace<Tabber>();
+		parent.clear();
+
+		Tabber& tabber = parent.emplace<Tabber>();
 
 		Page& tab0 = tabber.emplace<Page>("Tab 0");
 		createUiTestTable(tab0);
@@ -139,7 +174,7 @@ namespace mk
 		return tabber;
 	}
 
-	Table& createUiTestTable(Sheet& parent)
+	Sheet& createUiTestTable(Sheet& parent)
 	{
 		Table& table = parent.emplace<Table>(StringVector({ "ID", "Name", "Path", "Flags" }), std::vector<float>({ 0.25f, 0.25f, 0.25f, 0.25f }));
 
@@ -150,7 +185,7 @@ namespace mk
 		return table;
 	}
 
-	Table& createUiTestTableAlt(Sheet& parent)
+	Sheet& createUiTestTableAlt(Sheet& parent)
 	{
 		Table& table0 = parent.emplace<Table>(StringVector({ "Column 0", "Column 1", "Column 3" }), std::vector<float>({ 0.33f, 0.33f, 0.33f }));
 
@@ -190,11 +225,14 @@ namespace mk
 		return table0;
 	}
 
-	Tree& createUiTestTree(Sheet& parent)
+	Sheet& createUiTestTree(Sheet& parent)
 	{
-		Tree& tree0 = parent.emplace<Tree>();
+		Window& window = parent.emplace<Window>("Tree");
+		Page& page = window.body().emplace<Page>("Tree");
 
-		TreeNode& node = tree0.emplace<TreeNode>("", "Tree");
+		Tree& tree = page.emplace<Tree>();
+
+		TreeNode& node = tree.emplace<TreeNode>("", "Tree");
 
 		for(size_t i = 0; i < 5; i++)
 		{
@@ -214,7 +252,8 @@ namespace mk
 			innernode.emplace<Button>("Print");
 		}
 
-		return tree0;
+		window.frame().setSize(300.f, 500.f);
+		return window;
 	}
 
 	Tree& createUiTestTableTree(Sheet& parent)
@@ -318,9 +357,7 @@ namespace mk
 
 	Sheet& createUiTestInlineControls(Sheet& parent)
 	{
-		//Sheet& page = parent;
 		Page& page = parent.emplace<Page>("Inline Controls");
-		// @bug 280X : page inside page doesn't work @todo
 
 		Sequence& line0 = page.emplace<Sequence>();
 
@@ -432,75 +469,6 @@ namespace mk
 		static float arr[] = { 0.6f, 0.1f, 1.0f, 0.5f, 0.92f, 0.1f, 0.2f };
 		ImGui::PlotLines("Curve", arr, IM_ARRAYSIZE(arr));
 		ImGui::EndTooltip();
-		}*/
-
-
-		// Testing IMGUI_ONCE_UPON_A_FRAME macro
-		//for (int i = 0; i < 5; i++)
-		//{
-		// IMGUI_ONCE_UPON_A_FRAME
-		// {
-		// ImGui::Text("This will be displayed only once.");
-		// }
-		//}
-
-/*
-		if(ImGui::CollapsingHeader("Graphs widgets"))
-		{
-		static float arr[] = { 0.6f, 0.1f, 1.0f, 0.5f, 0.92f, 0.1f, 0.2f };
-		ImGui::PlotLines("Frame Times", arr, IM_ARRAYSIZE(arr));
-		static bool pause;
-		static ImVector<float> values; if(values.empty()) { values.resize(100); memset(&values.front(), 0, values.size()*sizeof(float)); }
-		static size_t values_offset = 0;
-		if(!pause)
-		{
-		// create dummy data at fixed 60 hz rate
-		static float refresh_time = -1.0f;
-		if(ImGui::GetTime() > refresh_time + 1.0f / 60.0f)
-		{
-		refresh_time = ImGui::GetTime();
-		static float phase = 0.0f;
-		values[values_offset] = cosf(phase);
-		values_offset = (values_offset + 1) % values.size();
-		phase += 0.10f*values_offset;
-		}
-		}
-		ImGui::PlotLines("Frame Times", &values.front(), (int)values.size(), (int)values_offset, "avg 0.0", -1.0f, 1.0f, ImVec2(0, 70));
-		ImGui::SameLine(); ImGui::Checkbox("pause", &pause);
-		ImGui::PlotHistogram("Histogram", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 70));
-		}
-		
-		if(ImGui::CollapsingHeader("Child regions"))
-		{
-		ImGui::Text("Without border");
-		static int line = 50;
-		bool goto_line = ImGui::Button("Goto");
-		ImGui::SameLine();
-		ImGui::PushItemWidth(100);
-		goto_line |= ImGui::InputInt("##Line", &line, 0, 0, ImGuiInputTextFlags_EnterReturnsTrue);
-		ImGui::PopItemWidth();
-		ImGui::BeginChild("Sub1", ImVec2(ImGui::GetWindowWidth() * 0.5f, 300));
-		for(int i = 0; i < 100; i++)
-		{
-		ImGui::Text("%04d: scrollable region", i);
-		if(goto_line && line == i)
-		ImGui::SetScrollPosHere();
-		}
-		if(goto_line && line >= 100)
-		ImGui::SetScrollPosHere();
-		ImGui::EndChild();
-		ImGui::SameLine();
-		ImGui::BeginChild("Sub2", ImVec2(0, 300), true);
-		ImGui::Text("With border");
-		ImGui::Columns(2);
-		for(int i = 0; i < 100; i++)
-		{
-		char buf[32];
-		ImFormatString(buf, IM_ARRAYSIZE(buf), "%08x", i * 5731);
-		ImGui::Button(buf);
-		ImGui::NextColumn();
-		}
-		ImGui::EndChild();
 		}*/
 
 

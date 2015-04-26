@@ -96,7 +96,10 @@ namespace mk
 	class StatSlider;
 
 	class Dropdown;
-	class DropdownBox;
+	class DropdownList;
+
+	class Menu;
+	class MenuList;
 
 	class Expandbox;
 

@@ -439,6 +439,9 @@ void nvgRoundedRect(NVGcontext* ctx, float x, float y, float w, float h, float r
 // Creates new rounded rectangle shaped sub-path.
 void nvgRoundedRect4(NVGcontext* ctx, float x, float y, float w, float h, float r0, float r1, float r2, float r3);
 
+// Creates new rounded rectangle shaped sub-path.
+void nvgRoundedFittedRect4(NVGcontext* ctx, float x, float y, float w, float h, float r0, float r1, float r2, float r3);
+
 // Creates new ellipse shaped sub-path.
 void nvgEllipse(NVGcontext* ctx, float cx, float cy, float rx, float ry);
 
