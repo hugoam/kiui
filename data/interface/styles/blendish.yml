@@ -11,7 +11,7 @@ WhiteLabel :
     skin_padding : 4.0,4.0,4.0,4.0
     
 SliderDisplay :
-    inherit_skin : Label
+    copy_skin : Label
     
 Blendish :
     copy_skin : Label
@@ -64,7 +64,7 @@ NumberField :
         
         
 TabHeader :
-    inherit_skin : Label
+    copy_skin : Label
     background_colour : 0.407,0.407,0.407,1.0
     border_width : 0.0,0.0,0.0,0.0
     corner_radius : 4.0,4.0,0.0,0.0
@@ -84,7 +84,7 @@ TabHeader :
         corner_radius : 4.0,4.0,0.0,0.0
     
 TableHead :
-    inherit_skin : NumberField
+    copy_skin : NumberField
     corner_radius : 0.0,0.0,0.0,0.0
     
 TypeIn :
@@ -112,6 +112,7 @@ Tree :
 Window :
     background_colour : 0.447,0.447,0.447,1.0
     corner_radius : 10.0,10.0,10.0,10.0
+    shadow : 2.0,2.0,7.0,2.0
     
 WindowHeader :
     background_colour : 0.275,0.275,0.275,1.0
@@ -139,19 +140,19 @@ Expandbox :
     topdown_gradient : 5,0
     
 ExpandboxHeader :
-    inherit_skin : Label
+    copy_skin : Label
     background_colour : 0.0,0.0,0.0,0.0
     
 ColumnHeader :
-    inherit_skin : Label
+    copy_skin : Label
     border_colour : 0.098,0.098,0.098,1.0
     border_width : 1.0,1.0,1.0,1.0
     
 Dropdown:
-    inherit_skin : Toggle
+    copy_skin : Toggle
     
 Typedown:
-    inherit_skin : TypeIn
+    copy_skin : TypeIn
     
 Checkbox :
     copy_skin : Toggle
@@ -171,7 +172,7 @@ RadioSwitch :
     corner_radius : 4.0,4.0,4.0,4.0
     
 RadioChoice :
-    inherit_skin : Toggle
+    copy_skin : Toggle
     corner_radius : 0.0,0.0,0.0,0.0
     
 FillerX :
@@ -180,12 +181,12 @@ FillerX :
     topdown_gradient : 15,-5
     
 SliderX :
-    inherit_skin : NumberField
+    copy_skin : NumberField
     corner_radius : 10.0,10.0,10.0,10.0
         
 SliderKnobX :
     inherit_skin : Clear
-    flow : MANUAL
+    flow : OVERLAY
     
 SliderDisplay :
     align : CENTER, CENTER
@@ -226,7 +227,7 @@ ScrollDown :
         background_colour : 1.0,0.0,0.0,1.0
         
 ScrollerKnobY :
-    inherit_skin : ScrollerButton
+    copy_skin : ScrollerButton
 
 Input<int> :
     corner_radius : 4.0,4.0,4.0,4.0
@@ -257,12 +258,15 @@ Tooltip :
         text_colour : 1.0,1.0,1.0,1.0
         background_colour : 0.176,0.176,0.176,0.902
 
-DropdownBox :
-    inherit_skin : Tooltip
+DropdownList :
+    copy_skin : Tooltip
+    
+MenuList :
+    copy_skin : Tooltip
     
 DropLabel :
     inherit : Label
-    inherit_skin : WhiteLabel
+    copy_skin : WhiteLabel
     override : Dropdown, Label
     override : Typedown, Label
     override : RadioSwitch, Label
@@ -282,3 +286,11 @@ DropdownChoice :
         background_colour : 0.337,0.502,0.761,1
         topdown_gradient : -15,15
         text_colour : 0.0,0.0,0.0,1.0
+        
+MenuChoice :
+    inherit : Button
+    inherit_skin : DropdownChoice
+    copy_skin : WhiteLabel
+    space : BLOCK
+    override : MenuList, Button
+    override : MenuList, Menu

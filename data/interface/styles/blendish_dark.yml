@@ -97,6 +97,7 @@ Window :
     border_colour : 0.275,0.275,0.275,1.0
     border_width : 1.0,1.0,1.0,1.0
     corner_radius : 10.0,10.0,10.0,10.0
+    shadow : 2.0,2.0,7.0,2.0
     
 WindowHeader :
     background_colour : 0.275,0.275,0.275,1.0
@@ -169,7 +170,7 @@ SliderX :
         
 SliderKnobX :
     inherit_skin : Clear
-    flow : MANUAL
+    flow : OVERLAY
     
 SliderDisplay :
     align : CENTER, CENTER
@@ -236,8 +237,11 @@ Tooltip :
         text_colour : 1.0,1.0,1.0,1.0
         background_colour : 0.176,0.176,0.176,0.902
 
-DropdownBox :
+DropdownList :
     inherit_skin : Tooltip
+    
+MenuList :
+    copy_skin : Tooltip
     
 DropdownLabel :
     inherit_skin : Label
@@ -253,3 +257,11 @@ DropdownChoice :
         background_colour : 0.337,0.502,0.761,1
         topdown_gradient : -15,15
         text_colour : 0.0,0.0,0.0,1.0
+        
+MenuChoice :
+    inherit : Button
+    inherit_skin : DropdownChoice
+    copy_skin : Label
+    space : BLOCK
+    override : MenuList, Button
+    override : MenuList, Menu

@@ -128,7 +128,7 @@ ScrollerKnobY :
     image_skin : mygui/scrollerknoby, 5, 2, 7, 4
     decline_image_skin : hovered, pressed, activated
 
-DropdownBox :
+DropdownList :
     inherit_skin : Frame
     
 DropdownLabel :

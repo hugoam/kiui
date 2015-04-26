@@ -23,9 +23,10 @@ WindowHeader :
     padding : 10.0,2.0,10.0,2.0
     image_skin : tbb/window_mover_overlay, 7, 7, 7, 7, 3
     align : LEFT, CENTER
+    tile : tbb/window_mover_bg_tile
     
 WindowFooter :
-    flow : MANUAL
+    flow : OVERLAY
     space : BOARD
     pivot : FORWARD, REVERSE
     align : LEFT, LEFT
@@ -86,7 +87,7 @@ Button :
 Dropdown :
     copy_skin : Button
     
-DropdownBox :
+DropdownList :
     copy_skin : Frame
     
 DropdownToggle :
@@ -124,6 +125,7 @@ ScrollerKnobY :
     
 SliderX :
     image_skin : tbb/slider_bg_x, 9, 9, 9, 9, 0, DIM_X
+    align : LEFT, CENTER
     
 SliderKnobX :
     inherit_skin : Clear
