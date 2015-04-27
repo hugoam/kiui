@@ -57,8 +57,16 @@ namespace mk
 			return;
 
 		Stripe* parent = d_parent;
+		bool flow = d_index < d_parent->sequence().size();
+
 		d_parent->remove(this);
 		parent->insert(this, d_index);
+
+		if(flow && !this->flow())
+		{
+			d_position[0] = 0.f;
+			d_position[1] = 0.f;
+		}
 	}
 
 	void Frame::updateSizing(Dimension dim)

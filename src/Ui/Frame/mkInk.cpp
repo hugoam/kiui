@@ -33,10 +33,11 @@ namespace mk
 		mLayers[layer.index()].erase(std::remove(mLayers[layer.index()].begin(), mLayers[layer.index()].end(), &layer), mLayers[layer.index()].end());
 		if(mLayers[layer.index()].size() == 0 && mZMax > 0)
 		{
-			mLayers.insert(mLayers.begin() + mZMax - 1, mLayers[layer.index()]);
+			mLayers.insert(mLayers.begin() + mZMax, std::vector<InkLayer*>());
 			mLayers.erase(mLayers.begin() + layer.index());
-			for(InkLayer* moved : mLayers[layer.index()])
-				moved->setIndex(layer.index());
+			for(size_t index = layer.index(); index < mZMax; ++index)
+				for(InkLayer* moved : mLayers[index])
+					moved->setIndex(index);
 			--mZMax;
 		}
 	}
