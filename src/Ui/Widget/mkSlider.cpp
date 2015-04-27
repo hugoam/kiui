@@ -157,13 +157,14 @@ namespace mk
 		if(!(mState & BOUND) || !mFrame->visible())
 			return;
 
-		if(mStyle->name() == "Scroller")
-			int i = 0;
-
 		float pos = (mVal - mMin) / (mMax - mMin) * this->length();		
 		mFiller.frame().setSizeDim(mDim, pos);
-		mButton.frame().setPositionDim(mDim, pos);
 		mButton.frame().parent()->positionDepth(&mButton.frame());
+
+		if(!mButton.frame().dexpand(mDim))
+			mButton.frame().setPositionDim(mDim, pos);
+		else
+			mButton.frame().setPositionDim(mDim, 0);
 
 		if(mButton.frame().dmanual(mDim))
 			mButton.frame().setSizeDim(mDim, std::max(mFrame->dsize(mDim == DIM_X ? DIM_Y : DIM_X), mKnobLength / (mKnobLength + mMax - mMin) * mFrame->dsize(mDim)));

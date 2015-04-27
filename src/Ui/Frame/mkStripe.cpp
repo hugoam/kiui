@@ -107,7 +107,7 @@ namespace mk
 		d_sequenceLength = 0.f;
 
 		for(Frame* frame : d_sequence)
-			if(!frame->dexpand(d_depth) && !frame->hidden())
+			if(!frame->dexpand(d_length) && !frame->hidden())
 				d_sequenceLength += this->offsetLength(frame);
 
 		this->updateLength();
@@ -118,7 +118,7 @@ namespace mk
 		d_maxDepth = 0.f;
 
 		for(Frame* frame : d_sequence)
-			if(dshrink(d_depth))
+			if(!frame->dexpand(d_depth) && !frame->hidden())
 				d_maxDepth = std::max(d_maxDepth, frame->doffset(d_depth));
 
 		this->updateDepth();
@@ -266,9 +266,6 @@ namespace mk
 
 		if(d_layout->weights().size() > 0)
 			this->initWeights();
-
-		this->updateLength();
-		this->updateDepth();
 	}
 
 	void Stripe::updateSizing()
@@ -347,7 +344,7 @@ namespace mk
 
 	void Stripe::flowSizedDepth(Frame* child, float delta)
 	{
-		if(delta < 0.f && d_maxDepth == -delta + child->doffset(d_depth))
+		if(delta < 0.f)
 		{
 			this->recomputeDepth();
 		}

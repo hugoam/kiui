@@ -126,7 +126,13 @@ namespace mk
 		{
 			d_sizing[dim] = FIXED;
 			if(d_layout->d_space != BOARD || d_size[dim] == 0.f)
-				this->setSizeDim(dim, d_layout->size()[dim]);
+			{
+				d_size[dim] = d_layout->size()[dim];
+				d_clipSize[dim] = d_layout->size()[dim];
+				this->setDirty(DIRTY_FRAME);
+				this->resized(dim);
+			}
+			//this->setSizeDim(dim, d_layout->size()[dim]);
 		}
 	}
 
@@ -200,10 +206,7 @@ namespace mk
 		UNUSED(tick); UNUSED(delta);
 
 		if(d_style->updated() > d_styleStamp)
-		{
 			this->resetStyle();
-			return;
-		}
 
 		switch(d_dirty)
 		{
@@ -285,7 +288,7 @@ namespace mk
 		if(dexpand(dim) || !flow())
 			d_clipSize[dim] = size;
 
-		if(d_parent && flow() && d_widget.state() & BOUND && (dshrink(dim) || dfixed(dim))) // Upward notification -> when shrinking
+		if(d_parent && flow() && d_widget.state() & BOUND && !dexpand(dim)) // Upward notification -> when shrinking
 			d_parent->flowSized(this, dim, delta);
 
 		if(d_parent && d_visible && d_widget.state() & BOUND && d_layout->d_flow == FLOAT_DEPTH && dim != d_parent->layoutDim())
