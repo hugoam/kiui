@@ -82,7 +82,8 @@ namespace mk
 	}
 
 	NanoTarget::NanoTarget(NanoWindow& window)
-		: mWindow(window)
+		: InkTarget(50)
+		, mWindow(window)
 	{}
 
 	void NanoTarget::nanodraw()

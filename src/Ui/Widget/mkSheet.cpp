@@ -225,10 +225,10 @@ namespace mk
 
 	Cursor::Cursor(RootSheet& rootSheet)
 		: Widget(LAYER)
-		, mTooltip(rootSheet.emplace<Tooltip>(""))
+		, mTooltip(rootSheet.emplace<Tooltip>(rootSheet, ""))
 	{
 		mStyle = &cls();
-		mFrame = make_unique<Layer>(*this, 15);
+		mFrame = make_unique<Layer>(*this, rootSheet.layer().target()->ztop());
 
 		mHovered = &rootSheet;
 	}
@@ -333,12 +333,12 @@ namespace mk
 		mDirty = true;
 	}
 
-	Tooltip::Tooltip(const string& label)
+	Tooltip::Tooltip(RootSheet& rootSheet, const string& label)
 		: Widget(LAYER)
 		, mLabel(label)
 	{
 		mStyle = &cls();
-		mFrame = make_unique<Layer>(*this, 14);
+		mFrame = make_unique<Layer>(*this, rootSheet.layer().target()->ztop()-1);
 	}
 
 	Tooltip::~Tooltip()

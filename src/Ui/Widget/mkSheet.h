@@ -220,7 +220,7 @@ namespace mk
 	class MK_UI_EXPORT _I_ Tooltip : public Widget
 	{
 	public:
-		Tooltip(const string& label);
+		Tooltip(RootSheet& rootSheet, const string& label);
 		~Tooltip();
 
 		const string& label() { return mLabel; }

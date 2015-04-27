@@ -12,6 +12,7 @@
 #include <Ui/Controller/mkController.h>
 #include <Ui/mkUiWindow.h>
 #include <Ui/Frame/mkInk.h>
+#include <Ui/Frame/mkLayer.h>
 
 namespace mk
 {
@@ -24,6 +25,7 @@ namespace mk
 		FrameType frameType() { return LAYER; }
 		UiWindow& uiWindow() { return mWindow; }
 		RootSheet& rootSheet() { return *this; }
+		Layer& layer() { return mFrame->as<Layer>(); }
 
 		Cursor* cursor() { return mCursor; }
 

@@ -19,6 +19,7 @@ namespace mk
 		FrameType frameType() { return LAYER; }
 
 		InkLayer& inkLayer() { return *d_inkLayer.get(); }
+		InkTarget* target() { return d_target; }
 		std::vector<Layer*>& layers() { return d_layers; }
 
 		void bind();

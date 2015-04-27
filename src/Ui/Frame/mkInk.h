@@ -28,9 +28,10 @@ namespace mk
 	class MK_UI_EXPORT InkTarget : public Object
 	{
 	public:
-		InkTarget() : mZMax(0), mLayers(16) {}
+		InkTarget(size_t layers) : mZMax(0), mLayers(layers) {}
 
 		size_t zmax() { return mZMax; }
+		size_t ztop() { return mLayers.size() - 1; }
 
 		unique_ptr<InkLayer> addLayer(Layer& layer, size_t z);
 		void removeLayer(InkLayer& layer);
