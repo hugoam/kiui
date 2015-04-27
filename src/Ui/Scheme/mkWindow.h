@@ -36,6 +36,7 @@ namespace mk
 		Label& title() { return mTitle; }
 		Button* closeButton() { return mCloseButton; }
 
+		bool leftClick(float xPos, float yPos);
 		bool leftDragStart(float xPos, float yPos);
 		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
 		bool leftDragEnd(float xPos, float yPos);

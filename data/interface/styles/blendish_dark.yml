@@ -1,5 +1,5 @@
 Clear :
-    text_colour : 1.0,1.0,1.0,1.0
+    text_colour : 1.0,1.0,1.0,0.0
 
 Label :
     text_colour : 1.0,1.0,1.0,1.0
@@ -79,6 +79,19 @@ TabHeader :
     activated|hovered :
         background_colour : 0.337,0.502,0.761,1
         
+Tab :
+    background_colour : 0.09,0.09,0.09,1.0
+    border_colour : 0.275,0.275,0.275,1.0
+    border_width : 1.0,1.0,1.0,1.0
+    corner_radius : 0.0,4.0,4.0,4.0
+    padding : 6.0,6.0,6.0,6.0
+    
+DockTab :
+    inherit : Tab
+    inherit_skin : Clear
+    padding : 0.0,0.0,0.0,0.0
+    override : Dockspace, Tab
+    
 TableHead :
     corner_radius : 0.0,0.0,0.0,0.0
     
@@ -249,7 +262,6 @@ DropdownLabel :
 DropdownToggle :
     inherit_skin : Clear
     image : blendish_updown
-    margin : 2.0,0.0
     skin_padding : 1.0,2.0,1.0,2.0
     
 DropdownChoice :

@@ -7,6 +7,7 @@
 
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Frame/mkFrame.h>
+#include <Ui/Frame/mkLayer.h>
 
 namespace mk
 {
@@ -19,12 +20,12 @@ namespace mk
 		mZMax = zmax;
 	}
 
-	unique_ptr<InkLayer> InkTarget::addLayer(Frame& frame, size_t z)
+	unique_ptr<InkLayer> InkTarget::addLayer(Layer& layer, size_t z)
 	{
 		if(z == 0) z = mZMax++;
-		unique_ptr<InkLayer> layer = createLayer(frame, z);
-		mLayers[z].push_back(layer.get());
-		return std::move(layer);
+		unique_ptr<InkLayer> inklayer = createLayer(layer, z);
+		mLayers[z].push_back(inklayer.get());
+		return std::move(inklayer);
 	}
 
 	void InkTarget::removeLayer(InkLayer& layer)
@@ -32,7 +33,8 @@ namespace mk
 		mLayers[layer.index()].erase(std::remove(mLayers[layer.index()].begin(), mLayers[layer.index()].end(), &layer), mLayers[layer.index()].end());
 		if(mLayers[layer.index()].size() == 0 && mZMax > 0)
 		{
-			std::swap(mLayers[layer.index()], mLayers[mZMax - 1]);
+			mLayers.insert(mLayers.begin() + mZMax - 1, mLayers[layer.index()]);
+			mLayers.erase(mLayers.begin() + layer.index());
 			for(InkLayer* moved : mLayers[layer.index()])
 				moved->setIndex(layer.index());
 			--mZMax;

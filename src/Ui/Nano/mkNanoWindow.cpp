@@ -6,7 +6,7 @@
 #include <Ui/Nano/mkNanoWindow.h>
 
 #include <Ui/Frame/mkFrame.h>
-#include <Ui/Frame/mkStripe.h>
+#include <Ui/Frame/mkLayer.h>
 #include <Ui/Nano/mkNanoInk.h>
 
 #include <Ui/Widget/mkWidget.h>
@@ -34,11 +34,11 @@
 
 namespace mk
 {
-	NanoLayer::NanoLayer(Frame& frame, NanoTarget& target, size_t index)
-		: InkLayer(target, index)
+	NanoLayer::NanoLayer(Layer& layer, NanoTarget& target, size_t index)
+		: InkLayer(layer, target, index)
 		, mTarget(target)
 		, mVisible(true)
-		, mFrame(frame)
+		, mFrame(layer)
 	{}
 
 	NanoLayer::~NanoLayer()
@@ -93,9 +93,9 @@ namespace mk
 					layer->as<NanoLayer>().nanodraw();
 	}
 
-	unique_ptr<InkLayer> NanoTarget::createLayer(Frame& frame, size_t z)
+	unique_ptr<InkLayer> NanoTarget::createLayer(Layer& layer, size_t z)
 	{
-		return make_unique<NanoLayer>(frame, *this, z);
+		return make_unique<NanoLayer>(layer, *this, z);
 	}
 
 	std::map<string, int> NanoWindow::sImages;

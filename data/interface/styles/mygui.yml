@@ -1,5 +1,5 @@
 Clear :
-    text_colour : 1.0,1.0,1.0,1.0
+    text_colour : 1.0,1.0,1.0,0.0
     
 Window :
     empty : true
@@ -13,7 +13,26 @@ Title :
     
 TabHeader :
     inherit_skin : Label
+    skin_padding : 8.0,6.0,8.0,4.0
     
+DockTab :
+    inherit : Tab
+    inherit_skin : Clear
+    padding : 0.0,0.0,0.0,0.0
+    override : Dockspace, Tab
+    
+Tab :
+    image_skin : mygui/tab, 4, 8, 6, 5
+    padding : 4.0,2.0,6.0,4.0
+    
+Page :
+    padding : 4.0,2.0,6.0,4.0
+    
+TabHeader :
+    inherit_skin : Label
+    image_skin : mygui/tab_button, 6, 6, 9, 4
+    decline_image_skin : hovered, activated, activated|hovered
+        
 WindowHeader :
     inherit_skin : Label
     image_skin : mygui/windowheader, 7, 10, 9, 17
@@ -23,7 +42,7 @@ WindowHeader :
     
 WindowBody :
     inherit_skin : Label
-    skin_margin : 0.0,-3.0,0.0, 0.0
+    skin_margin : 0.0,-3.0,0.0,0.0
     image_skin : mygui/windowbody_black, 4, 4, 6, 6
     padding : 10.0, 4.0, 10.0, 4.0
     
@@ -100,13 +119,17 @@ CloseButton :
 
 SliderKnobY :
     inherit_skin : Clear
-    image : mygui/sliderknoby
-    decline_image : hovered, pressed, activated
+    image_skin : mygui/sliderknoby, 1, 1, 3, 3
+    sizing : EXPAND, MANUAL
+    size : 0.0,7.0
+    decline_image_skin : hovered, pressed, activated
     
 SliderKnobX :
     inherit_skin : Clear
-    image : mygui/sliderknobx
-    decline_image : hovered, pressed, activated
+    image_skin : mygui/sliderknobx, 1, 1, 3, 3
+    sizing : MANUAL, EXPAND
+    size : 7.0,0.0
+    decline_image_skin : hovered, pressed, activated
     
 FillerX :
     background_colour : 1.0,1.0,1.0,0.3

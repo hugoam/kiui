@@ -210,6 +210,8 @@ namespace mk
 			mStyle->layout().d_opacity = fromString<Opacity>(value); // OPAQUE | VOID
 		else if(key == "space")
 			mStyle->layout().d_space = fromString<Space>(value); // AUTO | BLOCK | WRAP | DIV | SPACE | BOARD
+		else if(key == "sizing")
+			mStyle->layout().d_sizing = fromString<DimSizing>(value); // FIXED | SHRINK | EXPAND
 		else if(key == "layout_dim")
 			mStyle->layout().d_layoutDim = fromString<Dimension>(value); // DIM_X | DIM_Y
 		else if(key == "need")

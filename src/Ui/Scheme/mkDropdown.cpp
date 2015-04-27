@@ -26,7 +26,7 @@ namespace mk
 {
 	Dropdown::Dropdown(const Trigger& onSelected, StringVector choices, bool input)
 		: Sheet()
-		, mOnSelected(onSelected)
+		, mOnSelected()
 		, mSelected(nullptr)
 		, mDown(false)
 		, mList(this->makeappend<DropdownList>(*this))
@@ -38,6 +38,8 @@ namespace mk
 
 		for(string& choice : choices)
 			this->emplace<Label>(choice);
+
+		mOnSelected = onSelected;
 	}
 
 	Dropdown::~Dropdown()
@@ -92,7 +94,8 @@ namespace mk
 		mSelected->toggleState(ACTIVATED);
 		mHeader.update(button.content());
 
-		mOnSelected(*button.content());
+		if(mOnSelected)
+			mOnSelected(*button.content());
 	}
 
 	DropdownHeader::DropdownHeader(Dropdown& dropdown, bool input)

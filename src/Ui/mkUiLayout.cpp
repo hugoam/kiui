@@ -127,7 +127,6 @@ namespace mk
 		Dockspace::cls().layout().d_space = BOARD;
 		Docksection::cls().layout().d_space = BOARD;
 		ScrollSheet::cls().layout().d_space = BOARD;
-		Page::cls().layout().d_space = BOARD;
 		WindowBody::cls().layout().d_space = BOARD;
 		Tabber::cls().layout().d_space = BOARD;
 		TabberBody::cls().layout().d_space = BOARD;
@@ -137,6 +136,8 @@ namespace mk
 		DockWindow::cls().layout().d_space = BOARD;
 		Window::cls().layout().d_space = BOARD;
 		Textbox::cls().layout().d_space = BOARD;
+
+		Page::cls().layout().d_space = WRAP;
 
 		ScrollArea::cls().layout().d_space = SPACE;
 		ScrollArea::cls().layout().d_flow = FLOAT_DEPTH;
@@ -164,9 +165,12 @@ namespace mk
 		TableHead::cls().layout().d_layoutDim = DIM_X;
 
 		RadioSwitch::cls().layout().d_layoutDim = DIM_X;
+		RadioChoice::cls();
+
 		Sequence::cls().layout().d_layoutDim = DIM_X;
 		Header::cls().layout().d_layoutDim = DIM_X;
 		Dropdown::cls().layout().d_layoutDim = DIM_X;
+		Typedown::cls();
 
 		SliderX::cls().layout().d_layoutDim = DIM_X;
 		SliderY::cls().layout().d_layoutDim = DIM_Y;
@@ -200,6 +204,8 @@ namespace mk
 
 		WindowHeader::cls().layout().d_opacity = OPAQUE;
 		WindowSizer::cls().layout().d_opacity = OPAQUE;
+		WindowSizerLeft::cls();
+		WindowSizerRight::cls();
 		WindowFooter::cls().layout().d_layoutDim = DIM_X;
 
 		GridSheet::cls().layout().d_opacity = OPAQUE;
@@ -247,6 +253,7 @@ namespace mk
 		Scrollbar::cls().layout().d_layoutDim = DIM_Y;
 
 		Tab::cls().layout().d_padding = BoxFloat(0.f, 4.f, 0.f, 0.f);
+		TabHeader::cls();
 
 		Header::cls().layout().d_padding = BoxFloat(6.f);
 
@@ -326,7 +333,7 @@ namespace mk
 
 		Label::cls().skin().mTextColour = Colour::White;
 		Label::cls().skin().mPadding = BoxFloat(2.f);
-		Title::cls().skin().mTextSize = 18.f;
+		Title::cls();
 		
 		TypeIn::cls().skin().mTextColour = Colour::White;
 		TypeIn::cls().skin().mPadding = BoxFloat(2.f);
@@ -397,7 +404,7 @@ namespace mk
 		DockWindow::cls().skin().mBackgroundColour = Colour::DarkGrey;
 		WindowHeader::cls().skin().mBackgroundColour = Colour::LightGrey;
 		WindowFooter::cls().skin().mBackgroundColour = Colour::LightGrey;
-		WindowFooter::cls().layout().d_size = DimFloat(0.f, 5.f);
+		WindowFooter::cls().layout().d_size = DimFloat(0.f, 7.f);
 
 		Tab::cls().skin().mBackgroundColour = Colour::LightGrey;
 		TabberHead::cls().skin().mBackgroundColour = Colour::Black;

@@ -44,7 +44,7 @@ namespace mk
 
 		inline float sequenceLength() { return d_sequenceLength; }
 		inline Dimension layoutDim() { return d_layout->d_layoutDim; }
-		inline bool overflow() { return d_sequenceLength > dclipsize(d_length); }
+		inline bool overflow() { return d_sequenceLength > dsize(d_length); }
 		inline float cursor() { return d_cursor; }
 		inline float spacing() { return d_layout->spacing()[d_length]; }
 		

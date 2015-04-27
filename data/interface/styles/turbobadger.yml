@@ -1,5 +1,5 @@
 Clear :
-    text_colour : 1.0,1.0,1.0,1.0
+    text_colour : 1.0,1.0,1.0,0.0
     
 Label :
     text_colour : 1.0,1.0,1.0,1.0
@@ -40,13 +40,10 @@ WindowSizerRight :
     space : SPACE
     
 WindowBody :
-    padding : 10.0,4.0,4.0,4.0
-    
-Tabber :
-    inherit_skin : Frame
+    padding : 10.0,4.0,10.0,10.0
     
 Tab :
-    inherit_skin : Container
+    inherit_skin : Frame
     
 TabHeader :
     inherit_skin : Label
@@ -66,6 +63,9 @@ ExpandboxToggle :
     activated :
         image : tbb/toggle_section_icon_down
         
+TreeNodeToggle :
+    copy_skin : ExpandboxToggle
+    
 Checkbox :
     inherit_skin : Clear
     image : tbb/checkbox
@@ -75,6 +75,7 @@ Checkbox :
         overlay : tbb/checkbox_activated
     
 CloseButton :
+    inherit_skin : Clear
     image : tbb/window_close
     decline_image : pressed
     
@@ -91,6 +92,7 @@ DropdownList :
     copy_skin : Frame
     
 DropdownToggle :
+    inherit_skin : Clear
     image : tbb/arrow_down
     
 TypeIn :
@@ -107,13 +109,15 @@ SelectList :
     image_skin : tbb/editfield, 12, 12, 12, 12, 4
     
 ScrollUp :
-    image : tbb/empty
+    inherit_skin : Clear
+    space : BLOCK
     
 ScrollDown :
-    image : tbb/empty
+    inherit_skin : Clear
+    space : BLOCK
 
 Scrollbar :
-    padding : 4.0,4.0,4.0,4.0
+    padding : 8.0,0.0,0.0,0.0
     
 Scroller :
     size : 13.0,0.0

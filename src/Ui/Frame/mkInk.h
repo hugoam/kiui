@@ -32,14 +32,14 @@ namespace mk
 
 		size_t zmax() { return mZMax; }
 
-		unique_ptr<InkLayer> addLayer(Frame& frame, size_t z);
+		unique_ptr<InkLayer> addLayer(Layer& layer, size_t z);
 		void removeLayer(InkLayer& layer);
 		void moveToTop(InkLayer& layer);
 
 		static Type& cls() { static Type ty; return ty; }
 
 	protected:
-		virtual unique_ptr<InkLayer> createLayer(Frame& frame, size_t z) = 0;
+		virtual unique_ptr<InkLayer> createLayer(Layer& layer, size_t z) = 0;
 
 	protected:
 		size_t mZMax;
@@ -49,9 +49,10 @@ namespace mk
 	class MK_UI_EXPORT InkLayer : public Object
 	{
 	public:
-		InkLayer(InkTarget& target, size_t index) : mTarget(target), mIndex(index) {}
+		InkLayer(Layer& layer, InkTarget& target, size_t index) : mLayer(layer), mTarget(target), mIndex(index) {}
 		virtual ~InkLayer() { mTarget.removeLayer(*this); }
 
+		Layer& layer() { return mLayer; }
 		InkTarget& target() { return mTarget; }
 		size_t index() { return mIndex; }
 		void setIndex(size_t index) { mIndex = index; this->moved(index); }
@@ -67,6 +68,7 @@ namespace mk
 		static Type& cls() { static Type ty; return ty; }
 
 	protected:
+		Layer& mLayer;
 		InkTarget& mTarget;
 		size_t mIndex;
 	};

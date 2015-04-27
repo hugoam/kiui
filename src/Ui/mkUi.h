@@ -19,12 +19,11 @@ namespace mk
 	MK_UI_EXPORT Sheet& createUiTestFilteredList(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestTextEditor(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestDockspace(Sheet& parent);
-	MK_UI_EXPORT Sheet& createUiTestTabs(Sheet& parent);
-	MK_UI_EXPORT Sheet& createUiTestTable(Sheet& parent);
-	MK_UI_EXPORT Sheet& createUiTestTableAlt(Sheet& parent);
+	MK_UI_EXPORT Sheet& createUiTestTabs(Sheet& parent, bool window = true);
+	MK_UI_EXPORT Sheet& createUiTestTable(Sheet& parent, bool window = true);
 	MK_UI_EXPORT Sheet& createUiTestTree(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestInlineControls(Sheet& parent);
-	MK_UI_EXPORT Sheet& createUiTestControls(Sheet& parent);
+	MK_UI_EXPORT Sheet& createUiTestControls(Sheet& parent, bool window = true);
 	MK_UI_EXPORT Sheet& createUiTestProgressDialog(Sheet& parent);
 	MK_UI_EXPORT Window& createUiTestWindow(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestFileBrowser(Sheet& parent);

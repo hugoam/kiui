@@ -139,6 +139,7 @@ namespace mk
 	void Stripe::expandDepth()
 	{
 		float space = dspace(d_depth);
+
 		for(Frame* frame : d_contents)
 			if(frame->dexpand(d_depth))
 				frame->setSizeDim(d_depth, space);
@@ -312,7 +313,7 @@ namespace mk
 
 	void Stripe::flowShown(Frame* child)
 	{
-		if(d_sequence.size() > 1)
+		if(child->index() != 0)
 			d_sequenceLength += d_layout->spacing()[d_length];
 
 		if(!child->dexpand(d_length))
@@ -324,7 +325,7 @@ namespace mk
 
 	void Stripe::flowHidden(Frame* child)
 	{
-		if(d_sequence.size() > 1)
+		if(child->index() != 0)
 			d_sequenceLength -= d_layout->spacing()[d_length];
 
 		if(!child->dexpand(d_length))

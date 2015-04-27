@@ -16,7 +16,7 @@ namespace mk
 	class MK_UI_EXPORT NanoLayer : public InkLayer
 	{
 	public:
-		NanoLayer(Frame& frame, NanoTarget& target, size_t index);
+		NanoLayer(Layer& layer, NanoTarget& target, size_t index);
 		~NanoLayer();
 
 		NanoTarget& target() { return mTarget; }
@@ -49,7 +49,7 @@ namespace mk
 
 		NanoWindow& window() { return mWindow; }
 
-		unique_ptr<InkLayer> createLayer(Frame& frame, size_t z);
+		unique_ptr<InkLayer> createLayer(Layer& layer, size_t z);
 
 		void nanodraw();
 

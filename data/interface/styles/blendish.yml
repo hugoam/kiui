@@ -1,5 +1,5 @@
 Clear :
-    text_colour : 1.0,1.0,1.0,1.0
+    text_colour : 1.0,1.0,1.0,0.0
         
 Label :
     text_colour : 0.0,0.0,0.0,1.0
@@ -64,24 +64,41 @@ NumberField :
         
         
 TabHeader :
+    inherit_skin : Clear
     copy_skin : Label
     background_colour : 0.407,0.407,0.407,1.0
     border_width : 0.0,0.0,0.0,0.0
     corner_radius : 4.0,4.0,0.0,0.0
     topdown_gradient : 0,-30
-    
-    pressed :
-        background_colour : 0.392,0.392,0.392,1
-        topdown_gradient : -15,15
-        
+         
     activated :
         background_colour : 0.337,0.502,0.761,1
+        topdown_gradient : -15,15
+        
+    pressed :
+        background_colour : 0.392,0.392,0.392,1
         topdown_gradient : -15,15
         
     hovered :
         background_colour : 0.65,0.65,0.65,1.0
         border_width : 0.0,0.0,0.0,0.0
         corner_radius : 4.0,4.0,0.0,0.0
+        
+    activated|hovered :
+        background_colour : 0.337,0.502,0.761,1
+        
+Tab :
+    background_colour : 0.367,0.367,0.367,1.0
+    border_colour : 0.275,0.275,0.275,1.0
+    border_width : 1.0,1.0,1.0,1.0
+    corner_radius : 0.0,4.0,4.0,4.0
+    padding : 6.0,6.0,6.0,6.0
+    
+DockTab :
+    inherit : Tab
+    inherit_skin : Clear
+    padding : 0.0,0.0,0.0,0.0
+    override : Dockspace, Tab
     
 TableHead :
     copy_skin : NumberField
@@ -98,13 +115,7 @@ Header :
     background_colour : 0.447,0.447,0.447,1.0
     
 DockWindow :
-    background_colour : 0.447,0.447,0.447,1.0
-    
-Tab :
-    background_colour : 0.447,0.447,0.447,1.0
-    
-Page :
-    background_colour : 0.447,0.447,0.447,1.0
+    background_colour : 0.447,0.447,0.447,1.0 
     
 Tree : 
     background_colour : 0.447,0.447,0.447,1.0
@@ -142,7 +153,9 @@ Expandbox :
 ExpandboxHeader :
     copy_skin : Label
     background_colour : 0.0,0.0,0.0,0.0
-    
+    hovered :
+        background_colour : 0.0,0.0,0.0,0.0
+        
 ColumnHeader :
     copy_skin : Label
     border_colour : 0.098,0.098,0.098,1.0
@@ -278,7 +291,6 @@ DropdownLabel :
 DropdownToggle :
     inherit_skin : Clear
     image : blendish_updown
-    margin : 2.0,0.0
     skin_padding : 1.0,2.0,1.0,2.0
     
 DropdownChoice :

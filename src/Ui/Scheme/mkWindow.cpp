@@ -36,6 +36,13 @@ namespace mk
 			mCloseButton = &this->makeappend<CloseButton>(std::bind(&Window::close, &mWindow));
 	}
 
+	bool WindowHeader::leftClick(float x, float y)
+	{
+		UNUSED(x); UNUSED(y);
+		mWindow.frame().layer().moveToTop();
+		return true;
+	}
+
 	bool WindowHeader::leftDragStart(float xPos, float yPos)
 	{
 		UNUSED(xPos); UNUSED(yPos);

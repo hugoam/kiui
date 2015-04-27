@@ -57,6 +57,8 @@ namespace mk
 		mLayout = LayoutStyle();
 		mSkin = InkStyle();
 		mSubskins.clear();
+		if(mBase)
+			mBaseSkin = mBase;
 		++mUpdated;
 	}
 
@@ -80,7 +82,7 @@ namespace mk
 		if(mBaseSkin)
 			this->inheritSkins(*mBaseSkin);
 
-		//for(auto& subskin : mSubskins) @todo : why doesn't this behave correctly when enabled
+		//for(auto& subskin : mSubskins) //@todo : why doesn't this behave correctly when enabled
 		//	subskin.mSkin.copy(mSkin, true);
 	}
 

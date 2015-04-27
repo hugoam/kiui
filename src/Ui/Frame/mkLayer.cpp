@@ -79,12 +79,12 @@ namespace mk
 
 	void Layer::moveToTop()
 	{
-		/*if(d_parent)
+		if(d_parentLayer)
 		{
-			d_parent->layer()->layers().erase(std::remove(d_parent->layer()->layers().begin(), d_parent->layer()->layers().end(), this), d_parent->layer()->layers().end());
-			d_parent->layer()->layers().push_back(this);
-			d_parent->layer()->moveToTop();
-		}*/
+			d_parentLayer->layers().erase(std::remove(d_parentLayer->layers().begin(), d_parentLayer->layers().end(), this), d_parentLayer->layers().end());
+			d_parentLayer->layers().push_back(this);
+			//d_parentLayer->moveToTop();
+		}
 
 		d_inkLayer->moveToTop();
 	}

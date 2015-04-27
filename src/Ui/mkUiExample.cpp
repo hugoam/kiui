@@ -145,59 +145,61 @@ namespace mk
 		Dockspace& dockspace = parent.emplace<Dockspace>();
 
 		Page& dock0 = dockspace.emplace<Page>("Dock 0", "0.0");
-		createUiTestControls(dock0);
+		createUiTestControls(dock0, false);
 
 		Page& dock1 = dockspace.emplace<Page>("Dock 1", "0.1");
 		createUiTestInlineControls(dock1);
 
 		Page& dock2 = dockspace.emplace<Page>("Dock 2", "0.2");
-		createUiTestTable(dock2);
+		createUiTestTable(dock2, false);
 
 		return dockspace;
 	}
 
-	Sheet& createUiTestTabs(Sheet& parent)
+	Sheet& createUiTestTabs(Sheet& parent, bool window)
 	{
-		parent.clear();
+		if(!window)
+			parent.clear();
 
-		Tabber& tabber = parent.emplace<Tabber>();
+		Sheet& page = window ? parent.emplace<Window>("Tabs").body().emplace<Page>("Tabs")
+							 : parent;
+
+		Tabber& tabber = page.emplace<Tabber>();
 
 		Page& tab0 = tabber.emplace<Page>("Tab 0");
-		createUiTestTable(tab0);
+		createUiTestTable(tab0, false);
 
 		Page& tab1 = tabber.emplace<Page>("Tab 1");
 		createUiTestInlineControls(tab1);
 
 		Page& tab2 = tabber.emplace<Page>("Tab 2");
-		createUiTestControls(tab2);
+		createUiTestControls(tab2, false);
 
-		return tabber;
+		return page;
 	}
 
-	Sheet& createUiTestTable(Sheet& parent)
+	Sheet& createUiTestTable(Sheet& parent, bool window)
 	{
-		Table& table = parent.emplace<Table>(StringVector({ "ID", "Name", "Path", "Flags" }), std::vector<float>({ 0.25f, 0.25f, 0.25f, 0.25f }));
+		Sheet& page = window ? parent.emplace<Window>("Tables").body().emplace<Page>("Tables")
+							 : parent.emplace<Page>("Tables");
 
-		table.emplace<LabelSequence>(StringVector({ "0000", "Robert", "/path/robert", "...." }));
-		table.emplace<LabelSequence>(StringVector({ "0001", "Stephanie", "/path/stephanie", "line 1" }));
-		table.emplace<LabelSequence>(StringVector({ "0002", "C64", "/path/computer", "...." }));
+		Table& table0 = page.emplace<Table>(StringVector({ "ID", "Name", "Path", "Flags" }), std::vector<float>({ 0.25f, 0.25f, 0.25f, 0.25f }));
 
-		return table;
-	}
+		table0.emplace<LabelSequence>(StringVector({ "0000", "Robert", "/path/robert", "...." }));
+		table0.emplace<LabelSequence>(StringVector({ "0001", "Stephanie", "/path/stephanie", "line 1" }));
+		table0.emplace<LabelSequence>(StringVector({ "0002", "C64", "/path/computer", "...." }));
 
-	Sheet& createUiTestTableAlt(Sheet& parent)
-	{
-		Table& table0 = parent.emplace<Table>(StringVector({ "Column 0", "Column 1", "Column 3" }), std::vector<float>({ 0.33f, 0.33f, 0.33f }));
+		Table& table1 = page.emplace<Table>(StringVector({ "Column 0", "Column 1", "Column 3" }), std::vector<float>({ 0.33f, 0.33f, 0.33f }));
 
-		table0.emplace<LabelSequence>(StringVector({ "Hello", "kiUi", "World!" }));
-		table0.emplace<ButtonSequence>(StringVector({ "Banana", "Apple", "Corniflower" }));
-		table0.emplace<RadioSwitch>(nullptr, 0, StringVector({ "radio a", "radio b", "radio b" }));
+		table1.emplace<LabelSequence>(StringVector({ "Hello", "kiUi", "World!" }));
+		table1.emplace<ButtonSequence>(StringVector({ "Banana", "Apple", "Corniflower" }));
+		table1.emplace<RadioSwitch>(nullptr, 0, StringVector({ "radio a", "radio b", "radio b" }));
 
-		Sequence& line0 = table0.emplace<Sequence>();
+		Sequence& line0 = table1.emplace<Sequence>();
 
 		Expandbox& box0 = line0.emplace<Expandbox>("Category A");
 		box0.emplace<Label>("Blah blah blah");
-		
+
 		Expandbox& box1 = line0.emplace<Expandbox>("Category B");
 		box1.emplace<Label>("Blah blah blah");
 
@@ -205,24 +207,24 @@ namespace mk
 		box2.emplace<Label>("Blah blah blah");
 
 
-		Table& table1 = parent.emplace<Table>(StringVector({ "Left", "Right" }), std::vector<float>({ 0.5f, 0.5f }));
+		Table& table2 = page.emplace<Table>(StringVector({ "Left", "Right" }), std::vector<float>({ 0.5f, 0.5f }));
 
-		Sequence& line1 = table1.emplace<Sequence>();
+		Sequence& line1 = table2.emplace<Sequence>();
 
 		line1.emplace<InputFloat>("Red", 0.05f);
 		line1.emplace<InputFloat>("Blue", 0.05f);
 
-		Sequence& line2 = table1.emplace<Sequence>();
+		Sequence& line2 = table2.emplace<Sequence>();
 
 		line2.emplace<Textbox>("The quick brown fox jumps over the lazy dog.");
 		line2.emplace<Textbox>("The quick brown fox jumps over the lazy dog.");
 
-		Sequence& line3 = table1.emplace<Sequence>();
+		Sequence& line3 = table2.emplace<Sequence>();
 
 		line3.emplace<Label>("Hello Left");
 		line3.emplace<Label>("Hello Right");
 
-		return table0;
+		return page;
 	}
 
 	Sheet& createUiTestTree(Sheet& parent)
@@ -311,9 +313,12 @@ namespace mk
 		}*/
 	}
 
-	Sheet& createUiTestControls(Sheet& parent)
+	Sheet& createUiTestControls(Sheet& parent, bool window)
 	{
-		Table& table = parent.emplace<Table>(StringVector({ "input", "label" }), std::vector<float>({ 0.7f, 0.3f }));
+		Sheet& page = window ? parent.emplace<Window>("Tables").body().emplace<Page>("Tables")
+							 : parent.emplace<Page>("Controls");
+
+		Table& table = page.emplace<Table>(StringVector({ "input", "label" }), std::vector<float>({ 0.7f, 0.3f }));
 
 		table.emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {});
 		table.emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {}, true);
@@ -336,7 +341,7 @@ namespace mk
 		// ImGui::ColorEdit3("color 1", col1);
 		// ImGui::ColorEdit4("color 2", col2);
 
-		return table;
+		return page;
 	}
 
 	Sheet& createUiTestFileBrowser(Sheet& parent)
@@ -422,13 +427,10 @@ namespace mk
 		box1.emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha){ window.frame().inkstyle().mBackgroundColour.val.setA(alpha); });
 
 		Expandbox& box2 = page.emplace<Expandbox>("Widgets");
-		createUiTestControls(box2);
+		createUiTestControls(box2, false);
 
-		Expandbox& box3 = page.emplace<Expandbox>("Table");
-		createUiTestTable(box3);
-
-		Expandbox& box4 = page.emplace<Expandbox>("Columns");
-		createUiTestTableAlt(box4);
+		Expandbox& box3 = page.emplace<Expandbox>("Tables");
+		createUiTestTable(box3, false);
 
 		/*
 		if(ImGui::TreeNode("Style Editor"))
@@ -553,9 +555,8 @@ namespace mk
 
 	}
 
-	void switchUiTheme(Sheet& sheet, Widget& selected)
+	void switchUiTheme(Sheet& sheet, const string& name)
 	{
-		const string name = selected.label();
 		mk::StyleParser parser(sheet.uiWindow().styler());
 
 		if(name == "Blendish")
@@ -570,6 +571,12 @@ namespace mk
 			parser.loadStyleSheet(sheet.uiWindow().resourcePath() + "interface/styles/photoshop.yml");
 		else if(name == "Default")
 			parser.loadDefaultStyle();
+	}
+
+	void selectUiTheme(Sheet& sheet, Widget& selected)
+	{
+		const string name = selected.label();
+		switchUiTheme(sheet, name);
 	}
 
 	void pickUiSample(Sheet& sheet, Widget& selected)
@@ -607,11 +614,13 @@ namespace mk
 
 	void createUiTest(Form& root)
 	{
+		switchUiTheme(root.sheet(), "Blendish Dark");
+
 		Header& demoheader = root.sheet().emplace<Header>();
 		Board& demobody = root.sheet().emplace<Board>();
 		demoheader.emplace<Label>("Pick a demo sample : ");
 		demoheader.emplace<Dropdown>(std::bind(&pickUiSample, std::ref(demobody), std::placeholders::_1), StringVector({ "Dockspace", "Window", "Text Editor", "Filtered List", "Custom List", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" }));
 		demoheader.emplace<Label>("Switch theme : ");
-		demoheader.emplace<Dropdown>(std::bind(&switchUiTheme, std::ref(demobody), std::placeholders::_1), StringVector({ "Blendish", "Blendish Dark", "TurboBadger", "MyGui", "Photoshop", "Default" }));
+		demoheader.emplace<Dropdown>(std::bind(&selectUiTheme, std::ref(demobody), std::placeholders::_1), StringVector({ "Blendish", "Blendish Dark", "TurboBadger", "MyGui" }));
 	}
 }

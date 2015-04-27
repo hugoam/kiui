@@ -173,10 +173,12 @@ namespace mk
 
 		nvgBeginPath(mCtx);
 
+		float halfb = skin.borderWidth().x0() * 0.5;
+		float b = skin.borderWidth().x0();
 		if(mCorners.null())
-			nvgRect(mCtx, left, top, width, height);
+			nvgRect(mCtx, left + halfb, top + halfb, width - b, height - b);
 		else
-			nvgRoundedBox(mCtx, left, top, width, height, c0, c1, c2, c3);
+			nvgRoundedBox(mCtx, left + halfb, top + halfb, width - b, height- b, c0, c1, c2, c3);
 
 		if(skin.backgroundColour().a() != 0.f)
 		{
@@ -197,8 +199,6 @@ namespace mk
 		
 		if(skin.borderWidth().x0() > 0.f)
 		{
-			nvgBeginPath(mCtx);
-			nvgRoundedBox(mCtx, left + 0.5f, top + 0.5f, width - 1.f, height - 1.f, c0, c1, c2, c3);
 			nvgStrokeWidth(mCtx, skin.borderWidth().x0());
 			nvgStrokeColor(mCtx, nvgColour(skin.borderColour()));
 			nvgStroke(mCtx);
@@ -225,10 +225,7 @@ namespace mk
 		if(mImage || mOverlay)
 		{
 			nvgBeginPath(mCtx);
-			if(mCorners.null())
-				nvgRect(mCtx, cleft, ctop, contentWidth, contentHeight);
-			else
-				nvgRoundedBox(mCtx, cleft, ctop, contentWidth, contentHeight, c0, c1, c2, c3);
+			nvgRect(mCtx, cleft, ctop, contentWidth, contentHeight);
 
 			if(mImage)
 			{
@@ -247,10 +244,7 @@ namespace mk
 		if(mTile)
 		{
 			nvgBeginPath(mCtx);
-			if(mCorners.null())
-				nvgRect(mCtx, left, top, width, height);
-			else
-				nvgRoundedBox(mCtx, left, top, width, height, c0, c1, c2, c3);
+			nvgRect(mCtx, left, top, width, height);
 
 			int imgw, imgh;
 			nvgImageSize(mCtx, mTile, &imgw, &imgh);
