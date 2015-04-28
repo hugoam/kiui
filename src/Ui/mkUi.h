@@ -12,7 +12,7 @@
 
 namespace mk
 {
-	MK_UI_EXPORT void switchUiTheme(Sheet& sheet, Widget& selected);
+	MK_UI_EXPORT void selectUiTheme(Sheet& sheet, Widget& selected);
 	MK_UI_EXPORT void pickUiSample(Sheet& sheet, Widget& selected);
 	MK_UI_EXPORT Sheet& createUiTestScrollList(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestCustomList(Sheet& parent);
