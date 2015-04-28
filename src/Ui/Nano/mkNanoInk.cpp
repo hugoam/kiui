@@ -78,7 +78,7 @@ namespace mk
 	NanoInk::NanoInk(Frame& frame, NanoLayer& layer)
 		: Inkbox(frame)
 		, mCtx(layer.target().window().ctx())
-		, mCache(nvgCreateDisplayList(-1))
+		, mCache(nullptr)
 		, mLayer(layer)
 		, mImage(0)
 		, mOverlay(0)
@@ -87,7 +87,10 @@ namespace mk
 	{}
 
 	NanoInk::~NanoInk()
-	{}
+	{
+		if(mCache)
+			nvgDeleteDisplayList(mCache);
+	}
 
 	void NanoInk::show()
 	{
@@ -108,11 +111,18 @@ namespace mk
 		if(skin.mEmpty || !mVisible || mFrame.dclip(DIM_Y) == Frame::HIDDEN || mFrame.dclip(DIM_X) == Frame::HIDDEN)
 			return;
 
+		if(!mCache)
+		{
+			mCache = nvgCreateDisplayList(64);
+		}
+
 		if(!mUpdate)
 		{
 			nvgDrawDisplayList(mCtx, mCache);
 			return;
 		}
+
+		//std::cerr << mCache->
 
 		nvgResetDisplayList(mCache);
 		nvgBindDisplayList(mCtx, mCache);
