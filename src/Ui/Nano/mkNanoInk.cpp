@@ -108,7 +108,7 @@ namespace mk
 
 		InkStyle& skin = this->skin();
 
-		if(skin.mEmpty || !mVisible || mFrame.dclip(DIM_Y) == Frame::HIDDEN || mFrame.dclip(DIM_X) == Frame::HIDDEN)
+		if(skin.mEmpty || !mVisible)
 			return;
 
 		if(!mCache)
@@ -118,11 +118,12 @@ namespace mk
 
 		if(!mUpdate)
 		{
+			nvgSave(mCtx);
+			nvgTranslate(mCtx, floor(mFrame.dabsolute(DIM_X)), floor(mFrame.dabsolute(DIM_Y)));
 			nvgDrawDisplayList(mCtx, mCache);
+			nvgRestore(mCtx);
 			return;
 		}
-
-		//std::cerr << mCache->
 
 		nvgResetDisplayList(mCache);
 		nvgBindDisplayList(mCtx, mCache);
@@ -339,7 +340,12 @@ namespace mk
 			nvgResetScissor(mCtx);
 
 		nvgBindDisplayList(mCtx, nullptr);
+
+		nvgSave(mCtx);
+		nvgTranslate(mCtx, floor(mFrame.dabsolute(DIM_X)), floor(mFrame.dabsolute(DIM_Y)));
 		nvgDrawDisplayList(mCtx, mCache);
+		nvgRestore(mCtx);
+
 		mUpdate = false;
 	}
 
@@ -508,6 +514,17 @@ namespace mk
 		nvgFontSize(mCtx, skin().textSize());
 		nvgFontFace(mCtx, skin().textFont().c_str());
 		nvgTextAlign(mCtx, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+	}
+
+	void NanoInk::updatePosition()
+	{
+		mMoved = true;
+	}
+
+	void NanoInk::updateClip()
+	{
+		mUpdate = true;
+		this->updateFrame();
 	}
 
 	void NanoInk::updateFrame()

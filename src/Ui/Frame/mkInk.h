@@ -93,6 +93,8 @@ namespace mk
 		virtual void updateContent() = 0;
 		virtual void updateStyle() = 0;
 		virtual void updateFrame() = 0;
+		virtual void updateClip() = 0;
+		virtual void updatePosition() = 0;
 
 		void selectCaret(size_t index) { mSelectFirst = index; mSelectSecond = index; }
 		void selectFirst(size_t start) { mSelectFirst = start; mSelectSecond = start; }

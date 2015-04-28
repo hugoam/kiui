@@ -204,9 +204,12 @@ namespace mk
 
 	void Frame::updateClip(Dimension dim)
 	{
+		bool clip = this->dclip(dim);
 		d_clipPos[dim] = std::max(d_parent->d_clipPos[dim] - d_position[dim], 0.f);
 		d_clipSize[dim] = std::min(d_size[dim], d_parent->d_clipPos[dim] + d_parent->d_clipSize[dim] - d_position[dim]) - d_clipPos[dim];
 		d_clipSize[dim] = std::max(d_clipSize[dim], 0.f);
+		if(clip != this->dclip(dim))
+			d_inkbox->updateClip();
 	}
 
 	void Frame::nextFrame(size_t tick, size_t delta)
@@ -227,9 +230,11 @@ namespace mk
 		case DIRTY_CONTENT:
 			this->updateSize();
 		case DIRTY_FRAME:
+			d_inkbox->updateFrame();
+		case DIRTY_POSITION:
 			this->updatePosition();
 			this->updateClip();
-			d_inkbox->updateFrame();
+			d_inkbox->updatePosition();
 		case CLEAN:
 			break;
 		};
@@ -324,7 +329,7 @@ namespace mk
 	{
 		d_position[dim] = position;
 		d_clipPos[dim] = 0.f;
-		this->markDirty(DIRTY_FRAME);
+		this->markDirty(DIRTY_POSITION);
 	}
 
 	void Frame::markDirty(Dirty dirty)

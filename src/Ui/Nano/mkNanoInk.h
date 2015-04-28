@@ -20,6 +20,8 @@ namespace mk
 
 		void updateContent();
 		void updateFrame();
+		void updateClip();
+		void updatePosition();
 		void updateStyle();
 		
 		void show();
@@ -49,6 +51,7 @@ namespace mk
 		int mTile;
 		int mSkin;
 		bool mUpdate;
+		bool mMoved;
 		std::vector<NVGtextRow> mTextRows;
 	};
 

@@ -25,6 +25,7 @@ namespace mk
 		enum Dirty
 		{
 			CLEAN,				// Frame doesn't need update
+			DIRTY_POSITION,		// The position of the frame has changed
 			DIRTY_FRAME,		// The size of the frame has changed
 			DIRTY_CONTENT,		// The content of the inkbox has changed
 			DIRTY_WIDGET,		// The content of the widget has changed
@@ -129,13 +130,13 @@ namespace mk
 		inline float width() { return dsize(DIM_X); }
 		inline float height() { return dsize(DIM_Y); }
 
-		inline float cleft() { return floor(dabsolute(DIM_X) + dclippos(DIM_X) + d_inkstyle->margin().x0()); }
-		inline float ctop() { return floor(dabsolute(DIM_Y) + dclippos(DIM_Y) + d_inkstyle->margin().y0()); }
+		inline float cleft() { return floor(dclippos(DIM_X) + d_inkstyle->margin().x0()); }
+		inline float ctop() { return floor(dclippos(DIM_Y) + d_inkstyle->margin().y0()); }
 		inline float cwidth() { return floor(dclipsize(DIM_X) - d_inkstyle->margin().x0() - d_inkstyle->margin().x1()); }
 		inline float cheight() { return floor(dclipsize(DIM_Y) - d_inkstyle->margin().y0() - d_inkstyle->margin().y1()); }
 
-		inline float pleft() { return left() + d_inkstyle->padding().x0(); }
-		inline float ptop() { return top() + d_inkstyle->padding().y0(); }
+		inline float pleft() { return d_inkstyle->padding().x0(); }
+		inline float ptop() { return d_inkstyle->padding().y0(); }
 		inline float pwidth() { return width() - d_inkstyle->padding().x0() - d_inkstyle->padding().x1(); }
 		inline float pheight() { return height() - d_inkstyle->padding().y0() - d_inkstyle->padding().y1(); }
 

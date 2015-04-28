@@ -9,6 +9,7 @@
 #include <Object/mkObjectForward.h>
 
 struct NVGcontext;
+struct NVGdisplayList;
 struct GLFWwindow;
 
 namespace mk
