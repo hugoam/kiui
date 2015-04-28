@@ -41,12 +41,14 @@ namespace mk
 
 	protected:
 		NVGcontext* mCtx;
+		NVGdisplayList* mCache;
 		NanoLayer& mLayer;
 		BoxFloat mCorners;
 		int mImage;
 		int mOverlay;
 		int mTile;
 		int mSkin;
+		bool mUpdate;
 		std::vector<NVGtextRow> mTextRows;
 	};
 

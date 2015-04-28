@@ -1,3 +1,4 @@
+//
 // Copyright (c) 2009-2013 Mikko Mononen memon@inside.org
 //
 // This software is provided 'as-is', without any express or implied
@@ -98,6 +99,10 @@ int fonsResetAtlas(FONScontext* stash, int width, int height);
 int fonsAddFont(FONScontext* s, const char* name, const char* path);
 int fonsAddFontMem(FONScontext* s, const char* name, unsigned char* data, int ndata, int freeData);
 int fonsGetFontByName(FONScontext* s, const char* name);
+
+// Define font fallback
+void fonsDefineGlyphFallbackRange(FONScontext* s, int font, int fallbackFont,
+						 unsigned int begin, unsigned int end, float scale);
 
 // State handling
 void fonsPushState(FONScontext* s);
@@ -356,6 +361,18 @@ struct FONSglyph
 };
 typedef struct FONSglyph FONSglyph;
 
+#ifndef FONS_MAX_FALLBACKS
+#	define FONS_MAX_FALLBACKS 4
+#endif
+
+struct FONSFallback
+{
+	unsigned int begin, end;	//font range (codepoints)
+	int font;					//font to use
+	float scale;				//scale applied to the glyphs
+};
+typedef struct FONSFallback FONSFallback;
+
 struct FONSfont
 {
 	FONSttFontImpl font;
@@ -370,6 +387,9 @@ struct FONSfont
 	int cglyphs;
 	int nglyphs;
 	int lut[FONS_HASH_LUT_SIZE];
+
+	struct FONSFallback fallback[FONS_MAX_FALLBACKS]; 
+	int nfallbacks;
 };
 typedef struct FONSfont FONSfont;
 
@@ -927,6 +947,19 @@ int fonsGetFontByName(FONScontext* s, const char* name)
 	return FONS_INVALID;
 }
 
+void fonsDefineGlyphFallbackRange(FONScontext* s, int baseFont, int fallbackFont,
+						 unsigned int begin, unsigned int end, float scale)
+{
+	FONSfont* base = s->fonts[baseFont];
+	if (base->nfallbacks < FONS_MAX_FALLBACKS)
+	{
+		FONSFallback * f = &base->fallback[base->nfallbacks++];
+		f->font = fallbackFont;
+		f->begin = begin;
+		f->end = end;
+		f->scale = scale; 
+	}
+}
 
 static FONSglyph* fons__allocGlyph(FONSfont* font)
 {
@@ -1017,6 +1050,8 @@ static FONSglyph* fons__getGlyph(FONScontext* stash, FONSfont* font, unsigned in
 	unsigned char* bdst;
 	unsigned char* dst;
 
+	struct FONSttFontImpl * impl = &font->font;
+
 	if (isize < 2) return NULL;
 	if (iblur > 20) iblur = 20;
 	pad = iblur+2;
@@ -1034,9 +1069,21 @@ static FONSglyph* fons__getGlyph(FONScontext* stash, FONSfont* font, unsigned in
 	}
 
 	// Could not find glyph, create it.
-	scale = fons__tt_getPixelHeightScale(&font->font, size);
-	g = fons__tt_getGlyphIndex(&font->font, codepoint);
-	fons__tt_buildGlyphBitmap(&font->font, g, size, scale, &advance, &lsb, &x0, &y0, &x1, &y1);
+		
+	// check if there is a font fallback registered for this codepoint
+	for (i=0; i<font->nfallbacks; ++i)
+	{
+		struct FONSFallback * f = &font->fallback[i];
+		if (codepoint >= f->begin && codepoint <= f->end)
+		{
+			impl = &stash->fonts[f->font]->font;
+			size *= f->scale;
+		}
+	}
+
+	scale = fons__tt_getPixelHeightScale(impl, size);
+	g = fons__tt_getGlyphIndex(impl, codepoint);
+	fons__tt_buildGlyphBitmap(impl, g, size, scale, &advance, &lsb, &x0, &y0, &x1, &y1);
 	gw = x1-x0 + pad*2;
 	gh = y1-y0 + pad*2;
 
@@ -1070,7 +1117,7 @@ static FONSglyph* fons__getGlyph(FONScontext* stash, FONSfont* font, unsigned in
 
 	// Rasterize
 	dst = &stash->texData[(glyph->x0+pad) + (glyph->y0+pad) * stash->params.width];
-	fons__tt_renderGlyphBitmap(&font->font, dst, gw-pad*2,gh-pad*2, stash->params.width, scale,scale, g);
+	fons__tt_renderGlyphBitmap(impl, dst, gw-pad*2,gh-pad*2, stash->params.width, scale,scale, g);
 
 	// Make sure there is one pixel empty border.
 	dst = &stash->texData[glyph->x0 + glyph->y0 * stash->params.width];

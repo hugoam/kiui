@@ -1,3 +1,4 @@
+//
 // Copyright (c) 2013 Mikko Mononen memon@inside.org
 //
 // This software is provided 'as-is', without any express or implied
@@ -30,6 +31,11 @@ extern "C" {
 #endif
 
 typedef struct NVGcontext NVGcontext;
+
+// Perform vertex transformation in shader. Allows applying transformations to display lists.
+#define NVG_TRANSFORM_IN_VERTEX_SHADER 1
+
+typedef struct NVGdisplayList NVGdisplayList;
 
 struct NVGcolor {
 	union {
@@ -86,6 +92,7 @@ struct NVGglyphPosition {
 	const char* str;	// Position of the glyph in the input string.
 	float x;			// The x-coordinate of the logical glyph position.
 	float minx, maxx;	// The bounds of the glyph shape.
+	const char* next;	// Pointer to next glyph to be processed.
 };
 typedef struct NVGglyphPosition NVGglyphPosition;
 
@@ -121,6 +128,27 @@ void nvgCancelFrame(NVGcontext* ctx);
 
 // Ends drawing flushing remaining render state.
 void nvgEndFrame(NVGcontext* ctx);
+
+// Create a new display list for caching geometry in NanoVG front end. The display list will cache
+// tesselated/baked paths and text layouts. The cache grows dynamically; with initalNumCommands
+// parameter you can specifiy the inital size (use -1 for default size).
+// Returns handle to display list object.
+NVGdisplayList* nvgCreateDisplayList(int initalNumCommands);
+    
+// Deletes a generated display list and frees all memory.
+void nvgDeleteDisplayList(NVGdisplayList* list);
+    
+// Bind the display list; all NanoVG draw commands after this call will be cached. Including scissor and
+// paint. To unbind the display list set list parameter to NULL.
+void nvgBindDisplayList(NVGcontext* ctx, NVGdisplayList* list);
+    
+// Clears the cache but does not free or reallocate any memory. The size of cache keeps the same, even if
+// cache grew during previous use.
+void nvgResetDisplayList(NVGdisplayList* list);
+    
+// Draws the cached geometry by passing it to the back end. The current transform and global alpha is
+// applied to the display list.
+void nvgDrawDisplayList(NVGcontext* ctx, NVGdisplayList* list);
 
 //
 // Color utils
@@ -436,10 +464,8 @@ void nvgRect(NVGcontext* ctx, float x, float y, float w, float h);
 // Creates new rounded rectangle shaped sub-path.
 void nvgRoundedRect(NVGcontext* ctx, float x, float y, float w, float h, float r);
 
-// Creates new rounded rectangle shaped sub-path.
+// @kiui
 void nvgRoundedRect4(NVGcontext* ctx, float x, float y, float w, float h, float r0, float r1, float r2, float r3);
-
-// Creates new rounded rectangle shaped sub-path.
 void nvgRoundedFittedRect4(NVGcontext* ctx, float x, float y, float w, float h, float r0, float r1, float r2, float r3);
 
 // Creates new ellipse shaped sub-path.
@@ -496,6 +522,12 @@ int nvgCreateFont(NVGcontext* ctx, const char* name, const char* filename);
 // Returns handle to the font.
 int nvgCreateFontMem(NVGcontext* ctx, const char* name, unsigned char* data, int ndata, int freeData);
 
+// Add font fallback for existing fonts. This can be used to easily mix an custom icon font
+// with a system text font, e.g. draw all glyphs in custom unicode range (0xe000 .. 0xefff) with different font.
+// The relative scale for the replaced glyphs can be defined: 1.0f is default.
+void nvgDefineGlyphFallbackRange(NVGcontext* ctx, int baseFont, int fallbackFont, 
+								unsigned int begin, unsigned int end, float scale);
+
 // Finds a loaded font of specified name, and returns handle to it, or -1 if the font is not found.
 int nvgFindFont(NVGcontext* ctx, const char* name);
 
@@ -539,13 +571,13 @@ float nvgTextBounds(NVGcontext* ctx, float x, float y, const char* string, const
 // Measured values are returned in local coordinate space.
 void nvgTextBoxBounds(NVGcontext* ctx, float x, float y, float breakRowWidth, const char* string, const char* end, float* bounds);
 
-// @ kiui
-int nvgTextGlyphIndex(NVGcontext* ctx, float x, float y, const char* string, const char* end, float atX);
-int nvgTextGlyphPosition(NVGcontext* ctx, float x, float y, const char* string, const char* end, size_t index, NVGglyphPosition* position);
-
 // Calculates the glyph x positions of the specified text. If end is specified only the sub-string will be used.
 // Measured values are returned in local coordinate space.
 int nvgTextGlyphPositions(NVGcontext* ctx, float x, float y, const char* string, const char* end, NVGglyphPosition* positions, int maxPositions);
+
+// @ kiui
+int nvgTextGlyphIndex(NVGcontext* ctx, float x, float y, const char* string, const char* end, float atX);
+int nvgTextGlyphPosition(NVGcontext* ctx, float x, float y, const char* string, const char* end, size_t index, NVGglyphPosition* position);
 
 // Returns the vertical metrics based on the current text style.
 // Measured values are returned in local coordinate space.
@@ -600,9 +632,12 @@ struct NVGparams {
 	void (*renderViewport)(void* uptr, int width, int height);
 	void (*renderCancel)(void* uptr);
 	void (*renderFlush)(void* uptr);
-	void (*renderFill)(void* uptr, NVGpaint* paint, NVGscissor* scissor, float fringe, const float* bounds, const NVGpath* paths, int npaths);
-	void (*renderStroke)(void* uptr, NVGpaint* paint, NVGscissor* scissor, float fringe, float strokeWidth, const NVGpath* paths, int npaths);
-	void (*renderTriangles)(void* uptr, NVGpaint* paint, NVGscissor* scissor, const NVGvertex* verts, int nverts);
+	void (*renderFill)(void* uptr, NVGpaint* paint, NVGscissor* scissor, const float* xform,
+                       float fringe, const float* bounds, const NVGpath* paths, int npaths);
+	void (*renderStroke)(void* uptr, NVGpaint* paint, NVGscissor* scissor, const float* xform,
+                         float fringe, float strokeWidth, const NVGpath* paths, int npaths);
+	void (*renderTriangles)(void* uptr, NVGpaint* paint, NVGscissor* scissor, const float* xform,
+                            const NVGvertex* verts, int nverts);
 	void (*renderDelete)(void* uptr);
 };
 typedef struct NVGparams NVGparams;

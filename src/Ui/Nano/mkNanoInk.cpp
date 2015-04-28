@@ -78,10 +78,12 @@ namespace mk
 	NanoInk::NanoInk(Frame& frame, NanoLayer& layer)
 		: Inkbox(frame)
 		, mCtx(layer.target().window().ctx())
+		, mCache(nvgCreateDisplayList(-1))
 		, mLayer(layer)
 		, mImage(0)
 		, mOverlay(0)
 		, mTile(0)
+		, mUpdate(true)
 	{}
 
 	NanoInk::~NanoInk()
@@ -105,6 +107,15 @@ namespace mk
 
 		if(skin.mEmpty || !mVisible || mFrame.dclip(DIM_Y) == Frame::HIDDEN || mFrame.dclip(DIM_X) == Frame::HIDDEN)
 			return;
+
+		if(!mUpdate)
+		{
+			nvgDrawDisplayList(mCtx, mCache);
+			return;
+		}
+
+		nvgResetDisplayList(mCache);
+		nvgBindDisplayList(mCtx, mCache);
 
 		float left = mFrame.cleft();
 		float top = mFrame.ctop();
@@ -316,6 +327,9 @@ namespace mk
 
 		if(mFrame.dclip(DIM_X) || mFrame.dclip(DIM_Y))
 			nvgResetScissor(mCtx);
+
+		nvgBindDisplayList(mCtx, nullptr);
+		mUpdate = false;
 	}
 
 	float NanoInk::contentSize(Dimension dim)
@@ -428,10 +442,13 @@ namespace mk
 	}
 
 	void NanoInk::updateContent()
-	{}
+	{
+		mUpdate = true;
+	}
 
 	void NanoInk::updateStyle()
 	{
+		mUpdate = true;
 		mCorners = skin().mCornerRadius;
 
 		if(skin().mEmpty)
@@ -484,6 +501,8 @@ namespace mk
 
 	void NanoInk::updateFrame()
 	{
+		mUpdate = true;
+
 		if(skin().mEmpty || !mVisible || mFrame.dsize(DIM_X) == 0.f || mFrame.dsize(DIM_Y) == 0.f)
 			return;
 

@@ -69,7 +69,7 @@ namespace mk
 		NanoWindow(size_t width, size_t height, float pixelRatio, string resourcePath);
 		~NanoWindow();
 
-		void nextFrame();
+		void nextFrame(double time, double delta);
 
 		InkTarget& screenTarget();
 

@@ -21,7 +21,7 @@
 #include <iostream>
 
 #ifndef KIUI_EMSCRIPTEN
-#define CAP_FRAMERATE
+//#define CAP_FRAMERATE
 #endif
 
 #ifdef CAP_FRAMERATE
@@ -246,6 +246,7 @@ namespace mk
 		static double prevtime;
 
 		double time = glfwGetTime();
+		double delta = time - prevtime;
 		if(time - prevtime >= 4.f)
 		{
 			printf("fps %f\n", (frames / (time - prevtime)));
@@ -260,7 +261,7 @@ namespace mk
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		bool pursue = mUiWindow->nextFrame();
-		mNanoWindow->nextFrame();
+		mNanoWindow->nextFrame(time, delta);
 
 #ifdef CAP_FRAMERATE
 		double delta = 16.66666667 - ((glfwGetTime() - time) * 1000.f);

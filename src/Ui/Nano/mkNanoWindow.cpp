@@ -139,7 +139,7 @@ namespace mk
 #endif
 	}
 
-	void NanoWindow::nextFrame()
+	void NanoWindow::nextFrame(double time, double delta)
 	{
 		nvgBeginFrame(mCtx, mWidth, mHeight, mPixelRatio);
 
