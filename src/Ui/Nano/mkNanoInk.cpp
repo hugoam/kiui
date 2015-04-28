@@ -339,6 +339,7 @@ namespace mk
 			nvgResetScissor(mCtx);
 
 		nvgBindDisplayList(mCtx, nullptr);
+		nvgDrawDisplayList(mCtx, mCache);
 		mUpdate = false;
 	}
 
