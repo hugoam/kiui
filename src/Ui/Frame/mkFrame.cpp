@@ -208,7 +208,7 @@ namespace mk
 		d_clipPos[dim] = std::max(d_parent->d_clipPos[dim] - d_position[dim], 0.f);
 		d_clipSize[dim] = std::min(d_size[dim], d_parent->d_clipPos[dim] + d_parent->d_clipSize[dim] - d_position[dim]) - d_clipPos[dim];
 		d_clipSize[dim] = std::max(d_clipSize[dim], 0.f);
-		if(clip != this->dclip(dim))
+		if(clip || this->dclip(dim))
 			d_inkbox->updateClip();
 	}
 
