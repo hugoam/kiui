@@ -113,7 +113,7 @@ namespace mk
 
 		if(!mCache)
 		{
-			mCache = nvgCreateDisplayList(64);
+			mCache = nvgCreateDisplayList(12);
 		}
 
 		if(!mUpdate)
