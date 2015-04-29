@@ -219,6 +219,9 @@ namespace mk
 		if(d_style->updated() > d_styleStamp)
 			this->resetStyle();
 
+		if(d_parent && d_parent->dirty() >= DIRTY_POSITION && d_dirty < DIRTY_POSITION)
+			d_dirty = DIRTY_POSITION;
+
 		switch(d_dirty)
 		{
 		case DIRTY_VISIBILITY:
@@ -239,7 +242,8 @@ namespace mk
 			break;
 		};
 
-		d_dirty = CLEAN;
+		if(this->frameType() == FRAME)
+			d_dirty = CLEAN;
 	}
 
 	void Frame::transfer(Stripe& stripe, size_t index)
@@ -329,12 +333,7 @@ namespace mk
 	{
 		d_position[dim] = position;
 		d_clipPos[dim] = 0.f;
-		this->markDirty(DIRTY_POSITION);
-	}
-
-	void Frame::markDirty(Dirty dirty)
-	{
-		this->setDirty(dirty);
+		this->setDirty(DIRTY_POSITION);
 	}
 
 	void Frame::show()

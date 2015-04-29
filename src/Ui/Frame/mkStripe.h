@@ -79,7 +79,6 @@ namespace mk
 
 		void move(size_t from, size_t to);
 
-		void markDirty(Dirty dirty);
 		void setVisible(bool visible);
 
 		void migrate(Stripe& stripe);
@@ -116,8 +115,6 @@ namespace mk
 		void updateSpace();
 		void updateStyle();
 		void updateSizing();
-
-		void deepRelayout();
 
 		void initWeights();
 		void dispatchWeights();

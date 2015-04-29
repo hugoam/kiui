@@ -277,23 +277,6 @@ namespace mk
 		Frame::updateSizing();
 	}
 
-	void Stripe::deepRelayout()
-	{
-		d_relayout = true;
-
-		for(Frame* frame : d_contents)
-			if(frame->frameType() >= STRIPE)
-				frame->as<Stripe>().deepRelayout();
-	}
-
-	void Stripe::markDirty(Dirty dirty)
-	{
-		Frame::markDirty(dirty);
-
-		for(Frame* frame : d_contents)
-			frame->markDirty(dirty);
-	}
-
 	void Stripe::setVisible(bool visible)
 	{
 		Frame::setVisible(visible);

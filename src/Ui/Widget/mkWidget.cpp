@@ -33,7 +33,6 @@ namespace mk
 		, mStyle(&cls())
 		, mFrame(nullptr)
 		, mState(UNBOUND)
-		, mForm(nullptr)
 	{
 		if(frameType == STRIPE)
 			mFrame = make_unique<Stripe>(*this);
@@ -182,14 +181,6 @@ namespace mk
 	void Widget::nextFrame(size_t tick, size_t delta)
 	{
 		mFrame->nextFrame(tick, delta);
-
-		//std::cerr << "Widget :: nextFrame " << tick << " , " << delta << std::endl;
-		if(mForm)
-		{
-			//if(mForm->updated() == mForm->rootForm()->lastTick())
-			//	this->markDirty();
-			mForm->nextFrame(tick, delta);
-		}
 	}
 
 	Widget* Widget::pinpoint(float x, float y, bool modal)

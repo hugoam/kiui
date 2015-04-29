@@ -49,6 +49,7 @@ namespace mk
 
 		void setIndex(size_t index) { d_index = index; }
 		void setDirty(Dirty dirty) { if(dirty > d_dirty) d_dirty = dirty; }
+		void clearDirty() { d_dirty = CLEAN; }
 
 		Layer& layer();
 
@@ -79,8 +80,6 @@ namespace mk
 		virtual bool prevOffset(Dimension dim, float& pos, float seuil, bool top = false);
 
 		virtual void setVisible(bool visible);
-
-		virtual void markDirty(Dirty dirty);
 
 		virtual Frame* pinpoint(float x, float y, bool opaque);
 

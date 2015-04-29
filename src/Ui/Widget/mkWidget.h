@@ -41,7 +41,6 @@ namespace mk
 
 		_A_ inline Sheet* parent() { return mParent; }
 		_A_ inline Frame& frame() { return *mFrame.get(); }
-		_A_ inline Form* form() { return mForm; }
 		_A_ inline WidgetState state() { return mState; }
 		_A_ _M_ inline Style& style() { return *mStyle; }
 
@@ -153,8 +152,6 @@ namespace mk
 		Style* mStyle;
 		unique_ptr<Frame> mFrame;
 		WidgetState mState;
-
-		Form* mForm;
 
 		static string sNullString;
 	};

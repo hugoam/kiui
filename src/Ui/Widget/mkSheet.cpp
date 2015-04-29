@@ -50,6 +50,8 @@ namespace mk
 		
 		for(size_t i = 0; i < mContents.size(); ++i)
 			mContents[i]->nextFrame(tick, delta);
+
+		mFrame->clearDirty();
 	}
 
 	void Sheet::bind(Sheet* parent, size_t index)
