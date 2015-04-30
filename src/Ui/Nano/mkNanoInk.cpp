@@ -80,7 +80,8 @@ namespace mk
 	NanoInk::NanoInk(Frame& frame, NanoLayer& layer)
 		: Inkbox(frame)
 		, mCtx(layer.target().window().ctx())
-		, mCache(nullptr)
+		, mImageCache(nullptr)
+		, mTextCache(nullptr)
 		, mLayer(layer)
 		, mImage(0)
 		, mOverlay(0)
@@ -90,8 +91,10 @@ namespace mk
 
 	NanoInk::~NanoInk()
 	{
-		if(mCache)
-			nvgDeleteDisplayList(mCache);
+		if(mImageCache)
+			nvgDeleteDisplayList(mImageCache);
+		if(mTextCache)
+			nvgDeleteDisplayList(mTextCache);
 	}
 
 	void NanoInk::show()
@@ -104,7 +107,15 @@ namespace mk
 		mVisible = false;
 	}
 
-	void NanoInk::nanodraw()
+	void NanoInk::drawCache(NVGdisplayList* cache)
+	{
+		nvgSave(mCtx);
+		nvgTranslate(mCtx, floor(mFrame.dabsolute(DIM_X)), floor(mFrame.dabsolute(DIM_Y)));
+		nvgDrawDisplayList(mCtx, cache);
+		nvgRestore(mCtx);
+	}
+
+	void NanoInk::drawImage()
 	{
 		//std::cerr << "ink :: draw " << mFrame.style()->name() << std::endl;
 
@@ -113,22 +124,19 @@ namespace mk
 		if(skin.mEmpty || !mVisible)
 			return;
 
-		if(!mCache)
+		if(!mImageCache)
 		{
-			mCache = nvgCreateDisplayList(12);
+			mImageCache = nvgCreateDisplayList(12);
 		}
 
 		if(!mUpdate)
 		{
-			nvgSave(mCtx);
-			nvgTranslate(mCtx, floor(mFrame.dabsolute(DIM_X)), floor(mFrame.dabsolute(DIM_Y)));
-			nvgDrawDisplayList(mCtx, mCache);
-			nvgRestore(mCtx);
+			this->drawCache(mImageCache);
 			return;
 		}
 
-		nvgResetDisplayList(mCache);
-		nvgBindDisplayList(mCtx, mCache);
+		nvgResetDisplayList(mImageCache);
+		nvgBindDisplayList(mCtx, mImageCache);
 
 		float left = mFrame.cleft();
 		float top = mFrame.ctop();
@@ -253,6 +261,65 @@ namespace mk
 		if(mTile)
 			this->drawImage(*mTile, left, top, width, height);
 
+		if(mFrame.dclip(DIM_X) || mFrame.dclip(DIM_Y))
+			nvgResetScissor(mCtx);
+
+		nvgBindDisplayList(mCtx, nullptr);
+
+		this->drawCache(mImageCache);
+	}
+
+	void NanoInk::drawText()
+	{
+		InkStyle& skin = this->skin();
+
+		if(skin.mEmpty || !mVisible)
+			return;
+
+		if(!mTextCache)
+			mTextCache = nvgCreateDisplayList(-1);
+
+		if(!mUpdate)
+		{
+			this->drawCache(mTextCache);
+			return;
+		}
+
+		nvgResetDisplayList(mTextCache);
+		nvgBindDisplayList(mCtx, mTextCache);
+
+		float left = mFrame.cleft();
+		float top = mFrame.ctop();
+		float width = mFrame.cwidth();
+		float height = mFrame.cheight();;
+
+		float pleft = mFrame.pleft();
+		float ptop = mFrame.ptop();
+		float pwidth = mFrame.pwidth();
+		float pheight = mFrame.pheight();
+
+		float contentWidth = contentSize(DIM_X) - skin.padding()[DIM_X] - skin.padding()[DIM_X + 2];
+		float contentHeight = contentSize(DIM_Y) - skin.padding()[DIM_Y] - skin.padding()[DIM_Y + 2];
+
+		float cleft = pleft;
+		NVGalign halign = NVG_ALIGN_LEFT;
+		if(skin.align()[DIM_X] == CENTER)
+		{
+			halign = NVG_ALIGN_CENTER;
+			cleft = pleft + pwidth / 2.f - contentWidth / 2.f;
+		}
+		else if(skin.align()[DIM_X] == RIGHT)
+		{
+			halign = NVG_ALIGN_RIGHT;
+			cleft = pleft + pwidth - contentWidth;
+		}
+
+		float ctop = ptop;
+		if(skin.align()[DIM_Y] == CENTER)
+			ctop = ptop + pheight / 2.f - contentHeight / 2.f;
+		else if(skin.align()[DIM_Y] == RIGHT)
+			ctop = ptop + pheight - contentHeight;
+
 		// Caption
 		if(!mFrame.widget().label().empty() && !(pwidth <= 0.f || pheight <= 0.f))
 		{
@@ -277,7 +344,7 @@ namespace mk
 					x = pleft + pwidth*0.5f - row.width*0.5f;
 				else if(halign & NVG_ALIGN_RIGHT)
 					x = pleft + pwidth - row.width;
-						
+
 				if(mSelectFirst != mSelectSecond)
 				{
 					size_t indexStart = row.start - start;
@@ -303,7 +370,7 @@ namespace mk
 
 				nvgFillColor(mCtx, nvgColour(skin.mTextColour));
 				nvgText(mCtx, x, y, row.start, row.end);
-					
+
 				y += lineh;
 			}
 
@@ -319,10 +386,7 @@ namespace mk
 
 		nvgBindDisplayList(mCtx, nullptr);
 
-		nvgSave(mCtx);
-		nvgTranslate(mCtx, floor(mFrame.dabsolute(DIM_X)), floor(mFrame.dabsolute(DIM_Y)));
-		nvgDrawDisplayList(mCtx, mCache);
-		nvgRestore(mCtx);
+		this->drawCache(mTextCache);
 
 		mUpdate = false;
 	}

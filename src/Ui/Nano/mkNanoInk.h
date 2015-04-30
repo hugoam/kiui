@@ -40,14 +40,18 @@ namespace mk
 
 		void setupText();
 
-		void nanodraw();
+		void drawImage();
+		void drawText();
 
 	private:
 		void drawImage(int image, float x, float y, float w, float h, float imgx, float imgy, float imgw, float imgh);
 
+		void drawCache(NVGdisplayList* cache);
+
 	protected:
 		NVGcontext* mCtx;
-		NVGdisplayList* mCache;
+		NVGdisplayList* mImageCache;
+		NVGdisplayList* mTextCache;
 		NanoLayer& mLayer;
 		BoxFloat mCorners;
 		Image* mImage;

@@ -74,7 +74,8 @@ namespace mk
 
 		void nanodraw();
 
-		void draw(Frame& frame);
+		void drawImage(Frame& frame);
+		void drawText(Frame& frame);
 
 	protected:
 		NanoTarget& mTarget;

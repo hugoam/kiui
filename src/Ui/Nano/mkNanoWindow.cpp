@@ -202,16 +202,26 @@ namespace mk
 
 	void NanoLayer::nanodraw()
 	{
-		this->draw(mFrame);
+		this->drawImage(mFrame);
+		this->drawText(mFrame);
 	}
 
-	void NanoLayer::draw(Frame& frame)
+	void NanoLayer::drawImage(Frame& frame)
 	{
-		static_cast<NanoInk&>(frame.inkbox()).nanodraw();
+		static_cast<NanoInk&>(frame.inkbox()).drawImage();
 
 		if(frame.frameType() >= STRIPE)
 			for(Frame* subframe : frame.as<Stripe>().contents())
-				this->draw(*subframe);
+				this->drawImage(*subframe);
+	}
+
+	void NanoLayer::drawText(Frame& frame)
+	{
+		static_cast<NanoInk&>(frame.inkbox()).drawText();
+
+		if(frame.frameType() >= STRIPE)
+			for(Frame* subframe : frame.as<Stripe>().contents())
+				this->drawText(*subframe);
 	}
 
 	NanoTarget::NanoTarget(NanoWindow& window)
