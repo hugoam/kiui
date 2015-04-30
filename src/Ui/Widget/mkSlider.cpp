@@ -106,7 +106,7 @@ namespace mk
 
 	void Slider::nextFrame(size_t tick, size_t delta)
 	{
-		if(mFrame->dirty() >= Frame::DIRTY_FRAME)
+		if(mFrame->dirty() >= Frame::DIRTY_WIDGET)
 			this->updateKnob();
 
 		Sheet::nextFrame(tick, delta);
@@ -149,6 +149,7 @@ namespace mk
 
 		mKnobLength = knobLength ? knobLength : mStepLength;
 
+		this->markDirty();
 		this->updateKnob();
 	}
 

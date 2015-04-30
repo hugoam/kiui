@@ -117,7 +117,6 @@ namespace mk
 	void Scrollbar::nextFrame(size_t tick, size_t delta)
 	{
 		Sheet::nextFrame(tick, delta);
-
 		mScroller.updateMetrics(0.f, mSheet.stripe().sequenceLength() - mSheet.stripe().dclipsize(DIM_Y), mSheet.stripe().cursor(), 1.f, mSheet.stripe().dclipsize(DIM_Y));
 	}
 
