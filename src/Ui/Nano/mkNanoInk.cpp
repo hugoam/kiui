@@ -146,7 +146,7 @@ namespace mk
 		float pwidth = mFrame.pwidth();
 		float pheight = mFrame.pheight();
 
-#if 1 // DEBUG
+#if 0 // DEBUG
 		nvgBeginPath(mCtx);
 		nvgRect(mCtx, left + 0.5f, top + 0.5f, width - 1.f, height - 1.f);
 		nvgStrokeWidth(mCtx, 1.f);
