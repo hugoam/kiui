@@ -16,6 +16,8 @@
 
 #include <cmath>
 
+#define NANO_ATLAS
+
 namespace mk
 {
 	inline float clamp(float v, float mn, float mx)
@@ -244,36 +246,12 @@ namespace mk
 			nvgScissor(mCtx, left, top, width, height);
 
 		// Image
-		if(mImage || mOverlay)
-		{
-			nvgBeginPath(mCtx);
-			nvgRect(mCtx, cleft, ctop, contentWidth, contentHeight);
-
-			if(mImage)
-			{
-				NVGpaint imgPaint = nvgImagePattern(mCtx, cleft, ctop, contentWidth, contentHeight, 0.0f / 180.0f*NVG_PI, mImage, 1.f);
-				nvgFillPaint(mCtx, imgPaint);
-				nvgFill(mCtx);
-			}
-			if(mOverlay)
-			{
-				NVGpaint imgPaint = nvgImagePattern(mCtx, cleft, ctop, contentWidth, contentHeight, 0.0f / 180.0f*NVG_PI, mOverlay, 1.f);
-				nvgFillPaint(mCtx, imgPaint);
-				nvgFill(mCtx);
-			}
-		}
-
+		if(mImage)
+			this->drawImage(*mImage, cleft, ctop, contentWidth, contentHeight);
+		if(mOverlay)
+			this->drawImage(*mOverlay, cleft, ctop, contentWidth, contentHeight);
 		if(mTile)
-		{
-			nvgBeginPath(mCtx);
-			nvgRect(mCtx, left, top, width, height);
-
-			int imgw, imgh;
-			nvgImageSize(mCtx, mTile, &imgw, &imgh);
-			NVGpaint imgPaint = nvgImagePattern(mCtx, left, top, imgw, imgh, 0.0f / 180.0f*NVG_PI, mTile, 1.f);
-			nvgFillPaint(mCtx, imgPaint);
-			nvgFill(mCtx);
-		}
+			this->drawImage(*mTile, left, top, width, height);
 
 		// Caption
 		if(!mFrame.widget().label().empty() && !(pwidth <= 0.f || pheight <= 0.f))
@@ -353,13 +331,10 @@ namespace mk
 	{
 		if(mImage)
 		{
-			int width, height;
-			nvgImageSize(mCtx, mImage, &width, &height);
-
 			float xoffset = skin().padding()[DIM_X] + skin().padding()[DIM_X + 2];
 			float yoffset = skin().padding()[DIM_Y] + skin().padding()[DIM_Y + 2];
 
-			return dim == DIM_X ? float(width) + xoffset : float(height) + yoffset;
+			return dim == DIM_X ? float(mImage->d_width) + xoffset : float(mImage->d_height) + yoffset;
 		}
 		else if(skin().textColour().a() != 0.f)
 		{
@@ -471,42 +446,43 @@ namespace mk
 		if(skin().mEmpty)
 			return;
 
-		if(!mFrame.widget().image().empty())
-			mImage = fetchImage(mFrame.widget().image());
+		if(mFrame.widget().image())
+			mImage = &fetchImage(*mFrame.widget().image());
 		else
 			mImage = 0;
 
-		if(!skin().overlay().empty())
-			mOverlay = fetchImage(skin().overlay());
+		if(!skin().overlay().null())
+			mOverlay = &fetchImage(skin().overlay());
 		else
 			mOverlay = 0;
 
-		if(!skin().tile().empty())
-			mTile = fetchImage(skin().tile(), true);
+		if(!skin().tile().null())
+			mTile = &fetchImage(skin().tile(), true);
 		else
 			mTile = 0;
 
 		if(!skin().imageSkin().null())
 		{
-			mSkin = fetchImage(skin().imageSkin().d_image);
+			mSkin = &fetchImage(skin().imageSkin().d_image);
 
 			if(!skin().imageSkin().d_prepared)
-			{
-				int imgwidth, imgheight;
-				nvgImageSize(mCtx, mSkin, &imgwidth, &imgheight);
-				skin().imageSkin().prepare(imgwidth, imgheight);
-			}
+				skin().imageSkin().prepare(mSkin->d_width, mSkin->d_height);
 		}
 	}
 
-	int NanoInk::fetchImage(const string& image, bool tile)
+	Image& NanoInk::fetchImage(Image& image, bool tile)
 	{
-		auto it = NanoWindow::sImages.find(image);
-		if(it != NanoWindow::sImages.end())
-			return (*it).second;
-
-		NanoWindow::sImages[image] = nvgCreateImage(mCtx, (mLayer.target().window().resourcePath() + "interface/uisprites/" + image + ".png").c_str(), tile ? (NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY) : 0);
-		return NanoWindow::sImages[image];
+		if(image.d_index == 0)
+		{
+			image.d_index = nvgCreateImage(mCtx, (mLayer.target().window().resourcePath() + "interface/uisprites/" + image.d_name + ".png").c_str(), tile ? (NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY) : 0);
+			nvgImageSize(mCtx, image.d_index, &image.d_width, &image.d_height);
+#ifdef NANO_ATLAS
+			ImageRect& rect = mLayer.target().window().atlas().findSpriteRect(image.d_name + ".png");
+			image.d_left = rect.x;
+			image.d_top = rect.y;
+#endif
+		}
+		return image;
 	}
 
 	void NanoInk::setupText()
@@ -584,43 +560,57 @@ namespace mk
 		}
 	}
 
-	void NanoInk::drawImage(int image, float left, float top, float width, float height)
+	void NanoInk::drawImage(int image, float left, float top, float width, float height, float imgx, float imgy, float imgw, float imgh)
 	{
-		NVGpaint imgPaint = nvgImagePattern(mCtx, left, top, width, height, 0.0f / 180.0f*NVG_PI, image, 1.f);
+		NVGpaint imgPaint = imgPaint = nvgImagePattern(mCtx, imgx, imgy, imgw, imgh, 0.0f / 180.0f*NVG_PI, image, 1.f);
 		nvgBeginPath(mCtx);
 		nvgRect(mCtx, left, top, width, height);
 		nvgFillPaint(mCtx, imgPaint);
 		nvgFill(mCtx);
 	}
 
+	void NanoInk::drawImage(const Image& image, float x, float y, float w, float h)
+	{
+#ifdef NANO_ATLAS
+		NanoAtlas& atlas = mLayer.target().window().atlas();
+		this->drawImage(atlas.image(), x, y, w, h, x - image.d_left, y - image.d_top, atlas.width(), atlas.height());
+#else
+		this->drawImage(image.d_index, x, y, w, h, x, y, w, h);
+#endif
+		
+	}
+
+	void NanoInk::drawImageStretch(const Image& image, float left, float top, float width, float height, float xoff, float yoff, float xstretch, float ystretch)
+	{
+#ifdef NANO_ATLAS
+		NanoAtlas& atlas = mLayer.target().window().atlas();
+		this->drawImage(atlas.image(), left, top, width, height, left - image.d_left * xstretch + xoff * xstretch, top - image.d_top * ystretch + yoff * ystretch, atlas.width() * xstretch, atlas.height() * ystretch);
+#else
+		this->drawImage(image.d_index, left, top, width, height, left + xoff * xstretch, top + yoff * ystretch, image.d_width * xstretch, image.d_height * ystretch);
+#endif
+	}
+
+	void NanoInk::drawAtlasImage(const Image& image, float left, float top, float width, float height)
+	{
+
+	}
+
 	void NanoInk::drawSkinImage(ImageSkin::Section section, float left, float top, float width, float height)
 	{
-		int imgwidth, imgheight;
-		nvgImageSize(mCtx, mSkin, &imgwidth, &imgheight);
-
 		left -= skin().imageSkin().d_margin;
 		top -= skin().imageSkin().d_margin;
 
 		float xoffset = -skin().imageSkin().d_coords[section].x0();
 		float yoffset = -skin().imageSkin().d_coords[section].y0();
 
-		if(section == ImageSkin::TOP || section == ImageSkin::BOTTOM || section == ImageSkin::FILL)
-		{
-			float ratio = width / skin().imageSkin().d_fillWidth; //float(imgwidth);
-			xoffset *= ratio;
-			imgwidth *= ratio;
-		}
-		if(section == ImageSkin::LEFT || section == ImageSkin::RIGHT || section == ImageSkin::FILL)
-		{
-			float ratio = height / skin().imageSkin().d_fillHeight; //float(imgheight);
-			yoffset *= ratio;
-			imgheight *= ratio;
-		}
+		float xratio = 1.f;
+		float yratio = 1.f;
 
-		NVGpaint imgPaint = nvgImagePattern(mCtx, left + xoffset, top + yoffset, imgwidth, imgheight, 0.0f / 180.0f*NVG_PI, mSkin, 1.f);
-		nvgBeginPath(mCtx);
-		nvgRect(mCtx, left, top, width, height);
-		nvgFillPaint(mCtx, imgPaint);
-		nvgFill(mCtx);
+		if(section == ImageSkin::TOP || section == ImageSkin::BOTTOM || section == ImageSkin::FILL)
+			xratio = width / skin().imageSkin().d_fillWidth; //float(imgwidth);
+		if(section == ImageSkin::LEFT || section == ImageSkin::RIGHT || section == ImageSkin::FILL)
+			yratio = height / skin().imageSkin().d_fillHeight; //float(imgheight);
+
+		this->drawImageStretch(*mSkin, left, top, width, height, xoffset, yoffset, xratio, yratio);
 	}
 }

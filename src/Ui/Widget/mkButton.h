@@ -39,16 +39,17 @@ namespace mk
 	class MK_UI_EXPORT Icon : public Widget
 	{
 	public:
+		Icon(Image& image);
 		Icon(const string& image);
 
-		const string& image() { return mImage; }
+		Image* image() { return &mImage; }
 
-		void setImage(const string& image);
+		//void setImage(Image& image);
 
 		static StyleType& cls() { static StyleType ty("Icon", Widget::cls()); return ty; }
 
 	protected:
-		string mImage;
+		Image& mImage;
 	};
 
 	/*
@@ -111,15 +112,16 @@ namespace mk
 		typedef WidgetTrigger<Button>::Trigger Trigger;
 
 	public:
+		ImgButton(Image& image, const Trigger& trigger = Trigger());
 		ImgButton(const string& image, const Trigger& trigger = Trigger());
 
-		const string& image() { return mImage; }
+		Image* image() { return &mImage; }
 		const string& tooltip() { return mTooltip; }
 
 		static StyleType& cls() { static StyleType ty("ImgButton", Button::cls()); return ty; }
 
 	protected:
-		string mImage;
+		Image& mImage;
 		string mTooltip;
 	};
 

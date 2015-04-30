@@ -8,11 +8,53 @@
 /* mk Og */
 #include <Ui/mkUiForward.h>
 #include <Ui/Frame/mkInk.h>
+#include <Ui/Nano/RectPacking/Rect.h>
+#include <Ui/Nano/RectPacking/GuillotineBinPack.h>
 
 #include <memory>
 
 namespace mk
 {
+	struct ImageRect : public BPRect
+	{
+		string subfolder;
+		string image;
+	};
+
+	class MK_UI_EXPORT NanoAtlas
+	{
+	public:
+		NanoAtlas(NVGcontext* ctx, const string& path, size_t width, size_t height);
+
+		const string& path() { return mPath; }
+		size_t width() { return mWidth; }
+		size_t height() { return mHeight; }
+		int image() { return mImage; }
+
+		void createAtlas();
+		void generateAtlas();
+		void loadAtlas();
+
+		void fitImage(ImageRect& image);
+		void blitImage(ImageRect& image);
+
+		ImageRect& findSpriteRect(const string& image);
+		void appendSprite(const string& image, const string& group);
+		void defineSprite(const string& image, float left, float top, float width, float height);
+
+		std::vector<ImageRect>& sprites() { return mSprites; }
+
+	protected:
+		NVGcontext* mCtx;
+		string mPath;
+		size_t mWidth;
+		size_t mHeight;
+		GuillotineBinPack mRectPacker;
+		std::vector<ImageRect> mSprites;
+		unsigned char* mData;
+		int mImage;
+	};
+
 	class MK_UI_EXPORT NanoLayer : public InkLayer
 	{
 	public:
@@ -57,12 +99,6 @@ namespace mk
 		NanoWindow& mWindow;
 	};
 
-	class MK_UI_EXPORT NanoGl
-	{
-	public:
-		virtual ~NanoGl() {}
-	};
-
 	class MK_UI_EXPORT NanoWindow : public InkWindow
 	{
 	public:
@@ -75,18 +111,17 @@ namespace mk
 
 		string resourcePath() { return mResourcePath; }
 		NVGcontext* ctx() { return mCtx; }
-		
-		static std::map<string, int> sImages;
+		NanoAtlas& atlas() { return *mAtlas.get(); }
 
 	protected:
 		size_t mWidth;
 		size_t mHeight;
 		float mPixelRatio;
 		string mResourcePath;
-		unique_ptr<NanoGl> mNanoGl;
 
 		NVGcontext* mCtx;
 		unique_ptr<NanoTarget> mScreenTarget;
+		unique_ptr<NanoAtlas> mAtlas;
 	};
 
 }

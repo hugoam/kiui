@@ -52,10 +52,10 @@ namespace mk
 
 		virtual const string& name() { return sNullString; }
 		virtual const string& label() { return sNullString; }
-		virtual const string& image(); // { return sNullString; }
 		virtual const string& tooltip() { return sNullString; }
 		virtual const string& dockid() { return sNullString; }
 		virtual Style* hoverCursor() { return nullptr; }
+		virtual Image* image(); // { return sNullString; }
 
 		virtual const string& contentlabel() { return this->label(); }
 

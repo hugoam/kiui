@@ -171,7 +171,7 @@ namespace mk
 		{
 			WidgetState state = fromString<WidgetState>(strState);
 			string suffix = "_" + replaceAll(strState, "|", "_");
-			mStyle->decline(state).mImage = mSkin->image() + suffix;
+			mStyle->decline(state).mImage = Image(mSkin->image().d_name + suffix);
 		}
 	}
 	
@@ -184,7 +184,7 @@ namespace mk
 			string suffix = "_" + replaceAll(strState, "|", "_");
 			InkStyle& inkstyle = mStyle->decline(state);
 			inkstyle.mImageSkin = mSkin->mImageSkin;
-			inkstyle.mImageSkin.val.setImage(mSkin->mImageSkin.val.d_image + suffix);
+			inkstyle.mImageSkin.val.setImage(Image(mSkin->mImageSkin.val.d_image.d_name + suffix));
 		}
 	}
 
@@ -262,11 +262,11 @@ namespace mk
 		else if(key == "topdown_gradient")
 			mSkin->mTopdownGradient = fromString<DimFloat>(value); // top, down
 		else if(key == "image")
-			mSkin->mImage = value; // image.png
+			mSkin->mImage = Image(value); // image.png
 		else if(key == "overlay")
-			mSkin->mOverlay = value; // image.png
+			mSkin->mOverlay = Image(value); // image.png
 		else if(key == "tile")
-			mSkin->mTile = value; // image.png
+			mSkin->mTile = Image(value); // image.png
 		else if(key == "image_skin")
 			mSkin->mImageSkin = ImageSkin(values[0],	fromString<int>(values[1]), fromString<int>(values[2]),
 														fromString<int>(values[3]), fromString<int>(values[4]),

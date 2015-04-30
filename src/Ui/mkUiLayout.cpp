@@ -31,7 +31,7 @@ namespace mk
 			if(object)
 			{
 				InkStyle& ink = object->as<InkStyle>();
-				if(ink.backgroundColour().a() > 0.f || ink.textColour().a() > 0.f || ink.borderColour().a() > 0.f || !ink.image().empty() || !ink.imageSkin().null())
+				if(ink.backgroundColour().a() > 0.f || ink.textColour().a() > 0.f || ink.borderColour().a() > 0.f || !ink.image().null() || !ink.imageSkin().null())
 					ink.mEmpty = false;
 			}
 	}
@@ -259,19 +259,19 @@ namespace mk
 
 		EmptyStyle::cls().skin().mEmpty = true;
 
-		Cursor::cls().skin().mImage = "mousepointer";
+		Cursor::cls().skin().mImage = Image("mousepointer");
 
-		ResizeCursorX::cls().skin().mImage = "resize_h_20";
+		ResizeCursorX::cls().skin().mImage = Image("resize_h_20");
 		ResizeCursorX::cls().skin().mPadding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
-		ResizeCursorY::cls().skin().mImage = "resize_v_20";
+		ResizeCursorY::cls().skin().mImage = Image("resize_v_20");
 		ResizeCursorY::cls().skin().mPadding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
-		MoveCursor::cls().skin().mImage = "move_20";
+		MoveCursor::cls().skin().mImage = Image("move_20");
 		MoveCursor::cls().skin().mPadding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
-		ResizeCursorDiagLeft::cls().skin().mImage = "resize_diag_left_20";
+		ResizeCursorDiagLeft::cls().skin().mImage = Image("resize_diag_left_20");
 		ResizeCursorDiagLeft::cls().skin().mPadding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
-		ResizeCursorDiagRight::cls().skin().mImage = "resize_diag_right_20";
+		ResizeCursorDiagRight::cls().skin().mImage = Image("resize_diag_right_20");
 		ResizeCursorDiagRight::cls().skin().mPadding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
-		CaretCursor::cls().skin().mImage = "caret_white";
+		CaretCursor::cls().skin().mImage = Image("caret_white");
 		CaretCursor::cls().skin().mPadding = BoxFloat(-4.f, -9.f, +4.f, +9.f);
 
 		Caret::cls().skin().mBackgroundColour = Colour::White;
@@ -314,19 +314,19 @@ namespace mk
 
 		SliderDisplay::cls().skin().mAlign = DimAlign(CENTER, CENTER);
 
-		CloseButton::cls().skin().mImage = "close_15";
+		CloseButton::cls().skin().mImage = Image("close_15");
 		CloseButton::cls().skin().mPadding = BoxFloat(4.f);
 		CloseButton::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
 
 		DropdownToggle::cls().skin().mBackgroundColour = Colour::MidGrey;
-		DropdownToggle::cls().skin().mImage = "arrow_down_15";
+		DropdownToggle::cls().skin().mImage = Image("arrow_down_15");
 		DropdownToggle::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
 
-		ExpandboxToggle::cls().skin().mImage = "arrow_right_15";
-		ExpandboxToggle::cls().decline(ACTIVATED).mImage = "arrow_down_15";
+		ExpandboxToggle::cls().skin().mImage = Image("arrow_right_15");
+		ExpandboxToggle::cls().decline(ACTIVATED).mImage = Image("arrow_down_15");
 		ExpandboxToggle::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
-		ExpandboxToggle::cls().decline(DISABLED).mImage = "empty_15";
-		ExpandboxToggle::cls().decline(static_cast<WidgetState>(ACTIVATED | HOVERED)).mImage = "arrow_down_15";
+		ExpandboxToggle::cls().decline(DISABLED).mImage = Image("empty_15");
+		ExpandboxToggle::cls().decline(static_cast<WidgetState>(ACTIVATED | HOVERED)).mImage = Image("arrow_down_15");
 		ExpandboxToggle::cls().subskin(static_cast<WidgetState>(ACTIVATED | HOVERED)).mBackgroundColour = Colour::Red;
 
 		TreeNodeToggle::cls().copySkins(ExpandboxToggle::cls());
@@ -380,11 +380,11 @@ namespace mk
 		Slider::cls().skin().mBackgroundColour = Colour::MidGrey;
 		Slider::cls().skin().mCornerRadius = 3.f;
 
-		ScrollUp::cls().skin().mImage = "arrow_up_15";
+		ScrollUp::cls().skin().mImage = Image("arrow_up_15");
 		ScrollUp::cls().skin().mBackgroundColour = Colour::Transparent;
 		ScrollUp::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
 
-		ScrollDown::cls().skin().mImage = "arrow_down_15";
+		ScrollDown::cls().skin().mImage = Image("arrow_down_15");
 		ScrollDown::cls().skin().mBackgroundColour = Colour::Transparent;
 		ScrollDown::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
 

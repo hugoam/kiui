@@ -87,7 +87,7 @@ namespace mk
 
 	void Frame::updateSpace()
 	{
-		if(!d_widget.image().empty() || !d_widget.label().empty())
+		if(d_widget.image() || !d_widget.label().empty())
 			d_space = BLOCK;
 		else
 			d_space = BOARD;

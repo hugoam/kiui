@@ -132,7 +132,7 @@ namespace mk
 			: IdStruct(index<InkStyle>(), cls())
 			, mEmpty(true), mBackgroundColour(Colour::Transparent), mBorderColour(Colour::Transparent), mTextColour(Colour::Transparent), mImageColour(Colour::Transparent)
 			, mTextFont("dejavu"), mTextSize(14.f), mTextWrap(false)
-			, mAlign(DimAlign(LEFT, LEFT)), mBorderWidth(0.f), mImage(""), mCornerRadius(), mWeakCorners(true)
+			, mAlign(DimAlign(LEFT, LEFT)), mBorderWidth(0.f), mImage(), mCornerRadius(), mWeakCorners(true)
 		{}
 
 		InkStyle(const InkStyle& other)
@@ -176,14 +176,14 @@ namespace mk
 		_A_ bool textWrap() { return mTextWrap.val; }
 		_A_ BoxFloat& borderWidth() { return mBorderWidth.val; }
 		_A_ BoxFloat& cornerRadius() { return mCornerRadius.val; }
-		_A_ bool weakCorners() const { return mWeakCorners.val; }
+		_A_ bool weakCorners() { return mWeakCorners.val; }
 		_A_ BoxFloat& padding() { return mPadding.val; }
 		_A_ BoxFloat& margin() { return mMargin.val; }
 		_A_ DimAlign& align() { return mAlign.val; }
 		_A_ DimFloat& topdownGradient() { return mTopdownGradient.val; }
-		_A_ const string& image() const { return mImage.val; }
-		_A_ const string& overlay() const { return mOverlay.val; }
-		_A_ const string& tile() const { return mTile.val; }
+		_A_ Image& image() { return mImage.val; }
+		_A_ Image& overlay() { return mOverlay.val; }
+		_A_ Image& tile() { return mTile.val; }
 		_A_ ImageSkin& imageSkin() { return mImageSkin.val; }
 		_A_ Shadow& shadow() { return mShadow.val; }
 
@@ -202,9 +202,9 @@ namespace mk
 		StyleAttr<BoxFloat> mMargin;
 		StyleAttr<DimAlign> mAlign;
 		StyleAttr<DimFloat> mTopdownGradient;
-		StyleAttr<string> mImage;
-		StyleAttr<string> mOverlay;
-		StyleAttr<string> mTile;
+		StyleAttr<Image> mImage;
+		StyleAttr<Image> mOverlay;
+		StyleAttr<Image> mTile;
 		StyleAttr<ImageSkin> mImageSkin;
 		StyleAttr<Shadow> mShadow;
 

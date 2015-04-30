@@ -22,6 +22,26 @@
 
 namespace mk
 {
+	class MK_UI_EXPORT Image
+	{
+	public:
+		Image(const string& name) : d_name(name), d_left(0), d_top(0), d_width(0), d_height(0), d_index(0) {}
+		Image() {}
+
+		bool null() const { return d_name.empty(); }
+
+		string d_name;
+		int d_left;
+		int d_top;
+		int d_width;
+		int d_height;
+		int d_index;
+
+		bool d_stretch;
+
+		static std::map<string, Image> sIcons;
+	};
+
 	class _I_ ImageSkin : public Struct
 	{
 	public:
@@ -39,7 +59,7 @@ namespace mk
 		};
 
 	public:
-		ImageSkin(string image, int left, int top, int right, int bottom, int margin = 0, Dimension stretch = DIM_0)
+		ImageSkin(const string& image, int left, int top, int right, int bottom, int margin = 0, Dimension stretch = DIM_0)
 			: d_image(image)
 			, d_top(top), d_right(right), d_bottom(bottom), d_left(left)
 			, d_margin(margin)
@@ -54,22 +74,22 @@ namespace mk
 		ImageSkin()
 		{}
 
-		bool null() const { return d_image.empty(); }
+		bool null() const { return d_image.null(); }
 
-		void setImage(const string& image)
+		void setImage(const Image& image)
 		{
 			d_image = image;
-			d_images[TOP_LEFT] = d_image + "_topleft";
-			d_images[TOP_RIGHT] = d_image + "_topright";
-			d_images[BOTTOM_RIGHT] = d_image + "_bottomright";
-			d_images[BOTTOM_LEFT] = d_image + "_bottomleft";
+			d_images[TOP_LEFT] = d_image.d_name + "_topleft";
+			d_images[TOP_RIGHT] = d_image.d_name + "_topright";
+			d_images[BOTTOM_RIGHT] = d_image.d_name + "_bottomright";
+			d_images[BOTTOM_LEFT] = d_image.d_name + "_bottomleft";
 
-			d_images[TOP] = d_image + "_top";
-			d_images[RIGHT] = d_image + "_right";
-			d_images[BOTTOM] = d_image + "_bottom";
-			d_images[LEFT] = d_image + "_left";
+			d_images[TOP] = d_image.d_name + "_top";
+			d_images[RIGHT] = d_image.d_name + "_right";
+			d_images[BOTTOM] = d_image.d_name + "_bottom";
+			d_images[LEFT] = d_image.d_name + "_left";
 
-			d_images[FILL] = d_image + "_fill";
+			d_images[FILL] = d_image.d_name + "_fill";
 		}
 
 		void prepare(int width, int height)
@@ -100,7 +120,7 @@ namespace mk
 			filler(FILL, d_left, d_top, fillWidth, fillHeight); // width, height
 		}
 
-		_A_ _M_ string d_image;
+		_A_ _M_ Image d_image;
 		_A_ _M_ string d_filetype;
 
 		_A_ _M_ int d_top;

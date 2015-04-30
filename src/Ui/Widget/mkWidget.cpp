@@ -141,11 +141,11 @@ namespace mk
 			return style;
 	}
 
-	const string& Widget::image()
+	Image* Widget::image()
 	{
-		if(!mFrame->inkstyle().image().empty())
-			return mFrame->inkstyle().image();
-		return sNullString;
+		if(!mFrame->inkstyle().image().null())
+			return &mFrame->inkstyle().image();
+		return nullptr;
 	}
 
 	RootSheet& Widget::rootSheet()

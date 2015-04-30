@@ -37,18 +37,22 @@ namespace mk
 		mStyle = &cls();
 	}
 
-	Icon::Icon(const string& image)
+	Icon::Icon(Image& image)
 		: Widget()
 		, mImage(image)
 	{
 		mStyle = &cls();
 	}
 
-	void Icon::setImage(const string& image)
+	Icon::Icon(const string& image)
+		: Icon(Image::sIcons[image])
+	{}
+
+	/*void Icon::setImage(const string& image)
 	{
 		mImage = image;
 		mFrame->setDirty(Frame::DIRTY_WIDGET);
-	}
+	}*/
 
 	Button::Button(const string& label, const Trigger& trigger)
 		: Control()
@@ -86,9 +90,13 @@ namespace mk
 		return true;
 	}
 
-	ImgButton::ImgButton(const string& image, const Trigger& trigger)
+	ImgButton::ImgButton(Image& image, const Trigger& trigger)
 		: Button("", trigger)
 		, mImage(image)
+	{}
+
+	ImgButton::ImgButton(const string& image, const Trigger& trigger)
+		: ImgButton(Image::sIcons[image], trigger)
 	{}
 
 	WrapButton::WrapButton(Widget* content, const Trigger& trigger)
