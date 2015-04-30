@@ -174,7 +174,6 @@ namespace mk
 	NanoLayer::NanoLayer(Layer& layer, NanoTarget& target, size_t index)
 		: InkLayer(layer, target, index)
 		, mTarget(target)
-		, mVisible(true)
 		, mFrame(layer)
 	{}
 
@@ -188,14 +187,12 @@ namespace mk
 
 	void NanoLayer::show()
 	{
-		mVisible = true;
 		mFrame.inkbox().show();
 		//this->moveToTop();
 	}
 
 	void NanoLayer::hide()
 	{
-		mVisible = false;
 		mFrame.inkbox().hide();
 	}
 
@@ -216,7 +213,8 @@ namespace mk
 
 		if(frame.frameType() >= STRIPE)
 			for(Frame* subframe : frame.as<Stripe>().contents())
-				this->drawImage(*subframe);
+				if(subframe->visible())
+					this->drawImage(*subframe);
 	}
 
 	void NanoLayer::drawText(Frame& frame)
@@ -225,7 +223,8 @@ namespace mk
 
 		if(frame.frameType() >= STRIPE)
 			for(Frame* subframe : frame.as<Stripe>().contents())
-				this->drawText(*subframe);
+				if(subframe->visible())
+					this->drawText(*subframe);
 	}
 
 	NanoTarget::NanoTarget(NanoWindow& window)
@@ -237,7 +236,7 @@ namespace mk
 	{
 		for(auto& layers : mLayers)
 			for(InkLayer* layer : layers)
-				if(layer->as<NanoLayer>().visible())
+				if(layer->layer().visible())
 					layer->as<NanoLayer>().nanodraw();
 	}
 
@@ -254,9 +253,9 @@ namespace mk
 		, mCtx(nullptr)
 	{
 #if NANOVG_GL2
-		mCtx = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+		mCtx = nvgCreateGL2(NVG_ANTIALIAS);
 #elif NANOVG_GLES2
-		mCtx = nvgCreateGLES2(0);
+		mCtx = nvgCreateGLES2(NVG_STENCIL_STROKES);
 #endif
 
 		mAtlas = generateAtlas(mCtx, 1024, 1024, resourcePath);
@@ -292,12 +291,6 @@ namespace mk
 		nvgBeginFrame(mCtx, mWidth, mHeight, mPixelRatio);
 
 		mScreenTarget->nanodraw();
-
-		/*NVGpaint imgPaint = nvgImagePattern(mCtx, 0, 0, mWidth, mHeight, 0.0f / 180.0f*NVG_PI, mAtlas->image(), 1.f);
-		nvgBeginPath(mCtx);
-		nvgRect(mCtx, 0, 0, mWidth, mHeight);
-		nvgFillPaint(mCtx, imgPaint);
-		nvgFill(mCtx);*/
 
 		nvgEndFrame(mCtx);
 	}

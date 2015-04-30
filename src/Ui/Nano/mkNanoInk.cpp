@@ -133,8 +133,6 @@ namespace mk
 
 	void NanoInk::redrawImage()
 	{
-		//std::cerr << "ink :: draw " << mFrame.style()->name() << std::endl;
-
 		InkStyle& skin = this->skin();
 
 		nvgResetDisplayList(mImageCache);
@@ -184,8 +182,6 @@ namespace mk
 		float c1 = mCorners.y0();
 		float c2 = mCorners.x1();
 		float c3 = mCorners.y1();
-
-		//std::cerr << "ink :: draw " << mFrame.style()->name() << " at " << left << " , " << top << " size " << width << " , " << height << std::endl;
 
 		// Shadow
 		if(!skin.shadow().d_null)
@@ -410,8 +406,6 @@ namespace mk
 
 			float xoffset = skin().padding()[DIM_X] + skin().padding()[DIM_X + 2];
 			float yoffset = skin().padding()[DIM_Y] + skin().padding()[DIM_Y + 2];
-
-			//std::cerr << "ink :: contentSize for " << mFrame.style()->name() << " : " << (dim == DIM_X ? " x " : " y ") << (dim == DIM_X ? bounds[2] - bounds[0] + xoffset : bounds[3] - bounds[1] + yoffset) << std::endl;
 
 			return dim == DIM_X ? bounds[2] - bounds[0] + xoffset : height + yoffset;
 		}

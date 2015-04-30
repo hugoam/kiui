@@ -281,8 +281,5 @@ namespace mk
 			this->declineImage(value);
 		else if(key == "decline_image_skin")
 			this->declineImageSkin(value);
-
-		if(mStyle->name() == "Checkbox" && key == "image")
-			int i = 0;
 	}
 }

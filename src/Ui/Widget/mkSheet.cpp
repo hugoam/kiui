@@ -46,12 +46,15 @@ namespace mk
 
 	void Sheet::nextFrame(size_t tick, size_t delta)
 	{
+		bool dirty = mFrame->dirty() >= Frame::DIRTY_POSITION;
 		Widget::nextFrame(tick, delta);
 		
 		for(size_t i = 0; i < mContents.size(); ++i)
+		{
+			if(dirty)
+				mContents[i]->frame().setDirty(Frame::DIRTY_POSITION);
 			mContents[i]->nextFrame(tick, delta);
-
-		mFrame->clearDirty();
+		}
 	}
 
 	void Sheet::bind(Sheet* parent, size_t index)

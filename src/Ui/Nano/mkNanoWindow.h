@@ -63,8 +63,6 @@ namespace mk
 
 		NanoTarget& target() { return mTarget; }
 
-		bool visible() { return mVisible; }
-
 		unique_ptr<Inkbox> createInkbox(Frame& frame);
 
 		void show();
@@ -79,7 +77,6 @@ namespace mk
 
 	protected:
 		NanoTarget& mTarget;
-		bool mVisible;
 		Frame& mFrame;
 
 		std::vector<Frame*> mOrdered;

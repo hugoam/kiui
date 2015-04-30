@@ -49,7 +49,7 @@ namespace mk
 		StyleAttr& operator=(const T& v) { val = v; set = true; return *this; }
 		StyleAttr& operator=(const StyleAttr& other) { val = other.val; set = other.set; return *this; }
 
-		void copy(const StyleAttr& other, bool inherit) { if(inherit && set) return; val = other.val; if(!inherit) set = other.set; }
+		void copy(const StyleAttr& other, bool inherit) { if(set && (inherit || !other.set)) return; val = other.val; if(!inherit) set = other.set; }
 
 		T val;
 		bool set;

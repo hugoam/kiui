@@ -240,6 +240,7 @@ namespace mk
 
 		ColumnHeader::cls().layout().d_space = SPACE;
 
+		ExpandboxHeader::cls().layout().d_opacity = OPAQUE;
 		TreeNodeHeader::cls().layout().d_opacity = OPAQUE;
 
 		DropdownChoice::cls().layout().d_opacity = OPAQUE;
@@ -282,6 +283,7 @@ namespace mk
 		ExpandboxBody::cls().layout().d_spacing = DimFloat(4.f, 6.f);
 
 		WrapButton::cls().skin().mAlign = DimAlign(LEFT, CENTER);
+		ExpandboxHeader::cls().skin().mAlign = DimAlign(LEFT, CENTER);
 
 		ScrollerKnob::cls().layout().d_sizing = DimSizing(FIXED, MANUAL);
 		FillerX::cls().layout().d_sizing = DimSizing(MANUAL, FIXED);

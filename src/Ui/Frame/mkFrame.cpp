@@ -191,25 +191,27 @@ namespace mk
 		if(!d_parent || !d_visible || !clip())
 			return;
 
+		bool clipped = !d_inkbox->visible(); // We are visible, so the inkbox not visible means we were clipped
+		bool clipx = this->dclip(DIM_X);
+		bool clipy = this->dclip(DIM_Y);
+
 		this->updateClip(DIM_X);
 		this->updateClip(DIM_Y);
-
-		bool clipped = !d_inkbox->visible(); // We are visible, so the inkbox not visible means we were clipped
 
 		if((dclip(DIM_X) == HIDDEN || dclip(DIM_Y) == HIDDEN) && !clipped)
 			d_inkbox->hide();
 		else if(dclip(DIM_X) != HIDDEN && dclip(DIM_Y) != HIDDEN && clipped)
 			d_inkbox->show();
+
+		if(clipx || clipy || this->dclip(DIM_X) || this->dclip(DIM_Y))
+			d_inkbox->updateClip();
 	}
 
 	void Frame::updateClip(Dimension dim)
 	{
-		bool clip = this->dclip(dim);
 		d_clipPos[dim] = std::max(d_parent->d_clipPos[dim] - d_position[dim], 0.f);
 		d_clipSize[dim] = std::min(d_size[dim], d_parent->d_clipPos[dim] + d_parent->d_clipSize[dim] - d_position[dim]) - d_clipPos[dim];
 		d_clipSize[dim] = std::max(d_clipSize[dim], 0.f);
-		if(clip || this->dclip(dim))
-			d_inkbox->updateClip();
 	}
 
 	void Frame::nextFrame(size_t tick, size_t delta)
@@ -218,9 +220,6 @@ namespace mk
 
 		if(d_style->updated() > d_styleStamp)
 			this->resetStyle();
-
-		if(d_parent && d_parent->dirty() >= DIRTY_POSITION && d_dirty < DIRTY_POSITION)
-			d_dirty = DIRTY_POSITION;
 
 		switch(d_dirty)
 		{
@@ -242,8 +241,7 @@ namespace mk
 			break;
 		};
 
-		if(this->frameType() == FRAME)
-			d_dirty = CLEAN;
+		d_dirty = CLEAN;
 	}
 
 	void Frame::transfer(Stripe& stripe, size_t index)
