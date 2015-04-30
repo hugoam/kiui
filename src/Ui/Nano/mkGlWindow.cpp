@@ -206,6 +206,7 @@ namespace mk
 		glfwSetCharCallback(mGlWindow, [](GLFWwindow* w, unsigned int c) { static_cast<GlWindow*>(glfwGetWindowUserPointer(w))->injectChar(c); });
 		glfwSetMouseButtonCallback(mGlWindow, [](GLFWwindow* w, int button, int action, int mods) { static_cast<GlWindow*>(glfwGetWindowUserPointer(w))->injectMouseButton(button, action, mods); });
 		glfwSetCursorPosCallback(mGlWindow, [](GLFWwindow* w, double x, double y) { static_cast<GlWindow*>(glfwGetWindowUserPointer(w))->injectMouseMove(x, y); });
+		glfwSetScrollCallback(mGlWindow, [](GLFWwindow* w, double x, double y) { static_cast<GlWindow*>(glfwGetWindowUserPointer(w))->injectWheel(x, y); });
 
 		glfwMakeContextCurrent(mGlWindow);
 		glfwSetInputMode(mGlWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -329,5 +330,10 @@ namespace mk
 	{
 		UNUSED(codepoint); UNUSED(mods);
 		mInput->dispatchKeyPressed((KeyCode) 0, (char) codepoint);
+	}
+
+	void GlWindow::injectWheel(double x, double y)
+	{
+		mInput->dispatchMouseWheeled(mMouseX, mMouseY, x + y);
 	}
 }

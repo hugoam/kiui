@@ -127,7 +127,7 @@ namespace mk
 		bool mousePressed(float xPos, float yPos, MouseButton button);
 		bool mouseReleased(float xPos, float yPos, MouseButton button);
 
-		bool mouseWheel(float xPos, float yPos, float amount) { UNUSED(xPos); UNUSED(yPos); UNUSED(amount); return true; };
+		bool mouseWheel(float xPos, float yPos, float amount) { UNUSED(xPos); UNUSED(yPos); UNUSED(amount); return false; };
 
 		bool leftPressed(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
 		bool rightPressed(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };

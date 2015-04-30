@@ -144,6 +144,8 @@ namespace mk
 		ScrollArea::cls().layout().d_layoutDim = DIM_X;
 		ScrollArea::cls().layout().d_pivot = DimPivot(REVERSE, REVERSE);
 
+		ScrollSheet::cls().layout().d_opacity = OPAQUE;
+
 		Scrollbar::cls().layout().d_space = DIV;
 
 		Scroller::cls().layout().d_space = BOARD;
@@ -185,6 +187,8 @@ namespace mk
 		Dir::cls().layout().d_layoutDim = DIM_X;
 		File::cls().layout().d_layoutDim = DIM_X;
 
+		Directory::cls().layout().d_layoutDim = DIM_Y;
+
 		Dir::cls().layout().d_padding = BoxFloat(2.f, 2.f, 2.f, 2.f);
 		Dir::cls().layout().d_spacing = DimFloat(2.f, 2.f);
 		File::cls().layout().d_padding = BoxFloat(2.f, 2.f, 2.f, 2.f);
@@ -193,6 +197,7 @@ namespace mk
 		TreeNodeHeader::cls().layout().d_spacing = DimFloat(2.f, 2.f);
 
 		RootSheet::cls().layout().d_opacity = OPAQUE;
+		RootSheet::cls().layout().d_clipping = NOCLIP;
 
 		DropdownToggle::cls().layout().d_opacity = GLASSY;
 

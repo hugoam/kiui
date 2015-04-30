@@ -30,6 +30,7 @@ namespace mk
 		void injectMouseButton(int button, int action, int mods);
 		void injectKey(int key, int scancode, int action, int mods);
 		void injectChar(unsigned int codepoint, int mods = 0);
+		void injectWheel(double x, double y);
 
 		void updateSize();
 

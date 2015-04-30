@@ -103,9 +103,11 @@ namespace mk
 		ScrollSheet(FrameType frameType = STRIPE);
 		~ScrollSheet();
 
+		void clear();
+
 		void nextFrame(size_t tick, size_t delta);
 
-		void clear();
+		bool mouseWheel(float xPos, float yPos, float amount);
 
 		static StyleType& cls() { static StyleType ty("ScrollSheet", Sheet::cls()); return ty; }
 

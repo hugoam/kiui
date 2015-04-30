@@ -177,6 +177,20 @@ namespace mk
 		}
 	}
 
+	bool ScrollSheet::mouseWheel(float xPos, float yPos, float amount)
+	{
+		UNUSED(xPos); UNUSED(yPos);
+		if(!this->stripe().overflow())
+			return false;
+		if(amount > 0)
+			while(amount-- > 0)
+				mScrollArea.scrollbar().scrollup();
+		else if(amount < 0)
+			while(amount++ < 0)
+				mScrollArea.scrollbar().scrolldown();
+		return true;
+	};
+
 	GridSheet::GridSheet(Dimension dim)
 		: Sheet()
 		, mDim(dim)
