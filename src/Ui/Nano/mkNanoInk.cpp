@@ -275,7 +275,7 @@ namespace mk
 			return;
 
 		if(!mTextCache)
-			mTextCache = nvgCreateDisplayList(1);
+			mTextCache = nvgCreateDisplayList(2);
 
 		if(!mUpdate)
 		{
