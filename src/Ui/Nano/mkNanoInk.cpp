@@ -125,7 +125,7 @@ namespace mk
 			return;
 
 		if(!mImageCache)
-			mImageCache = nvgCreateDisplayList(9);
+			mImageCache = nvgCreateDisplayList(10);
 
 		if(!mUpdate)
 		{
