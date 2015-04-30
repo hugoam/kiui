@@ -112,7 +112,11 @@ namespace mk
 		// @todo : sort images
 
 		for(ImageRect& image : mSprites)
+		{
 			this->fitImage(image);
+			string name = image.subfolder + replaceAll(image.image, ".png", "");
+			Image::sIcons[name] = Image(name, image.width, image.height);
+		}
 	}
 
 	void NanoAtlas::loadAtlas()

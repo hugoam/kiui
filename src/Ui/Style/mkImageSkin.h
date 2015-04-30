@@ -25,8 +25,8 @@ namespace mk
 	class MK_UI_EXPORT Image
 	{
 	public:
-		Image(const string& name) : d_name(name), d_left(0), d_top(0), d_width(0), d_height(0), d_index(0) {}
-		Image() {}
+		Image(const string& name, int width = 0, int height = 0) : d_name(name), d_left(0), d_top(0), d_width(width), d_height(height), d_index(0) {}
+		Image() : d_name(), d_left(0), d_top(0), d_width(0), d_height(0), d_index(0) {}
 
 		bool null() const { return d_name.empty(); }
 
