@@ -32,7 +32,6 @@ namespace mk
 		void caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight);
 
 		Image& fetchImage(Image& image, bool tile = false);
-		void drawAtlasImage(const Image& image, float x, float y, float w, float h);
 		void drawImage(const Image& image, float x, float y, float w, float h);
 		void drawImageStretch(const Image& image, float x, float y, float w, float h, float xoff = 0.f, float yoff = 0.f, float xstretch = 1.f, float ystretch = 1.f);
 		void drawSkinImage(ImageSkin::Section section, float x, float y, float w, float h);

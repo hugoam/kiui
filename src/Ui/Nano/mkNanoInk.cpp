@@ -562,7 +562,7 @@ namespace mk
 
 	void NanoInk::drawImage(int image, float left, float top, float width, float height, float imgx, float imgy, float imgw, float imgh)
 	{
-		NVGpaint imgPaint = imgPaint = nvgImagePattern(mCtx, imgx, imgy, imgw, imgh, 0.0f / 180.0f*NVG_PI, image, 1.f);
+		NVGpaint imgPaint = nvgImagePattern(mCtx, imgx, imgy, imgw, imgh, 0.0f / 180.0f*NVG_PI, image, 1.f);
 		nvgBeginPath(mCtx);
 		nvgRect(mCtx, left, top, width, height);
 		nvgFillPaint(mCtx, imgPaint);
@@ -588,11 +588,6 @@ namespace mk
 #else
 		this->drawImage(image.d_index, left, top, width, height, left + xoff * xstretch, top + yoff * ystretch, image.d_width * xstretch, image.d_height * ystretch);
 #endif
-	}
-
-	void NanoInk::drawAtlasImage(const Image& image, float left, float top, float width, float height)
-	{
-
 	}
 
 	void NanoInk::drawSkinImage(ImageSkin::Section section, float left, float top, float width, float height)
