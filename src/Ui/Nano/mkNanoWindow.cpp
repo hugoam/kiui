@@ -256,7 +256,7 @@ namespace mk
 #if NANOVG_GL2
 		mCtx = nvgCreateGL2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
 #elif NANOVG_GLES2
-		mCtx = nvgCreateGLES2(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
+		mCtx = nvgCreateGLES2(0);
 #endif
 
 		mAtlas = generateAtlas(mCtx, 1024, 1024, resourcePath);

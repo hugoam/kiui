@@ -86,7 +86,8 @@ namespace mk
 		, mImage(0)
 		, mOverlay(0)
 		, mTile(0)
-		, mUpdate(true)
+		, mImageUpdate(true)
+		, mTextUpdate(true)
 	{}
 
 	NanoInk::~NanoInk()
@@ -117,21 +118,24 @@ namespace mk
 
 	void NanoInk::drawImage()
 	{
-		//std::cerr << "ink :: draw " << mFrame.style()->name() << std::endl;
-
-		InkStyle& skin = this->skin();
-
-		if(skin.mEmpty || !mVisible)
+		if(this->skin().mEmpty || !mVisible)
 			return;
 
 		if(!mImageCache)
 			mImageCache = nvgCreateDisplayList(10);
 
-		if(!mUpdate)
-		{
-			this->drawCache(mImageCache);
-			return;
-		}
+		if(mImageUpdate)
+			this->redrawImage();
+
+		this->drawCache(mImageCache);
+		mImageUpdate = false;
+	}
+
+	void NanoInk::redrawImage()
+	{
+		//std::cerr << "ink :: draw " << mFrame.style()->name() << std::endl;
+
+		InkStyle& skin = this->skin();
 
 		nvgResetDisplayList(mImageCache);
 		nvgBindDisplayList(mCtx, mImageCache);
@@ -263,25 +267,26 @@ namespace mk
 			nvgResetScissor(mCtx);
 
 		nvgBindDisplayList(mCtx, nullptr);
-
-		this->drawCache(mImageCache);
 	}
 
 	void NanoInk::drawText()
 	{
-		InkStyle& skin = this->skin();
-
-		if(skin.mEmpty || !mVisible)
+		if(this->skin().mEmpty || !mVisible)
 			return;
 
 		if(!mTextCache)
 			mTextCache = nvgCreateDisplayList(2);
 
-		if(!mUpdate)
-		{
-			this->drawCache(mTextCache);
-			return;
-		}
+		if(mTextUpdate)
+			this->redrawText();
+
+		this->drawCache(mTextCache);
+		mTextUpdate = false;
+	}
+
+	void NanoInk::redrawText()
+	{
+		InkStyle& skin = this->skin();
 
 		nvgResetDisplayList(mTextCache);
 		nvgBindDisplayList(mCtx, mTextCache);
@@ -383,10 +388,6 @@ namespace mk
 			nvgResetScissor(mCtx);
 
 		nvgBindDisplayList(mCtx, nullptr);
-
-		this->drawCache(mTextCache);
-
-		mUpdate = false;
 	}
 
 	float NanoInk::contentSize(Dimension dim)
@@ -497,12 +498,14 @@ namespace mk
 
 	void NanoInk::updateContent()
 	{
-		mUpdate = true;
+		mTextUpdate = true;
+		mImageUpdate = true;
 	}
 
 	void NanoInk::updateStyle()
 	{
-		mUpdate = true;
+		mTextUpdate = true;
+		mImageUpdate = true;
 		mCorners = skin().mCornerRadius;
 
 		if(skin().mEmpty)
@@ -561,13 +564,15 @@ namespace mk
 
 	void NanoInk::updateClip()
 	{
-		mUpdate = true;
+		mTextUpdate = true;
+		mImageUpdate = true;
 		this->updateFrame();
 	}
 
 	void NanoInk::updateFrame()
 	{
-		mUpdate = true;
+		mTextUpdate = true;
+		mImageUpdate = true;
 
 		if(skin().mEmpty || !mVisible || mFrame.dsize(DIM_X) == 0.f || mFrame.dsize(DIM_Y) == 0.f)
 			return;

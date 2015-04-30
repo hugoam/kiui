@@ -42,6 +42,8 @@ namespace mk
 
 		void drawImage();
 		void drawText();
+		void redrawImage();
+		void redrawText();
 
 	private:
 		void drawImage(int image, float x, float y, float w, float h, float imgx, float imgy, float imgw, float imgh);
@@ -58,7 +60,8 @@ namespace mk
 		Image* mOverlay;
 		Image* mTile;
 		Image* mSkin;
-		bool mUpdate;
+		bool mTextUpdate;
+		bool mImageUpdate;
 		bool mMoved;
 		std::vector<NVGtextRow> mTextRows;
 	};
