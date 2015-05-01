@@ -16,8 +16,6 @@
 
 #include <cmath>
 
-#include <iostream>
-
 #define NANO_ATLAS
 
 namespace mk

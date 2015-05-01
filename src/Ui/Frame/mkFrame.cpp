@@ -152,6 +152,7 @@ namespace mk
 
 		this->setVisible(parent->visible());
 		this->updateState(d_widget.state());
+		this->updateOnce();
 	}
 	
 	void Frame::unbind()
@@ -221,6 +222,11 @@ namespace mk
 		if(d_style->updated() > d_styleStamp)
 			this->resetStyle();
 
+		this->updateOnce();
+	}
+
+	void Frame::updateOnce()
+	{
 		switch(d_dirty)
 		{
 		case DIRTY_VISIBILITY:

@@ -89,6 +89,8 @@ namespace mk
 
 		void resetStyle();
 
+		void updateOnce();
+
 		void updateSizing(Dimension dim);
 		void updateFixed(Dimension dim);
 

@@ -116,8 +116,8 @@ namespace mk
 		if(mInput)
 		{
 			mContent->hide();
-			mInput->setString(mContent->contentlabel());
 			mInput->show();
+			mInput->setString(mContent->contentlabel());
 			mInput->typeIn().leftClick(this->rootSheet().lastPressedX(), this->rootSheet().lastPressedY());
 		}
 		else
