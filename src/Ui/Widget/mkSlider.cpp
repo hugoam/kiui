@@ -106,10 +106,10 @@ namespace mk
 
 	void Slider::nextFrame(size_t tick, size_t delta)
 	{
-		if(mFrame->dirty() >= Frame::DIRTY_WIDGET)
-			this->updateKnob();
-
+		bool dirty = mFrame->dirty() >= Frame::DIRTY_WIDGET;
 		Sheet::nextFrame(tick, delta);
+		if(dirty)
+			this->updateKnob();
 	}
 
 	float Slider::length()
