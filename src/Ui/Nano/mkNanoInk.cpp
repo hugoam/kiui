@@ -594,6 +594,10 @@ namespace mk
 			mTextRows[0].end = mTextRows[0].start + mFrame.widget().label().size();
 			mTextRows[0].width = this->contentSize(DIM_X);
 		}
+		else
+		{
+			mTextRows.clear();
+		}
 
 		NanoInk& parent = static_cast<NanoInk&>(mFrame.parent()->inkbox());
 		if(parent.mCorners.null() || !skin().mWeakCorners || !mFrame.flow())
