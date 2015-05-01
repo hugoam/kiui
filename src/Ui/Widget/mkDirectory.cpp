@@ -50,10 +50,6 @@ namespace mk
 		, mPath(path)
 	{
 		mStyle = &cls();
-
-		char buffer[PATH_MAX];
-		mPath = replaceAll(mPath, "/", "\\");
-
 		this->update();
 	}
 
@@ -84,12 +80,12 @@ namespace mk
 
 	void Directory::moveIn(const string& subdir)
 	{
-		this->setLocation(mPath + "\\" + subdir);
+		this->setLocation(mPath + "/" + subdir);
 	}
 
 	void Directory::moveOut()
 	{
-		size_t pos = mPath.rfind("\\");
+		size_t pos = mPath.rfind("/");
 		this->setLocation(mPath.substr(0, pos));
 	}
 
