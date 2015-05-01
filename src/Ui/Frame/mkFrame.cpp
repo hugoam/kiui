@@ -204,7 +204,7 @@ namespace mk
 		else if(dclip(DIM_X) != HIDDEN && dclip(DIM_Y) != HIDDEN && clipped)
 			d_inkbox->show();
 
-		if(clipx || clipy || this->dclip(DIM_X) || this->dclip(DIM_Y))
+		if(clipped || clipx || clipy || this->dclip(DIM_X) || this->dclip(DIM_Y))
 			d_inkbox->updateClip();
 	}
 
