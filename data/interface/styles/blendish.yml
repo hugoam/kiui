@@ -151,10 +151,16 @@ Expandbox :
     topdown_gradient : 5,0
     
 ExpandboxHeader :
-    copy_skin : Label
+    inherit_skin : Label
     background_colour : 0.0,0.0,0.0,0.0
     hovered :
-        background_colour : 0.0,0.0,0.0,0.0
+        border_colour : 1.0,1.0,1.0,0.3
+        border_width : 1.0,1.0,1.0,1.0
+        
+TreeNodeHeader :
+    inherit_skin : ExpandboxHeader
+    activated :
+        background_colour : 1.0,1.0,1.0,0.3
         
 ColumnHeader :
     copy_skin : Label

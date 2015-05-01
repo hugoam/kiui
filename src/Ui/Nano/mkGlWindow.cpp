@@ -21,7 +21,7 @@
 #include <iostream>
 
 #ifndef KIUI_EMSCRIPTEN
-//#define CAP_FRAMERATE
+#define CAP_FRAMERATE
 #endif
 
 #ifdef CAP_FRAMERATE
@@ -265,9 +265,9 @@ namespace mk
 		mNanoWindow->nextFrame(time, delta);
 
 #ifdef CAP_FRAMERATE
-		double delta = 16.66666667 - ((glfwGetTime() - time) * 1000.f);
+		double deltaf = 16.66666667 - ((glfwGetTime() - time) * 1000.f);
 
-		if(delta > 0.f)
+		if(deltaf > 0.f)
 			std::this_thread::sleep_for(std::chrono::milliseconds(int(delta)));
 #endif
 

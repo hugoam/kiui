@@ -16,6 +16,8 @@
 
 #include <cmath>
 
+#include <iostream>
+
 #define NANO_ATLAS
 
 namespace mk
@@ -45,22 +47,14 @@ namespace mk
 		return isnan(a) ? b : (isnan(b) ? a : ((a > b) ? a : b));
 	}
 
-	void nvgRoundedBox(NVGcontext *ctx, float x, float y, float w, float h, float cr0, float cr1, float cr2, float cr3)
+	void nvgRoundedBox(NVGcontext *ctx, float x, float y, float w, float h, float cr0, float cr1, float cr2, float cr3, Dimension fitDim = DIM_0)
 	{
-		nvgRoundedRect4(ctx, x, y, w, h, cr0, cr1, cr2, cr3);
-
-		/*float d;
-
-		w = fmaxf(0, w);
-		h = fmaxf(0, h);
-		d = fminf(w, h);
-
-		nvgMoveTo(ctx, x, y + h*0.5f);
-		nvgArcTo(ctx, x, y, x + w, y, cr0);
-		nvgArcTo(ctx, x + w, y, x + w, y + h, cr1);
-		nvgArcTo(ctx, x + w, y + h, x, y + h, cr2);
-		nvgArcTo(ctx, x, y + h, x, y, cr3);
-		nvgClosePath(ctx);*/
+		if(fitDim == DIM_0)
+			nvgRoundedRect4(ctx, x, y, w, h, cr0, cr1, cr2, cr3);
+		else if(fitDim == DIM_X)
+			nvgRoundedRect4FitY(ctx, x, y, w, h, cr0, cr1, cr2, cr3);
+		else if(fitDim == DIM_Y)
+			nvgRoundedRect4FitX(ctx, x, y, w, h, cr0, cr1, cr2, cr3);
 	}
 
 	NVGcolor nvgColour(const Colour& colour)
@@ -86,6 +80,7 @@ namespace mk
 		, mImage(0)
 		, mOverlay(0)
 		, mTile(0)
+		, mFitCorners(DIM_0)
 		, mImageUpdate(true)
 		, mTextUpdate(true)
 	{}
@@ -135,9 +130,6 @@ namespace mk
 	{
 		InkStyle& skin = this->skin();
 
-		nvgResetDisplayList(mImageCache);
-		nvgBindDisplayList(mCtx, mImageCache);
-
 		float left = mFrame.cleft();
 		float top = mFrame.ctop();
 		float width = mFrame.cwidth();
@@ -147,6 +139,15 @@ namespace mk
 		float ptop = mFrame.ptop();
 		float pwidth = mFrame.pwidth();
 		float pheight = mFrame.pheight();
+
+		float halfb = skin.borderWidth().x0() * 0.5;
+		float b = skin.borderWidth().x0();
+
+		if(width - b <= 0.f || height - b <= 0.f)
+			return;
+
+		nvgResetDisplayList(mImageCache);
+		nvgBindDisplayList(mCtx, mImageCache);
 
 #if 0 // DEBUG
 		nvgBeginPath(mCtx);
@@ -202,15 +203,12 @@ namespace mk
 		// Rect
 
 		nvgBeginPath(mCtx);
-
-		float halfb = skin.borderWidth().x0() * 0.5;
-		float b = skin.borderWidth().x0();
 		if(mCorners.null())
 			nvgRect(mCtx, left + halfb, top + halfb, width - b, height - b);
 		else
-			nvgRoundedBox(mCtx, left + halfb, top + halfb, width - b, height- b, c0, c1, c2, c3);
+			nvgRoundedBox(mCtx, left + halfb, top + halfb, width - b, height - b, c0, c1, c2, c3, mFitCorners);
 
-		if(skin.backgroundColour().a() != 0.f)
+		if(skin.backgroundColour().a() > 0.f)
 		{
 			if(skin.topdownGradient().null())
 			{
@@ -271,7 +269,7 @@ namespace mk
 			return;
 
 		if(!mTextCache)
-			mTextCache = nvgCreateDisplayList(2);
+			mTextCache = nvgCreateDisplayList(3);
 
 		if(mTextUpdate)
 			this->redrawText();
@@ -610,6 +608,8 @@ namespace mk
 
 			mCorners.setY0(fmaxf(0.f, parent.mCorners.y0() - (mFrame.parent()->dsize(DIM_X) - (mFrame.dposition(DIM_X) + mFrame.dsize(DIM_X)))));
 			mCorners.setX1(fmaxf(0.f, parent.mCorners.x1() - (mFrame.parent()->dsize(DIM_X) - (mFrame.dposition(DIM_X) + mFrame.dsize(DIM_X)))));
+
+			mFitCorners = DIM_X;
 		}
 		else if(mFrame.parent()->layoutDim() == DIM_Y)
 		{
@@ -618,6 +618,8 @@ namespace mk
 
 			mCorners.setX1(fmaxf(0.f, parent.mCorners.x1() - (mFrame.parent()->dsize(DIM_Y) - (mFrame.dposition(DIM_Y) + mFrame.dsize(DIM_Y)))));
 			mCorners.setY1(fmaxf(0.f, parent.mCorners.y1() - (mFrame.parent()->dsize(DIM_Y) - (mFrame.dposition(DIM_Y) + mFrame.dsize(DIM_Y)))));
+
+			mFitCorners = DIM_Y;
 		}
 	}
 

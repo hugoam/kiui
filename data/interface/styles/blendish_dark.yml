@@ -139,7 +139,15 @@ Expandbox :
 ExpandboxHeader :
     inherit_skin : Label
     background_colour : 0.0,0.0,0.0,0.0
-    
+    hovered :
+        border_colour : 1.0,1.0,1.0,0.3
+        border_width : 2.0,2.0,2.0,2.0
+        
+TreeNodeHeader :
+    inherit_skin : ExpandboxHeader
+    activated :
+        background_colour : 1.0,1.0,1.0,0.3
+        
 ColumnHeader :
     inherit_skin : Label
     border_colour : 0.275,0.275,0.275,1.0

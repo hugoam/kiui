@@ -60,6 +60,7 @@ namespace mk
 		Image* mOverlay;
 		Image* mTile;
 		Image* mSkin;
+		Dimension mFitCorners;
 		bool mTextUpdate;
 		bool mImageUpdate;
 		bool mMoved;

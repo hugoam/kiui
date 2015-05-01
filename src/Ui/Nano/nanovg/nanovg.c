@@ -2555,26 +2555,24 @@ void nvgRoundedRect(NVGcontext* ctx, float x, float y, float w, float h, float r
 }
 
 // @kiui
-void nvgRoundedFittedRect4(NVGcontext* ctx, float x, float y, float w, float h, float r0, float r1, float r2, float r3)
+void nvgRoundedRect4FitX(NVGcontext* ctx, float x, float y, float w, float h, float r0, float r1, float r2, float r3)
+{
+	float hmax = nvg__maxf(r0, r1) + nvg__maxf(r2, r3);
+	float hcrop = nvg__maxf(0.f, hmax - h);
+
+	w -= hcrop;
+	x += hcrop / 2.f;
+
+	nvgRoundedRect4(ctx, x, y, w, h, r0, r1, r2, r3);
+}
+
+void nvgRoundedRect4FitY(NVGcontext* ctx, float x, float y, float w, float h, float r0, float r1, float r2, float r3)
 {
 	float wmax = nvg__maxf(r0, r3) + nvg__maxf(r1, r2);
-	float hmax = nvg__maxf(r0, r1) + nvg__maxf(r2, r3);
-	float wcrop = wmax - w;
-	float hcrop = hmax - h;
+	float wcrop = nvg__maxf(0.f, wmax - w);
 
-	if(hcrop > 0.f)
-	{
-		w -= hcrop * 2.f;
-		x += hcrop;
-		wcrop = wmax - w;
-	}
-
-	if(wcrop > 0.f)
-	{
-		h -= wcrop * 2.f;
-		y += wcrop;
-		hcrop = hmax - h;
-	}
+	h -= wcrop;
+	y += wcrop / 2.f;
 
 	nvgRoundedRect4(ctx, x, y, w, h, r0, r1, r2, r3);
 }
@@ -2583,20 +2581,20 @@ void nvgRoundedRect4(NVGcontext* ctx, float x, float y, float w, float h, float 
 {
 	float wmax = nvg__maxf(r0, r3) + nvg__maxf(r1, r2);
 	float hmax = nvg__maxf(r0, r1) + nvg__maxf(r2, r3);
-	float wcrop = wmax - w;
-	float hcrop = hmax - h;
+	float wcrop = nvg__maxf(0.f, wmax - w);
+	float hcrop = nvg__maxf(0.f, hmax - h);
 
-	float r0h = r0 - ((hcrop > 0.f) ? hcrop * r0 / hmax : 0.f);
-	float r0w = r0 - ((wcrop > 0.f) ? wcrop * r0 / wmax : 0.f);
+	float r0h = r0 - (hcrop * r0 / hmax);
+	float r0w = r0 - (wcrop * r0 / wmax);
 
-	float r1h = r1 - ((hcrop > 0.f) ? hcrop * r1 / hmax : 0.f);
-	float r1w = r1 - ((wcrop > 0.f) ? wcrop * r1 / wmax : 0.f);
+	float r1h = r1 - (hcrop * r1 / hmax);
+	float r1w = r1 - (wcrop * r1 / wmax);
 
-	float r2h = r2 - ((hcrop > 0.f) ? hcrop * r2 / hmax : 0.f);
-	float r2w = r2 - ((wcrop > 0.f) ? wcrop * r2 / wmax : 0.f);
+	float r2h = r2 - (hcrop * r2 / hmax);
+	float r2w = r2 - (wcrop * r2 / wmax);
 
-	float r3h = r3 - ((hcrop > 0.f) ? hcrop * r3 / hmax : 0.f);
-	float r3w = r3 - ((wcrop > 0.f) ? wcrop * r3 / wmax : 0.f);
+	float r3h = r3 - (hcrop * r3 / hmax);
+	float r3w = r3 - (wcrop * r3 / wmax);
 
 	float vals[] = {
 		NVG_MOVETO, x, y + r0h,
