@@ -26,9 +26,10 @@ namespace mk
 		, d_freeSpace(0)
 		, d_floatDepth(0)
 		, d_maxDepth(0)
-		, d_relayout(true)
 		, d_weights()
-	{}
+	{
+		this->setDirty(DIRTY_FLOW);
+	}
 
 	Stripe::~Stripe()
 	{}
@@ -68,14 +69,14 @@ namespace mk
 	{
 		d_sequence.size() = 0;
 		d_contents.clear();
-		d_relayout = true;
+		this->setDirty(DIRTY_FLOW);
 	}
 
 	void Stripe::insertFlow(Frame* frame, size_t index)
 	{
 		UNUSED(index);
 		++d_sequence.size();
-		d_relayout = true;
+		this->setDirty(DIRTY_FLOW);
 
 		if(!frame->hidden())
 			this->flowShown(frame);
@@ -84,7 +85,7 @@ namespace mk
 	void Stripe::removeFlow(Frame* frame)
 	{
 		--d_sequence.size();
-		d_relayout = true;
+		this->setDirty(DIRTY_FLOW);
 
 		if(!frame->hidden())
 			this->flowHidden(frame);
@@ -122,6 +123,11 @@ namespace mk
 				d_maxDepth = std::max(d_maxDepth, frame->doffset(d_depth));
 
 		this->updateDepth();
+	}
+
+	void Stripe::updateSize()
+	{
+		Frame::updateSize();
 	}
 
 	void Stripe::updateLength()
@@ -163,11 +169,6 @@ namespace mk
 
 	void Stripe::relayout()
 	{
-		if(!d_relayout)
-			return;
-
-		d_relayout = false;
-
 		this->normalizeSpan();
 
 		if(d_layout->d_weight == LIST && d_weights && d_weights->size() > 0)
@@ -219,6 +220,9 @@ namespace mk
 
 	void Stripe::dispatchWeights()
 	{
+		if(d_contents.size() < d_weights->size())
+			return;
+
 		for(size_t index = 0; index != d_weights->size(); ++index)
 			if((*d_weights)[index] >= 0.f)
 				d_contents[index]->setSpanDim(d_length, (*d_weights)[index]);
@@ -234,7 +238,7 @@ namespace mk
 					frame->as<Stripe>().contents()[index]->setSpanDim(d_depth, (*d_weights)[index]);
 	}
 
-	void Stripe::nextFrame(size_t tick, size_t delta)
+	void Stripe::updateOnce()
 	{
 		// Layouting consists of :
 		//	0. Shrinking the tree recursively from leaves to root to determine free space (Done each time a frame size is adjusted)
@@ -242,9 +246,10 @@ namespace mk
 		//		Size the tree recursively from root to leaves
 		//		Position the tree recursively from root to leaves
 
-		this->relayout();
+		if(d_dirty >= DIRTY_FLOW)
+			this->relayout();
 
-		Frame::nextFrame(tick, delta);
+		Frame::updateOnce();
 	}
 
 	void Stripe::updateSpace()
@@ -323,7 +328,7 @@ namespace mk
 		UNUSED(child);
 		d_sequenceLength += delta;
 		this->updateLength();
-		d_relayout = true;
+		this->setDirty(DIRTY_FLOW);
 	}
 
 	void Stripe::flowSizedDepth(Frame* child, float delta)
@@ -370,14 +375,14 @@ namespace mk
 	{
 		UNUSED(child);
 		d_sequenceLength += delta;
-		d_relayout = true;
+		this->setDirty(DIRTY_FLOW);
 	}
 
 	void Stripe::floatSizedDepth(Frame* child, float delta)
 	{
 		UNUSED(child);
 		d_floatDepth += delta;
-		d_relayout = true;
+		this->setDirty(DIRTY_FLOW);
 	}
 
 	void Stripe::resized(Dimension dim)
@@ -387,7 +392,7 @@ namespace mk
 			this->expandLength();
 		else
 			this->expandDepth();
-		d_relayout = true;
+		this->setDirty(DIRTY_FLOW);
 	}
 
 	Frame* Stripe::pinpoint(float x, float y, bool opaque)
@@ -457,7 +462,7 @@ namespace mk
 		float pos = 0.f;
 		this->prevOffset(d_length, pos, d_cursor, true);
 		d_cursor = std::max(0.f, pos);
-		d_relayout = true;
+		this->setDirty(DIRTY_FLOW);
 	}
 
 	void Stripe::cursorDown()
@@ -465,6 +470,6 @@ namespace mk
 		float pos = 0.f;
 		this->nextOffset(d_length, pos, d_cursor, true);
 		d_cursor = std::min(d_sequenceLength - d_clipSize[DIM_Y], pos);
-		d_relayout = true;
+		this->setDirty(DIRTY_FLOW);
 	}
 }

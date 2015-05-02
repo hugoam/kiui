@@ -67,7 +67,7 @@ namespace mk
 			frame->setPositionDim(d_depth, this->offsetDepth(frame) + d_layout->padding()[d_depth] + frame->layout()->margin()[d_depth] / 2);
 		}
 
-		void setCursor(float cursor) { d_cursor = cursor; d_relayout = true; }
+		void setCursor(float cursor) { d_cursor = cursor; this->setDirty(DIRTY_FLOW); }
 
 		void append(Frame* widget);
 		void insert(Frame* widget, size_t index);
@@ -82,8 +82,6 @@ namespace mk
 		void setVisible(bool visible);
 
 		void migrate(Stripe& stripe);
-
-		void markRelayout() { d_relayout = true; }
 
 		void resized(Dimension dim);
 
@@ -110,11 +108,13 @@ namespace mk
 		bool nextOffset(Dimension dim, float& pos, float seuil, bool top = false);
 		bool prevOffset(Dimension dim, float& pos, float seuil, bool top = false);
 
-		void nextFrame(size_t tick, size_t delta);
+		void updateOnce();
 
 		void updateSpace();
 		void updateStyle();
 		void updateSizing();
+
+		void updateSize();
 
 		void initWeights();
 		void dispatchWeights();
@@ -153,8 +153,6 @@ namespace mk
 		float d_floatDepth;
 		float d_freeSpace;
 		float d_maxDepth;
-
-		bool d_relayout;
 
 		unique_ptr<std::vector<float>> d_weights;
 	};

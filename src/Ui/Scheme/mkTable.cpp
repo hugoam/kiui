@@ -26,7 +26,7 @@ namespace mk
 	{
 		mParent->stripe().weights()[first.frame().index()] = first.frame().dspan(DIM_X);
 		mParent->stripe().weights()[second.frame().index()] = second.frame().dspan(DIM_X);
-		mParent->stripe().markRelayout();
+		mParent->stripe().setDirty(Frame::DIRTY_FLOW);
 	}
 
 	ColumnHeader::ColumnHeader(const string& label)

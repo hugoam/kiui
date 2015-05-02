@@ -76,7 +76,7 @@ namespace mk
 		else if(d_space == BLOCK)
 			d_sizing[dim] = SHRINK;
 		else if(d_space == WRAP)
-			d_sizing[dim] = d_parent->d_sizing[dim];
+			d_sizing[dim] = d_parent->d_sizing[dim] == FIXED ? EXPAND : d_parent->d_sizing[dim];
 		else if(d_space == BOARD)
 			d_sizing[dim] = EXPAND;
 		else if(d_parent && ((d_space == SPACE && d_parent->layoutDim() == dim) || (d_space == DIV && d_parent->layoutDim() != dim)))
@@ -108,7 +108,7 @@ namespace mk
 
 		this->setDirty(DIRTY_SKIN);
 		if(d_parent)
-			d_parent->markRelayout();
+			d_parent->setDirty(DIRTY_FLOW);
 	}
 
 	void Frame::updateSizing()
@@ -229,6 +229,8 @@ namespace mk
 	{
 		switch(d_dirty)
 		{
+		case DIRTY_LAYOUT:
+		case DIRTY_FLOW:
 		case DIRTY_VISIBILITY:
 			d_visible ? d_inkbox->show() : d_inkbox->hide();
 		case DIRTY_SKIN:
@@ -330,7 +332,7 @@ namespace mk
 		d_span[dim] = span;
 		this->setDirty(DIRTY_FRAME);
 
-		d_parent->markRelayout();
+		d_parent->setDirty(DIRTY_FLOW);
 	}
 
 	void Frame::setPositionDim(Dimension dim, float position)

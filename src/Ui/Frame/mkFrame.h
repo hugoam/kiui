@@ -30,8 +30,8 @@ namespace mk
 			DIRTY_CONTENT,		// The content of the inkbox has changed
 			DIRTY_WIDGET,		// The content of the widget has changed
 			DIRTY_SKIN,			// The skin of the frame has changed
-			//DIRTY_FLOW,		// The flow of the frame has changed
 			DIRTY_VISIBILITY,	// The visibility of the frame has changed
+			DIRTY_FLOW,			// The flow of the frame has changed
 		};
 
 		virtual FrameType frameType() { return FRAME; }
@@ -89,7 +89,7 @@ namespace mk
 
 		void resetStyle();
 
-		void updateOnce();
+		virtual void updateOnce();
 
 		void updateSizing(Dimension dim);
 		void updateFixed(Dimension dim);
@@ -98,7 +98,7 @@ namespace mk
 		virtual void updateSizing();
 		virtual void updateStyle();
 		void updatePosition();
-		void updateSize();
+		virtual void updateSize();
 
 		void updateState(WidgetState state);
 
