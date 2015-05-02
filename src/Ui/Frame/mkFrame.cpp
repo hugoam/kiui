@@ -229,7 +229,6 @@ namespace mk
 	{
 		switch(d_dirty)
 		{
-		case DIRTY_LAYOUT:
 		case DIRTY_FLOW:
 		case DIRTY_VISIBILITY:
 			d_visible ? d_inkbox->show() : d_inkbox->hide();
