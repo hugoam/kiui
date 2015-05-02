@@ -215,7 +215,7 @@ namespace mk
 	Widget& Dockspace::vappend(unique_ptr<Widget> widget)
 	{
 		Docksection& section = mMainLine.findOrCreateSection(widget->dockid());
-		Window& window = section.emplace<Window>(widget->name(), true, true, nullptr, &section);
+		Window& window = section.emplace<Window>(widget->name(), static_cast<WindowState>(WINDOW_DOCKABLE | WINDOW_DEFAULT), nullptr, &section);
 		window.docked();
 		return window.vappend(std::move(widget));
 	}

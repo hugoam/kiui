@@ -150,13 +150,10 @@ namespace mk
 		mStyle = &cls();
 	}
 
-	Window::Window(const string& title, bool closable, bool dockable, const Trigger& onClose, Docksection* dock)
+	Window::Window(const string& title, WindowState state, const Trigger& onClose, Docksection* dock)
 		: LayerSheet()
 		, mName(title)
-		, mClosable(closable)
-		, mDockable(dockable)
-		, mMovable(true)
-		, mSizable(true)
+		, mWindowState(state)
 		, mContent(nullptr)
 		, mOnClose(onClose)
 		, mDock(dock)
@@ -182,6 +179,11 @@ namespace mk
 		}
 	}
 
+	void Window::toggleWindowState(WindowState state)
+	{
+		mWindowState = static_cast<WindowState>(mWindowState ^ state);
+	}
+
 	void Window::toggleClosable()
 	{
 		mHeader.closeButton()->frame().visible() ? mHeader.closeButton()->hide() : mHeader.closeButton()->show();
@@ -189,13 +191,13 @@ namespace mk
 
 	void Window::toggleMovable()
 	{
-		mMovable = !mMovable;
+		this->toggleWindowState(WINDOW_MOVABLE);
 	}
 
 	void Window::toggleResizable()
 	{
-		mSizable = !mSizable;
-		mSizable ? mFooter.show() : mFooter.hide();
+		this->toggleWindowState(WINDOW_SIZABLE);
+		this->sizable() ? mFooter.show() : mFooter.hide();
 	}
 
 	void Window::showTitlebar()
@@ -224,8 +226,8 @@ namespace mk
 	void Window::docked()
 	{
 		this->reset(&DockWindow::cls());
-		if(mSizable)
-			mFooter.hide();
+		this->toggleMovable();
+		this->toggleResizable();
 	}
 
 	void Window::undock()
@@ -239,8 +241,8 @@ namespace mk
 	void Window::undocked()
 	{
 		this->reset(&Window::cls());
-		if(mSizable)
-			mFooter.show();
+		this->toggleMovable();
+		this->toggleResizable();
 
 		mFrame->setPosition(mFrame->dabsolute(DIM_X), mFrame->dabsolute(DIM_Y));
 		mFrame->as<Layer>().moveToTop();
@@ -276,8 +278,8 @@ namespace mk
 		return true;
 	}
 
-	WindowForm::WindowForm(unique_ptr<Form> content, const string& title, bool closable, bool dockable, const Widget::Trigger& onClose)
-		: Form(make_unique<Window>(title, closable, dockable, onClose))
+	WindowForm::WindowForm(unique_ptr<Form> content, const string& title, WindowState state, const Widget::Trigger& onClose)
+		: Form(make_unique<Window>(title, state, onClose))
 	{
 		this->append(std::move(content));
 	}

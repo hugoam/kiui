@@ -123,18 +123,25 @@ namespace mk
 
 		WrapSheet::cls().layout().d_space = WRAP;
 
+		Window::cls().layout().d_space = BOARD;
+
+		DockWindow::cls().layout().d_space = BOARD;
+
+		ShrinkWindow::cls().layout().d_space = BLOCK;
+		ShrinkWindow::cls().layout().d_size = DimFloat();
+
+		WindowBody::cls().layout().d_space = WRAP;
+
 		Board::cls().layout().d_space = BOARD;
 		Dockspace::cls().layout().d_space = BOARD;
 		Docksection::cls().layout().d_space = BOARD;
 		ScrollSheet::cls().layout().d_space = BOARD;
-		WindowBody::cls().layout().d_space = BOARD;
 		Tabber::cls().layout().d_space = BOARD;
 		TabberBody::cls().layout().d_space = BOARD;
 		Tab::cls().layout().d_space = BOARD;
 		Tree::cls().layout().d_space = BOARD;
 		List::cls().layout().d_space = BOARD;
-		DockWindow::cls().layout().d_space = BOARD;
-		Window::cls().layout().d_space = BOARD;
+
 		Textbox::cls().layout().d_space = BOARD;
 
 		Page::cls().layout().d_space = WRAP;
