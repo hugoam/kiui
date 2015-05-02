@@ -128,7 +128,6 @@ namespace mk
 	{
 		mStyle = style;
 		mFrame->resetStyle();
-		mFrame->setDirty(Frame::DIRTY_LAYOUT);
 	}
 
 	Style& Widget::fetchOverride(Style& style)
