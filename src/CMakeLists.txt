@@ -46,9 +46,24 @@ if (MSVC)
 	endif()
 endif ()
 
-option(${PROJECT_NAME}_STATIC "Build static lib instead dynamic one")
+if (DEFINED ENV{${PROJECT_NAME}_STATIC})
+	if ($ENV{${PROJECT_NAME}_STATIC})
+		message(STATUS "env variable ${PROJECT_NAME}_STATIC is set")
+		if (NOT DEFINED ${PROJECT_NAME}_STATIC)
+			# enable static build from env only on first config start
+			option(${PROJECT_NAME}_STATIC "Build static lib instead dynamic one" ON)
+		endif ()
+	endif ()
+endif()
+
+# if KIUI_STATIC env not set into 1 enable dynamic lib by default
+if (NOT DEFINED ${PROJECT_NAME}_STATIC)
+	option(${PROJECT_NAME}_STATIC "Build static lib instead dynamic one")
+endif ()
+
 set(LIB_TYPE SHARED)
 if (${PROJECT_NAME}_STATIC)
+	message(STATUS "Building kiui static lib")
 	set(LIB_TYPE STATIC)
 	if (CMAKE_COMPILER_IS_GNUCXX OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
 		#enable Position-independent code generation for static lib
