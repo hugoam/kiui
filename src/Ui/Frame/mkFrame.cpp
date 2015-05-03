@@ -57,7 +57,7 @@ namespace mk
 			return;
 
 		Stripe* parent = d_parent;
-		bool flow = d_index < d_parent->sequence().size();
+		bool flow = d_flow;
 
 		d_parent->remove(this);
 		parent->insert(this, d_index);
@@ -100,6 +100,7 @@ namespace mk
 		d_inkstyle = &d_style->subskin(d_widget.state());
 		d_styleStamp = d_style->updated();
 
+		d_flow = d_layout->d_flow == FLOW;
 		d_opacity = d_layout->d_opacity;
 		if(d_span.null())
 			d_span = d_layout->d_span;
@@ -153,7 +154,7 @@ namespace mk
 		this->updateState(d_widget.state());
 		this->updateOnce();
 		d_hidden = hidden; // @this kludge ensure flowSized is not wrongly called on size update (it will be added in flowShown right after)
-		this->setVisible(parent->visible());
+		this->setVisible(d_parent->visible());
 	}
 	
 	void Frame::unbind()

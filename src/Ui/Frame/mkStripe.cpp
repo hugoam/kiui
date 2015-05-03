@@ -51,7 +51,6 @@ namespace mk
 
 		d_contents.insert(d_contents.begin() + index, frame);
 		this->reindex(index);
-
 		if(frame->flow())
 			++d_sequence.size();
 
@@ -62,10 +61,10 @@ namespace mk
 	void Stripe::remove(Frame* frame)
 	{
 		frame->unbind();
+
 		d_contents.erase(d_contents.begin() + frame->index());
 		this->reindex(frame->index());
-
-		if(frame->index() < d_sequence.size())
+		if(frame->flow())
 			--d_sequence.size();
 
 		if(!frame->hidden())
@@ -299,10 +298,10 @@ namespace mk
 		this->childSizedDepth(child, child->doffset(d_depth));
 
 		if(child->flow())
-		{
-			d_sequenceLength += (child->index() == 0 ? 0.f : d_layout->spacing()[d_length]);
-			this->setDirty(DIRTY_FLOW); // @useless
-		}
+			this->setDirty(DIRTY_FLOW);
+
+		if(child->flow() && d_sequence.size() != 1)
+			d_sequenceLength += d_layout->spacing()[d_length];
 	}
 
 	void Stripe::childHidden(Frame* child)
@@ -311,10 +310,10 @@ namespace mk
 		this->childSizedDepth(child, -child->doffset(d_depth));
 
 		if(child->flow())
-		{
-			d_sequenceLength -= (child->index() == 0 ? 0.f : d_layout->spacing()[d_length]);
-			this->setDirty(DIRTY_FLOW); // @useless
-		}
+			this->setDirty(DIRTY_FLOW);
+
+		if(child->flow() && d_sequence.size() != 0)
+			d_sequenceLength -= d_layout->spacing()[d_length];
 	}
 
 	void Stripe::childSized(Frame* child, Dimension dim, float delta)

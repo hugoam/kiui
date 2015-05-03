@@ -45,6 +45,7 @@ namespace mk
 		inline bool hidden() { return d_hidden; }
 		inline bool visible() { return d_visible; }
 		inline size_t index() { return d_index; }
+		inline bool flow() { return d_flow; }
 
 		inline Inkbox& inkbox() { return *d_inkbox.get(); }
 		inline Style& style() { return *d_style; }
@@ -164,6 +165,7 @@ namespace mk
 		Dirty d_dirty;
 		bool d_hidden;
 		bool d_visible;
+		bool d_flow;
 		DimFloat d_absolute;
 		DimFloat d_clipPos;
 		DimFloat d_clipSize;
