@@ -47,6 +47,10 @@ namespace mk
 		inline bool overflow() { return d_sequenceLength > dsize(d_length); }
 		inline float cursor() { return d_cursor; }
 		inline float spacing() { return d_layout->spacing()[d_length]; }
+
+		inline Dirty forceDirty() { return d_forceDirty; }
+		inline void setForceDirty(Dirty dirty) { if(dirty > d_forceDirty) d_forceDirty = dirty; }
+		inline void clearForceDirty() { d_forceDirty = CLEAN; }
 		
 		inline std::vector<float>& weights() { return *d_weights.get(); }
 
@@ -67,7 +71,7 @@ namespace mk
 			frame->setPositionDim(d_depth, this->offsetDepth(frame) + d_layout->padding()[d_depth] + frame->layout()->margin()[d_depth] / 2);
 		}
 
-		void setCursor(float cursor) { d_cursor = cursor; this->setDirty(DIRTY_FLOW); }
+		void setCursor(float cursor) { d_cursor = cursor; this->setDirty(DIRTY_OFFSET); }
 
 		void append(Frame* widget);
 		void insert(Frame* widget, size_t index);
@@ -153,6 +157,8 @@ namespace mk
 		float d_floatDepth;
 		float d_freeSpace;
 		float d_maxDepth;
+
+		Dirty d_forceDirty;
 
 		unique_ptr<std::vector<float>> d_weights;
 	};

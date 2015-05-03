@@ -26,6 +26,7 @@ namespace mk
 		, d_freeSpace(0)
 		, d_floatDepth(0)
 		, d_maxDepth(0)
+		, d_forceDirty(CLEAN)
 		, d_weights()
 	{
 		this->setDirty(DIRTY_FLOW);
@@ -179,8 +180,6 @@ namespace mk
 		this->expandDepth();
 		this->expandLength();
 
-		this->positionSequence();
-
 #if 0 // DEBUG
 			Stripe* parent = d_parent;
 			while(parent)
@@ -207,8 +206,11 @@ namespace mk
 			if(!frame->hidden())
 			{
 				frame->setPositionDim(d_length, !prev ? offset : prev->dposition(d_length) + prev->dsize(d_length) + d_layout->spacing()[d_length]);
+				frame->setDirty(DIRTY_CLIP);
 				prev = frame;
 			}
+
+		this->setForceDirty(DIRTY_POSITION);
 	}
 
 	void Stripe::initWeights()
@@ -246,8 +248,20 @@ namespace mk
 		//		Size the tree recursively from root to leaves
 		//		Position the tree recursively from root to leaves
 
-		if(d_dirty >= DIRTY_FLOW)
+		this->clearForceDirty();
+
+		if(d_parent)
+			this->setForceDirty(d_parent->d_forceDirty);
+
+		switch(d_dirty)
+		{
+		case DIRTY_FLOW:
 			this->relayout();
+		case DIRTY_OFFSET:
+			this->positionSequence();
+		case DIRTY_ABSOLUTE:
+			this->setForceDirty(DIRTY_ABSOLUTE);
+		}
 
 		Frame::updateOnce();
 	}
