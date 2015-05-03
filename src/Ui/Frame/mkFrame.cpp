@@ -148,9 +148,12 @@ namespace mk
 		this->updateStyle();
 		d_inkbox = this->layer().inkLayer().createInkbox(*this);
 
-		this->setVisible(parent->visible());
+		bool hidden = d_hidden;
+		d_hidden = true;
 		this->updateState(d_widget.state());
 		this->updateOnce();
+		d_hidden = hidden; // @this kludge ensure flowSized is not wrongly called on size update (it will be added in flowShown right after)
+		this->setVisible(parent->visible());
 	}
 	
 	void Frame::unbind()
@@ -318,15 +321,8 @@ namespace mk
 		if(dexpand(dim) || !flow())
 			d_clipSize[dim] = size;
 
-		if(d_parent && flow() && d_widget.state() & BOUND && !dexpand(dim)) // Upward notification -> when shrinking
-			d_parent->flowSized(this, dim, delta);
-
-		if(d_parent && d_visible && d_widget.state() & BOUND && d_layout->d_flow == FLOAT_DEPTH && dim != d_parent->layoutDim())
-			d_parent->floatSizedDepth(this, delta);
-		if(d_parent && d_visible && d_widget.state() & BOUND && d_layout->d_flow == FLOAT_LENGTH && dim == d_parent->layoutDim())
-			d_parent->floatSizedLength(this, delta);
-
-		//if(dexpand(dim)) // Downward notification -> when expanding
+		if(d_parent)
+			d_parent->childSized(this, dim, delta);
 		this->resized(dim);
 	}
 
@@ -354,10 +350,8 @@ namespace mk
 		d_hidden = false;
 		if(!d_visible)
 			this->setVisible(true);
-		if(d_parent && this->flow())
-			d_parent->flowShown(this);
-		if(d_parent && this->floats())
-			d_parent->floatShown(this);
+		if(d_parent)
+			d_parent->childShown(this);
 	}
 
 	void Frame::hide()
@@ -365,10 +359,8 @@ namespace mk
 		d_hidden = true;
 		if(d_visible)
 			this->setVisible(false);
-		if(d_parent && this->flow())
-			d_parent->flowHidden(this);
-		if(d_parent && this->floats())
-			d_parent->floatHidden(this);
+		if(d_parent)
+			d_parent->childHidden(this);
 	}
 
 	void Frame::setVisible(bool visible)

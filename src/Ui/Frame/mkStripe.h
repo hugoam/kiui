@@ -78,9 +78,6 @@ namespace mk
 		void remove(Frame* widget);
 		void clear();
 
-		void insertFlow(Frame* widget, size_t index);
-		void removeFlow(Frame* widget);
-
 		void move(size_t from, size_t to);
 
 		void setVisible(bool visible);
@@ -89,15 +86,14 @@ namespace mk
 
 		void resized(Dimension dim);
 
-		void flowHidden(Frame* child);
-		void flowShown(Frame* child);
+		void childShown(Frame* child);
+		void childHidden(Frame* child);
+		void childSized(Frame* child, Dimension dim, float delta);
+		void childSizedLength(Frame* child, float delta);
+		void childSizedDepth(Frame* child, float delta);
 
 		void flowSizedLength(Frame* child, float delta);
 		void flowSizedDepth(Frame* child, float delta);
-		void flowSized(Frame* child, Dimension dim, float delta);
-
-		void floatHidden(Frame* child);
-		void floatShown(Frame* child);
 
 		void floatSizedLength(Frame* child, float delta);
 		void floatSizedDepth(Frame* child, float delta);
