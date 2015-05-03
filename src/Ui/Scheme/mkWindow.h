@@ -13,18 +13,6 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ DockWindow : public Object
-	{
-	public:
-		static StyleType& cls() { static StyleType ty("DockWindow", Sheet::cls()); return ty; }
-	};
-
-	class MK_UI_EXPORT _I_ ShrinkWindow : public Object
-	{
-	public:
-		static StyleType& cls() { static StyleType ty("ShrinkWindow", Sheet::cls()); return ty; }
-	};
-
 	class MK_UI_EXPORT _I_ WindowHeader : public Sequence
 	{
 	public:
@@ -113,22 +101,38 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("CloseButton", Button::cls()); return ty; }
 	};
 
+	enum WindowState
+	{
+		WINDOW_NOSTATE = 0,
+		WINDOW_DOCKABLE = 1 << 0,
+		WINDOW_CLOSABLE = 1 << 1,
+		WINDOW_MOVABLE = 1 << 2,
+		WINDOW_SIZABLE = 1 << 3,
+		WINDOW_SHRINK = 1 << 4,
+		WINDOW_DEFAULT = WINDOW_MOVABLE | WINDOW_SIZABLE | WINDOW_CLOSABLE
+	};
+
 	class MK_UI_EXPORT Window : public LayerSheet
 	{
 	public:
-		Window(const string& title, bool closable = true, bool dockable = false, const Trigger& onClose = nullptr, Docksection* dock = nullptr);
+		Window(const string& title, WindowState state = WINDOW_DEFAULT, const Trigger& onClose = nullptr, Docksection* dock = nullptr);
 		~Window();
 
 		const string& name();
 
-		bool dockable() { return mDockable; }
-		bool movable() { return mMovable; }
-		bool closable() { return mClosable; }
-		
+		WindowState windowState() { return mWindowState; }
 		WindowBody& body() { return mBody; }
 		Docksection* dock() { return mDock; }
 
+		bool closable() { return (mWindowState & WINDOW_CLOSABLE) != 0; }
+		bool dockable() { return (mWindowState & WINDOW_DOCKABLE) != 0; }
+		bool movable()  { return (mWindowState & WINDOW_MOVABLE) != 0; }
+		bool sizable() { return (mWindowState & WINDOW_SIZABLE) != 0; }
+		bool shrink() { return (mWindowState & WINDOW_SHRINK) != 0; }
+
 		void bind(Sheet* parent, size_t index);
+
+		void toggleWindowState(WindowState state);
 
 		void toggleClosable();
 		void toggleMovable();
@@ -154,10 +158,7 @@ namespace mk
 
 	protected:
 		string mName;
-		bool mClosable;
-		bool mDockable;
-		bool mMovable;
-		bool mSizable;
+		WindowState mWindowState;
 		Widget* mContent;
 		Trigger mOnClose;
 		WindowHeader& mHeader;
@@ -167,10 +168,22 @@ namespace mk
 		Docksection* mDock;
 	};
 
+	class MK_UI_EXPORT _I_ DockWindow : public Object
+	{
+	public:
+		static StyleType& cls() { static StyleType ty("DockWindow", Sheet::cls()); return ty; }
+	};
+
+	class MK_UI_EXPORT _I_ ShrinkWindow : public Object
+	{
+	public:
+		static StyleType& cls() { static StyleType ty("ShrinkWindow", Window::cls()); return ty; }
+	};
+
 	class MK_UI_EXPORT WindowForm : public Form
 	{
 	public:
-		WindowForm(unique_ptr<Form> content, const string& title, bool closable = true, bool dockable = false, const Widget::Trigger& onClose = nullptr);
+		WindowForm(unique_ptr<Form> content, const string& title, WindowState state = WINDOW_NOSTATE, const Widget::Trigger& onClose = nullptr);
 	};
 }
 

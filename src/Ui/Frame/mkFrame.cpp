@@ -76,7 +76,7 @@ namespace mk
 		else if(d_space == BLOCK)
 			d_sizing[dim] = SHRINK;
 		else if(d_space == WRAP)
-			d_sizing[dim] = d_parent->d_sizing[dim];
+			d_sizing[dim] = d_parent->d_sizing[dim] == FIXED ? EXPAND : d_parent->d_sizing[dim];
 		else if(d_space == BOARD)
 			d_sizing[dim] = EXPAND;
 		else if(d_parent && ((d_space == SPACE && d_parent->layoutDim() == dim) || (d_space == DIV && d_parent->layoutDim() != dim)))
@@ -107,8 +107,6 @@ namespace mk
 		this->updateSizing();
 
 		this->setDirty(DIRTY_SKIN);
-		if(d_parent)
-			d_parent->markRelayout();
 	}
 
 	void Frame::updateSizing()
@@ -227,8 +225,13 @@ namespace mk
 
 	void Frame::updateOnce()
 	{
+		if(d_parent)
+			this->setDirty(d_parent->forceDirty());
+
 		switch(d_dirty)
 		{
+		case DIRTY_FLOW:
+		case DIRTY_OFFSET:
 		case DIRTY_VISIBILITY:
 			d_visible ? d_inkbox->show() : d_inkbox->hide();
 		case DIRTY_SKIN:
@@ -241,7 +244,10 @@ namespace mk
 			d_inkbox->updateFrame();
 		case DIRTY_POSITION:
 			this->updatePosition();
+		case DIRTY_CLIP:
 			this->updateClip();
+		case DIRTY_ABSOLUTE:
+			this->derivePosition();
 			d_inkbox->updatePosition();
 		case CLEAN:
 			break;
@@ -272,7 +278,10 @@ namespace mk
 			this->setPositionDim(DIM_X, d_parent->dsize(DIM_X) - d_size[DIM_X]);
 		else if(flow() && d_parent)
 			d_parent->positionDepth(this);
+	}
 
+	void Frame::derivePosition()
+	{
 		d_absolute[DIM_X] = this->calcAbsolute(DIM_X);
 		d_absolute[DIM_Y] = this->calcAbsolute(DIM_Y);
 	}
@@ -330,14 +339,14 @@ namespace mk
 		d_span[dim] = span;
 		this->setDirty(DIRTY_FRAME);
 
-		d_parent->markRelayout();
+		d_parent->setDirty(DIRTY_FLOW);
 	}
 
 	void Frame::setPositionDim(Dimension dim, float position)
 	{
 		d_position[dim] = position;
 		d_clipPos[dim] = 0.f;
-		this->setDirty(DIRTY_POSITION);
+		this->setDirty(DIRTY_ABSOLUTE);
 	}
 
 	void Frame::show()
