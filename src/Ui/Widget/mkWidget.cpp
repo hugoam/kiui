@@ -124,10 +124,16 @@ namespace mk
 		//this->reset(style);
 	}
 
-	void Widget::reset(Style* style)
+	void Widget::resetStyle(Style* style)
 	{
 		mStyle = style;
 		mFrame->resetStyle();
+	}
+
+	void Widget::resetSkin(Style* style)
+	{
+		mStyle = style;
+		mFrame->updateStyle();
 	}
 
 	Style& Widget::fetchOverride(Style& style)

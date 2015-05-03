@@ -78,7 +78,8 @@ namespace mk
 		void destroy();
 		void detach();
 
-		void reset(Style* style);
+		void resetStyle(Style* style);
+		void resetSkin(Style* style);
 
 		void nextFrame(size_t tick, size_t delta);
 

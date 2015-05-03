@@ -295,13 +295,13 @@ namespace mk
 		this->unhover();
 		mHovered = &widget;
 		if(widget.hoverCursor())
-			this->reset(widget.hoverCursor());
+			this->resetSkin(widget.hoverCursor());
 	}
 
 	void Cursor::unhover()
 	{
 		if(mHovered->hoverCursor())
-			this->reset(&cls());
+			this->resetSkin(&cls());
 		mHovered->unhover();
 		mHovered = &this->rootSheet();
 

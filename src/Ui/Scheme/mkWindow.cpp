@@ -225,7 +225,7 @@ namespace mk
 
 	void Window::docked()
 	{
-		this->reset(&DockWindow::cls());
+		this->resetStyle(&DockWindow::cls());
 		this->toggleMovable();
 		this->toggleResizable();
 	}
@@ -240,7 +240,7 @@ namespace mk
 
 	void Window::undocked()
 	{
-		this->reset(&Window::cls());
+		this->resetStyle(&Window::cls());
 		this->toggleMovable();
 		this->toggleResizable();
 
