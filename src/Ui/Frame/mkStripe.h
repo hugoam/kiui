@@ -92,10 +92,7 @@ namespace mk
 		void childSizedLength(Frame* child, float delta);
 		void childSizedDepth(Frame* child, float delta);
 
-		void flowSizedLength(Frame* child, float delta);
 		void flowSizedDepth(Frame* child, float delta);
-
-		void floatSizedLength(Frame* child, float delta);
 		void floatSizedDepth(Frame* child, float delta);
 
 		void normalizeSpan();

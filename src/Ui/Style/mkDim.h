@@ -56,7 +56,7 @@ namespace mk
 	enum _I_ Flow : unsigned int
 	{
 		FLOW = 0,
-		//FILL = 1,
+		FILL = 1,
 		OVERLAY = 2,
 		FLOAT_DEPTH = 3,
 		FLOAT_LENGTH = 4

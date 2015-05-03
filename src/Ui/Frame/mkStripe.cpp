@@ -318,7 +318,7 @@ namespace mk
 
 	void Stripe::childSized(Frame* child, Dimension dim, float delta)
 	{
-		if(child->hidden())// || (child->widget().state() & BOUND) == 0)
+		if(child->hidden() || child->dexpand(dim))
 			return;
 
 		if(dim == d_length)
@@ -329,26 +329,20 @@ namespace mk
 
 	void Stripe::childSizedLength(Frame* child, float delta)
 	{
-		if(child->flow() && !child->dexpand(d_length))
-			this->flowSizedLength(child, delta);// flow
-		else if(child->layout()->d_flow == FLOAT_LENGTH)
-			this->floatSizedLength(child, delta);
+		if(!(child->flow() || child->floats()) || child->dexpand(d_length))
+			return;
+
+		d_sequenceLength += delta;
+		this->updateLength();
+		this->setDirty(DIRTY_FLOW);
 	}
 
 	void Stripe::childSizedDepth(Frame* child, float delta)
 	{
-		if(child->flow() && !child->dexpand(d_depth))
-			this->flowSizedDepth(child, delta);// flow
+		if(child->flow() || child->layout()->d_flow == FILL)
+			this->flowSizedDepth(child, delta);
 		else if(child->layout()->d_flow == FLOAT_DEPTH)
 			this->floatSizedDepth(child, delta);
-	}
-
-	void Stripe::flowSizedLength(Frame* child, float delta)
-	{
-		UNUSED(child);
-		d_sequenceLength += delta;
-		this->updateLength();
-		this->setDirty(DIRTY_FLOW);
 	}
 
 	void Stripe::flowSizedDepth(Frame* child, float delta)
@@ -362,13 +356,6 @@ namespace mk
 			d_maxDepth = std::max(d_maxDepth, child->doffset(d_depth));
 			this->updateDepth();
 		}
-	}
-
-	void Stripe::floatSizedLength(Frame* child, float delta)
-	{
-		UNUSED(child);
-		d_sequenceLength += delta;
-		this->setDirty(DIRTY_FLOW);
 	}
 
 	void Stripe::floatSizedDepth(Frame* child, float delta)

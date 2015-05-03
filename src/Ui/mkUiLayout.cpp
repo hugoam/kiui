@@ -184,7 +184,7 @@ namespace mk
 		SliderX::cls().layout().d_layoutDim = DIM_X;
 		SliderY::cls().layout().d_layoutDim = DIM_Y;
 
-		SliderKnob::cls().layout().d_flow = OVERLAY;
+		SliderKnob::cls().layout().d_flow = FILL;
 
 		ScrollerX::cls().layout().d_layoutDim = DIM_X;
 		ScrollerY::cls().layout().d_layoutDim = DIM_Y;
