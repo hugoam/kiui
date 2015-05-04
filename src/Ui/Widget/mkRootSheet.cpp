@@ -22,7 +22,7 @@
 
 namespace mk
 {
-	RootSheet::RootSheet(UiWindow& window, Form* form, bool absolute)
+	RootSheet::RootSheet(UiWindow& window, bool absolute)
 		: Sheet(LAYER)
 		, mWindow(window)
 		, mLeftPressed(false)

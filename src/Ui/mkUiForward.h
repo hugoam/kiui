@@ -111,6 +111,9 @@ namespace mk
 	class Dockline;
 	class Dockspace;
 
+	class Dockbox;
+	class Dockbar;
+
 	class Cursor;
 
 	class Skinner;
@@ -122,11 +125,6 @@ namespace mk
 	class FMethodCall;
 
 	class WValue;
-
-	class InputString;
-	class InputBool;
-	class InputInt;
-	class InputFloat;
 
 	class SliderInt;
 	class SliderFloat;

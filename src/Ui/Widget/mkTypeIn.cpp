@@ -123,6 +123,7 @@ namespace mk
 
 	bool TypeIn::leftDrag(float xPos, float yPos, float xDif, float yDif)
 	{
+		UNUSED(xDif); UNUSED(yDif);
 		size_t index = mFrame->inkbox().caretIndex(xPos - mFrame->dabsolute(DIM_X), yPos - mFrame->dabsolute(DIM_Y));
 		mFrame->inkbox().selectSecond(index);
 		mCaret.setIndex(index);
@@ -131,6 +132,7 @@ namespace mk
 
 	bool TypeIn::leftDragEnd(float xPos, float yPos)
 	{
+		UNUSED(xPos); UNUSED(yPos);
 		return true;
 	}
 

@@ -29,7 +29,9 @@ namespace mk
 	{
 		DIM_X = 0,
 		DIM_Y = 1,
-		DIM_0 = 2
+		DIM_XX = 2,
+		DIM_YY = 3,
+		DIM_NULL = 4
 	};
 
 	enum _I_ Pivot : unsigned int
@@ -40,10 +42,15 @@ namespace mk
 
 	enum _I_ Align : unsigned int
 	{
-		CENTER = 0,
-		LEFT = 1,
-		RIGHT = 2
+		LEFT = 0,
+		CENTER = 1,
+		RIGHT = 2,
+		OUT_LEFT = 3,
+		OUT_RIGHT = 4
 	};
+
+	extern float AlignExtent[5];
+	extern float AlignSpace[5];
 
 	enum _I_ FrameType : unsigned int
 	{
@@ -56,17 +63,19 @@ namespace mk
 	enum _I_ Flow : unsigned int
 	{
 		FLOW = 0,
-		FILL = 1,
-		OVERLAY = 2,
-		FLOAT_DEPTH = 3,
-		FLOAT_LENGTH = 4
+		FREE = 1,
+		FREE_FILL = 2,
+		ALIGN = 3,
+		OVERLAY = 4,
+		FLOAT_DEPTH = 5,
+		FLOAT_LENGTH = 6
 	};
 
 	enum _I_ Space : unsigned int
 	{
 		AUTO = 0,
 		BLOCK = 1,
-		WRAP = 2,
+		FIT = 2,
 		DIV = 3,
 		SPACE = 4,
 		BOARD = 5
@@ -76,8 +85,9 @@ namespace mk
 	{
 		FIXED = 0,
 		SHRINK = 1,
-		EXPAND = 2,
-		MANUAL = 3,
+		WRAP = 2,
+		EXPAND = 3,
+		MANUAL = 4
 	};
 
 	enum _I_ Clipping : unsigned int

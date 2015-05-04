@@ -75,7 +75,7 @@ namespace mk
 
 		mController = mRootSheet;
 
-		this->resize(mWidth, mHeight);
+		this->resize(size_t(mWidth), size_t(mHeight));
 	}
 
 	void UiWindow::resize(size_t width, size_t height)

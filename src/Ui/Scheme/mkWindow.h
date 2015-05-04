@@ -34,7 +34,6 @@ namespace mk
 	protected:
 		Window& mWindow;
 		Label& mTitle;
-		Widget& mSpacer;
 		Button* mCloseButton;
 		string mTooltip;
 	};

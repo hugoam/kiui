@@ -7,7 +7,7 @@
 
 #include <Ui/Form/mkForm.h>
 #include <Ui/Form/mkRootForm.h>
-#include <Ui/Form/mkInput.h>
+#include <Ui/Widget/mkInput.h>
 #include <Ui/Form/mkWidgets.h>
 #include <Ui/Form/mkHook.h>
 
@@ -38,6 +38,7 @@
 #include <Ui/Scheme/mkTable.h>
 #include <Ui/Scheme/mkTabber.h>
 #include <Ui/Scheme/mkDockspace.h>
+#include <Ui/Scheme/mkDockbar.h>
 
 #include <Ui/Frame/mkDimString.h>
 

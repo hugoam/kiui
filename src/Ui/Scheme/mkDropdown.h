@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_WDROPDOWN_H
-#define MK_WDROPDOWN_H
+#ifndef MK_DROPDOWN_H
+#define MK_DROPDOWN_H
 
 /* mk */
 #include <Ui/Widget/mkSheet.h>
@@ -125,6 +125,12 @@ namespace mk
 
 	protected:
 		Menu& mMenu;
+	};
+
+	class MK_UI_EXPORT SubMenuList : public Object
+	{
+	public:
+		static StyleType& cls() { static StyleType ty("SubMenuList", MenuList::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT Menu : public Sheet

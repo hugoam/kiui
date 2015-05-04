@@ -10,7 +10,7 @@ namespace mk
 	Uibox::Uibox()
 		: d_position(0.f, 0.f)
 		, d_size(0.f, 0.f)
-		, d_space(WRAP)
+		, d_space(FIT)
 		, d_sizing(SHRINK, SHRINK)
 		, d_layout(nullptr)
 	{}

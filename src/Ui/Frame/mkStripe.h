@@ -54,28 +54,32 @@ namespace mk
 		
 		inline std::vector<float>& weights() { return *d_weights.get(); }
 
-		inline float offsetLength(Frame* frame) { return frame->dsize(d_length) + frame->layout()->margin()[d_length] + (frame->index() != d_sequence.size()-1 ? this->spacing() : 0.f); }
-		inline float offset(Frame* frame, Dimension dim) { return dim == d_length ? offsetLength(frame) : frame->doffset(d_length); }
+		inline float dspace(Dimension dim) { return d_size[dim] - dpadding(dim) - dbackpadding(dim) - (dim == d_length ? 0.f : d_floatDepth); }
 
-		inline float offsetDepth(Frame* frame)
-		{
-			if(d_inkstyle->align()[d_depth] == CENTER)
-				return (dspace(d_depth) - frame->doffset(d_depth)) / 2.f;
-			else if(d_inkstyle->align()[d_depth] == RIGHT)
-				return (dspace(d_depth) - frame->doffset(d_depth));
-			return 0.f;
-		}
+		inline float spacing(Frame& frame) { return (frame.index() != d_sequence.size()-1) ? this->spacing() : 0.f; }
+		inline float extent(Frame& frame, Dimension dim) { return frame.dextent(dim) + (dim == d_length ? this->spacing(frame) : 0.f); }
+		inline float extentFlow(Frame& frame) { return frame.dextent(d_length) + this->spacing(frame); }
 
-		inline void positionDepth(Frame* frame)
-		{
-			frame->setPositionDim(d_depth, this->offsetDepth(frame) + d_layout->padding()[d_depth] + frame->layout()->margin()[d_depth] / 2);
-		}
+		inline float align(float space, float extent, Align align) { return space * AlignSpace[align] - extent * AlignExtent[align]; }
+		inline float align(Frame& frame, Dimension dim) { return  align(frame.flow() ? dspace(dim) : dsize(dim), frame.dextent(dim), frame.dalign(dim)); }
+		inline float alignFlow(Frame& frame) { return d_freeSpace * AlignSpace[frame.dalign(d_length)]; }
+
+		inline float offset(Frame& frame, Dimension dim) { return dpadding(dim) + frame.dmargin(dim) + align(frame, dim); }
+
+		inline float offsetFlowFirst(Frame& frame) { return -d_cursor + dpadding(d_length) + frame.dmargin(d_length) + alignFlow(frame); }
+		inline float offsetFlowNext(Frame& frame, Frame& prev) { return prev.doffset(d_length) + this->spacing() - alignFlow(prev) + alignFlow(frame); }
+		inline float offsetFlow(Frame& frame) { Frame* before = frame.before(); return before ? offsetFlowNext(frame, *before) : offsetFlowFirst(frame); }
+
+		inline float dpivotposition(Frame& frame, Dimension dim) { return d_layout->pivot()[dim] ? dsize(dim) - frame.dsize(dim) - frame.dposition(dim) : frame.dposition(dim); }
+
+		void positionLength(Frame& frame);
+		void positionDepth(Frame& frame);
 
 		void setCursor(float cursor) { d_cursor = cursor; this->setDirty(DIRTY_OFFSET); }
 
-		void append(Frame* widget);
-		void insert(Frame* widget, size_t index);
-		void remove(Frame* widget);
+		void append(Frame& widget);
+		void insert(Frame& widget, size_t index);
+		void remove(Frame& widget);
 		void clear();
 
 		void move(size_t from, size_t to);
@@ -86,14 +90,14 @@ namespace mk
 
 		void resized(Dimension dim);
 
-		void childShown(Frame* child);
-		void childHidden(Frame* child);
-		void childSized(Frame* child, Dimension dim, float delta);
-		void childSizedLength(Frame* child, float delta);
-		void childSizedDepth(Frame* child, float delta);
+		void childShown(Frame& child);
+		void childHidden(Frame& child);
+		void childSized(Frame& child, Dimension dim, float delta);
+		void childSizedLength(Frame& child, float delta);
+		void childSizedDepth(Frame& child, float delta);
 
-		void flowSizedDepth(Frame* child, float delta);
-		void floatSizedDepth(Frame* child, float delta);
+		void flowSizedDepth(Frame& child, float delta);
+		void floatSizedDepth(Frame& child, float delta);
 
 		void normalizeSpan();
 
@@ -117,9 +121,6 @@ namespace mk
 		void dispatchWeights();
 		void dispatchTableWeights();
 
-		inline float dspace(Dimension dim) { return d_size[dim] - d_layout->padding()[dim] - d_layout->padding()[dim + 2] - (dim == d_length ? 0.f : d_floatDepth); }
-		inline float dpivotposition(Dimension dim, Frame* frame) { return d_layout->pivot()[dim] ? dsize(dim) - frame->dsize(dim) - frame->dposition(dim) : frame->dposition(dim); }
-
 		Frame* pinpoint(float x, float y, bool opaque);
 
 		void shrinkSizeDim(Dimension dim, float size);
@@ -135,8 +136,6 @@ namespace mk
 
 		void expandDepth();
 		void expandLength();
-
-		void positionSequence();
 
 	protected:
 		Dimension d_depth;

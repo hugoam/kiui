@@ -30,13 +30,20 @@ namespace mk
 
 		inline float dposition(Dimension dim) { return d_position[dim]; }
 		inline float dsize(Dimension dim) { return d_size[dim]; }
+		inline float dspan(Dimension dim) { return d_span[dim]; }
+
+		inline float dpadding(Dimension dim) { return d_layout->padding()[dim]; }
+		inline float dbackpadding(Dimension dim) { return d_layout->padding()[dim + 2]; }
+		inline float dmargin(Dimension dim) { return d_layout->margin()[dim]; }
+
+		inline Align dalign(Dimension dim) { return d_layout->align()[dim]; }
+
 		inline bool dexpand(Dimension dim) { return d_sizing[dim] == EXPAND; }
 		inline bool dshrink(Dimension dim) { return d_sizing[dim] == SHRINK; }
 		inline bool dmanual(Dimension dim) { return d_sizing[dim] == MANUAL; }
 		inline bool dfixed(Dimension dim) { return d_sizing[dim] == FIXED; }
-		inline float dspan(Dimension dim) { return d_span[dim]; }
 
-		inline bool flow() { return d_layout->d_flow == FLOW; }
+		inline bool unflow() { return d_layout->d_flow == FREE || d_layout->d_flow == FREE_FILL; }
 		inline bool floats() { return d_layout->d_flow == FLOAT_DEPTH || d_layout->d_flow == FLOAT_LENGTH; }
 		inline bool clip() { return d_layout->d_clipping == CLIP; }
 		inline bool opaque() { return d_opacity <= GLASSY; }

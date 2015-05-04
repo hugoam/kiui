@@ -73,11 +73,9 @@ namespace mk
 			return;
 
 		mList.show();
+		mList.frame().as<Layer>().moveToTop();
 		if(modal)
 			mList.modal();
-
-		mList.frame().as<Layer>().moveToTop();
-		mList.frame().setPositionDim(DIM_Y, mFrame->dsize(DIM_Y));
 
 		mDown = true;
 	}
@@ -233,12 +231,7 @@ namespace mk
 	{
 		mList.show();
 		mList.modal();
-
 		mList.frame().as<Layer>().moveToTop();
-		if(!mSubmenu)
-			mList.frame().setPositionDim(DIM_Y, mFrame->dsize(DIM_Y));
-		else if(mSubmenu)
-			mList.frame().setPositionDim(DIM_X, mFrame->dsize(DIM_X));
 
 		mDown = true;
 	}

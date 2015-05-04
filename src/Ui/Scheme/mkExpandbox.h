@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_WEXPANDBOX_H
-#define MK_WEXPANDBOX_H
+#ifndef MK_EXPANDBOX_H
+#define MK_EXPANDBOX_H
 
 /* mk */
 #include <Ui/Widget/mkSheet.h>

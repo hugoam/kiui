@@ -268,7 +268,7 @@ namespace mk
 		double deltaf = 16.66666667 - ((glfwGetTime() - time) * 1000.f);
 
 		if(deltaf > 0.f)
-			std::this_thread::sleep_for(std::chrono::milliseconds(int(delta)));
+			std::this_thread::sleep_for(std::chrono::milliseconds(int(deltaf)));
 #endif
 
 		glfwSwapBuffers(mGlWindow);

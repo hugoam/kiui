@@ -160,7 +160,7 @@ namespace mk
 
 		float pos = (mVal - mMin) / (mMax - mMin) * this->length();		
 		mFiller.frame().setSizeDim(mDim, pos);
-		mButton.frame().parent()->positionDepth(&mButton.frame());
+		mButton.frame().parent()->positionDepth(mButton.frame());
 
 		if(!mButton.frame().dexpand(mDim))
 			mButton.frame().setPositionDim(mDim, pos);

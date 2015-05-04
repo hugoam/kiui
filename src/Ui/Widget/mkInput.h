@@ -20,36 +20,38 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT InputInt : public Sequence
+	template <class T_Val, class T_Arg = T_Val, class T_Input = typename Input<T_Val>>
+	class Field : public Sequence
 	{
 	public:
-		InputInt(const string& label, int value, std::function<void(int)> callback = nullptr);
+		Field(const string& label, const T_Val& value, std::function<void(T_Arg)> callback = nullptr, bool reverse = false)
+			: Sequence()
+			, mInput(this->makeappend<T_Input>(value, callback))
+			, mLabel(this->makeappend<Label>(label))
+		{
+			UNUSED(reverse);
+		}
 
-		static StyleType& cls() { static StyleType ty("InputInt", Sequence::cls()); return ty; }
+		Input<T_Val>& input() { return mInput; }
+
+		static StyleType& cls() { static StyleType ty("Field<" + typecls<T_Val>().name() + ">", Sequence::cls()); return ty; }
+
+	protected:
+		Input<T_Val>& mInput;
+		Label& mLabel;
 	};
 
-	class MK_UI_EXPORT InputFloat : public Sequence
+	typedef Field<bool> InputBool;
+	typedef Field<int> InputInt;
+	typedef Field<float> InputFloat;
+	typedef Field<string> InputText;
+
+	class MK_UI_EXPORT InputRadio : public Sequence
 	{
 	public:
-		InputFloat(const string& label, float value, std::function<void(float)> callback = nullptr);
+		InputRadio(const string& label, StringVector choices, std::function<void(const string&)> callback = nullptr);
 
-		static StyleType& cls() { static StyleType ty("InputFloat", Sequence::cls()); return ty; }
-	};
-
-	class MK_UI_EXPORT InputBool : public Sequence
-	{
-	public:
-		InputBool(const string& label, bool value, std::function<void(bool)> callback = nullptr);
-
-		static StyleType& cls() { static StyleType ty("InputBool", Sequence::cls()); return ty; }
-	};
-
-	class MK_UI_EXPORT InputText : public Sequence
-	{
-	public:
-		InputText(const string& label, const string& text, std::function<void(string)> callback = nullptr, bool reverse = false);
-
-		static StyleType& cls() { static StyleType ty("InputText", Sequence::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("InputDropdown", Sequence::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT InputDropdown : public Sequence

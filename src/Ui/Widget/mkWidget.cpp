@@ -62,7 +62,7 @@ namespace mk
 		mParent = parent;
 
 		if(mFrame->frameType() != LAYER3D)
-			mParent->stripe().insert(mFrame.get(), index);
+			mParent->stripe().insert(*mFrame.get(), index);
 		else
 			mFrame->as<Layer>().bind();
 

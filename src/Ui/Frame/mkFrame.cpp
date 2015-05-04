@@ -25,6 +25,9 @@
 
 namespace mk
 {
+	float AlignSpace[5] = { 0.f, 0.5f, 1.f, 0.f, 1.f };
+	float AlignExtent[5] = { 0.f, 0.5f, 1.f, 1.f, 0.f };
+
 	Frame::Frame(Widget& widget)
 		: Uibox()
 		, d_widget(widget)
@@ -59,8 +62,8 @@ namespace mk
 		Stripe* parent = d_parent;
 		bool flow = d_flow;
 
-		d_parent->remove(this);
-		parent->insert(this, d_index);
+		d_parent->remove(*this);
+		parent->insert(*this, d_index);
 
 		if(flow && !this->flow())
 		{
@@ -75,13 +78,18 @@ namespace mk
 			d_sizing[dim] = d_layout->sizing()[dim];
 		else if(d_space == BLOCK)
 			d_sizing[dim] = SHRINK;
-		else if(d_space == WRAP)
+		else if(d_space == FIT)
 			d_sizing[dim] = d_parent->d_sizing[dim] == FIXED ? EXPAND : d_parent->d_sizing[dim];
 		else if(d_space == BOARD)
 			d_sizing[dim] = EXPAND;
 		else if(d_parent && ((d_space == SPACE && d_parent->layoutDim() == dim) || (d_space == DIV && d_parent->layoutDim() != dim)))
-			d_sizing[dim] = EXPAND;
+			d_sizing[dim] = WRAP;
 		else if(d_parent && ((d_space == SPACE && d_parent->layoutDim() != dim) || (d_space == DIV && d_parent->layoutDim() == dim)))
+			d_sizing[dim] = SHRINK;
+
+		if(d_sizing[dim] == WRAP && d_parent->d_sizing[dim] != SHRINK)
+			d_sizing[dim] = EXPAND;
+		if(d_sizing[dim] == WRAP && d_parent->d_sizing[dim] == SHRINK)
 			d_sizing[dim] = SHRINK;
 	}
 
@@ -149,11 +157,6 @@ namespace mk
 		this->updateStyle();
 		d_inkbox = this->layer().inkLayer().createInkbox(*this);
 
-		bool hidden = d_hidden;
-		d_hidden = true;
-		this->updateState(d_widget.state());
-		this->updateOnce();
-		d_hidden = hidden; // @this kludge ensure flowSized is not wrongly called on size update (it will be added in flowShown right after)
 		this->setVisible(d_parent->visible());
 	}
 	
@@ -166,17 +169,26 @@ namespace mk
 
 	void Frame::remove()
 	{
-		d_parent->remove(this);
+		d_parent->remove(*this);
 	}
 
-	Frame* Frame::prev()
+	Frame* Frame::before()
 	{
-		return d_parent->contents().at(d_index - 1);
+		int index = d_index;
+		while(index-- > 0)
+			if(!d_parent->contents().at(index)->hidden())
+				return d_parent->contents().at(index);
+		return nullptr;
 	}
 
-	Frame* Frame::next()
+	Frame& Frame::prev()
 	{
-		return d_parent->contents().at(d_index + 1);
+		return *d_parent->contents().at(d_index - 1);
+	}
+
+	Frame& Frame::next()
+	{
+		return *d_parent->contents().at(d_index + 1);
 	}
 
 	bool Frame::first()
@@ -195,8 +207,6 @@ namespace mk
 			return;
 
 		bool clipped = !d_inkbox->visible(); // We are visible, so the inkbox not visible means we were clipped
-		bool clipx = this->dclip(DIM_X);
-		bool clipy = this->dclip(DIM_Y);
 
 		this->updateClip(DIM_X);
 		this->updateClip(DIM_Y);
@@ -206,8 +216,7 @@ namespace mk
 		else if(dclip(DIM_X) != HIDDEN && dclip(DIM_Y) != HIDDEN && clipped)
 			d_inkbox->show();
 
-		if(clipped || clipx || clipy || this->dclip(DIM_X) || this->dclip(DIM_Y))
-			d_inkbox->updateClip();
+		d_inkbox->updateClip();
 	}
 
 	void Frame::updateClip(Dimension dim)
@@ -262,7 +271,7 @@ namespace mk
 
 	void Frame::transfer(Stripe& stripe, size_t index)
 	{
-		stripe.insert(this, index);
+		stripe.insert(*this, index);
 		this->migrate(stripe);
 	}
 
@@ -278,10 +287,11 @@ namespace mk
 
 	void Frame::updatePosition()
 	{
-		if(d_layout->d_flow == FLOAT_DEPTH)
-			this->setPositionDim(DIM_X, d_parent->dsize(DIM_X) - d_size[DIM_X]);
-		else if(flow() && d_parent)
-			d_parent->positionDepth(this);
+		if(!d_parent || d_hidden || unflow())
+			return;
+
+		d_parent->positionDepth(*this);
+		d_parent->positionLength(*this);
 	}
 
 	void Frame::derivePosition()
@@ -323,7 +333,7 @@ namespace mk
 			d_clipSize[dim] = size;
 
 		if(d_parent)
-			d_parent->childSized(this, dim, delta);
+			d_parent->childSized(*this, dim, delta);
 		this->resized(dim);
 	}
 
@@ -352,7 +362,7 @@ namespace mk
 		if(!d_visible)
 			this->setVisible(true);
 		if(d_parent)
-			d_parent->childShown(this);
+			d_parent->childShown(*this);
 	}
 
 	void Frame::hide()
@@ -361,7 +371,7 @@ namespace mk
 		if(d_visible)
 			this->setVisible(false);
 		if(d_parent)
-			d_parent->childHidden(this);
+			d_parent->childHidden(*this);
 	}
 
 	void Frame::setVisible(bool visible)
@@ -390,7 +400,7 @@ namespace mk
 	float Frame::calcAbsolute(Dimension dim)
 	{
 		if(d_parent)
-			return d_parent->dabsolute(dim) + d_parent->dpivotposition(dim, this);
+			return d_parent->dabsolute(dim) + d_parent->dpivotposition(*this, dim);
 		else
 			return dposition(dim);
 	}
@@ -413,16 +423,18 @@ namespace mk
 
 	bool Frame::nextOffset(Dimension dim, float& pos, float seuil, bool top)
 	{
-		pos += d_parent->offset(this, dim);
+		UNUSED(top);
+		pos += d_parent->extent(*this, dim);
 		return pos > seuil;
 	}
 
 	bool Frame::prevOffset(Dimension dim, float& pos, float seuil, bool top)
 	{
-		if(pos + d_parent->offset(this, dim) >= seuil)
+		UNUSED(top);
+		if(pos + d_parent->extent(*this, dim) >= seuil)
 			return true;
 		
-		pos += d_parent->offset(this, dim);
+		pos += d_parent->extent(*this, dim);
 		return false;
 	}
 }

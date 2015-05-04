@@ -16,7 +16,7 @@
 namespace mk
 {
 	template <> Flow fromString<Flow>(const string& str) { if(str == "FLOW") return FLOW; else if(str == "OVERLAY") return OVERLAY; return FLOW; }
-	template <> Space fromString<Space>(const string& str) { if(str == "AUTO") return AUTO; if(str == "BLOCK") return BLOCK; else if(str == "WRAP") return WRAP; else if(str == "DIV") return DIV; else if(str == "SPACE") return SPACE; else if(str == "BOARD") return BOARD; return AUTO; }
+	template <> Space fromString<Space>(const string& str) { if(str == "AUTO") return AUTO; if(str == "BLOCK") return BLOCK; else if(str == "FIT") return FIT; else if(str == "DIV") return DIV; else if(str == "SPACE") return SPACE; else if(str == "BOARD") return BOARD; return AUTO; }
 	template <> Clipping fromString<Clipping>(const string& str) { if(str == "NOCLIP") return NOCLIP; else if(str == "CLIP") return CLIP; return NOCLIP; }
 	template <> Opacity fromString<Opacity>(const string& str) { if(str == "OPAQUE") return OPAQUE; else if(str == "VOID") return VOID; return OPAQUE; }
 	template <> Dimension fromString<Dimension>(const string& str) { if(str == "DIM_X") return DIM_X; else if(str == "DIM_Y") return DIM_Y; return DIM_X; }
@@ -93,7 +93,6 @@ namespace mk
 	{
 		mStyler.reset();
 
-		yaml_event_t event;
 		yaml_token_t token;
 
 		int done = 0;
@@ -209,11 +208,13 @@ namespace mk
 		else if(key == "opacity")
 			mStyle->layout().d_opacity = fromString<Opacity>(value); // OPAQUE | VOID
 		else if(key == "space")
-			mStyle->layout().d_space = fromString<Space>(value); // AUTO | BLOCK | WRAP | DIV | SPACE | BOARD
+			mStyle->layout().d_space = fromString<Space>(value); // AUTO | BLOCK | FIT | DIV | SPACE | BOARD
 		else if(key == "sizing")
 			mStyle->layout().d_sizing = fromString<DimSizing>(value); // FIXED | SHRINK | EXPAND
 		else if(key == "layout_dim")
 			mStyle->layout().d_layoutDim = fromString<Dimension>(value); // DIM_X | DIM_Y
+		else if(key == "align")
+			mStyle->layout().d_align = fromString<DimAlign>(value); // x, y
 		else if(key == "need")
 			mStyle->layout().d_space = fromString<Space>(value); // BLOCK | SPACE | BOARD
 		else if(key == "span")
@@ -253,7 +254,7 @@ namespace mk
 			mSkin->mCornerRadius = fromString<BoxFloat>(value); // topleft, topright, bottomright, bottomleft
 		else if(key == "weak_corners")
 			mSkin->mWeakCorners = (value == "false" ? false : true); // true | false
-		else if(key == "align")
+		else if(key == "skin_align")
 			mSkin->mAlign = fromString<DimAlign>(value); // x, y
 		else if(key == "skin_padding")
 			mSkin->mPadding = fromString<BoxFloat>(value); // left, right, top, bottom
@@ -271,7 +272,7 @@ namespace mk
 			mSkin->mImageSkin = ImageSkin(values[0],	fromString<int>(values[1]), fromString<int>(values[2]),
 														fromString<int>(values[3]), fromString<int>(values[4]),
 														values.size() > 5 ? fromString<int>(values[5]) : 0,
-														values.size() > 6 ? fromString<Dimension>(values[6]) : DIM_0); // : image.png
+														values.size() > 6 ? fromString<Dimension>(values[6]) : DIM_NULL); // : image.png
 		else if(key == "shadow")
 			mSkin->mShadow = Shadow(	fromString<float>(values[0]), fromString<float>(values[1]),
 										fromString<float>(values[2]), fromString<float>(values[3])); // : xoffset, yoffset, blur, spread

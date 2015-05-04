@@ -19,7 +19,7 @@ namespace mk
 	class MK_UI_EXPORT _I_ RootSheet : public Sheet, public InputController
 	{
 	public:
-		RootSheet(UiWindow& window, Form* form, bool absolute = true);
+		RootSheet(UiWindow& window, bool absolute = true);
 		~RootSheet();
 
 		FrameType frameType() { return LAYER; }

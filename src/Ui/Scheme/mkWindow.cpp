@@ -29,7 +29,6 @@ namespace mk
 		, mWindow(window)
 		, mTooltip("Drag me")
 		, mTitle(this->makeappend<Label>(mWindow.name()))
-		, mSpacer(this->makeappend<SpacerX>())
 	{
 		mStyle = &cls();
 		if(mWindow.closable())
@@ -92,7 +91,7 @@ namespace mk
 
 	bool WindowSizer::leftDragStart(float xPos, float yPos)
 	{
-		UNUSED(yPos);
+		UNUSED(xPos); UNUSED(yPos);
 		mWindow.frame().as<Layer>().moveToTop();
 		return true;
 	}

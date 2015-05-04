@@ -19,7 +19,7 @@
 namespace mk
 {
 	RootForm::RootForm(UiWindow& uiWindow)
-		: Form(make_unique<RootSheet>(uiWindow, this))
+		: Form(make_unique<RootSheet>(uiWindow))
 		, mWindow(uiWindow)
 		, mLastTick(0)
 		, mRootSheet(mSheet.as<RootSheet>())

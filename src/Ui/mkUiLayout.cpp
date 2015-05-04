@@ -45,9 +45,6 @@ namespace mk
 				object->as<Style>().reset();
 
 		this->defaultLayout();
-		//this->defaultSkins();
-
-		this->prepare();
 	}
 
 	Style* Styler::fetchOverride(Style& style, Style& overrider)
@@ -92,13 +89,13 @@ namespace mk
 	{
 		// Built-in Layouts
 
-		Cursor::cls().layout().d_flow = OVERLAY;
+		Cursor::cls().layout().d_flow = FREE;
 		Cursor::cls().layout().d_clipping = NOCLIP;
 
-		Tooltip::cls().layout().d_flow = OVERLAY;
+		Tooltip::cls().layout().d_flow = FREE;
 		Tooltip::cls().layout().d_clipping = NOCLIP;
 
-		ContextMenu::cls().layout().d_flow = OVERLAY;
+		ContextMenu::cls().layout().d_flow = FREE;
 		ContextMenu::cls().layout().d_clipping = NOCLIP;
 
 		Control::cls().layout().d_opacity = OPAQUE;
@@ -107,9 +104,9 @@ namespace mk
 		Dialog::cls().layout().d_padding = BoxFloat(25.f, 12.f, 25.f, 12.f);
 		Dialog::cls().layout().d_spacing = DimFloat(6.f, 6.f);
 
-		Caret::cls().layout().d_flow = OVERLAY;
+		Caret::cls().layout().d_flow = FREE;
 
-		Window::cls().layout().d_flow = OVERLAY;
+		Window::cls().layout().d_flow = FREE;
 		Window::cls().layout().d_opacity = OPAQUE;
 		Window::cls().layout().d_layoutDim = DIM_Y;
 		Window::cls().layout().d_size = DimFloat(480.f, 350.f);
@@ -121,7 +118,7 @@ namespace mk
 		WrapButton::cls().layout().d_opacity = OPAQUE;
 		WrapButton::cls().layout().d_layoutDim = DIM_X;
 
-		WrapSheet::cls().layout().d_space = WRAP;
+		WrapSheet::cls().layout().d_space = FIT;
 
 		Window::cls().layout().d_space = BOARD;
 
@@ -130,7 +127,7 @@ namespace mk
 		ShrinkWindow::cls().layout().d_space = BLOCK;
 		ShrinkWindow::cls().layout().d_size = DimFloat();
 
-		WindowBody::cls().layout().d_space = WRAP;
+		WindowBody::cls().layout().d_space = FIT;
 
 		Board::cls().layout().d_space = BOARD;
 		Dockspace::cls().layout().d_space = BOARD;
@@ -144,10 +141,26 @@ namespace mk
 
 		Textbox::cls().layout().d_space = BOARD;
 
-		Page::cls().layout().d_space = WRAP;
+		Page::cls().layout().d_space = FIT;
+
+		Dockbar::cls().layout().d_layoutDim = DIM_X;
+		Dockbar::cls().layout().d_flow = FLOAT_DEPTH;
+		Dockbar::cls().layout().d_space = SPACE;
+		Dockbar::cls().layout().d_align = DimAlign(RIGHT, LEFT);
+
+		Docker::cls().layout().d_flow = ALIGN;
+		Docker::cls().layout().d_clipping = NOCLIP;
+		Docker::cls().layout().d_space = DIV;
+		Docker::cls().layout().d_align = DimAlign(OUT_LEFT, LEFT);
+		Dockbox::cls().layout().d_flow = FLOW;
+		Dockbox::cls().layout().d_space = BLOCK;
+		Dockbox::cls().layout().d_size = DimFloat(200.f, 0.f);
+
+		Dockbox::cls().inheritSkins(Expandbox::cls());
 
 		ScrollArea::cls().layout().d_space = SPACE;
 		ScrollArea::cls().layout().d_flow = FLOAT_DEPTH;
+		ScrollArea::cls().layout().d_align = DimAlign(RIGHT, LEFT);
 		ScrollArea::cls().layout().d_layoutDim = DIM_X;
 		ScrollArea::cls().layout().d_pivot = DimPivot(REVERSE, REVERSE);
 
@@ -167,7 +180,7 @@ namespace mk
 		Menu::cls().layout().d_space = BLOCK;
 		MenuList::cls().layout().d_space = BLOCK;
 
-		SliderDisplay::cls().layout().d_space = BOARD;
+		SliderDisplay::cls().layout().d_space = BLOCK;
 
 		Input<bool>::cls().layout().d_space = BLOCK;
 
@@ -184,7 +197,7 @@ namespace mk
 		SliderX::cls().layout().d_layoutDim = DIM_X;
 		SliderY::cls().layout().d_layoutDim = DIM_Y;
 
-		SliderKnob::cls().layout().d_flow = FILL;
+		SliderKnob::cls().layout().d_flow = FREE_FILL;
 
 		ScrollerX::cls().layout().d_layoutDim = DIM_X;
 		ScrollerY::cls().layout().d_layoutDim = DIM_Y;
@@ -257,10 +270,11 @@ namespace mk
 
 		DropdownChoice::cls().layout().d_opacity = OPAQUE;
 
-		DropdownList::cls().layout().d_flow = OVERLAY;
+		DropdownList::cls().layout().d_flow = ALIGN;
+		DropdownList::cls().layout().d_align = DimAlign(LEFT, OUT_RIGHT);
 		DropdownList::cls().layout().d_clipping = NOCLIP;
 
-		MenuList::cls().layout().d_flow = OVERLAY;
+		MenuList::cls().layout().d_flow = ALIGN;
 		MenuList::cls().layout().d_clipping = NOCLIP;
 
 		Scrollbar::cls().layout().d_layoutDim = DIM_Y;
@@ -294,8 +308,10 @@ namespace mk
 		Page::cls().layout().d_spacing = DimFloat(4.f, 6.f);
 		ExpandboxBody::cls().layout().d_spacing = DimFloat(4.f, 6.f);
 
-		WrapButton::cls().skin().mAlign = DimAlign(LEFT, CENTER);
-		ExpandboxHeader::cls().skin().mAlign = DimAlign(LEFT, CENTER);
+		Button::cls().layout().d_align = DimAlign(LEFT, CENTER);
+		Toggle::cls().layout().d_align = DimAlign(LEFT, CENTER);
+		WrapButton::cls().layout().d_align = DimAlign(LEFT, CENTER);
+		CloseButton::cls().layout().d_align = DimAlign(RIGHT, CENTER);
 
 		ScrollerKnob::cls().layout().d_sizing = DimSizing(FIXED, MANUAL);
 		FillerX::cls().layout().d_sizing = DimSizing(MANUAL, FIXED);
@@ -326,7 +342,7 @@ namespace mk
 		SliderKnob::cls().skin().mCornerRadius = 3.f;
 		SliderKnob::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
 
-		SliderDisplay::cls().skin().mAlign = DimAlign(CENTER, CENTER);
+		SliderDisplay::cls().layout().d_align = DimAlign(CENTER, CENTER);
 
 		CloseButton::cls().skin().mImage = Image("close_15");
 		CloseButton::cls().skin().mPadding = BoxFloat(4.f);
