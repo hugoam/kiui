@@ -20,6 +20,8 @@ namespace mk
 
 		void click();
 
+		static StyleType& cls() { static StyleType ty("DockToggle", ImgButton::cls()); return ty; }
+
 	protected:
 		Dockbox& mDockbox;
 	};

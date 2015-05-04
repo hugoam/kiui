@@ -21,14 +21,14 @@
 
 namespace mk
 {
-	template <class T_Val, class T_Arg = T_Val, class T_Input = typename Input<T_Val>>
+	template <class T_Val, class T_Arg = T_Val>
 	class Field : public Sequence
 	{
 	public:
 		Field(const string& label, const T_Val& value, std::function<void(T_Arg)> callback = nullptr, bool reverse = false)
 			: Sequence()
-			, mInput(this->makeappend<T_Input>(value, callback))
-			, mLabel(this->makeappend<Label>(label))
+			, mInput(this->template makeappend<typename Input<T_Val>>(value, callback))
+			, mLabel(this->template makeappend<Label>(label))
 		{
 			UNUSED(reverse);
 		}
