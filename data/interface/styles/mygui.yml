@@ -54,6 +54,9 @@ Frame :
     padding : 4.0, 4.0, 4.0, 4.0
     image_skin : mygui/frame_assym, 4, 4, 6, 6
 
+Dockbar :
+    inherit_skin : Frame
+    
 TypeIn :
     copy_skin : Label
     image_skin : mygui/editbox, 6, 6, 8, 8

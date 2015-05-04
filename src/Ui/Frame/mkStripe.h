@@ -64,7 +64,7 @@ namespace mk
 		inline float align(Frame& frame, Dimension dim) { return  align(frame.flow() ? dspace(dim) : dsize(dim), frame.dextent(dim), frame.dalign(dim)); }
 		inline float alignFlow(Frame& frame) { return d_freeSpace * AlignSpace[frame.dalign(d_length)]; }
 
-		inline float offset(Frame& frame, Dimension dim) { return dpadding(dim) + frame.dmargin(dim) + align(frame, dim); }
+		inline float offset(Frame& frame, Dimension dim) { return (frame.flow() ? dpadding(dim) + frame.dmargin(dim) : 0.f) + align(frame, dim); }
 
 		inline float offsetFlowFirst(Frame& frame) { return -d_cursor + dpadding(d_length) + frame.dmargin(d_length) + alignFlow(frame); }
 		inline float offsetFlowNext(Frame& frame, Frame& prev) { return prev.doffset(d_length) + this->spacing() - alignFlow(prev) + alignFlow(frame); }

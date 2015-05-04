@@ -116,9 +116,13 @@ Header :
     
 Dockbar :
     background_colour : 0.447,0.447,0.447,1.0
+    border_colour : 0.146,0.146,0.146,1.0
+    border_width : 1.0,1.0,1.0,1.0
+    corner_radius : 2.0,2.0,2.0,2.0
     
 DockWindow :
     background_colour : 0.447,0.447,0.447,1.0 
+    corner_radius : 3.0,3.0,3.0,3.0
     
 Tree : 
     background_colour : 0.447,0.447,0.447,1.0

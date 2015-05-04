@@ -15,7 +15,9 @@ Container :
     
 Window :
     image_skin : tbb/window, 16, 16, 16, 16, 12
-    
+    activated :
+        image_skin : tbb/window_active, 16, 16, 16, 16, 12
+
 DockWindow :
     image_skin : tbb/window, 16, 16, 16, 16, 12
     
@@ -47,6 +49,12 @@ TabHeader :
     image_skin : tbb/tab_button_top_inactive, 12, 12, 12, 12, 6
     activated :
         image_skin : tbb/tab_button_top_active, 12, 12, 12, 12, 6
+        
+Dockbar :
+    inherit_skin : Frame
+    
+Dockbox :
+    image_skin : tbb/frame, 4, 4, 4, 4
     
 Expandbox :
     copy_skin : Container

@@ -475,6 +475,8 @@ namespace mk
 		Dockbar& tooldock = parent.emplace<Dockbar>();
 
 		StyleEdit& styleedit = tooldock.emplace<StyleEdit>(parent.uiWindow().styler());
+		Page& options = tooldock.emplace<Page>("Options");
+		options.emplace<InputBool>("Toggle debug draw", false, [](bool on) {});
 
 		return tooldock;
 	}

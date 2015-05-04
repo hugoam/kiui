@@ -156,6 +156,8 @@ namespace mk
 		Dockbox::cls().layout().d_space = BLOCK;
 		Dockbox::cls().layout().d_size = DimFloat(200.f, 0.f);
 
+		Dockbar::cls().layout().d_padding = BoxFloat(4.f);
+
 		Dockbox::cls().rebaseSkins(DockWindow::cls());
 
 		DockToggle::cls();

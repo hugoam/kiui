@@ -8,7 +8,7 @@
 namespace mk
 {
 	Dockbox::Dockbox(Dockbar& dockbar, const string& title, const string& icon)
-		: Window(title, static_cast<WindowState>(WINDOW_CLOSABLE))
+		: Window(title, static_cast<WindowState>(0))
 		, mDockbar(dockbar)
 		, mToggle(dockbar.toggles().emplace<DockToggle>(*this, icon))
 	{

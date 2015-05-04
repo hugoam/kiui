@@ -276,6 +276,8 @@ namespace mk
 		else if(key == "shadow")
 			mSkin->mShadow = Shadow(	fromString<float>(values[0]), fromString<float>(values[1]),
 										fromString<float>(values[2]), fromString<float>(values[3])); // : xoffset, yoffset, blur, spread
+		else if(key == "no_shadow")
+			mSkin->mShadow = Shadow();
 		else if(key == "shadow_colour")
 			mSkin->mShadow.val.d_colour = fromString<Colour>(value);
 		else if(key == "decline_image")
