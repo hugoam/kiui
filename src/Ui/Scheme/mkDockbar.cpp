@@ -10,7 +10,7 @@ namespace mk
 	Dockbox::Dockbox(Dockbar& dockbar, const string& title, const string& icon)
 		: Window(title, static_cast<WindowState>(0))
 		, mDockbar(dockbar)
-		, mToggle(dockbar.toggles().emplace<DockToggle>(*this, icon))
+		, mToggle(dockbar.append(make_unique<DockToggle>(*this, icon)).as<DockToggle>())
 	{
 		mStyle = &cls();
 	}
@@ -38,7 +38,6 @@ namespace mk
 
 	Dockbar::Dockbar()
 		: Sheet()
-		, mToggles(this->makeappend<Sheet>())
 		, mDocker(this->makeappend<Docker>())
 	{
 		mStyle = &cls();

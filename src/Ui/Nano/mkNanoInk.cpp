@@ -20,6 +20,8 @@
 
 namespace mk
 {
+	bool NanoInk::sDebugDraw = false;
+
 	inline float clamp(float v, float mn, float mx)
 	{
 		return (v > mx) ? mx : (v < mn) ? mn : v;
@@ -111,20 +113,20 @@ namespace mk
 
 	void NanoInk::drawImage()
 	{
-#if 0 // DEBUG
-		if(!mVisible || !mFrame.visible())
-			return;
+#if 1 // DEBUG
+		if(sDebugDraw && mVisible)
+		{
+			float left = mFrame.dabsolute(DIM_X) + mFrame.cleft();
+			float top = mFrame.dabsolute(DIM_Y) + mFrame.ctop();
+			float width = mFrame.cwidth();
+			float height = mFrame.cheight();
 
-		float left = mFrame.dabsolute(DIM_X) + mFrame.cleft();
-		float top = mFrame.dabsolute(DIM_Y) + mFrame.ctop();
-		float width = mFrame.cwidth();
-		float height = mFrame.cheight();
-
-		nvgBeginPath(mCtx);
-		nvgRect(mCtx, left + 0.5f, top + 0.5f, width - 1.f, height - 1.f);
-		nvgStrokeWidth(mCtx, 1.f);
-		nvgStrokeColor(mCtx, nvgColour(Colour::Red));
-		nvgStroke(mCtx);
+			nvgBeginPath(mCtx);
+			nvgRect(mCtx, left + 0.5f, top + 0.5f, width - 1.f, height - 1.f);
+			nvgStrokeWidth(mCtx, 1.f);
+			nvgStrokeColor(mCtx, nvgColour(Colour::Red));
+			nvgStroke(mCtx);
+		}
 #endif
 
 		if(this->skin().mEmpty || !mVisible)

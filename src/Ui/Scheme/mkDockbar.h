@@ -54,8 +54,6 @@ namespace mk
 	public:
 		Dockbar();
 
-		Sheet& toggles() { return mToggles; }
-
 		Widget& addDock(const string& name, const string& icon, unique_ptr<Widget> widget);
 
 		Widget& vappend(unique_ptr<Widget> widget);
@@ -64,7 +62,6 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Dockbar", Sheet::cls()); return ty; }
 
 	protected:
-		Sheet& mToggles;
 		Docker& mDocker;
 	};
 }

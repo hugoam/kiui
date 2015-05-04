@@ -8,6 +8,7 @@
 #include <Ui/mkUi.h>
 
 #include <Ui/Nano/mkGlWindow.h>
+#include <Ui/Nano/mkNanoInk.h>
 
 #include <cfloat>
 
@@ -476,7 +477,7 @@ namespace mk
 
 		StyleEdit& styleedit = tooldock.emplace<StyleEdit>(parent.uiWindow().styler());
 		Page& options = tooldock.emplace<Page>("Options");
-		options.emplace<InputBool>("Toggle debug draw", false, [](bool on) {});
+		options.emplace<InputBool>("Toggle debug draw", false, [](bool on) { NanoInk::sDebugDraw = on; });
 
 		return tooldock;
 	}
