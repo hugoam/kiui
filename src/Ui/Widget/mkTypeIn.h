@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_WTYPEIN_H
-#define MK_WTYPEIN_H
+#ifndef MK_TYPEIN_H
+#define MK_TYPEIN_H
 
 /* mk */
 #include <Ui/mkUiForward.h>

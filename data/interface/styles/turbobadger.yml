@@ -22,14 +22,11 @@ DockWindow :
 WindowHeader :
     padding : 10.0,2.0,10.0,2.0
     image_skin : tbb/window_mover_overlay, 7, 7, 7, 7, 3
-    align : LEFT, CENTER
     tile : tbb/window_mover_bg_tile
     
 WindowFooter :
     flow : OVERLAY
     space : BOARD
-    pivot : FORWARD, REVERSE
-    align : LEFT, LEFT
     
 WindowSizerLeft :
     opacity : VOID
@@ -37,7 +34,7 @@ WindowSizerLeft :
 WindowSizerRight :
     image : tbb/resizer
     align : RIGHT, RIGHT
-    space : SPACE
+    skin_align : RIGHT, RIGHT
     
 WindowBody :
     padding : 10.0,4.0,10.0,10.0

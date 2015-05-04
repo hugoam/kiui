@@ -33,7 +33,7 @@ Button :
         topdown_gradient : -15,15
         
 Toggle :
-    inherit_skin : Blendish
+    copy_skin : Blendish
     background_colour : 0.275,0.275,0.275,1.0
     text_colour : 1.0,1.0,1.0,1.0
 
@@ -117,7 +117,12 @@ WindowHeader :
     topdown_gradient : 15,-15
     text_colour : 1.0,1.0,1.0,1.0
     padding : 4.0,2.0,4.0,2.0
-    align : CENTER, CENTER
+    
+Dockbar :
+    copy_skin : WindowHeader
+    
+DockToggle :
+    copy_skin : Toggle
     
 WindowBody :
     padding : 10.0, 4.0, 4.0, 4.0

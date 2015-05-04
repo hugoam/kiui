@@ -61,7 +61,6 @@ TypeIn :
 
 Dropdown :
     inherit_skin : TypeIn
-    align : LEFT, CENTER
     
 DropdownToggle :
     inherit_skin : Clear

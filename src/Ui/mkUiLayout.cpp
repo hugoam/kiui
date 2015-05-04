@@ -143,6 +143,7 @@ namespace mk
 
 		Page::cls().layout().d_space = FIT;
 
+		Dockbar::cls().layout().d_space = SPACE;
 		Dockbar::cls().layout().d_flow = FLOAT_DEPTH;
 		Dockbar::cls().layout().d_align = DimAlign(RIGHT, LEFT);
 
@@ -156,6 +157,8 @@ namespace mk
 		Dockbox::cls().layout().d_size = DimFloat(200.f, 0.f);
 
 		Dockbox::cls().rebaseSkins(DockWindow::cls());
+
+		DockToggle::cls();
 
 		ScrollArea::cls().layout().d_space = SPACE;
 		ScrollArea::cls().layout().d_flow = FLOAT_DEPTH;

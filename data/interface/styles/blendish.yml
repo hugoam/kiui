@@ -114,6 +114,9 @@ TypeIn :
 Header : 
     background_colour : 0.447,0.447,0.447,1.0
     
+Dockbar :
+    background_colour : 0.447,0.447,0.447,1.0
+    
 DockWindow :
     background_colour : 0.447,0.447,0.447,1.0 
     
@@ -130,7 +133,6 @@ WindowHeader :
     topdown_gradient : 15,-15
     text_colour : 1.0,1.0,1.0,1.0
     padding : 4.0,2.0,4.0,2.0
-    align : CENTER, CENTER
     
 WindowBody :
     padding : 10.0, 4.0, 4.0, 4.0
