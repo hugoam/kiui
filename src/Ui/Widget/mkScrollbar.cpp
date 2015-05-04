@@ -82,7 +82,6 @@ namespace mk
 		, mDown(this->makeappend<ScrollDown>(std::bind(&Scrollbar::scrolldown, this)))
 	{
 		mStyle = &cls();
-		//mScroller->resetMetrics(0.f, mSheet->sequenceLength() - mSheet->dclipsize(DIM_Y), mSheet->cursor(), 1.f, mSheet->dclipsize(DIM_Y));
 	}
 
 	Scrollbar::~Scrollbar()
@@ -117,7 +116,8 @@ namespace mk
 	void Scrollbar::nextFrame(size_t tick, size_t delta)
 	{
 		Sheet::nextFrame(tick, delta);
-		mScroller.updateMetrics(0.f, mSheet.stripe().sequenceLength() - mSheet.stripe().dclipsize(DIM_Y), mSheet.stripe().cursor(), 1.f, mSheet.stripe().dclipsize(DIM_Y));
+		Stripe& stripe = mSheet.stripe();
+		mScroller.updateMetrics(0.f, stripe.sequenceLength() - stripe.dclipsize(DIM_Y), stripe.cursor(), 1.f, stripe.dclipsize(DIM_Y));
 	}
 
 	ScrollArea::ScrollArea(Sheet& sheet)

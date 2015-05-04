@@ -11,6 +11,8 @@
 
 #include <cfloat>
 
+using namespace std::placeholders;
+
 namespace mk
 {
 	const char* girl_names[] =
@@ -36,47 +38,45 @@ namespace mk
 		"Ebbe", "Aron", "Julian", "Elvin", "Ivar", 0
 	};
 
+	class CustomElement : public Sequence
+	{
+	public:
+		CustomElement(const string& name)
+			: Sequence()
+			, mLabel(this->build(name))
+		{
+			mStyle = &cls();
+		}
+
+		Label& build(const string& name)
+		{
+			this->emplace<Checkbox>(nullptr, false);
+			this->emplace<Icon>("tbb/icon48");
+			Sheet& sheet = this->emplace<Sheet>();
+			Label& label = sheet.emplace<Label>(name);
+			sheet.emplace<Label>("Male");
+			this->emplace<CloseButton>([this](Button&){ this->parent()->parent()->vrelease(*this); });
+			return label;
+		}
+
+		const string& contentlabel() { return mLabel.label(); }
+
+		static StyleType& cls() { static StyleType ty("CustomElement", Sequence::cls()); return ty; }
+
+	protected:
+		Label& mLabel;
+	};
+
 	Sheet& createUiTestCustomList(Sheet& parent)
 	{
 		Window& window = parent.emplace<Window>("Customized list items");
 		Page& page = window.body().emplace<Page>("List and filter");
 		SelectList& list = page.emplace<SelectList>();
 
-		class CustomElement : public Sequence
-		{
-		public:
-			CustomElement(const string& name)
-				: Sequence()
-				, mLabel(this->build(name))
-			{
-				mStyle = &cls();
-			}
-
-			Label& build(const string& name)
-			{
-				this->emplace<Checkbox>(nullptr, false);
-				this->emplace<Icon>("tbb/icon48");
-				Sheet& sheet = this->emplace<Sheet>();
-				Label& label = sheet.emplace<Label>(name);
-				sheet.emplace<Label>("Male");
-				this->emplace<CloseButton>([this](Button&){ this->parent()->parent()->vrelease(*this); });
-				return label;
-			}
-
-			const string& contentlabel() { return mLabel.label(); }
-
-			static StyleType& cls() { static StyleType ty("CustomElement", Sequence::cls()); return ty; }
-
-		protected:
-			Label& mLabel;
-		};
-
-		CustomElement::cls().skin().mAlign = DimAlign(LEFT, CENTER);
-
 		for(int i = 0; boy_names[i]; i++)
 			list.emplace<CustomElement>(boy_names[i]);
 
-		FilterInput& input = page.emplace<FilterInput>(list);
+		page.emplace<FilterInput>(list);
 
 		window.frame().setSize(250.f, 300.f);
 		return window;
@@ -93,7 +93,7 @@ namespace mk
 		for(int i = 0; girl_names[i]; i++)
 			list.emplace<Label>(boy_names[i]);
 
-		FilterInput& input = page.emplace<FilterInput>(list);
+		page.emplace<FilterInput>(list);
 
 		window.frame().setSize(130.f, 300.f);
 		return window;
@@ -283,34 +283,25 @@ namespace mk
 		return tree;
 	}
 
-	Textbox* createUiTestMarkupText(Sheet& parent)
+	Sheet& createUiTestMarkupText(Sheet& parent)
 	{
-		parent.emplace<Textbox>("This is a long paragraph. The text should automatically wrap on the edge of the window. The current implementation follows simple rules that works for English and possibly other languages.");
-		parent.emplace<SliderFloat>("Wrap width", AutoStat<float>(200.f, -20.f, 600.f, 0.1f), [](float width){ });
-		
-		/*ImGui::Text("Test paragraph 1:");
-		ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetCursorScreenPos() + ImVec2(wrap_width, 0.0f), ImGui::GetCursorScreenPos() + ImVec2(wrap_width + 10, ImGui::GetTextLineHeight()), 0xFFFF00FF);
-		ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + wrap_width);
-		ImGui::Text("lazy dog. This paragraph is made to fit within %.0f pixels. The quick brown fox jumps over the lazy dog.", wrap_width);
-		ImGui::GetWindowDrawList()->AddRect(ImGui::GetItemBoxMin(), ImGui::GetItemBoxMax(), 0xFF00FFFF);
-		ImGui::PopTextWrapPos();
-		ImGui::Text("Test paragraph 2:");
-		ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetCursorScreenPos() + ImVec2(wrap_width, 0.0f), ImGui::GetCursorScreenPos() + ImVec2(wrap_width + 10, ImGui::GetTextLineHeight()), 0xFFFF00FF);
-		ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + wrap_width);
-		ImGui::Text("aaaaaaaa bbbbbbbb, cccccccc,dddddddd. eeeeeeee ffffffff. gggggggg!hhhhhhhh");
-		ImGui::GetWindowDrawList()->AddRect(ImGui::GetItemBoxMin(), ImGui::GetItemBoxMax(), 0xFF00FFFF);
-		ImGui::PopTextWrapPos();
-		ImGui::TreePop();*/
+		Page& page = parent.emplace<Page>("Markup Text");
+		page.emplace<Textbox>("This is a long paragraph. The text should automatically wrap on the edge of the window. The current implementation follows no word splitting rules, text is just split at the last character.");
+		page.emplace<SliderFloat>("Wrap width", AutoStat<float>(200.f, -20.f, 600.f, 0.1f), [](float){ });
 
-		return nullptr;
+		Sequence& line0 = page.emplace<Sequence>();
+		line0.emplace<Icon>("bullet");
+		line0.emplace<Label>("Bullet point 1");
 
-		/*if(ImGui::TreeNode("Colored Text"))
-		{
-			// Using shortcut. You can use PushStyleColor()/PopStyleColor() for more flexibility.
-			ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Pink");
-			ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Yellow");
-			ImGui::TreePop();
-		}*/
+		Sequence& line1 = page.emplace<Sequence>();
+		line1.emplace<Icon>("bullet");
+		line1.emplace<Textbox>("Bullet point 2\nOn multiple lines");
+
+		Sequence& line2 = page.emplace<Sequence>();
+		line2.emplace<Icon>("bullet");
+		line2.emplace<Label>("Bullet point 3");
+
+		return page;
 	}
 
 	Sheet& createUiTestControls(Sheet& parent, bool window)
@@ -320,8 +311,11 @@ namespace mk
 
 		Table& table = page.emplace<Table>(StringVector({ "input", "label" }), std::vector<float>({ 0.7f, 0.3f }));
 
+		table.emplace<InputBool>("checkbox input", false);
+		table.emplace<InputRadio>("radio input", StringVector({ "radio a", "radio b", "radio c" }));
+
 		table.emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {});
-		table.emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {}, true);
+		table.emplace<InputDropdown>("typedown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {}, true);
 
 		table.emplace<InputText>("string input", "Hello, world!");
 		table.emplace<InputInt>("int input", 123);
@@ -331,16 +325,28 @@ namespace mk
 		table.emplace<SliderInt>("int -100..100", AutoStat<int>(0, -100, 100, 1));
 
 		table.emplace<SliderFloat>("float input", AutoStat<float>(1.123f, 0.0f, 2.0f, 0.001f));
-		table.emplace<SliderFloat>("log float", AutoStat<float>(0.f, 0.0f, 10.0f, 1.f));
+		//table.emplace<SliderFloat>("log float", AutoStat<float>(0.f, 0.0f, 10.0f, 1.f));
 		//table.emplace<SliderFloat>("signed log float", AutoStat<float>(0.f, -10.0f, 10.0f, 1.f));
 		//table.emplace<SliderFloat>("unbound float", AutoStat<float>(123456789.0f, -FLT_MAX, FLT_MAX, 1.f));
 
 		// table.emplace<SliderAngle>("angle", 0.f);
-		// table.emplace<FVector3>("slider float3", 0.0f, 1.0f);
 
-		// ImGui::ColorEdit3("color 1", col1);
-		// ImGui::ColorEdit4("color 2", col2);
+		// table.emplace<InputVec3>("slider float3", 0.0f, 1.0f);
+		// table.emplace<InputColor>("color input");
 
+		return page;
+	}
+
+	Sheet& createUiTestFocusTabbing(Sheet& parent)
+	{
+		Page& page = parent.emplace<Page>("Tabbing");
+		page.emplace<Label>("Use TAB/SHIFT+TAB to cycle through keyboard editable fields.");
+
+		page.emplace<TypeIn>(nullptr, "1");
+		page.emplace<TypeIn>(nullptr, "2");
+		page.emplace<TypeIn>(nullptr, "3");
+		page.emplace<TypeIn>(nullptr, "4 (tab skip)");
+		page.emplace<TypeIn>(nullptr, "5");
 		return page;
 	}
 
@@ -432,127 +438,45 @@ namespace mk
 		Expandbox& box3 = page.emplace<Expandbox>("Tables");
 		createUiTestTable(box3, false);
 
-		/*
-		if(ImGui::TreeNode("Style Editor"))
-		{
-		ImGui::ShowStyleEditor();
-		ImGui::TreePop();
-		}
-		static bool a = false;
-		if(ImGui::Button("Button")) { printf("Clicked\n"); a ^= 1; }
-		if(a)
-		{
-		ImGui::SameLine();
-		ImGui::Text("Thanks for clicking me!");
-		}
-		if(ImGui::TreeNode("Bullets"))
-		{
-		ImGui::BulletText("Bullet point 1");
-		ImGui::BulletText("Bullet point 2\nOn multiple lines");
-		ImGui::BulletText("Bullet point 3");
-		ImGui::TreePop();
-		}
-
-		static bool check = true;
-		ImGui::Checkbox("checkbox", &check);
-		static int e = 0;
-		ImGui::RadioButton("radio a", &e, 0); ImGui::SameLine();
-		ImGui::RadioButton("radio b", &e, 1); ImGui::SameLine();
-		ImGui::RadioButton("radio c", &e, 2);
-		ImGui::Text("Hover me");
-		if(ImGui::IsItemHovered())
-		ImGui::SetTooltip("I am a tooltip");
-		ImGui::SameLine();
-		ImGui::Text("- or me");
-		if(ImGui::IsItemHovered())
-		{
-		ImGui::BeginTooltip();
-		ImGui::Text("I am a fancy tooltip");
-		static float arr[] = { 0.6f, 0.1f, 1.0f, 0.5f, 0.92f, 0.1f, 0.2f };
-		ImGui::PlotLines("Curve", arr, IM_ARRAYSIZE(arr));
-		ImGui::EndTooltip();
-		}*/
-
-
-	/*
-	if(ImGui::CollapsingHeader("Filtering"))
-	{
-	static ImGuiTextFilter filter;
-	ImGui::Text("Filter usage:\n"
-	" \"\" display all lines\n"
-	" \"xxx\" display lines containing \"xxx\"\n"
-	" \"xxx,yyy\" display lines containing \"xxx\" or \"yyy\"\n"
-	" \"-xxx\" hide lines containing \"xxx\"");
-	filter.Draw();
-	const char* lines[] = { "aaa1.c", "bbb1.c", "ccc1.c", "aaa2.cpp", "bbb2.cpp", "ccc2.cpp", "abc.h", "hello, world" };
-	for(size_t i = 0; i < IM_ARRAYSIZE(lines); i++)
-	if(filter.PassFilter(lines[i]))
-	ImGui::BulletText("%s", lines[i]);
-	}
-	if(ImGui::CollapsingHeader("Keyboard & Focus"))
-	{
-	if(ImGui::TreeNode("Tabbing"))
-	{
-	ImGui::Text("Use TAB/SHIFT+TAB to cycle thru keyboard editable fields.");
-	static char buf[32] = "dummy";
-	ImGui::InputText("1", buf, IM_ARRAYSIZE(buf));
-	ImGui::InputText("2", buf, IM_ARRAYSIZE(buf));
-	ImGui::InputText("3", buf, IM_ARRAYSIZE(buf));
-	ImGui::PushAllowKeyboardFocus(false);
-	ImGui::InputText("4 (tab skip)", buf, IM_ARRAYSIZE(buf));
-	//ImGui::SameLine(); ImGui::Text("(?)"); if (ImGui::IsHovered()) ImGui::SetTooltip("Use ImGui::PushAllowKeyboardFocus(bool)\nto disable tabbing through certain widgets.");
-	ImGui::PopAllowKeyboardFocus();
-	ImGui::InputText("5", buf, IM_ARRAYSIZE(buf));
-	ImGui::TreePop();
-	}
-	if(ImGui::TreeNode("Focus from code"))
-	{
-	bool focus_1 = ImGui::Button("Focus on 1"); ImGui::SameLine();
-	bool focus_2 = ImGui::Button("Focus on 2"); ImGui::SameLine();
-	bool focus_3 = ImGui::Button("Focus on 3");
-	int has_focus = 0;
-	static char buf[128] = "click on a button to set focus";
-	if(focus_1) ImGui::SetKeyboardFocusHere();
-	ImGui::InputText("1", buf, IM_ARRAYSIZE(buf));
-	if(ImGui::IsItemFocused()) has_focus = 1;
-	if(focus_2) ImGui::SetKeyboardFocusHere();
-	ImGui::InputText("2", buf, IM_ARRAYSIZE(buf));
-	if(ImGui::IsItemFocused()) has_focus = 2;
-	ImGui::PushAllowKeyboardFocus(false);
-	if(focus_3) ImGui::SetKeyboardFocusHere();
-	ImGui::InputText("3 (tab skip)", buf, IM_ARRAYSIZE(buf));
-	if(ImGui::IsItemFocused()) has_focus = 3;
-	ImGui::PopAllowKeyboardFocus();
-	if(has_focus)
-	ImGui::Text("Item with focus: %d", has_focus);
-	else
-	ImGui::Text("Item with focus: <none>");
-	ImGui::TreePop();
-	}
-	}
-	static bool show_app_console = false;
-	static bool show_app_long_text = false;
-	static bool show_app_auto_resize = false;
-	static bool show_app_fixed_overlay = false;
-	if(ImGui::CollapsingHeader("App Examples"))
-	{
-	ImGui::Checkbox("Console", &show_app_console);
-	ImGui::Checkbox("Long text display", &show_app_long_text);
-	ImGui::Checkbox("Auto-resizing window", &show_app_auto_resize);
-	ImGui::Checkbox("Simple overlay", &show_app_fixed_overlay);
-	}
-	if(show_app_console)
-	ShowExampleAppConsole(&show_app_console);
-	if(show_app_long_text)
-	ShowExampleAppLongText(&show_app_long_text);
-	if(show_app_auto_resize)
-	ShowExampleAppAutoResize(&show_app_auto_resize);
-	if(show_app_fixed_overlay)
-	ShowExampleAppFixedOverlay(&show_app_fixed_overlay);
-	ImGui::End();*/
-
 		return window;
+	}
 
+	class StyleEdit : public Page
+	{
+	public:
+		StyleEdit(Styler& styler)
+			: Page("Style Edit")
+			, mStyler(styler)
+			, mStylePicker(this->emplace<Typedown>([this](Widget& choice){ this->pickStyle(choice.label()); }))
+			, mImageInput(this->emplace<InputText>("Skin Image", "", [](string text) {}))
+		{
+			for(Object* object : Style::indexer().objects())
+				if(object)
+					mStylePicker.emplace<Label>(object->as<Style>().name());
+		}
+
+		void pickStyle(const string& name)
+		{
+			mStyle = mStyler.fetchStyle(name);
+			mSkin = &mStyle->skin();
+			mImageInput.input().setString(mSkin->image().d_name);
+		}
+
+	protected:
+		Styler& mStyler;
+		Dropdown& mStylePicker;
+		InputText& mImageInput;
+		Style* mStyle;
+		InkStyle* mSkin;
+	};
+
+	Sheet& createUiStyleEdit(Sheet& parent)
+	{
+		Dockbar& tooldock = parent.emplace<Dockbar>();
+
+		StyleEdit& styleedit = tooldock.emplace<StyleEdit>(parent.uiWindow().styler());
+
+		return tooldock;
 	}
 
 	void switchUiTheme(Sheet& sheet, const string& name)
@@ -571,6 +495,8 @@ namespace mk
 			parser.loadStyleSheet(sheet.uiWindow().resourcePath() + "interface/styles/photoshop.yml");
 		else if(name == "Default")
 			parser.loadDefaultStyle();
+
+		CustomElement::cls().layout().d_align = DimAlign(LEFT, CENTER);
 	}
 
 	void selectUiTheme(Sheet& sheet, Widget& selected)
@@ -618,9 +544,12 @@ namespace mk
 
 		Header& demoheader = root.sheet().emplace<Header>();
 		Board& demobody = root.sheet().emplace<Board>();
+		Board& samplebody = demobody.emplace<Board>();
+		createUiStyleEdit(demobody);
+
 		demoheader.emplace<Label>("Pick a demo sample : ");
-		demoheader.emplace<Dropdown>(std::bind(&pickUiSample, std::ref(demobody), std::placeholders::_1), StringVector({ "Dockspace", "Window", "Text Editor", "Filtered List", "Custom List", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" }));
+		demoheader.emplace<Dropdown>(std::bind(&pickUiSample, std::ref(samplebody), std::placeholders::_1), StringVector({ "Dockspace", "Window", "Text Editor", "Filtered List", "Custom List", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" }));
 		demoheader.emplace<Label>("Switch theme : ");
-		demoheader.emplace<Dropdown>(std::bind(&selectUiTheme, std::ref(demobody), std::placeholders::_1), StringVector({ "Blendish", "Blendish Dark", "TurboBadger", "MyGui" }));
+		demoheader.emplace<Dropdown>(std::bind(&selectUiTheme, std::ref(samplebody), std::placeholders::_1), StringVector({ "Blendish", "Blendish Dark", "TurboBadger", "MyGui" }));
 	}
 }

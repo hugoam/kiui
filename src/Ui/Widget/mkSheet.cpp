@@ -48,8 +48,9 @@ namespace mk
 	{
 		Widget::nextFrame(tick, delta);
 		
-		for(size_t i = 0; i < mContents.size(); ++i)
-			mContents[i]->nextFrame(tick, delta);
+		Stripe& stripe = this->stripe();
+		for(size_t i = 0; i < stripe.contents().size(); ++i)
+			stripe.contents()[i]->widget().nextFrame(tick, delta);
 	}
 
 	void Sheet::bind(Sheet* parent, size_t index)

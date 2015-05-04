@@ -150,13 +150,16 @@ namespace mk
 		mKnobLength = knobLength ? knobLength : mStepLength;
 
 		this->markDirty();
-		this->updateKnob();
+		//this->updateKnob(); @useless ?
 	}
 
 	void Slider::updateKnob()
 	{
 		if(!(mState & BOUND) || !mFrame->visible())
 			return;
+
+		if(mButton.frame().dmanual(mDim))
+			mButton.frame().setSizeDim(mDim, std::max(mFrame->dsize(mDim == DIM_X ? DIM_Y : DIM_X), mKnobLength / (mKnobLength + mMax - mMin) * mFrame->dsize(mDim)));
 
 		float pos = (mVal - mMin) / (mMax - mMin) * this->length();		
 		mFiller.frame().setSizeDim(mDim, pos);
@@ -166,9 +169,6 @@ namespace mk
 			mButton.frame().setPositionDim(mDim, pos);
 		else
 			mButton.frame().setPositionDim(mDim, 0);
-
-		if(mButton.frame().dmanual(mDim))
-			mButton.frame().setSizeDim(mDim, std::max(mFrame->dsize(mDim == DIM_X ? DIM_Y : DIM_X), mKnobLength / (mKnobLength + mMax - mMin) * mFrame->dsize(mDim)));
 	}
 
 	SliderDisplay::SliderDisplay(const string& label)

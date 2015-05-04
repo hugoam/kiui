@@ -11,6 +11,7 @@
 #include <Ui/mkUiForward.h>
 #include <Ui/Widget/mkValue.h>
 #include <Ui/Widget/mkSlider.h>
+#include <Ui/Widget/mkTypeIn.h>
 
 #include <Object/Util/mkStat.h>
 #include <Object/Util/mkDispatch.h>

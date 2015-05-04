@@ -143,20 +143,19 @@ namespace mk
 
 		Page::cls().layout().d_space = FIT;
 
-		Dockbar::cls().layout().d_layoutDim = DIM_X;
 		Dockbar::cls().layout().d_flow = FLOAT_DEPTH;
-		Dockbar::cls().layout().d_space = SPACE;
 		Dockbar::cls().layout().d_align = DimAlign(RIGHT, LEFT);
 
 		Docker::cls().layout().d_flow = ALIGN;
 		Docker::cls().layout().d_clipping = NOCLIP;
 		Docker::cls().layout().d_space = DIV;
 		Docker::cls().layout().d_align = DimAlign(OUT_LEFT, LEFT);
+
 		Dockbox::cls().layout().d_flow = FLOW;
 		Dockbox::cls().layout().d_space = BLOCK;
 		Dockbox::cls().layout().d_size = DimFloat(200.f, 0.f);
 
-		Dockbox::cls().inheritSkins(Expandbox::cls());
+		Dockbox::cls().rebaseSkins(DockWindow::cls());
 
 		ScrollArea::cls().layout().d_space = SPACE;
 		ScrollArea::cls().layout().d_flow = FLOAT_DEPTH;

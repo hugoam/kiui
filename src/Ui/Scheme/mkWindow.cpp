@@ -161,6 +161,8 @@ namespace mk
 		, mFooter(this->makeappend<WindowFooter>(*this))
 	{
 		mStyle = dock ? &DockWindow::cls() : &Window::cls();
+		if(!this->sizable())
+			mFooter.hide();
 	}
 
 	Window::~Window()
