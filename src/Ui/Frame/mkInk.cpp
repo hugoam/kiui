@@ -10,35 +10,4 @@
 #include <Ui/Frame/mkLayer.h>
 
 namespace mk
-{
-	void InkTarget::moveToTop(InkLayer& layer)
-	{
-		size_t zmax = mZMax;
-		this->removeLayer(layer);
-		mLayers[mZMax].push_back(&layer);
-		layer.setIndex(mZMax);
-		mZMax = zmax;
-	}
-
-	unique_ptr<InkLayer> InkTarget::addLayer(Layer& layer, size_t z)
-	{
-		if(z == 0) z = mZMax++;
-		unique_ptr<InkLayer> inklayer = createLayer(layer, z);
-		mLayers[z].push_back(inklayer.get());
-		return std::move(inklayer);
-	}
-
-	void InkTarget::removeLayer(InkLayer& layer)
-	{
-		mLayers[layer.index()].erase(std::remove(mLayers[layer.index()].begin(), mLayers[layer.index()].end(), &layer), mLayers[layer.index()].end());
-		if(mLayers[layer.index()].size() == 0 && mZMax > 0)
-		{
-			mLayers.insert(mLayers.begin() + mZMax, std::vector<InkLayer*>());
-			mLayers.erase(mLayers.begin() + layer.index());
-			for(size_t index = layer.index(); index < mZMax; ++index)
-				for(InkLayer* moved : mLayers[index])
-					moved->setIndex(index);
-			--mZMax;
-		}
-	}
-}
+{}

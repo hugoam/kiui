@@ -133,6 +133,7 @@ namespace mk
 		Dockspace::cls().layout().d_space = BOARD;
 		Docksection::cls().layout().d_space = BOARD;
 		ScrollSheet::cls().layout().d_space = BOARD;
+		LayerSheet::cls().layout().d_space = BOARD;
 		Tabber::cls().layout().d_space = BOARD;
 		TabberBody::cls().layout().d_space = BOARD;
 		Tab::cls().layout().d_space = BOARD;

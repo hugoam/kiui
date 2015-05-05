@@ -547,7 +547,7 @@ namespace mk
 
 		Header& demoheader = root.sheet().emplace<Header>();
 		Board& demobody = root.sheet().emplace<Board>();
-		Board& samplebody = demobody.emplace<Board>();
+		LayerSheet& samplebody = demobody.emplace<LayerSheet>();
 		createUiStyleEdit(demobody);
 
 		demoheader.emplace<Label>("Pick a demo sample : ");

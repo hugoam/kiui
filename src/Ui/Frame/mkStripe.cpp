@@ -96,7 +96,7 @@ namespace mk
 
 		for(Frame* frame : d_sequence)
 			if(!frame->dexpand(d_length) && !frame->hidden())
-				d_sequenceLength += this->extentFlow(*frame);
+				d_sequenceLength += this->extentSequence(*frame);
 
 		this->updateLength();
 	}
@@ -181,7 +181,7 @@ namespace mk
 	void Stripe::positionLength(Frame& frame)
 	{
 		if(frame.flow())
-			frame.setPositionDim(d_length, this->offsetFlow(frame));
+			frame.setPositionDim(d_length, this->offsetSequence(frame));
 		else
 			frame.setPositionDim(d_length, this->offset(frame, d_length));
 	}
@@ -403,17 +403,17 @@ namespace mk
 		if(d_length != dim)
 			return Frame::nextOffset(dim, pos, seuil);
 
-		pos += d_parent->extentFlow(*this);
+		pos += d_parent->extentSequence(*this);
 
 		if(pos < seuil && !top)
 			return false;
 
-		pos -= d_parent->extentFlow(*this);
+		pos -= d_parent->extentSequence(*this);
 		for(Frame* frame : d_sequence)
 			if(frame->nextOffset(dim, pos, seuil))
 				return true;
 
-		pos -= d_parent->extentFlow(*this);
+		pos -= d_parent->extentSequence(*this);
 		return Frame::nextOffset(dim, pos, seuil);
 	}
 
@@ -422,7 +422,7 @@ namespace mk
 		if(d_length != dim)
 			return Frame::prevOffset(dim, pos, seuil);
 
-		if(top || pos + d_parent->extentFlow(*this) >= seuil)
+		if(top || pos + d_parent->extentSequence(*this) >= seuil)
 			for(Frame* frame : d_sequence)
 				if(frame->prevOffset(dim, pos, seuil))
 					return true;

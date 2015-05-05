@@ -46,6 +46,7 @@ namespace mk
 		void redrawText();
 
 		static bool sDebugDraw;
+		static int sDebugBatch;
 
 	private:
 		void drawImage(int image, float x, float y, float w, float h, float imgx, float imgy, float imgw, float imgh);

@@ -7,6 +7,7 @@
 
 /* mk headers */
 #include <Ui/Frame/mkStripe.h>
+#include <Ui/Frame/mkInk.h>
 
 namespace mk
 {
@@ -18,9 +19,14 @@ namespace mk
 
 		FrameType frameType() { return LAYER; }
 
+		size_t index() { return d_index; }
+		size_t z() { return d_z; }
+
 		InkLayer& inkLayer() { return *d_inkLayer.get(); }
 		InkTarget* target() { return d_target; }
 		std::vector<Layer*>& layers() { return d_layers; }
+
+		Layer& rootLayer() { if(!d_parentLayer) return *this; Layer* root = d_parentLayer; while(root->d_parentLayer) root = root->d_parentLayer; return *root; }
 
 		void bind();
 
@@ -29,15 +35,23 @@ namespace mk
 
 		void nextFrame(size_t tick, size_t delta);
 
+		void add(Layer& layer);
+		void remove(Layer& layer);
+
+		void reorder();
+		size_t reorder(size_t index, size_t next);
 		void moveToTop();
 
 		Frame* pinpoint(float x, float y, bool opaque);
 
 	protected:
-		size_t d_zorder;
+		size_t d_index;
+		size_t d_next;
+		size_t d_z;
+		size_t d_numLayers;
 		InkTarget* d_target;
-		std::vector<Layer*> d_layers;
 		Layer* d_parentLayer;
+		std::vector<Layer*> d_layers;
 		unique_ptr<InkLayer> d_inkLayer;
 	};
 

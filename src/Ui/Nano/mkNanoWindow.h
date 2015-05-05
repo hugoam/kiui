@@ -68,10 +68,9 @@ namespace mk
 		void show();
 		void hide();
 
-		void moveToTop();
+		void move(size_t index) {}
 
 		void nanodraw();
-
 		void drawImage(Frame& frame);
 		void drawText(Frame& frame);
 
@@ -92,6 +91,7 @@ namespace mk
 		unique_ptr<InkLayer> createLayer(Layer& layer, size_t z);
 
 		void nanodraw();
+		void drawLayer(Layer& layer);
 
 	protected:
 		NanoWindow& mWindow;

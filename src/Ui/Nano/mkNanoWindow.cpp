@@ -35,6 +35,8 @@
 
 #include <dirent.h>
 
+#include <iostream>
+
 namespace mk
 {
 	ImageRect makeRect(NVGcontext* ctx, const string& path, const string& image, const string& subfolder = "")
@@ -196,11 +198,6 @@ namespace mk
 		mFrame.inkbox().hide();
 	}
 
-	void NanoLayer::moveToTop()
-	{
-		mTarget.moveToTop(*this);
-	}
-
 	void NanoLayer::nanodraw()
 	{
 		this->drawImage(mFrame);
@@ -234,14 +231,22 @@ namespace mk
 
 	void NanoTarget::nanodraw()
 	{
-		for(auto& layers : mLayers)
-			for(InkLayer* layer : layers)
-				if(layer->layer().visible())
-					layer->as<NanoLayer>().nanodraw();
+		this->drawLayer(*d_rootLayer);
+	}
+
+	void NanoTarget::drawLayer(Layer& layer)
+	{
+		layer.inkLayer().as<NanoLayer>().nanodraw();
+
+		for(Layer* sublayer : layer.layers())
+			if(sublayer->layer().visible())
+				this->drawLayer(*sublayer);
 	}
 
 	unique_ptr<InkLayer> NanoTarget::createLayer(Layer& layer, size_t z)
 	{
+		if(!d_rootLayer)
+			d_rootLayer = &layer;
 		return make_unique<NanoLayer>(layer, *this, z);
 	}
 
@@ -288,11 +293,19 @@ namespace mk
 
 	void NanoWindow::nextFrame(double time, double delta)
 	{
+		NanoInk::sDebugBatch = 0;
 		nvgBeginFrame(mCtx, mWidth, mHeight, mPixelRatio);
 
 		mScreenTarget->nanodraw();
 
 		nvgEndFrame(mCtx);
+
+		static double prevtime = 0.0;
+		if(time - prevtime > 1.0)
+		{
+			std::cerr << "Frames drawn : " << NanoInk::sDebugBatch << std::endl;
+			prevtime = time;
+		}
 	}
 
 	InkTarget& NanoWindow::screenTarget()

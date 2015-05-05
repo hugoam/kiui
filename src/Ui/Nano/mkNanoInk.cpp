@@ -21,6 +21,7 @@
 namespace mk
 {
 	bool NanoInk::sDebugDraw = false;
+	int NanoInk::sDebugBatch = 0;
 
 	inline float clamp(float v, float mn, float mx)
 	{
@@ -131,6 +132,8 @@ namespace mk
 
 		if(this->skin().mEmpty || !mVisible)
 			return;
+
+		++sDebugBatch;
 
 		if(!mImageCache)
 			mImageCache = nvgCreateDisplayList(11);

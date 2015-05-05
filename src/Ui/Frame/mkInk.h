@@ -28,41 +28,33 @@ namespace mk
 	class MK_UI_EXPORT InkTarget : public Object
 	{
 	public:
-		InkTarget(size_t layers) : mZMax(0), mLayers(layers) {}
+		InkTarget(size_t layers) : d_layers(layers), d_rootLayer(nullptr) {}
 
-		size_t zmax() { return mZMax; }
-		size_t ztop() { return mLayers.size() - 1; }
+		size_t ztop() { return d_layers; }
 
-		unique_ptr<InkLayer> addLayer(Layer& layer, size_t z);
-		void removeLayer(InkLayer& layer);
-		void moveToTop(InkLayer& layer);
+		virtual unique_ptr<InkLayer> createLayer(Layer& layer, size_t z) = 0;
 
 		static Type& cls() { static Type ty; return ty; }
 
 	protected:
-		virtual unique_ptr<InkLayer> createLayer(Layer& layer, size_t z) = 0;
-
-	protected:
-		size_t mZMax;
-		std::vector<std::vector<InkLayer*>> mLayers;
+		size_t d_layers;
+		Layer* d_rootLayer;
 	};
 	
 	class MK_UI_EXPORT InkLayer : public Object
 	{
 	public:
 		InkLayer(Layer& layer, InkTarget& target, size_t index) : mLayer(layer), mTarget(target), mIndex(index) {}
-		virtual ~InkLayer() { mTarget.removeLayer(*this); }
+		virtual ~InkLayer() {}
 
 		Layer& layer() { return mLayer; }
 		InkTarget& target() { return mTarget; }
 		size_t index() { return mIndex; }
-		void setIndex(size_t index) { mIndex = index; this->moved(index); }
-
-		void moveToTop() { mTarget.moveToTop(*this); }
+		void setIndex(size_t index) { mIndex = index; this->move(index); }
 
 		virtual unique_ptr<Inkbox> createInkbox(Frame& frame) = 0;
 
-		virtual void moved(size_t index) { UNUSED(index); }
+		virtual void move(size_t z) = 0;
 		virtual void show() = 0;
 		virtual void hide() = 0;
 
