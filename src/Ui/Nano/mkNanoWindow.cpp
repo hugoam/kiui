@@ -213,7 +213,7 @@ namespace mk
 
 		if(frame.frameType() >= STRIPE)
 			for(Frame* subframe : frame.as<Stripe>().contents())
-				if(subframe->visible())
+				if(subframe->visible() && subframe->frameType() < LAYER)
 					this->drawImage(*subframe);
 	}
 
@@ -223,7 +223,7 @@ namespace mk
 
 		if(frame.frameType() >= STRIPE)
 			for(Frame* subframe : frame.as<Stripe>().contents())
-				if(subframe->visible())
+				if(subframe->visible() && subframe->frameType() < LAYER)
 					this->drawText(*subframe);
 	}
 
