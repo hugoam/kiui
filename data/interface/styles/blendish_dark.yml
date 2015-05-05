@@ -105,6 +105,7 @@ TypeIn :
 DockWindow :
     background_colour : 0.09,0.09,0.09,1.0
     corner_radius : 3.0,3.0,3.0,3.0
+    shadow : 0.0,0.0,5.0,2.0
     
 Window :
     background_colour : 0.0,0.0,0.0,1.0
