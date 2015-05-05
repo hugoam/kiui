@@ -54,7 +54,7 @@ Dockbar :
     inherit_skin : Frame
     
 Dockbox :
-    image_skin : tbb/frame, 4, 4, 4, 4
+    image_skin : tbb/frame_shadow, 16, 16, 16, 16, 12
     
 Expandbox :
     copy_skin : Container
