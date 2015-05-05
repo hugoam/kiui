@@ -31,10 +31,17 @@ namespace mk
 		, mEdit(edit)
 	{}
 
-	void Value::updateValue()
+	void Value::triggerUpdate()
 	{
 		++mUpdate;
 		this->notifyUpdate();
+	}
+
+	void Value::triggerModify()
+	{
+		++mUpdate;
+		this->notifyUpdate();
+		this->notifyModify();
 	}
 
 	string Value::getString()
@@ -45,7 +52,7 @@ namespace mk
 	void Value::setString(const string& value)
 	{
 		mValue->setString(value);
-		this->updateValue();
+		this->triggerModify();
 	}
 
 	WValue::WValue(Lref& value, bool edit)

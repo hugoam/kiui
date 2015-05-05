@@ -76,9 +76,9 @@ namespace mk
 		return true;
 	}
 
-	void FilterInput::notifyUpdate()
+	void FilterInput::notifyModify()
 	{
-		Input<string>::notifyUpdate();
+		Input<string>::notifyModify();
 		this->updateFilter(mValue->ref<string>());
 	}
 

@@ -171,11 +171,15 @@ namespace mk
 		void updateStat()
 		{
 			mStat.modify(T(mSlider.val()));
-			this->updateValue();
 			mDisplay.setLabel(toString(mStat.value()));
+			this->triggerModify();
 		}
 
-		void notifyUpdate() { ++this->mUpdate; if(this->mOnUpdate) this->mOnUpdate(mStat.value()); }
+		void updateValue(T val) { mStat.modify(val); this->triggerUpdate(); }
+		void modifyValue(T val) { mStat.modify(val); this->triggerModify(); }
+
+		void notifyUpdate() { this->updateSlider(); }
+		void notifyModify() { this->updateSlider(); if(this->mOnUpdate) this->mOnUpdate(mStat.value()); }
 
 		static StyleType& cls() { static StyleType ty("StatSlider<" + typecls<T>().name() + ">", WValue::cls()); return ty; }
 

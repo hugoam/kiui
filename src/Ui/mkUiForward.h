@@ -126,9 +126,6 @@ namespace mk
 
 	class WValue;
 
-	class SliderInt;
-	class SliderFloat;
-
 	class Hook;
 
 	class NanoInk;

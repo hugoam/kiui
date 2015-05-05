@@ -156,6 +156,9 @@ namespace mk
 	public:
 		Toggle(const Trigger& triggerOn, const Trigger& triggerOff, bool isOn = true);
 
+		bool on() { return mOn; }
+
+		void update(bool on);
 		void toggle();
 
 		bool leftClick(float x, float y);

@@ -143,8 +143,8 @@ namespace mk
 		mMin = min;
 		mMax = max;
 		mVal = val;
-		mStepLength = stepLength;
-		mNumSteps = (mMax - mMin) / stepLength + 1;
+		mStepLength = stepLength == 0 ? 1.f : stepLength;
+		mNumSteps = (mMax - mMin) / mStepLength + 1;
 		mStep = int((mVal - mMin) / mStepLength);
 
 		mKnobLength = knobLength ? knobLength : mStepLength;

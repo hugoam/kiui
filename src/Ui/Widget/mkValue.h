@@ -35,8 +35,17 @@ namespace mk
 		string getString();
 		void setString(const string& value);
 
-		virtual void updateValue();
+		void triggerUpdate();
+		void triggerModify();
+
 		virtual void notifyUpdate() {}
+		virtual void notifyModify() {}
+
+		template <class T>
+		void modifyValue(T val) { mValue->set<T>(val); this->triggerModify(); }
+
+		template <class T>
+		void updateValue(T val) { mValue->set<T>(val); this->triggerUpdate(); }
 
 	protected:
 		Lref mCopy;

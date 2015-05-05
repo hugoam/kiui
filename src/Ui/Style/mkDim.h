@@ -170,6 +170,7 @@ namespace mk
 		bool cnull() const { return (d_values[0] == 0.f && d_values[1] == 0.f && d_values[2] == 0.f && d_values[3] == 0.f); }
 
 		void assign(float x0, float y0, float x1, float y1) { d_values[0] = x0; d_values[1] = y0; d_values[2] = x1; d_values[3] = y1; }
+		void assign(float val) { d_values[0] = val; d_values[1] = val; d_values[2] = val; d_values[3] = val; }
 
 		void setX0(float x0) { d_values[0] = x0; d_null = cnull(); }
 		void setY0(float y0) { d_values[1] = y0; d_null = cnull(); }

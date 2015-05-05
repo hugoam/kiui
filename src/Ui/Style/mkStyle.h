@@ -169,17 +169,19 @@ namespace mk
 			mShadow.copy(other.mShadow, inherit);
 		}
 
+		void setEmpty(bool empty) { mEmpty = empty; }
+
 		_A_ bool empty() const { return mEmpty; }
 		_A_ Colour& backgroundColour() { return mBackgroundColour.val; }
 		_A_ Colour& borderColour() { return mBorderColour.val; }
 		_A_ Colour& imageColour() { return mImageColour.val; }
 		_A_ Colour& textColour() { return mTextColour.val; }
 		_A_ const string& textFont() { return mTextFont.val; }
-		_A_ float textSize() { return mTextSize.val; }
-		_A_ bool textWrap() { return mTextWrap.val; }
+		_A_ float& textSize() { return mTextSize.val; }
+		_A_ bool& textWrap() { return mTextWrap.val; }
 		_A_ BoxFloat& borderWidth() { return mBorderWidth.val; }
 		_A_ BoxFloat& cornerRadius() { return mCornerRadius.val; }
-		_A_ bool weakCorners() { return mWeakCorners.val; }
+		_A_ bool& weakCorners() { return mWeakCorners.val; }
 		_A_ BoxFloat& padding() { return mPadding.val; }
 		_A_ BoxFloat& margin() { return mMargin.val; }
 		_A_ DimAlign& align() { return mAlign.val; }
@@ -242,6 +244,7 @@ namespace mk
 		_A_ InkStyle& skin() { return mSkin; }
 		_A_ _M_ size_t updated() { return mUpdated; }
 
+		void markUpdate() { ++mUpdated; }
 		void setUpdated(size_t update) { mUpdated = update; }
 
 		Type* styleType() { return mStyleType; }

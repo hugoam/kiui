@@ -44,7 +44,7 @@ namespace mk
 		void filterOn();
 		void filterOff();
 
-		void notifyUpdate();
+		void notifyModify();
 
 		void updateFilter(const string& filter);
 		bool fitsFilter(const string& filter, const string& value);

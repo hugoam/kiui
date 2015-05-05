@@ -22,27 +22,27 @@
 namespace mk
 {
 	Checkbox::Checkbox(WValue* input, bool on)
-		: Toggle(std::bind(&Checkbox::on, this), std::bind(&Checkbox::off, this), on)
+		: Toggle(std::bind(&Checkbox::toggleOn, this), std::bind(&Checkbox::toggleOff, this), on)
 		, mInput(input)
 	{
 		mStyle = &cls();
 	}
 
-	void Checkbox::on()
+	void Checkbox::toggleOn()
 	{
 		if(mInput)
 		{
 			mInput->value()->set<bool>(mOn);
-			mInput->updateValue();
+			mInput->triggerModify();
 		}
 	}
 
-	void Checkbox::off()
+	void Checkbox::toggleOff()
 	{
 		if(mInput)
 		{
 			mInput->value()->set<bool>(mOn);
-			mInput->updateValue();
+			mInput->triggerModify();
 		}
 	}
 }

@@ -16,8 +16,8 @@ namespace mk
 	public:
 		Checkbox(WValue* input, bool on);
 
-		void on();
-		void off();
+		void toggleOn();
+		void toggleOff();
 
 		static StyleType& cls() { static StyleType ty("Checkbox", Toggle::cls()); return ty; }
 

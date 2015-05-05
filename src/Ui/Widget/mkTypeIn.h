@@ -30,7 +30,7 @@ namespace mk
 			, mOnUpdate(callback)
 		{}
 
-		void notifyUpdate() { if(mOnUpdate) mOnUpdate(mValue->get<T>()); }
+		void notifyModify() { if(mOnUpdate) mOnUpdate(mValue->get<T>()); }
 
 	protected:
 		std::function<void(T_Val)> mOnUpdate;
@@ -117,15 +117,17 @@ namespace mk
 		{
 			this->mValue->template set<T>(this->mValue->template get<T>() + mStep);
 			mTypeIn.updateString();
-			this->updateValue();
+			this->triggerModify();
 		}
 
 		void decrement()
 		{
 			this->mValue->template set<T>(this->mValue->template get<T>() - mStep);
 			mTypeIn.updateString();
-			this->updateValue();
+			this->triggerModify();
 		}
+
+		void notifyUpdate() { mTypeIn.updateString(); }
 
 		static StyleType& cls() { static StyleType ty("NumberInput<" + typecls<T>().name() + ">", WValue::cls()); return ty; }
 
@@ -185,19 +187,24 @@ namespace mk
 	public:
 		Input(Lref& value, std::function<void(bool)> callback = nullptr)
 			: WTypedInput<bool>(value, callback)
+			, mCheckbox(this->makeappend<Checkbox>(this, mValue->get<bool>()))
 		{
 			this->mStyle = &cls();
-			this->makeappend<Checkbox>(this, mValue->get<bool>());
 		}
 
 		Input(bool value, std::function<void(bool)> callback = nullptr)
 			: WTypedInput<bool>(value, callback)
+			, mCheckbox(this->makeappend<Checkbox>(this, mValue->get<bool>()))
 		{
 			this->mStyle = &cls();
-			this->makeappend<Checkbox>(this, mValue->get<bool>());
 		}
 
+		void notifyUpdate() { mCheckbox.update(mValue->get<bool>()); }
+
 		static StyleType& cls() { static StyleType ty("Input<bool>", WValue::cls()); return ty; }
+
+	protected:
+		Checkbox& mCheckbox;
 	};
 
 	template <>
@@ -216,7 +223,8 @@ namespace mk
 
 		TypeIn& typeIn() { return mTypeIn; }
 
-		void notifyUpdate() { mTypeIn.updateString(); if(this->mOnUpdate) this->mOnUpdate(this->mValue->get<string>()); }
+		void notifyUpdate() { mTypeIn.updateString(); }
+		void notifyModify() { if(this->mOnUpdate) this->mOnUpdate(this->mValue->get<string>()); }
 
 	protected:
 		TypeIn& mTypeIn;

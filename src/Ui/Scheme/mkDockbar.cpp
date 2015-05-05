@@ -46,6 +46,7 @@ namespace mk
 	Widget& Dockbar::addDock(const string& name, const string& icon, unique_ptr<Widget> widget)
 	{
 		Dockbox& dockbox = mDocker.emplace<Dockbox>(*this, name, icon);
+		dockbox.hide();
 		return dockbox.vappend(std::move(widget));
 	}
 

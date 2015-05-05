@@ -57,7 +57,10 @@ namespace mk
 	void Frame::resetStyle()
 	{
 		if(!d_parent)
+		{
+			this->updateStyle();
 			return;
+		}
 
 		Stripe* parent = d_parent;
 		bool flow = d_flow;

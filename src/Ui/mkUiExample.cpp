@@ -312,20 +312,20 @@ namespace mk
 
 		Table& table = page.emplace<Table>(StringVector({ "input", "label" }), std::vector<float>({ 0.7f, 0.3f }));
 
-		table.emplace<InputBool>("checkbox input", false);
-		table.emplace<InputRadio>("radio input", StringVector({ "radio a", "radio b", "radio c" }));
+		table.emplace<InputBool>("checkbox input", false, nullptr, true);
+		table.emplace<InputRadio>("radio input", StringVector({ "radio a", "radio b", "radio c" }), nullptr, true);
 
-		table.emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {});
-		table.emplace<InputDropdown>("typedown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {}, true);
+		table.emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {}, false, true);
+		table.emplace<InputDropdown>("typedown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {}, true, true);
 
-		table.emplace<InputText>("string input", "Hello, world!");
-		table.emplace<InputInt>("int input", 123);
-		table.emplace<InputFloat>("float input", 0.001f);
+		table.emplace<InputText>("string input", "Hello, world!", nullptr, true);
+		table.emplace<InputInt>("int input", 123, nullptr, true);
+		table.emplace<InputFloat>("float input", 0.001f, nullptr, true);
 
-		table.emplace<SliderInt>("int 0..3", AutoStat<int>(2, 0, 3, 1));
-		table.emplace<SliderInt>("int -100..100", AutoStat<int>(0, -100, 100, 1));
+		table.emplace<SliderInt>("int 0..3", AutoStat<int>(2, 0, 3, 1), nullptr, true);
+		table.emplace<SliderInt>("int -100..100", AutoStat<int>(0, -100, 100, 1), nullptr, true);
 
-		table.emplace<SliderFloat>("float input", AutoStat<float>(1.123f, 0.0f, 2.0f, 0.001f));
+		table.emplace<SliderFloat>("float input", AutoStat<float>(1.123f, 0.0f, 2.0f, 0.001f), nullptr, true);
 		//table.emplace<SliderFloat>("log float", AutoStat<float>(0.f, 0.0f, 10.0f, 1.f));
 		//table.emplace<SliderFloat>("signed log float", AutoStat<float>(0.f, -10.0f, 10.0f, 1.f));
 		//table.emplace<SliderFloat>("unbound float", AutoStat<float>(123456789.0f, -FLT_MAX, FLT_MAX, 1.f));
@@ -426,10 +426,10 @@ namespace mk
 
 		Expandbox& box1 = page.emplace<Expandbox>("Window options");
 
-		box1.emplace<InputBool>("titlebar", true, [&window](bool on) { on ? window.showTitlebar() : window.hideTitlebar(); });
-		box1.emplace<InputBool>("movable", true, [&window](bool) { window.toggleMovable(); });
-		box1.emplace<InputBool>("resizable", true, [&window](bool) { window.toggleResizable(); });
-		box1.emplace<InputBool>("closable", true, [&window](bool) { window.toggleClosable(); });
+		box1.emplace<InputBool>("titlebar", true, [&window](bool on) { on ? window.showTitlebar() : window.hideTitlebar(); }, true);
+		box1.emplace<InputBool>("movable", true, [&window](bool) { window.toggleMovable(); }, true);
+		box1.emplace<InputBool>("resizable", true, [&window](bool) { window.toggleResizable(); }, true);
+		box1.emplace<InputBool>("closable", true, [&window](bool) { window.toggleClosable(); }, true);
 
 		box1.emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha){ window.frame().inkstyle().mBackgroundColour.val.setA(alpha); });
 
@@ -449,7 +449,20 @@ namespace mk
 			: Page("Style Edit")
 			, mStyler(styler)
 			, mStylePicker(this->emplace<Typedown>([this](Widget& choice){ this->pickStyle(choice.label()); }))
-			, mImageInput(this->emplace<InputText>("Skin Image", "", [](string text) {}))
+			, mEmpty(this->emplace<InputBool>("Empty", true, [this](bool empty) { this->mSkin->setEmpty(empty); this->mStyle->markUpdate(); }))
+			, mBackgroundColour(this->emplace<InputColour>("Background Colour", Colour(), [this](Colour colour) { this->mSkin->backgroundColour() = colour; this->mStyle->markUpdate(); }))
+			, mGradientTop(this->emplace<SliderInt>("Gradient Top", AutoStat<int>(0, -50, +50), [this](int top) { this->mSkin->topdownGradient().setX(float(top)); this->mStyle->markUpdate(); }))
+			, mGradientDown(this->emplace<SliderInt>("Gradient Bottom", AutoStat<int>(0, -50, +50), [this](int down) { this->mSkin->topdownGradient().setY(float(down)); this->mStyle->markUpdate(); }))
+			, mCornerRadius(this->emplace<SliderInt>("Corner Radius", AutoStat<int>(0, 0, 25), [this](int radius) { this->mSkin->cornerRadius().assign(float(radius)); this->mStyle->markUpdate(); }))
+			, mBorderWidth(this->emplace<SliderFloat>("Border Width", AutoStat<float>(0.f, 0.f, 10.f, 0.1f), [this](float width) { this->mSkin->borderWidth().assign(width); this->mStyle->markUpdate(); }))
+			, mBorderColour(this->emplace<InputColour>("Border Colour", Colour(), [this](Colour colour) { this->mSkin->borderColour() = colour; this->mStyle->markUpdate(); }))
+			, mTextSize(this->emplace<SliderInt>("Text Size", AutoStat<int>(0, 0, 50), [this](int size) { this->mSkin->textSize() = float(size); this->mStyle->markUpdate(); }))
+			, mTextColour(this->emplace<InputColour>("Text Colour", Colour(), [this](Colour colour) { this->mSkin->textColour() = colour; this->mStyle->markUpdate(); }))
+			, mPadding(this->emplace<SliderInt>("Padding", AutoStat<int>(0, 0, 25), [this](int padding) { this->mSkin->padding().assign(padding); this->mStyle->markUpdate(); }))
+			//, mAlignX(this->emplace<InputRadio>("Align Y", StringVector({ "Left", "Center", "Right", "OutLeft", "OutRight" }), [this](const string&) {}))
+			//, mAlignY(this->emplace<InputRadio>("Align Y", StringVector({ "Left", "Center", "Right", "OutLeft", "OutRight" }), [this](const string&) {}))
+			, mImage(this->emplace<InputText>("Image", "", [this](string name) { this->mSkin->image().d_name = name; this->mStyle->markUpdate(); }))
+			, mSkinImage(this->emplace<InputText>("Skin Image", "", [this](string name) { this->mSkin->image().d_name = name; this->mStyle->markUpdate(); }))
 		{
 			for(Object* object : Style::indexer().objects())
 				if(object)
@@ -460,13 +473,42 @@ namespace mk
 		{
 			mStyle = mStyler.fetchStyle(name);
 			mSkin = &mStyle->skin();
-			mImageInput.input().setString(mSkin->image().d_name);
+
+			mEmpty.input().modifyValue(mSkin->empty());
+			mBackgroundColour.input().modifyValue<Colour>(mSkin->backgroundColour());
+			mGradientTop.input().modifyValue(mSkin->topdownGradient().x());
+			mGradientDown.input().modifyValue(mSkin->topdownGradient().y());
+			mCornerRadius.input().modifyValue(mSkin->cornerRadius().x0());
+			mBorderWidth.input().modifyValue(mSkin->borderWidth().x0());
+			mBorderColour.input().modifyValue<Colour>(mSkin->borderColour());
+			mTextSize.input().modifyValue(mSkin->textSize());
+			mTextColour.input().modifyValue<Colour>(mSkin->textColour());
+			mPadding.input().modifyValue(mSkin->padding().x0());
+			//mAlignX.input().modifyValue();
+			//mAlignY.input().modifyValue();
+			mImage.input().modifyValue<string>(mSkin->image().d_name);
+			mSkinImage.input().modifyValue<string>(mSkin->imageSkin().d_image.d_name);
 		}
 
 	protected:
 		Styler& mStyler;
 		Dropdown& mStylePicker;
-		InputText& mImageInput;
+
+		InputBool& mEmpty;
+		InputColour& mBackgroundColour;
+		SliderInt& mGradientTop;
+		SliderInt& mGradientDown;
+		SliderInt& mCornerRadius;
+		SliderFloat& mBorderWidth;
+		InputColour& mBorderColour;
+		SliderInt& mTextSize;
+		InputColour& mTextColour;
+		SliderInt& mPadding;
+		//InputRadio& mAlignX;
+		//InputRadio& mAlignY;
+		InputText& mImage;
+		InputText& mSkinImage;
+
 		Style* mStyle;
 		InkStyle* mSkin;
 	};

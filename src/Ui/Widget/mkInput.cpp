@@ -12,43 +12,28 @@
 #include <Ui/Form/mkWidgets.h>
 
 #include <Ui/Widget/mkTypeIn.h>
-#include <Ui/Widget/mkSlider.h>
 
 using namespace std::placeholders;
 
 namespace mk
 {
-	InputRadio::InputRadio(const string& label, StringVector choices, std::function<void(const string&)> callback)
+	InputRadio::InputRadio(const string& label, StringVector choices, std::function<void(const string&)> callback, bool reverse)
 		: Sequence()
 	{
+		if(!reverse) this->makeappend<Label>(label);
 		this->makeappend<RadioSwitch>([callback](Widget& widget) { if(callback) callback(widget.label()); }, 0, choices);
-		this->makeappend<Label>(label);
+		if(reverse) this->makeappend<Label>(label);
 	}
 
 	InputDropdown::InputDropdown(const string& label, StringVector choices, std::function<void(const string&)> callback, bool textinput, bool reverse)
 		: Sequence()
 	{
-		UNUSED(reverse);
+		if(!reverse) this->makeappend<Label>(label);
 		if(textinput)
 			this->makeappend<Typedown>([callback](Widget& widget) { if(callback) callback(widget.label()); }, choices);
 		else
 			this->makeappend<Dropdown>([callback](Widget& widget) { if(callback) callback(widget.label()); }, choices);
-
-		this->makeappend<Label>(label);
-	}
-
-	SliderInt::SliderInt(const string& label, AutoStat<int> value, std::function<void(int)> callback)
-		: Sequence()
-	{
-		this->makeappend<StatSlider<int>>(value, callback),
-		this->makeappend<Label>(label);
-	}
-
-	SliderFloat::SliderFloat(const string& label, AutoStat<float> value, std::function<void(float)> callback)
-		: Sequence()
-	{
-		this->makeappend<StatSlider<float>>(value, callback);
-		this->makeappend<Label>(label);
+		if(reverse) this->makeappend<Label>(label);
 	}
 
 	//unique_ptr<Form> dispatchStoreForm(Form* member, Lref& lref, Stock* store) { return make_unique<FStore>(member, member->as<FMember>()->dmember()); }

@@ -155,7 +155,7 @@ namespace mk
 
 		Dockbox::cls().layout().d_flow = FLOW;
 		Dockbox::cls().layout().d_space = BLOCK;
-		Dockbox::cls().layout().d_size = DimFloat(200.f, 0.f);
+		Dockbox::cls().layout().d_size = DimFloat(300.f, 0.f);
 
 		Dockbar::cls().layout().d_padding = BoxFloat(4.f);
 		Dockbar::cls().layout().d_spacing = DimFloat(4.f, 4.f);
