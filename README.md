@@ -35,6 +35,7 @@ Label& label = expandbox.emplace<Label>("kiUi says hello.");
 Button& button = expand.emplace<Button>("Push me");
 ```
 
+For a more in-depth usage example look at the full demo implementation : [Example](src/Ui/mkUiExample.cpp)
 
 Nano
 ====
