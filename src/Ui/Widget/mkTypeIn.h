@@ -89,6 +89,8 @@ namespace mk
 			, mPlus(this->template makeappend<Button>("+", std::bind(&NumberInput<T>::increment, this)))
 			, mMinus(this->template makeappend<Button>("-", std::bind(&NumberInput<T>::decrement, this)))
 			, mStep(1)
+			, mMinimum(std::numeric_limits<T>::lowest())
+			, mMaximum(std::numeric_limits<T>::max())
 		{
 			this->mStyle = &cls();
 			this->build();
@@ -100,6 +102,8 @@ namespace mk
 			, mPlus(this->template makeappend<Button>("+", std::bind(&NumberInput<T>::increment, this)))
 			, mMinus(this->template makeappend<Button>("-", std::bind(&NumberInput<T>::decrement, this)))
 			, mStep(1)
+			, mMinimum(std::numeric_limits<T>::lowest())
+			, mMaximum(std::numeric_limits<T>::max())
 		{
 			this->mStyle = &cls();
 			this->build();
@@ -115,14 +119,30 @@ namespace mk
 
 		void increment()
 		{
-			this->mValue->template set<T>(this->mValue->template get<T>() + mStep);
+			const auto currentValue = this->mValue->template get<T>();
+			if (mMaximum == currentValue)
+				return;
+
+			if (mMaximum - mStep <= currentValue)
+				this->mValue->template set<T>(mMaximum);
+			else
+				this->mValue->template set<T>(currentValue + mStep);
+
 			mTypeIn.updateString();
 			this->updateValue();
 		}
 
 		void decrement()
 		{
-			this->mValue->template set<T>(this->mValue->template get<T>() - mStep);
+			const auto currentValue = this->mValue->template get<T>();
+			if (mMinimum == currentValue)
+				return;
+
+			if (mMinimum + mStep >= currentValue)
+				this->mValue->template set<T>(mMinimum);
+			else
+				this->mValue->template set<T>(currentValue - mStep);
+
 			mTypeIn.updateString();
 			this->updateValue();
 		}
@@ -134,6 +154,8 @@ namespace mk
 		Button& mPlus;
 		Button& mMinus;
 		T mStep;
+		T mMinimum;
+		T mMaximum;
 	};
 
 	template <class T>
