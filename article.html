@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Kiui by novembermonk</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Kiui</h1>
+        <p class="header">Auto-layout Ui library, lightweight, skinnable and system agnostic, with an OpenGL backend</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/novembermonk/kiui/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/novembermonk/kiui/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/novembermonk/kiui">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/novembermonk">novembermonk</a></p>
+
+
+      </header>
+      <section>
+        <h1>
+<a id="ive-spent-the-last-4-months-developing-an-ui-toolkit-focused-towards-games-with-qt-power-yet-small-and-lean-it-is-free-open-source-and-i-want-to-share-it-with-game-developpers" class="anchor" href="#ive-spent-the-last-4-months-developing-an-ui-toolkit-focused-towards-games-with-qt-power-yet-small-and-lean-it-is-free-open-source-and-i-want-to-share-it-with-game-developpers" aria-hidden="true"><span class="octicon octicon-link"></span></a>I've spent the last 4 months developing an UI toolkit focused towards games, with Qt-power yet small and lean. It is free, open-source, and I want to share it with game developpers.</h1>
+
+<p>TL;DR - Made a new free and open-source UI library that gamedevs should know about</p>
+
+<p>Show me the demo already ! Try it in the browser : <a href="http://novembermonk.github.io/kiui/livedemo/kiui.html">here</a>
+<img src="media/themes.gif?raw=true" alt="switching between styles at runtime"></p>
+
+<p>Have a look at a few GIFs : <a href="http://novembermonk.github.io/kiui/media/styles.gif">Themes</a>, <a href="http://novembermonk.github.io/kiui/media/dockspace.gif">Dock Windows</a>, <a href="http://novembermonk.github.io/kiui/media/texteditx.gif">Text Edit</a>, <a href="http://novembermonk.github.io/kiui/media/styling.gif">Tweakin Style</a>, <a href="http://novembermonk.github.io/kiui/media/stylingbis.gif">Tweakin Some More</a></p>
+
+<h1>
+<a id="why-" class="anchor" href="#why-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why ?</h1>
+
+<p>Like I suppose, many gamedevs before me, coding UI has always been a source of discomfort.
+I wanted to code my interfaces as I coded the rest. With a sense of freedom to organise everything however I felt the most natural.
+In most domains, when I have needed a library to do a specific task, I've been able to find a small and efficient library that would do just that.
+That is true of database, pathfinding, message queuing, network, even rendering.
+Yet... the UI domain was rebellious. All the solutions I tried forced me to write ugly code.</p>
+
+<p>You can feel the lack of diversity in UI when you google the answers to question : what is a good UI library for games ?
+I even went to web-based UI at some point, and it taught me about some great features an UI solution should have. But I needed native UI.
+So, four months ago, I finally rolled up my sleeves, deciding that if there was one domain where I could bring something to the world, it was about UI.</p>
+
+<p>Today, after four month, the library is good enough to start communicating about it on public channels like the gamedev community.
+I hope to find here some enthusiasts first users, and get the word out, so that the library can grow toward stability over the following months.</p>
+
+<h1>
+<a id="what-makes-it-stick-out-" class="anchor" href="#what-makes-it-stick-out-" aria-hidden="true"><span class="octicon octicon-link"></span></a>What makes it stick out ?</h1>
+
+<p>Here are all the requirements and features that I strived to pack into this library :</p>
+
+<ul>
+<li>Logic code is separated from appearance code, for clean UI code writing</li>
+<li>Layout is automatic, no manual positioning or sizing is ever needed (no messing with VSizers and HBoxes)</li>
+<li>Appearance is completely tweakable both through Style Sheets and directly from code</li>
+<li>Vector based skinning (borders, rounded corners, gradients, shadows)</li>
+<li>Game friendly image based skinning (9 sprites)</li>
+<li>Basic widgets : dropdown, slider, checkbox, text input, multiline text, filtered dropdown</li>
+<li>Toolkit widgets : dockspace, dockable windows, tabs, docking bar, tables, trees</li>
+<li>Fit for both an editor UI and a game UI</li>
+<li>Core library is completely standalone and self contained</li>
+<li>Has a nifty standalone renderer using the really good NanoVG vector drawing library</li>
+</ul>
+
+<p>Technical specs :</p>
+
+<ul>
+<li>Modern C++ (in the limit of my young knowledge)</li>
+<li>Emscripten and</li>
+<li>Cross-Platform (tested under gcc, clang and msvc as of now)</li>
+<li>Free as in beer and as in speech : MIT license</li>
+<li>Lightweight : small codebase of around 15kLoC, 600kB footprint for the .dll on windows</li>
+</ul>
+
+<h1>
+<a id="whats-the-catch-" class="anchor" href="#whats-the-catch-" aria-hidden="true"><span class="octicon octicon-link"></span></a>What's the catch ?</h1>
+
+<p>Well kiUi is still in its infancy. It is a work in progress, with an API that is not stable yet.
+There is virtually no documentation as of now, although I believe the code to be quite clean and self-explanatory.
+And now that it's close to being feature-complete I'll have time to write docs and tutorials.</p>
+
+<h1>
+<a id="so-what-now-" class="anchor" href="#so-what-now-" aria-hidden="true"><span class="octicon octicon-link"></span></a>So what now ?</h1>
+
+<p>Well if you have a project like mine, a game with quite a lot of UI design and possibly a toolset or an editor, consider using it !</p>
+
+<p>Here is the github repository where the real stuff happens : <a href="https://github.com/novembermonk/kiui">https://github.com/novembermonk/kiui</a></p>
+
+<p>Happy to share it, and happy to hear any kind of feedback, bug reports in the future. (I'm exposing myself to a shitstorm of issue reports, I know ;) )</p>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
