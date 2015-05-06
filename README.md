@@ -12,7 +12,7 @@ It is designed according to the following design goals :
 - Brevity and simplicity above everything else, especially in C++ code
 - Good for both an editor Ui and a game Ui
 
-![screenshot of the example window with a raw skin](kiui.png?raw=true)
+![screenshot of the example window with a raw skin](media/kiui.png?raw=true)
 
 Auto-Layout
 ===========
