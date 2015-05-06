@@ -35,6 +35,7 @@ Label& label = expandbox.emplace<Label>("kiUi says hello.");
 Button& button = expand.emplace<Button>("Push me");
 ```
 
+
 Nano
 ====
 
@@ -72,9 +73,6 @@ Editor
 ======
 
 kiUi will come with a simple editor which also uses kiUi for its interface
-
-![screenshot of the WIP editor for kiUi](editor.png?raw=true)
-
 
 
 ## License
