@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -15,17 +16,18 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1>Kiui</h1>
-        <p>Auto-layout Ui library, lightweight, skinnable and system agnostic, with an OpenGL backend</p>
-
-        <p class="view"><a href="https://github.com/novembermonk/kiui">View the Project on GitHub <small>novembermonk/kiui</small></a></p>
-
+        <h1 class="header">Kiui</h1>
+        <p class="header">Auto-layout Ui library, lightweight, skinnable and system agnostic, with an OpenGL backend</p>
 
         <ul>
-          <li><a href="https://github.com/novembermonk/kiui/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/novembermonk/kiui/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/novembermonk/kiui">View On <strong>GitHub</strong></a></li>
+          <li class="download"><a class="buttons" href="https://github.com/novembermonk/kiui/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/novembermonk/kiui/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/novembermonk/kiui">View On GitHub</a></li>
         </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/novembermonk">novembermonk</a></p>
+
+
       </header>
       <section>
         <h1>
@@ -33,7 +35,8 @@
 </h1>
 
 <p>kiUi is a lightweight auto-layout Ui library, abstracted out from any rendering or input code.</p>
-<p>kiUi supports Emscripten : Try the live demo <a href="http://novembermonk.github.io/kiui/livedemo/kiui.html">here</a>.</p>
+
+<p>kiui supports Emscripten : try the live demo <a href="http://novembermonk.github.io/kiui/livedemo/kiui.html">here</a>.</p>
 
 <p>It is designed according to the following design goals :</p>
 
@@ -62,28 +65,28 @@
 <h1>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h1>
 
-<div class="highlight highlight-C++"><pre>UiWindow* uiwindow = <span class="pl-k">new</span> UiWindow();
+<div class="highlight highlight-C++"><pre>RootSheet&amp; root = uiwindow.rootSheet();
+Window&amp; window = root.emplace&lt;Window&gt;(<span class="pl-s"><span class="pl-pds">"</span>Example window<span class="pl-pds">"</span></span>);
 
-Form* root = uiwindow-&gt;<span class="pl-en">rootForm</span>();
-Window* window = root-&gt;makeappend&lt;Window&gt;(<span class="pl-s"><span class="pl-pds">"</span>Example window<span class="pl-pds">"</span></span>);
+Expandbox&amp; expandbox = window.emplace&lt;Expandbox&gt;(<span class="pl-s"><span class="pl-pds">"</span>Collapsable box<span class="pl-pds">"</span></span>);
 
-Expandbox* expandbox = window-&gt;makeappend&lt;Expandbox&gt;(<span class="pl-s"><span class="pl-pds">"</span>Collapsable box<span class="pl-pds">"</span></span>);
+Label&amp; label = expandbox.emplace&lt;Label&gt;(<span class="pl-s"><span class="pl-pds">"</span>kiUi says hello.<span class="pl-pds">"</span></span>);
+Button&amp; button = expand.emplace&lt;Button&gt;(<span class="pl-s"><span class="pl-pds">"</span>Push me<span class="pl-pds">"</span></span>);</pre></div>
 
-Label* label = expandbox-&gt;makeappend&lt;Label&gt;(<span class="pl-s"><span class="pl-pds">"</span>kiUi says hello.<span class="pl-pds">"</span></span>);
-Button* button = expand-&gt;makeappend&lt;Button&gt;(<span class="pl-s"><span class="pl-pds">"</span>Push me<span class="pl-pds">"</span></span>);</pre></div>
+<p>For a more in-depth usage example look at the full demo implementation : <a href="src/Ui/mkUiExample.cpp">Example</a></p>
 
 <h1>
 <a id="nano" class="anchor" href="#nano" aria-hidden="true"><span class="octicon octicon-link"></span></a>Nano</h1>
 
 <p>kiUi comes with a light renderer / input system based on NanoVG and GLFW to quickly bootstrap a prototype application in a few lines of code.</p>
 
-<div class="highlight highlight-C++"><pre>GlWindow* glwindow = <span class="pl-k">new</span> GlWindow(<span class="pl-c1">1200</span>, <span class="pl-c1">800</span>, <span class="pl-s"><span class="pl-pds">"</span>mk UiEditApp<span class="pl-pds">"</span></span>);
-glwindow-&gt;<span class="pl-en">initContext</span>();
+<div class="highlight highlight-C++"><pre>GlWindow <span class="pl-en">glwindow</span>(<span class="pl-c1">1200</span>, <span class="pl-c1">800</span>, <span class="pl-s"><span class="pl-pds">"</span>mk UiEditApp<span class="pl-pds">"</span></span>);
+glwindow.initContext();
 
-UiWindow* uiwindow = glwindow-&gt;<span class="pl-en">uiWindow</span>();
+UiWindow&amp; uiwindow = glwindow.uiWindow();
 <span class="pl-k">bool</span> pursue = <span class="pl-c1">true</span>;
 <span class="pl-k">while</span>(pursue)
-    pursue = glwindow-&gt;<span class="pl-en">renderFrame</span>();</pre></div>
+    pursue = glwindow.renderFrame();</pre></div>
 
 <h1>
 <a id="widgets" class="anchor" href="#widgets" aria-hidden="true"><span class="octicon octicon-link"></span></a>Widgets</h1>
@@ -100,14 +103,15 @@ UiWindow* uiwindow = glwindow-&gt;<span class="pl-en">uiWindow</span>();
 <h1>
 <a id="skins" class="anchor" href="#skins" aria-hidden="true"><span class="octicon octicon-link"></span></a>Skins</h1>
 
-<p>kiUi was conceived so that each element can be styled in a way very similar to CSS</p>
+<p>kiUi was conceived so that each element can be styled in a way very similar to CSS, through Style Sheets
+You can switch between Styles Sheets on the fly</p>
+
+<p><img src="media/themes.gif?raw=true" alt="switching between styles at runtime"></p>
 
 <h1>
 <a id="editor" class="anchor" href="#editor" aria-hidden="true"><span class="octicon octicon-link"></span></a>Editor</h1>
 
 <p>kiUi will come with a simple editor which also uses kiUi for its interface</p>
-
-<p><img src="editor.png?raw=true" alt="screenshot of the WIP editor for kiUi"></p>
 
 <h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
@@ -121,11 +125,10 @@ UiWindow* uiwindow = glwindow-&gt;<span class="pl-en">uiWindow</span>();
 Uses <a href="https://github.com/glfw/glfw">glfw</a> for OpenGL context management</p>
       </section>
       <footer>
-        <p>This project is maintained by <a href="https://github.com/novembermonk">novembermonk</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
       </footer>
     </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
   </body>
 </html>
