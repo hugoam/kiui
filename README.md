@@ -63,7 +63,10 @@ Widgets
 Skins
 =====
 
-kiUi was conceived so that each element can be styled in a way very similar to CSS
+kiUi was conceived so that each element can be styled in a way very similar to CSS, through Style Sheets
+You can switch between Styles Sheets on the fly
+
+![switching between styles at runtime](media/themes.gif?raw=true)
 
 Editor
 ======
