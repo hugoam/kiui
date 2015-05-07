@@ -79,8 +79,6 @@ namespace mk
 		else
 			this->trigger();
 
-		this->toggleState(ACTIVATED);
-
 		return true;
 	}
 
