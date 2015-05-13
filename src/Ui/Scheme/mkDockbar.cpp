@@ -54,7 +54,8 @@ namespace mk
 	{
 		string icon = replaceAll(widget->name(), " ", "");
 		std::transform(icon.begin(), icon.end(), icon.begin(), ::tolower);
-		return this->addDock(widget->name(), icon, std::move(widget));
+		const string name = widget->name();
+		return this->addDock(name, icon, std::move(widget));
 	}
 
 	unique_ptr<Widget> Dockbar::vrelease(Widget& widget)
