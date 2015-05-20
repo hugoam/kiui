@@ -69,7 +69,7 @@ namespace mk
 	class MK_UI_EXPORT Inkbox : public NonCopy
 	{
 	public:
-		Inkbox(Frame& frame) : mFrame(frame), mVisible(false), mSelectFirst(0), mSelectSecond(0) {}
+		Inkbox(Frame& frame) : mFrame(frame), mVisible(false), mFitCorners(DIM_NULL), mSelectFirst(0), mSelectSecond(0) {}
 		virtual ~Inkbox() {}
 
 		Frame& frame() { return mFrame; }

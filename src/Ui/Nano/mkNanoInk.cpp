@@ -81,7 +81,6 @@ namespace mk
 		, mImage(0)
 		, mOverlay(0)
 		, mTile(0)
-		, mFitCorners(DIM_NULL)
 		, mImageUpdate(true)
 		, mTextUpdate(true)
 	{}
@@ -555,6 +554,11 @@ namespace mk
 	}
 
 	void NanoInk::updatePosition()
+	{
+		mMoved = true;
+	}
+
+	void NanoInk::updateAbsolute()
 	{
 		mMoved = true;
 	}

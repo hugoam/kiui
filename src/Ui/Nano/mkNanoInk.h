@@ -22,6 +22,7 @@ namespace mk
 		void updateFrame();
 		void updateClip();
 		void updatePosition();
+		void updateAbsolute();
 		void updateStyle();
 		
 		void show();
