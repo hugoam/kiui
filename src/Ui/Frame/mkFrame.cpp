@@ -357,7 +357,7 @@ namespace mk
 	{
 		d_position[dim] = position;
 		d_clipPos[dim] = 0.f;
-		this->setDirty(DIRTY_POSITION); // @note was DIRTY_ABSOLUTE (performance hazard with current setting)
+		this->setDirty(DIRTY_ABSOLUTE);
 	}
 
 	void Frame::show()
