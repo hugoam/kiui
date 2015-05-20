@@ -20,11 +20,8 @@ namespace mk
 
 		void updateContent();
 		void updateFrame();
-		void updateClip();
-		void updatePosition();
-		void updateAbsolute();
 		void updateStyle();
-		
+
 		void show();
 		void hide();
 

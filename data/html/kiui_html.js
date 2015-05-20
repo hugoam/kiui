@@ -48,13 +48,18 @@ HtmlLayer = Module.InkLayer.extend('InkLayer',
     },
 });
 
+TextSizer = document.createElement('div');
+document.body.appendChild(TextSizer);
+TextSizer.style.cssText = 'position:absolute; height:auto; width:auto; white-space:nowrap;';
+
+ImgSizer = document.createElement('img');
+document.body.appendChild(ImgSizer);
+			
 HtmlInk = Module.HtmlInkImpl.extend('HtmlInkImpl',
 {
     __construct: function(frame)
 	{
-        this.__parent.__construct.call(this, frame);
-		this.frm = frame;
-		this.widget = this.frm.widget();
+		this.widget = frame.widget();
 		this.parent = frame.parent();
 		this.parentbox = this.parent ? this.parent.inkbox() : 0;
 		
@@ -64,6 +69,8 @@ HtmlInk = Module.HtmlInkImpl.extend('HtmlInkImpl',
 			this.parentbox.element.appendChild(this.element);
 		else
 			document.getElementById('main_target').appendChild(this.element);
+		
+		this.__parent.__construct.call(this, frame, this.element);
     },
 	__destruct: function(frame)
 	{
@@ -94,26 +101,17 @@ HtmlInk = Module.HtmlInkImpl.extend('HtmlInkImpl',
 			this.element.textContent = this.widget.label();
     },
     contentSize: function(dim)
-    {
+    {		
 		if(this.element.textContent)
 		{
-			var test = document.createElement('div');
-			document.body.appendChild(test);
-			test.style.cssText = 'position:absolute; height:auto; width:auto; white-space:nowrap;';
-			test.style.font = this.element.style.font;
-			test.textContent = this.element.textContent;			
-			var size = (dim == Module.Dimension.DIM_X ? test.clientWidth : test.clientHeight);
-			test.remove();
-			return size;
+			TextSizer.style.font = this.element.style.font;
+			TextSizer.textContent = this.element.textContent;
+			return (dim == Module.Dimension.DIM_X ? TextSizer.clientWidth : TextSizer.clientHeight);
 		}
 		else if(this.widget.image())
 		{
-			var img = document.createElement('img');
-			img.src = 'data/interface/uisprites/' + this.widget.image().name + '.png';
-			document.body.appendChild(img);
-			var size = dim == Module.Dimension.DIM_X ? img.naturalWidth : img.naturalHeight;
-			img.remove();
-			return size;
+			ImgSizer.src = 'data/interface/uisprites/' + this.widget.image().name + '.png';
+			return (dim == Module.Dimension.DIM_X ? ImgSizer.naturalWidth : ImgSizer.naturalHeight);
 		}
 		return 0.0;
     },

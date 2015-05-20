@@ -9,11 +9,14 @@
 #include <Ui/mkUiForward.h>
 #include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkLayer.h>
+#include <Ui/Widget/mkWidget.h>
 #include <Ui/mkRenderWindow.h>
 #include <Ui/mkUiWindow.h>
 #include <Ui/Input/mkInputDispatcher.h>
 
 #include <emscripten/bind.h>
+
+//#define EMCPP_IMPL
 
 using namespace emscripten;
 
@@ -80,13 +83,10 @@ namespace mk
 	class HtmlInkImpl : public Inkbox
 	{
 	public:
-		HtmlInkImpl(Frame& frame) : Inkbox(frame) {}
+		HtmlInkImpl(Frame& frame, val element) : Inkbox(frame), mElement(element) {}
 
-		void updateFrame() { this->updateCorners(); }
-		void updateClip() {}
-		void updatePosition() {}
+		void updateFrame() { this->updateCorners(); if(mFrame.dirty() > Frame::DIRTY_ABSOLUTE) this->recssElement(); }
 		void updateStyle() { this->styleCorners(); this->recssStyle(); }
-		void updateAbsolute() { this->recssElement(); }
 
 		void show() { mVisible = true; }
 		void hide() { mVisible = false; }
@@ -94,8 +94,66 @@ namespace mk
 		void recssElement();
 		void recssStyle();
 
+#ifndef EMCPP_IMPL
 		virtual void elementCSS(const string& css) = 0;
 		virtual void styleCSS(const string& name, const string& css) = 0;
+#else
+		void updateContent() { if(!mFrame.widget().label().empty()) mElement.set("textContent", mFrame.widget().label()); }
+
+		void elementCSS(const string& css) { mElement["style"].set("cssText", "position:absolute;" + css); }
+		void styleCSS(const string& name, const string& css)
+		{
+			static val document = val::global("document");
+			if(!document.call<val>("getElementById", val(name)).as<bool>())
+			{
+				val style = document.call<val>("createElement", val("style"));
+				style.set("id", val(name));
+				style.set("type", val("text/css"));
+				style.set("innerHTML", "." + name + " { " + css + " }");
+				document["head"].call<void>("appendChild", style);
+			}
+
+			mElement.set("className", name);
+		}
+
+		static val textSizer()
+		{
+			static val document = val::global("document");
+			static val textSizer = document.call<val>("createElement", val("div"));
+			document["body"].call<void>("appendChild", textSizer);
+			return textSizer;
+		}
+
+		static val imgSizer()
+		{
+			static val document = val::global("document");
+			static val imgSizer = document.call<val>("createElement", val("img"));
+			document["body"].call<void>("appendChild", imgSizer);
+			return imgSizer;
+		}
+
+		float contentSize(Dimension dim)
+		{
+			if(!mFrame.widget().label().empty())
+			{
+				static val sizer = textSizer();
+				sizer["style"].set("cssText", "position:absolute; height:auto; width:auto; white-space:nowrap;");
+				sizer["style"].set("font", mElement["style"]["font"]);
+				sizer.set("textContent", mElement["textContent"]);
+				return dim == DIM_X ? sizer["clientWidth"].as<float>() : sizer["clientHeight"].as<float>();
+			}
+			else if(mFrame.widget().image())
+			{
+				static val sizer = imgSizer();
+				sizer.set("src", "data/interface/uisprites/" + mFrame.widget().image()->d_name + ".png");
+				return dim == DIM_X ? sizer["naturalWidth"].as<float>() : sizer["naturalHeight"].as<float>();
+			}
+			return 0.0;
+		}
+#endif
+
+	protected:
+		val mElement;
 	};
 
 	class HtmlInkProxy : public wrapper<HtmlInkImpl>
@@ -103,12 +161,15 @@ namespace mk
 	public:
 		EMSCRIPTEN_WRAPPER(HtmlInkProxy);
 
+#ifndef EMCPP_IMPL
 		void updateContent() { return call<void>("updateContent"); }
 
 		void elementCSS(const string& css) { return call<void>("elementCSS", css); }
 		void styleCSS(const string& name, const string& css) { return call<void>("styleCSS", name, css); }
 
 		float contentSize(Dimension dim) { return call<float>("contentSize", dim); }
+#endif
+
 		size_t caretIndex(float x, float y) { return call<size_t>("caretIndex", x, y); }
 		void caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight) { return call<void>("caretCoords", index, caretX, caretY, caretHeight); }
 	};

@@ -553,25 +553,14 @@ namespace mk
 		nvgTextAlign(mCtx, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
 	}
 
-	void NanoInk::updatePosition()
-	{
-		mMoved = true;
-	}
-
-	void NanoInk::updateAbsolute()
-	{
-		mMoved = true;
-	}
-
-	void NanoInk::updateClip()
-	{
-		mTextUpdate = true;
-		mImageUpdate = true;
-		this->updateFrame();
-	}
-
 	void NanoInk::updateFrame()
 	{
+		if(mFrame.dirty() >= Frame::DIRTY_ABSOLUTE)
+			mMoved = true;
+
+		if(mFrame.dirty() < Frame::DIRTY_CLIP)
+			return;
+
 		mTextUpdate = true;
 		mImageUpdate = true;
 

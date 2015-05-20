@@ -365,16 +365,20 @@ namespace mk
 
 		class_<Inkbox>("Inkbox")
 			.function("frame", &Inkbox::frame)
+#ifndef EMCPP_IMPL
 			.function("updateContent", &Inkbox::updateContent, pure_virtual())
 			.function("contentSize", &Inkbox::show, pure_virtual())
+#endif
 			.function("caretIndex", &Inkbox::hide, pure_virtual())
 			.function("caretCoords", &Inkbox::hide, pure_virtual())
 			;
 
 		class_<HtmlInkImpl, base<Inkbox>>("HtmlInkImpl")
+#ifndef EMCPP_IMPL
 			.function("elementCSS", &HtmlInkImpl::elementCSS, pure_virtual())
 			.function("styleCSS", &HtmlInkImpl::styleCSS, pure_virtual())
-			.allow_subclass<HtmlInkProxy>("HtmlInkProxy", constructor<Frame&>())
+#endif
+			.allow_subclass<HtmlInkProxy>("HtmlInkProxy", constructor<Frame&, val>())
 			;
 	}
 }

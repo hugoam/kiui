@@ -69,7 +69,7 @@ namespace mk
 	class MK_UI_EXPORT Inkbox : public NonCopy
 	{
 	public:
-		Inkbox(Frame& frame) : mFrame(frame), mVisible(false), mFitCorners(DIM_NULL), mSelectFirst(0), mSelectSecond(0) {}
+		Inkbox(Frame& frame) : mFrame(frame), mVisible(true), mFitCorners(DIM_NULL), mSelectFirst(0), mSelectSecond(0) {}
 		virtual ~Inkbox() {}
 
 		Frame& frame() { return mFrame; }
@@ -86,9 +86,6 @@ namespace mk
 		virtual void updateContent() = 0;
 		virtual void updateStyle() = 0;
 		virtual void updateFrame() = 0;
-		virtual void updateClip() = 0;
-		virtual void updatePosition() = 0;
-		virtual void updateAbsolute() = 0;
 
 		void selectCaret(size_t index) { mSelectFirst = index; mSelectSecond = index; }
 		void selectFirst(size_t start) { mSelectFirst = start; mSelectSecond = start; }

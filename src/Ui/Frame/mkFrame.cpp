@@ -218,8 +218,6 @@ namespace mk
 			d_inkbox->hide();
 		else if(dclip(DIM_X) != HIDDEN && dclip(DIM_Y) != HIDDEN && clipped)
 			d_inkbox->show();
-
-		d_inkbox->updateClip();
 	}
 
 	void Frame::updateClip(Dimension dim)
@@ -244,31 +242,20 @@ namespace mk
 		if(d_parent)
 			this->setDirty(d_parent->forceDirty());
 
-		switch(d_dirty)
-		{
-		case DIRTY_FLOW:
-		case DIRTY_OFFSET:
-		case DIRTY_VISIBILITY:
+		if(d_dirty >= DIRTY_VISIBILITY)
 			d_visible ? d_inkbox->show() : d_inkbox->hide();
-		case DIRTY_SKIN:
+		if(d_dirty >= DIRTY_SKIN)
 			d_inkbox->updateStyle();
-		case DIRTY_WIDGET:
-			d_inkbox->updateContent();
-		case DIRTY_CONTENT:
+		if(d_dirty >= DIRTY_WIDGET)
 			this->updateSize();
-		case DIRTY_FRAME:
-			d_inkbox->updateFrame();
-		case DIRTY_POSITION:
+		if(d_dirty >= DIRTY_POSITION)
 			this->updatePosition();
-			d_inkbox->updatePosition();
-		case DIRTY_CLIP:
+		if(d_dirty >= DIRTY_CLIP)
 			this->updateClip();
-		case DIRTY_ABSOLUTE:
+		if(d_dirty >= DIRTY_ABSOLUTE)
 			this->derivePosition();
-			d_inkbox->updateAbsolute();
-		case CLEAN:
-			break;
-		};
+		if(d_dirty >= DIRTY_ABSOLUTE)
+			d_inkbox->updateFrame();
 
 		d_dirty = CLEAN;
 	}
@@ -357,7 +344,7 @@ namespace mk
 	{
 		d_position[dim] = position;
 		d_clipPos[dim] = 0.f;
-		this->setDirty(DIRTY_ABSOLUTE);
+		this->setDirty(DIRTY_POSITION);
 	}
 
 	void Frame::show()

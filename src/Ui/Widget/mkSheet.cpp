@@ -255,7 +255,7 @@ namespace mk
 
 		if(mDirty)
 		{
-			mFrame->inkbox().updatePosition();
+			mFrame->inkbox().updateFrame();
 			mDirty = false;
 		}
 	}

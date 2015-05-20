@@ -28,13 +28,12 @@ namespace mk
 			DIRTY_ABSOLUTE,		// The absolute position of the frame has changed
 			DIRTY_CLIP,			// The clipping of the frame has changed
 			DIRTY_POSITION,		// The relative position of the frame has changed
-			DIRTY_FRAME,		// The size of the frame has changed
-			DIRTY_CONTENT,		// The content of the inkbox has changed
-			DIRTY_WIDGET,		// The content of the widget has changed
-			DIRTY_SKIN,			// The skin of the frame has changed
-			DIRTY_VISIBILITY,	// The visibility of the frame has changed
 			DIRTY_OFFSET,		// The offset of the contents has changed
 			DIRTY_FLOW,			// The flow of the contents has changed
+			DIRTY_FRAME,		// The size of the frame has changed
+			DIRTY_SKIN,			// The skin of the frame has changed
+			DIRTY_WIDGET,		// The content of the widget has changed
+			DIRTY_VISIBILITY,	// The visibility of the frame has changed
 		};
 
 		virtual FrameType frameType() { return FRAME; }

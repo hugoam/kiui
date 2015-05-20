@@ -225,15 +225,12 @@ namespace mk
 		if(d_parent)
 			this->setForceDirty(d_parent->d_forceDirty);
 
-		switch(d_dirty)
-		{
-		case DIRTY_FLOW:
+		if(d_dirty >= DIRTY_FLOW)
 			this->relayout();
-		case DIRTY_OFFSET:
+		if(d_dirty >= DIRTY_OFFSET)
 			this->setForceDirty(DIRTY_POSITION);
-		case DIRTY_ABSOLUTE:
+		if(d_dirty >= DIRTY_ABSOLUTE)
 			this->setForceDirty(DIRTY_ABSOLUTE);
-		}
 
 		Frame::updateOnce();
 	}
@@ -365,7 +362,6 @@ namespace mk
 			this->expandLength();
 		else
 			this->expandDepth();
-		this->setDirty(DIRTY_FLOW);
 	}
 
 	Frame* Stripe::pinpoint(float x, float y, bool opaque)
@@ -435,7 +431,7 @@ namespace mk
 		float pos = 0.f;
 		this->prevOffset(d_length, pos, d_cursor, true);
 		d_cursor = std::max(0.f, pos);
-		this->setDirty(DIRTY_FLOW);
+		this->setDirty(DIRTY_OFFSET);
 	}
 
 	void Stripe::cursorDown()
@@ -443,6 +439,6 @@ namespace mk
 		float pos = 0.f;
 		this->nextOffset(d_length, pos, d_cursor, true);
 		d_cursor = std::min(d_sequenceLength - d_clipSize[DIM_Y], pos);
-		this->setDirty(DIRTY_FLOW);
+		this->setDirty(DIRTY_OFFSET);
 	}
 }
