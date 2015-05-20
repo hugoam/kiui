@@ -32,6 +32,8 @@ namespace mk
 		float operator [](size_t i) const { return mFloats[i]; }
 		float& operator [](size_t i) { return mFloats[i]; }
 
+		bool null() { return a() == 0.f; }
+
 		static Type& cls() { static Type ty; return ty; }
 
 	protected:

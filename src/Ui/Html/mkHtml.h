@@ -19,29 +19,18 @@ using namespace emscripten;
 
 namespace mk
 {
-	class HtmlTarget : public InkTarget
-	{
-	public:
-		HtmlTarget() : InkTarget(50) {}
-
-		unique_ptr<InkLayer> createLayer(Layer& layer, size_t z)
-		{
-			return val::global("HtmlLayer").new_(layer, *this, z).as<unique_ptr<InkLayer>>();
-		}
-	};
-
 	class HtmlWindow : public InkWindow, public RenderWindow, public InputWindow
 	{
 	public:
 		HtmlWindow(size_t width, size_t height, string title, string resourcePath)
 			: RenderWindow(width, height, title, 0)
-			, mTarget()
 			, mUiWindow(resourcePath)
+			, mTarget(val::global("HtmlTarget").new_(50, width, height, mUiWindow).as<unique_ptr<InkTarget>>())
 		{
 			mUiWindow.setup(*this, *this, nullptr);
 		}
 
-		InkTarget& screenTarget() { return mTarget; }
+		InkTarget& screenTarget() { return *mTarget.get(); }
 		UiWindow& uiWindow() { return mUiWindow; }
 
 		void initInput(InputDispatcher& dispatcher, size_t wndHandle)
@@ -56,8 +45,20 @@ namespace mk
 		}
 
 	protected:
-		HtmlTarget mTarget;
 		UiWindow mUiWindow;
+		unique_ptr<InkTarget> mTarget;
+	};
+
+	class HtmlTargetProxy : public wrapper<InkTarget>
+	{
+	public:
+		EMSCRIPTEN_WRAPPER(HtmlTargetProxy);
+
+		unique_ptr<InkLayer> createLayer(Layer& layer, size_t z)
+		{
+			static val cls = val::global("HtmlLayer");
+			return cls.new_(layer, *this, z).as<unique_ptr<InkLayer>>();
+		}
 	};
 
 	class HtmlLayerProxy : public wrapper<InkLayer>
@@ -67,7 +68,8 @@ namespace mk
 
 		unique_ptr<Inkbox> createInkbox(Frame& frame)
 		{
-			return val::global("HtmlInk").new_(frame).as<unique_ptr<Inkbox>>();
+			static val cls = val::global("HtmlInk");
+			return cls.new_(frame).as<unique_ptr<Inkbox>>();
 		}
 
 		void move(size_t z) { return call<void>("move", z); }
@@ -75,24 +77,52 @@ namespace mk
 		void hide() { return call<void>("hide"); }
 	};
 
-	class HtmlInkProxy : public wrapper<Inkbox>
+	class HtmlInkImpl : public Inkbox
+	{
+	public:
+		HtmlInkImpl(Frame& frame) : Inkbox(frame) {}
+
+		void updateFrame() { this->updateCorners(); }
+		void updateClip() {}
+		void updatePosition() {}
+		void updateStyle() { this->styleCorners(); this->recssStyle(); }
+		void updateAbsolute() { this->recssElement(); }
+
+		void show() { mVisible = true; }
+		void hide() { mVisible = false; }
+
+		void recssElement();
+		void recssStyle();
+
+		virtual void elementCSS(const string& css) = 0;
+		virtual void styleCSS(const string& name, const string& css) = 0;
+	};
+
+	class HtmlInkProxy : public wrapper<HtmlInkImpl>
 	{
 	public:
 		EMSCRIPTEN_WRAPPER(HtmlInkProxy);
 
 		void updateContent() { return call<void>("updateContent"); }
-		void updateFrame() { return call<void>("updateFrame"); }
-		void updateClip() { return call<void>("updateClip"); }
-		void updatePosition() { return call<void>("updatePosition"); }
-		void updateStyle() { return call<void>("updateStyle"); }
 
-		void show() { return call<void>("show"); }
-		void hide() { return call<void>("hide"); }
+		void elementCSS(const string& css) { return call<void>("elementCSS", css); }
+		void styleCSS(const string& name, const string& css) { return call<void>("styleCSS", name, css); }
 
 		float contentSize(Dimension dim) { return call<float>("contentSize", dim); }
 		size_t caretIndex(float x, float y) { return call<size_t>("caretIndex", x, y); }
 		void caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight) { return call<void>("caretCoords", index, caretX, caretY, caretHeight); }
 	};
+
+	void cssStyle(InkStyle& style, string& css);
+	void cssElement(Inkbox& inkbox, string& css);
+	void cssFrame(Inkbox& inkbox, string& css);
+	void cssPosition(Inkbox& inkbox, string& css);
+	void cssCorners(Inkbox& inkbox, string& css);
+	void cssVisible(Inkbox& inkbox, string& css);
+
+	string rcssStyle(InkStyle& style);
+	string rcssElement(Inkbox& inkbox);
+	string rcssCorners(Inkbox& inkbox);
 }
 
 #endif

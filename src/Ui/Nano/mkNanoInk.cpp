@@ -399,10 +399,7 @@ namespace mk
 	{
 		if(mImage)
 		{
-			float xoffset = skin().padding()[DIM_X] + skin().padding()[DIM_X + 2];
-			float yoffset = skin().padding()[DIM_Y] + skin().padding()[DIM_Y + 2];
-
-			return dim == DIM_X ? float(mImage->d_width) + xoffset : float(mImage->d_height) + yoffset;
+			return dim == DIM_X ? float(mImage->d_width) : float(mImage->d_height);
 		}
 		else if(skin().textColour().a() != 0.f)
 		{
@@ -413,10 +410,7 @@ namespace mk
 			nvgTextBounds(mCtx, 0.f, 0.f, mFrame.widget().label().c_str(), nullptr, bounds);
 			nvgTextMetrics(mCtx, nullptr, nullptr, &height);
 
-			float xoffset = skin().padding()[DIM_X] + skin().padding()[DIM_X + 2];
-			float yoffset = skin().padding()[DIM_Y] + skin().padding()[DIM_Y + 2];
-
-			return dim == DIM_X ? bounds[2] - bounds[0] + xoffset : height + yoffset;
+			return dim == DIM_X ? bounds[2] - bounds[0] : height;
 		}
 		else if(!skin().imageSkin().null())
 		{
@@ -509,7 +503,7 @@ namespace mk
 	{
 		mTextUpdate = true;
 		mImageUpdate = true;
-		mCorners = skin().mCornerRadius;
+		this->styleCorners();
 
 		if(skin().mEmpty)
 			return;
@@ -612,28 +606,7 @@ namespace mk
 			mTextRows.clear();
 		}
 
-		NanoInk& parent = static_cast<NanoInk&>(mFrame.parent()->inkbox());
-		if(parent.mCorners.null() || !skin().mWeakCorners || !mFrame.flow())
-			return;
-
-		mFitCorners = mFrame.parent()->layoutDim();
-
-		if(mFrame.parent()->layoutDim() == DIM_X)
-		{
-			mCorners.setX0(fmaxf(0.f, parent.mCorners.x0() - mFrame.dposition(DIM_X)));
-			mCorners.setY1(fmaxf(0.f, parent.mCorners.y1() - mFrame.dposition(DIM_X)));
-
-			mCorners.setY0(fmaxf(0.f, parent.mCorners.y0() - (mFrame.parent()->dsize(DIM_X) - (mFrame.dposition(DIM_X) + mFrame.dsize(DIM_X)))));
-			mCorners.setX1(fmaxf(0.f, parent.mCorners.x1() - (mFrame.parent()->dsize(DIM_X) - (mFrame.dposition(DIM_X) + mFrame.dsize(DIM_X)))));
-		}
-		else if(mFrame.parent()->layoutDim() == DIM_Y)
-		{
-			mCorners.setX0(fmaxf(0.f, parent.mCorners.x0() - mFrame.dposition(DIM_Y)));
-			mCorners.setY0(fmaxf(0.f, parent.mCorners.y0() - mFrame.dposition(DIM_Y)));
-
-			mCorners.setX1(fmaxf(0.f, parent.mCorners.x1() - (mFrame.parent()->dsize(DIM_Y) - (mFrame.dposition(DIM_Y) + mFrame.dsize(DIM_Y)))));
-			mCorners.setY1(fmaxf(0.f, parent.mCorners.y1() - (mFrame.parent()->dsize(DIM_Y) - (mFrame.dposition(DIM_Y) + mFrame.dsize(DIM_Y)))));
-		}
+		this->updateCorners();
 	}
 
 	void NanoInk::drawImage(int image, float left, float top, float width, float height, float imgx, float imgy, float imgw, float imgh)

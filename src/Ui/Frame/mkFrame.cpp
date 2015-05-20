@@ -260,11 +260,12 @@ namespace mk
 			d_inkbox->updateFrame();
 		case DIRTY_POSITION:
 			this->updatePosition();
+			d_inkbox->updatePosition();
 		case DIRTY_CLIP:
 			this->updateClip();
 		case DIRTY_ABSOLUTE:
 			this->derivePosition();
-			d_inkbox->updatePosition();
+			d_inkbox->updateAbsolute();
 		case CLEAN:
 			break;
 		};
@@ -309,9 +310,9 @@ namespace mk
 		//	return;
 
 		if(dshrink(DIM_X) && (this->frameType() == FRAME || this->as<Stripe>().sequence().size() == 0))
-			this->setSizeDim(DIM_X, d_inkbox->contentSize(DIM_X));
-		if(dshrink(DIM_Y) && (this->frameType() == FRAME || this->as<Stripe>().sequence().size() == 0)) // !this->container())
-			this->setSizeDim(DIM_Y, d_inkbox->contentSize(DIM_Y));
+			this->setSizeDim(DIM_X, d_inkbox->contentSize(DIM_X) + d_inkstyle->padding().x0() + d_inkstyle->padding().x1());
+		if(dshrink(DIM_Y) && (this->frameType() == FRAME || this->as<Stripe>().sequence().size() == 0))
+			this->setSizeDim(DIM_Y, d_inkbox->contentSize(DIM_Y) + d_inkstyle->padding().y0() + d_inkstyle->padding().y1());
 	}
 
 	void Frame::updateState(WidgetState state)
@@ -356,7 +357,7 @@ namespace mk
 	{
 		d_position[dim] = position;
 		d_clipPos[dim] = 0.f;
-		this->setDirty(DIRTY_ABSOLUTE);
+		this->setDirty(DIRTY_POSITION); // @note was DIRTY_ABSOLUTE (performance hazard with current setting)
 	}
 
 	void Frame::show()

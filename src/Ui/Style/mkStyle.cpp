@@ -32,6 +32,7 @@ namespace mk
 		, mBaseSkin(base)
 		, mName(type.name())
 		, mLayout()
+		, mSkin(mName)
 		, mSubskins()
 		, mUpdated(0)
 	{
@@ -46,7 +47,7 @@ namespace mk
 		, mBaseSkin(nullptr)
 		, mName(name)
 		, mLayout()
-		, mSkin()
+		, mSkin(mName)
 		, mSubskins()
 		, mUpdated(0)
 	{}
@@ -57,7 +58,7 @@ namespace mk
 	void Style::reset()
 	{
 		mLayout = LayoutStyle();
-		mSkin = InkStyle();
+		mSkin = InkStyle(mName);
 		mSubskins.clear();
 		if(mBase)
 			mBaseSkin = mBase;
@@ -129,7 +130,7 @@ namespace mk
 				return skin.mSkin;
 			}
 
-		mSubskins.emplace_back(state);
+		mSubskins.emplace_back(state, mName + toString(state));
 		mSubskins.back().mSkin.copy(original, inherit);
 		return mSubskins.back().mSkin;
 	}

@@ -74,6 +74,7 @@ namespace mk
 
 		Frame& frame() { return mFrame; }
 		bool visible() { return mVisible; }
+		BoxFloat& corners() { return mCorners; }
 		size_t selectStart() { return mSelectFirst < mSelectSecond ? mSelectFirst : mSelectSecond; }
 		size_t selectEnd() { return mSelectSecond > mSelectFirst ? mSelectSecond : mSelectFirst; }
 
@@ -87,6 +88,7 @@ namespace mk
 		virtual void updateFrame() = 0;
 		virtual void updateClip() = 0;
 		virtual void updatePosition() = 0;
+		virtual void updateAbsolute() = 0;
 
 		void selectCaret(size_t index) { mSelectFirst = index; mSelectSecond = index; }
 		void selectFirst(size_t start) { mSelectFirst = start; mSelectSecond = start; }
@@ -96,9 +98,14 @@ namespace mk
 		virtual size_t caretIndex(float x, float y) = 0;
 		virtual void caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight) = 0;
 
+		void updateCorners();
+		void styleCorners();
+
 	protected:
 		Frame& mFrame;
 		bool mVisible;
+		BoxFloat mCorners;
+		Dimension mFitCorners;
 		size_t mSelectFirst;
 		size_t mSelectSecond;
 	};

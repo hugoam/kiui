@@ -131,8 +131,9 @@ namespace mk
 	class MK_UI_EXPORT _I_ InkStyle : public IdStruct, public Indexed<InkStyle>
 	{
 	public:
-		_C_ InkStyle()
+		_C_ InkStyle(const string& name)
 			: IdStruct(index<InkStyle>(), cls())
+			, mName(name)
 			, mEmpty(true), mBackgroundColour(Colour::Transparent), mBorderColour(Colour::Transparent), mTextColour(Colour::Transparent), mImageColour(Colour::Transparent)
 			, mTextFont("dejavu"), mTextSize(14.f), mTextWrap(false)
 			, mAlign(DimAlign(LEFT, LEFT)), mBorderWidth(0.f), mImage(), mCornerRadius(), mWeakCorners(true)
@@ -140,6 +141,7 @@ namespace mk
 
 		InkStyle(const InkStyle& other)
 			: IdStruct(index<InkStyle>(), cls())
+			, mName(other.mName)
 		{
 			this->copy(other);
 		}
@@ -171,6 +173,7 @@ namespace mk
 
 		void setEmpty(bool empty) { mEmpty = empty; }
 
+		_A_ const string& name() const { return mName; }
 		_A_ bool empty() const { return mEmpty; }
 		_A_ Colour& backgroundColour() { return mBackgroundColour.val; }
 		_A_ Colour& borderColour() { return mBorderColour.val; }
@@ -192,6 +195,7 @@ namespace mk
 		_A_ ImageSkin& imageSkin() { return mImageSkin.val; }
 		_A_ Shadow& shadow() { return mShadow.val; }
 
+		string mName;
 		bool mEmpty;
 		StyleAttr<Colour> mBackgroundColour;
 		StyleAttr<Colour> mBorderColour;
@@ -221,8 +225,7 @@ namespace mk
 	class MK_UI_EXPORT SubSkin
 	{
 	public:
-		SubSkin() {}
-		SubSkin(WidgetState state) : mState(state) {}
+		SubSkin(WidgetState state, const string& name) : mState(state), mSkin(name) {}
 		SubSkin(WidgetState state, const InkStyle& skin) : mState(state), mSkin(skin) {}
 
 		WidgetState mState;

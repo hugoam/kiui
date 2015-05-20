@@ -58,12 +58,10 @@ namespace mk
 		NVGdisplayList* mImageCache;
 		NVGdisplayList* mTextCache;
 		NanoLayer& mLayer;
-		BoxFloat mCorners;
 		Image* mImage;
 		Image* mOverlay;
 		Image* mTile;
 		Image* mSkin;
-		Dimension mFitCorners;
 		bool mTextUpdate;
 		bool mImageUpdate;
 		bool mMoved;

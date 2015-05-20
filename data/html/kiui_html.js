@@ -1,4 +1,41 @@
-HtmlLayer = Module.InkLayer.extend("InkLayer",
+mouseButton = function(event)
+{
+	if(event.which == 1)
+		return Module.MouseButton.LEFT_BUTTON;
+	else if(event.which == 2)
+		return Module.MouseButton.MIDDLE_BUTTON;
+	else if(event.which == 3)
+		return Module.MouseButton.RIGHT_BUTTON;
+}
+
+html_ink_global_id = 0;
+
+HtmlTarget = Module.InkTarget.extend('InkTarget',
+{
+	__construct: function(layers, width, height, uiWindow)
+	{
+		this.__parent.__construct.call(this, layers);
+		this.uiWindow = uiWindow;
+		this.element = $('<div id="main_target"></div>').appendTo('.emscripten_border');
+		this.element.css({ 'position' : 'relative', 'width' : width + 'px', 'height' : height + 'px', 'background-color' : 'rgb(0,0,0)' });
+		var target = this.element;
+		this.element.on('mousedown', function(event) {
+			uiWindow.dispatchMousePressed(event.pageX - $(target).offset().left, event.pageY - $(target).offset().top, mouseButton(event));
+			return false;
+		});
+		this.element.on('mouseup', function(event) {
+			uiWindow.dispatchMouseReleased(event.pageX - $(target).offset().left, event.pageY - $(target).offset().top, mouseButton(event));
+			return false;
+		});
+		this.element.on('mousemove', function(event) {
+			uiWindow.dispatchMouseMoved(event.pageX - $(target).offset().left, event.pageY - $(target).offset().top, 0.0, 0.0);
+			return false;
+		});
+		$('#canvas').css('display', 'none');
+	},
+});
+
+HtmlLayer = Module.InkLayer.extend('InkLayer',
 {
     move: function(index)
     {
@@ -11,51 +48,73 @@ HtmlLayer = Module.InkLayer.extend("InkLayer",
     },
 });
 
-HtmlInk = Module.Inkbox.extend("Inkbox",
+HtmlInk = Module.HtmlInkImpl.extend('HtmlInkImpl',
 {
-    __construct: function(frame) {
+    __construct: function(frame)
+	{
         this.__parent.__construct.call(this, frame);
-        this.element = $("<div></div>").appendTo("body");
-		this.element.css({ 'position' : 'absolute', 'height' : 'auto', 'width' : 'auto' });
+		this.frm = frame;
+		this.widget = this.frm.widget();
+		this.parent = frame.parent();
+		this.parentbox = this.parent ? this.parent.inkbox() : 0;
+		
+        this.element = document.createElement('div');
+		this.element.id = ++html_ink_global_id;
+		if(this.parent)
+			this.parentbox.element.appendChild(this.element);
+		else
+			document.getElementById('main_target').appendChild(this.element);
     },
+	__destruct: function(frame)
+	{
+		this.__parent.__destruct.call(this);
+		this.element.parentNode.removeChild(this.element);
+	},
+	styleCSS: function(name, css)
+	{
+		if(!document.getElementById(name))
+		{
+			var style = document.createElement('style');
+			style.id = name;
+			style.type = 'text/css';
+			style.innerHTML = '.' + name + ' { ' + css + ' }';
+			document.head.appendChild(style);
+		}
+		
+		this.element.className = name;
+	},
+	elementCSS: function(css)
+	{
+		this.element.style.cssText = 'position:absolute;';
+		this.element.style.cssText += css;
+	},
     updateContent: function()
     {
-		this.element.text(this.frame().widget().label());
-    },
-    updateFrame: function()
-    {
-        this.element.width(this.frame().cwidth());
-        this.element.height(this.frame().cheight());
-    },
-    updateClip: function()
-    {
-    },
-    updatePosition: function()
-    {
-		var aleft = this.frame().dabsolute(Module.Dimension.DIM_X) + this.frame().cleft();
-		var atop = this.frame().dabsolute(Module.Dimension.DIM_Y) + this.frame().ctop();
-        this.element.offset({ left: aleft, top : atop });
-    },
-    updateStyle: function()
-    {
-        var style = this.frame().inkstyle();
-        if(style.image().name)
-            this.element.css({ 'background-image' : 'url("/data/interface/uisprites/' + style.image().name + '.png"', 'background-size' : '100%' });
-        if(style.backgroundColour().a() > 0.0)
-            this.element.css({ 'background-color' : 'rgba(' + style.backgroundColour().r() + ',' + style.backgroundColour().g() + ',' + style.backgroundColour().b() + ',' + style.backgroundColour().a() + ')' });
-    },
-    show: function()
-    {
-        this.element.show();
-    },
-    hide: function()
-    {
-        this.element.hide();
+		if(this.widget.label())
+			this.element.textContent = this.widget.label();
     },
     contentSize: function(dim)
     {
-		if(this.element.text())
-			return (dim == Module.Dimension.DIM_X ? this.element.width() : this.element.height())
+		if(this.element.textContent)
+		{
+			var test = document.createElement('div');
+			document.body.appendChild(test);
+			test.style.cssText = 'position:absolute; height:auto; width:auto; white-space:nowrap;';
+			test.style.font = this.element.style.font;
+			test.textContent = this.element.textContent;			
+			var size = (dim == Module.Dimension.DIM_X ? test.clientWidth : test.clientHeight);
+			test.remove();
+			return size;
+		}
+		else if(this.widget.image())
+		{
+			var img = document.createElement('img');
+			img.src = 'data/interface/uisprites/' + this.widget.image().name + '.png';
+			document.body.appendChild(img);
+			var size = dim == Module.Dimension.DIM_X ? img.naturalWidth : img.naturalHeight;
+			img.remove();
+			return size;
+		}
 		return 0.0;
     },
 	caretIndex: function(x, y)
