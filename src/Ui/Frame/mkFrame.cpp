@@ -295,6 +295,8 @@ namespace mk
 	{
 		//if(!d_inkbox->visible()) // @note this is needed for gorilla, but not for nanovg, discuss
 		//	return;
+		
+		d_inkbox->updateContent();
 
 		if(dshrink(DIM_X) && (this->frameType() == FRAME || this->as<Stripe>().sequence().size() == 0))
 			this->setSizeDim(DIM_X, d_inkbox->contentSize(DIM_X) + d_inkstyle->padding().x0() + d_inkstyle->padding().x1());
@@ -344,7 +346,7 @@ namespace mk
 	{
 		d_position[dim] = position;
 		d_clipPos[dim] = 0.f;
-		this->setDirty(DIRTY_POSITION);
+		this->setDirty(DIRTY_POSITION); // @note was DIRTY_ABSOLUTE (performance hazard with current setting)
 	}
 
 	void Frame::show()
