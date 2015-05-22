@@ -136,7 +136,7 @@ namespace mk
 			, mName(name)
 			, mEmpty(true), mBackgroundColour(Colour::Transparent), mBorderColour(Colour::Transparent), mTextColour(Colour::Transparent), mImageColour(Colour::Transparent)
 			, mTextFont("dejavu"), mTextSize(14.f), mTextWrap(false)
-			, mAlign(DimAlign(LEFT, LEFT)), mBorderWidth(0.f), mImage(), mCornerRadius(), mWeakCorners(true)
+			, mAlign(DimAlign(LEFT, LEFT)), mBorderWidth(0.f), mImage(), mCornerRadius(), mWeakCorners(false)
 		{}
 
 		InkStyle(const InkStyle& other)

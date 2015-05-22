@@ -292,6 +292,11 @@ namespace mk
 
 		EmptyStyle::cls().skin().mEmpty = true;
 
+		WindowHeader::cls().skin().mWeakCorners = true;
+		WindowFooter::cls().skin().mWeakCorners = true;
+		FillerX::cls().skin().mWeakCorners = true;
+		RadioChoice::cls().skin().mWeakCorners = true;
+
 		Cursor::cls().skin().mImage = Image("mousepointer");
 
 		ResizeCursorX::cls().skin().mImage = Image("resize_h_20");
