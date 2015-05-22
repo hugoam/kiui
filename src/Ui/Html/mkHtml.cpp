@@ -15,14 +15,21 @@ namespace mk
 
 	void cssBoxFloat(const BoxFloat& value, string& css)
 	{
-		toString(value.x0(), css);
+		toString(int(value.x0()), css);
 		css += "px ";
-		toString(value.y0(), css);
+		toString(int(value.y0()), css);
 		css += "px ";
-		toString(value.x1(), css);
+		toString(int(value.x1()), css);
 		css += "px ";
-		toString(value.y1(), css);
+		toString(int(value.y1()), css);
 		css += "px";
+	}
+
+	string cssBoxFloat(const BoxFloat& value)
+	{
+		string css;
+		cssBoxFloat(value, css);
+		return css;
 	}
 
 	void cssColour(const Colour& colour, string& css)
@@ -71,11 +78,20 @@ namespace mk
 		}
 	}
 
+	void cssFontStyle(const string& font, string& css)
+	{
+		css += "arial, sans-serif; ";
+	}
+
+	void cssFontSize(int size, string& css)
+	{
+		toString(size, css); css += "px; ";
+	}
 
 	void cssStyle(InkStyle& style, string& css)
 	{
-		css += "font-style: arial, sans-serif; ";
-		css += "font-size: "; toString(style.textSize(), css); css += "px; ";
+		css += "font-style: "; cssFontStyle(style.textFont(), css);
+		css += "font-size: "; cssFontSize(style.textSize(), css);
 		css += "text-align: "; cssAlign(style.align().x(), css); css += "; ";
 		css += "vertical-align: middle; ";
 
@@ -142,12 +158,6 @@ namespace mk
 			css += ".png\"); ";
 			css += "backgroundSize:100%; ";
 		}
-		if(!inkbox.corners().null())
-		{
-			css += "border-radius: ";
-			cssBoxFloat(inkbox.corners(), css);
-			css += "; ";
-		}
 		if(!inkbox.skin().borderWidth().null())
 		{
 			css += "border-style:solid; ";
@@ -194,6 +204,7 @@ namespace mk
 			css += "border-radius:";
 			cssBoxFloat(inkbox.corners(), css);
 			css += "; ";
+			printf("border-radius: %s", cssBoxFloat(inkbox.corners()).c_str());
 		}
 	}
 
@@ -205,18 +216,55 @@ namespace mk
 			css += "display:none; ";
 	}
 
+#ifdef EMCPP_PROPERTIES
 	void HtmlInkImpl::recssElement()
 	{
-		string css;
+		val style = mElement["style"];
 
-		cssElement(*this, css);
-		cssFrame(*this, css);
-		cssPosition(*this, css);
-		cssCorners(*this, css);
-		cssVisible(*this, css);
+		BoxFloat& bwidth = mFrame.inkstyle().borderWidth();
+		float width = mFrame.cwidth() - bwidth.x0() - bwidth.x1();
+		float height = mFrame.cheight() - bwidth.y0() - bwidth.y1();
+		float left = mFrame.dposition(DIM_X) - bwidth.x0();
+		float top = mFrame.dposition(DIM_Y) - bwidth.y0();
 
-		this->elementCSS(css);
+		style.set("width", toString(width) + "px");
+		style.set("height", toString(height) + "px");
+		style.set("left", toString(left) + "px");
+		style.set("top", toString(top) + "px");
+
+		if(mFrame.widget().image())
+		{
+			style.set("backgroundImage", "url(\"data/interface/uisprites/" + mFrame.widget().image()->d_name + ".png\")");
+			style.set("backgroundSize", "100%");
+		}
+		if(!mFrame.inkstyle().borderWidth().null())
+		{
+			style.set("borderStyle", "solid");
+			style.set("borderWidth", cssBoxFloat(mFrame.inkstyle().borderWidth()));
+		}
+		if(!mCorners.null())
+		{
+			style.set("borderRadius", cssBoxFloat(mCorners));
+		}
+
+		style.set("display", mVisible ? "block" : "none");
 	}
+#else
+	void HtmlInkImpl::recssElement()
+	{
+		mCss.clear();
+
+		mCss += "position:absolute;";
+
+		cssElement(*this, mCss);
+		cssFrame(*this, mCss);
+		cssPosition(*this, mCss);
+		cssCorners(*this, mCss);
+		cssVisible(*this, mCss);
+
+		this->elementCSS(mCss);
+	}
+#endif
 
 	void HtmlInkImpl::recssStyle()
 	{
@@ -357,9 +405,11 @@ namespace mk
 			;
 
 		class_<InkLayer>("InkLayer")
+#ifndef EMCPP_IMPL
 			.function("move", &InkLayer::move, pure_virtual())
 			.function("show", &InkLayer::show, pure_virtual())
 			.function("hide", &InkLayer::hide, pure_virtual())
+#endif
 			.allow_subclass<HtmlLayerProxy>("HtmlLayerProxy", constructor<Layer&, InkTarget&, size_t>())
 			;
 
@@ -368,9 +418,9 @@ namespace mk
 #ifndef EMCPP_IMPL
 			.function("updateContent", &Inkbox::updateContent, pure_virtual())
 			.function("contentSize", &Inkbox::show, pure_virtual())
-#endif
 			.function("caretIndex", &Inkbox::hide, pure_virtual())
 			.function("caretCoords", &Inkbox::hide, pure_virtual())
+#endif
 			;
 
 		class_<HtmlInkImpl, base<Inkbox>>("HtmlInkImpl")

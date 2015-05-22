@@ -16,7 +16,8 @@
 
 #include <emscripten/bind.h>
 
-//#define EMCPP_IMPL
+#define EMCPP_IMPL
+//#define EMCPP_PROPERTIES
 
 using namespace emscripten;
 
@@ -75,18 +76,24 @@ namespace mk
 			return cls.new_(frame).as<unique_ptr<Inkbox>>();
 		}
 
+#ifndef EMCPP_IMPL
 		void move(size_t z) { return call<void>("move", z); }
 		void show() { return call<void>("show"); }
 		void hide() { return call<void>("hide"); }
+#else
+		void move(size_t z) {}
+		void show() {}
+		void hide() {}
+#endif
 	};
 
 	class HtmlInkImpl : public Inkbox
 	{
 	public:
-		HtmlInkImpl(Frame& frame, val element) : Inkbox(frame), mElement(element) {}
+		HtmlInkImpl(Frame& frame, val element) : Inkbox(frame), mElement(element), mStyle(mElement["style"]) {}
 
 		void updateFrame() { this->updateCorners(); if(mFrame.dirty() > Frame::DIRTY_ABSOLUTE) this->recssElement(); }
-		void updateStyle() { this->styleCorners(); this->recssStyle(); }
+		void updateStyle() { this->styleCorners(); this->recssStyle(); mStyle = mElement["style"]; }
 
 		void show() { mVisible = true; }
 		void hide() { mVisible = false; }
@@ -100,7 +107,7 @@ namespace mk
 #else
 		void updateContent() { if(!mFrame.widget().label().empty()) mElement.set("textContent", mFrame.widget().label()); }
 
-		void elementCSS(const string& css) { mElement["style"].set("cssText", "position:absolute;" + css); }
+		void elementCSS(const string& css) { static val key("cssText"); mStyle.set(key, css); }
 		void styleCSS(const string& name, const string& css)
 		{
 			static val document = val::global("document");
@@ -120,6 +127,7 @@ namespace mk
 		{
 			static val document = val::global("document");
 			static val textSizer = document.call<val>("createElement", val("div"));
+			textSizer["style"].set("cssText", "position:absolute; height:auto; width:auto; white-space:nowrap;");
 			document["body"].call<void>("appendChild", textSizer);
 			return textSizer;
 		}
@@ -137,23 +145,35 @@ namespace mk
 			if(!mFrame.widget().label().empty())
 			{
 				static val sizer = textSizer();
-				sizer["style"].set("cssText", "position:absolute; height:auto; width:auto; white-space:nowrap;");
-				sizer["style"].set("font", mElement["style"]["font"]);
-				sizer.set("textContent", mElement["textContent"]);
-				return dim == DIM_X ? sizer["clientWidth"].as<float>() : sizer["clientHeight"].as<float>();
+				static val style = sizer["style"];
+				static val font("font");
+				static val textContent("textContent");
+				static val clientWidth("clientWidth");
+				static val clientHeight("clientHeight");
+				style.set(font, mStyle[font]);
+				sizer.set(textContent, mElement[textContent]);
+				return dim == DIM_X ? sizer[clientWidth].as<float>() : sizer[clientHeight].as<float>();
 			}
 			else if(mFrame.widget().image())
 			{
 				static val sizer = imgSizer();
-				sizer.set("src", "data/interface/uisprites/" + mFrame.widget().image()->d_name + ".png");
-				return dim == DIM_X ? sizer["naturalWidth"].as<float>() : sizer["naturalHeight"].as<float>();
+				static val src("src");
+				static val naturalWidth("naturalWidth");
+				static val naturalHeight("naturalHeight");
+				sizer.set(src, "data/interface/uisprites/" + mFrame.widget().image()->d_name + ".png");
+				return dim == DIM_X ? sizer[naturalWidth].as<float>() : sizer[naturalHeight].as<float>();
 			}
 			return 0.0;
 		}
+
+		size_t caretIndex(float x, float y) { return 0; }
+		void caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight) { printf("caretCoords\n"); }
 #endif
 
 	protected:
 		val mElement;
+		val mStyle;
+		string mCss;
 	};
 
 	class HtmlInkProxy : public wrapper<HtmlInkImpl>
@@ -168,10 +188,10 @@ namespace mk
 		void styleCSS(const string& name, const string& css) { return call<void>("styleCSS", name, css); }
 
 		float contentSize(Dimension dim) { return call<float>("contentSize", dim); }
-#endif
 
 		size_t caretIndex(float x, float y) { return call<size_t>("caretIndex", x, y); }
 		void caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight) { return call<void>("caretCoords", index, caretX, caretY, caretHeight); }
+#endif
 	};
 
 	void cssStyle(InkStyle& style, string& css);

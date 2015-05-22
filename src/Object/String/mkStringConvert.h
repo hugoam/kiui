@@ -28,9 +28,7 @@ namespace mk
 	template <class T>
 	inline void type_to_string(const T& val, string& str)
 	{
-		std::stringstream ss;
-		ss << val;
-		str += ss.str();
+		str += std::to_string(val);
 	}
 
 	// Vector - string con*version
