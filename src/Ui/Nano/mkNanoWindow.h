@@ -68,7 +68,7 @@ namespace mk
 		void show();
 		void hide();
 
-		void move(size_t index) {}
+		void move(size_t index, size_t z) {}
 
 		void nanodraw();
 		void drawImage(Frame& frame);

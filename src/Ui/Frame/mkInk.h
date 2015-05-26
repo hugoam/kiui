@@ -54,7 +54,7 @@ namespace mk
 
 		virtual unique_ptr<Inkbox> createInkbox(Frame& frame) = 0;
 
-		virtual void move(size_t z) = 0;
+		virtual void move(size_t index, size_t z) = 0;
 		virtual void show() = 0;
 		virtual void hide() = 0;
 
