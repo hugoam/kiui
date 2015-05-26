@@ -39,7 +39,7 @@ namespace mk
 		void remove(Layer& layer);
 
 		void reorder();
-		size_t reorder(size_t index, size_t next);
+		size_t reorder(size_t pos, size_t index, size_t next);
 		void moveToTop();
 
 		Frame* pinpoint(float x, float y, bool opaque);

@@ -54,10 +54,10 @@ namespace mk
 		else
 			d_inkLayer = d_parentLayer->inkLayer().target().createLayer(*this, d_z ? d_z : d_index);
 
+		Frame::bind(parent);
+
 		if(migrate)
 			this->migrate(*this);
-
-		Frame::bind(parent);
 	}
 
 	void Layer::unbind()
@@ -94,7 +94,7 @@ namespace mk
 		this->reorder(d_index, d_next);
 	}
 
-	size_t Layer::reorder(size_t cursor, size_t next)
+	size_t Layer::reorder(size_t pos, size_t cursor, size_t next)
 	{
 		d_index = cursor;
 		d_next = next;
@@ -111,14 +111,14 @@ namespace mk
 #endif
 
 		if(d_inkLayer)
-			d_inkLayer->move(d_index);
+			d_inkLayer->move(pos, d_index);
 
 		cursor = next;
 		next = next + d_numLayers;
 
 		for(size_t i = 0; i < d_numLayers; ++i)
 		{
-			next += d_layers[i]->reorder(cursor, next);
+			next += d_layers[i]->reorder(i, cursor, next);
 			cursor += 1;
 		}
 
