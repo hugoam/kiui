@@ -91,7 +91,7 @@ namespace mk
 
 	void Layer::reorder()
 	{
-		this->reorder(d_index, d_next);
+		this->reorder(0, d_index, d_next);
 	}
 
 	size_t Layer::reorder(size_t pos, size_t cursor, size_t next)
@@ -111,7 +111,7 @@ namespace mk
 #endif
 
 		if(d_inkLayer)
-			d_inkLayer->move(pos, d_index);
+			d_inkLayer->setIndex(pos, d_index);
 
 		cursor = next;
 		next = next + d_numLayers;

@@ -44,13 +44,14 @@ namespace mk
 	class MK_UI_EXPORT InkLayer : public Object
 	{
 	public:
-		InkLayer(Layer& layer, InkTarget& target, size_t index) : mLayer(layer), mTarget(target), mIndex(index) {}
+		InkLayer(Layer& layer, InkTarget& target, size_t z) : mLayer(layer), mTarget(target), mZ(z) {}
 		virtual ~InkLayer() {}
 
 		Layer& layer() { return mLayer; }
 		InkTarget& target() { return mTarget; }
+		size_t z() { return mZ; }
 		size_t index() { return mIndex; }
-		void setIndex(size_t index) { mIndex = index; this->move(index); }
+		void setIndex(size_t index, size_t z) { mIndex = index; mZ = z; this->move(index, z); }
 
 		virtual unique_ptr<Inkbox> createInkbox(Frame& frame) = 0;
 
@@ -63,6 +64,7 @@ namespace mk
 	protected:
 		Layer& mLayer;
 		InkTarget& mTarget;
+		size_t mZ;
 		size_t mIndex;
 	};
 
