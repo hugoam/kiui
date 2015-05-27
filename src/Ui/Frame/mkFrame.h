@@ -50,6 +50,8 @@ namespace mk
 		inline Style& style() { return *d_style; }
 		inline InkStyle& inkstyle() { return *d_inkstyle; }
 
+		inline bool bound() { return bool(d_inkbox); }
+
 		void setIndex(size_t index) { d_index = index; }
 		void setDirty(Dirty dirty) { if(dirty > d_dirty) d_dirty = dirty; }
 		void clearDirty() { d_dirty = CLEAN; }

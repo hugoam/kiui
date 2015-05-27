@@ -205,10 +205,13 @@ namespace mk
 
 		void move(size_t pos, size_t z)
 		{
-			val& parent = static_cast<HtmlInk&>(mLayer.parentLayer().inkbox()).element();
-			val& next = static_cast<HtmlInk&>(mLayer.parentLayer().layers()[pos].inkbox()).element();
-			val& element = static_cast<HtmlInk&>(mLayer.inkbox()).element();
-			[parentNode].insertBefore(divs[2], divs[0]);
+			if(!mLayer.bound() || !mLayer.parent()) return;
+
+			static val parentNode("parentNode");
+			val parent = static_cast<HtmlInk&>(mLayer.parent()->layer().inkbox()).element();
+			val next = static_cast<HtmlInk&>(mLayer.parent()->layer().layers()[pos]->inkbox()).element();
+			val element = static_cast<HtmlInk&>(mLayer.inkbox()).element();
+			parent[parentNode].call<void>("insertBefore", next, element);
 		}
 
 		void show() {}
