@@ -30,22 +30,22 @@ namespace mk
 
 	static float fminf(float a, float b)
 	{
-		return isnan(a) ? b : (isnan(b) ? a : ((a < b) ? a : b));
+		return std::isnan(a) ? b : (std::isnan(b) ? a : ((a < b) ? a : b));
 	}
 
 	static float fmaxf(float a, float b)
 	{
-		return isnan(a) ? b : (isnan(b) ? a : ((a > b) ? a : b));
+		return std::isnan(a) ? b : (std::isnan(b) ? a : ((a > b) ? a : b));
 	}
 
 	static double fmin(double a, double b)
 	{
-		return isnan(a) ? b : (isnan(b) ? a : ((a < b) ? a : b));
+		return std::isnan(a) ? b : (std::isnan(b) ? a : ((a < b) ? a : b));
 	}
 
 	static double fmax(double a, double b)
 	{
-		return isnan(a) ? b : (isnan(b) ? a : ((a > b) ? a : b));
+		return std::isnan(a) ? b : (std::isnan(b) ? a : ((a > b) ? a : b));
 	}
 
 	void nvgRoundedBox(NVGcontext *ctx, float x, float y, float w, float h, float cr0, float cr1, float cr2, float cr3, Dimension fitDim = DIM_NULL)
