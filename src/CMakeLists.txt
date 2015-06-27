@@ -36,6 +36,7 @@ add_definitions("-DOBJECT_EXPORT")
 add_definitions("-DUI_EXPORT")
 
 add_definitions("-DNANOVG_GLEW")
+add_definitions("-DYAML_DECLARE_STATIC")
 
 if (MSVC)
 	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
@@ -58,8 +59,8 @@ endif ()
 
 add_library(kiui ${LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(kiui ${OPENGL_LIBRARIES})
 target_link_libraries(kiui ${GLFW_LIBRARIES})
+target_link_libraries(kiui ${OPENGL_LIBRARIES})
 
 include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(${GLFW_INCLUDE_DIR})
