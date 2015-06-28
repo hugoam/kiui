@@ -24,8 +24,8 @@ endif ()
 
 find_package(OpenGL)
 find_package(GLFW)
-add_definitions(-DGLEW_STATIC)
-find_package(GLEW REQUIRED)
+#add_definitions(-DGLEW_STATIC)
+#find_package(GLEW REQUIRED)
 
 if (WIN32)
     add_definitions(-DKIUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}/data/")
