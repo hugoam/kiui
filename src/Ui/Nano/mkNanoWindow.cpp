@@ -34,6 +34,7 @@
 #include <Ui/Nano/nanovg/stb_image.h>
 
 #include <dirent.h>
+#include <sys/stat.h>
 
 #include <iostream>
 
@@ -55,6 +56,8 @@ namespace mk
 	{
 		DIR* dir = opendir(path.c_str());
 		dirent* ent;
+		string fullpath;
+		struct stat buf;
 
 		while((ent = readdir(dir)) != NULL)
 		{
@@ -74,6 +77,8 @@ namespace mk
 
 		DIR* dir = opendir(path.c_str());
 		dirent* ent;
+		string fullpath;
+		struct stat buf;
 
 		spritesInFolder(window.ctx(), *atlas.get(), path, "");
 
