@@ -13,6 +13,7 @@
 #include <Ui/mkRenderWindow.h>
 #include <Ui/mkUiWindow.h>
 #include <Ui/Input/mkInputDispatcher.h>
+#include <Ui/Form/mkRootForm.h>
 
 #include <emscripten/bind.h>
 
@@ -25,16 +26,18 @@ namespace mk
 	class HtmlWindow : public InkWindow, public RenderWindow, public InputWindow
 	{
 	public:
-		HtmlWindow(size_t width, size_t height, string title, string resourcePath)
+		HtmlWindow(size_t width, size_t height, string title, string resourcePath, std::function<void (Form&)> init)
 			: RenderWindow(width, height, title, 0)
-			, mUiWindow(resourcePath)
-			, mTarget(val::global("HtmlTarget").new_(50, width, height, mUiWindow).as<unique_ptr<InkTarget>>())
+			, mResourcePath(resourcePath)
+			, mInit(init)
+			, mRun(std::bind(&HtmlWindow::preload, this))
+			, mPreloader(val::global("HtmlPreloader").new_(val("data/interface/uisprites/")))
 		{
-			mUiWindow.setup(*this, *this, nullptr);
+			mPreloader.call<void>("preload");
 		}
 
 		InkTarget& screenTarget() { return *mTarget.get(); }
-		UiWindow& uiWindow() { return mUiWindow; }
+		UiWindow& uiWindow() { return *mUiWindow.get(); }
 
 		void initInput(InputDispatcher& dispatcher, size_t wndHandle)
 		{}
@@ -42,13 +45,73 @@ namespace mk
 		void resize(size_t width, size_t height)
 		{}
 
+		void loadImages()
+		{
+			val images = mPreloader["images"];
+			val filenames = mPreloader["files"];
+			unsigned int length = images["length"].as<unsigned int>();
+
+			for(unsigned int i = 0; i < length; ++i)
+			{
+				val image = images[i];
+				val file = filenames[i];
+
+				string name = replaceAll(file.as<string>(), ".png", "");
+				float width = image["width"].as<float>();
+				float height = image["height"].as<float>();
+
+				printf("Image src %s %f %f \n", name.c_str(), width, height);
+
+				this->addImage(name, width, height);
+			}
+
+			mUiWindow = make_unique<UiWindow>(mResourcePath);
+			mTarget = val::global("HtmlTarget").new_(50, mWidth, mHeight, *mUiWindow.get()).as<unique_ptr<InkTarget>>();
+
+			mUiWindow->setup(*this, *this, nullptr);
+			mUiWindow->init();
+
+			mInit(mUiWindow->rootForm());
+		}
+
+		bool preload()
+		{
+			bool loaded = mPreloader["preloaded"].as<bool>();
+			printf("Preloaded %d \n", loaded);
+
+			if(loaded)
+			{
+				printf("Parsing images \n");
+
+				this->loadImages();
+
+				mRun = std::bind(&HtmlWindow::update, this);
+			}
+			else
+			{
+				printf("Not parsing images \n");
+			}
+		}
+
+		bool update()
+		{
+			return mUiWindow->nextFrame();
+		}
+
 		bool nextFrame()
 		{
-			return mUiWindow.nextFrame();
+			return mRun();
 		}
 
 	protected:
-		UiWindow mUiWindow;
+		string mResourcePath;
+
+		std::function<void(Form&)> mInit;
+		std::function<bool(void)> mRun;
+
+		val mPreloader;
+
+		unique_ptr<UiWindow> mUiWindow;
 		unique_ptr<InkTarget> mTarget;
 	};
 
@@ -109,8 +172,10 @@ namespace mk
 
 		void createElement()
 		{
+			static int id = 0;
 			static val document = val::global("document");
 			mElement = document.call<val>("createElement", val("div"));
+			mElement.set("id", val(toString(++id)));
 			mStyle = mElement["style"];
 			//this.element.style.position = "absolute";
 			if(mFrame.parent())
@@ -155,14 +220,23 @@ namespace mk
 		float textWidth()
 		{
 			static val document = val::global("document");
+			static val window = val::global("window");
 			static val canvas = document.call<val>("createElement", val("canvas"));
 			static val context = canvas.call<val>("getContext", val("2d"));
 
 			static val font("font");
+			static val fontSize("fontSize");
+			static val fontFamily("fontFamily");
 			static val textContent("textContent");
 			static val width("width");
 
-			context.set(font, mStyle[font]);
+			static val module = val::global("Module");
+			static val space(" ");
+
+			val style = window.call<val>("getComputedStyle", mElement);
+			val stylefont = style[fontSize].call<val>("concat", space, style[fontFamily]);
+
+			context.set(font, stylefont);
 			val metrics = context.call<val>("measureText", mText[textContent]);
 			return metrics[width].as<float>();
 		};
@@ -205,13 +279,13 @@ namespace mk
 
 		void move(size_t pos, size_t z)
 		{
-			if(!mLayer.bound() || !mLayer.parent()) return;
+			/*if(!mLayer.bound() || !mLayer.parent()) return;
 
-			static val parentNode("parentNode");
-			val parent = static_cast<HtmlInk&>(mLayer.parent()->layer().inkbox()).element();
-			val next = static_cast<HtmlInk&>(mLayer.parent()->layer().layers()[pos]->inkbox()).element();
-			val element = static_cast<HtmlInk&>(mLayer.inkbox()).element();
-			parent[parentNode].call<void>("insertBefore", next, element);
+			Layer& parentLayer = mLayer.parent()->layer();
+			val& parent = static_cast<HtmlInk&>(parentLayer.inkbox()).element();
+			val& next = static_cast<HtmlInk&>(parentLayer.layers()[pos]->inkbox()).element();
+			val& element = static_cast<HtmlInk&>(mLayer.inkbox()).element();
+			parent.call<void>("insertBefore", element, next);*/
 		}
 
 		void show() {}

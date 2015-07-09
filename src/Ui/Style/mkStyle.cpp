@@ -13,8 +13,6 @@
 
 namespace mk
 {
-	std::map<string, Image> Image::sIcons;
-
 	StyleType::StyleType(const string& name)
 		: Type(name)
 		, Style(*this, nullptr)

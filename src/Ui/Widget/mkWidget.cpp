@@ -149,8 +149,8 @@ namespace mk
 
 	Image* Widget::image()
 	{
-		if(!mFrame->inkstyle().image().null())
-			return &mFrame->inkstyle().image();
+		if(mFrame->inkstyle().image())
+			return mFrame->inkstyle().image();
 		return nullptr;
 	}
 

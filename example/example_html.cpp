@@ -14,10 +14,10 @@
 
 #include <fstream>
 
-mk::HtmlWindow* gWindow;
 void iterate()
 {
-	gWindow->nextFrame();
+	static mk::HtmlWindow htmlWindow(1200, 800, "kiUi demo", KIUI_EXAMPLE_RESSOURCE_PATH, [](mk::Form& rootForm){ createUiTest(rootForm); });
+	htmlWindow.nextFrame();
 }
 
 void run_script_file(const std::string& file)
@@ -31,17 +31,7 @@ void run_script_file(const std::string& file)
 
 int main(int argc, char *argv[])
 {
-	run_script_file("/data/html/jquery-2.1.4.js");
 	run_script_file("/data/html/kiui_html.js");
-
-	mk::HtmlWindow htmlwindow(1200, 800, "kiUi demo", KIUI_EXAMPLE_RESSOURCE_PATH);
-	gWindow = &htmlwindow;
-
-	mk::UiWindow& uiwindow = htmlwindow.uiWindow();
-	uiwindow.init();
-
-	mk::Form& root = uiwindow.rootForm();
-	createUiTest(root);
 
 	emscripten_set_main_loop(iterate, 0, 1);
 }

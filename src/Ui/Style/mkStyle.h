@@ -189,9 +189,9 @@ namespace mk
 		_A_ BoxFloat& margin() { return mMargin.val; }
 		_A_ DimAlign& align() { return mAlign.val; }
 		_A_ DimFloat& topdownGradient() { return mTopdownGradient.val; }
-		_A_ Image& image() { return mImage.val; }
-		_A_ Image& overlay() { return mOverlay.val; }
-		_A_ Image& tile() { return mTile.val; }
+		_A_ Image* image() { return mImage.val; }
+		_A_ Image* overlay() { return mOverlay.val; }
+		_A_ Image* tile() { return mTile.val; }
 		_A_ ImageSkin& imageSkin() { return mImageSkin.val; }
 		_A_ Shadow& shadow() { return mShadow.val; }
 
@@ -211,9 +211,9 @@ namespace mk
 		StyleAttr<BoxFloat> mMargin;
 		StyleAttr<DimAlign> mAlign;
 		StyleAttr<DimFloat> mTopdownGradient;
-		StyleAttr<Image> mImage;
-		StyleAttr<Image> mOverlay;
-		StyleAttr<Image> mTile;
+		StyleAttr<Image*> mImage;
+		StyleAttr<Image*> mOverlay;
+		StyleAttr<Image*> mTile;
 		StyleAttr<ImageSkin> mImageSkin;
 		StyleAttr<Shadow> mShadow;
 

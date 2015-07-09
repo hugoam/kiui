@@ -45,7 +45,7 @@ namespace mk
 	}
 
 	Icon::Icon(const string& image)
-		: Icon(Image::sIcons[image])
+		: Icon(findImage(image))
 	{}
 
 	/*void Icon::setImage(const string& image)
@@ -95,7 +95,7 @@ namespace mk
 	{}
 
 	ImgButton::ImgButton(const string& image, const Trigger& trigger)
-		: ImgButton(Image::sIcons[image], trigger)
+		: ImgButton(findImage(image), trigger)
 	{}
 
 	WrapButton::WrapButton(Widget* content, const Trigger& trigger)

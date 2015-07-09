@@ -18,6 +18,8 @@ namespace mk
 		NanoInk(Frame& frame, NanoLayer& layer);
 		~NanoInk();
 
+		NVGcontext* ctx() { return mCtx; }
+
 		void updateContent();
 		void updateFrame();
 		void updateStyle();

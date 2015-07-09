@@ -22,11 +22,29 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT Image
+	class MK_UI_EXPORT Image : public IdStruct, public Indexed<Image>
 	{
 	public:
-		Image(const string& name, int width = 0, int height = 0) : d_name(name), d_left(0), d_top(0), d_width(width), d_height(height), d_index(0) {}
-		Image() : d_name(), d_left(0), d_top(0), d_width(0), d_height(0), d_index(0) {}
+		Image(const string& name, int width = 0, int height = 0)
+			: IdStruct(index<Image>(), cls())
+			, d_name(name), d_left(0), d_top(0), d_width(width), d_height(height), d_index(0)
+		{}
+
+		Image()
+			: IdStruct(index<Image>(), cls())
+			, d_name(), d_left(0), d_top(0), d_width(0), d_height(0), d_index(0)
+		{}
+
+		Image(Image&& other)
+			: IdStruct(index<Image>(), cls())
+			, d_name(other.d_name)
+			, d_left(other.d_left)
+			, d_top(other.d_top)
+			, d_width(other.d_width)
+			, d_height(other.d_height)
+			, d_index(other.d_index)
+			, d_stretch(other.d_stretch)
+		{}
 
 		bool null() const { return d_name.empty(); }
 
@@ -39,8 +57,21 @@ namespace mk
 
 		bool d_stretch;
 
-		static std::map<string, Image> sIcons;
+		static Type& cls() { static Type ty; return ty; }
 	};
+
+	inline Image* findImageImpl(const string& name)
+	{
+		for(Object* object : Image::indexer().objects())
+			if(object && object->as<Image>().d_name == name)
+				return &object->as<Image>();
+		return nullptr;
+	}
+
+	inline Image& findImage(const string& name)
+	{
+		return *findImageImpl(name);
+	}
 
 	class _I_ ImageSkin : public Struct
 	{
@@ -60,7 +91,7 @@ namespace mk
 
 	public:
 		ImageSkin(const string& image, int left, int top, int right, int bottom, int margin = 0, Dimension stretch = DIM_NULL)
-			: d_image(image)
+			: d_image(&findImage(image))
 			, d_top(top), d_right(right), d_bottom(bottom), d_left(left)
 			, d_margin(margin)
 			, d_prepared(false)
@@ -68,28 +99,29 @@ namespace mk
 			, d_coords(9)
 			, d_stretch(stretch)
 		{
-			this->setImage(image);
+			this->setImage(*d_image);
 		}
 
 		ImageSkin()
+			: d_image(nullptr)
 		{}
 
-		bool null() const { return d_image.null(); }
+		bool null() const { return d_image == nullptr; }
 
-		void setImage(const Image& image)
+		void setImage(Image& image)
 		{
-			d_image = image;
-			d_images[TOP_LEFT] = d_image.d_name + "_topleft";
-			d_images[TOP_RIGHT] = d_image.d_name + "_topright";
-			d_images[BOTTOM_RIGHT] = d_image.d_name + "_bottomright";
-			d_images[BOTTOM_LEFT] = d_image.d_name + "_bottomleft";
+			d_image = &image;
+			d_images[TOP_LEFT] = image.d_name + "_topleft";
+			d_images[TOP_RIGHT] = image.d_name + "_topright";
+			d_images[BOTTOM_RIGHT] = image.d_name + "_bottomright";
+			d_images[BOTTOM_LEFT] = image.d_name + "_bottomleft";
 
-			d_images[TOP] = d_image.d_name + "_top";
-			d_images[RIGHT] = d_image.d_name + "_right";
-			d_images[BOTTOM] = d_image.d_name + "_bottom";
-			d_images[LEFT] = d_image.d_name + "_left";
+			d_images[TOP] = image.d_name + "_top";
+			d_images[RIGHT] = image.d_name + "_right";
+			d_images[BOTTOM] = image.d_name + "_bottom";
+			d_images[LEFT] = image.d_name + "_left";
 
-			d_images[FILL] = d_image.d_name + "_fill";
+			d_images[FILL] = image.d_name + "_fill";
 		}
 
 		void prepare(int width, int height)
@@ -120,7 +152,7 @@ namespace mk
 			filler(FILL, d_left, d_top, fillWidth, fillHeight); // width, height
 		}
 
-		_A_ _M_ Image d_image;
+		_A_ _M_ Image* d_image;
 		_A_ _M_ string d_filetype;
 
 		_A_ _M_ int d_top;

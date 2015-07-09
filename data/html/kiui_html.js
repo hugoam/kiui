@@ -8,27 +8,96 @@ mouseButton = function(event)
 		return Module.MouseButton.RIGHT_BUTTON;
 }
 
+HtmlPreloader = function(rootdir)
+{
+	this.rootdir = rootdir;
+	this.files = [];
+	this.images = [];
+	this.loaded = 0;
+	this.preloaded = false;
+	
+	this.preloadDir = function(dir)
+	{
+		Module.print(dir);
+		var files = FS.readdir(dir);
+
+		for(var i = 0; i < files.length; ++i)
+		{
+			var path = dir + files[i];
+			Module.print(path);
+
+			if(files[i] == '.' || files[i] == '..')
+				continue;
+
+			if(FS.isDir(FS.lstat(path).mode))
+			{
+				this.preloadDir(path + '/');
+			}
+			else
+			{
+				var preloader = this;
+				var img = new Image();
+				var file = path.replace(this.rootdir,'');
+				this.images.push(img);
+				this.files.push(file);
+				img.src = path;
+				img.onload = function()
+				{
+					preloader.loaded++;
+					if (preloader.loaded === preloader.images.length)
+					{
+						Module.print("Finished loading " + preloader.loaded + " images");
+						preloader.preloaded = true;
+					}
+				};
+			}
+		}
+	};
+	
+	this.preload = function()
+	{
+		this.preloadDir(this.rootdir);
+	}
+};
+
 HtmlTarget = Module.InkTarget.extend('InkTarget',
 {
 	__construct: function(layers, width, height, uiWindow)
 	{
 		this.__parent.__construct.call(this, layers);
 		this.uiWindow = uiWindow;
-		this.element = $('<div id="main_target"></div>').appendTo('.emscripten_border');
-		this.element.css({ 'position' : 'relative', 'width' : width + 'px', 'height' : height + 'px', 'background-color' : 'rgb(0,0,0)' });
+		this.element = document.createElement('div');
+		this.element.id = "main_target";
+		document.getElementsByClassName('emscripten_border')[0].appendChild(this.element);
+
+		this.element.style.position = 'relative';
+		this.element.style.width = width + 'px';
+		this.element.style.height = height + 'px';
+		this.element.style.backgroundColor = 'rgb(0,0,0)'; 
+		
 		var target = this.element;
-		this.element.on('mousedown', function(event) {
-			uiWindow.dispatchMousePressed(event.pageX - $(target).offset().left, event.pageY - $(target).offset().top, mouseButton(event));
+		this.element.addEventListener('mousedown', function(event) {
+			var rect = target.getBoundingClientRect();
+			var x = Math.min(event.pageX - rect.left, width);
+			var y = Math.min(event.pageY - rect.top, height);
+			uiWindow.dispatchMousePressed(x, y, mouseButton(event));
 			return false;
 		});
-		this.element.on('mouseup', function(event) {
-			uiWindow.dispatchMouseReleased(event.pageX - $(target).offset().left, event.pageY - $(target).offset().top, mouseButton(event));
+		this.element.addEventListener('mouseup', function(event) {
+			var rect = target.getBoundingClientRect();
+			var x = Math.min(event.pageX - rect.left, width);
+			var y = Math.min(event.pageY - rect.top, height);
+			uiWindow.dispatchMouseReleased(x, y, mouseButton(event));
 			return false;
 		});
-		this.element.on('mousemove', function(event) {
-			uiWindow.dispatchMouseMoved(event.pageX - $(target).offset().left, event.pageY - $(target).offset().top, 0.0, 0.0);
+		this.element.addEventListener('mousemove', function(event) {
+			var rect = target.getBoundingClientRect();
+			var x = Math.min(event.pageX - rect.left, width);
+			var y = Math.min(event.pageY - rect.top, height);
+			uiWindow.dispatchMouseMoved(x, y, 0.0, 0.0);
 			return false;
 		});
-		$('#canvas').css('display', 'none');
+		document.getElementById('canvas').style.display = 'none';
 	},
 });
+

@@ -24,7 +24,7 @@ namespace mk
 	class MK_UI_EXPORT NanoAtlas
 	{
 	public:
-		NanoAtlas(NVGcontext* ctx, const string& path, size_t width, size_t height);
+		NanoAtlas(NanoWindow& window, const string& path, size_t width, size_t height);
 
 		const string& path() { return mPath; }
 		size_t width() { return mWidth; }
@@ -45,6 +45,7 @@ namespace mk
 		std::vector<ImageRect>& sprites() { return mSprites; }
 
 	protected:
+		NanoWindow& mWindow;
 		NVGcontext* mCtx;
 		string mPath;
 		size_t mWidth;
@@ -68,7 +69,7 @@ namespace mk
 		void show();
 		void hide();
 
-		void move(size_t index, size_t z) {}
+		void move(size_t index, size_t z);
 
 		void nanodraw();
 		void drawImage(Frame& frame);

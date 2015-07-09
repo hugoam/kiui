@@ -19,10 +19,18 @@ namespace mk
 	class MK_UI_EXPORT InkWindow : public Object
 	{
 	public:
+		void addImage(const string& image, int width, int height)
+		{
+			mImages.emplace_back(image, width, height);
+		}
+
 		virtual InkTarget& screenTarget() = 0;
 		//virtual InkTarget* spaceTarget(Camera* camera, int width, int height) = 0;
 
 		static Type& cls() { static Type ty; return ty; }
+
+	protected:
+		std::vector<Image> mImages;
 	};
 
 	class MK_UI_EXPORT InkTarget : public Object

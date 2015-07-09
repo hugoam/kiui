@@ -138,8 +138,12 @@ namespace mk
 		if(!d_parentLayer)
 			return;
 
-		d_parentLayer->remove(*this);
-		d_parentLayer->add(*this);
+		Stripe* parent = d_parent;
+		d_parent->remove(*this);
+		parent->insert(*this, parent->contents().size());
+
+		//d_parentLayer->remove(*this);
+		//d_parentLayer->add(*this);
 	}
 
 	Frame* Layer::pinpoint(float x, float y, bool opaque)

@@ -398,10 +398,13 @@ namespace mk
 			.function("padding", &InkStyle::padding)
 			.function("align", &InkStyle::align)
 			.function("topdownGradient", &InkStyle::topdownGradient)
-			.function("image", &InkStyle::image)
-			.function("overlay", &InkStyle::overlay)
-			.function("tile", &InkStyle::tile)
+			.function("image", &InkStyle::image, allow_raw_pointers())
+			.function("overlay", &InkStyle::overlay, allow_raw_pointers())
+			.function("tile", &InkStyle::tile, allow_raw_pointers())
 			.function("shadow", &InkStyle::shadow)
+			;
+
+		class_<InkWindow>("InkWindow")
 			;
 
 		class_<InkTarget>("InkTarget")

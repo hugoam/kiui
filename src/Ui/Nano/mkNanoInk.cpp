@@ -512,19 +512,19 @@ namespace mk
 		else
 			mImage = 0;
 
-		if(!skin().overlay().null())
-			mOverlay = &fetchImage(skin().overlay());
+		if(skin().overlay())
+			mOverlay = &fetchImage(*skin().overlay());
 		else
 			mOverlay = 0;
 
-		if(!skin().tile().null())
-			mTile = &fetchImage(skin().tile(), true);
+		if(skin().tile())
+			mTile = &fetchImage(*skin().tile(), true);
 		else
 			mTile = 0;
 
 		if(!skin().imageSkin().null())
 		{
-			mSkin = &fetchImage(skin().imageSkin().d_image);
+			mSkin = &fetchImage(*skin().imageSkin().d_image);
 
 			if(!skin().imageSkin().d_prepared)
 				skin().imageSkin().prepare(mSkin->d_width, mSkin->d_height);
