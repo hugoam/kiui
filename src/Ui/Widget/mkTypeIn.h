@@ -80,26 +80,26 @@ namespace mk
 	};
 
 	template <class T>
-	class NumberInput : public WTypedInput<T>
+	class NumberInput : public WTypedInput<AutoStat<T>, T>
 	{
 	public:
-		NumberInput(Lref& value, std::function<void(T)> callback = nullptr)
-			: WTypedInput<T>(value, callback)
+		NumberInput(Lref& lref, std::function<void(T)> callback = nullptr)
+			: WTypedInput<AutoStat<T>, T>(lref, callback)
+			, mStat(this->mValue->template ref<AutoStat<T>>())
 			, mTypeIn(this->template makeappend<TypeIn>(this))
 			, mPlus(this->template makeappend<Button>("+", std::bind(&NumberInput<T>::increment, this)))
 			, mMinus(this->template makeappend<Button>("-", std::bind(&NumberInput<T>::decrement, this)))
-			, mStep(1)
 		{
 			this->mStyle = &cls();
 			this->build();
 		}
 
-		NumberInput(T value, std::function<void(T)> callback = nullptr)
-			: WTypedInput<T>(value, callback)
+		NumberInput(AutoStat<T> value, std::function<void(T)> callback = nullptr)
+			: WTypedInput<AutoStat<T>, T>(value, callback)
+			, mStat(this->mValue->template ref<AutoStat<T>>())
 			, mTypeIn(this->template makeappend<TypeIn>(this))
 			, mPlus(this->template makeappend<Button>("+", std::bind(&NumberInput<T>::increment, this)))
 			, mMinus(this->template makeappend<Button>("-", std::bind(&NumberInput<T>::decrement, this)))
-			, mStep(1)
 		{
 			this->mStyle = &cls();
 			this->build();
@@ -115,14 +115,14 @@ namespace mk
 
 		void increment()
 		{
-			this->mValue->template set<T>(this->mValue->template get<T>() + mStep);
+			mStat.increment();
 			mTypeIn.updateString();
 			this->triggerModify();
 		}
 
 		void decrement()
 		{
-			this->mValue->template set<T>(this->mValue->template get<T>() - mStep);
+			mStat.decrement();
 			mTypeIn.updateString();
 			this->triggerModify();
 		}
@@ -132,10 +132,10 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("NumberInput<" + typecls<T>().name() + ">", WValue::cls()); return ty; }
 
 	protected:
+		AutoStat<T>& mStat;
 		TypeIn& mTypeIn;
 		Button& mPlus;
 		Button& mMinus;
-		T mStep;
 	};
 
 	template <class T>
@@ -150,7 +150,7 @@ namespace mk
 			: NumberInput<int>(value, callback)
 		{}
 
-		Input(int value, std::function<void(int)> callback = nullptr)
+		Input(AutoStat<int> value, std::function<void(int)> callback = nullptr)
 			: NumberInput<int>(value, callback)
 		{}
 	};
@@ -163,7 +163,7 @@ namespace mk
 			: NumberInput<float>(value, callback)
 		{}
 
-		Input(float value, std::function<void(float)> callback = nullptr)
+		Input(AutoStat<float> value, std::function<void(float)> callback = nullptr)
 			: NumberInput<float>(value, callback)
 		{}
 	};
@@ -176,7 +176,7 @@ namespace mk
 			: NumberInput<double>(value, callback)
 		{}
 
-		Input(double value, std::function<void(double)> callback = nullptr)
+		Input(AutoStat<double> value, std::function<void(double)> callback = nullptr)
 			: NumberInput<double>(value, callback)
 		{}
 	};

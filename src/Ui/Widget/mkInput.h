@@ -72,8 +72,8 @@ namespace mk
 	};
 
 	typedef Field<bool, bool, Input<bool>> InputBool;
-	typedef Field<int, int, Input<int>> InputInt;
-	typedef Field<float, float, Input<float>> InputFloat;
+	typedef Field<AutoStat<int>, int, Input<int>> InputInt;
+	typedef Field<AutoStat<float>, float, Input<float>> InputFloat;
 	typedef Field<string, string, Input<string>> InputText;
 
 	typedef Field<Colour, Colour, Input<Colour>> InputColour;

@@ -321,8 +321,8 @@ namespace mk
 		table.emplace<InputDropdown>("typedown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {}, true, true);
 
 		table.emplace<InputText>("string input", "Hello, world!", nullptr, true);
-		table.emplace<InputInt>("int input", 123, nullptr, true);
-		table.emplace<InputFloat>("float input", 0.001f, nullptr, true);
+		table.emplace<InputInt>("int input", AutoStat<int>(123, 0, 1000, 1), nullptr, true);
+		table.emplace<InputFloat>("float input", AutoStat<float>(0.001f, 0.f, 100.f, 0.001f), nullptr, true);
 
 		table.emplace<SliderInt>("int 0..3", AutoStat<int>(2, 0, 3, 1), nullptr, true);
 		table.emplace<SliderInt>("int -100..100", AutoStat<int>(0, -100, 100, 1), nullptr, true);
@@ -463,8 +463,8 @@ namespace mk
 			, mPadding(this->emplace<SliderInt>("Padding", AutoStat<int>(0, 0, 25), [this](int padding) { this->mSkin->padding().assign(padding); this->mStyle->markUpdate(); }))
 			//, mAlignX(this->emplace<InputRadio>("Align Y", StringVector({ "Left", "Center", "Right", "OutLeft", "OutRight" }), [this](const string&) {}))
 			//, mAlignY(this->emplace<InputRadio>("Align Y", StringVector({ "Left", "Center", "Right", "OutLeft", "OutRight" }), [this](const string&) {}))
-			, mImage(this->emplace<InputText>("Image", "", [this](string name) { this->mSkin->image().d_name = name; this->mStyle->markUpdate(); }))
-			, mSkinImage(this->emplace<InputText>("Skin Image", "", [this](string name) { this->mSkin->image().d_name = name; this->mStyle->markUpdate(); }))
+			, mImage(this->emplace<InputText>("Image", "", [this](string name) { /*this->mSkin->image().d_name = name;*/ this->mStyle->markUpdate(); }))
+			, mSkinImage(this->emplace<InputText>("Skin Image", "", [this](string name) { /*this->mSkin->image().d_name = name;*/ this->mStyle->markUpdate(); }))
 		{
 			for(Object* object : Style::indexer().objects())
 				if(object)
@@ -488,8 +488,10 @@ namespace mk
 			mPadding.input().modifyValue(mSkin->padding().x0());
 			//mAlignX.input().modifyValue();
 			//mAlignY.input().modifyValue();
-			mImage.input().modifyValue<string>(mSkin->image().d_name);
-			mSkinImage.input().modifyValue<string>(mSkin->imageSkin().d_image.d_name);
+			if(mSkin->image())
+				mImage.input().modifyValue<string>(mSkin->image()->d_name);
+			if(!mSkin->imageSkin().null())
+				mSkinImage.input().modifyValue<string>(mSkin->imageSkin().d_image->d_name);
 		}
 
 	protected:

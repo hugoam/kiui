@@ -38,8 +38,8 @@ namespace mk
 		void increment(T& value, T amount) const { value += amount; update(value); }
 		void decrement(T& value, T amount) const { value -= amount; update(value); }
 
-		void decrement(T& value) const { value += mStep; update(value); }
-		void increment(T& value) const { value -= mStep; update(value); }
+		void increment(T& value) const { value += mStep; update(value); }
+		void decrement(T& value) const { value -= mStep; update(value); }
 
 		void multiply(T& value, T& base, T multiplier) const { T diff = value - base; base *= multiplier; value = base + diff; update(value); }
 		
@@ -163,7 +163,7 @@ namespace mk
 	class AutoStat : public Struct
 	{
 	public:
-		AutoStat(T value = T(), T min = T(), T max = T(), T step = T())
+		AutoStat(T value = T(), T min = std::numeric_limits<T>::lowest(), T max = std::numeric_limits<T>::max(), T step = T())
 			: mValue(value)
 			, mValueRef(mValue)
 			, mDef(min, max, step)
