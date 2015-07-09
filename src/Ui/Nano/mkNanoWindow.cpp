@@ -34,7 +34,6 @@
 #include <Ui/Nano/nanovg/stb_image.h>
 
 #include <dirent.h>
-#include <sys/stat.h>
 
 #include <iostream>
 
@@ -56,10 +55,9 @@ namespace mk
 	{
 		DIR* dir = opendir(path.c_str());
 		dirent* ent;
-		string fullpath;
-		struct stat buf;
-		
-		while((ent = readdir(dir)) != NULL) {
+
+		while((ent = readdir(dir)) != NULL)
+		{
 			fullpath = path + "/" + ent->d_name;
 			stat(fullpath.c_str(), &buf);
 			if((buf.st_mode & S_IFREG) == S_IFREG)
@@ -69,19 +67,18 @@ namespace mk
 		closedir(dir);
 	}
 
-	unique_ptr<NanoAtlas> generateAtlas(NVGcontext* ctx, size_t atlasWidth, size_t atlasHeight, string resourcePath)
+	unique_ptr<NanoAtlas> generateAtlas(NanoWindow& window, size_t atlasWidth, size_t atlasHeight, string resourcePath)
 	{
 		string path = resourcePath + "interface/uisprites/";
-		unique_ptr<NanoAtlas> atlas = make_unique<NanoAtlas>(ctx, path, atlasWidth, atlasHeight);
+		unique_ptr<NanoAtlas> atlas = make_unique<NanoAtlas>(window, path, atlasWidth, atlasHeight);
 
 		DIR* dir = opendir(path.c_str());
 		dirent* ent;
-		string fullpath;
-		struct stat buf;
 
-		spritesInFolder(ctx, *atlas.get(), path, "");
+		spritesInFolder(window.ctx(), *atlas.get(), path, "");
 
-		while((ent = readdir(dir)) != NULL) {
+		while((ent = readdir(dir)) != NULL)
+		{
 			fullpath = path + "/" + ent->d_name;
 			stat(fullpath.c_str(), &buf);
 			if((buf.st_mode & S_IFDIR) == S_IFDIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
@@ -97,8 +94,9 @@ namespace mk
 		return atlas;
 	}
 
-	NanoAtlas::NanoAtlas(NVGcontext* ctx, const string& path, size_t width, size_t height)
-		: mCtx(ctx)
+	NanoAtlas::NanoAtlas(NanoWindow& window, const string& path, size_t width, size_t height)
+		: mWindow(window)
+		, mCtx(window.ctx())
 		, mPath(path)
 		, mWidth(width)
 		, mHeight(height)
@@ -128,7 +126,7 @@ namespace mk
 		{
 			this->fitImage(image);
 			string name = image.subfolder + replaceAll(image.image, ".png", "");
-			Image::sIcons[name] = Image(name, image.width, image.height);
+			mWindow.addImage(name, image.width, image.height);
 		}
 	}
 
@@ -209,6 +207,15 @@ namespace mk
 		mFrame.inkbox().hide();
 	}
 
+	void NanoLayer::move(size_t pos, size_t z)
+	{
+		/*if(!mLayer.bound() || !mLayer.parent()) return;
+
+		std::cerr << static_cast<NanoInk&>(mLayer.parent()->layer().inkbox()).ctx() << std::endl;
+		std::cerr << static_cast<NanoInk&>(mLayer.parent()->layer().layers()[pos]->inkbox()).ctx() << std::endl;
+		std::cerr << static_cast<NanoInk&>(mLayer.inkbox()).ctx() << std::endl;*/
+	}
+
 	void NanoLayer::nanodraw()
 	{
 		this->drawImage(mFrame);
@@ -274,7 +281,7 @@ namespace mk
 		mCtx = nvgCreateGLES2(NVG_STENCIL_STROKES);
 #endif
 
-		mAtlas = generateAtlas(mCtx, 1024, 1024, resourcePath);
+		mAtlas = generateAtlas(*this, 1024, 1024, resourcePath);
 
 		string fontPath = resourcePath + "interface/fonts/DejaVuSans.ttf";
 		nvgCreateFont(mCtx, "dejavu", fontPath.c_str());
@@ -292,8 +299,8 @@ namespace mk
 
 	NanoWindow::~NanoWindow()
 	{
-		for(auto& kv : Image::sIcons)
-			nvgDeleteImage(mCtx, kv.second.d_index);
+		for(Image& image : mImages)
+			nvgDeleteImage(mCtx, image.d_index);
 
 #if NANOVG_GL2
 		nvgDeleteGL2(mCtx);
