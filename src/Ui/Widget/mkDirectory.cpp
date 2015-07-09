@@ -8,6 +8,7 @@
 #include <Ui/Widget/mkButton.h>
 
 #include <dirent.h>
+#include <sys/stat.h>
 
 #include <iostream>
 
@@ -57,16 +58,24 @@ namespace mk
 	{
 		DIR* dir = opendir(mPath.c_str());
 		dirent* ent;
+		string fullpath;
+		struct stat buf;
 
-		while((ent = readdir(dir)) != NULL)
-			if(ent->d_type & DT_DIR && string(ent->d_name) != ".")
+		while((ent = readdir(dir)) != NULL) {
+			fullpath = mPath + "/" + ent->d_name;
+			stat(fullpath.c_str(), &buf);
+			if ((buf.st_mode & S_IFDIR) == S_IFDIR && string(ent->d_name) != ".")
 				this->emplace<Dir>(ent->d_name);
+		}
 
 		rewinddir(dir);
 
-		while((ent = readdir(dir)) != NULL)
-			if(ent->d_type & DT_REG)
+		while((ent = readdir(dir)) != NULL) {
+			fullpath = mPath + "/" + ent->d_name;
+			stat(fullpath.c_str(), &buf);
+			if ((buf.st_mode & S_IFREG) == S_IFREG)
 				this->emplace<File>(ent->d_name);
+		}
 
 		closedir(dir);
 	}
@@ -124,20 +133,28 @@ namespace mk
 	{
 		DIR* dir = opendir(mPath.c_str());
 		dirent* ent;
+		string fullpath;
+		struct stat buf;
 
-		while((ent = readdir(dir)) != NULL)
-			if(ent->d_type & DT_DIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
+		while((ent = readdir(dir)) != NULL) {
+			fullpath = mPath + "/" + ent->d_name;
+			stat(fullpath.c_str(), &buf);
+			if((buf.st_mode & S_IFDIR) == S_IFDIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
 			{
 				DirectoryNode& node = this->emplace<DirectoryNode>(mPath + "/" + ent->d_name, ent->d_name, true);
 				if(!mCollapsed)
 					node.update();
 			}
+		}
 
 		rewinddir(dir);
 
-		while((ent = readdir(dir)) != NULL)
-			if(ent->d_type & DT_REG)
-				this->emplace<FileNode>(ent->d_name);
+		while ((ent = readdir(dir)) != NULL) {
+			fullpath = mPath + "/" + ent->d_name;
+			stat(fullpath.c_str(), &buf);
+			if ((buf.st_mode & S_IFREG) == S_IFREG)
+				this->emplace < FileNode > (ent->d_name);
+		}
 
 		closedir(dir);
 	}

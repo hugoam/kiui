@@ -34,6 +34,7 @@
 #include <Ui/Nano/nanovg/stb_image.h>
 
 #include <dirent.h>
+#include <sys/stat.h>
 
 #include <iostream>
 
@@ -55,10 +56,15 @@ namespace mk
 	{
 		DIR* dir = opendir(path.c_str());
 		dirent* ent;
-
-		while((ent = readdir(dir)) != NULL)
-			if(ent->d_type & DT_REG)
+		string fullpath;
+		struct stat buf;
+		
+		while((ent = readdir(dir)) != NULL) {
+			fullpath = path + "/" + ent->d_name;
+			stat(fullpath.c_str(), &buf);
+			if((buf.st_mode & S_IFREG) == S_IFREG)
 				atlas.sprites().push_back(makeRect(ctx, atlas.path(), ent->d_name, subfolder));
+		}
 
 		closedir(dir);
 	}
@@ -70,12 +76,17 @@ namespace mk
 
 		DIR* dir = opendir(path.c_str());
 		dirent* ent;
+		string fullpath;
+		struct stat buf;
 
 		spritesInFolder(ctx, *atlas.get(), path, "");
 
-		while((ent = readdir(dir)) != NULL)
-			if(ent->d_type & DT_DIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
+		while((ent = readdir(dir)) != NULL) {
+			fullpath = path + "/" + ent->d_name;
+			stat(fullpath.c_str(), &buf);
+			if((buf.st_mode & S_IFDIR) == S_IFDIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
 				spritesInFolder(ctx, *atlas.get(), path + ent->d_name, string(ent->d_name) + "/");
+		}
 
 		closedir(dir);
 
