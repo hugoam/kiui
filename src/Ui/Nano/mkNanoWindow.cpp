@@ -87,7 +87,7 @@ namespace mk
 			fullpath = path + "/" + ent->d_name;
 			stat(fullpath.c_str(), &buf);
 			if((buf.st_mode & S_IFDIR) == S_IFDIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
-				spritesInFolder(ctx, *atlas.get(), path + ent->d_name, string(ent->d_name) + "/");
+				spritesInFolder(window.ctx(), *atlas.get(), path + ent->d_name, string(ent->d_name) + "/");
 		}
 
 		closedir(dir);
