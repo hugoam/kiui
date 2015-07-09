@@ -1,4 +1,4 @@
-file(GLOB SOURCE_FILES example.cpp)
+file(GLOB SOURCE_FILES example_nanovg.cpp)
 
 add_executable(kiui_example ${SOURCE_FILES})
 
