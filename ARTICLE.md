@@ -1,12 +1,12 @@
-I've spent the last 4 months developing an UI toolkit focused towards games, with Qt-power yet small and lean. It is free, open-source, and I want to share it with game developpers.
+I've spent the last 4 months developing an UI toolkit focused towards games, with a lot of power yet small and lean. It is free, open-source, and I want to share it with game developpers.
 
 TL;DR - Made a new free and open-source UI library that gamedevs should know about
 =====
-Show me the demo already ! Try it in the browser : [here](http://novembermonk.github.io/kiui/livedemo/kiui.html)
+Show me the demo already ! Try it in the browser : [here](http://hugoam.github.io/kiui/livedemo/kiui.html)
 ![switching between styles at runtime](media/themes.gif?raw=true)
-Have a look at a few GIFs : [Themes](http://novembermonk.github.io/kiui/media/styles.gif) [Dock Windows](http://novembermonk.github.io/kiui/media/dockspace.gif)
-[Text Edit](http://novembermonk.github.io/kiui/media/texteditx.gif) [Tweakin Style](http://novembermonk.github.io/kiui/media/styling.gif) [Tweakin Some More] (http://novembermonk.github.io/kiui/media/stylingbis.gif)
-Open-source ! [Github](https://github.com/novembermonk/kiui)
+Have a look at a few GIFs : [Themes](http://hugoam.github.io/kiui/media/styles.gif) [Dock Windows](http://hugoam.github.io/kiui/media/dockspace.gif)
+[Text Edit](http://hugoam.github.io/kiui/media/texteditx.gif) [Tweakin Style](http://hugoam.github.io/kiui/media/styling.gif) [Tweakin Some More] (http://hugoam.github.io/kiui/media/stylingbis.gif)
+Open-source ! [Github](https://github.com/hugoam/kiui)
 
 Why ?
 =====
@@ -53,7 +53,7 @@ And now that it's close to being feature-complete I'll have time to write docs a
 So what now ?
 =============
 Well if you have a project like mine, a game with quite a lot of UI design and possibly a toolset or an editor, consider using it !
-Here is the github repository where the real stuff happens : https://github.com/novembermonk/kiui
+Here is the github repository where the real stuff happens : https://github.com/hugoam/kiui
 Happy to share it, and happy to hear any kind of feedback, bug reports in the future. (I'm exposing myself to a shitstorm of issue reports, I know ;) )
 
 There will also be a kind of discussion on the next features and widgets to implement.
