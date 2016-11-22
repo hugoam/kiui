@@ -12,7 +12,7 @@ namespace mk
 	Timer Timer::sInstance;
 
     Timer::Timer()
-        : mTimeTable()
+        : m_timeTable()
     {}
 
     Timer::~Timer()
@@ -20,13 +20,13 @@ namespace mk
 
 	void Timer::firstUpdate(void* updater)
 	{
-		mTimeTable.insert (std::pair<void*, clock_t> (updater, clock()));
+		m_timeTable.insert (std::pair<void*, clock_t> (updater, clock()));
 	}
 
     void Timer::update(void* updater)
     {
-        TimeTable::iterator it = mTimeTable.find(updater);
-        if(it != mTimeTable.end())
+        TimeTable::iterator it = m_timeTable.find(updater);
+        if(it != m_timeTable.end())
         {
 			//std::cerr << "Update_clock: " << clock() << std::endl;
             (*it).second = clock();
@@ -36,8 +36,8 @@ namespace mk
     double Timer::read(void* updater)
     {
         double timeStep(0.0f);
-        TimeTable::iterator it = mTimeTable.find(updater);
-        if(it != mTimeTable.end())
+        TimeTable::iterator it = m_timeTable.find(updater);
+        if(it != m_timeTable.end())
         {
 			//std::cerr << "Clock: " << clock() << std::endl;
             timeStep = static_cast<double>(clock() - (*it).second) / CLOCKS_PER_SEC;
@@ -54,7 +54,7 @@ namespace mk
 	}
 
     Clock::Clock()
-        : mLast(clock())
+        : m_last(clock())
     {}
 
     Clock::~Clock()
@@ -62,7 +62,7 @@ namespace mk
 
     void Clock::update()
     {
-		mLast = clock();
+		m_last = clock();
     }
 
 	size_t Clock::readTick()
@@ -73,15 +73,15 @@ namespace mk
 	size_t Clock::stepTick()
 	{
 		size_t tick = this->readTick();
-		size_t delta = tick - mLastTick;
+		size_t delta = tick - m_lastTick;
 
-		mLastTick = tick;
+		m_lastTick = tick;
 		return delta;
 	}
 
     double Clock::read()
     {
-        double timeStep = static_cast<double>(clock() - mLast) / CLOCKS_PER_SEC;
+        double timeStep = static_cast<double>(clock() - m_last) / CLOCKS_PER_SEC;
         return timeStep;
     }
 

@@ -6,19 +6,20 @@
 #define MK_UI_H_INCLUDED
 
 #include <Ui/mkUiForward.h>
-#include <Ui/Form/mkForm.h>
-
-#include <memory>
 
 namespace mk
 {
+	MK_UI_EXPORT void switchUiTheme(UiWindow& uiWindow, const string& name);
 	MK_UI_EXPORT void selectUiTheme(Sheet& sheet, Widget& selected);
 	MK_UI_EXPORT void pickUiSample(Sheet& sheet, Widget& selected);
+	MK_UI_EXPORT Sheet& createUiStyleEdit(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestScrollList(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestCustomList(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestFilteredList(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestTextEditor(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestDockspace(Sheet& parent);
+	MK_UI_EXPORT Sheet& createUiTestNodes(Sheet& parent);
+	MK_UI_EXPORT Sheet& createUiTestNodeEditor(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestTabs(Sheet& parent, bool window = true);
 	MK_UI_EXPORT Sheet& createUiTestTable(Sheet& parent, bool window = true);
 	MK_UI_EXPORT Sheet& createUiTestTree(Sheet& parent);
@@ -28,7 +29,7 @@ namespace mk
 	MK_UI_EXPORT Window& createUiTestWindow(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestFileBrowser(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestFileTree(Sheet& parent);
-	MK_UI_EXPORT void createUiTest(Form& parent);
+	MK_UI_EXPORT void createUiTest(Device& parent);
 }
 
 #endif // MK_UI_H_INCLUDED

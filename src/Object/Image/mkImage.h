@@ -15,9 +15,12 @@ namespace mk
 	public:
 		Palette();
 
+		void reset();
 		void load(string file);
+		void add(Colour colour);
 
 		Colour colours[257];
+		size_t size;
 	};
 
 	class MK_OBJECT_EXPORT Image256
@@ -28,10 +31,10 @@ namespace mk
 
 		void write(uint8_t* data);
 
-		size_t* mPixels;
-		size_t mWidth;
-		size_t mHeight;
-		Palette mPalette;
+		size_t* m_pixels;
+		size_t m_width;
+		size_t m_height;
+		Palette m_palette;
 	};
 }
 

@@ -13,10 +13,10 @@
 #include <Ui/mkRenderWindow.h>
 #include <Ui/mkUiWindow.h>
 #include <Ui/Input/mkInputDispatcher.h>
-#include <Ui/Form/mkRootForm.h>
 
 #include <emscripten/bind.h>
 
+#define EMCPP_IMPL
 //#define EMCPP_PROPERTIES
 
 using namespace emscripten;
@@ -26,18 +26,16 @@ namespace mk
 	class HtmlWindow : public InkWindow, public RenderWindow, public InputWindow
 	{
 	public:
-		HtmlWindow(size_t width, size_t height, string title, string resourcePath, std::function<void (Form&)> init)
+		HtmlWindow(size_t width, size_t height, string title, string resourcePath)
 			: RenderWindow(width, height, title, 0)
-			, mResourcePath(resourcePath)
-			, mInit(init)
-			, mRun(std::bind(&HtmlWindow::preload, this))
-			, mPreloader(val::global("HtmlPreloader").new_(val("data/interface/uisprites/")))
+			, mUiWindow(resourcePath)
+			, mTarget(val::global("HtmlTarget").new_(50, width, height, mUiWindow).as<unique_ptr<InkTarget>>())
 		{
-			mPreloader.call<void>("preload");
+			mUiWindow.setup(*this, *this, nullptr);
 		}
 
 		InkTarget& screenTarget() { return *mTarget.get(); }
-		UiWindow& uiWindow() { return *mUiWindow.get(); }
+		UiWindow& uiWindow() { return mUiWindow; }
 
 		void initInput(InputDispatcher& dispatcher, size_t wndHandle)
 		{}
@@ -45,163 +43,71 @@ namespace mk
 		void resize(size_t width, size_t height)
 		{}
 
-		void loadImages()
-		{
-			val images = mPreloader["images"];
-			val filenames = mPreloader["files"];
-			unsigned int length = images["length"].as<unsigned int>();
-
-			for(unsigned int i = 0; i < length; ++i)
-			{
-				val image = images[i];
-				val file = filenames[i];
-
-				string name = replaceAll(file.as<string>(), ".png", "");
-				float width = image["width"].as<float>();
-				float height = image["height"].as<float>();
-
-				printf("Image src %s %f %f \n", name.c_str(), width, height);
-
-				this->addImage(name, width, height);
-			}
-
-			mUiWindow = make_unique<UiWindow>(mResourcePath);
-			mTarget = val::global("HtmlTarget").new_(50, mWidth, mHeight, *mUiWindow.get()).as<unique_ptr<InkTarget>>();
-
-			mUiWindow->setup(*this, *this, nullptr);
-			mUiWindow->init();
-
-			mInit(mUiWindow->rootForm());
-		}
-
-		bool preload()
-		{
-			bool loaded = mPreloader["preloaded"].as<bool>();
-			printf("Preloaded %d \n", loaded);
-
-			if(loaded)
-			{
-				printf("Parsing images \n");
-
-				this->loadImages();
-
-				mRun = std::bind(&HtmlWindow::update, this);
-			}
-			else
-			{
-				printf("Not parsing images \n");
-			}
-		}
-
-		bool update()
-		{
-			return mUiWindow->nextFrame();
-		}
-
 		bool nextFrame()
 		{
-			return mRun();
+			return mUiWindow.nextFrame();
 		}
 
 	protected:
-		string mResourcePath;
-
-		std::function<void(Form&)> mInit;
-		std::function<bool(void)> mRun;
-
-		val mPreloader;
-
-		unique_ptr<UiWindow> mUiWindow;
+		UiWindow mUiWindow;
 		unique_ptr<InkTarget> mTarget;
 	};
 
-	class HtmlInk : public Inkbox
+	class HtmlTargetProxy : public wrapper<InkTarget>
 	{
 	public:
-		HtmlInk(Frame& frame)
-			: Inkbox(frame)
-			, mElement(val::null())
-			, mStyle(val::null())
-			, mText(val::null())
-			, mImage(val::null())
+		EMSCRIPTEN_WRAPPER(HtmlTargetProxy);
+
+		unique_ptr<InkLayer> createLayer(Layer& layer, size_t z)
 		{
-			createElement();
+			static val cls = val::global("HtmlLayer");
+			return cls.new_(layer, *this, z).as<unique_ptr<InkLayer>>();
+		}
+	};
+
+	class HtmlLayerProxy : public wrapper<InkLayer>
+	{
+	public:
+		EMSCRIPTEN_WRAPPER(HtmlLayerProxy);
+
+		unique_ptr<Inkbox> createInkbox(Frame& frame)
+		{
+			static val cls = val::global("HtmlInk");
+			return cls.new_(frame).as<unique_ptr<Inkbox>>();
 		}
 
-		~HtmlInk()
-		{
-			static val parentNode("parentNode");
-			mElement[parentNode].call<void>("removeChild", mElement);
-		}
+#ifndef EMCPP_IMPL
+		void move(size_t z) { return call<void>("move", z); }
+		void show() { return call<void>("show"); }
+		void hide() { return call<void>("hide"); }
+#else
+		void move(size_t z) {}
+		void show() {}
+		void hide() {}
+#endif
+	};
 
-		val& element() { return mElement; }
+	class HtmlInkImpl : public Inkbox
+	{
+	public:
+		HtmlInkImpl(Frame& frame, val element) : Inkbox(frame), mElement(element), mStyle(mElement["style"]) {}
 
-#ifndef EMCPP_PROPERTIES
 		void updateFrame() { this->updateCorners(); if(mFrame.dirty() > Frame::DIRTY_ABSOLUTE) this->recssElement(); }
 		void updateStyle() { this->styleCorners(); this->recssStyle(); mStyle = mElement["style"]; }
 
 		void show() { mVisible = true; }
 		void hide() { mVisible = false; }
-#else
-		void updateStyle() { this->styleCorners(); this->recssStyle(); mStyle = mElement["style"]; }
-		void updateFrame();
 
-		void show() { mVisible = true; static val display("display"); static val block("block"); mStyle.set(display, block); }
-		void hide() { mVisible = false; static val display("display"); static val none("none"); mStyle.set(display, none); }
-#endif
-
-#ifndef EMCPP_PROPERTIES
 		void recssElement();
-#endif
 		void recssStyle();
 
-		void updateContent()
-		{
-			static val textContent("textContent");
-			if(!mFrame.widget().label().empty() && mText.isNull())
-				this->createText();
-			if(!mFrame.widget().label().empty())
-				mText.set(textContent, mFrame.widget().label());
+#ifndef EMCPP_IMPL
+		virtual void elementCSS(const string& css) = 0;
+		virtual void styleCSS(const string& name, const string& css) = 0;
+#else
+		void updateContent() { if(!mFrame.widget().label().empty()) mElement.set("textContent", mFrame.widget().label()); }
 
-			static val src("src");
-			if(mFrame.widget().image() && mImage.isNull())
-				this->createImage();
-			if(mFrame.widget().image())
-				mImage.set(src, "data/interface/uisprites/" + mFrame.widget().image()->d_name + ".png");
-		}
-
-		void createElement()
-		{
-			static int id = 0;
-			static val document = val::global("document");
-			mElement = document.call<val>("createElement", val("div"));
-			mElement.set("id", val(toString(++id)));
-			mStyle = mElement["style"];
-			//this.element.style.position = "absolute";
-			if(mFrame.parent())
-				static_cast<HtmlInk&>(mFrame.parent()->inkbox()).mElement.call<void>("appendChild", mElement);
-			else
-				document.call<val>("getElementById", val("main_target")).call<void>("appendChild", mElement);
-		}
-
-		void createText()
-		{
-			static val document = val::global("document");
-			static val div("div");
-			mText = document.call<val>("createElement", div);
-			mText["style"].set("cssText", "height:auto; width:auto; white-space:nowrap; overflow:hidden; ");
-			mElement.call<void>("appendChild", mText);
-		}
-
-		void createImage()
-		{
-			static val document = val::global("document");
-			static val img("img");
-			mImage = document.call<val>("createElement", img);
-			mElement.call<void>("appendChild", mImage);
-		}
-
-		void elementCSS(const string& css) { static val key("cssText"); mStyle.set(key, css.c_str()); }
+		void elementCSS(const string& css) { static val key("cssText"); mStyle.set(key, css); }
 		void styleCSS(const string& name, const string& css)
 		{
 			static val document = val::global("document");
@@ -217,90 +123,75 @@ namespace mk
 			mElement.set("className", name);
 		}
 
-		float textWidth()
+		static val textSizer()
 		{
 			static val document = val::global("document");
-			static val window = val::global("window");
-			static val canvas = document.call<val>("createElement", val("canvas"));
-			static val context = canvas.call<val>("getContext", val("2d"));
+			static val textSizer = document.call<val>("createElement", val("div"));
+			textSizer["style"].set("cssText", "position:absolute; height:auto; width:auto; white-space:nowrap;");
+			document["body"].call<void>("appendChild", textSizer);
+			return textSizer;
+		}
 
-			static val font("font");
-			static val fontSize("fontSize");
-			static val fontFamily("fontFamily");
-			static val textContent("textContent");
-			static val width("width");
-
-			static val module = val::global("Module");
-			static val space(" ");
-
-			val style = window.call<val>("getComputedStyle", mElement);
-			val stylefont = style[fontSize].call<val>("concat", space, style[fontFamily]);
-
-			context.set(font, stylefont);
-			val metrics = context.call<val>("measureText", mText[textContent]);
-			return metrics[width].as<float>();
-		};
+		static val imgSizer()
+		{
+			static val document = val::global("document");
+			static val imgSizer = document.call<val>("createElement", val("img"));
+			document["body"].call<void>("appendChild", imgSizer);
+			return imgSizer;
+		}
 
 		float contentSize(Dimension dim)
 		{
 			if(!mFrame.widget().label().empty())
 			{
-				return dim == DIM_X ? textWidth() : mFrame.inkstyle().textSize();
+				static val sizer = textSizer();
+				static val style = sizer["style"];
+				static val font("font");
+				static val textContent("textContent");
+				static val clientWidth("clientWidth");
+				static val clientHeight("clientHeight");
+				style.set(font, mStyle[font]);
+				sizer.set(textContent, mElement[textContent]);
+				return dim == DIM_X ? sizer[clientWidth].as<float>() : sizer[clientHeight].as<float>();
 			}
 			else if(mFrame.widget().image())
 			{
+				static val sizer = imgSizer();
+				static val src("src");
 				static val naturalWidth("naturalWidth");
 				static val naturalHeight("naturalHeight");
-				return dim == DIM_X ? mImage[naturalWidth].as<float>() : mImage[naturalHeight].as<float>();
+				sizer.set(src, "data/interface/uisprites/" + mFrame.widget().image()->d_name + ".png");
+				return dim == DIM_X ? sizer[naturalWidth].as<float>() : sizer[naturalHeight].as<float>();
 			}
 			return 0.0;
 		}
 
 		size_t caretIndex(float x, float y) { return 0; }
 		void caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight) { printf("caretCoords\n"); }
+#endif
 
 	protected:
 		val mElement;
-		val mText;
-		val mImage;
 		val mStyle;
 		string mCss;
 	};
 
-	class HtmlLayer : public InkLayer
+	class HtmlInkProxy : public wrapper<HtmlInkImpl>
 	{
 	public:
-		HtmlLayer(Layer& layer, InkTarget& target, size_t z) : InkLayer(layer, target, z) {}
+		EMSCRIPTEN_WRAPPER(HtmlInkProxy);
 
-		unique_ptr<Inkbox> createInkbox(Frame& frame)
-		{
-			return make_unique<HtmlInk>(frame);
-		}
+#ifndef EMCPP_IMPL
+		void updateContent() { return call<void>("updateContent"); }
 
-		void move(size_t pos, size_t z)
-		{
-			/*if(!mLayer.bound() || !mLayer.parent()) return;
+		void elementCSS(const string& css) { return call<void>("elementCSS", css); }
+		void styleCSS(const string& name, const string& css) { return call<void>("styleCSS", name, css); }
 
-			Layer& parentLayer = mLayer.parent()->layer();
-			val& parent = static_cast<HtmlInk&>(parentLayer.inkbox()).element();
-			val& next = static_cast<HtmlInk&>(parentLayer.layers()[pos]->inkbox()).element();
-			val& element = static_cast<HtmlInk&>(mLayer.inkbox()).element();
-			parent.call<void>("insertBefore", element, next);*/
-		}
+		float contentSize(Dimension dim) { return call<float>("contentSize", dim); }
 
-		void show() {}
-		void hide() {}
-	};
-
-	class HtmlTargetProxy : public wrapper<InkTarget>
-	{
-	public:
-		EMSCRIPTEN_WRAPPER(HtmlTargetProxy);
-
-		unique_ptr<InkLayer> createLayer(Layer& layer, size_t z)
-		{
-			return make_unique<HtmlLayer>(layer, *this, z);
-		}
+		size_t caretIndex(float x, float y) { return call<size_t>("caretIndex", x, y); }
+		void caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight) { return call<void>("caretCoords", index, caretX, caretY, caretHeight); }
+#endif
 	};
 
 	void cssStyle(InkStyle& style, string& css);

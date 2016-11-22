@@ -95,10 +95,7 @@ namespace mk
 		css += "text-align: "; cssAlign(style.align().x(), css); css += "; ";
 		css += "vertical-align: middle; ";
 
-		css += "padding: "; cssBoxFloat(style.padding(), css); css += "; ";
-		css += "box-sizing: border-box; ";
-
-		/*if(!style.image().null())
+		if(!style.image().null())
 		{
 			css += "background-image: url(\"data/interface/uisprites/";
 			css += style.image().d_name;
@@ -109,7 +106,7 @@ namespace mk
 		}
 		if(!style.tile().null())
 		{
-		}*/
+		}
 		if(!style.backgroundColour().null())
 		{
 			css += "background-color: ";
@@ -154,6 +151,13 @@ namespace mk
 
 	void cssElement(Inkbox& inkbox, string& css)
 	{
+		if(inkbox.frame().widget().image())
+		{
+			css += "background-image: url(\"data/interface/uisprites/";
+			css += inkbox.frame().widget().image()->d_name;
+			css += ".png\"); ";
+			css += "backgroundSize:100%; ";
+		}
 		if(!inkbox.skin().borderWidth().null())
 		{
 			css += "border-style:solid; ";
@@ -165,12 +169,16 @@ namespace mk
 
 	void cssFrame(Inkbox& inkbox, string& css)
 	{
+		BoxFloat& bwidth = inkbox.skin().borderWidth();
+		float width = inkbox.frame().cwidth() - bwidth.x0() - bwidth.x1();
+		float height = inkbox.frame().cheight() - bwidth.y0() - bwidth.y1();
+
 		css += "width:";
-		toString(inkbox.frame().cwidth(), css);
+		toString(width, css);
 		css += "px; ";
 
 		css += "height:";
-		toString(inkbox.frame().cheight(), css);
+		toString(height, css);
 		css += "px; ";
 	}
 
@@ -196,6 +204,7 @@ namespace mk
 			css += "border-radius:";
 			cssBoxFloat(inkbox.corners(), css);
 			css += "; ";
+			printf("border-radius: %s", cssBoxFloat(inkbox.corners()).c_str());
 		}
 	}
 
@@ -207,8 +216,41 @@ namespace mk
 			css += "display:none; ";
 	}
 
-#ifndef EMCPP_PROPERTIES
-	void HtmlInk::recssElement()
+#ifdef EMCPP_PROPERTIES
+	void HtmlInkImpl::recssElement()
+	{
+		val style = mElement["style"];
+
+		BoxFloat& bwidth = mFrame.inkstyle().borderWidth();
+		float width = mFrame.cwidth() - bwidth.x0() - bwidth.x1();
+		float height = mFrame.cheight() - bwidth.y0() - bwidth.y1();
+		float left = mFrame.dposition(DIM_X) - bwidth.x0();
+		float top = mFrame.dposition(DIM_Y) - bwidth.y0();
+
+		style.set("width", toString(width) + "px");
+		style.set("height", toString(height) + "px");
+		style.set("left", toString(left) + "px");
+		style.set("top", toString(top) + "px");
+
+		if(mFrame.widget().image())
+		{
+			style.set("backgroundImage", "url(\"data/interface/uisprites/" + mFrame.widget().image()->d_name + ".png\")");
+			style.set("backgroundSize", "100%");
+		}
+		if(!mFrame.inkstyle().borderWidth().null())
+		{
+			style.set("borderStyle", "solid");
+			style.set("borderWidth", cssBoxFloat(mFrame.inkstyle().borderWidth()));
+		}
+		if(!mCorners.null())
+		{
+			style.set("borderRadius", cssBoxFloat(mCorners));
+		}
+
+		style.set("display", mVisible ? "block" : "none");
+	}
+#else
+	void HtmlInkImpl::recssElement()
 	{
 		mCss.clear();
 
@@ -222,55 +264,9 @@ namespace mk
 
 		this->elementCSS(mCss);
 	}
-#else
-	void HtmlInk::updateFrame()
-	{
-		this->updateCorners();
-
-		BoxFloat& bwidth = mFrame.inkstyle().borderWidth();
-
-		if(mFrame.dirty() > Frame::DIRTY_ABSOLUTE)
-		{
-			float left = mFrame.dposition(DIM_X) - bwidth.x0();
-			float top = mFrame.dposition(DIM_Y) - bwidth.y0();
-
-			static val kleft("left");
-			static val ktop("top");
-
-			mStyle.set(kleft, toString(left) + "px");
-			mStyle.set(ktop, toString(top) + "px");
-		}
-
-		if(mFrame.dirty() >= Frame::DIRTY_FRAME)
-		{
-			float width = mFrame.cwidth() - bwidth.x0() - bwidth.x1();
-			float height = mFrame.cheight() - bwidth.y0() - bwidth.y1();
-
-			static val kwidth("width");
-			static val kheight("height");
-
-			mStyle.set(kwidth, toString(width) + "px");
-			mStyle.set(kheight, toString(height) + "px");
-		}
-
-		if(mFrame.widget().image())
-		{
-			mStyle.set("backgroundImage", "url(\"data/interface/uisprites/" + mFrame.widget().image()->d_name + ".png\")");
-			mStyle.set("backgroundSize", "100%");
-		}
-		if(!mFrame.inkstyle().borderWidth().null())
-		{
-			mStyle.set("borderStyle", "solid");
-			mStyle.set("borderWidth", cssBoxFloat(mFrame.inkstyle().borderWidth()));
-		}
-		if(!mCorners.null())
-		{
-			mStyle.set("borderRadius", cssBoxFloat(mCorners));
-		}
-	}
 #endif
 
-	void HtmlInk::recssStyle()
+	void HtmlInkImpl::recssStyle()
 	{
 		string css;
 
@@ -398,13 +394,10 @@ namespace mk
 			.function("padding", &InkStyle::padding)
 			.function("align", &InkStyle::align)
 			.function("topdownGradient", &InkStyle::topdownGradient)
-			.function("image", &InkStyle::image, allow_raw_pointers())
-			.function("overlay", &InkStyle::overlay, allow_raw_pointers())
-			.function("tile", &InkStyle::tile, allow_raw_pointers())
+			.function("image", &InkStyle::image)
+			.function("overlay", &InkStyle::overlay)
+			.function("tile", &InkStyle::tile)
 			.function("shadow", &InkStyle::shadow)
-			;
-
-		class_<InkWindow>("InkWindow")
 			;
 
 		class_<InkTarget>("InkTarget")
@@ -412,10 +405,30 @@ namespace mk
 			;
 
 		class_<InkLayer>("InkLayer")
+#ifndef EMCPP_IMPL
+			.function("move", &InkLayer::move, pure_virtual())
+			.function("show", &InkLayer::show, pure_virtual())
+			.function("hide", &InkLayer::hide, pure_virtual())
+#endif
+			.allow_subclass<HtmlLayerProxy>("HtmlLayerProxy", constructor<Layer&, InkTarget&, size_t>())
 			;
 
 		class_<Inkbox>("Inkbox")
 			.function("frame", &Inkbox::frame)
+#ifndef EMCPP_IMPL
+			.function("updateContent", &Inkbox::updateContent, pure_virtual())
+			.function("contentSize", &Inkbox::show, pure_virtual())
+			.function("caretIndex", &Inkbox::hide, pure_virtual())
+			.function("caretCoords", &Inkbox::hide, pure_virtual())
+#endif
+			;
+
+		class_<HtmlInkImpl, base<Inkbox>>("HtmlInkImpl")
+#ifndef EMCPP_IMPL
+			.function("elementCSS", &HtmlInkImpl::elementCSS, pure_virtual())
+			.function("styleCSS", &HtmlInkImpl::styleCSS, pure_virtual())
+#endif
+			.allow_subclass<HtmlInkProxy>("HtmlInkProxy", constructor<Frame&, val>())
 			;
 	}
 }

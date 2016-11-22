@@ -12,6 +12,7 @@
 #include <Ui/mkUiForward.h>
 #include <Ui/Frame/mkUibox.h>
 #include <Ui/Input/mkInputDispatcher.h>
+#include <Ui/Input/mkInputDevice.h>
 #include <Ui/Style/mkStyle.h>
 
 #include <functional>
@@ -30,21 +31,25 @@ namespace mk
 		DISABLED = 1 << 5,
 		PRESSED = 1 << 6,
 		DRAGGED = 1 << 7,
-		MODAL = 1 << 8
+		CONTROL = 1 << 8,
+		MODAL = 1 << 9
 	};
 
-	class MK_UI_EXPORT _I_ Widget : public TypeObject, public InputReceiver, public Updatable
+	class MK_UI_EXPORT _I_ Widget : public TypeObject, public InputWidget, public Updatable
 	{
 	public:
-		Widget(FrameType frameType = FRAME);
+		Widget(StyleType& type = cls(), FrameType frameType = FRAME);
 		~Widget();
 
-		_A_ inline Sheet* parent() { return mParent; }
-		_A_ inline Frame& frame() { return *mFrame.get(); }
-		_A_ inline WidgetState state() { return mState; }
-		_A_ _M_ inline Style& style() { return *mStyle; }
+		_A_ inline Sheet* parent() { return m_parent; }
+		_A_ inline Frame& frame() { return *m_frame; }
+		_A_ inline WidgetState state() { return m_state; }
+		_A_ _M_ inline Style& style() { return *m_style; }
+		_A_ inline Device* device() { return m_device; }
 
-		void setStyle(Style* style);
+		void setStyle(Style& style);
+
+		void setDevice(Device& device) { m_device = &device; }
 
 		virtual unique_ptr<Widget> clone() { return make_unique<Widget>(); }
 
@@ -63,13 +68,15 @@ namespace mk
 
 		UiWindow& uiWindow();
 
-		virtual void show();
-		virtual void hide();
+		void show();
+		void hide();
 
 		virtual void cleanup();
 
-		virtual void bind(Sheet* parent, size_t index);
-		virtual void rebind(Sheet* parent, size_t index);
+		virtual void bind(Sheet& parent, size_t index);
+		virtual void rebind(Sheet& parent, size_t index);
+
+		virtual void bound() {}
 		
 		unique_ptr<Widget> unbind();
 		unique_ptr<Widget> extract();
@@ -78,14 +85,23 @@ namespace mk
 		void destroy();
 		void detach();
 
-		void resetStyle(Style* style);
-		void resetSkin(Style* style);
+		void resetStyle(Style& style);
+		void resetSkin(Style& style);
 
 		void nextFrame(size_t tick, size_t delta);
 
-		void toggleState(WidgetState);
+		void toggleState(WidgetState state);
 
 		void markDirty();
+
+		void hover();
+		void unhover();
+
+		void control();
+		void uncontrol();
+
+		void modal();
+		void unmodal();
 
 		void activate();
 		void deactivate();
@@ -93,66 +109,35 @@ namespace mk
 		virtual void focused() {}
 		virtual void unfocused() {}
 
-		void hover();
-		void unhover();
-
-		void focus();
-		void unfocus();
-
-		void modal();
-		void unmodal();
-
-		Widget* copyTo(Sheet* sheet);
-
-		virtual Widget* pinpoint(float x, float y, bool modal = false);
+		virtual Widget* pinpoint(float x, float y);
 
 		Widget& prev();
 		Widget& next();
 
-		bool contains(Widget* widget);
+		bool contains(Widget& widget);
 
-		InputReceiver* propagateMouse(float x, float y);
-		InputReceiver* propagateKey();
+		virtual void customDraw() {}
 
-		bool keyUp(KeyCode code, char c) { UNUSED(code); UNUSED(c); return true; };
-		bool keyDown(KeyCode code, char c) { UNUSED(code); UNUSED(c); return true; };
+		InputReceiver* controlEvent(InputEvent& inputEvent);
+		InputReceiver* propagateEvent(InputEvent& inputEvent);
 
-		bool mouseEntered(float x, float y);
-		bool mouseLeaved(float x, float y);
+		void mouseEntered(MouseEvent& mouseEvent);
+		void mouseLeaved(MouseEvent& mouseEvent);
 
-		//bool mouseMoved(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return true; };
-		//bool mousePressed(float xPos, float yPos, MouseButton button) { UNUSED(xPos); UNUSED(yPos); UNUSED(button); return false; };
-		//bool mouseReleased(float xPos, float yPos, MouseButton button) { UNUSED(xPos); UNUSED(yPos); UNUSED(button); return false; };
-
-		bool mouseMoved(float xPos, float yPos, float xDif, float yDif);
-		bool mousePressed(float xPos, float yPos, MouseButton button);
-		bool mouseReleased(float xPos, float yPos, MouseButton button);
-
-		bool mouseWheel(float xPos, float yPos, float amount) { UNUSED(xPos); UNUSED(yPos); UNUSED(amount); return false; };
-
-		bool leftPressed(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
-		bool rightPressed(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
-
-		bool leftClick(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
-		bool rightClick(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
-
-		bool rightDragStart(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
-		bool rightDrag(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return true; };
-		bool rightDragEnd(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
-
-		bool leftDragStart(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
-		bool leftDrag(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return true; };
-		bool leftDragEnd(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return true; };
+		void mousePressed(MouseEvent& mouseEvent);
+		void mouseReleased(MouseEvent& mouseEvent);
 
 		typedef std::function<void(Widget&)> Trigger;
 
 		static StyleType& cls() { static StyleType ty("Widget"); return ty; }
 
 	protected:
-		Sheet* mParent;
-		Style* mStyle;
-		unique_ptr<Frame> mFrame;
-		WidgetState mState;
+		Sheet* m_parent;
+		Style* m_style;
+		unique_ptr<Frame> m_frame;
+		WidgetState m_state;
+
+		Device* m_device;
 
 		static string sNullString;
 	};
@@ -160,7 +145,7 @@ namespace mk
 	class MK_UI_EXPORT Control : public Widget
 	{
 	public:
-		Control();
+		Control(StyleType& type = cls());
 
 		static StyleType& cls() { static StyleType ty("Control"); return ty; }
 	};

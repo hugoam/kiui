@@ -14,63 +14,92 @@ namespace mk
 	class MK_UI_EXPORT InputWindow
 	{
 	public:
-		virtual void initInput(InputDispatcher& dispatcher, size_t wndHandle) = 0;
+		virtual void initInput(Mouse& mouse, Keyboard& keyboard, size_t wndHandle) = 0;
 		virtual void resize(size_t width, size_t height) = 0;
 	};
 
-    class MK_UI_EXPORT InputDispatcher
-    {
-	public:
-		virtual void dispatchMousePressed(float x, float y, MouseButton button) = 0;
-		virtual void dispatchMouseMoved(float x, float y, float xDif, float yDif) = 0;
-		virtual void dispatchMouseReleased(float x, float y, MouseButton button) = 0;
-		virtual void dispatchMouseWheeled(float x, float y, float amount) = 0;
-
-		virtual void dispatchKeyPressed(KeyCode key, char c) = 0;
-		virtual void dispatchKeyReleased(KeyCode key, char c) = 0;
-    };
-
-	class MK_UI_EXPORT InputController
+	class MK_UI_EXPORT InputReceiver
 	{
 	public:
-		virtual InputReceiver* controlMouse(float x, float y) = 0;
-		virtual InputReceiver* controlKey() = 0;
+		enum ControlMode
+		{
+			CM_NONE,
+			CM_CONTROL,
+			CM_MODAL,
+			CM_ABSOLUTE
+		};
 
-		virtual void activated() {}
-		virtual void deactivated() {}
+		virtual InputReceiver* dispatchEvent(InputEvent& inputEvent) { UNUSED(inputEvent); return this; }
+		virtual InputReceiver* controlEvent(InputEvent& inputEvent) { UNUSED(inputEvent); return this; }
+		virtual InputReceiver* propagateEvent(InputEvent& inputEvent) { UNUSED(inputEvent); return this; }
+
+		virtual void takeControl(ControlMode mode) = 0;
+		virtual void yieldControl() = 0;
 	};
 
-	class MK_UI_EXPORT InputReceiver// : public InputController
+	class MK_UI_EXPORT InputFrame : public InputReceiver
 	{
 	public:
-		//InputReceiver* controlMouse(float x, float y) { UNUSED(x); UNUSED(y); return this; }
-		//InputReceiver* controlKey() { return this; }
+		InputFrame();
 
-		virtual InputReceiver* propagateMouse(float x, float y) { UNUSED(x); UNUSED(y); return this; }
-		virtual InputReceiver* propagateKey() { return this; }
+		InputFrame* parentFrame() { return m_parentFrame; }
 
-		virtual bool keyUp(KeyCode code, char c) { UNUSED(code); UNUSED(c); return false; };
-		virtual bool keyDown(KeyCode code, char c) { UNUSED(code); UNUSED(c); return false; };
+		InputFrame& rootFrame();
 
-		virtual bool mouseEntered(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
-		virtual bool mouseLeaved(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
+		InputReceiver* dispatchEvent(InputEvent& inputEvent);
+		InputReceiver* controlEvent(InputEvent& inputEvent);
+		InputReceiver* propagateEvent(InputEvent& inputEvent);
 
-		virtual bool mouseMoved(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return false; };
-		virtual bool mouseWheel(float xPos, float yPos, float amount) { UNUSED(xPos); UNUSED(yPos); UNUSED(amount); return false; };
+		void setController(InputFrame& inputFrame);
 
-		virtual bool mousePressed(float xPos, float yPos, MouseButton button) { UNUSED(xPos); UNUSED(yPos); UNUSED(button); return false; };
-		virtual bool mouseReleased(float xPos, float yPos, MouseButton button) { UNUSED(xPos); UNUSED(yPos); UNUSED(button); return false; };
+		void takeControl(ControlMode mode);
+		void takeControl(InputFrame& inputFrame);
+		void yieldControl();
 
-		virtual bool leftClick(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
-		virtual bool rightClick(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
+		virtual void control() {};
+		virtual void uncontrol() {};
 
-		virtual bool rightDragStart(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
-		virtual bool rightDrag(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return false; };
-		virtual bool rightDragEnd(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
+		virtual void modal() {};
+		virtual void unmodal() {};
 
-		virtual bool leftDragStart(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
-		virtual bool leftDrag(float xPos, float yPos, float xDif, float yDif) { UNUSED(xPos); UNUSED(yPos); UNUSED(xDif); UNUSED(yDif); return false; };
-		virtual bool leftDragEnd(float xPos, float yPos) { UNUSED(xPos); UNUSED(yPos); return false; };
+	protected:
+		InputFrame* m_controller;
+		InputFrame* m_controlled;
+		InputFrame* m_parentFrame;
+		ControlMode m_controlMode;
+	};
+
+
+	class MK_UI_EXPORT InputWidget : public InputFrame
+	{
+	public:
+		InputReceiver* dispatchEvent(InputEvent& inputEvent);
+
+		virtual void mouseMoved(MouseEvent& mouseEvent);
+
+		virtual void mouseEntered(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual void mouseLeaved(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+
+		virtual void mousePressed(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual void mouseReleased(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+
+		virtual void mouseWheel(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+
+		virtual void leftClick(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual void rightClick(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual void middleClick(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+
+		virtual void rightDragStart(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual void rightDrag(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual void rightDragEnd(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+
+		virtual void leftDragStart(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual void leftDrag(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual void leftDragEnd(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+
+		virtual void middleDragStart(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual void middleDrag(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual void middleDragEnd(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
 	};
 }
 

@@ -5,44 +5,35 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Widget/mkButton.h>
 
-#include <Ui/Form/mkWidgets.h>
+#include <Ui/Widget/mkWidgets.h>
 
-#include <Ui/Form/mkForm.h>
 #include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
-
-#include <Ui/Form/mkHook.h>
 
 #include <Ui/mkUiWindow.h>
 
 namespace mk
 {
-	Label::Label(const string& label, FrameType frameType)
-		: Widget(frameType)
-		, mLabel(label)
-	{
-		mStyle = &cls();
-	}
+	Label::Label(const string& label, StyleType& type, FrameType frameType)
+		: Widget(type, frameType)
+		, m_label(label)
+	{}
 
 	void Label::setLabel(const string& label)
 	{
-		mLabel = label;
-		mFrame->setDirty(Frame::DIRTY_WIDGET);
+		m_label = label;
+		m_frame->setDirty(Frame::DIRTY_WIDGET);
 	}
 
 	Title::Title(const string& label)
-		: Label(label)
-	{
-		mStyle = &cls();
-	}
+		: Label(label, cls())
+	{}
 
 	Icon::Icon(Image& image)
-		: Widget()
-		, mImage(image)
-	{
-		mStyle = &cls();
-	}
+		: Widget(cls())
+		, m_image(image)
+	{}
 
 	Icon::Icon(const string& image)
 		: Icon(findImage(image))
@@ -50,134 +41,109 @@ namespace mk
 
 	/*void Icon::setImage(const string& image)
 	{
-		mImage = image;
-		mFrame->setDirty(Frame::DIRTY_WIDGET);
+		m_image = image;
+		m_frame->setDirty(Frame::DIRTY_WIDGET);
 	}*/
 
-	Button::Button(const string& label, const Trigger& trigger)
-		: Control()
+	Button::Button(const string& label, const Trigger& trigger, StyleType& type)
+		: Control(type)
 		, WidgetTrigger(trigger)
-		, mLabel(label)
-	{
-		mStyle = &cls();
-	}
+		, m_label(label)
+	{}
 
-	bool Button::leftPressed(float x, float y)
+	void Button::leftClick(MouseEvent& mouseEvent)
 	{
-		UNUSED(x); UNUSED(y);
-		//toggleState(TRIGGERED);
-		return true;
-	}
-
-	bool Button::leftClick(float x, float y)
-	{
-		UNUSED(x); UNUSED(y);
-		if(uiWindow().ctrlPressed())
+		UNUSED(mouseEvent);
+		if(uiWindow().keyboard().ctrlPressed())
 			this->triggerCtrl();
-		else if(uiWindow().shiftPressed())
+		else if(uiWindow().keyboard().shiftPressed())
 			this->triggerShift();
 		else
 			this->trigger();
-
-		return true;
 	}
 
-	bool Button::rightClick(float x, float y)
+	void Button::rightClick(MouseEvent& mouseEvent)
 	{
-		UNUSED(x); UNUSED(y);
+		UNUSED(mouseEvent);
 		triggerAlt();
-		return true;
 	}
 
-	ImgButton::ImgButton(Image& image, const Trigger& trigger)
-		: Button("", trigger)
-		, mImage(image)
+	ImgButton::ImgButton(Image& image, const Trigger& trigger, StyleType& type)
+		: Button("", trigger, type)
+		, m_image(image)
 	{}
 
-	ImgButton::ImgButton(const string& image, const Trigger& trigger)
-		: ImgButton(findImage(image), trigger)
+	ImgButton::ImgButton(const string& image, const Trigger& trigger, StyleType& type)
+		: ImgButton(findImage(image), trigger, type)
 	{}
 
-	WrapButton::WrapButton(Widget* content, const Trigger& trigger)
-		: Sheet()
+	WrapButton::WrapButton(Widget* content, const Trigger& trigger, StyleType& type)
+		: Sheet(type)
 		, WidgetTrigger(trigger)
-		, mContent(content)
-	{
-		mStyle = &cls();
-	}
+		, m_content(content)
+	{}
 
-	WrapButton::WrapButton(unique_ptr<Widget> content, const Trigger& trigger)
-		: WrapButton(content.get(), trigger)
+	WrapButton::WrapButton(unique_ptr<Widget> content, const Trigger& trigger, StyleType& type)
+		: WrapButton(content.get(), trigger, type)
 	{
 		this->append(std::move(content));
 	}
 
 	Widget* WrapButton::content()
 	{
-		return mContents[0].get();
+		return m_contents[0].get();
 	}
 
-	bool WrapButton::leftPressed(float x, float y)
+	void WrapButton::leftClick(MouseEvent& mouseEvent)
 	{
-		UNUSED(x); UNUSED(y);
-		toggleState(TRIGGERED);
-		return true;
-	}
-
-	bool WrapButton::leftClick(float x, float y)
-	{
-		UNUSED(x); UNUSED(y);
-		if(uiWindow().ctrlPressed())
+		UNUSED(mouseEvent);
+		if(uiWindow().keyboard().ctrlPressed())
 			this->triggerCtrl();
-		else if(uiWindow().shiftPressed())
+		else if(uiWindow().keyboard().shiftPressed())
 			this->triggerShift();
 		else
 			this->trigger();
 
 		//toggleState(HOVERED);
-		return true;
 	}
 
-	bool WrapButton::rightClick(float x, float y)
+	void WrapButton::rightClick(MouseEvent& mouseEvent)
 	{
-		UNUSED(x); UNUSED(y);
+		UNUSED(mouseEvent);
 		triggerAlt();
-		return true;
 	}
 
-	Toggle::Toggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on)
-		: Control()
-		, mTriggerOn(triggerOn)
-		, mTriggerOff(triggerOff)
-		, mOn(on)
+	Toggle::Toggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on, StyleType& type)
+		: Control(type)
+		, m_triggerOn(triggerOn)
+		, m_triggerOff(triggerOff)
+		, m_on(on)
 	{
-		mStyle = &cls();
-		if(mOn)
+		if(m_on)
 			this->toggleState(ACTIVATED);
 	}
 	
 	void Toggle::update(bool on)
 	{
-		if(on != mOn)
+		if(on != m_on)
 			this->toggleState(ACTIVATED);
-		mOn = on;
+		m_on = on;
 	}
 
 	void Toggle::toggle()
 	{
-		mOn = !mOn;
+		m_on = !m_on;
 		this->toggleState(ACTIVATED);
 
-		if(mOn)
-			mTriggerOn(this);
+		if(m_on)
+			m_triggerOn(this);
 		else
-			mTriggerOff(this);
+			m_triggerOff(this);
 	}
 
-	bool Toggle::leftClick(float x, float y)
+	void Toggle::leftClick(MouseEvent& mouseEvent)
 	{
-		UNUSED(x); UNUSED(y);
+		UNUSED(mouseEvent);
 		this->toggle();
-		return true;
 	}
 }

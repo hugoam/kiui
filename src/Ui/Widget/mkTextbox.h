@@ -20,7 +20,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Textbox", TypeIn::cls()); return ty; }
 
 	protected:
-		string mString;
+		string m_string;
 	};
 }
 

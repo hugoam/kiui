@@ -13,34 +13,13 @@
 #ifdef MK_STD_PROXIES
 namespace std
 {
-	template<class _Ty>
-	struct allocator;
+	class string;
 
 	template<class _Ty>
-	struct default_delete;
-
-	template<class _Ty, class _Dx = default_delete<_Ty>>
 	class unique_ptr;
 
-	template <class _Ty, class _Alloc = allocator<_Ty>>
+	template <class _Ty>
 	class vector;
-}
-#endif
-
-#ifdef MK_TYPE_PROXIES
-namespace mk
-{
-	template <class T, class S, class... Parts>
-	class TPrototype;
-
-	template <class T>
-	class TObject;
-
-	template <class T, class S>
-	class TPart;
-
-	template <class T>
-	class TStem;
 }
 #endif
 
@@ -111,16 +90,36 @@ namespace mk
 	class AbstractPool;
 	class MultiPool;
 
-	class Stock;
-	class UniqueStock;
-	class ObjectStock;
-
 	class Indexer;
 
 	template <class T>
 	class Library;
 
+	class Injector;
+	class Maker;
+
+	class Creator;
+	class DataSource;
+	class DataLoader;
+	class LoaderMember;
+	class Loader;
+
+	class User;
+
+	class Procedure;
+	class ProcedureType;
+
+	class Member;
+	class Method;
+	class Imprint;
+
+	class Echobject;
+	class Echomember;
+	class Echomethod;
+
 	class Image256;
+
+	class Module;
 }
 
 #endif // mkOBJECTFORWARD_H_INCLUDED

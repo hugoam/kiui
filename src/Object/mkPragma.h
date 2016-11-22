@@ -7,6 +7,7 @@
 
 #if _MSC_VER
 #	pragma warning (disable : 4251) // members are private, so there's no risk them being accessed by the user
+#	pragma warning (disable : 4512) // objects cannot be copied / assigned anyway
 #endif
 
 #endif // MK_PRAGMA_H_INCLUDED

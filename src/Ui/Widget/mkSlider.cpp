@@ -8,9 +8,8 @@
 #include <Object/String/mkStringConvert.h>
 #include <Object/Util/mkStatString.h>
 
-#include <Ui/Form/mkWidgets.h>
+#include <Ui/Widget/mkWidgets.h>
 
-#include <Ui/Form/mkForm.h>
 #include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
@@ -21,92 +20,75 @@
 
 namespace mk
 {
-	SliderKnob::SliderKnob(Dimension dim)
-		: Button("")
-		, mDim(dim)
-		, mStartPos(0.f)
-		, mStartOffset(0.f)
+	SliderKnob::SliderKnob(Dimension dim, StyleType& type)
+		: Button("", Trigger(), type)
+		, m_dim(dim)
+		, m_startPos(0.f)
+		, m_startOffset(0.f)
 	{}
 
 	float SliderKnob::offset(float pos)
 	{
-		float length = mFrame->parent()->dsize(mDim) - (mFrame->dexpand(mDim) ? 0.f : mFrame->dsize(mDim));
-		float offset = std::min(length, std::max(0.f, mStartOffset + pos - mStartPos));
+		float length = m_frame->parent()->dsize(m_dim) - (m_frame->dexpand(m_dim) ? 0.f : m_frame->dsize(m_dim));
+		float offset = std::min(length, std::max(0.f, m_startOffset + pos - m_startPos));
 		return offset;
 	}
 
-	bool SliderKnob::leftDragStart(float xPos, float yPos)
+	void SliderKnob::leftDragStart(MouseEvent& mouseEvent)
 	{
-		mStartPos = mDim == DIM_X ? xPos : yPos;
-		mStartOffset = mFrame->dexpand(mDim) ? (mStartPos - mFrame->parent()->dabsolute(mDim)) : mFrame->dposition(mDim);
-		toggleState(ACTIVATED);
-		return true;
+		m_startPos = m_dim == DIM_X ? mouseEvent.posX : mouseEvent.posY;
+		m_startOffset = m_frame->dexpand(m_dim) ? (m_startPos - m_frame->parent()->dabsolute(m_dim)) : m_frame->dposition(m_dim);
+		this->activate();
 	}
 
-	bool SliderKnob::leftDrag(float xPos, float yPos, float xDif, float yDif)
+	void SliderKnob::leftDrag(MouseEvent& mouseEvent)
 	{
-		UNUSED(xDif); UNUSED(yDif);
-		mParent->as<Slider>().offsetChange(offset(mDim == DIM_X ? xPos : yPos), false);
-		return true;
+		UNUSED(mouseEvent);
+		m_parent->as<Slider>().offsetChange(offset(m_dim == DIM_X ? mouseEvent.posX : mouseEvent.posY), false);
 	}
 
-	bool SliderKnob::leftDragEnd(float xPos, float yPos)
+	void SliderKnob::leftDragEnd(MouseEvent& mouseEvent)
 	{
-		mParent->as<Slider>().offsetChange(offset(mDim == DIM_X ? xPos : yPos), true);
-		toggleState(ACTIVATED);
-		return true;
+		m_parent->as<Slider>().offsetChange(offset(m_dim == DIM_X ? mouseEvent.posX : mouseEvent.posY), true);
+		this->deactivate();
 	}
 
 	SliderKnobX::SliderKnobX()
-		: SliderKnob(DIM_X)
-	{
-		mStyle = &cls();
-	}
+		: SliderKnob(DIM_X, cls())
+	{}
 
 	SliderKnobY::SliderKnobY()
-		: SliderKnob(DIM_Y)
-	{
-		mStyle = &cls();
-	}
+		: SliderKnob(DIM_Y, cls())
+	{}
 
 	SpacerX::SpacerX()
-		: Widget()
-	{
-		mStyle = &cls();
-	}
+		: Widget(cls())
+	{}
 
 	SpacerY::SpacerY()
-		: Widget()
-	{
-		mStyle = &cls();
-	}
+		: Widget(cls())
+	{}
 
 
-	Slider::Slider(Dimension dim, const Trigger& onUpdated)
-		: Sheet()
-		, mDim(dim)
-		, mOnUpdated(onUpdated)
-		, mFiller(dim == DIM_X ? (Widget&) this->makeappend<FillerX>() : (Widget&) this->makeappend<FillerY>())
-		, mButton(dim == DIM_X ? (SliderKnob&) this->makeappend<SliderKnobX>() : (SliderKnob&) this->makeappend<SliderKnobY>())
-	{
-		mStyle = &cls();
-	}
+	Slider::Slider(Dimension dim, const Trigger& onUpdated, StyleType& type)
+		: Sheet(type)
+		, m_dim(dim)
+		, m_onUpdated(onUpdated)
+		, m_filler(dim == DIM_X ? (Widget&) this->makeappend<FillerX>() : (Widget&) this->makeappend<FillerY>())
+		, m_button(dim == DIM_X ? (SliderKnob&) this->makeappend<SliderKnobX>() : (SliderKnob&) this->makeappend<SliderKnobY>())
+	{}
 	
 	SliderX::SliderX(const Trigger& onUpdated)
-		: Slider(DIM_X, onUpdated)
-	{
-		mStyle = &cls();
-	}
+		: Slider(DIM_X, onUpdated, cls())
+	{}
 
 	SliderY::SliderY(const Trigger& onUpdated)
-		: Slider(DIM_Y, onUpdated)
-	{
-		mStyle = &cls();
-	}
+		: Slider(DIM_Y, onUpdated, cls())
+	{}
 
 	void Slider::nextFrame(size_t tick, size_t delta)
 	{
-		bool dirty = mFrame->dirty() >= Frame::DIRTY_WIDGET;
+		bool dirty = m_frame->dirty() >= Frame::DIRTY_FRAME;
 		Sheet::nextFrame(tick, delta);
 		if(dirty)
 			this->updateKnob();
@@ -114,40 +96,40 @@ namespace mk
 
 	float Slider::length()
 	{
-		if(mButton.frame().dexpand(mDim))
-			return mFrame->dsize(mDim);
+		if(m_button.frame().dexpand(m_dim))
+			return m_frame->dsize(m_dim);
 		else
-			return mFrame->dsize(mDim) - mButton.frame().dsize(mDim);
+			return m_frame->dsize(m_dim) - m_button.frame().dsize(m_dim);
 	}
 
 	void Slider::offsetChange(float offset, bool ended)
 	{
-		int step = int(round(offset / this->length() * (mNumSteps - 1.f)));
-		if(step != mStep)
+		int step = int(round(offset / this->length() * (m_numSteps - 1.f)));
+		if(step != m_step)
 		{
-			mStep = step;
-			mVal = mMin + step * mStepLength;
+			m_step = step;
+			m_val = m_min + step * m_stepLength;
 			this->updateKnob();
-			this->sliderStep(mVal, ended);
+			this->sliderStep(m_val, ended);
 		}
 	}
 
 	void Slider::updateMetrics(float min, float max, float val, float stepLength, float knobLength)
 	{
-		if(min != mMin || max != mMax || val != mVal || stepLength != mStepLength || (knobLength && knobLength != mKnobLength))
+		if(min != m_min || max != m_max || val != m_val || stepLength != m_stepLength || (knobLength && knobLength != m_knobLength))
 			this->resetMetrics(min, max, val, stepLength, knobLength);
 	}
 
 	void Slider::resetMetrics(float min, float max, float val, float stepLength, float knobLength)
 	{
-		mMin = min;
-		mMax = max;
-		mVal = val;
-		mStepLength = stepLength == 0 ? 1.f : stepLength;
-		mNumSteps = (mMax - mMin) / mStepLength + 1;
-		mStep = int((mVal - mMin) / mStepLength);
+		m_min = min;
+		m_max = max;
+		m_val = val;
+		m_stepLength = stepLength == 0 ? 1.f : stepLength;
+		m_numSteps = (m_max - m_min) / m_stepLength + 1;
+		m_step = int((m_val - m_min) / m_stepLength);
 
-		mKnobLength = knobLength ? knobLength : mStepLength;
+		m_knobLength = knobLength ? knobLength : m_stepLength;
 
 		this->markDirty();
 		//this->updateKnob(); @useless ?
@@ -155,25 +137,23 @@ namespace mk
 
 	void Slider::updateKnob()
 	{
-		if(!(mState & BOUND) || !mFrame->visible())
+		if(!(m_state & BOUND) || !m_frame->visible())
 			return;
 
-		if(mButton.frame().dmanual(mDim))
-			mButton.frame().setSizeDim(mDim, std::max(mFrame->dsize(mDim == DIM_X ? DIM_Y : DIM_X), mKnobLength / (mKnobLength + mMax - mMin) * mFrame->dsize(mDim)));
+		if(m_button.frame().dmanual(m_dim))
+			m_button.frame().setSizeDim(m_dim, std::max(m_frame->dsize(m_dim == DIM_X ? DIM_Y : DIM_X), m_knobLength / (m_knobLength + m_max - m_min) * m_frame->dsize(m_dim)));
 
-		float pos = (mVal - mMin) / (mMax - mMin) * this->length();		
-		mFiller.frame().setSizeDim(mDim, pos);
-		mButton.frame().parent()->positionDepth(mButton.frame());
+		float pos = (m_val - m_min) / (m_max - m_min) * this->length();		
+		m_filler.frame().setSizeDim(m_dim, pos);
+		m_button.frame().parent()->positionDepth(m_button.frame());
 
-		if(!mButton.frame().dexpand(mDim))
-			mButton.frame().setPositionDim(mDim, pos);
+		if(!m_button.frame().dexpand(m_dim))
+			m_button.frame().setPositionDim(m_dim, pos);
 		else
-			mButton.frame().setPositionDim(mDim, 0);
+			m_button.frame().setPositionDim(m_dim, 0);
 	}
 
 	SliderDisplay::SliderDisplay(const string& label)
-		: Label(label)
-	{
-		mStyle = &cls();
-	}
+		: Label(label, cls())
+	{}
 }

@@ -21,26 +21,26 @@ namespace mk
 
 	void Styler::prepare()
 	{
-		mOverrides.resize(1000);
+		m_overrides.resize(1000);
 
-		for(Object* object : Style::indexer().objects())
+		for(Object* object : Style::cls().indexer().objects())
 			if(object)
 				object->as<Style>().inherit();
 
-		for(Object* object : InkStyle::indexer().objects())
+		for(Object* object : InkStyle::cls().indexer().objects())
 			if(object)
 			{
 				InkStyle& ink = object->as<InkStyle>();
 				if(ink.backgroundColour().a() > 0.f || ink.textColour().a() > 0.f || ink.borderColour().a() > 0.f || ink.image() || !ink.imageSkin().null())
-					ink.mEmpty = false;
+					ink.m_empty = false;
 			}
 	}
 
 	void Styler::reset()
 	{
-		mOverrides.clear();
+		m_overrides.clear();
 
-		for(Object* object : Style::indexer().objects())
+		for(Object* object : Style::cls().indexer().objects())
 			if(object)
 				object->as<Style>().reset();
 
@@ -49,20 +49,20 @@ namespace mk
 
 	Style* Styler::fetchOverride(Style& style, Style& overrider)
 	{
-		if(mOverrides[overrider.id()].size() > 0)
-			for(StyleOverride& override : mOverrides[overrider.id()])
-				if(&override.mStyle == &style)
-					return &override.mOverride;
+		if(m_overrides[overrider.id()].size() > 0)
+			for(StyleOverride& override : m_overrides[overrider.id()])
+				if(&override.m_style == &style)
+					return &override.m_override;
 
 		return nullptr;
 	}
 
 	void Styler::override(Style& stem, Style& overrideWhat, Style& overrideWith)
 	{
-		if(mOverrides.size() <= stem.id())
-			mOverrides.resize(stem.id() + 1);
+		if(m_overrides.size() <= stem.id())
+			m_overrides.resize(stem.id() + 1);
 
-		mOverrides[stem.id()].emplace_back(overrideWhat, overrideWith);
+		m_overrides[stem.id()].emplace_back(overrideWhat, overrideWith);
 	}
 
 	void Styler::override(const string& stem, const string& style, const string& overrider)
@@ -73,13 +73,13 @@ namespace mk
 	Style& Styler::dynamicStyle(const string& name)
 	{
 		if(this->fetchStyle(name) == nullptr)
-			mDynamicStyles.emplace_back(make_unique<Style>(name));
+			m_dynamicStyles.emplace_back(make_unique<Style>(name));
 		return *this->fetchStyle(name);
 	}
 
 	Style* Styler::fetchStyle(const string& name)
 	{
-		for(Object* object : Style::indexer().objects())
+		for(Object* object : Style::cls().indexer().objects())
 			if(object && object->as<Style>().name() == name)
 				return &object->as<Style>();
 		return nullptr;
@@ -110,6 +110,31 @@ namespace mk
 		Window::cls().layout().d_opacity = OPAQUE;
 		Window::cls().layout().d_layoutDim = DIM_Y;
 		Window::cls().layout().d_size = DimFloat(480.f, 350.f);
+
+		Popup::cls().layout().d_flow = FREE;
+		Popup::cls().layout().d_opacity = OPAQUE;
+		Popup::cls().layout().d_space = BOARD;
+		Popup::cls().layout().d_size = DimFloat(280.f, 350.f);
+
+		Node::cls().layout().d_flow = FREE;
+		Node::cls().layout().d_opacity = OPAQUE;
+		Node::cls().layout().d_layoutDim = DIM_X;
+
+		NodePlug::cls().layout().d_layoutDim = DIM_X;
+		NodePlug::cls().layout().d_opacity = OPAQUE;
+
+		Node::cls().layout().d_space = BLOCK;
+
+		NodeIn::cls().layout().d_space = DIV;
+		NodeOut::cls().layout().d_space = DIV;
+
+		NodeBody::cls().layout().d_space = DIV;
+		NodePlug::cls().layout().d_space = BLOCK;
+
+		NodePlugKnob::cls().layout().d_space = BLOCK;
+
+		Canvas::cls().layout().d_space = BOARD;
+		Canvas::cls().layout().d_opacity = OPAQUE;
 
 		DockWindow::cls().layout().d_opacity = OPAQUE;
 
@@ -195,7 +220,7 @@ namespace mk
 		RadioSwitch::cls().layout().d_layoutDim = DIM_X;
 		RadioChoice::cls();
 
-		Sequence::cls().layout().d_layoutDim = DIM_X;
+		Band::cls().layout().d_layoutDim = DIM_X;
 		Header::cls().layout().d_layoutDim = DIM_X;
 		Dropdown::cls().layout().d_layoutDim = DIM_X;
 		Typedown::cls();
@@ -208,7 +233,7 @@ namespace mk
 		ScrollerX::cls().layout().d_layoutDim = DIM_X;
 		ScrollerY::cls().layout().d_layoutDim = DIM_Y;
 
-		Icon::cls().skin().mEmpty = false;
+		Icon::cls().skin().m_empty = false;
 
 		Dir::cls().layout().d_layoutDim = DIM_X;
 		File::cls().layout().d_layoutDim = DIM_X;
@@ -290,31 +315,31 @@ namespace mk
 
 		Header::cls().layout().d_padding = BoxFloat(6.f);
 
-		EmptyStyle::cls().skin().mEmpty = true;
+		EmptyStyle::cls().skin().m_empty = true;
 
-		WindowHeader::cls().skin().mWeakCorners = true;
-		WindowFooter::cls().skin().mWeakCorners = true;
-		FillerX::cls().skin().mWeakCorners = true;
-		RadioChoice::cls().skin().mWeakCorners = true;
+		WindowHeader::cls().skin().m_weakCorners = true;
+		WindowFooter::cls().skin().m_weakCorners = true;
+		FillerX::cls().skin().m_weakCorners = true;
+		RadioChoice::cls().skin().m_weakCorners = true;
 
-		Cursor::cls().skin().mImage = &findImage("mousepointer");
+		Cursor::cls().skin().m_image = &findImage("mousepointer");
 
-		ResizeCursorX::cls().skin().mImage = &findImage("resize_h_20");
-		ResizeCursorX::cls().skin().mPadding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
-		ResizeCursorY::cls().skin().mImage = &findImage("resize_v_20");
-		ResizeCursorY::cls().skin().mPadding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
-		MoveCursor::cls().skin().mImage = &findImage("move_20");
-		MoveCursor::cls().skin().mPadding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
-		ResizeCursorDiagLeft::cls().skin().mImage = &findImage("resize_diag_left_20");
-		ResizeCursorDiagLeft::cls().skin().mPadding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
-		ResizeCursorDiagRight::cls().skin().mImage = &findImage("resize_diag_right_20");
-		ResizeCursorDiagRight::cls().skin().mPadding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
-		CaretCursor::cls().skin().mImage = &findImage("caret_white");
-		CaretCursor::cls().skin().mPadding = BoxFloat(-4.f, -9.f, +4.f, +9.f);
+		ResizeCursorX::cls().skin().m_image = &findImage("resize_h_20");
+		ResizeCursorX::cls().skin().m_padding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
+		ResizeCursorY::cls().skin().m_image = &findImage("resize_v_20");
+		ResizeCursorY::cls().skin().m_padding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
+		MoveCursor::cls().skin().m_image = &findImage("move_20");
+		MoveCursor::cls().skin().m_padding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
+		ResizeCursorDiagLeft::cls().skin().m_image = &findImage("resize_diag_left_20");
+		ResizeCursorDiagLeft::cls().skin().m_padding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
+		ResizeCursorDiagRight::cls().skin().m_image = &findImage("resize_diag_right_20");
+		ResizeCursorDiagRight::cls().skin().m_padding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
+		CaretCursor::cls().skin().m_image = &findImage("caret_white");
+		CaretCursor::cls().skin().m_padding = BoxFloat(-4.f, -9.f, +4.f, +9.f);
 
-		Caret::cls().skin().mBackgroundColour = Colour::White;
+		Caret::cls().skin().m_backgroundColour = Colour::White;
 
-		Textbox::cls().skin().mTextWrap = true;
+		Textbox::cls().skin().m_textWrap = true;
 
 		Page::cls().layout().d_spacing = DimFloat(4.f, 6.f);
 		ExpandboxBody::cls().layout().d_spacing = DimFloat(4.f, 6.f);
@@ -327,16 +352,15 @@ namespace mk
 		ScrollerKnob::cls().layout().d_sizing = DimSizing(FIXED, MANUAL);
 		FillerX::cls().layout().d_sizing = DimSizing(MANUAL, FIXED);
 
+		this->override(Scroller::cls(), FillerX::cls(), SpacerX::cls());
+		this->override(Scroller::cls(), FillerY::cls(), SpacerY::cls());
+
 		this->override(Scroller::cls(), SliderKnobX::cls(), ScrollerKnobX::cls());
 		this->override(Scroller::cls(), SliderKnobY::cls(), ScrollerKnobY::cls());
 	}
 
 	void Styler::defaultSkins()
 	{
-		// @todo WSIWYG mode for frame OPACITY parameter where any frame inked with background is set as _OPAQUE
-		// this will allow to have an editor interface where any rectangle you see can be selected
-		// whereas if it was set as _VOID it would not be possible to select it (the pinpointing just passes through)
-
 		// Skins
 
 		TableHead::cls().layout().d_spacing = DimFloat(1.f, 0.f);
@@ -349,129 +373,136 @@ namespace mk
 		SliderKnobX::cls().layout().d_size = DimFloat(8.f, 0.f);
 		SliderKnobY::cls().layout().d_size = DimFloat(0.f, 8.f);
 
-		SliderKnob::cls().skin().mBackgroundColour = Colour::LightGrey;
-		SliderKnob::cls().skin().mCornerRadius = 3.f;
-		SliderKnob::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
+		SliderKnob::cls().skin().m_backgroundColour = Colour::LightGrey;
+		SliderKnob::cls().skin().m_cornerRadius = 3.f;
+		SliderKnob::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
 
 		SliderDisplay::cls().layout().d_align = DimAlign(CENTER, CENTER);
 
-		CloseButton::cls().skin().mImage = &findImage("close_15");
-		CloseButton::cls().skin().mPadding = BoxFloat(4.f);
-		CloseButton::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
+		CloseButton::cls().skin().m_image = &findImage("close_15");
+		CloseButton::cls().skin().m_padding = BoxFloat(4.f);
+		CloseButton::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
 
-		DropdownToggle::cls().skin().mBackgroundColour = Colour::MidGrey;
-		DropdownToggle::cls().skin().mImage = &findImage("arrow_down_15");
-		DropdownToggle::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
+		DropdownToggle::cls().skin().m_backgroundColour = Colour::MidGrey;
+		DropdownToggle::cls().skin().m_image = &findImage("arrow_down_15");
+		DropdownToggle::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
 
-		ExpandboxToggle::cls().skin().mImage = &findImage("arrow_right_15");
-		ExpandboxToggle::cls().decline(ACTIVATED).mImage = &findImage("arrow_down_15");
-		ExpandboxToggle::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
-		ExpandboxToggle::cls().decline(DISABLED).mImage = &findImage("empty_15");
-		ExpandboxToggle::cls().decline(static_cast<WidgetState>(ACTIVATED | HOVERED)).mImage = &findImage("arrow_down_15");
-		ExpandboxToggle::cls().subskin(static_cast<WidgetState>(ACTIVATED | HOVERED)).mBackgroundColour = Colour::Red;
+		ExpandboxToggle::cls().skin().m_image = &findImage("arrow_right_15");
+		ExpandboxToggle::cls().decline(ACTIVATED).m_image = &findImage("arrow_down_15");
+		ExpandboxToggle::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
+		ExpandboxToggle::cls().decline(DISABLED).m_image = &findImage("empty_15");
+		ExpandboxToggle::cls().decline(static_cast<WidgetState>(ACTIVATED | HOVERED)).m_image = &findImage("arrow_down_15");
+		ExpandboxToggle::cls().subskin(static_cast<WidgetState>(ACTIVATED | HOVERED)).m_backgroundColour = Colour::Red;
 
 		TreeNodeToggle::cls().copySkins(ExpandboxToggle::cls());
 
-		Label::cls().skin().mTextColour = Colour::White;
-		Label::cls().skin().mPadding = BoxFloat(2.f);
+		Label::cls().skin().m_textColour = Colour::White;
+		Label::cls().skin().m_padding = BoxFloat(2.f);
 		Title::cls();
 		
-		TypeIn::cls().skin().mTextColour = Colour::White;
-		TypeIn::cls().skin().mPadding = BoxFloat(2.f);
+		TypeIn::cls().skin().m_textColour = Colour::White;
+		TypeIn::cls().skin().m_padding = BoxFloat(2.f);
 
-		Button::cls().skin().mBackgroundColour = Colour::MidGrey;
-		Button::cls().skin().mTextColour = Colour::White;
-		Button::cls().skin().mPadding = BoxFloat(2.f);
-		Button::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
-		Button::cls().decline(ACTIVATED).mBackgroundColour = Colour::LightGrey;
-		Button::cls().decline(static_cast<WidgetState>(ACTIVATED | HOVERED)).mBackgroundColour = Colour::Red;
+		Button::cls().skin().m_backgroundColour = Colour::MidGrey;
+		Button::cls().skin().m_textColour = Colour::White;
+		Button::cls().skin().m_padding = BoxFloat(2.f);
+		Button::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
+		Button::cls().decline(ACTIVATED).m_backgroundColour = Colour::LightGrey;
+		Button::cls().decline(static_cast<WidgetState>(ACTIVATED | HOVERED)).m_backgroundColour = Colour::Red;
 
-		ImgButton::cls().skin().mBackgroundColour = Colour::Transparent;
+		ImgButton::cls().skin().m_backgroundColour = Colour::Transparent;
 
-		CloseButton::cls().skin().mBackgroundColour = Colour::Transparent;
-		DropdownToggle::cls().skin().mBackgroundColour = Colour::Transparent;
+		CloseButton::cls().skin().m_backgroundColour = Colour::Transparent;
+		DropdownToggle::cls().skin().m_backgroundColour = Colour::Transparent;
 
 		//Toggle::cls().copySkins(Button::cls());
 		WrapButton::cls().copySkins(Button::cls());
 
-		EmptyStyle::cls().skin().mBackgroundColour = Colour::Transparent;
+		EmptyStyle::cls().skin().m_backgroundColour = Colour::Transparent;
 		DropdownHeader::cls().copySkins(EmptyStyle::cls());
 
 		Dir::cls().copySkins(ImgButton::cls());
 		File::cls().copySkins(ImgButton::cls());
 		TreeNodeHeader::cls().copySkins(ImgButton::cls());
 
-		ProgressBarX::cls().skin().mBackgroundColour = Colour::LightGrey;
-		ProgressBarX::cls().skin().mBorderColour = Colour::White;
-		ProgressBarX::cls().skin().mBorderWidth = 0.5f;
+		ProgressBarX::cls().skin().m_backgroundColour = Colour::LightGrey;
+		ProgressBarX::cls().skin().m_borderColour = Colour::White;
+		ProgressBarX::cls().skin().m_borderWidth = 0.5f;
 		ProgressBarX::cls().layout().d_padding = BoxFloat(1.f, 1.f, 1.f, 1.f);
 
-		FillerX::cls().skin().mBackgroundColour = Colour(0.05f, 0.65f, 1.f, 0.6f);
-		FillerY::cls().skin().mBackgroundColour = Colour(0.05f, 0.65f, 1.f, 0.6f);
+		FillerX::cls().skin().m_backgroundColour = Colour(0.05f, 0.65f, 1.f, 0.6f);
+		FillerY::cls().skin().m_backgroundColour = Colour(0.05f, 0.65f, 1.f, 0.6f);
 
-		ScrollerKnob::cls().skin().mBackgroundColour = Colour::LightGrey;
-		ScrollerKnob::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
-		ScrollerKnob::cls().decline(PRESSED).mBackgroundColour = Colour::Red;
+		ScrollerKnob::cls().skin().m_backgroundColour = Colour::LightGrey;
+		ScrollerKnob::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
+		ScrollerKnob::cls().decline(PRESSED).m_backgroundColour = Colour::Red;
 
-		ScrollerKnobX::cls().skin().mMargin = BoxFloat(0.f, 4.f, 0.f, 4.f);
-		ScrollerKnobY::cls().skin().mMargin = BoxFloat(4.f, 0.f, 4.f, 0.f);
+		ScrollerKnobX::cls().skin().m_margin = BoxFloat(0.f, 4.f, 0.f, 4.f);
+		ScrollerKnobY::cls().skin().m_margin = BoxFloat(4.f, 0.f, 4.f, 0.f);
 
-		Scrollbar::cls().skin().mBackgroundColour = Colour::Black;
+		Scrollbar::cls().skin().m_backgroundColour = Colour::Black;
 
-		Slider::cls().skin().mBackgroundColour = Colour::MidGrey;
-		Slider::cls().skin().mCornerRadius = 3.f;
+		Slider::cls().skin().m_backgroundColour = Colour::MidGrey;
+		Slider::cls().skin().m_cornerRadius = 3.f;
 
-		ScrollUp::cls().skin().mImage = &findImage("arrow_up_15");
-		ScrollUp::cls().skin().mBackgroundColour = Colour::Transparent;
-		ScrollUp::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
+		ScrollUp::cls().skin().m_image = &findImage("arrow_up_15");
+		ScrollUp::cls().skin().m_backgroundColour = Colour::Transparent;
+		ScrollUp::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
 
-		ScrollDown::cls().skin().mImage = &findImage("arrow_down_15");
-		ScrollDown::cls().skin().mBackgroundColour = Colour::Transparent;
-		ScrollDown::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
+		ScrollDown::cls().skin().m_image = &findImage("arrow_down_15");
+		ScrollDown::cls().skin().m_backgroundColour = Colour::Transparent;
+		ScrollDown::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
 
-		Scroller::cls().skin().mBackgroundColour = Colour::Transparent;
+		Scroller::cls().skin().m_backgroundColour = Colour::Transparent;
 
-		Dialog::cls().skin().mBackgroundColour = Colour::DarkGrey;
+		NodeCable::cls().skin().m_borderWidth = 2.f;
+		NodeCable::cls().skin().m_borderColour = Colour::White;
 
-		Tooltip::cls().skin().mPadding = BoxFloat(4.f);
-		Tooltip::cls().skin().mTextColour = Colour::White;
-		Tooltip::cls().skin().mBackgroundColour = Colour::MidGrey;
+		Dialog::cls().skin().m_backgroundColour = Colour::DarkGrey;
 
-		Tree::cls().skin().mBackgroundColour = Colour::Black;
-		List::cls().skin().mBackgroundColour = Colour::Black;
+		Tooltip::cls().skin().m_padding = BoxFloat(4.f);
+		Tooltip::cls().skin().m_textColour = Colour::White;
+		Tooltip::cls().skin().m_backgroundColour = Colour::MidGrey;
+
+		//Tree::cls().skin().m_backgroundColour = Colour::Black;
+		//List::cls().skin().m_backgroundColour = Colour::Black;
 		SelectList::cls();
 
-		Window::cls().skin().mBackgroundColour = Colour::AlphaGrey;
-		DockWindow::cls().skin().mBackgroundColour = Colour::DarkGrey;
-		WindowHeader::cls().skin().mBackgroundColour = Colour::LightGrey;
-		WindowFooter::cls().skin().mBackgroundColour = Colour::LightGrey;
+		Window::cls().skin().m_backgroundColour = Colour::AlphaGrey;
+		//DockWindow::cls().skin().m_backgroundColour = Colour::DarkGrey;
+		WindowHeader::cls().skin().m_backgroundColour = Colour::LightGrey;
+		WindowFooter::cls().skin().m_backgroundColour = Colour::LightGrey;
 		WindowFooter::cls().layout().d_size = DimFloat(0.f, 7.f);
 
-		Tab::cls().skin().mBackgroundColour = Colour::LightGrey;
-		TabberHead::cls().skin().mBackgroundColour = Colour::Black;
 
-		ExpandboxHeader::cls().skin().mBackgroundColour = Colour::LightGrey;
-		ExpandboxHeader::cls().decline(ACTIVATED).mBackgroundColour = Colour::Red;
+		//Tab::cls().skin().m_backgroundColour = Colour::LightGrey;
+		TabberHead::cls().skin().m_backgroundColour = Colour::Black;
 
-		ColumnHeader::cls().skin().mBackgroundColour = Colour::MidGrey;
+		ExpandboxHeader::cls().skin().m_backgroundColour = Colour::LightGrey;
+		ExpandboxHeader::cls().decline(ACTIVATED).m_backgroundColour = Colour::Red;
 
-		Header::cls().skin().mBackgroundColour = Colour::DarkGrey;
+		ColumnHeader::cls().skin().m_backgroundColour = Colour::MidGrey;
 
-		//ExpandboxBody::cls().skin().mBackgroundColour = Colour::DarkGrey;
+		Header::cls().skin().m_backgroundColour = Colour::DarkGrey;
 
-		TreeNodeBody::cls().skin().mBackgroundColour = Colour::Transparent;
+		ExpandboxBody::cls().skin().m_backgroundColour = Colour::DarkGrey;
 
-		Caret::cls().skin().mBackgroundColour = Colour::Black;
+		TreeNodeBody::cls().skin().m_backgroundColour = Colour::Transparent;
 
-		TypeIn::cls().skin().mBackgroundColour = Colour::LightGrey;
-		TypeIn::cls().skin().mCornerRadius = BoxFloat(3.f, 3.f, 3.f, 3.f);
-		TypeIn::cls().decline(ACTIVATED).mBackgroundColour = Colour::Red;
+		Caret::cls().skin().m_backgroundColour = Colour::Black;
+
+		TypeIn::cls().skin().m_backgroundColour = Colour::LightGrey;
+		TypeIn::cls().skin().m_cornerRadius = BoxFloat(3.f, 3.f, 3.f, 3.f);
+		TypeIn::cls().decline(ACTIVATED).m_backgroundColour = Colour::Red;
 
 		Dropdown::cls().copySkins(TypeIn::cls());
-		DropdownList::cls().skin().mBackgroundColour = Colour::LightGrey;
+		DropdownList::cls().skin().m_backgroundColour = Colour::LightGrey;
 
-		Checkbox::cls().skin().mBackgroundColour = Colour::MidGrey;
-		Checkbox::cls().decline(HOVERED).mBackgroundColour = Colour::Red;
-		Checkbox::cls().decline(ACTIVATED).mBackgroundColour = Colour::LightGrey;
+		Checkbox::cls().skin().m_backgroundColour = Colour::MidGrey;
+		Checkbox::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
+		Checkbox::cls().decline(ACTIVATED).m_backgroundColour = Colour::LightGrey;
+
+		Node::cls().rebaseSkins(Window::cls());
+		NodeBody::cls().rebaseSkins(WindowHeader::cls());
 	}
 }

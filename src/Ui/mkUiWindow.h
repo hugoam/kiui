@@ -9,20 +9,12 @@
 #include <Object/Util/mkColour.h>
 #include <Object/Util/mkTimer.h>
 #include <Ui/mkUiForward.h>
-#include <Ui/Input/mkInputDispatcher.h>
-#include <Ui/Form/mkForm.h>
-#include <Ui/Controller/mkController.h>
+#include <Ui/Input/mkInputDevice.h>
 #include <Ui/mkRenderWindow.h>
 
 namespace mk
 {
-	template <class T_Widget, class T_Form>
-	unique_ptr<Widget> createWidget(Form* form)
-	{
-		return make_unique<T_Widget>(form->as<T_Form>());
-	}
-
-	class MK_UI_EXPORT UiWindow : public InputDispatcher
+	class MK_UI_EXPORT UiWindow
 	{
 	public:
 		UiWindow(const string& resourcePath = "", User* user = nullptr);
@@ -31,64 +23,56 @@ namespace mk
 		void setup(RenderWindow& renderWindow, InkWindow& inkWindow, InputWindow* inputWindow);
 		void init();
 
-		const string& resourcePath() { return mResourcePath; }
+		const string& resourcePath() { return m_resourcePath; }
 
-		RenderWindow& renderWindow() { return *mRenderWindow; }
-		InkWindow& inkWindow() { return *mInkWindow; }
-		RootSheet& rootSheet() { return *mRootSheet; }
-		RootForm& rootForm() { return *mRootForm.get(); }
+		float width() { return m_width; }
+		float height() { return m_height; }
 
-		User* user() { return mUser; }
+		RenderWindow& renderWindow() { return *m_renderWindow; }
+		InkWindow& inkWindow() { return *m_inkWindow; }
+		RootSheet& rootSheet() { return *m_rootSheet; }
+		RootDevice& rootDevice() { return *m_rootDevice; }
 
-		Styler& styler() { return *mStyler.get(); }
+		Mouse& mouse() { return *m_mouse; }
+		Keyboard& keyboard() { return *m_keyboard; }
+
+		User& user() { return *m_user; }
+
+		Styler& styler() { return *m_styler; }
+
+		bool shutdownRequested() { return m_shutdownRequested; }
 
 		void resize(size_t width, size_t height);
 
-		void setRootForm(RootForm* form);
-
 		bool nextFrame();
-		bool shutdownRequested() { return mShutdownRequested; }
-		bool shiftPressed() { return mShiftPressed; }
-		bool ctrlPressed() { return mCtrlPressed; }
 
-		float width() { return mWidth; }
-		float height() { return mHeight; }
+		void shutdown();
 
-		void dispatchKeyPressed(KeyCode key, char c);
-		void dispatchKeyReleased(KeyCode key, char c);
-
-		void dispatchMousePressed(float x, float y, MouseButton button);
-		void dispatchMouseMoved(float x, float y, float xDif, float yDif);
-		void dispatchMouseReleased(float x, float y, MouseButton button);
-		void dispatchMouseWheeled(float x, float y, float amount);
-
-		static std::map<string, std::function<unique_ptr<Widget>(Form*)>> sDispatch;
+		void handleDestroyWidget(Widget& widget);
 
 	protected:
-		string mResourcePath;
+		string m_resourcePath;
 
-		float mWidth;
-		float mHeight;
+		float m_width;
+		float m_height;
 
-		RenderWindow* mRenderWindow;
-		InkWindow* mInkWindow;
-		InputWindow* mInputWindow;
+		RenderWindow* m_renderWindow;
+		InkWindow* m_inkWindow;
+		InputWindow* m_inputWindow;
 
-		unique_ptr<Styler> mStyler;
+		unique_ptr<Styler> m_styler;
 
-		unique_ptr<RootForm> mRootForm;
-		RootSheet* mRootSheet;
+		unique_ptr<RootDevice> m_rootDevice;
+		unique_ptr<RootSheet> m_rootSheet;
 
-		InputController* mController;
+		unique_ptr<Mouse> m_mouse;
+		unique_ptr<Keyboard> m_keyboard;
 
-		bool mShiftPressed;
-		bool mCtrlPressed;
+		bool m_shutdownRequested;
 
-		bool mShutdownRequested;
+		Clock m_clock;
 
-		Clock mClock;
-
-		User* mUser;
+		User* m_user;
 	};
 }
 

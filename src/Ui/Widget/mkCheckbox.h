@@ -22,7 +22,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Checkbox", Toggle::cls()); return ty; }
 
 	protected:
-		WValue* mInput;
+		WValue* m_input;
 	};
 }
 

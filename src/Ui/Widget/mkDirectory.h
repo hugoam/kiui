@@ -25,7 +25,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Dir", WrapButton::cls()); return ty; }
 
 	protected:
-		string mName;
+		string m_name;
 	};
 
 	class MK_UI_EXPORT _I_ File : public WrapButton
@@ -38,7 +38,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("File", WrapButton::cls()); return ty; }
 
 	protected:
-		string mName;
+		string m_name;
 	};
 
 	class MK_UI_EXPORT _I_ Directory : public ScrollSheet
@@ -55,7 +55,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Directory", ScrollSheet::cls()); return ty; }
 
 	protected:
-		string mPath;
+		string m_path;
 	};
 
 	class MK_UI_EXPORT _I_ FileBrowser : public Sheet
@@ -66,8 +66,8 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("FileBrowser", Sheet::cls()); return ty; }
 
 	protected:
-		string mPath;
-		Directory& mDirectory;
+		string m_path;
+		Directory& m_directory;
 	};
 
 	class MK_UI_EXPORT _I_ FileNode : public TreeNode
@@ -89,7 +89,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("DirectoryNode", TreeNode::cls()); return ty; }
 
 	protected:
-		string mPath;
+		string m_path;
 	};
 
 

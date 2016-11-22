@@ -9,20 +9,20 @@
 
 namespace mk
 {
-	Stem::Stem(Id id, Type& type, Proto* proto)
+	Stem::Stem(Id id, Type& type, Proto& proto)
 		: IdObject(id, type)
 		, Modular(proto)
 	{}
 
 	Part::Part(Type& type, Stem& stem)
 		: Object()
-		, mStem(stem)
+		, m_stem(stem)
 	{
 		stem.addPart(type, this);
 	}
 
 	Part::Part(Stem& stem)
 		: Object()
-		, mStem(stem)
+		, m_stem(stem)
 	{}
 }

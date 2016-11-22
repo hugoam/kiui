@@ -26,15 +26,21 @@ namespace mk
 
 	class User;
 
-	class InputDispatcher;
+	class InputDevice;
+	class Keyboard;
+	class Mouse;
+	class MouseButton;
+
+	struct InputEvent;
+	struct MouseEvent;
+	struct KeyEvent;
+
+	class InputWindow;
 	class InputReceiver;
-	class InputPropagator;
+	class InputFrame;
 	class InputWidget;
 
 	class Style;
-
-	class Form;
-	class RootForm;
 
 	class Button;
 	class Label;
@@ -60,10 +66,12 @@ namespace mk
 	class TreeNode;
 
 	class Window;
-	class Dockspace;
+	class Node;
+	class Canvas;
+
+	class NodeCable;
 
 	class Inkbox;
-	class InkStyle;
 	class InkStyle;
 	class InkTarget;
 	class InkLayer;
@@ -119,22 +127,56 @@ namespace mk
 	class Skinner;
 	class Styler;
 	class UiWindow;
-	
-	class FMethod;
-	class FMethodBind;
-	class FMethodCall;
 
 	class WValue;
 
+	class Device;
+	class DeviceType;
+	class Response;
 	class Hook;
+	class RootDevice;
+	class DeviceMapper;
+	class DeviceMapping;
 
-	class NanoInk;
-	class NanoLayer;
-	class NanoTarget;
+	class Stack;
+	class SelectStack;
+	class PickStack;
+
+	class RenderWindow;
+
+	// Renderer
 	class NanoGl;
+	class NanoRenderer;
 	class NanoWindow;
+	class NanoAtlas;
 
+	class GlRenderer;
 	class GlWindow;
+
+	// Edit Devices
+	class NodeInput;
+	class NodeOutput;
+	class DNode;
+	class DCanvas;
+
+	class DMethod;
+	class DMethodBind;
+	class DMethodCall;
+
+	class DValue;
+	class DSequence;
+	class DLink;
+	class DEnum;
+
+	class DStructure;
+
+	class DObjectEdit;
+	class DMemberEdit;
+	class DModularEdit;
+	class DEdit;
+
+	class DRootObjectCreate;
+	class DObjectCreate;
 
 	class Controller;
 }

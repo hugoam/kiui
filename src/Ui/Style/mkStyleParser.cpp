@@ -51,6 +51,7 @@ namespace mk
 			else if(name == "pressed") state |= PRESSED;
 			else if(name == "dragged") state |= DRAGGED;
 			else if(name == "modal") state |= MODAL;
+			else if(name == "control") state |= CONTROL;
 		}
 
 		return static_cast<WidgetState>(state);
@@ -61,22 +62,22 @@ namespace mk
 	public:
 		Impl()
 		{
-			yaml_parser_initialize(&mParser);
+			yaml_parser_initialize(&m_parser);
 		}
 
 		~Impl()
 		{
-			yaml_parser_delete(&mParser);
+			yaml_parser_delete(&m_parser);
 		}
 
-		yaml_parser_t mParser;
+		yaml_parser_t m_parser;
 	};
 
 	StyleParser::StyleParser(Styler& styler)
-		: mStyler(styler)
-		, mState(IN_DOCUMENT)
-		, mKeyState(IN_KEY_DEFINITION)
-		, mPimpl(make_unique<Impl>())
+		: m_styler(styler)
+		, m_state(IN_DOCUMENT)
+		, m_keyState(IN_KEY_DEFINITION)
+		, m_pimpl(make_unique<Impl>())
 	{}
 
 	StyleParser::~StyleParser()
@@ -84,56 +85,56 @@ namespace mk
 
 	void StyleParser::loadDefaultStyle()
 	{
-		mStyler.reset();
-		mStyler.defaultSkins();
-		mStyler.prepare();
+		m_styler.reset();
+		m_styler.defaultSkins();
+		m_styler.prepare();
 	}
 
 	void StyleParser::loadStyleSheet(const string& path)
 	{
-		mStyler.reset();
+		m_styler.reset();
 
 		yaml_token_t token;
 
 		int done = 0;
 
 		FILE *input = fopen(path.c_str(), "rb");
-		yaml_parser_set_input_file(&mPimpl->mParser, input);
+		yaml_parser_set_input_file(&m_pimpl->m_parser, input);
 
 		while(!done)
 		{
-			if(!yaml_parser_scan(&mPimpl->mParser, &token))
+			if(!yaml_parser_scan(&m_pimpl->m_parser, &token))
 				return;
 
 			switch(token.type)
 			{
 			case YAML_KEY_TOKEN:
-				mKeyState = IN_KEY_DEFINITION;
+				m_keyState = IN_KEY_DEFINITION;
 				break;
 			case YAML_VALUE_TOKEN:
-				mKeyState = IN_VALUE_DEFINITION;
+				m_keyState = IN_VALUE_DEFINITION;
 				break;
 			case YAML_BLOCK_MAPPING_START_TOKEN:
 			case YAML_FLOW_MAPPING_START_TOKEN:
-				if(mState == IN_DOCUMENT)
-					mState = IN_MAIN_BLOCK;
-				else if(mState == IN_MAIN_BLOCK)
-					this->startStyle(mKey);
-				else if(mState == IN_STYLE_DEFINITION)
-					this->startSubskin(mKey);
+				if(m_state == IN_DOCUMENT)
+					m_state = IN_MAIN_BLOCK;
+				else if(m_state == IN_MAIN_BLOCK)
+					this->startStyle(m_key);
+				else if(m_state == IN_STYLE_DEFINITION)
+					this->startSubskin(m_key);
 				break;
 			case YAML_BLOCK_END_TOKEN:
 			case YAML_FLOW_MAPPING_END_TOKEN:
-				if(mState == IN_STYLE_DEFINITION)
-					mState = IN_MAIN_BLOCK;
-				if(mState == IN_SUBSKIN_DEFINITION)
-					mState = IN_STYLE_DEFINITION;
+				if(m_state == IN_STYLE_DEFINITION)
+					m_state = IN_MAIN_BLOCK;
+				if(m_state == IN_SUBSKIN_DEFINITION)
+					m_state = IN_STYLE_DEFINITION;
 				break;
 			case YAML_SCALAR_TOKEN:
-				if(mKeyState == IN_KEY_DEFINITION)
-					mKey = reinterpret_cast<const char*>(token.data.scalar.value);
-				else if(mKeyState == IN_VALUE_DEFINITION)
-					this->parseValue(mKey, reinterpret_cast<const char*>(token.data.scalar.value));
+				if(m_keyState == IN_KEY_DEFINITION)
+					m_key = reinterpret_cast<const char*>(token.data.scalar.value);
+				else if(m_keyState == IN_VALUE_DEFINITION)
+					this->parseValue(m_key, reinterpret_cast<const char*>(token.data.scalar.value));
 				break;
 			default:
 				break;
@@ -143,24 +144,24 @@ namespace mk
 			yaml_token_delete(&token);
 		}
 
-		mStyler.prepare();
+		m_styler.prepare();
 	}
 
 	void StyleParser::startStyle(const string& name)
 	{
-		mState = IN_STYLE_DEFINITION;
-		mStyle = &mStyler.dynamicStyle(name);
-		mStyle->setUpdated(mStyle->updated() + 1);
-		mSkin = &mStyle->skin();
-		mStyle->skin().mEmpty = false;
+		m_state = IN_STYLE_DEFINITION;
+		m_style = &m_styler.dynamicStyle(name);
+		m_style->setUpdated(m_style->updated() + 1);
+		m_skin = &m_style->skin();
+		m_style->skin().m_empty = false;
 	}
 
 	void StyleParser::startSubskin(const string& name)
 	{
-		mState = IN_SUBSKIN_DEFINITION;
+		m_state = IN_SUBSKIN_DEFINITION;
 		string clean = replaceAll(name, " ", "");
 		WidgetState state = fromString<WidgetState>(clean);
-		mSkin = &mStyle->decline(state);
+		m_skin = &m_style->decline(state);
 	}
 
 	void StyleParser::declineImage(const string& strStates)
@@ -170,7 +171,7 @@ namespace mk
 		{
 			WidgetState state = fromString<WidgetState>(strState);
 			string suffix = "_" + replaceAll(strState, "|", "_");
-			mStyle->decline(state).mImage = &findImage(mSkin->image()->d_name + suffix);
+			m_style->decline(state).m_image = &findImage(m_skin->image()->d_name + suffix);
 		}
 	}
 	
@@ -181,9 +182,9 @@ namespace mk
 		{
 			WidgetState state = fromString<WidgetState>(strState);
 			string suffix = "_" + replaceAll(strState, "|", "_");
-			InkStyle& inkstyle = mStyle->decline(state);
-			inkstyle.mImageSkin = mSkin->mImageSkin;
-			inkstyle.mImageSkin.val.setImage(findImage(mSkin->mImageSkin.val.d_image->d_name + suffix));
+			InkStyle& inkstyle = m_style->decline(state);
+			inkstyle.m_imageSkin = m_skin->m_imageSkin;
+			inkstyle.m_imageSkin.val.setImage(findImage(m_skin->m_imageSkin.val.d_image->d_name + suffix));
 		}
 	}
 
@@ -193,93 +194,93 @@ namespace mk
 		std::vector<string> values = splitString(value, ",");
 
 		if(key == "inherit")
-			mStyle->rebase(*mStyler.fetchStyle(value));
+			m_style->rebase(*m_styler.fetchStyle(value));
 		if(key == "inherit_skin")
-			mStyle->rebaseSkins(*mStyler.fetchStyle(value));
+			m_style->rebaseSkins(*m_styler.fetchStyle(value));
 		if(key == "copy_skin")
-			mStyle->copySkins(*mStyler.fetchStyle(value));
+			m_style->copySkins(*m_styler.fetchStyle(value));
 		else if(key == "override")
-			mStyler.override(values[0], values[1], mStyle->name());
+			m_styler.override(values[0], values[1], m_style->name());
 
 		else if(key == "flow")
-			mStyle->layout().d_flow = fromString<Flow>(value); // FLOW | OVERLAY | FLOAT
+			m_style->layout().d_flow = fromString<Flow>(value); // FLOW | OVERLAY | FLOAT
 		else if(key == "clipping")
-			mStyle->layout().d_clipping = fromString<Clipping>(value); // NOCLIP | CLIP
+			m_style->layout().d_clipping = fromString<Clipping>(value); // NOCLIP | CLIP
 		else if(key == "opacity")
-			mStyle->layout().d_opacity = fromString<Opacity>(value); // OPAQUE | VOID
+			m_style->layout().d_opacity = fromString<Opacity>(value); // OPAQUE | VOID
 		else if(key == "space")
-			mStyle->layout().d_space = fromString<Space>(value); // AUTO | BLOCK | FIT | DIV | SPACE | BOARD
+			m_style->layout().d_space = fromString<Space>(value); // AUTO | BLOCK | FIT | DIV | SPACE | BOARD
 		else if(key == "sizing")
-			mStyle->layout().d_sizing = fromString<DimSizing>(value); // FIXED | SHRINK | EXPAND
+			m_style->layout().d_sizing = fromString<DimSizing>(value); // FIXED | SHRINK | EXPAND
 		else if(key == "layout_dim")
-			mStyle->layout().d_layoutDim = fromString<Dimension>(value); // DIM_X | DIM_Y
+			m_style->layout().d_layoutDim = fromString<Dimension>(value); // DIM_X | DIM_Y
 		else if(key == "align")
-			mStyle->layout().d_align = fromString<DimAlign>(value); // x, y
+			m_style->layout().d_align = fromString<DimAlign>(value); // x, y
 		else if(key == "need")
-			mStyle->layout().d_space = fromString<Space>(value); // BLOCK | SPACE | BOARD
+			m_style->layout().d_space = fromString<Space>(value); // BLOCK | SPACE | BOARD
 		else if(key == "span")
-			mStyle->layout().d_span = fromString<DimFloat>(value); // 1.0, 1.0
+			m_style->layout().d_span = fromString<DimFloat>(value); // 1.0, 1.0
 		else if(key == "size")
-			mStyle->layout().d_size = fromString<DimFloat>(value); // 123.0, 123.0
+			m_style->layout().d_size = fromString<DimFloat>(value); // 123.0, 123.0
 		else if(key == "padding")
-			mStyle->layout().d_padding = fromString<BoxFloat>(value); // left, right, top, bottom
+			m_style->layout().d_padding = fromString<BoxFloat>(value); // left, right, top, bottom
 		else if(key == "margin")
-			mStyle->layout().d_margin = fromString<DimFloat>(value); // x, y
+			m_style->layout().d_margin = fromString<DimFloat>(value); // x, y
 		else if(key == "spacing")
-			mStyle->layout().d_spacing = fromString<DimFloat>(value); // x, y
+			m_style->layout().d_spacing = fromString<DimFloat>(value); // x, y
 		else if(key == "pivot")
-			mStyle->layout().d_pivot = fromString<DimPivot>(value);// FORWARD | REVERSE
+			m_style->layout().d_pivot = fromString<DimPivot>(value);// FORWARD | REVERSE
 		else if(key == "weight")
-			mStyle->layout().d_weight = fromString<Weight>(value); // LIST | TABLE
+			m_style->layout().d_weight = fromString<Weight>(value); // LIST | TABLE
 		else if(key == "weights")
-			mStyle->layout().d_weights = fromString<std::vector<float>>(value); // : 0.3, 0.4, 0.3
+			m_style->layout().d_weights = fromString<std::vector<float>>(value); // : 0.3, 0.4, 0.3
 
 		else if(key == "empty")
-			mSkin->mEmpty = (value == "false" ? false : true);
+			m_skin->m_empty = (value == "false" ? false : true);
 		else if(key == "background_colour")
-			mSkin->mBackgroundColour = fromString<Colour>(value); // r, g, b, a
+			m_skin->m_backgroundColour = fromString<Colour>(value); // r, g, b, a
 		else if(key == "border_colour")
-			mSkin->mBorderColour = fromString<Colour>(value); // r, g, b, a
+			m_skin->m_borderColour = fromString<Colour>(value); // r, g, b, a
 		else if(key == "image_colour")
-			mSkin->mImageColour = fromString<Colour>(value); // r, g, b, a
+			m_skin->m_imageColour = fromString<Colour>(value); // r, g, b, a
 		else if(key == "text_colour")
-			mSkin->mTextColour = fromString<Colour>(value); // r, g, b, a
+			m_skin->m_textColour = fromString<Colour>(value); // r, g, b, a
 		else if(key == "text_size")
-			mSkin->mTextSize = fromString<float>(value); // 0.0
+			m_skin->m_textSize = fromString<float>(value); // 0.0
 		else if(key == "text_colour")
-			mSkin->mTextFont = value; // fontname
+			m_skin->m_textFont = value; // fontname
 		else if(key == "border_width")
-			mSkin->mBorderWidth = fromString<BoxFloat>(value); // top, right, bottom, left
+			m_skin->m_borderWidth = fromString<BoxFloat>(value); // top, right, bottom, left
 		else if(key == "corner_radius")
-			mSkin->mCornerRadius = fromString<BoxFloat>(value); // topleft, topright, bottomright, bottomleft
+			m_skin->m_cornerRadius = fromString<BoxFloat>(value); // topleft, topright, bottomright, bottomleft
 		else if(key == "weak_corners")
-			mSkin->mWeakCorners = (value == "false" ? false : true); // true | false
+			m_skin->m_weakCorners = (value == "false" ? false : true); // true | false
 		else if(key == "skin_align")
-			mSkin->mAlign = fromString<DimAlign>(value); // x, y
+			m_skin->m_align = fromString<DimAlign>(value); // x, y
 		else if(key == "skin_padding")
-			mSkin->mPadding = fromString<BoxFloat>(value); // left, right, top, bottom
+			m_skin->m_padding = fromString<BoxFloat>(value); // left, right, top, bottom
 		else if(key == "skin_margin")
-			mSkin->mMargin = fromString<BoxFloat>(value); // x, y, z, w
+			m_skin->m_margin = fromString<BoxFloat>(value); // x, y, z, w
 		else if(key == "topdown_gradient")
-			mSkin->mTopdownGradient = fromString<DimFloat>(value); // top, down
+			m_skin->m_topdownGradient = fromString<DimFloat>(value); // top, down
 		else if(key == "image")
-			mSkin->mImage = &findImage(value); // image.png
+			m_skin->m_image = &findImage(value); // image.png
 		else if(key == "overlay")
-			mSkin->mOverlay = &findImage(value); // image.png
+			m_skin->m_overlay = &findImage(value); // image.png
 		else if(key == "tile")
-			mSkin->mTile = &findImage(value); // image.png
+			m_skin->m_tile = &findImage(value); // image.png
 		else if(key == "image_skin")
-			mSkin->mImageSkin = ImageSkin(values[0],	fromString<int>(values[1]), fromString<int>(values[2]),
+			m_skin->m_imageSkin = ImageSkin(values[0],	fromString<int>(values[1]), fromString<int>(values[2]),
 														fromString<int>(values[3]), fromString<int>(values[4]),
 														values.size() > 5 ? fromString<int>(values[5]) : 0,
 														values.size() > 6 ? fromString<Dimension>(values[6]) : DIM_NULL); // : image.png
 		else if(key == "shadow")
-			mSkin->mShadow = Shadow(	fromString<float>(values[0]), fromString<float>(values[1]),
+			m_skin->m_shadow = Shadow(	fromString<float>(values[0]), fromString<float>(values[1]),
 										fromString<float>(values[2]), fromString<float>(values[3])); // : xoffset, yoffset, blur, spread
 		else if(key == "no_shadow")
-			mSkin->mShadow = Shadow();
+			m_skin->m_shadow = Shadow();
 		else if(key == "shadow_colour")
-			mSkin->mShadow.val.d_colour = fromString<Colour>(value);
+			m_skin->m_shadow.val.d_colour = fromString<Colour>(value);
 		else if(key == "decline_image")
 			this->declineImage(value);
 		else if(key == "decline_image_skin")

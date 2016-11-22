@@ -20,22 +20,22 @@ namespace mk
 	class MK_OBJECT_EXPORT Executable
 	{
 	public:
-		Executable() : mDone(false), mDoneFlag(0) {}
+		Executable() : m_done(false), m_doneFlag(0) {}
 		virtual ~Executable() {}
 
 		virtual void begin() = 0;
 		virtual void update(size_t tick, double step) { UNUSED(tick); UNUSED(step); }
 		virtual void abort() {}
 		
-		void execute() { mDone = false; this->begin(); }
-		void stop()	{ mDone = true; if(mDoneFlag) *mDoneFlag = true; this->abort(); }
-		bool done() { return mDone; }
+		void execute() { m_done = false; this->begin(); }
+		void stop()	{ m_done = true; if(m_doneFlag) *m_doneFlag = true; this->abort(); }
+		bool done() { return m_done; }
 
-		void flag(std::atomic<bool>* done) { *done = false; mDoneFlag = done; }
+		void flag(std::atomic<bool>* done) { *done = false; m_doneFlag = done; }
 
 	protected:
-		bool mDone;
-		std::atomic<bool>* mDoneFlag;
+		bool m_done;
+		std::atomic<bool>* m_doneFlag;
 	};
 }
 

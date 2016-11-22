@@ -23,7 +23,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("DockToggle", ImgButton::cls()); return ty; }
 
 	protected:
-		Dockbox& mDockbox;
+		Dockbox& m_dockbox;
 	};
 
 	class MK_UI_EXPORT Dockbox : public Window
@@ -31,14 +31,14 @@ namespace mk
 	public:
 		Dockbox(Dockbar& dockbar, const string& title, const string& icon);
 
-		Dockbar& dockbar() { return mDockbar; }
-		DockToggle& toggle() { return mToggle; }
+		Dockbar& dockbar() { return m_dockbar; }
+		DockToggle& toggle() { return m_toggle; }
 
 		static StyleType& cls() { static StyleType ty("Dockbox", Window::cls()); return ty; }
 
 	protected:
-		Dockbar& mDockbar;
-		DockToggle& mToggle;
+		Dockbar& m_dockbar;
+		DockToggle& m_toggle;
 	};
 
 	class MK_UI_EXPORT Docker : public Sheet
@@ -62,7 +62,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Dockbar", Sheet::cls()); return ty; }
 
 	protected:
-		Docker& mDocker;
+		Docker& m_docker;
 	};
 }
 

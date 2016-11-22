@@ -30,7 +30,7 @@ namespace mk
 		void processActions();
 
 	private:
-		LocklessQueue<ProcedureType> mActions;
+		LocklessQueue<ProcedureType> m_actions;
 	};
 }
 

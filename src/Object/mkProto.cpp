@@ -9,12 +9,15 @@
 
 namespace mk
 {
-	Proto::Proto(Type* type)
-		: IdObject(index<Proto>(), cls())
-		, mType(type)
-		, mNumParts(0)
-		, mHashParts(MAX_TYPES) // Type::maxId() doesn't work because at the time Proto is instantiated not all types have been loaded
-	{
-		type->setupProto(this);
-	}
+	Proto::Proto(Type& type)
+		: IdObject(cls())
+		, m_type(type)
+		, m_numParts(0)
+		, m_hashParts(MAX_TYPES) // Type::maxId() doesn't work because at the time Proto is instantiated not all types have been loaded
+	{}
+
+	ProtoType::ProtoType()
+		: Type(PROTOTYPE)
+		, m_proto(*this)
+	{}
 }

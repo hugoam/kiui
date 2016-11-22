@@ -24,7 +24,7 @@ namespace mk
 		Uibox();
 		~Uibox();
 
-		LayoutStyle* layout() { return d_layout; }
+		LayoutStyle& layout() { return *d_layout; }
 
 		inline DimFloat position() { return d_position; }
 

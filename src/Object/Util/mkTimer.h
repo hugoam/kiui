@@ -20,10 +20,10 @@ namespace mk
 		return size_t(clock() / TICK_INTERVAL);
 	}
 
-	class MK_OBJECT_EXPORT Time
+	class MK_OBJECT_EXPORT _I_ Time : public Struct
 	{
 	public:
-		Time(double val) : value(val) {}
+		_C_ Time(double val) : value(val) {}
 		Time(int days, int hours, int minutes, int seconds) : value(days * 86400 + hours * 3600 + minutes * 60 + seconds) {}
 		Time(int hours, int minutes, int seconds) : value(hours * 3600 + minutes * 60 + seconds) {}
 		Time(const Time& other) : value(other.value) {}
@@ -31,26 +31,28 @@ namespace mk
 
 		operator double() const { return value; }
 
-		double value;
+		_A_ double value;
 
 		inline int days() { return int(value) / 86400; }
 		inline int hours() { return int(value) % 86400 / 3600; }
 		inline int minutes() { return int(value) % 3600 / 60; }
 		inline int seconds() { return int(value) % 60; }
+
+		static Type& cls() { static Type ty; return ty; }
 	};
 
-	class MK_OBJECT_EXPORT TimeSpan : public Struct
+	class MK_OBJECT_EXPORT _I_ TimeSpan : public Struct
 	{
 	public:
-		TimeSpan(Time s, Time e) : start(s), end(e) {}
+		_C_ TimeSpan(Time s, Time e) : start(s), end(e) {}
 		TimeSpan(int sh, int eh) : start(0, sh, 0, 0), end(0, eh, 0, 0) {}
 		TimeSpan() : start(), end() {}
 
 		Time operator [](size_t i) const { return i == 0 ? start : end; }
 		Time& operator [](size_t i) { return i == 0 ? start : end; }
 
-		Time start;
-		Time end;
+		_A_ Time start;
+		_A_ Time end;
 
 		static Type& cls() { static Type ty; return ty; }
 	};
@@ -58,7 +60,7 @@ namespace mk
 	class MK_OBJECT_EXPORT Timer
     {
 	public:
-		static Timer* me() { return &sInstance; }
+		static Timer& me() { return sInstance; }
 
 	private:
 		static Timer sInstance;
@@ -74,7 +76,7 @@ namespace mk
 
     private:
         typedef std::map<void*, clock_t> TimeTable;
-        TimeTable mTimeTable;
+        TimeTable m_timeTable;
     };
 
 	class MK_OBJECT_EXPORT Clock
@@ -91,8 +93,8 @@ namespace mk
 		size_t stepTick();
 
     private:
-        clock_t mLast;
-		size_t mLastTick;
+        clock_t m_last;
+		size_t m_lastTick;
     };
 
 //	template <> inline void fromString(const string& str, TimeSpan& vec) { string_to_fixed_vector<TimeSpan, float>(str, vec); }

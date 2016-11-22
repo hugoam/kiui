@@ -8,7 +8,6 @@
 /* mk */
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Widget/mkButton.h>
-#include <Ui/Form/mkForm.h>
 
 namespace mk
 {
@@ -27,21 +26,21 @@ namespace mk
 
 		unique_ptr<Widget> vrelease(Widget& widget);
 
-		Button& header() { return mHeader; }
+		Button& header() { return m_header; }
 
 		static StyleType& cls() { static StyleType ty("Tab", Sheet::cls()); return ty; }
 
 	protected:
-		Button& mHeader;
-		bool mActive;
+		Button& m_header;
+		bool m_active;
 	};
 
-	class MK_UI_EXPORT _I_ TabberHead : public Sequence
+	class MK_UI_EXPORT _I_ TabberHead : public Band
 	{
 	public:
 		TabberHead();
 
-		static StyleType& cls() { static StyleType ty("TabberHead", Sequence::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("TabberHead", Band::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT _I_ TabberBody : public Sheet
@@ -55,7 +54,7 @@ namespace mk
 	class MK_UI_EXPORT Tabber : public Sheet
 	{
 	public:
-		Tabber(bool downtabs = false);
+		Tabber(StyleType& type = cls(), bool downtabs = false);
 		~Tabber();
 
 		void select(size_t index);
@@ -71,10 +70,10 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Tabber", Sheet::cls()); return ty; }
 
 	protected:
-		TabberHead& mHeaders;
-		TabberBody& mTabs;
-		Tab* mCurrentTab;
-		bool mDownTabs;
+		TabberHead& m_headers;
+		TabberBody& m_tabs;
+		Tab* m_currentTab;
+		bool m_downTabs;
 	};
 }
 

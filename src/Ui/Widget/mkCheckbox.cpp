@@ -15,34 +15,30 @@
 
 #include <Ui/Widget/mkTypeIn.h>
 
-#include <Ui/mkUiWindow.h>
-
 #include <Ui/Widget/mkSheet.h>
 
 namespace mk
 {
 	Checkbox::Checkbox(WValue* input, bool on)
-		: Toggle(std::bind(&Checkbox::toggleOn, this), std::bind(&Checkbox::toggleOff, this), on)
-		, mInput(input)
-	{
-		mStyle = &cls();
-	}
+		: Toggle(std::bind(&Checkbox::toggleOn, this), std::bind(&Checkbox::toggleOff, this), on, cls())
+		, m_input(input)
+	{}
 
 	void Checkbox::toggleOn()
 	{
-		if(mInput)
+		if(m_input)
 		{
-			mInput->value()->set<bool>(mOn);
-			mInput->triggerModify();
+			m_input->value()->set<bool>(m_on);
+			m_input->triggerModify();
 		}
 	}
 
 	void Checkbox::toggleOff()
 	{
-		if(mInput)
+		if(m_input)
 		{
-			mInput->value()->set<bool>(mOn);
-			mInput->triggerModify();
+			m_input->value()->set<bool>(m_on);
+			m_input->triggerModify();
 		}
 	}
 }

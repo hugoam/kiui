@@ -8,7 +8,7 @@
 namespace mk
 {
 	Scheduler::Scheduler(size_t queueSize)
-		: mActions(queueSize)
+		: m_actions(queueSize)
 	{}
 
 	Scheduler::~Scheduler() 
@@ -16,7 +16,7 @@ namespace mk
 
 	bool Scheduler::scheduleAction(const ProcedureType& action)
 	{
-		return mActions.push(action);
+		return m_actions.push(action);
 	}
 
 	void Scheduler::processActions()
@@ -24,9 +24,9 @@ namespace mk
 		int i = 0;
 		ProcedureType action;
 
-		if(!mActions.empty())
+		if(!m_actions.empty())
 		{
-			while(((++i) < 5) && mActions.pop(action))
+			while(((++i) < 5) && m_actions.pop(action))
 			{
 				action();
 			}

@@ -14,40 +14,40 @@
 namespace mk
 {
 	StyleType::StyleType(const string& name)
-		: Type(name)
+		: Type(TYPE, name)
 		, Style(*this, nullptr)
 	{}
 
 	StyleType::StyleType(const string& name, StyleType& base)
-		: Type(name, *base.styleType())
+		: Type(*base.styleType(), TYPE, name)
 		, Style(*this, &base)
 	{}
 
 	Style::Style(Type& type, Style* base)
-		: IdStruct(index<Style>(), cls())
-		, mStyleType(&type)
-		, mBase(base)
-		, mBaseSkin(base)
-		, mName(type.name())
-		, mLayout()
-		, mSkin(mName)
-		, mSubskins()
-		, mUpdated(0)
+		: IdStruct(cls())
+		, m_styleType(&type)
+		, m_base(base)
+		, m_baseSkin(base)
+		, m_name(type.name())
+		, m_layout()
+		, m_skin(m_name)
+		, m_subskins()
+		, m_updated(0)
 	{
-		if(mBase)
+		if(m_base)
 			this->inherit();
 	}
 
 	Style::Style(const string& name)
-		: IdStruct(index<Style>(), cls())
-		, mStyleType(nullptr)
-		, mBase(nullptr)
-		, mBaseSkin(nullptr)
-		, mName(name)
-		, mLayout()
-		, mSkin(mName)
-		, mSubskins()
-		, mUpdated(0)
+		: IdStruct(cls())
+		, m_styleType(nullptr)
+		, m_base(nullptr)
+		, m_baseSkin(nullptr)
+		, m_name(name)
+		, m_layout()
+		, m_skin(m_name)
+		, m_subskins()
+		, m_updated(0)
 	{}
 
 	Style::~Style()
@@ -55,86 +55,86 @@ namespace mk
 
 	void Style::reset()
 	{
-		mLayout = LayoutStyle();
-		mSkin = InkStyle(mName);
-		mSubskins.clear();
-		if(mBase)
-			mBaseSkin = mBase;
-		++mUpdated;
+		m_layout = LayoutStyle();
+		m_skin = InkStyle(m_name);
+		m_subskins.clear();
+		if(m_base)
+			m_baseSkin = m_base;
+		++m_updated;
 	}
 
 	void Style::rebase(Style& base)
 	{
-		mBase = &base;
-		mBaseSkin = &base;
+		m_base = &base;
+		m_baseSkin = &base;
 		this->inherit();
 	}
 
 	void Style::rebaseSkins(Style& base)
 	{
-		mBaseSkin = &base;
+		m_baseSkin = &base;
 		this->inherit();
 	}
 
 	void Style::inherit()
 	{
-		if(mBase)
-			this->inheritLayout(*mBase);
-		if(mBaseSkin)
-			this->inheritSkins(*mBaseSkin);
+		if(m_base)
+			this->inheritLayout(*m_base);
+		if(m_baseSkin)
+			this->inheritSkins(*m_baseSkin);
 
-		//for(auto& subskin : mSubskins) //@todo : why doesn't this behave correctly when enabled
-		//	subskin.mSkin.copy(mSkin, true);
+		//for(auto& subskin : m_subskins) //@todo : why doesn't this behave correctly when enabled
+		//	subskin.m_skin.copy(m_skin, true);
 	}
 
 	void Style::inheritLayout(Style& base)
 	{
-		mLayout.copy(base.layout(), true);
+		m_layout.copy(base.layout(), true);
 	}
 
 	void Style::inheritSkins(Style& base)
 	{
-		mSkin.copy(base.skin(), true);
+		m_skin.copy(base.skin(), true);
 
-		for(auto& subskin : base.mSubskins)
+		for(auto& subskin : base.m_subskins)
 		{
-			this->copy(subskin.mState, mSkin, false);
-			this->copy(subskin.mState, subskin.mSkin, true);
+			this->copy(subskin.m_state, m_skin, false);
+			this->copy(subskin.m_state, subskin.m_skin, true);
 		}
 	}
 
 	void Style::copySkins(Style& base)
 	{
-		mSkin.copy(base.skin(), false);
+		m_skin.copy(base.skin(), false);
 
-		for(auto& subskin : base.mSubskins)
-			this->copy(subskin.mState, subskin.mSkin, false);
+		for(auto& subskin : base.m_subskins)
+			this->copy(subskin.m_state, subskin.m_skin, false);
 	}
 
 	InkStyle& Style::subskin(WidgetState state)
 	{
-		for(SubSkin& skin : reverse_adapt(mSubskins))
-			if((state & skin.mState) == skin.mState)
-				return skin.mSkin;
-		return mSkin;
+		for(SubSkin& skin : reverse_adapt(m_subskins))
+			if((state & skin.m_state) == skin.m_state)
+				return skin.m_skin;
+		return m_skin;
 	}
 
 	InkStyle& Style::copy(WidgetState state, InkStyle& original, bool inherit)
 	{
-		for(SubSkin& skin : reverse_adapt(mSubskins))
-			if(state == skin.mState)
+		for(SubSkin& skin : reverse_adapt(m_subskins))
+			if(state == skin.m_state)
 			{
-				skin.mSkin.copy(original, inherit);
-				return skin.mSkin;
+				skin.m_skin.copy(original, inherit);
+				return skin.m_skin;
 			}
 
-		mSubskins.emplace_back(state, mName + toString(state));
-		mSubskins.back().mSkin.copy(original, inherit);
-		return mSubskins.back().mSkin;
+		m_subskins.emplace_back(state, m_name + toString(state));
+		m_subskins.back().m_skin.copy(original, inherit);
+		return m_subskins.back().m_skin;
 	}
 
 	InkStyle& Style::decline(WidgetState state)
 	{
-		return this->copy(state, mSkin, false);
+		return this->copy(state, m_skin, false);
 	}
 }

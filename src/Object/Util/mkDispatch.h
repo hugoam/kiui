@@ -21,7 +21,7 @@ namespace mk
 	struct DispatchRef { static inline T& ref(Lref& ref) { return ref->any<T>()->ref(); } };
 
 	template <class T>
-	struct DispatchRef<T*> { static inline T* ref(Lref& ref) { return ref->as<T>(); } };
+	struct DispatchRef<T*> { static inline T* ref(Lref& ref) { return &ref->as<T>(); } };
 
 	template <class D, class C, class R>
 	class HashDispatch
@@ -29,55 +29,28 @@ namespace mk
 	public:
 		static void branch(Type& type, const std::function<R (C, Lref&)>& func)
 		{
-			if(mDispatcher.size() < type.id()+1)
-				mDispatcher.resize(type.id()+51);
-				
-			mDispatcher[type.id()] = func;
+			m_dispatcher[type.id()] = func;
 		}
 
 		static R dispatch(C context, Lref& ref)
 		{
-			return mDispatcher[ref->type().id()](context, ref);
+			return m_dispatcher[ref->type().id()](context, ref);
 		}
 
-		static R dispatchup(C context, Lref& ref)
+		static bool check(Lref& ref)
 		{
-			// Slower dispatch, but we check the bases for relevant entries in the dispatcher
-			Type* type = &ref->type();
-			for(; type->base() != nullptr; type = type->base())
-				if(check(*type))
-					break;
-			return mDispatcher[type->id()](context, ref);
-		}
-
-		static bool check(Type& type)
-		{
-			if(type.id() > mDispatcher.size())
-				return false;
-			return (bool) mDispatcher[type.id()];
-		}
-
-		static bool checkup(Type& type)
-		{
-			Type* base = &type;
-			while(base->base() != nullptr)
-			{
-				if(check(*base))
-					return true;
-				base = base->base();
-			}
-			return check(*base);
+			return m_dispatcher[ref->type().id()] != nullptr;
 		}
 
 		typedef C Context;
 		typedef R Return;
 
 	protected:
-		static std::vector<std::function<R (C, Lref&)>> mDispatcher;
+		static std::vector<std::function<R (C, Lref&)>> m_dispatcher;
 	};
 
 	template <class D, class C, class R>
-	typename std::vector<std::function<R (C, Lref&)>> HashDispatch<D,C,R>::mDispatcher = std::vector<std::function<R (C, Lref&)>>();
+	typename std::vector<std::function<R (C, Lref&)>> HashDispatch<D,C,R>::m_dispatcher = std::vector<std::function<R (C, Lref&)>>(10000);
 
 
 	template <class D, class T, typename D::Return(*f)(typename D::Context, Lref&, T)>
@@ -100,6 +73,29 @@ namespace mk
 
 	template <class D, class T, typename D::Return(*f)(typename D::Context, Lref&, T)>
 	Dispatch<D,T,f> Dispatch<D,T,f>::branch = Dispatch<D,T,f>();
+
+	template <class D, typename bool(*mask)(Type&), typename D::Return(*f)(typename D::Context, Lref&)>
+	class MaskDispatch
+	{
+	public:
+		MaskDispatch()
+		{
+			for(IdObject* type : Type::cls().indexer().objects())
+				if(type && mask(type->as<Type>()))
+					D::branch(type->as<Type>(), &dispatch);
+		}
+
+		static typename D::Return dispatch(typename D::Context context, Lref& lref)
+		{
+			return f(context, lref);
+		}
+
+	protected:
+		static MaskDispatch<D, mask, f> branch;
+	};
+
+	template <class D, typename bool(*mask)(Type&), typename D::Return(*f)(typename D::Context, Lref&)>
+	MaskDispatch<D, mask, f> MaskDispatch<D, mask, f>::branch;
 }
 
 #endif // mkDISPATCH_H_INCLUDED

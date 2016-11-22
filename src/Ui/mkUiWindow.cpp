@@ -7,7 +7,7 @@
 
 #include <Ui/mkUiLayout.h>
 
-#include <Ui/Form/mkRootForm.h>
+#include <Ui/Device/mkRootDevice.h>
 
 #include <Object/String/mkString.h>
 #include <Object/Util/mkMake.h>
@@ -33,107 +33,89 @@
 
 namespace mk
 {
-	std::map<string, std::function<unique_ptr<Widget>(Form*)>> UiWindow::sDispatch;
-
 	UiWindow::UiWindow(const string& resourcePath, User* user)
-		: mResourcePath(resourcePath)
-		, mStyler(make_unique<Styler>())
-		, mController(nullptr)
-		, mShiftPressed(false)
-		, mCtrlPressed(false)
-		, mShutdownRequested(false)
-		, mRootSheet(nullptr)
-		, mUser(user)
+		: m_resourcePath(resourcePath)
+		, m_styler(make_unique<Styler>())
+		, m_shutdownRequested(false)
+		, m_rootSheet(nullptr)
+		, m_user(user)
+		, m_renderWindow(nullptr)
+		, m_inkWindow(nullptr)
+		, m_inputWindow(nullptr)
 	{
-		mStyler->defaultLayout();
-		mStyler->defaultSkins();
 	}
 
 	UiWindow::~UiWindow()
 	{
-		//mRootSheet->clear();
+		m_rootSheet->clear();
 	}
 
 	void UiWindow::setup(RenderWindow& renderWindow, InkWindow& inkWindow, InputWindow* inputWindow)
 	{
-		mRenderWindow = &renderWindow;
-		mInkWindow = &inkWindow;
-		mInputWindow = inputWindow;
+		m_renderWindow = &renderWindow;
+		m_inkWindow = &inkWindow;
+		m_inputWindow = inputWindow;
 
-		mWidth = float(renderWindow.width());
-		mHeight = float(renderWindow.height());
+		m_width = float(renderWindow.width());
+		m_height = float(renderWindow.height());
+
+		m_styler->defaultLayout();
+		m_styler->defaultSkins();
+
+		this->init();
 	}
 
 	void UiWindow::init()
 	{
-		mStyler->prepare();
+		m_styler->prepare();
 
-		mRootForm = make_unique<RootForm>(*this);
-		mRootSheet = &mRootForm->rootSheet();
+		m_rootSheet = make_unique<RootSheet>(*this, m_inkWindow->screenTarget());
+		m_rootDevice = make_unique<RootDevice>(*this, *m_rootSheet);
 
-		mRootSheet->frame().setSize(mWidth, mHeight);
+		m_mouse = make_unique<Mouse>(*m_rootSheet);
+		m_keyboard = make_unique<Keyboard>(*m_rootSheet);
 
-		mController = mRootSheet;
+		m_rootDevice->declareDefaultMappings();
 
-		this->resize(size_t(mWidth), size_t(mHeight));
+		m_inputWindow->initInput(*m_mouse, *m_keyboard, m_renderWindow->handle());
+
+		m_rootSheet->frame().setSize(m_width, m_height);
+
+		this->resize(size_t(m_width), size_t(m_height));
 	}
 
 	void UiWindow::resize(size_t width, size_t height)
 	{
-		mWidth = float(width);
-		mHeight = float(height);
+		m_width = float(width);
+		m_height = float(height);
 
-		if(mInputWindow)
-			mInputWindow->resize(width, height);
+		if(m_inputWindow)
+			m_inputWindow->resize(width, height);
 
-		if(mRootSheet)
-			mRootSheet->frame().setSize(float(width), float(height));
+		if(m_rootSheet)
+			m_rootSheet->frame().setSize(float(width), float(height));
 	}
 
 	bool UiWindow::nextFrame()
 	{
-		size_t tick = mClock.readTick();
-		size_t delta = mClock.stepTick();
+		size_t tick = m_clock.readTick();
+		size_t delta = m_clock.stepTick();
 
-		mRootSheet->nextFrame(tick, delta);
-		return !mShutdownRequested;
+		m_mouse->nextFrame();
+		m_keyboard->nextFrame();
+
+		m_rootSheet->nextFrame(tick, delta);
+
+		return !m_shutdownRequested;
 	}
 
-	void UiWindow::dispatchMousePressed(float x, float y, MouseButton button)
+	void UiWindow::shutdown()
 	{
-		mRootSheet->mousePressed(x, y, button);
+		m_shutdownRequested = true;
 	}
 
-	void UiWindow::dispatchMouseMoved(float x, float y, float xDif, float yDif)
+	void UiWindow::handleDestroyWidget(Widget& widget)
 	{
-		mRootSheet->mouseMoved(x, y, xDif, yDif);
-	}
-
-	void UiWindow::dispatchMouseReleased(float x, float y, MouseButton button)
-	{
-		mRootSheet->mouseReleased(x, y, button);
-	}
-
-	void UiWindow::dispatchMouseWheeled(float x, float y, float amount)
-	{
-		mRootSheet->mouseWheel(x, y, amount);
-	}
-
-	void UiWindow::dispatchKeyPressed(KeyCode key, char c)
-	{
-		if(key == KC_ESCAPE)
-			mShutdownRequested = true;
-		else if(key == KC_LSHIFT || key == KC_RSHIFT)
-			mShiftPressed = true;
-
-		mRootSheet->keyDown(key, c);
-	}
-
-	void UiWindow::dispatchKeyReleased(KeyCode key, char c)
-	{
-		if(key == KC_LSHIFT || key == KC_RSHIFT)
-			mShiftPressed = false;
-
-		mRootSheet->keyUp(key, c);
+		m_mouse->handleDestroyWidget(widget);
 	}
 }

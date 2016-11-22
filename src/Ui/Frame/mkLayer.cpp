@@ -11,7 +11,6 @@
 #include <Ui/Frame/mkInk.h>
 
 #include <Ui/Widget/mkWidget.h>
-#include <Ui/Form/mkForm.h>
 
 #include <iostream>
 
@@ -36,8 +35,8 @@ namespace mk
 	void Layer::bind()
 	{
 		this->updateStyle();
-		d_inkLayer = d_target->createLayer(*this, d_index);
-		d_inkbox = d_inkLayer->createInkbox(*this);
+		d_inkLayer = make_unique<InkLayer>(*this, *d_target, d_index);
+		d_inkbox = make_unique<Inkbox>(*this);
 	}
 
 	void Layer::bind(Stripe* parent)
@@ -50,9 +49,9 @@ namespace mk
 		unique_ptr<InkLayer> oldLayer = std::move(d_inkLayer);
 
 		if(d_target)
-			d_inkLayer = d_target->createLayer(*this, d_z ? d_z : d_index);
+			d_inkLayer = make_unique<InkLayer>(*this, *d_target, d_z ? d_z : d_index);
 		else
-			d_inkLayer = d_parentLayer->inkLayer().target().createLayer(*this, d_z ? d_z : d_index);
+			d_inkLayer = make_unique<InkLayer>(*this, d_parentLayer->inkLayer().target(), d_z ? d_z : d_index);
 
 		Frame::bind(parent);
 
@@ -138,12 +137,12 @@ namespace mk
 		if(!d_parentLayer)
 			return;
 
-		Stripe* parent = d_parent;
-		d_parent->remove(*this);
-		parent->insert(*this, parent->contents().size());
+		//Stripe* parent = d_parent;
+		//d_parent->remove(*this);
+		//parent->insert(*this, parent->contents().size());
 
-		//d_parentLayer->remove(*this);
-		//d_parentLayer->add(*this);
+		d_parentLayer->remove(*this);
+		d_parentLayer->add(*this);
 	}
 
 	Frame* Layer::pinpoint(float x, float y, bool opaque)

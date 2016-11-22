@@ -5,8 +5,7 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Scheme/mkTabber.h>
 
-#include <Ui/Form/mkForm.h>
-#include <Ui/Form/mkWidgets.h>
+#include <Ui/Widget/mkWidgets.h>
 
 #include <Ui/Frame/mkFrame.h>
 
@@ -15,52 +14,43 @@ using namespace std::placeholders;
 namespace mk
 {
 	TabHeader::TabHeader(const string& label, const Trigger& trigger)
-		: Button(label, trigger)
-	{
-		mStyle = &cls();
-	}
+		: Button(label, trigger, cls())
+	{}
 
 	Tab::Tab(Button& header, bool active)
-		: Sheet()
-		, mHeader(header)
-		, mActive(active)
+		: Sheet(cls())
+		, m_header(header)
+		, m_active(active)
 	{
-		mStyle = &cls();
-		if(!mActive)
+		if(!m_active)
 			this->hide();
 		else
-			mHeader.activate();
+			m_header.activate();
 	}
 
 	unique_ptr<Widget> Tab::vrelease(Widget& widget)
 	{
-		return mParent->parent()->vrelease(widget);
+		return m_parent->parent()->vrelease(widget);
 	}
 
 	TabberHead::TabberHead()
-		: Sequence()
-	{
-		mStyle = &cls();
-	}
+		: Band(cls())
+	{}
 
 	TabberBody::TabberBody()
-		: Sheet()
-	{
-		mStyle = &cls();
-	}
+		: Sheet(cls())
+	{}
 
-	Tabber::Tabber(bool downtabs)
-		: Sheet()
-		, mCurrentTab(nullptr)
-		, mDownTabs(downtabs)
-		, mHeaders(this->makeappend<TabberHead>())
-		, mTabs(this->makeappend<TabberBody>())
+	Tabber::Tabber(StyleType& type, bool downtabs)
+		: Sheet(type)
+		, m_currentTab(nullptr)
+		, m_downTabs(downtabs)
+		, m_headers(this->makeappend<TabberHead>())
+		, m_tabs(this->makeappend<TabberBody>())
 	{
-		mStyle = &cls();
-
-		//if(mDownTabs)
-		//	mFrame->as<Stripe>().move(0, 1);
-		mHeaders.hide();
+		//if(m_downTabs)
+		//	m_frame->as<Stripe>().move(0, 1);
+		m_headers.hide();
 	}
 
 	Tabber::~Tabber()
@@ -68,13 +58,13 @@ namespace mk
 
 	Widget& Tabber::vappend(unique_ptr<Widget> widget)
 	{
-		Button& header = mHeaders.emplace<TabHeader>(widget->name(), std::bind(&Tabber::headerClicked, this, _1));
-		Tab& tab = mTabs.emplace<Tab>(header, mCurrentTab == nullptr);
+		Button& header = m_headers.emplace<TabHeader>(widget->name(), std::bind(&Tabber::headerClicked, this, _1));
+		Tab& tab = m_tabs.emplace<Tab>(header, m_currentTab == nullptr);
 
-		if(!mCurrentTab)
-			mCurrentTab = &tab;
-		else if(mTabs.count() == 2)
-			mHeaders.show();
+		if(!m_currentTab)
+			m_currentTab = &tab;
+		else if(m_tabs.count() == 2)
+			m_headers.show();
 
 		return tab.append(std::move(widget));
 	}
@@ -83,17 +73,17 @@ namespace mk
 	{
 		Tab& tab = widget.parent()->as<Tab>();
 
-		if(&tab == mCurrentTab)
-			mCurrentTab = nullptr;
+		if(&tab == m_currentTab)
+			m_currentTab = nullptr;
 
 		unique_ptr<Widget> unique = widget.unbind();
 		tab.header().destroy();
 		tab.destroy();
 
-		if(mTabs.count() > 0)
+		if(m_tabs.count() > 0)
 			this->showTab(size_t(0));
-		if(mTabs.count() == 1)
-			mHeaders.hide();
+		if(m_tabs.count() == 1)
+			m_headers.hide();
 
 		return unique;
 	}
@@ -105,18 +95,18 @@ namespace mk
 
 	void Tabber::showTab(Tab& tab)
 	{
-		if(mCurrentTab)
+		if(m_currentTab)
 		{
-			mCurrentTab->hide();
-			mCurrentTab->header().deactivate();
+			m_currentTab->hide();
+			m_currentTab->header().deactivate();
 		}
 		tab.show();
 		tab.header().activate();
-		mCurrentTab = &tab;
+		m_currentTab = &tab;
 	}
 
 	void Tabber::showTab(size_t index)
 	{
-		this->showTab(mTabs.at(index)->as<Tab>());
+		this->showTab(m_tabs.at(index)->as<Tab>());
 	}
 }

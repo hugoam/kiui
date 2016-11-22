@@ -12,7 +12,11 @@
 
 #include <Ui/Nano/mkNanoWindow.h>
 
+#ifdef KIUI_DRAW_CACHE
+#include <Ui/Nano/nanovg_cache/nanovg.h>
+#else
 #include <Ui/Nano/nanovg/nanovg.h>
+#endif
 
 #include <cmath>
 
@@ -20,42 +24,19 @@
 
 namespace mk
 {
-	bool NanoInk::sDebugDraw = false;
-	int NanoInk::sDebugBatch = 0;
 
 	inline float clamp(float v, float mn, float mx)
 	{
 		return (v > mx) ? mx : (v < mn) ? mn : v;
 	}
 
-	static float fminf(float a, float b)
+	void nvgRoundedBox(NVGcontext *ctx, float x, float y, float w, float h, float cr0, float cr1, float cr2, float cr3)
 	{
-		return std::isnan(a) ? b : (std::isnan(b) ? a : ((a < b) ? a : b));
-	}
-
-	static float fmaxf(float a, float b)
-	{
-		return std::isnan(a) ? b : (std::isnan(b) ? a : ((a > b) ? a : b));
-	}
-
-	static double fmin(double a, double b)
-	{
-		return std::isnan(a) ? b : (std::isnan(b) ? a : ((a < b) ? a : b));
-	}
-
-	static double fmax(double a, double b)
-	{
-		return std::isnan(a) ? b : (std::isnan(b) ? a : ((a > b) ? a : b));
-	}
-
-	void nvgRoundedBox(NVGcontext *ctx, float x, float y, float w, float h, float cr0, float cr1, float cr2, float cr3, Dimension fitDim = DIM_NULL)
-	{
-		if(fitDim == DIM_NULL)
-			nvgRoundedRect4(ctx, x, y, w, h, cr0, cr1, cr2, cr3);
-		else if(fitDim == DIM_X)
-			nvgRoundedRect4FitY(ctx, x, y, w, h, cr0, cr1, cr2, cr3);
-		else if(fitDim == DIM_Y)
-			nvgRoundedRect4FitX(ctx, x, y, w, h, cr0, cr1, cr2, cr3);
+#ifdef KIUI_DRAW_CACHE
+		nvgRoundedRect4(ctx, x, y, w, h, cr0, cr1, cr2, cr3);
+#else
+		nvgRoundedRectVarying(ctx, x, y, w, h, cr0, cr1, cr2, cr3);
+#endif
 	}
 
 	NVGcolor nvgColour(const Colour& colour)
@@ -72,582 +53,329 @@ namespace mk
 							colour.a());
 	}
 
-	NanoInk::NanoInk(Frame& frame, NanoLayer& layer)
-		: Inkbox(frame)
-		, mCtx(layer.target().window().ctx())
-		, mImageCache(nullptr)
-		, mTextCache(nullptr)
-		, mLayer(layer)
-		, mImage(0)
-		, mOverlay(0)
-		, mTile(0)
-		, mImageUpdate(true)
-		, mTextUpdate(true)
+	NanoRenderer::NanoRenderer(NanoWindow& window)
+		: m_window(window)
+		, m_atlas(window.atlas())
+		, m_ctx(window.ctx())
 	{}
 
-	NanoInk::~NanoInk()
+#ifdef KIUI_DRAW_CACHE
+	void NanoRenderer::createCache(void*& cache, size_t size)
 	{
-		if(mImageCache)
-			nvgDeleteDisplayList(mImageCache);
-		if(mTextCache)
-			nvgDeleteDisplayList(mTextCache);
+		if(!cache)
+			cache = nvgCreateDisplayList(11);
 	}
 
-	void NanoInk::show()
+	void NanoRenderer::drawCache(void* cache, float x, float y)
 	{
-		mVisible = true;
+		nvgSave(ctx());
+		nvgTranslate(ctx(), x, y);
+		nvgDrawDisplayList(ctx(), (NVGdisplayList*) cache);
+		nvgRestore(ctx());
 	}
 
-	void NanoInk::hide()
+	void NanoRenderer::destroyCache(void* cache)
 	{
-		mVisible = false;
+		nvgDeleteDisplayList((NVGdisplayList*) cache);
 	}
-
-	void NanoInk::drawCache(NVGdisplayList* cache)
-	{
-		nvgSave(mCtx);
-		nvgTranslate(mCtx, floor(mFrame.dabsolute(DIM_X)), floor(mFrame.dabsolute(DIM_Y)));
-		nvgDrawDisplayList(mCtx, cache);
-		nvgRestore(mCtx);
-	}
-
-	void NanoInk::drawImage()
-	{
-#if 1 // DEBUG
-		if(sDebugDraw && mVisible)
-		{
-			float left = mFrame.dabsolute(DIM_X) + mFrame.cleft();
-			float top = mFrame.dabsolute(DIM_Y) + mFrame.ctop();
-			float width = mFrame.cwidth();
-			float height = mFrame.cheight();
-
-			nvgBeginPath(mCtx);
-			nvgRect(mCtx, left + 0.5f, top + 0.5f, width - 1.f, height - 1.f);
-			nvgStrokeWidth(mCtx, 1.f);
-			nvgStrokeColor(mCtx, nvgColour(Colour::Red));
-			nvgStroke(mCtx);
-		}
 #endif
 
-		if(this->skin().mEmpty || !mVisible)
+	void NanoRenderer::initImage(Image& image, bool tile)
+	{
+		if(image.d_index)
 			return;
 
-		++sDebugBatch;
-
-		if(!mImageCache)
-			mImageCache = nvgCreateDisplayList(11);
-
-		if(mImageUpdate)
-			this->redrawImage();
-
-		this->drawCache(mImageCache);
-		mImageUpdate = false;
+		string path = m_window.resourcePath() + "interface/uisprites/" + image.d_name + ".png";
+		image.d_index = nvgCreateImage(ctx(), path.c_str(), tile ? (NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY) : 0);
+		nvgImageSize(ctx(), image.d_index, &image.d_width, &image.d_height);
+#ifdef NANO_ATLAS
+		ImageRect& rect = atlas().findSpriteRect(image.d_name + ".png");
+		image.d_left = rect.x;
+		image.d_top = rect.y;
+#endif
 	}
 
-	void NanoInk::redrawImage()
+	void NanoRenderer::clipRect(BoxFloat& rect)
 	{
-		InkStyle& skin = this->skin();
+		nvgScissor(ctx(), rect.x(), rect.y(), rect.w(), rect.h());
+	}
 
-		float left = mFrame.cleft();
-		float top = mFrame.ctop();
-		float width = mFrame.cwidth();
-		float height = mFrame.cheight();
+	void NanoRenderer::unclipRect()
+	{
+		nvgResetScissor(ctx());
+	}
 
-		float pleft = mFrame.pleft();
-		float ptop = mFrame.ptop();
-		float pwidth = mFrame.pwidth();
-		float pheight = mFrame.pheight();
+	void NanoRenderer::clipFrame(BoxFloat& rect, BoxFloat& corners)
+	{
+		nvgGlobalCompositeOperation(ctx(), NVG_SOURCE_IN);
 
-		float halfb = skin.borderWidth().x0() * 0.5;
-		float b = skin.borderWidth().x0();
+		pathRect(rect, corners, 0.f);
 
-		if(width - b <= 0.f || height - b <= 0.f)
-			return;
+		nvgFillColor(ctx(), nvgColour(Colour::Black));
+		nvgFill(ctx());
+	}
 
-		nvgResetDisplayList(mImageCache);
-		nvgBindDisplayList(mCtx, mImageCache);
+	void NanoRenderer::clipShape()
+	{
+		nvgGlobalCompositeOperation(ctx(), NVG_SOURCE_IN);
+	}
 
-		float contentWidth = contentSize(DIM_X) - skin.padding()[DIM_X] - skin.padding()[DIM_X + 2];
-		float contentHeight = contentSize(DIM_Y) - skin.padding()[DIM_Y] - skin.padding()[DIM_Y + 2];
+	void NanoRenderer::unclipShape()
+	{
+		nvgGlobalCompositeOperation(ctx(), NVG_SOURCE_OVER);
+	}
 
-		float cleft = pleft;
-		NVGalign halign = NVG_ALIGN_LEFT;
-		if(skin.align()[DIM_X] == CENTER)
-		{
-			halign = NVG_ALIGN_CENTER;
-			cleft = pleft + pwidth / 2.f - contentWidth / 2.f;
-		}
-		else if(skin.align()[DIM_X] == RIGHT)
-		{
-			halign = NVG_ALIGN_RIGHT;
-			cleft = pleft + pwidth - contentWidth;
-		}
+	void NanoRenderer::pathBezier(float x1, float y1, float c1x, float c1y, float c2x, float c2y, float x2, float y2)
+	{
+		nvgBeginPath(ctx());
+		nvgMoveTo(ctx(), x1, y1);
+		nvgBezierTo(ctx(), c1x, c1y, c2x, c2y, x2, y2);
+	}
 
-		float ctop = ptop;
-		if(skin.align()[DIM_Y] == CENTER)
-			ctop = ptop + pheight / 2.f - contentHeight / 2.f;
-		else if(skin.align()[DIM_Y] == RIGHT)
-			ctop = ptop + pheight - contentHeight;
+	void NanoRenderer::pathRect(BoxFloat& rect, BoxFloat& corners, float border)
+	{
+		float halfborder = border * 0.5f;
 
-		float c0 = mCorners.x0();
-		float c1 = mCorners.y0();
-		float c2 = mCorners.x1();
-		float c3 = mCorners.y1();
-
-		// Shadow
-		if(!skin.shadow().d_null)
-		{
-			const Shadow& shadow = skin.shadow();
-			NVGpaint shadowPaint = nvgBoxGradient(mCtx, left + shadow.d_xpos - shadow.d_spread, top + shadow.d_ypos - shadow.d_spread, width + shadow.d_spread * 2.f, height + shadow.d_spread * 2.f, c0 + shadow.d_spread, shadow.d_blur, nvgRGBA(0, 0, 0, 128), nvgRGBA(0, 0, 0, 0));
-			nvgBeginPath(mCtx);
-			nvgRect(mCtx, left + shadow.d_xpos - shadow.d_radius, top + shadow.d_ypos - shadow.d_radius, width + shadow.d_radius * 2.f, height + shadow.d_radius * 2.f);
-			if(mCorners.null())
-				nvgRect(mCtx, left, top, width, height);
-			else
-				nvgRoundedBox(mCtx, left, top, width, height, c0, c1, c2, c3);
-			nvgPathWinding(mCtx, NVG_HOLE);
-			nvgFillPaint(mCtx, shadowPaint);
-			nvgFill(mCtx);
-		}
-
-		// Rect
-
-		nvgBeginPath(mCtx);
-		if(mCorners.null())
-			nvgRect(mCtx, left + halfb, top + halfb, width - b, height - b);
+		// Path
+		if(corners.null())
+			nvgRect(ctx(), rect.x() + halfborder, rect.y() + halfborder, rect.w() - border, rect.h() - border);
 		else
-			nvgRoundedBox(mCtx, left + halfb, top + halfb, width - b, height - b, c0, c1, c2, c3, mFitCorners);
+			nvgRoundedBox(ctx(), rect.x() + halfborder, rect.y() + halfborder, rect.w() - border, rect.h() - border, corners.xx(), corners.xy(), corners.yx(), corners.yy());
+	}
 
+	void NanoRenderer::drawShadow(BoxFloat& rect, BoxFloat& corners, Shadow& shadow)
+	{
+		NVGpaint shadowPaint = nvgBoxGradient(ctx(), rect.x() + shadow.d_xpos - shadow.d_spread, rect.y() + shadow.d_ypos - shadow.d_spread, rect.w() + shadow.d_spread * 2.f, rect.h() + shadow.d_spread * 2.f, corners.xy() + shadow.d_spread, shadow.d_blur, nvgRGBA(0, 0, 0, 128), nvgRGBA(0, 0, 0, 0));
+		nvgBeginPath(ctx());
+		nvgRect(ctx(), rect.x() + shadow.d_xpos - shadow.d_radius, rect.y() + shadow.d_ypos - shadow.d_radius, rect.w() + shadow.d_radius * 2.f, rect.h() + shadow.d_radius * 2.f);
+		if(corners.null())
+			nvgRect(ctx(), rect.x(), rect.y(), rect.w(), rect.h());
+		else
+			nvgRoundedBox(ctx(), rect.x(), rect.y(), rect.w(), rect.h(), corners.xx(), corners.xy(), corners.yx(), corners.yy());
+		nvgPathWinding(ctx(), NVG_HOLE);
+		nvgFillPaint(ctx(), shadowPaint);
+		nvgFill(ctx());
+	}
+
+	void NanoRenderer::drawRect(BoxFloat& rect, BoxFloat& corners, InkStyle& skin)
+	{
+		float border = skin.borderWidth().x0();
+
+		nvgBeginPath(ctx());
+		this->pathRect(rect, corners, border);
+
+		// Fill
 		if(skin.backgroundColour().a() > 0.f)
-		{
-			if(skin.topdownGradient().null())
-			{
-				nvgFillColor(mCtx, nvgColour(skin.mBackgroundColour));
-			}
-			else
-			{
-				NVGcolor first = nvgOffsetColour(skin.backgroundColour(), skin.topdownGradient().x());
-				NVGcolor second = nvgOffsetColour(skin.backgroundColour(), skin.topdownGradient().y());
-				nvgFillPaint(mCtx, (height > width) ?
-					nvgLinearGradient(mCtx, left, top, left + width, top, first, second) :
-					nvgLinearGradient(mCtx, left, top, left, top + height, first, second));
-			}
-			nvgFill(mCtx);
-		}
-		
-		if(skin.borderWidth().x0() > 0.f)
-		{
-			nvgStrokeWidth(mCtx, skin.borderWidth().x0());
-			nvgStrokeColor(mCtx, nvgColour(skin.borderColour()));
-			nvgStroke(mCtx);
-		}
+			this->fill(skin, rect);
 
-		// ImageSkin
-		if(!skin.imageSkin().null())
-		{
-			const ImageSkin& imgskin = skin.mImageSkin;
-			float margin = skin.imageSkin().d_margin * 2.f;
-
-			if(imgskin.d_stretch == DIM_X)
-				imgskin.stretchCoords(width + margin, imgskin.d_height, [this, left, ctop](ImageSkin::Section s, int x, int y, int w, int h){ this->drawSkinImage(s, float(left + x), float(ctop + y), float(w), float(h)); });
-			else if(imgskin.d_stretch == DIM_Y)
-				imgskin.stretchCoords(imgskin.d_width, height + margin, [this, cleft, top](ImageSkin::Section s, int x, int y, int w, int h){ this->drawSkinImage(s, float(cleft + x), float(top + y), float(w), float(h)); });
-			else
-				imgskin.stretchCoords(width + margin, height + margin, [this, left, top](ImageSkin::Section s, int x, int y, int w, int h){ this->drawSkinImage(s, float(left + x), float(top + y), float(w), float(h)); });
-		}
-
-		if(mFrame.dclip(DIM_X) || mFrame.dclip(DIM_Y)) 
-			nvgScissor(mCtx, left, top, width, height);
-
-		// Image
-		if(mImage)
-			this->drawImage(*mImage, cleft, ctop, contentWidth, contentHeight);
-		if(mOverlay)
-			this->drawImage(*mOverlay, cleft, ctop, contentWidth, contentHeight);
-		if(mTile)
-			this->drawImage(*mTile, left, top, width, height);
-
-		if(mFrame.dclip(DIM_X) || mFrame.dclip(DIM_Y))
-			nvgResetScissor(mCtx);
-
-		nvgBindDisplayList(mCtx, nullptr);
+		// Border
+		if(border > 0.f)
+			this->stroke(skin);
 	}
 
-	void NanoInk::drawText()
+	void NanoRenderer::drawRectClipped(BoxFloat& rect, BoxFloat& corners, InkStyle& skin, BoxFloat& clipRect, BoxFloat& clipCorners)
 	{
-		if(this->skin().mEmpty || !mVisible)
-			return;
+		float border = skin.borderWidth().x0();
 
-		if(!mTextCache)
-			mTextCache = nvgCreateDisplayList(3);
+		nvgBeginPath(ctx());
+		this->clipFrame(clipRect, clipCorners);
+		this->pathRect(rect, corners, border);
 
-		if(mTextUpdate)
-			this->redrawText();
+		// Fill
+		if(skin.backgroundColour().a() > 0.f)
+			this->fill(skin, rect);
 
-		this->drawCache(mTextCache);
-		mTextUpdate = false;
+		// Border
+		if(border > 0.f)
+			this->stroke(skin);
+
+		//this->unclipShape();
 	}
 
-	void NanoInk::redrawText()
+	void NanoRenderer::fill(InkStyle& skin, BoxFloat& rect)
 	{
-		InkStyle& skin = this->skin();
+		if(skin.topdownGradient().null())
+		{
+			nvgFillColor(ctx(), nvgColour(skin.m_backgroundColour));
+		}
+		else
+		{
+			NVGcolor first = nvgOffsetColour(skin.backgroundColour(), skin.topdownGradient().x());
+			NVGcolor second = nvgOffsetColour(skin.backgroundColour(), skin.topdownGradient().y());
+			nvgFillPaint(ctx(), (rect.h() > rect.w()) ?
+				nvgLinearGradient(ctx(), rect.x(), rect.y(), rect.x() + rect.w(), rect.y(), first, second) :
+				nvgLinearGradient(ctx(), rect.x(), rect.y(), rect.x(), rect.y() + rect.h(), first, second));
+		}
+		nvgFill(ctx());
+	}
 
-		nvgResetDisplayList(mTextCache);
-		nvgBindDisplayList(mCtx, mTextCache);
+	void NanoRenderer::stroke(InkStyle& skin)
+	{
+		float border = skin.borderWidth().x0();
 
-		float left = mFrame.cleft();
-		float top = mFrame.ctop();
-		float width = mFrame.cwidth();
-		float height = mFrame.cheight();
+		nvgStrokeWidth(ctx(), border);
+		nvgStrokeColor(ctx(), nvgColour(skin.borderColour()));
+		nvgStroke(ctx());
+	}
 
-		float pleft = mFrame.pleft();
-		float ptop = mFrame.ptop();
-		float pwidth = mFrame.pwidth();
-		float pheight = mFrame.pheight();
+	void NanoRenderer::drawImage(int image, BoxFloat& rect, BoxFloat& imageRect)
+	{
+		NVGpaint imgPaint = nvgImagePattern(ctx(), imageRect.x(), imageRect.y(), imageRect.w(), imageRect.h(), 0.0f / 180.0f*NVG_PI, image, 1.f);
+		nvgBeginPath(ctx());
+		nvgRect(ctx(), rect.x(), rect.y(), rect.w(), rect.h());
+		nvgFillPaint(ctx(), imgPaint);
+		nvgFill(ctx());
+	}
 
-		float contentWidth = contentSize(DIM_X) - skin.padding()[DIM_X] - skin.padding()[DIM_X + 2];
-		float contentHeight = contentSize(DIM_Y) - skin.padding()[DIM_Y] - skin.padding()[DIM_Y + 2];
+	void NanoRenderer::drawImage(const Image& image, BoxFloat& rect)
+	{
+#ifdef NANO_ATLAS
+		BoxFloat imageRect(rect.x() - image.d_left, rect.y() - image.d_top, atlas().width(), atlas().height());
+		this->drawImage(atlas().image(), rect, imageRect);
+#else
+		this->drawImage(image.d_index, rect, rect);
+#endif
+	}
 
-		float cleft = pleft;
+	void NanoRenderer::drawImageStretch(const Image& image, BoxFloat& rect, float xstretch, float ystretch)
+	{
+#ifdef NANO_ATLAS
+		BoxFloat imageRect(rect.x() - image.d_left * xstretch, rect.y() - image.d_top * ystretch, atlas().width() * xstretch, atlas().height() * ystretch);
+		this->drawImage(atlas().image(), rect, imageRect);
+#else
+		this->drawImage(image.d_index, rect, left, top, image.d_width * xstretch, image.d_height * ystretch);
+#endif
+	}
+
+
+	void NanoRenderer::setupText(InkStyle& skin)
+	{
+		nvgFontSize(ctx(), skin.textSize());
+		nvgFontFace(ctx(), skin.textFont().c_str());
+		nvgTextAlign(ctx(), NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+	}
+
+	void NanoRenderer::fillText(const string& text, BoxFloat& paddedRect, InkStyle& skin, TextRow& row)
+	{
+		this->setupText(skin);
+
+		float lineh = 0.f;
+		nvgTextMetrics(ctx(), NULL, NULL, &lineh);
+
+		row.start = text.c_str();
+		row.end = text.c_str() + text.size();
+		row.rect.assign(paddedRect.x(), paddedRect.y(), this->textSize(text, DIM_X, skin), lineh);
+
+		this->breakTextLine(paddedRect, row);
+	}
+
+	void NanoRenderer::breakText(const string& text, BoxFloat& paddedRect, InkStyle& skin, std::vector<TextRow>& textRows)
+	{
+		float x = paddedRect.x();
+		float y = paddedRect.y();
+
+		this->setupText(skin);
+
 		NVGalign halign = NVG_ALIGN_LEFT;
 		if(skin.align()[DIM_X] == CENTER)
-		{
 			halign = NVG_ALIGN_CENTER;
-			cleft = pleft + pwidth / 2.f - contentWidth / 2.f;
-		}
 		else if(skin.align()[DIM_X] == RIGHT)
-		{
 			halign = NVG_ALIGN_RIGHT;
-			cleft = pleft + pwidth - contentWidth;
-		}
 
-		float ctop = ptop;
-		if(skin.align()[DIM_Y] == CENTER)
-			ctop = ptop + pheight / 2.f - contentHeight / 2.f;
-		else if(skin.align()[DIM_Y] == RIGHT)
-			ctop = ptop + pheight - contentHeight;
-
-		// Caption
-		if(!mFrame.widget().label().empty() && !(pwidth <= 0.f || pheight <= 0.f))
-		{
-			//if(mFrame.dclip(DIM_X) || mFrame.dclip(DIM_Y)) 
-			// ^ @note this doesn't work because a frame is set to clipped only by its parent, and not when the label is larger than the frame itself
-			nvgScissor(mCtx, left, top, width, height);
-
-			this->setupText();
-
-			float lineh = 0.f;
-			nvgTextMetrics(mCtx, NULL, NULL, &lineh);
-
-			const char* start = mFrame.widget().label().c_str();
-			float x = pleft;
-			float y = ptop;
-
-			for(NVGtextRow& row : mTextRows)
-			{
-				if(halign & NVG_ALIGN_LEFT)
-					x = pleft;
-				else if(halign & NVG_ALIGN_CENTER)
-					x = pleft + pwidth*0.5f - row.width*0.5f;
-				else if(halign & NVG_ALIGN_RIGHT)
-					x = pleft + pwidth - row.width;
-
-				if(mSelectFirst != mSelectSecond)
-				{
-					size_t indexStart = row.start - start;
-					size_t indexEnd = row.end - start;
-
-					if(indexEnd > selectStart() && indexStart < selectEnd())
-					{
-						size_t selectStart = std::max(indexStart, this->selectStart());
-						size_t selectEnd = std::min(indexEnd, this->selectEnd());
-
-						NVGglyphPosition startPosition;
-						nvgTextGlyphPosition(mCtx, 0.f, 0.f, row.start, row.end, selectStart - (row.start - start), &startPosition);
-
-						NVGglyphPosition endPosition;
-						nvgTextGlyphPosition(mCtx, 0.f, 0.f, row.start, row.end, selectEnd - (row.start - start), &endPosition);
-
-						nvgBeginPath(mCtx);
-						nvgFillColor(mCtx, nvgRGBA(0, 55, 255, 124));
-						nvgRect(mCtx, x + startPosition.x, y, endPosition.x - startPosition.x, lineh);
-						nvgFill(mCtx);
-					}
-				}
-
-				nvgFillColor(mCtx, nvgColour(skin.mTextColour));
-				nvgText(mCtx, x, y, row.start, row.end);
-
-				y += lineh;
-			}
-
-			/*
-			nvgText(mCtx, cleft, ctop, mFrame.widget().label().c_str(), nullptr);
-			*/
-
-			nvgResetScissor(mCtx);
-		}
-
-		if(mFrame.dclip(DIM_X) || mFrame.dclip(DIM_Y))
-			nvgResetScissor(mCtx);
-
-		nvgBindDisplayList(mCtx, nullptr);
-	}
-
-	float NanoInk::contentSize(Dimension dim)
-	{
-		if(mImage)
-		{
-			return dim == DIM_X ? float(mImage->d_width) : float(mImage->d_height);
-		}
-		else if(skin().textColour().a() != 0.f)
-		{
-			float bounds[4];
-			float height;
-
-			this->setupText();
-			nvgTextBounds(mCtx, 0.f, 0.f, mFrame.widget().label().c_str(), nullptr, bounds);
-			nvgTextMetrics(mCtx, nullptr, nullptr, &height);
-
-			return dim == DIM_X ? bounds[2] - bounds[0] : height;
-		}
-		else if(!skin().imageSkin().null())
-		{
-			if(skin().imageSkin().d_stretch == DIM_X)
-				return skin().imageSkin().d_height;
-			else if(skin().imageSkin().d_stretch == DIM_Y)
-				return skin().imageSkin().d_width;
-		}
-		
-		return 0.f;
-	}
-
-	size_t NanoInk::caretIndex(float posX, float posY)
-	{
-		const char* start = mFrame.widget().label().c_str();
-		const char* end = start + mFrame.widget().label().size();
-
-		float pwidth = mFrame.pwidth();
-		float x = skin().padding()[DIM_X];
-		float y = skin().padding()[DIM_Y];
+		const char* first = text.c_str();
+		const char* end = first + text.size();
+		int nrows = 0;
 
 		float lineh = 0.f;
-		nvgTextMetrics(mCtx, NULL, NULL, &lineh);
+		nvgTextMetrics(ctx(), NULL, NULL, &lineh);
 
-		for(NVGtextRow& row : mTextRows)
+		textRows.clear();
+
+		NVGtextRow nvgTextRow;
+
+		while((nrows = nvgTextBreakLines(ctx(), first, end, paddedRect.w(), &nvgTextRow, 1)))
 		{
-			if(posY < y + lineh)
-			{
-				NVGalign halign = NVG_ALIGN_LEFT;
-				if(halign & NVG_ALIGN_LEFT)
-					x = x;
-				else if(halign & NVG_ALIGN_CENTER)
-					x = x + pwidth*0.5f - row.width*0.5f;
-				else if(halign & NVG_ALIGN_RIGHT)
-					x = x + pwidth - row.width;
+			if(halign & NVG_ALIGN_LEFT)
+				x = paddedRect.x();
+			else if(halign & NVG_ALIGN_CENTER)
+				x = paddedRect.x() + paddedRect.w()*0.5f - nvgTextRow.width*0.5f;
+			else if(halign & NVG_ALIGN_RIGHT)
+				x = paddedRect.x() + paddedRect.w() - nvgTextRow.width;
 
-				return nvgTextGlyphIndex(mCtx, x, y, row.start, row.end, posX) + row.start - start;
-			}
+			first = nvgTextRow.next;
+
+			textRows.resize(textRows.size() + 1);
+			
+			textRows.back().start = nvgTextRow.start;
+			textRows.back().end = nvgTextRow.end;
+			textRows.back().rect.assign(paddedRect.x(), paddedRect.y() + y, nvgTextRow.maxx, lineh);
+
+			this->breakTextLine(paddedRect, textRows.back());
+
 			y += lineh;
 		}
-
-		return end - start;
-
-		//return nvgTextGlyphIndex(mCtx, skin().padding()[DIM_X], skin().padding()[DIM_Y], mFrame.widget().label().c_str(), nullptr, posX);
 	}
 
-	void NanoInk::caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight)
+	void NanoRenderer::breakTextLine(BoxFloat& paddedRect, TextRow& textRow)
 	{
-		float lineh = 0.f;
-		nvgTextMetrics(mCtx, NULL, NULL, &lineh);
+		size_t numGlyphs = textRow.end - textRow.start;
+		std::vector<NVGglyphPosition> positions;
+		positions.resize(numGlyphs);
+		textRow.glyphs.resize(numGlyphs);
 
-		const char* start = mFrame.widget().label().c_str();
+		nvgTextGlyphPositions(ctx(), paddedRect.x(), paddedRect.y(), textRow.start, textRow.end, &positions.front(), positions.size());
 
-		float x = skin().padding()[DIM_X];
-		float y = skin().padding()[DIM_Y];
-		float pwidth = mFrame.pwidth();
-
-		for(NVGtextRow& row : mTextRows)
+		for(size_t i = 0; i < positions.size(); ++i)
 		{
-			if(index <= row.end - start)
-			{
-				NVGglyphPosition position;
-				nvgTextGlyphPosition(mCtx, 0.f, 0.f, row.start, row.end, index - (row.start - start), &position);
-				caretX = x + position.x;
-				caretY = y;
-				nvgTextMetrics(mCtx, nullptr, nullptr, &caretHeight);
-				return;
-			}
-			y += lineh;
-		}
-
-		caretX = 0.f;
-		caretY = y;
-		return;
-
-		NVGglyphPosition position;
-		nvgTextGlyphPosition(mCtx, 0.f, 0.f, mFrame.widget().label().c_str(), nullptr, index, &position);
-		caretX = skin().padding()[DIM_X] + position.x;
-		caretY = skin().padding()[DIM_Y] + 0.f;
-		nvgTextMetrics(mCtx, nullptr, nullptr, &caretHeight);
-	}
-
-	void NanoInk::updateContent()
-	{
-		mTextUpdate = true;
-		mImageUpdate = true;
-	}
-
-	void NanoInk::updateStyle()
-	{
-		mTextUpdate = true;
-		mImageUpdate = true;
-		this->styleCorners();
-
-		if(skin().mEmpty)
-			return;
-
-		if(mFrame.widget().image())
-			mImage = &fetchImage(*mFrame.widget().image());
-		else
-			mImage = 0;
-
-		if(skin().overlay())
-			mOverlay = &fetchImage(*skin().overlay());
-		else
-			mOverlay = 0;
-
-		if(skin().tile())
-			mTile = &fetchImage(*skin().tile(), true);
-		else
-			mTile = 0;
-
-		if(!skin().imageSkin().null())
-		{
-			mSkin = &fetchImage(*skin().imageSkin().d_image);
-
-			if(!skin().imageSkin().d_prepared)
-				skin().imageSkin().prepare(mSkin->d_width, mSkin->d_height);
+			NVGglyphPosition& glyph = positions[i];
+			TextGlyph& out = textRow.glyphs[i];
+			out.position = textRow.start + i;
+			out.rect.assign(paddedRect.x() + glyph.minx, textRow.rect.y(), glyph.maxx - glyph.minx, textRow.rect.h());
 		}
 	}
 
-	Image& NanoInk::fetchImage(Image& image, bool tile)
+	void NanoRenderer::drawText(float x, float y, const char* start, const char* end, InkStyle& skin)
 	{
-		if(image.d_index == 0)
-		{
-			image.d_index = nvgCreateImage(mCtx, (mLayer.target().window().resourcePath() + "interface/uisprites/" + image.d_name + ".png").c_str(), tile ? (NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY) : 0);
-			nvgImageSize(mCtx, image.d_index, &image.d_width, &image.d_height);
-#ifdef NANO_ATLAS
-			ImageRect& rect = mLayer.target().window().atlas().findSpriteRect(image.d_name + ".png");
-			image.d_left = rect.x;
-			image.d_top = rect.y;
-#endif
-		}
-		return image;
+		this->setupText(skin);
+
+		nvgFillColor(ctx(), nvgColour(skin.m_textColour));
+		nvgText(ctx(), x, y, start, end);
 	}
 
-	void NanoInk::setupText()
+#ifdef KIUI_DRAW_CACHE
+	void NanoRenderer::beginUpdate(void* cache)
 	{
-		nvgFontSize(mCtx, skin().textSize());
-		nvgFontFace(mCtx, skin().textFont().c_str());
-		nvgTextAlign(mCtx, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+		nvgResetDisplayList((NVGdisplayList*) cache);
+		nvgBindDisplayList(ctx(), (NVGdisplayList*) cache);
 	}
 
-	void NanoInk::updateFrame()
+	void NanoRenderer::endUpdate(void* cache)
 	{
-		if(mFrame.dirty() >= Frame::DIRTY_ABSOLUTE)
-			mMoved = true;
-
-		if(mFrame.dirty() < Frame::DIRTY_CLIP)
-			return;
-
-		mTextUpdate = true;
-		mImageUpdate = true;
-
-		if(skin().mEmpty || !mVisible || mFrame.dsize(DIM_X) == 0.f || mFrame.dsize(DIM_Y) == 0.f)
-			return;
-
-		if(!mFrame.widget().label().empty() && skin().textWrap())
-		{
-			mTextRows.clear();
-
-			this->setupText();
-
-			const char* first = mFrame.widget().label().c_str();
-			const char* end = first + mFrame.widget().label().size();
-			int nrows = 0;
-
-			mTextRows.resize(1);
-
-			while((nrows = nvgTextBreakLines(mCtx, first, end, mFrame.pwidth(), &mTextRows.back(), 1)))
-			{
-				first = mTextRows.back().next;
-				mTextRows.resize(mTextRows.size() + 1);
-			}
-
-			mTextRows.pop_back();
-		}
-		else if(!mFrame.widget().label().empty())
-		{
-			mTextRows.resize(1);
-			mTextRows[0].start = mFrame.widget().label().c_str();
-			mTextRows[0].end = mTextRows[0].start + mFrame.widget().label().size();
-			mTextRows[0].width = this->contentSize(DIM_X);
-		}
-		else
-		{
-			mTextRows.clear();
-		}
-
-		this->updateCorners();
+		nvgBindDisplayList(ctx(), nullptr);
 	}
-
-	void NanoInk::drawImage(int image, float left, float top, float width, float height, float imgx, float imgy, float imgw, float imgh)
-	{
-		NVGpaint imgPaint = nvgImagePattern(mCtx, imgx, imgy, imgw, imgh, 0.0f / 180.0f*NVG_PI, image, 1.f);
-		nvgBeginPath(mCtx);
-		nvgRect(mCtx, left, top, width, height);
-		nvgFillPaint(mCtx, imgPaint);
-		nvgFill(mCtx);
-	}
-
-	void NanoInk::drawImage(const Image& image, float x, float y, float w, float h)
-	{
-#ifdef NANO_ATLAS
-		NanoAtlas& atlas = mLayer.target().window().atlas();
-		this->drawImage(atlas.image(), x, y, w, h, x - image.d_left, y - image.d_top, atlas.width(), atlas.height());
 #else
-		this->drawImage(image.d_index, x, y, w, h, x, y, w, h);
-#endif
-		
-	}
-
-	void NanoInk::drawImageStretch(const Image& image, float left, float top, float width, float height, float xoff, float yoff, float xstretch, float ystretch)
+	void NanoRenderer::beginUpdate(float x, float y)
 	{
-#ifdef NANO_ATLAS
-		NanoAtlas& atlas = mLayer.target().window().atlas();
-		this->drawImage(atlas.image(), left, top, width, height, left - image.d_left * xstretch + xoff * xstretch, top - image.d_top * ystretch + yoff * ystretch, atlas.width() * xstretch, atlas.height() * ystretch);
-#else
-		this->drawImage(image.d_index, left, top, width, height, left + xoff * xstretch, top + yoff * ystretch, image.d_width * xstretch, image.d_height * ystretch);
-#endif
+		nvgSave(ctx());
+		nvgTranslate(ctx(), x, y);
 	}
 
-	void NanoInk::drawSkinImage(ImageSkin::Section section, float left, float top, float width, float height)
+	void NanoRenderer::endUpdate()
 	{
-		left -= skin().imageSkin().d_margin;
-		top -= skin().imageSkin().d_margin;
-
-		float xoffset = -skin().imageSkin().d_coords[section].x0();
-		float yoffset = -skin().imageSkin().d_coords[section].y0();
-
-		float xratio = 1.f;
-		float yratio = 1.f;
-
-		if(section == ImageSkin::TOP || section == ImageSkin::BOTTOM || section == ImageSkin::FILL)
-			xratio = width / skin().imageSkin().d_fillWidth; //float(imgwidth);
-		if(section == ImageSkin::LEFT || section == ImageSkin::RIGHT || section == ImageSkin::FILL)
-			yratio = height / skin().imageSkin().d_fillHeight; //float(imgheight);
-
-		this->drawImageStretch(*mSkin, left, top, width, height, xoffset, yoffset, xratio, yratio);
+		nvgRestore(ctx());
 	}
+#endif
+
+	float NanoRenderer::textSize(const string& text, Dimension dim, InkStyle& skin)
+	{
+		float bounds[4];
+		float height;
+
+		this->setupText(skin);
+		nvgTextBounds(ctx(), 0.f, 0.f, text.c_str(), nullptr, bounds);
+		nvgTextMetrics(ctx(), nullptr, nullptr, &height);
+
+		return dim == DIM_X ? bounds[2] - bounds[0] : height;
+	}
+
 }

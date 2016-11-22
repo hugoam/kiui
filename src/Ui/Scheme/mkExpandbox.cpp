@@ -7,46 +7,38 @@
 
 #include <Ui/Widget/mkSheet.h>
 
-#include <Ui/Form/mkForm.h>
-#include <Ui/Form/mkWidgets.h>
+#include <Ui/Widget/mkWidgets.h>
 
 #include <Ui/Frame/mkFrame.h>
 
 namespace mk
 {
 	ExpandboxHeader::ExpandboxHeader()
-		: Sequence()
-	{
-		mStyle = &cls();
-	}
+		: Band(cls())
+	{}
 
 	ExpandboxBody::ExpandboxBody()
-		: Sheet()
-	{
-		mStyle = &cls();
-	}
+		: Sheet(cls())
+	{}
 
 	ExpandboxToggle::ExpandboxToggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on)
-		: Toggle(triggerOn, triggerOff, on)
-	{
-		mStyle = &cls();
-	}
+		: Toggle(triggerOn, triggerOff, on, cls())
+	{}
 
-	Expandbox::Expandbox(const string& title, bool collapsed, bool build)
-		: Sheet()
-		, mTitle(title)
-		, mCollapsed(collapsed)
+	Expandbox::Expandbox(const string& title, bool collapsed, bool build, StyleType& type)
+		: Sheet(type)
+		, m_title(title)
+		, m_collapsed(collapsed)
 	{
-		mStyle = &cls();
 		if(build)
 		{
-			mHeader = &this->makeappend<ExpandboxHeader>();
-			mContainer = &this->makeappend<ExpandboxBody>();
+			m_header = &this->makeappend<ExpandboxHeader>();
+			m_container = &this->makeappend<ExpandboxBody>();
 
-			mExpandButton = &mHeader->emplace<ExpandboxToggle>(std::bind(&Expandbox::expand, this), std::bind(&Expandbox::collapse, this), !mCollapsed);
-			mTitleLabel = &mHeader->emplace<Title>(mTitle);
+			m_expandButton = &m_header->emplace<ExpandboxToggle>(std::bind(&Expandbox::expand, this), std::bind(&Expandbox::collapse, this), !m_collapsed);
+			m_titleLabel = &m_header->emplace<Title>(m_title);
 
-			mContainer->hide();
+			m_container->hide();
 		}
 	}
 
@@ -55,25 +47,25 @@ namespace mk
 
 	Widget& Expandbox::vappend(unique_ptr<Widget> widget)
 	{
-		if(!mCollapsed && mContainer->frame().hidden())
-			mContainer->show();
-		return mContainer->append(std::move(widget));
+		if(!m_collapsed && m_container->frame().hidden())
+			m_container->show();
+		return m_container->append(std::move(widget));
 	}
 
 	unique_ptr<Widget> Expandbox::vrelease(Widget& widget)
 	{
-		return mContainer->release(widget);
+		return m_container->release(widget);
 	}
 
 	void Expandbox::expand()
 	{
-		mContainer->show();
-		mCollapsed = false;
+		m_container->show();
+		m_collapsed = false;
 	}
 
 	void Expandbox::collapse()
 	{
-		mContainer->hide();
-		mCollapsed = true;
+		m_container->hide();
+		m_collapsed = true;
 	}
 }

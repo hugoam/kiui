@@ -22,19 +22,30 @@
 #include <GL/glext.h>
 #endif
 
+#ifdef KIUI_DRAW_CACHE
+#include <Ui/Nano/nanovg_cache/nanovg.h>
+#else
 #include <Ui/Nano/nanovg/nanovg.h>
+#endif
 
 #if KIUI_EMSCRIPTEN
 #define NANOVG_GLES2_IMPLEMENTATION
 #else
-#define NANOVG_GL2_IMPLEMENTATION
+//#define NANOVG_GL2_IMPLEMENTATION
+#define NANOVG_GL3_IMPLEMENTATION
 #endif
 
+#ifdef KIUI_DRAW_CACHE
+#include <Ui/Nano/nanovg_cache/nanovg_gl.h>
+#else
 #include <Ui/Nano/nanovg/nanovg_gl.h>
+#endif
+
 #include <Ui/Nano/nanovg/stb_image.h>
 
+#include <Ui/mkUiWindow.h>
+
 #include <dirent.h>
-#include <sys/stat.h>
 
 #include <iostream>
 
@@ -56,16 +67,10 @@ namespace mk
 	{
 		DIR* dir = opendir(path.c_str());
 		dirent* ent;
-		string fullpath;
-		struct stat buf;
 
 		while((ent = readdir(dir)) != NULL)
-		{
-			fullpath = path + "/" + ent->d_name;
-			stat(fullpath.c_str(), &buf);
-			if((buf.st_mode & S_IFREG) == S_IFREG)
+			if(ent->d_type & DT_REG)
 				atlas.sprites().push_back(makeRect(ctx, atlas.path(), ent->d_name, subfolder));
-		}
 
 		closedir(dir);
 	}
@@ -77,18 +82,12 @@ namespace mk
 
 		DIR* dir = opendir(path.c_str());
 		dirent* ent;
-		string fullpath;
-		struct stat buf;
 
-		spritesInFolder(window.ctx(), *atlas.get(), path, "");
+		spritesInFolder(window.ctx(), *atlas, path, "");
 
 		while((ent = readdir(dir)) != NULL)
-		{
-			fullpath = path + "/" + ent->d_name;
-			stat(fullpath.c_str(), &buf);
-			if((buf.st_mode & S_IFDIR) == S_IFDIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
-				spritesInFolder(window.ctx(), *atlas.get(), path + ent->d_name, string(ent->d_name) + "/");
-		}
+			if(ent->d_type & DT_DIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
+				spritesInFolder(window.ctx(), *atlas, path + ent->d_name, string(ent->d_name) + "/");
 
 		closedir(dir);
 
@@ -100,21 +99,21 @@ namespace mk
 	}
 
 	NanoAtlas::NanoAtlas(NanoWindow& window, const string& path, size_t width, size_t height)
-		: mWindow(window)
-		, mCtx(window.ctx())
-		, mPath(path)
-		, mWidth(width)
-		, mHeight(height)
-		, mRectPacker(width, height)
+		: m_window(window)
+		, m_ctx(window.ctx())
+		, m_path(path)
+		, m_width(width)
+		, m_height(height)
+		, m_rectPacker(width, height)
 	{}
 
 	void NanoAtlas::createAtlas()
 	{
-		mData = new unsigned char[mWidth*mHeight*4];
+		m_data = new unsigned char[m_width*m_height*4];
 
-		unsigned char* in = mData;
-		for(size_t y = 0; y < mHeight; ++y)
-			for(size_t x = 0; x < mWidth; ++x)
+		unsigned char* in = m_data;
+		for(size_t y = 0; y < m_height; ++y)
+			for(size_t x = 0; x < m_width; ++x)
 			{
 				*(in++) = 0;
 				*(in++) = 0;
@@ -127,29 +126,29 @@ namespace mk
 	{
 		// @todo : sort images
 
-		for(ImageRect& image : mSprites)
+		for(ImageRect& image : m_sprites)
 		{
 			this->fitImage(image);
 			string name = image.subfolder + replaceAll(image.image, ".png", "");
-			mWindow.addImage(name, image.width, image.height);
+			m_window.addImage(name, image.width, image.height);
 		}
 	}
 
 	void NanoAtlas::loadAtlas()
 	{
-		mImage = nvgCreateImageRGBA(mCtx, mWidth, mHeight, 0, mData);
-		delete [] mData;
+		m_image = nvgCreateImageRGBA(m_ctx, m_width, m_height, 0, m_data);
+		delete [] m_data;
 	}
 
 	void NanoAtlas::fitImage(ImageRect& image)
 	{
-		static_cast<BPRect&>(image) = mRectPacker.Insert(image.width, image.height, false, GuillotineBinPack::RectBestShortSideFit, GuillotineBinPack::SplitShorterLeftoverAxis);
+		static_cast<BPRect&>(image) = m_rectPacker.Insert(image.width, image.height, false, GuillotineBinPack::RectBestShortSideFit, GuillotineBinPack::SplitShorterLeftoverAxis);
 		this->blitImage(image);
 	}
 
 	void NanoAtlas::blitImage(ImageRect& image)
 	{
-		string path = mPath + image.subfolder + image.image;
+		string path = m_path + image.subfolder + image.image;
 		int width, height, n;
 		unsigned char* img;
 		stbi_set_unpremultiply_on_load(1);
@@ -157,11 +156,11 @@ namespace mk
 		img = stbi_load(path.c_str(), &width, &height, &n, 4);
 
 		unsigned char* out = img;
-		for(size_t y = 0; y < height; ++y)
+		for(int y = 0; y < height; ++y)
 		{
-			size_t offset = image.x * 4 + (image.y + y) * mWidth * 4;
-			unsigned char* in = mData + offset;
-			for(size_t x = 0; x < width; ++x)
+			size_t offset = image.x * 4 + (image.y + y) * m_width * 4;
+			unsigned char* in = m_data + offset;
+			for(int x = 0; x < width; ++x)
 			{
 				*(in++) = *(out++);
 				*(in++) = *(out++);
@@ -175,164 +174,106 @@ namespace mk
 
 	ImageRect& NanoAtlas::findSpriteRect(const string& name)
 	{
-		for(ImageRect& sprite : mSprites)
+		for(ImageRect& sprite : m_sprites)
 			if(sprite.subfolder + sprite.image == name)
 				return sprite;
 	}
 
 	void NanoAtlas::appendSprite(const string& name, const string& group)
 	{
-		mSprites.push_back(makeRect(mCtx, name, group));
-		ImageRect& sprite = mSprites.back();
+		m_sprites.push_back(makeRect(m_ctx, name, group));
+		ImageRect& sprite = m_sprites.back();
 		this->fitImage(sprite);
 	}
 
-	NanoLayer::NanoLayer(Layer& layer, NanoTarget& target, size_t index)
-		: InkLayer(layer, target, index)
-		, mTarget(target)
-		, mFrame(layer)
-	{}
-
-	NanoLayer::~NanoLayer()
-	{}
-
-	unique_ptr<Inkbox> NanoLayer::createInkbox(Frame& frame)
-	{
-		return make_unique<NanoInk>(frame, *this);
-	}
-
-	void NanoLayer::show()
-	{
-		mFrame.inkbox().show();
-		//this->moveToTop();
-	}
-
-	void NanoLayer::hide()
-	{
-		mFrame.inkbox().hide();
-	}
-
-	void NanoLayer::move(size_t pos, size_t z)
-	{
-		/*if(!mLayer.bound() || !mLayer.parent()) return;
-
-		std::cerr << static_cast<NanoInk&>(mLayer.parent()->layer().inkbox()).ctx() << std::endl;
-		std::cerr << static_cast<NanoInk&>(mLayer.parent()->layer().layers()[pos]->inkbox()).ctx() << std::endl;
-		std::cerr << static_cast<NanoInk&>(mLayer.inkbox()).ctx() << std::endl;*/
-	}
-
-	void NanoLayer::nanodraw()
-	{
-		this->drawImage(mFrame);
-		this->drawText(mFrame);
-	}
-
-	void NanoLayer::drawImage(Frame& frame)
-	{
-		static_cast<NanoInk&>(frame.inkbox()).drawImage();
-
-		if(frame.frameType() >= STRIPE)
-			for(Frame* subframe : frame.as<Stripe>().contents())
-				if(subframe->visible() && subframe->frameType() < LAYER)
-					this->drawImage(*subframe);
-	}
-
-	void NanoLayer::drawText(Frame& frame)
-	{
-		static_cast<NanoInk&>(frame.inkbox()).drawText();
-
-		if(frame.frameType() >= STRIPE)
-			for(Frame* subframe : frame.as<Stripe>().contents())
-				if(subframe->visible() && subframe->frameType() < LAYER)
-					this->drawText(*subframe);
-	}
-
-	NanoTarget::NanoTarget(NanoWindow& window)
-		: InkTarget(50)
-		, mWindow(window)
-	{}
-
-	void NanoTarget::nanodraw()
-	{
-		this->drawLayer(*d_rootLayer);
-	}
-
-	void NanoTarget::drawLayer(Layer& layer)
-	{
-		layer.inkLayer().as<NanoLayer>().nanodraw();
-
-		for(Layer* sublayer : layer.layers())
-			if(sublayer->layer().visible())
-				this->drawLayer(*sublayer);
-	}
-
-	unique_ptr<InkLayer> NanoTarget::createLayer(Layer& layer, size_t z)
-	{
-		if(!d_rootLayer)
-			d_rootLayer = &layer;
-		return make_unique<NanoLayer>(layer, *this, z);
-	}
-
-	NanoWindow::NanoWindow(size_t width, size_t height, float pixelRatio, string resourcePath)
-		: mWidth(width)
-		, mHeight(height)
-		, mPixelRatio(pixelRatio)
-		, mResourcePath(resourcePath)
-		, mCtx(nullptr)
+	NanoWindow::NanoWindow(UiWindow& uiWindow, string resourcePath)
+		: InkWindow(uiWindow, make_unique<NanoRenderer>(*this))
+		, m_nanorenderer(*static_cast<NanoRenderer*>(m_renderer.get()))
+		, m_resourcePath(resourcePath)
+		, m_ctx(nullptr)
 	{
 #if NANOVG_GL2
-		mCtx = nvgCreateGL2(NVG_ANTIALIAS);
+		m_ctx = nvgCreateGL2(NVG_ANTIALIAS);
+#elif NANOVG_GL3
+		m_ctx = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
 #elif NANOVG_GLES2
-		mCtx = nvgCreateGLES2(NVG_STENCIL_STROKES);
+		m_ctx = nvgCreateGLES2(NVG_STENCIL_STROKES);
 #endif
 
-		mAtlas = generateAtlas(*this, 1024, 1024, resourcePath);
+		m_atlas = generateAtlas(*this, 1024, 1024, resourcePath);
+
+		for(Image& image : m_images)
+			m_nanorenderer.initImage(image, false);
 
 		string fontPath = resourcePath + "interface/fonts/DejaVuSans.ttf";
-		nvgCreateFont(mCtx, "dejavu", fontPath.c_str());
-		nvgFontSize(mCtx, 14.0f);
-		nvgFontFace(mCtx, "dejavu");
+		nvgCreateFont(m_ctx, "dejavu", fontPath.c_str());
+		nvgFontSize(m_ctx, 14.0f);
+		nvgFontFace(m_ctx, "dejavu");
 
-		if(mCtx == nullptr)
+		if(m_ctx == nullptr)
 		{
 			printf("Could not init nanovg.\n");
 			return;
 		}
-
-		mScreenTarget = make_unique<NanoTarget>(*this);
 	}
 
 	NanoWindow::~NanoWindow()
 	{
-		for(Image& image : mImages)
-			nvgDeleteImage(mCtx, image.d_index);
+		for(Image& image : m_images)
+			nvgDeleteImage(m_ctx, image.d_index);
 
 #if NANOVG_GL2
-		nvgDeleteGL2(mCtx);
+		nvgDeleteGL2(m_ctx);
+#elif NANOVG_GL3
+		nvgDeleteGL3(m_ctx);
 #elif NANOVG_GLES2
-		nvgDeleteGLES2(mCtx);
+		nvgDeleteGLES2(m_ctx);
 #endif
+	}
+
+	NVGcolor nvgColor(const Colour& colour)
+	{
+		return nvgRGBAf(colour.r(), colour.g(), colour.b(), colour.a());
 	}
 
 	void NanoWindow::nextFrame(double time, double delta)
 	{
-		NanoInk::sDebugBatch = 0;
-		nvgBeginFrame(mCtx, mWidth, mHeight, mPixelRatio);
+		float pixelRatio = 1.f;
 
-		mScreenTarget->nanodraw();
+		Inkbox::sDebugBatch = 0;
+		nvgBeginFrame(m_ctx, m_uiWindow.width(), m_uiWindow.height(), pixelRatio);
 
-		nvgEndFrame(mCtx);
+		this->draw();
+
+		/*nvgGlobalCompositeOperation(ctx(), NVG_SOURCE_IN);
+
+		// clipping shape
+		nvgBeginPath(ctx());
+		nvgRoundedRect(ctx(), 115, 35, 304, 156, 10);
+		nvgFillColor(ctx(), nvgColor(Colour::Black));
+		nvgFill(ctx());
+
+		// filling whole screen with red, we want that clipped into the previous shape
+		// nvgBeginPath(ctx()); // when calling nvgBeginPath() between two shapes NVG_SOURCE_IN doesn't seem to be applied
+		nvgRect(ctx(), 0, 0, m_uiWindow.width(), m_uiWindow.height());
+		nvgFillColor(ctx(), nvgColor(Colour::Red));
+		nvgFill(ctx());
+		nvgClosePath(ctx());
+
+		nvgGlobalCompositeOperation(ctx(), NVG_SOURCE_OVER);*/
+
+		nvgEndFrame(m_ctx);
 
 		static double prevtime = 0.0;
 		if(time - prevtime > 1.0)
 		{
-			std::cerr << "Frames drawn : " << NanoInk::sDebugBatch << std::endl;
+			//std::cerr << "Frames drawn : " << Inkbox::sDebugBatch << std::endl;
 			prevtime = time;
 		}
 	}
 
 	InkTarget& NanoWindow::screenTarget()
 	{
-		return *mScreenTarget.get();
+		return *m_screenTarget;
 	}
 }

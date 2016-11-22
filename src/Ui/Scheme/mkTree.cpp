@@ -5,8 +5,7 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Scheme/mkTree.h>
 
-#include <Ui/Form/mkForm.h>
-#include <Ui/Form/mkWidgets.h>
+#include <Ui/Widget/mkWidgets.h>
 
 #include <Ui/Scheme/mkExpandbox.h>
 
@@ -17,121 +16,82 @@ using namespace std::placeholders;
 namespace mk
 {
 	TreeNodeHeader::TreeNodeHeader(const Trigger& trigger)
-		: WrapButton(nullptr, trigger)
-	{
-		mStyle = &cls();
-	}
+		: WrapButton(nullptr, trigger, cls())
+	{}
 
 	TreeNodeBody::TreeNodeBody()
-		: Sheet()
-	{
-		mStyle = &cls();
-	}
+		: Sheet(cls())
+	{}
 
 	TreeNodeToggle::TreeNodeToggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on)
-		: Toggle(triggerOn, triggerOff, on)
+		: Toggle(triggerOn, triggerOff, on, cls())
+	{}
+
+	TreeNode::TreeNode(const string& image, const string& title, bool collapsed, StyleType& type)
+		: Expandbox(title, collapsed, false, type)
+		, m_image(image)
 	{
-		mStyle = &cls();
-	}
+		m_header = &this->makeappend<TreeNodeHeader>(std::bind(&TreeNode::selected, this));
+		m_container = &this->makeappend<TreeNodeBody>();
 
-	TreeNode::TreeNode(const string& image, const string& title, bool collapsed, Object* object)
-		: Expandbox(title, collapsed, false)
-		, mImage(image)
-		, mObject(object)
-	{
-		mType = &cls();
-		mStyle = &cls();
+		m_expandButton = &m_header->emplace<TreeNodeToggle>(std::bind(&Expandbox::expand, this), std::bind(&Expandbox::collapse, this), !m_collapsed);
+		if(!m_image.empty())
+			m_icon = &m_header->emplace<Icon>(m_image);
+		m_titleLabel = &m_header->emplace<Title>(m_title);
 
-		mHeader = &this->makeappend<TreeNodeHeader>(std::bind(&TreeNode::selected, this));
-		mContainer = &this->makeappend<TreeNodeBody>();
-
-		mExpandButton = &mHeader->emplace<TreeNodeToggle>(std::bind(&Expandbox::expand, this), std::bind(&Expandbox::collapse, this), !mCollapsed);
-		if(!mImage.empty())
-			mIcon = &mHeader->emplace<Icon>(mImage);
-		mTitleLabel = &mHeader->emplace<Title>(mTitle);
-
-		mExpandButton->toggleState(DISABLED);
-		mContainer->hide();
+		m_expandButton->toggleState(DISABLED);
+		m_container->hide();
 	}
 
 	TreeNode::~TreeNode()
-	{
-		//mParent->as<Tree>()->removeNode(mObject, this);
-	}
+	{}
 
 	Widget& TreeNode::vappend(unique_ptr<Widget> widget)
 	{
-		if(mContainer->count() == 0)
-			mExpandButton->toggleState(DISABLED);
-
-		this->tree()->addNode(widget->as<TreeNode>());
+		if(m_container->count() == 0)
+			m_expandButton->toggleState(DISABLED);
 
 		return Expandbox::vappend(std::move(widget));
 	}
 
 	unique_ptr<Widget> TreeNode::vrelease(Widget& widget)
 	{
-		if(mContainer->count() == 1)
-			mExpandButton->toggleState(DISABLED);
-
-		this->tree()->removeNode(widget.as<TreeNode>());
+		if(m_container->count() == 1)
+			m_expandButton->toggleState(DISABLED);
 
 		return Expandbox::vrelease(widget);
 	}
 
-	Tree* TreeNode::tree()
+	Tree& TreeNode::tree()
 	{
-		Sheet* parent = mParent;
+		Sheet* parent = m_parent;
 		while(&parent->type() != &Tree::cls())
 			parent = parent->parent();
-		return &parent->as<Tree>();
+		return parent->as<Tree>();
 	}
 
 	void TreeNode::selected()
 	{
-		this->tree()->select(this);
+		this->tree().select(*this);
 	}
 
-	Tree::Tree(const std::function<void(TreeNode*)>& onSelected)
-		: ScrollSheet()
-		, mRootNode(nullptr)
-		, mSelected(nullptr)
-		, mOnSelected(onSelected)
-	{
-		mStyle = &cls();
-		mType = &cls();
-	}
+	Tree::Tree(const std::function<void(TreeNode&)>& onSelected)
+		: ScrollSheet(cls())
+		, m_rootNode(nullptr)
+		, m_selected(nullptr)
+		, m_onSelected(onSelected)
+	{}
 
 	Tree::~Tree()
 	{}
 
-	TreeNode* Tree::node(Object* object)
+	void Tree::select(TreeNode& selected)
 	{
-		return mNodes[object];
-	}
+		if(m_selected)
+			m_selected->header()->toggleState(ACTIVATED);
 
-	void Tree::addNode(TreeNode& node)
-	{
-		mNodes[node.object()] = &node;
-	}
-
-	void Tree::removeNode(TreeNode& node)
-	{
-		mNodes.erase(node.object());
-	}
-
-	void Tree::select(Object* object)
-	{
-		this->select(mNodes[object]);
-	}
-
-	void Tree::select(TreeNode* selected)
-	{
-		if(mSelected)
-			mSelected->header()->toggleState(ACTIVATED);
-
-		selected->header()->toggleState(ACTIVATED);
-		mSelected = selected;
+		selected.header()->toggleState(ACTIVATED);
+		m_selected = &selected;
 
 		/*Widget* node = selected;
 		while(node != this)
@@ -146,7 +106,7 @@ namespace mk
 			node = node->parent();
 		}*/
 
-		if(mOnSelected)
-			mOnSelected(selected);
+		if(m_onSelected)
+			m_onSelected(selected);
 	}
 }

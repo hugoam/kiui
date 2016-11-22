@@ -42,17 +42,17 @@ namespace mk
 		void declineImageSkin(const string& states);
 
 	protected:
-		Styler& mStyler;
-		ParserState mState;
-		ParserKeyState mKeyState;
-		Style* mStyle;
-		InkStyle* mSkin;
-		LayoutStyle* mLayoutStyle;
-		InkStyle* mInkStyle;
-		string mKey;
+		Styler& m_styler;
+		ParserState m_state;
+		ParserKeyState m_keyState;
+		Style* m_style;
+		InkStyle* m_skin;
+		LayoutStyle* m_layoutStyle;
+		InkStyle* m_inkStyle;
+		string m_key;
 
 		class Impl;
-		unique_ptr<Impl> mPimpl;
+		unique_ptr<Impl> m_pimpl;
 	};
 }
 

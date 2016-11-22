@@ -10,7 +10,6 @@
 #include <Ui/Frame/mkUibox.h>
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Widget/mkButton.h>
-#include <Ui/Form/mkForm.h>
 
 namespace mk
 {
@@ -30,16 +29,16 @@ namespace mk
 		Widget& vappend(unique_ptr<Widget> widget);
 		unique_ptr<Widget> vrelease(Widget& widget);
 
-		WrapButton* active() { return mActive; }
+		WrapButton* active() { return m_active; }
 
 		void activated(WrapButton& button);
 
 		static StyleType& cls() { static StyleType ty("RadioSwitch", Sheet::cls()); return ty; }
 
 	protected:
-		Trigger mOnSelected;
-		WrapButton* mActive;
-		size_t mActiveIndex;
+		Trigger m_onSelected;
+		WrapButton* m_active;
+		size_t m_activeIndex;
 	};
 }
 

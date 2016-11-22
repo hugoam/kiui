@@ -19,25 +19,25 @@ namespace mk
 
 		Colour& operator=(const Colour&);
 
-		_A_ _M_ float r() const { return mFloats[0]; }
-		_A_ _M_ float g() const { return mFloats[1]; }
-		_A_ _M_ float b() const { return mFloats[2]; }
-		_A_ _M_ float a() const { return mFloats[3]; }
+		_A_ _M_ float r() const { return m_floats[0]; }
+		_A_ _M_ float g() const { return m_floats[1]; }
+		_A_ _M_ float b() const { return m_floats[2]; }
+		_A_ _M_ float a() const { return m_floats[3]; }
 
-		void setR(float r) { mFloats[0] = r; }
-		void setG(float g) { mFloats[1] = g; }
-		void setB(float b) { mFloats[2] = b; }
-		void setA(float a) { mFloats[3] = a; }
+		void setR(float r) { m_floats[0] = r; }
+		void setG(float g) { m_floats[1] = g; }
+		void setB(float b) { m_floats[2] = b; }
+		void setA(float a) { m_floats[3] = a; }
 
-		float operator [](size_t i) const { return mFloats[i]; }
-		float& operator [](size_t i) { return mFloats[i]; }
+		float operator [](size_t i) const { return m_floats[i]; }
+		float& operator [](size_t i) { return m_floats[i]; }
 
 		bool null() { return a() == 0.f; }
 
 		static Type& cls() { static Type ty; return ty; }
 
 	protected:
-		float mFloats[4];
+		float m_floats[4];
 
 	public:
 		static Colour Black;

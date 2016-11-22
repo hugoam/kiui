@@ -11,72 +11,47 @@
 
 namespace mk
 {
-	Controller::Controller()
-		: mLower(nullptr)
+	KeyInputFrame::KeyInputFrame()
+		: InputWidget()
 	{}
 
-	Controller::~Controller()
-	{}
-
-	InputReceiver* Controller::controlMouse(float x, float y)
+	void KeyInputFrame::keyUp(KeyEvent& keyEvent)
 	{
-		UNUSED(x); UNUSED(y);
-		return this;
-	}
-
-	InputReceiver* Controller::controlKey()
-	{
-		return this;
-	}
-
-	InputReceiver* Controller::propagateMouse(float x, float y)
-	{
-		return mLower->controlMouse(x, y);
-	}
-
-	InputReceiver* Controller::propagateKey()
-	{
-		return mLower->controlKey();
-	}
-
-	void Controller::take(Widget* widget)
-	{
-		mInputWidget = widget;
-		mInputWidget->rootSheet().takeControl(this);
-	}
-
-	void Controller::stack(Widget* widget)
-	{
-		mInputWidget = widget;
-		mInputWidget->rootSheet().stackControl(this);
-	}
-
-	void Controller::yield()
-	{
-		mInputWidget->rootSheet().yieldControl(this);
-	}
-
-	bool Controller::keyUp(KeyCode keyCode, char c)
-	{
-		UNUSED(c);
-		auto it = keyUpHandlers.find(keyCode);
+		auto it = keyUpHandlers.find(keyEvent.code);
 		if(it != keyUpHandlers.end())
 		{
 			(*it).second();
-			return true;
+			keyEvent.consumed = true;
 		}
-		return false;
 	}
 
-	bool Controller::keyDown(KeyCode keyCode, char c)
+	void KeyInputFrame::keyDown(KeyEvent& keyEvent)
 	{
-		UNUSED(c);
-		auto it = keyDownHandlers.find(keyCode);
+		auto it = keyDownHandlers.find(keyEvent.code);
 		if(it != keyDownHandlers.end())
 		{
 			(*it).second();
-			return true;
+			keyEvent.consumed = true;
 		}
-		return false;
 	}
+
+	Controller::Controller(ControlMode controlMode)
+		: KeyInputFrame()
+		, m_controlMode(controlMode)
+		, m_inputWidget(nullptr)
+	{}
+
+	void Controller::takeControl(Widget& inputWidget)
+	{
+		m_inputWidget = &inputWidget;
+		InputFrame::m_controlMode = m_controlMode;
+		InputFrame::takeControl(inputWidget);
+	}
+
+	void Controller::yieldControl()
+	{
+		m_inputWidget = nullptr;
+		InputFrame::yieldControl();
+	}
+
 }

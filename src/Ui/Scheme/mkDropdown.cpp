@@ -5,10 +5,7 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Scheme/mkDropdown.h>
 
-#include <Ui/Form/mkWidgets.h>
-
-#include <Ui/Form/mkForm.h>
-#include <Ui/Form/mkRootForm.h>
+#include <Ui/Widget/mkWidgets.h>
 
 #include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
@@ -24,22 +21,21 @@ using namespace std::placeholders;
 
 namespace mk
 {
-	Dropdown::Dropdown(const Trigger& onSelected, StringVector choices, bool input)
-		: Sheet()
-		, mOnSelected()
-		, mSelected(nullptr)
-		, mDown(false)
-		, mList(this->makeappend<DropdownList>(*this))
-		, mHeader(this->makeappend<DropdownHeader>(*this, input))
-		, mToggle(this->makeappend<DropdownToggle>(*this))
+	Dropdown::Dropdown(const Trigger& onSelected, StringVector choices, bool input, StyleType& type)
+		: Sheet(type)
+		, m_onSelected()
+		, m_selected(nullptr)
+		, m_down(false)
+		, m_list(this->makeappend<DropdownList>(*this))
+		, m_header(this->makeappend<DropdownHeader>(*this, input))
+		, m_toggle(this->makeappend<DropdownToggle>(*this))
 	{
-		mStyle = &cls();
-		mList.hide();
+		m_list.hide();
 
 		for(string& choice : choices)
 			this->emplace<Label>(choice);
 
-		mOnSelected = onSelected;
+		m_onSelected = onSelected;
 	}
 
 	Dropdown::~Dropdown()
@@ -47,9 +43,9 @@ namespace mk
 
 	Widget& Dropdown::vappend(std::unique_ptr<Widget> widget)
 	{
-		WrapButton& button = mList.emplace<DropdownChoice>(std::move(widget), std::bind(&Dropdown::selected, this, _1));
-		if(mSelected == nullptr)
-			this->selected(button);
+		WrapButton& button = m_list.emplace<DropdownChoice>(std::move(widget), std::bind(&Dropdown::selected, this, _1));
+		//if(m_selected == nullptr)
+		//	this->select(button);
 
 		return button;
 	}
@@ -61,102 +57,105 @@ namespace mk
 
 	void Dropdown::dropup()
 	{
-		mList.hide();
-		if(mList.state() & MODAL)
-			mList.unmodal();
-		mDown = false;
+		m_list.hide();
+		if(m_list.state() & MODAL)
+			m_list.yieldControl();
+		m_down = false;
 	}
 
 	void Dropdown::dropdown(bool modal)
 	{
-		if(mList.count() == 0)
-			return;
+		//if(m_list.count() == 0)
+		//	return;
 
-		mList.show();
-		mList.frame().as<Layer>().moveToTop();
+		m_list.show();
+		m_list.frame().as<Layer>().moveToTop();
 		if(modal)
-			mList.modal();
+			m_list.takeControl(CM_MODAL);
 
-		mDown = true;
+		m_down = true;
+	}
+
+	void Dropdown::select(WrapButton& button)
+	{
+		if(m_selected)
+			m_selected->toggleState(ACTIVATED);
+
+		m_selected = &button;
+		m_selected->toggleState(ACTIVATED);
+		m_header.updateContent(*button.content());
+
+		if(m_onSelected)
+			m_onSelected(*button.content());
 	}
 
 	void Dropdown::selected(WrapButton& button)
 	{
-		if(mDown)
+		if(m_down)
 			this->dropup();
 
-		if(mSelected)
-			mSelected->toggleState(ACTIVATED);
-
-		mSelected = &button;
-		mSelected->toggleState(ACTIVATED);
-		mHeader.update(button.content());
-
-		if(mOnSelected)
-			mOnSelected(*button.content());
+		this->select(button);
 	}
 
 	DropdownHeader::DropdownHeader(Dropdown& dropdown, bool input)
-		: WrapButton(nullptr, std::bind(&DropdownHeader::click, this))
-		, mDropdown(dropdown)
-		, mInput(nullptr)
+		: WrapButton(nullptr, std::bind(&DropdownHeader::click, this), cls())
+		, m_dropdown(dropdown)
+		, m_input(nullptr)
 	{
-		mStyle = &cls();
 		if(input)
 		{
-			mInput = &this->makeappend<FilterInput>(mDropdown.dropbox(), std::bind(&DropdownHeader::onInput, this, _1));
-			mInput->hide();
+			m_input = &this->makeappend<FilterInput>(m_dropdown.dropbox(), std::bind(&DropdownHeader::onInput, this, _1));
+			m_input->hide();
 		}
 	}
 
 	void DropdownHeader::click()
 	{
-		if(mInput)
+		if(m_input)
 		{
-			mContent->hide();
-			mInput->show();
-			mInput->setString(mContent->contentlabel());
-			mInput->typeIn().leftClick(this->rootSheet().lastPressedX(), this->rootSheet().lastPressedY());
+			m_content->hide();
+			m_input->show();
+			m_input->setString(m_content->contentlabel());
+			MouseClickEvent mouseEvent(InputEvent::DEVICE_MOUSE_LEFT_BUTTON, this->uiWindow().mouse().lastX(), this->uiWindow().mouse().lastY());
+			m_input->typeIn().leftClick(mouseEvent);
 		}
 		else
 		{
-			mDropdown.dropdown();
+			m_dropdown.dropdown();
 		}
 	}
 
 	void DropdownHeader::onInput(string value)
 	{
-		mInput->filterOn();
+		m_input->filterOn();
 
-		if(!mDropdown.down())
-			mDropdown.dropdown(false);
+		if(!m_dropdown.down())
+			m_dropdown.dropdown(false);
 	}
 
-	void DropdownHeader::update(Widget* choice)
+	void DropdownHeader::updateContent(Widget& choice)
 	{
-		if(mInput && (mInput->typeIn().state() & FOCUSED))
+		if(m_input && (m_input->typeIn().state() & CONTROL))
 		{
-			mInput->typeIn().unfocus();
-			mInput->hide();
+			m_input->typeIn().yieldControl();
+			m_input->hide();
 		}
 
-		if(mContent)
-			this->release(*mContent);
-		mContent = &this->append(choice->clone());
+		if(m_content)
+			this->release(*m_content);
+		m_content = &this->append(choice.clone());
 	}
 
 	DropdownToggle::DropdownToggle(Dropdown& dropdown)
-		: Button("", std::bind(&DropdownToggle::click, this))
-		, mDropdown(dropdown)
-	{
-		mStyle = &cls();
-	}
+		: Button("", std::bind(&DropdownToggle::click, this), cls())
+		, m_dropdown(dropdown)
+	{}
 
 	void DropdownToggle::click()
 	{
-		if(mDropdown.header().input())
-			mDropdown.header().input()->filterOff();
-		mDropdown.dropdown();
+		if(m_dropdown.header().input())
+			m_dropdown.header().input()->filterOff();
+		m_dropdown.dropdown();
 	}
 
 	DropdownLabel::DropdownLabel(const string& label)
@@ -164,83 +163,91 @@ namespace mk
 	{}
 
 	DropdownChoice::DropdownChoice(unique_ptr<Widget> content, const Trigger& trigger)
-		: WrapButton(std::move(content), trigger)
+		: WrapButton(std::move(content), trigger, cls())
 	{
-		mStyle = &cls();
 		//content->setStyle(DropdownLabel::cls());
 	}
 
 	DropdownList::DropdownList(Dropdown& dropdown)
-		: List(LAYER)
-		, mDropdown(dropdown)
+		: List(cls(), LAYER)
+		, m_dropdown(dropdown)
 	{
-		mStyle = &cls();
-		mFrame = make_unique<Layer>(*this, 0);
+		m_frame = make_unique<Layer>(*this, 0);
 	}
 
-	bool DropdownList::leftClick(float x, float y)
+	void DropdownList::leftClick(MouseEvent& mouseEvent)
 	{
-		UNUSED(x); UNUSED(y);
-		mDropdown.dropup();
-		return true;
+		UNUSED(mouseEvent);
+		m_dropdown.dropup();
+	}
+
+	void DropdownList::rightClick(MouseEvent& mouseEvent)
+	{
+		UNUSED(mouseEvent);
+		//m_dropdown.dropup();
 	}
 
 	Typedown::Typedown(const Trigger& onSelected, StringVector choices)
 		: Dropdown(onSelected, choices, true)
-	{
-		mStyle = &cls();
-	}
+	{}
 
 	MenuList::MenuList(Menu& menu)
-		: List(LAYER)
-		, mMenu(menu)
+		: List(cls(), LAYER)
+		, m_menu(menu)
 	{
-		mStyle = &cls();
-		mFrame = make_unique<Layer>(*this, 0);
+		m_frame = make_unique<Layer>(*this, 0);
 	}
 
-	bool MenuList::leftClick(float x, float y)
+	void MenuList::leftClick(MouseEvent& mouseEvent)
 	{
-		UNUSED(x); UNUSED(y);
-		mMenu.dropup();
-		return true;
+		UNUSED(mouseEvent);
+		m_menu.dropup();
 	}
 
 	Menu::Menu(const string& label, bool submenu)
-		: Sheet()
-		, mSubmenu(submenu)
-		, mButton(this->makeappend<Button>(label, std::bind(&Menu::dropdown, this)))
-		, mList(this->makeappend<MenuList>(*this))
-		, mDown(false)
+		: Sheet(cls())
+		, m_submenu(submenu)
+		, m_button(this->makeappend<Button>(label, std::bind(&Menu::dropdown, this)))
+		, m_list(this->makeappend<MenuList>(*this))
+		, m_down(false)
 	{
-		mStyle = &cls();
-		mList.hide();
+		m_list.hide();
 	}
 
 	Widget& Menu::vappend(std::unique_ptr<Widget> widget)
 	{
-		return mList.append(std::move(widget));
+		WrapButton& button = m_list.emplace<DropdownChoice>(std::move(widget), std::bind(&Menu::selected, this, _1));
+		return button;
+
+		//return m_list.append(std::move(widget));
 	}
 
 	unique_ptr<Widget> Menu::vrelease(Widget& widget)
 	{
-		return mList.release(widget);
+		return widget.extract();
+		//return m_list.release(widget);
+	}
+
+	void Menu::selected(WrapButton& selected)
+	{
+		//selected;
+		this->dropup();
 	}
 
 	void Menu::dropdown()
 	{
-		mList.show();
-		mList.modal();
-		mList.frame().as<Layer>().moveToTop();
+		m_list.show();
+		m_list.takeControl(CM_MODAL);
+		m_list.frame().as<Layer>().moveToTop();
 
-		mDown = true;
+		m_down = true;
 	}
 
 	void Menu::dropup()
 	{
-		mList.hide();
-		if(mList.state() & MODAL)
-			mList.unmodal();
-		mDown = false;
+		m_list.hide();
+		if(m_list.state() & MODAL)
+			m_list.yieldControl();
+		m_down = false;
 	}
 }

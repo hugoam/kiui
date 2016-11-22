@@ -22,29 +22,32 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT Image : public IdStruct, public Indexed<Image>
+	class MK_UI_EXPORT _I_ Image : public IdStruct
 	{
 	public:
 		Image(const string& name, int width = 0, int height = 0)
-			: IdStruct(index<Image>(), cls())
+			: IdStruct(cls())
 			, d_name(name), d_left(0), d_top(0), d_width(width), d_height(height), d_index(0)
 		{}
 
 		Image()
-			: IdStruct(index<Image>(), cls())
+			: IdStruct(cls())
 			, d_name(), d_left(0), d_top(0), d_width(0), d_height(0), d_index(0)
 		{}
 
+		Image(const Image& other)
+			: IdStruct(other)
+		{
+			*this = other;
+		}
+
 		Image(Image&& other)
-			: IdStruct(index<Image>(), cls())
-			, d_name(other.d_name)
-			, d_left(other.d_left)
-			, d_top(other.d_top)
-			, d_width(other.d_width)
-			, d_height(other.d_height)
-			, d_index(other.d_index)
-			, d_stretch(other.d_stretch)
-		{}
+			: IdStruct(cls())
+		{
+			*this = other;
+		}
+
+		Image& operator=(const Image&) = default;
 
 		bool null() const { return d_name.empty(); }
 
@@ -57,20 +60,14 @@ namespace mk
 
 		bool d_stretch;
 
-		static Type& cls() { static Type ty; return ty; }
+		static Type& cls() { static Type ty(INDEXED); return ty; }
 	};
-
-	inline Image* findImageImpl(const string& name)
-	{
-		for(Object* object : Image::indexer().objects())
-			if(object && object->as<Image>().d_name == name)
-				return &object->as<Image>();
-		return nullptr;
-	}
 
 	inline Image& findImage(const string& name)
 	{
-		return *findImageImpl(name);
+		for(Object* object : Image::cls().indexer().objects())
+			if(object && object->as<Image>().d_name == name)
+				return object->as<Image>();
 	}
 
 	class _I_ ImageSkin : public Struct
@@ -96,7 +93,6 @@ namespace mk
 			, d_margin(margin)
 			, d_prepared(false)
 			, d_images(9)
-			, d_coords(9)
 			, d_stretch(stretch)
 		{
 			this->setImage(*d_image);
@@ -111,17 +107,20 @@ namespace mk
 		void setImage(Image& image)
 		{
 			d_image = &image;
-			d_images[TOP_LEFT] = image.d_name + "_topleft";
-			d_images[TOP_RIGHT] = image.d_name + "_topright";
-			d_images[BOTTOM_RIGHT] = image.d_name + "_bottomright";
-			d_images[BOTTOM_LEFT] = image.d_name + "_bottomleft";
+			d_images[TOP_LEFT].d_name = image.d_name + "_topleft";
+			d_images[TOP_RIGHT].d_name = image.d_name + "_topright";
+			d_images[BOTTOM_RIGHT].d_name = image.d_name + "_bottomright";
+			d_images[BOTTOM_LEFT].d_name = image.d_name + "_bottomleft";
 
-			d_images[TOP] = image.d_name + "_top";
-			d_images[RIGHT] = image.d_name + "_right";
-			d_images[BOTTOM] = image.d_name + "_bottom";
-			d_images[LEFT] = image.d_name + "_left";
+			d_images[TOP].d_name = image.d_name + "_top";
+			d_images[RIGHT].d_name = image.d_name + "_right";
+			d_images[BOTTOM].d_name = image.d_name + "_bottom";
+			d_images[LEFT].d_name = image.d_name + "_left";
 
-			d_images[FILL] = image.d_name + "_fill";
+			d_images[FILL].d_name = image.d_name + "_fill";
+
+			for(size_t i = 0; i < 9; ++i)
+				d_images[i].d_index = d_image->d_index;
 		}
 
 		void prepare(int width, int height)
@@ -131,25 +130,33 @@ namespace mk
 			d_fillWidth = width - d_left - d_right;
 			d_fillHeight = height - d_top - d_bottom;
 
-			this->stretchCoords(width, height, [this](Section s, int x, int y, int w, int h){ this->d_coords[s] = BoxFloat(x, y, w, h); });
+			d_solidWidth = width - d_margin - d_margin;
+			d_solidHeight = height - d_margin - d_margin;
+
+			this->stretchCoords(0, 0, width, height, [this](Section s, int x, int y, int w, int h) {
+				this->d_images[s].d_left = this->d_image->d_left + x;
+				this->d_images[s].d_top = this->d_image->d_top + y;
+				this->d_images[s].d_width = w;
+				this->d_images[s].d_height = h;
+			 });
 		}
 
-		void stretchCoords(int width, int height, std::function<void(Section, int, int, int, int)> filler) const
+		void stretchCoords(int x, int y, int width, int height, std::function<void(Section, int, int, int, int)> filler) const
 		{
 			int fillWidth = width - d_left - d_right;
 			int fillHeight = height - d_top - d_bottom;
 
-			filler(TOP_LEFT, 0, 0, d_left, d_top);
-			filler(TOP_RIGHT, fillWidth + d_left, 0, d_right, d_top);
-			filler(BOTTOM_RIGHT, fillWidth + d_left, fillHeight + d_top, d_right, d_bottom);
-			filler(BOTTOM_LEFT, 0, fillHeight + d_top, d_left, d_bottom);
+			filler(TOP_LEFT, x, y, d_left, d_top);
+			filler(TOP_RIGHT, x + fillWidth + d_left, y, d_right, d_top);
+			filler(BOTTOM_RIGHT, x + fillWidth + d_left, y + fillHeight + d_top, d_right, d_bottom);
+			filler(BOTTOM_LEFT, x, y + fillHeight + d_top, d_left, d_bottom);
 
-			filler(TOP, d_left, 0, fillWidth, d_top); // width, 0.f
-			filler(RIGHT, fillWidth + d_left, d_top, d_right, fillHeight); // 0.f, height
-			filler(BOTTOM, d_left, fillHeight + d_top, fillWidth, d_bottom); // width, 0.f
-			filler(LEFT, 0, d_top, d_left, fillHeight); // 0.f, height
+			filler(TOP, x + d_left, y, fillWidth, d_top); // width, 0.f
+			filler(RIGHT, x + fillWidth + d_left, y + d_top, d_right, fillHeight); // 0.f, height
+			filler(BOTTOM, x + d_left, y + fillHeight + d_top, fillWidth, d_bottom); // width, 0.f
+			filler(LEFT, x, y + d_top, d_left, fillHeight); // 0.f, height
 
-			filler(FILL, d_left, d_top, fillWidth, fillHeight); // width, height
+			filler(FILL, x + d_left, y + d_top, fillWidth, fillHeight); // width, height
 		}
 
 		_A_ _M_ Image* d_image;
@@ -165,11 +172,13 @@ namespace mk
 		int d_width;
 		int d_height;
 
+		int d_solidWidth;
+		int d_solidHeight;
+
 		int d_fillWidth;
 		int d_fillHeight;
 
-		std::vector<string> d_images;
-		std::vector<BoxFloat> d_coords;
+		std::vector<Image> d_images;
 
 		bool d_prepared;
 

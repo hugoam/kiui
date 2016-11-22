@@ -11,65 +11,60 @@
 
 namespace mk
 {
-	class Modular::Plug : public NonCopy
-	{
-	public:
-		Plug(unique_ptr<Part> p, Type& t) : part(std::move(p)), type(&t) {}
-		Plug(Plug&& other) : part(std::move(other.part)), type(other.type) {}
-
-		Plug& operator=(Plug&& other) { part = std::move(other.part); type = other.type; return *this; }
-
-		unique_ptr<Part> part;
-		Type* type;
-	};
-
-	Modular::Modular(Proto* proto)
-		: mProto(proto)
-		, mParts(proto ? proto->numParts() : 0)
+	Modular::Modular(Proto& proto)
+		: m_proto(proto)
+		, m_parts(proto.numParts())
 	{}
 
 	Modular::~Modular()
 	{
-		for(size_t i = mParts.size(); i > 0; --i)
-			mParts.pop_back();
+		for(size_t i = m_parts.size(); i > 0; --i)
+			m_parts.pop_back();
 	}
 
 	void Modular::addPart(Type& type, Part* part)
 	{
-		mParts[mProto->partIndex(type)] = part;
+		m_parts[m_proto.partIndex(type)] = part;
 	}
 
 	bool Modular::hasPart(Type& type)
 	{
-		return mProto->hasPart(type);
+		return m_proto.hasPart(type);
 	}
 
-	Part* Modular::part(Type& type)
+	Part& Modular::part(Type& type)
 	{
-		return mParts[mProto->partIndex(type)];
+		return *m_parts[m_proto.partIndex(type)];
 	}
 
 	void Modular::pushPlug(unique_ptr<Part> part, Type& type)
 	{
-		mPlugs.emplace_back(std::move(part), type);
+		m_plugs.emplace_back(std::move(part), type);
 	}
 
 	void Modular::removePlug(Type& type)
 	{
-		mPlugs.erase(std::remove_if(mPlugs.begin(), mPlugs.end(), [&type](const Plug& p) { return p.type == &type; }), mPlugs.end());
+		m_plugs.erase(std::remove_if(m_plugs.begin(), m_plugs.end(), [&type](const Plug& p) { return p.type == &type; }), m_plugs.end());
 	}
 
 	void Modular::removePlug(void* plug)
 	{
-		mPlugs.erase(std::remove_if(mPlugs.begin(), mPlugs.end(), [plug](const Plug& p) { return p.part.get() == plug; }), mPlugs.end());
+		m_plugs.erase(std::remove_if(m_plugs.begin(), m_plugs.end(), [plug](const Plug& p) { return p.part.get() == plug; }), m_plugs.end());
 	}
 
-	Part* Modular::plug(Type& type)
+	Part& Modular::plug(Type& type)
 	{
-		for(Plug& plug : mPlugs)
+		for(Plug& plug : m_plugs)
 			if(plug.type == &type)
-				return plug.part.get();
+				return *plug.part.get();
+		//return nullptr;
+	}
 
-		return nullptr;
+	bool Modular::hasPlug(Type& type)
+	{
+		for (Plug& plug : m_plugs)
+			if (plug.type == &type)
+				return true;
+		return false;
 	}
 }

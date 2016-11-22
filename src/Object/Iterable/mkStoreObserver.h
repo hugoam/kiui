@@ -5,11 +5,7 @@
 #ifndef MK_STOREOBSERVER_H_INCLUDED
 #define MK_STOREOBSERVER_H_INCLUDED
 
-/* mk */
-#include <Object/Iterable/mkStoreObserver.h>
-#include <Object/mkObject.h>
-
-#include <memory>
+#include <Object/mkObjectForward.h>
 
 namespace mk
 {
@@ -18,31 +14,28 @@ namespace mk
 	{
 	public:
 		virtual bool handleClear() { return false; }
-		virtual void handleAdd(T* object) = 0;
-		virtual void handleRemove(T* object) = 0;
+		virtual void handleAdd(T& object) = 0;
+		virtual void handleRemove(T& object) = 0;
 	};
 
-	template <>
-	class StoreObserver<Object>
+	class Observer
 	{
 	public:
-		virtual bool handleClear() { return false; }
-		virtual void handleAdd(Object& object, Type* type) = 0;
-		virtual void handleRemove(Object& object, Type* type) = 0;
+		virtual ~Observer() {}
 	};
 
 	template <class T>
-	class GenericObserver : public StoreObserver<T>
+	class GenericObserver : public Observer, public StoreObserver<T>
 	{
 	public:
-		GenericObserver(Store<T>* store, StoreObserver<Object>* observer) : mObserver(observer) { store->addObserver(this); }
+		GenericObserver(Store<T>& store, StoreObserver<Object>& observer) : m_observer(observer) { store.observe(*this); }
 
-		virtual bool handleClear() { return mObserver->handleClear(); }
-		virtual void handleAdd(T* object) { mObserver->handleAdd(object, T::cls()); }
-		virtual void handleRemove(T* object) { mObserver->handleRemove(object, T::cls()); }
+		virtual bool handleClear() { return m_observer.handleClear(); }
+		virtual void handleAdd(T& object) { m_observer.handleAdd(object); }
+		virtual void handleRemove(T& object) { m_observer.handleRemove(object); }
 
 	protected:
-		StoreObserver<Object>* mObserver;
+		StoreObserver<Object>& m_observer;
 	};
 
 	template class MK_OBJECT_EXPORT StoreObserver<Object>;

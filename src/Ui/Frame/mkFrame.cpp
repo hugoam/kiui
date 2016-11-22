@@ -8,12 +8,8 @@
 #include <Object/String/mkString.h>
 #include <Object/Iterable/mkReverse.h>
 
-#include <Ui/Form/mkForm.h>
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Frame/mkInk.h>
-
-#include <Ui/mkUiWindow.h>
-#include <Ui/mkUiLayout.h>
 
 #include <Ui/Frame/mkStripe.h>
 #include <Ui/Frame/mkLayer.h>
@@ -134,7 +130,7 @@ namespace mk
 		this->updateFixed(DIM_X);
 		this->updateFixed(DIM_Y);
 
-		if(d_parent && d_parent->parent() && d_parent->parent()->layout()->d_weight == TABLE) // @kludge if this is not done the table layout is fucked up because elements are set back to SHRINK and their size is wrongly substracted from sequencelength
+		if(d_parent && d_parent->parent() && d_parent->parent()->layout().d_weight == TABLE) // @kludge if this is not done the table layout is fucked up because elements are set back to SHRINK and their size is wrongly substracted from sequencelength
 			d_sizing[DIM_X] = EXPAND;
 	}
 
@@ -158,7 +154,7 @@ namespace mk
 	{
 		d_parent = parent;
 		this->updateStyle();
-		d_inkbox = this->layer().inkLayer().createInkbox(*this);
+		d_inkbox = make_unique<Inkbox>(*this); //this->layer().inkLayer()
 
 		this->setVisible(d_parent->visible());
 	}
@@ -272,7 +268,7 @@ namespace mk
 		if(this->frameType() == LAYER)
 			return;
 
-		d_inkbox = this->layer().inkLayer().createInkbox(*this);
+		d_inkbox = make_unique<Inkbox>(*this);
 		this->setDirty(DIRTY_VISIBILITY);
 	}
 
@@ -293,9 +289,6 @@ namespace mk
 
 	void Frame::updateSize()
 	{
-		//if(!d_inkbox->visible()) // @note this is needed for gorilla, but not for nanovg, discuss
-		//	return;
-		
 		d_inkbox->updateContent();
 
 		if(dshrink(DIM_X) && (this->frameType() == FRAME || this->as<Stripe>().sequence().size() == 0))
@@ -310,7 +303,10 @@ namespace mk
 		d_inkstyle = &d_style->subskin(state);
 
 		if(d_inkstyle != inkstyle)
+		{
 			this->setDirty(DIRTY_SKIN);
+			std::cerr << ">>>>>> SKIN " << d_inkstyle->name() << std::endl;
+		}
 	}
 
 	void Frame::setSizeDim(Dimension dim, float size)

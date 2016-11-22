@@ -5,32 +5,26 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Scheme/mkRadioButton.h>
 
-#include <Ui/Form/mkWidgets.h>
+#include <Ui/Widget/mkWidgets.h>
 
-#include <Ui/Form/mkForm.h>
 #include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
-
-#include <Ui/mkUiWindow.h>
 
 using namespace std::placeholders;
 
 namespace mk
 {
 	RadioChoice::RadioChoice(Widget* content, const Trigger& trigger)
-		: WrapButton(content, trigger)
-	{
-		mStyle = &cls();
-	}
+		: WrapButton(content, trigger, cls())
+	{}
 
 	RadioSwitch::RadioSwitch(const Trigger& onSelected, size_t active, StringVector labels)
-		: Sheet()
-		, mOnSelected(onSelected)
-		, mActive(nullptr)
-		, mActiveIndex(active)
+		: Sheet(cls())
+		, m_onSelected(onSelected)
+		, m_active(nullptr)
+		, m_activeIndex(active)
 	{
-		mStyle = &cls();
 		for(string& label : labels)
 			this->emplace<Label>(label);
 	}
@@ -39,10 +33,10 @@ namespace mk
 	{
 		WrapButton& button = this->makeappend<RadioChoice>(widget.get(), std::bind(&RadioSwitch::activated, this, _1));
 		button.append(std::move(widget));
-		if(mContents.size() - 1 == mActiveIndex)
+		if(m_contents.size() - 1 == m_activeIndex)
 		{
-			mActive = &button;
-			mActive->activate();
+			m_active = &button;
+			m_active->activate();
 		}
 		return button;
 	}
@@ -54,11 +48,11 @@ namespace mk
 
 	void RadioSwitch::activated(WrapButton& button)
 	{
-		if(mActive)
-			mActive->deactivate();
-		mActive = &button;
-		mActive->activate();
-		if(mOnSelected)
-			mOnSelected(*button.content());
+		if(m_active)
+			m_active->deactivate();
+		m_active = &button;
+		m_active->activate();
+		if(m_onSelected)
+			m_onSelected(*button.content());
 	}
 }

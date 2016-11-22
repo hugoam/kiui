@@ -23,36 +23,36 @@ namespace mk
 
 	Colour::Colour(float r, float g, float b, float a)
 #ifndef _MSC_VER
-		: mFloats{ r, g, b, a }
+		: m_floats{ r, g, b, a }
 #endif
 	{
 #ifdef _MSC_VER
-		mFloats[0] = r;
-		mFloats[1] = g;
-		mFloats[2] = b;
-		mFloats[3] = a;
+		m_floats[0] = r;
+		m_floats[1] = g;
+		m_floats[2] = b;
+		m_floats[3] = a;
 #endif
 	}
 
 	Colour::Colour(const Colour& col)
 #ifndef _MSC_VER
-		: mFloats{ col.r(), col.g(), col.b(), col.a() }
+		: m_floats{ col.r(), col.g(), col.b(), col.a() }
 #endif
 	{
 #ifdef _MSC_VER
-		mFloats[0] = col.r();
-		mFloats[1] = col.g();
-		mFloats[2] = col.b();
-		mFloats[3] = col.a();
+		m_floats[0] = col.r();
+		m_floats[1] = col.g();
+		m_floats[2] = col.b();
+		m_floats[3] = col.a();
 #endif
 	}
 
 	Colour& Colour::operator=(const Colour& rhs)
 	{
-		mFloats[0] = rhs.r();
-		mFloats[1] = rhs.g();
-		mFloats[2] = rhs.b();
-		mFloats[3] = rhs.a();
+		m_floats[0] = rhs.r();
+		m_floats[1] = rhs.g();
+		m_floats[2] = rhs.b();
+		m_floats[3] = rhs.a();
 		return *this;
 	}
 }

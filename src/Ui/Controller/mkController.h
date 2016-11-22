@@ -16,37 +16,33 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT Controller : public InputController, public InputReceiver
+	class MK_UI_EXPORT KeyInputFrame : public InputWidget
 	{
 	public:
-		Controller();
-		virtual ~Controller();
+		KeyInputFrame();
 
-		void take(Widget* widget);
-		void stack(Widget* widget);
-		void yield();
-
-		void setLower(InputController* lower) { mLower = lower; }
-		InputController* lower() { return mLower; }
-
-		InputReceiver* controlMouse(float x, float y);
-		InputReceiver* controlKey();
-
-		InputReceiver* propagateMouse(float x, float y);
-		InputReceiver* propagateKey();
-
-		bool keyUp(KeyCode code, char c);
-		bool keyDown(KeyCode code, char c);
+		void keyUp(KeyEvent& keyEvent);
+		void keyDown(KeyEvent& keyEvent);
 
 	protected:
-		InputController* mLower;
-		Widget* mInputWidget;
-
-		typedef std::function<void ()> KeyHandler;
+		typedef std::function<void()> KeyHandler;
 		typedef std::map<KeyCode, KeyHandler> KeyMap;
 
 		KeyMap keyDownHandlers;
 		KeyMap keyUpHandlers;
+	};
+
+	class MK_UI_EXPORT Controller : public KeyInputFrame
+	{
+	public:
+		Controller(ControlMode controlMode);
+
+		void takeControl(Widget& inputWidget);
+		void yieldControl();
+
+	protected:
+		ControlMode m_controlMode;
+		Widget* m_inputWidget;
 	};
 }
 

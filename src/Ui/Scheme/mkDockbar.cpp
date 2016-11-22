@@ -8,44 +8,36 @@
 namespace mk
 {
 	Dockbox::Dockbox(Dockbar& dockbar, const string& title, const string& icon)
-		: Window(title, static_cast<WindowState>(0))
-		, mDockbar(dockbar)
-		, mToggle(dockbar.append(make_unique<DockToggle>(*this, icon)).as<DockToggle>())
-	{
-		mStyle = &cls();
-	}
+		: Window(title, static_cast<WindowState>(0), nullptr, nullptr, cls())
+		, m_dockbar(dockbar)
+		, m_toggle(dockbar.append(make_unique<DockToggle>(*this, icon)).as<DockToggle>())
+	{}
 
 	DockToggle::DockToggle(Dockbox& dockbox, const string& icon)
-		: ImgButton(icon, std::bind(&DockToggle::click, this))
-		, mDockbox(dockbox)
-	{
-		mStyle = &cls();
-	}
+		: ImgButton(icon, std::bind(&DockToggle::click, this), cls())
+		, m_dockbox(dockbox)
+	{}
 
 	void DockToggle::click()
 	{
-		if(mDockbox.frame().hidden())
-			mDockbox.show();
+		if(m_dockbox.frame().hidden())
+			m_dockbox.show();
 		else
-			mDockbox.hide();
+			m_dockbox.hide();
 	}
 
 	Docker::Docker()
-		: Sheet()
-	{
-		mStyle = &cls();
-	}
+		: Sheet(cls())
+	{}
 
 	Dockbar::Dockbar()
-		: Sheet()
-		, mDocker(this->makeappend<Docker>())
-	{
-		mStyle = &cls();
-	}
+		: Sheet(cls())
+		, m_docker(this->makeappend<Docker>())
+	{}
 
 	Widget& Dockbar::addDock(const string& name, const string& icon, unique_ptr<Widget> widget)
 	{
-		Dockbox& dockbox = mDocker.emplace<Dockbox>(*this, name, icon);
+		Dockbox& dockbox = m_docker.emplace<Dockbox>(*this, name, icon);
 		dockbox.hide();
 		return dockbox.vappend(std::move(widget));
 	}

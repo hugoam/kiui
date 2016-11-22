@@ -22,7 +22,7 @@ namespace mk
 	class MK_UI_EXPORT Scroller : public Slider
 	{
 	public:
-		Scroller(Dimension dim);
+		Scroller(Dimension dim, StyleType& type);
 
 		void sliderStep(float offset, bool ended);
 
@@ -44,7 +44,7 @@ namespace mk
 	class MK_UI_EXPORT ScrollerKnob : public SliderKnob
 	{
 	public:
-		ScrollerKnob(Dimension dim);
+		ScrollerKnob(Dimension dim, StyleType& type);
 
 		static StyleType& cls() { static StyleType ty("ScrollerKnob", SliderKnob::cls()); return ty; }
 	};
@@ -87,9 +87,6 @@ namespace mk
 		Scrollbar(Sheet& sheet);
 		~Scrollbar();
 
-		void show();
-		void hide();
-	
 		void scrollup();
 		void scrolldown();
 		void scroll(float offset);
@@ -98,10 +95,10 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Scrollbar", Sheet::cls()); return ty; }
 
 	protected:
-		Sheet& mSheet;
-		Button& mUp;
-		Scroller& mScroller;
-		Button& mDown;
+		Sheet& m_sheet;
+		Button& m_up;
+		Scroller& m_scroller;
+		Button& m_down;
 	};
 
 	class MK_UI_EXPORT ScrollArea : public Sheet
@@ -109,12 +106,12 @@ namespace mk
 	public:
 		ScrollArea(Sheet& sheet);
 
-		Scrollbar& scrollbar() { return mScrollbar; }
+		Scrollbar& scrollbar() { return m_scrollbar; }
 
 		static StyleType& cls() { static StyleType ty("ScrollArea", Sheet::cls()); return ty; }
 
 	protected:
-		Scrollbar& mScrollbar;
+		Scrollbar& m_scrollbar;
 	};
 }
 

@@ -11,33 +11,33 @@ namespace mk
 	{
 	public:
 		RenderWindow(unsigned int width, unsigned int height, string title, size_t handle)
-			: mWidth(width)
-			, mHeight(height)
-			, mTitle(title)
-			, mHandle(handle)
-			, mResized(false)
-			, mActive(true)
-			, mShutdown(false)
+			: m_width(width)
+			, m_height(height)
+			, m_title(title)
+			, m_handle(handle)
+			, m_resized(false)
+			, m_active(true)
+			, m_shutdown(false)
 		{}
 		
-		size_t handle() { return mHandle; }
+		size_t handle() { return m_handle; }
 		
-		unsigned int width() { return mWidth; }
-		unsigned int height() { return mHeight; }
+		unsigned int width() { return m_width; }
+		unsigned int height() { return m_height; }
 
-		bool resized() { return mResized; }
-		bool active() { return mActive; }
-		bool shutdown() { return mShutdown; }
+		bool resized() { return m_resized; }
+		bool active() { return m_active; }
+		bool shutdown() { return m_shutdown; }
 
 	protected:
-		unsigned int mWidth;
-		unsigned int mHeight;
-		string mTitle;
-		bool mResized;
-		bool mActive;
-		bool mShutdown;
+		unsigned int m_width;
+		unsigned int m_height;
+		string m_title;
+		bool m_resized;
+		bool m_active;
+		bool m_shutdown;
 
-		size_t mHandle;
+		size_t m_handle;
 	};
 }
 

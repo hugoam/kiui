@@ -157,7 +157,7 @@ namespace mk
 		KC_MEDIASELECT = 0xED     // Media Select
 	};
 
-	enum MouseButton
+	enum MouseButtonCode
 	{
 		NO_BUTTON = 0x00000000,
 		LEFT_BUTTON = 0x00000001,

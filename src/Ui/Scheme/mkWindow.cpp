@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hugo Amiardhugo.amiard@laposte.net
+//  Copyright (c) 2015 Hugo Amiard hugo.amiard@laposte.net
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
@@ -7,9 +7,8 @@
 
 #include <Ui/Scheme/mkDockspace.h>
 
-#include <Ui/Form/mkWidgets.h>
+#include <Ui/Widget/mkWidgets.h>
 
-#include <Ui/Form/mkForm.h>
 #include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
@@ -24,171 +23,189 @@ using namespace std::placeholders;
 
 namespace mk
 {
+	Popup::Popup()
+		: LayerSheet(cls())
+	{}
+
+	void Popup::bound()
+	{
+		float x = uiWindow().mouse().lastX() - m_parent->frame().left();
+		float y = uiWindow().mouse().lastY() - m_parent->frame().top();
+		m_frame->setPosition(x, y);
+
+		this->takeControl(CM_MODAL);
+	}
+
+	void Popup::leftClick(MouseEvent& mouseEvent)
+	{
+		mouseEvent.abort = true;
+		this->yieldControl();
+		this->remove();
+	}
+
+	void Popup::rightClick(MouseEvent& mouseEvent)
+	{
+		mouseEvent.abort = true;
+		this->yieldControl();
+		this->remove();
+	}
+
 	WindowHeader::WindowHeader(Window& window)
-		: Sequence()
-		, mWindow(window)
-		, mTooltip("Drag me")
-		, mTitle(this->makeappend<Label>(mWindow.name()))
+		: Band(cls())
+		, m_window(window)
+		, m_tooltip("Drag me")
+		, m_title(this->makeappend<Label>(m_window.name()))
 	{
-		mStyle = &cls();
-		if(mWindow.closable())
-			mCloseButton = &this->makeappend<CloseButton>(std::bind(&Window::close, &mWindow));
+		if(m_window.closable())
+			m_closeButton = &this->makeappend<CloseButton>(std::bind(&Window::close, &m_window));
 	}
 
-	bool WindowHeader::leftClick(float x, float y)
+	void WindowHeader::leftClick(MouseEvent& mouseEvent)
 	{
-		UNUSED(x); UNUSED(y);
-		mWindow.activate();
-		mWindow.frame().layer().moveToTop();
-		return true;
+		UNUSED(mouseEvent);
+		m_window.activate();
+		m_window.frame().layer().moveToTop();
 	}
 
-	bool WindowHeader::leftDragStart(float xPos, float yPos)
+	void WindowHeader::leftDragStart(MouseEvent& mouseEvent)
 	{
-		UNUSED(xPos); UNUSED(yPos);
-		if(mWindow.dock())
-			mWindow.undock();
+		UNUSED(mouseEvent);
+		if(m_window.dock())
+			m_window.undock();
 
-		mWindow.frame().layer().setOpacity(VOID);
-		mWindow.frame().layer().moveToTop();
-		return true;
+		m_window.frame().layer().setOpacity(VOID);
+		m_window.frame().layer().moveToTop();
 	}
 
-	bool WindowHeader::leftDrag(float xPos, float yPos, float xDif, float yDif)
+	void WindowHeader::leftDrag(MouseEvent& mouseEvent)
 	{
-		UNUSED(xPos); UNUSED(yPos);
-		if(mWindow.movable())
-			mWindow.frame().setPosition(mWindow.frame().dposition(DIM_X) + xDif, mWindow.frame().dposition(DIM_Y) + yDif);
-
-		return true;
+		UNUSED(mouseEvent);
+		if(m_window.movable())
+			m_window.frame().setPosition(m_window.frame().dposition(DIM_X) + mouseEvent.deltaX, m_window.frame().dposition(DIM_Y) + mouseEvent.deltaY);
 	}
 
-	bool WindowHeader::leftDragEnd(float xPos, float yPos)
+	void WindowHeader::leftDragEnd(MouseEvent& mouseEvent)
 	{
-		if(mWindow.dockable())
+		if(m_window.dockable())
 		{
-			Widget* widget = this->rootSheet().pinpoint(xPos, yPos);
+			Widget* widget = this->rootSheet().pinpoint(mouseEvent.posX, mouseEvent.posY);
 			while(widget && &widget->type() != &Docksection::cls())
 				widget = widget->parent();
 
 			if(widget)
 			{
-				Docksection& section = widget->as<Docksection>().docktarget(xPos, yPos);
-				mWindow.dock(section);
+				Docksection& section = widget->as<Docksection>().docktarget(mouseEvent.posX, mouseEvent.posY);
+				m_window.dock(section);
 			}
 		}
 
-		mWindow.frame().layer().setOpacity(OPAQUE);
-		return true;
+		m_window.frame().layer().setOpacity(OPAQUE);
 	}
 
-	WindowSizer::WindowSizer(Window& window, bool left)
-		: Widget()
-		, mWindow(window)
-		, mResizeLeft(left)
+	WindowSizer::WindowSizer(Window& window, StyleType& type, bool left)
+		: Widget(type)
+		, m_window(window)
+		, m_resizeLeft(left)
+	{}
+
+	void WindowSizer::leftDragStart(MouseEvent& mouseEvent)
 	{
-		mStyle = &cls();
+		UNUSED(mouseEvent);
+		m_window.frame().as<Layer>().moveToTop();
 	}
 
-	bool WindowSizer::leftDragStart(float xPos, float yPos)
+	void WindowSizer::leftDrag(MouseEvent& mouseEvent)
 	{
-		UNUSED(xPos); UNUSED(yPos);
-		mWindow.frame().as<Layer>().moveToTop();
-		return true;
-	}
-
-	bool WindowSizer::leftDrag(float xPos, float yPos, float xDif, float yDif)
-	{
-		UNUSED(xPos); UNUSED(yPos);
-		if(mResizeLeft)
+		UNUSED(mouseEvent);
+		if(m_resizeLeft)
 		{
-			mWindow.frame().setPositionDim(DIM_X, mWindow.frame().dposition(DIM_X) + xDif);
-			mWindow.frame().setSize(std::max(10.f, mWindow.frame().dsize(DIM_X) - xDif), std::max(25.f, mWindow.frame().dsize(DIM_Y) + yDif));
+			m_window.frame().setPositionDim(DIM_X, m_window.frame().dposition(DIM_X) + mouseEvent.deltaX);
+			m_window.frame().setSize(std::max(10.f, m_window.frame().dsize(DIM_X) - mouseEvent.deltaX), std::max(25.f, m_window.frame().dsize(DIM_Y) + mouseEvent.deltaY));
 		}
 		else
 		{
-			mWindow.frame().setSize(std::max(10.f, mWindow.frame().dsize(DIM_X) + xDif), std::max(25.f, mWindow.frame().dsize(DIM_Y) + yDif));
+			m_window.frame().setSize(std::max(10.f, m_window.frame().dsize(DIM_X) + mouseEvent.deltaX), std::max(25.f, m_window.frame().dsize(DIM_Y) + mouseEvent.deltaY));
 		}
-		return true;
 	}
 
-	bool WindowSizer::leftDragEnd(float xPos, float yPos)
+	void WindowSizer::leftDragEnd(MouseEvent& mouseEvent)
 	{
-		UNUSED(xPos); UNUSED(yPos);
-		return true;
+		UNUSED(mouseEvent);
 	}
 
 	WindowSizerLeft::WindowSizerLeft(Window& window)
-		: WindowSizer(window, true)
-	{
-		mStyle = &cls();
-	}
+		: WindowSizer(window, cls(), true)
+	{}
 
 	WindowSizerRight::WindowSizerRight(Window& window)
-		: WindowSizer(window, false)
-	{
-		mStyle = &cls();
-	}
+		: WindowSizer(window, cls(), false)
+	{}
 
 	WindowFooter::WindowFooter(Window& window)
-		: Sheet()
-		, mFirstSizer(this->makeappend<WindowSizerLeft>(window))
-		, mSecondSizer(this->makeappend<WindowSizerRight>(window))
-	{
-		mStyle = &cls();
-	};
+		: Sheet(cls())
+		, m_firstSizer(this->makeappend<WindowSizerLeft>(window))
+		, m_secondSizer(this->makeappend<WindowSizerRight>(window))
+	{}
 
 	WindowBody::WindowBody()
-		: Sheet()
-	{
-		mStyle = &cls();
-	}
+		: Sheet(cls())
+	{}
 
 	CloseButton::CloseButton(const Trigger& trigger)
-		: Button("", trigger)
+		: Button("", trigger, cls())
+	{}
+
+	void CloseButton::leftClick(MouseEvent& mouseEvent)
 	{
-		mStyle = &cls();
+		Button::leftClick(mouseEvent);
+		mouseEvent.abort = true;
 	}
 
-	Window::Window(const string& title, WindowState state, const Trigger& onClose, Docksection* dock)
-		: LayerSheet()
-		, mName(title)
-		, mWindowState(state)
-		, mContent(nullptr)
-		, mOnClose(onClose)
-		, mDock(dock)
-		, mHeader(this->makeappend<WindowHeader>(*this))
-		, mBody(this->makeappend<WindowBody>())
-		, mFooter(this->makeappend<WindowFooter>(*this))
+	void CloseButton::rightClick(MouseEvent& mouseEvent)
 	{
-		mStyle = dock ? &DockWindow::cls() : &Window::cls();
+		Button::rightClick(mouseEvent);
+		mouseEvent.abort = true;
+	}
+
+	Window::Window(const string& title, WindowState state, const Trigger& onClose, Docksection* dock, StyleType& type)
+		: LayerSheet(type)
+		, m_name(title)
+		, m_windowState(state)
+		, m_content(nullptr)
+		, m_onClose(onClose)
+		, m_dock(dock)
+		, m_header(this->makeappend<WindowHeader>(*this))
+		, m_body(this->makeappend<WindowBody>())
+		, m_footer(this->makeappend<WindowFooter>(*this))
+	{
+		m_style = dock ? &DockWindow::cls() : &Window::cls();
 		if(!this->sizable())
-			mFooter.hide();
+			m_footer.hide();
 	}
 
 	Window::~Window()
 	{}
 
-	void Window::bind(Sheet* parent, size_t index)
+	void Window::bind(Sheet& parent, size_t index)
 	{
 		Sheet::bind(parent, index);
 
-		if(!mDock)
+		if(!m_dock)
 		{
-			float x = this->rootSheet().frame().dsize(DIM_X) / 2 - mFrame->dsize(DIM_X) / 2;
-			float y = this->rootSheet().frame().dsize(DIM_Y) / 2 - mFrame->dsize(DIM_Y) / 2;
-			mFrame->setPosition(x, y);
+			float x = this->rootSheet().frame().dsize(DIM_X) / 2 - m_frame->dsize(DIM_X) / 2;
+			float y = this->rootSheet().frame().dsize(DIM_Y) / 2 - m_frame->dsize(DIM_Y) / 2;
+			m_frame->setPosition(x, y);
 		}
 	}
 
 	void Window::toggleWindowState(WindowState state)
 	{
-		mWindowState = static_cast<WindowState>(mWindowState ^ state);
+		m_windowState = static_cast<WindowState>(m_windowState ^ state);
 	}
 
 	void Window::toggleClosable()
 	{
-		mHeader.closeButton()->frame().visible() ? mHeader.closeButton()->hide() : mHeader.closeButton()->show();
+		m_header.closeButton()->frame().visible() ? m_header.closeButton()->hide() : m_header.closeButton()->show();
 	}
 
 	void Window::toggleMovable()
@@ -199,35 +216,35 @@ namespace mk
 	void Window::toggleResizable()
 	{
 		this->toggleWindowState(WINDOW_SIZABLE);
-		this->sizable() ? mFooter.show() : mFooter.hide();
+		this->sizable() ? m_footer.show() : m_footer.hide();
 	}
 
 	void Window::showTitlebar()
 	{
-		mHeader.show();
+		m_header.show();
 	}
 
 	void Window::hideTitlebar()
 	{
-		mHeader.hide();
+		m_header.hide();
 	}
 
 	const string& Window::name()
 	{
-		return mContent ? mContent->name() : mName;
+		return m_content ? m_content->name() : m_name;
 	}
 
 	void Window::dock(Docksection& docksection)
 	{
 		std::cerr << ">>>>>>>>>>>  Window :: dock" << std::endl;
 		this->docked();
-		mDock = &docksection;
+		m_dock = &docksection;
 		docksection.dock(*this);
 	}
 
 	void Window::docked()
 	{
-		this->resetStyle(&DockWindow::cls());
+		this->resetStyle(DockWindow::cls());
 		this->toggleMovable();
 		this->toggleResizable();
 	}
@@ -235,54 +252,46 @@ namespace mk
 	void Window::undock()
 	{
 		std::cerr << ">>>>>>>>>>>  Window :: undock" << std::endl;
-		mDock->undock(*this);
-		mDock = nullptr;
+		m_dock->undock(*this);
+		m_dock = nullptr;
 		this->undocked();
 	}
 
 	void Window::undocked()
 	{
-		this->resetStyle(&Window::cls());
+		this->resetStyle(Window::cls());
 		this->toggleMovable();
 		this->toggleResizable();
 
-		mFrame->setPosition(mFrame->dabsolute(DIM_X), mFrame->dabsolute(DIM_Y));
-		mFrame->as<Layer>().moveToTop();
+		m_frame->setPosition(m_frame->dabsolute(DIM_X), m_frame->dabsolute(DIM_Y));
+		m_frame->as<Layer>().moveToTop();
 	}
 	
 	void Window::close()
 	{
-		if(mOnClose)
-			mOnClose(*this);
+		if(m_onClose)
+			m_onClose(*this);
 		this->remove();
 	}
 
 	Widget& Window::vappend(unique_ptr<Widget> widget)
 	{
-		mHeader.title().setLabel(widget->name());
-		mContent = widget.get();
-		return mBody.append(std::move(widget));
+		m_header.title().setLabel(widget->name());
+		m_content = widget.get();
+		return m_body.append(std::move(widget));
 	}
 
-	bool Window::leftClick(float x, float y)
+	void Window::leftClick(MouseEvent& mouseEvent)
 	{
-		UNUSED(x); UNUSED(y);
-		if(!mDock)
-			mFrame->as<Layer>().moveToTop();
-		return true;
+		UNUSED(mouseEvent);
+		if(!m_dock)
+			m_frame->as<Layer>().moveToTop();
 	}
 
-	bool Window::rightClick(float x, float y)
+	void Window::rightClick(MouseEvent& mouseEvent)
 	{
-		UNUSED(x); UNUSED(y);
-		if(!mDock)
-			mFrame->as<Layer>().moveToTop();
-		return true;
-	}
-
-	WindowForm::WindowForm(unique_ptr<Form> content, const string& title, WindowState state, const Widget::Trigger& onClose)
-		: Form(make_unique<Window>(title, state, onClose))
-	{
-		this->append(std::move(content));
+		UNUSED(mouseEvent);
+		if(!m_dock)
+			m_frame->as<Layer>().moveToTop();
 	}
 }

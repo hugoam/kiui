@@ -5,7 +5,7 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Scheme/mkList.h>
 
-#include <Ui/Form/mkWidgets.h>
+#include <Ui/Widget/mkWidgets.h>
 
 #include <iostream>
 
@@ -13,17 +13,13 @@ using namespace std::placeholders;
 
 namespace mk
 {
-	List::List(FrameType frameType)
-		: ScrollSheet(frameType)
-	{
-		mStyle = &cls();
-	}
+	List::List(StyleType& type, FrameType frameType)
+		: ScrollSheet(type, frameType)
+	{}
 
-	SelectList::SelectList()
-		: List()
-	{
-		mStyle = &cls();
-	}
+	SelectList::SelectList(StyleType& type)
+		: List(type)
+	{}
 
 	Widget& SelectList::vappend(std::unique_ptr<Widget> widget)
 	{
@@ -42,12 +38,12 @@ namespace mk
 
 	FilterInput::FilterInput(Sheet& list, std::function<void(string)> callback)
 		: Input<string>("", callback)
-		, mList(list)
+		, m_list(list)
 	{}
 
 	void FilterInput::filterOn()
 	{
-		this->updateFilter(mValue->ref<string>());
+		this->updateFilter(m_value->ref<string>());
 	}
 
 	void FilterInput::filterOff()
@@ -57,7 +53,7 @@ namespace mk
 
 	void FilterInput::updateFilter(const string& filter)
 	{
-		for(auto& pt : mList.contents())
+		for(auto& pt : m_list.contents())
 		{
 			bool fit = fitsFilter(filter, pt->contentlabel());
 			if(fit && pt->frame().hidden())
@@ -79,48 +75,43 @@ namespace mk
 	void FilterInput::notifyModify()
 	{
 		Input<string>::notifyModify();
-		this->updateFilter(mValue->ref<string>());
+		this->updateFilter(m_value->ref<string>());
 	}
 
-	Sequence::Sequence()
-		: Sheet()
-	{
-		mStyle = &cls();
-	}
+	Band::Band(StyleType& type)
+		: Sheet(type)
+	{}
 
 	LabelSequence::LabelSequence(StringVector labels)
-		: Sequence()
+		: Band()
 	{
 		for(string& label : labels)
 			this->emplace<Label>(label);
 	}
 	
 	ButtonSequence::ButtonSequence(StringVector labels)
-		: Sequence()
+		: Band()
 	{
 		for(string& label : labels)
 			this->emplace<Button>(label);
 	}
 
 	SortList::SortList()
-		: List()
-	{
-		mStyle = &cls();
-		mType = &cls();
-	}
+		: List(cls())
+	{}
 
-	/*void SortList::move(Form* form, size_t index)
+	/*void SortList::move(Device* form, size_t index)
 	{
 		if(form->index() == index) // @required because after droping in a specific spot, a move is issued, and if the item was dropped at the end the move will crash
 			return;
 
 		size_t from = form->index();
-		mContents.move(form->index(), index);
+		m_contents.move(form->index(), index);
 		moved(from, index);
 
 		//this->altered();
 	}
 
-	void SortList::transfer(Form* form, SortList* list, size_t index)
+	void SortList::transfer(Device* form, SortList* list, size_t index)
 	{}*/
 }

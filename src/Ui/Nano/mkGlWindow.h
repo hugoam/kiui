@@ -19,10 +19,10 @@ namespace mk
 		GlWindow(size_t width, size_t height, string title, string resourcePath);
 		~GlWindow();
 
-		UiWindow& uiWindow() { return *mUiWindow.get(); }
+		UiWindow& uiWindow() { return *m_uiWindow; }
 
 		void initContext();
-		void initInput(InputDispatcher& dispatcher, size_t windowHnd);
+		void initInput(Mouse& mouse, Keyboard& keyboard, size_t windowHnd);
 
 		bool renderFrame();
 
@@ -37,18 +37,19 @@ namespace mk
 		void resize(size_t width, size_t height);
 
 	protected:
-		string mResourcePath;
-		unique_ptr<NanoWindow> mNanoWindow;
-		unique_ptr<UiWindow> mUiWindow;
+		string m_resourcePath;
+		unique_ptr<NanoWindow> m_nanoWindow;
+		unique_ptr<UiWindow> m_uiWindow;
 
-		GLFWwindow* mGlWindow;
-		int mFbWidth;
-		int mFbHeight;
+		GLFWwindow* m_glWindow;
+		int m_fbWidth;
+		int m_fbHeight;
 
-		float mMouseX;
-		float mMouseY;
+		float m_mouseX;
+		float m_mouseY;
 
-		InputDispatcher* mInput;
+		Mouse* m_mouse;
+		Keyboard* m_keyboard;
 	};
 
 

@@ -9,51 +9,63 @@
 #include <Ui/mkUiForward.h>
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Widget/mkButton.h>
-#include <Ui/Form/mkForm.h>
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ WindowHeader : public Sequence
+	class MK_UI_EXPORT Popup : public LayerSheet
+	{
+	public:
+		Popup();
+
+		virtual void bound();
+
+		void leftClick(MouseEvent& mouseEvent);
+		void rightClick(MouseEvent& mouseEvent);
+
+		static StyleType& cls() { static StyleType ty("Popup", LayerSheet::cls()); return ty; }
+	};
+
+	class MK_UI_EXPORT _I_ WindowHeader : public Band
 	{
 	public:
 		WindowHeader(Window& window);
 
 		Style* hoverCursor() { return &MoveCursor::cls(); }
-		const string& tooltip() { return mTooltip; }
+		const string& tooltip() { return m_tooltip; }
 
-		Label& title() { return mTitle; }
-		Button* closeButton() { return mCloseButton; }
+		Label& title() { return m_title; }
+		Button* closeButton() { return m_closeButton; }
 
-		bool leftClick(float xPos, float yPos);
-		bool leftDragStart(float xPos, float yPos);
-		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
-		bool leftDragEnd(float xPos, float yPos);
+		void leftClick(MouseEvent& mouseEvent);
+		void leftDragStart(MouseEvent& mouseEvent);
+		void leftDrag(MouseEvent& mouseEvent);
+		void leftDragEnd(MouseEvent& mouseEvent);
 
-		static StyleType& cls() { static StyleType ty("WindowHeader", Sequence::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("WindowHeader", Band::cls()); return ty; }
 
 	protected:
-		Window& mWindow;
-		Label& mTitle;
-		Button* mCloseButton;
-		string mTooltip;
+		Window& m_window;
+		Label& m_title;
+		Button* m_closeButton;
+		string m_tooltip;
 	};
 
 	class MK_UI_EXPORT _I_ WindowSizer : public Widget
 	{
 	public:
-		WindowSizer(Window& window, bool left);
+		WindowSizer(Window& window, StyleType& type, bool left);
 
 		Style* hoverCursor() { return &ResizeCursorDiagRight::cls(); }
 
-		bool leftDragStart(float xPos, float yPos);
-		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
-		bool leftDragEnd(float xPos, float yPos);
+		void leftDragStart(MouseEvent& mouseEvent);
+		void leftDrag(MouseEvent& mouseEvent);
+		void leftDragEnd(MouseEvent& mouseEvent);
 
 		static StyleType& cls() { static StyleType ty("WindowSizer", Widget::cls()); return ty; }
 
 	protected:
-		Window& mWindow;
-		bool mResizeLeft;
+		Window& m_window;
+		bool m_resizeLeft;
 	};
 
 	class MK_UI_EXPORT _I_ WindowSizerLeft : public WindowSizer
@@ -80,8 +92,8 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("WindowFooter", Sheet::cls()); return ty; }
 
 	protected:
-		WindowSizer& mFirstSizer;
-		WindowSizer& mSecondSizer;
+		WindowSizer& m_firstSizer;
+		WindowSizer& m_secondSizer;
 	};
 
 	class MK_UI_EXPORT _I_ WindowBody : public Sheet
@@ -96,6 +108,9 @@ namespace mk
 	{
 	public:
 		CloseButton(const Trigger& trigger);
+
+		void leftClick(MouseEvent& mouseEvent);
+		void rightClick(MouseEvent& mouseEvent);
 
 		static StyleType& cls() { static StyleType ty("CloseButton", Button::cls()); return ty; }
 	};
@@ -114,22 +129,22 @@ namespace mk
 	class MK_UI_EXPORT Window : public LayerSheet
 	{
 	public:
-		Window(const string& title, WindowState state = WINDOW_DEFAULT, const Trigger& onClose = nullptr, Docksection* dock = nullptr);
+		Window(const string& title, WindowState state = WINDOW_DEFAULT, const Trigger& onClose = nullptr, Docksection* dock = nullptr, StyleType& type = cls());
 		~Window();
 
 		const string& name();
 
-		WindowState windowState() { return mWindowState; }
-		WindowBody& body() { return mBody; }
-		Docksection* dock() { return mDock; }
+		WindowState windowState() { return m_windowState; }
+		WindowBody& body() { return m_body; }
+		Docksection* dock() { return m_dock; }
 
-		bool closable() { return (mWindowState & WINDOW_CLOSABLE) != 0; }
-		bool dockable() { return (mWindowState & WINDOW_DOCKABLE) != 0; }
-		bool movable()  { return (mWindowState & WINDOW_MOVABLE) != 0; }
-		bool sizable() { return (mWindowState & WINDOW_SIZABLE) != 0; }
-		bool shrink() { return (mWindowState & WINDOW_SHRINK) != 0; }
+		bool closable() { return (m_windowState & WINDOW_CLOSABLE) != 0; }
+		bool dockable() { return (m_windowState & WINDOW_DOCKABLE) != 0; }
+		bool movable()  { return (m_windowState & WINDOW_MOVABLE) != 0; }
+		bool sizable() { return (m_windowState & WINDOW_SIZABLE) != 0; }
+		bool shrink() { return (m_windowState & WINDOW_SHRINK) != 0; }
 
-		void bind(Sheet* parent, size_t index);
+		void bind(Sheet& parent, size_t index);
 
 		void toggleWindowState(WindowState state);
 
@@ -139,8 +154,8 @@ namespace mk
 		void showTitlebar();
 		void hideTitlebar();
 
-		bool leftClick(float x, float y);
-		bool rightClick(float x, float y);
+		void leftClick(MouseEvent& mouseEvent);
+		void rightClick(MouseEvent& mouseEvent);
 
 		Widget& vappend(unique_ptr<Widget> widget);
 		//unique_ptr<Widget> vrelease(Widget& widget);
@@ -156,15 +171,15 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Window", LayerSheet::cls()); return ty; }
 
 	protected:
-		string mName;
-		WindowState mWindowState;
-		Widget* mContent;
-		Trigger mOnClose;
-		WindowHeader& mHeader;
-		WindowBody& mBody;
-		WindowFooter& mFooter;
+		string m_name;
+		WindowState m_windowState;
+		Widget* m_content;
+		Trigger m_onClose;
+		WindowHeader& m_header;
+		WindowBody& m_body;
+		WindowFooter& m_footer;
 
-		Docksection* mDock;
+		Docksection* m_dock;
 	};
 
 	class MK_UI_EXPORT _I_ DockWindow : public Object
@@ -177,12 +192,6 @@ namespace mk
 	{
 	public:
 		static StyleType& cls() { static StyleType ty("ShrinkWindow", Window::cls()); return ty; }
-	};
-
-	class MK_UI_EXPORT WindowForm : public Form
-	{
-	public:
-		WindowForm(unique_ptr<Form> content, const string& title, WindowState state = WINDOW_NOSTATE, const Widget::Trigger& onClose = nullptr);
 	};
 }
 

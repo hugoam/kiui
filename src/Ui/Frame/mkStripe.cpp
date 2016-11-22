@@ -10,7 +10,6 @@
 #include <Ui/Frame/mkInk.h>
 
 #include <Ui/Widget/mkWidget.h>
-#include <Ui/Form/mkForm.h>
 
 #include <algorithm>
 #include <iostream>
@@ -210,6 +209,13 @@ namespace mk
 		d_weights->clear();
 	}
 
+	void Stripe::setWeights(std::vector<float> weights)
+	{
+		this->initWeights();
+
+		*d_weights = weights;
+	}
+
 	void Stripe::dispatchTableWeights()
 	{
 		for(size_t index = 0; index != d_weights->size(); ++index)
@@ -319,7 +325,7 @@ namespace mk
 
 	void Stripe::childSizedLength(Frame& child, float delta)
 	{
-		if(!(child.flow() || child.floats()) || child.layout()->d_flow == FLOAT_DEPTH || child.dexpand(d_length))
+		if(!(child.flow() || child.floats()) || child.layout().d_flow == FLOAT_DEPTH || child.dexpand(d_length))
 			return;
 
 		d_sequenceLength += delta;
@@ -329,9 +335,9 @@ namespace mk
 
 	void Stripe::childSizedDepth(Frame& child, float delta)
 	{
-		if(child.flow() || child.layout()->d_flow == FREE_FILL)
+		if(child.flow() || child.layout().d_flow == FREE_FILL)
 			this->flowSizedDepth(child, delta);
-		else if(child.layout()->d_flow == FLOAT_DEPTH)
+		else if(child.layout().d_flow == FLOAT_DEPTH)
 			this->floatSizedDepth(child, delta);
 	}
 

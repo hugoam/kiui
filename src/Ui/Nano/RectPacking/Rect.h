@@ -3,7 +3,8 @@
 
 	This work is released to Public Domain, do whatever you want with it.
 */
-#pragma once
+#ifndef MK_RECT_H
+#define MK_RECT_H
 
 #include <vector>
 
@@ -79,3 +80,5 @@ public:
 		return true;
 	}
 };
+
+#endif

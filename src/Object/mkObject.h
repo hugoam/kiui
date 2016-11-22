@@ -43,35 +43,43 @@ namespace mk
 	public:
 		TypeObject(Type& type);
 
-		Type& type() { return *mType; }
-		const Type& type() const { return *mType; }
+		Type& type() { return m_type; }
+		const Type& type() const { return m_type; }
 		
 	protected:
-		Type* mType;
+		Type& m_type;
+	};
+
+	class MK_OBJECT_EXPORT TypeStruct : public TypeObject
+	{
+	public:
+		TypeStruct(Type& type) : TypeObject(type) {}
+		TypeStruct(const TypeStruct& other) : TypeObject((Type&)other.type()) {}
+		TypeStruct& operator=(const TypeStruct&) { return *this; }
 	};
 
 	class MK_OBJECT_EXPORT IdObject : public TypeObject
 	{
 	public:
 		IdObject(Id id, Type& type);
+		IdObject(Type& type);
 		~IdObject();
 
-		template <class T>
-		Id index(Id id) { if(id == 0) id = T::indexer().alloc(); T::indexer().insert(*this, id); return id; }
-
-		template <class T>
-		Id index() { Id id = T::indexer().alloc(); T::indexer().insert(*this, id); return id; }
-
-		Id id() const { return mId; }
+		Id id() const { return m_id; }
 
 	protected:
-		Id mId;
+		IdObject(int);
+
+	protected:
+		Id m_id;
 	};
 
 	class MK_OBJECT_EXPORT IdStruct : public IdObject
 	{
 	public:
 		IdStruct(Id id, Type& type) : IdObject(id, type) {}
+		IdStruct(Type& type) : IdObject(type) {}
+		IdStruct(const IdStruct& other) : IdObject((Type&) other.type()) {}
 		IdStruct& operator=(const IdStruct&) { return *this; }
 	};
 

@@ -19,63 +19,75 @@
 
 namespace mk
 {
-#ifndef OBJECT_EXPORT
-	template class MK_OBJECT_EXPORT Store<TypeObject>;
-#endif
-
-	class MK_OBJECT_EXPORT Indexer : public Store<TypeObject>, public NonCopy
+	class MK_OBJECT_EXPORT Indexer : public Store<Object>, public NonCopy
 	{
 	public:
-		Indexer(Type& type) : mType(type), mCount(0), mObjects() { mType.setupIndexer(this); mObjects.emplace_back(nullptr); }
+		Indexer(Type& type) : m_type(type), m_count(0), m_next(0), m_objects(1, nullptr) {}
 		~Indexer() {}
 
-		std::vector<IdObject*>& objects() { return mObjects; }
+		std::vector<IdObject*>& objects() { return m_objects; }
 
-		size_t vsize() const { return size(); }
-		void vclear() { clear(); }
-		Type& sequenceType() const { return mType; }
-		void vadd(TypeObject& object) { this->add(object.as<IdObject>()); }
-		size_t vindex(Object& object) { return object.as<IdObject>().id(); }
-		size_t vindex(TypeObject& object) { return object.as<IdObject>().id(); }
+		Type& elementType() const { return m_type; }
 
-		void add(IdObject& object) { if(object.id() >= mObjects.size()) mObjects.resize(object.id() + 1); mObjects[object.id()] = &object; ++mCount; }
-		void insert(IdObject& object, Id id) { if(id >= mObjects.size()) mObjects.resize(id + 1); mObjects[id] = &object; ++mCount; }
-		void remove(IdObject& object) { mObjects[object.id()] = nullptr; --mCount; }
-		IdObject* at(Id id) { if(id < mObjects.size()) return mObjects[id]; else return nullptr; }
-		Id alloc() { return mObjects.size(); }
+		void add(Object& object) { this->add(object.as<IdObject>()); }
+		void remove(Object& object) { this->remove(object.as<IdObject>()); }
 
-		size_t size() const { return mCount; }
-		void viterateobj(const std::function<void(Object*)>& callback) { for(Object* object : mObjects) callback(object); }
-		void clear() { mObjects.clear(); mCount = 0; }
+		void add(IdObject& object) { this->resize(object); m_objects[object.id()] = &object; ++m_count; notifyAdd(object); }
+		void insert(IdObject& object, Id id) { this->resize(id); m_objects[id] = &object; ++m_count; notifyAdd(object); }
+		void remove(IdObject& object) { m_objects[object.id()] = nullptr; --m_count; notifyRemove(object); }
+		bool has(IdObject& object) { return std::find(m_objects.begin(), m_objects.end(), &object) != m_objects.end(); }
+		IdObject& at(Id id) { return *m_objects[id]; }
+		IdObject* atSafe(Id id) { if(id < m_objects.size()) return m_objects[id]; else return nullptr; }
+		Id alloc() { return m_next++; }
 
-		void viterate(const std::function<void(TypeObject*)>& callback) { for(TypeObject* object : mObjects) callback(object); }
-		TypeObject* vat(size_t pos) { return at(pos); }
+		inline void resize(IdObject& object) { if(object.id() >= m_objects.size()) m_objects.resize(object.id() * 2); }
+		inline void resize(Id id) { if(id >= m_objects.size()) m_objects.resize(id * 2); }
 
-		void addObserver(StoreObserver<TypeObject>* observer)
+		size_t size() const { return m_count; }
+		void iterate(const std::function<void(Object&)>& callback) const { for(Object* object : m_objects) if(object) callback(*object); }
+		bool has(Object& object) const { return this->has(object.as<IdObject>()); }
+
+		void clear() { m_objects.clear(); m_count = 0; }
+
+		void notifyAdd(Object&/* object*/)
 		{
-			mObservers.push_back(observer);
-			for(TypeObject* object : mObjects)
-				if(object)
-					observer->handleAdd(object);
+			//for(StoreObserver<Object>* observer : m_observers)
+			//	observer->handleAdd(object);
 		}
 
-		void removeObserver(StoreObserver<TypeObject>* observer)
+		void notifyRemove(Object&/* object*/)
 		{
-			mObservers.erase(std::remove(mObservers.begin(), mObservers.end(), observer), mObservers.end());
+			//for(StoreObserver<Object>* observer : m_observers)
+			//	observer->handleRemove(object);
+		}
+
+		void observe(StoreObserver<Object>& observer)
+		{
+			m_observers.push_back(&observer);
+			for(TypeObject* object : m_objects)
+				if(object)
+					observer.handleAdd(*object);
+		}
+
+		void unobserve(StoreObserver<Object>& observer)
+		{
+			m_observers.erase(std::remove(m_observers.begin(), m_observers.end(), &observer), m_observers.end());
+		}
+
+		void unobserveNotify(StoreObserver<Object>& observer)
+		{
+			m_observers.erase(std::remove(m_observers.begin(), m_observers.end(), &observer), m_observers.end());
+			for(TypeObject* object : m_objects)
+				if(object)
+					observer.handleRemove(*object);
 		}
 
 	protected:
-		Type& mType;
-		std::vector<IdObject*> mObjects;
-		size_t mCount;
-		std::vector<StoreObserver<TypeObject>*> mObservers;
-	};
-
-	template <class T, class I = void>
-	class Indexed
-	{
-	public:
-		static inline Indexer& indexer() { static Indexer ind(T::cls()); return ind; } //return &sIndexer; }
+		Type& m_type;
+		std::vector<IdObject*> m_objects;
+		size_t m_count;
+		size_t m_next;
+		std::vector<StoreObserver<Object>*> m_observers;
 	};
 }
 

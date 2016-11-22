@@ -15,17 +15,17 @@ namespace mk
 	class MK_UI_EXPORT Label : public Widget
 	{
 	public:
-		Label(const string& label, FrameType frameType = FRAME);
+		Label(const string& label, StyleType& type = cls(), FrameType frameType = FRAME);
 
-		const string& label() { return mLabel; }
-		unique_ptr<Widget> clone() { return make_unique<Label>(mLabel); }
+		const string& label() { return m_label; }
+		unique_ptr<Widget> clone() { return make_unique<Label>(m_label); }
 
 		void setLabel(const string& label);
 
 		static StyleType& cls() { static StyleType ty("Label", Widget::cls()); return ty; }
 
 	protected:
-		string mLabel;
+		string m_label;
 	};
 
 	class MK_UI_EXPORT Title : public Label
@@ -42,26 +42,15 @@ namespace mk
 		Icon(Image& image);
 		Icon(const string& image);
 
-		Image* image() { return &mImage; }
+		Image* image() { return &m_image; }
 
 		//void setImage(Image& image);
 
 		static StyleType& cls() { static StyleType ty("Icon", Widget::cls()); return ty; }
 
 	protected:
-		Image& mImage;
+		Image& m_image;
 	};
-
-	/*
-	DynamicImage::DynamicImage(unique_ptr<Image256> image)
-		: Form(style)
-		, mImage(std::move(image))
-	{
-		mType = cls();
-	}
-
-	DynamicImage::~DynamicImage()
-	{}*/
 
 	template <class T_Widget>
 	class WidgetTrigger
@@ -70,18 +59,18 @@ namespace mk
 		typedef std::function<void(T_Widget&)> Trigger;
 
 	public:
-		WidgetTrigger(const Trigger& trigger) : mTrigger(trigger) {}
+		WidgetTrigger(const Trigger& trigger) : m_trigger(trigger) {}
 
-		virtual void trigger() { if(mTrigger) mTrigger(static_cast<T_Widget&>(*this)); }
-		virtual void triggerAlt() { if(mTriggerAlt) mTriggerAlt(static_cast<T_Widget&>(*this)); }
-		virtual void triggerShift() { if(mTriggerShift) mTriggerShift(static_cast<T_Widget&>(*this)); }
-		virtual void triggerCtrl() { if(mTriggerCtrl) mTriggerCtrl(static_cast<T_Widget&>(*this)); }
+		virtual void trigger() { if(m_trigger) m_trigger(static_cast<T_Widget&>(*this)); }
+		virtual void triggerAlt() { if(m_triggerAlt) m_triggerAlt(static_cast<T_Widget&>(*this)); }
+		virtual void triggerShift() { if(m_triggerShift) m_triggerShift(static_cast<T_Widget&>(*this)); }
+		virtual void triggerCtrl() { if(m_triggerCtrl) m_triggerCtrl(static_cast<T_Widget&>(*this)); }
 
 	protected:
-		Trigger mTrigger;
-		Trigger mTriggerAlt;
-		Trigger mTriggerShift;
-		Trigger mTriggerCtrl;
+		Trigger m_trigger;
+		Trigger m_triggerAlt;
+		Trigger m_triggerShift;
+		Trigger m_triggerCtrl;
 	};
 
 	class MK_UI_EXPORT Button : public Control, public WidgetTrigger<Button>
@@ -90,20 +79,21 @@ namespace mk
 		typedef WidgetTrigger<Button>::Trigger Trigger;
 
 	public:
-		Button(const string& label, const Trigger& trigger = Trigger());
+		Button(const string& label, const Trigger& trigger = Trigger(), StyleType& type = cls());
 
-		const string& label() { return mLabel; }
-		const string& tooltip() { return mTooltip; }
+		const string& label() { return m_label; }
+		const string& tooltip() { return m_tooltip; }
 
-		bool leftPressed(float x, float y);
-		bool leftClick(float x, float y);
-		bool rightClick(float x, float y);
+		void leftClick(MouseEvent& mouseEvent);
+		void rightClick(MouseEvent& mouseEvent);
+
+		unique_ptr<Widget> clone() { return make_unique<Button>(m_label, m_trigger, cls()); }
 
 		static StyleType& cls() { static StyleType ty("Button", Control::cls()); return ty; }
 
 	protected:
-		string mLabel;
-		string mTooltip;
+		string m_label;
+		string m_tooltip;
 	};
 
 	class MK_UI_EXPORT ImgButton : public Button
@@ -112,17 +102,17 @@ namespace mk
 		typedef WidgetTrigger<Button>::Trigger Trigger;
 
 	public:
-		ImgButton(Image& image, const Trigger& trigger = Trigger());
-		ImgButton(const string& image, const Trigger& trigger = Trigger());
+		ImgButton(Image& image, const Trigger& trigger = Trigger(), StyleType& type = cls());
+		ImgButton(const string& image, const Trigger& trigger = Trigger(), StyleType& type = cls());
 
-		Image* image() { return &mImage; }
-		const string& tooltip() { return mTooltip; }
+		Image* image() { return &m_image; }
+		const string& tooltip() { return m_tooltip; }
 
 		static StyleType& cls() { static StyleType ty("ImgButton", Button::cls()); return ty; }
 
 	protected:
-		Image& mImage;
-		string mTooltip;
+		Image& m_image;
+		string m_tooltip;
 	};
 
 	class MK_UI_EXPORT WrapButton : public Sheet, public WidgetTrigger<WrapButton>
@@ -131,21 +121,20 @@ namespace mk
 		typedef WidgetTrigger<WrapButton>::Trigger Trigger;
 
 	public:
-		WrapButton(Widget* content, const Trigger& trigger = Trigger());
-		WrapButton(unique_ptr<Widget> content, const Trigger& trigger = Trigger());
+		WrapButton(Widget* content, const Trigger& trigger = Trigger(), StyleType& type = cls());
+		WrapButton(unique_ptr<Widget> content, const Trigger& trigger = Trigger(), StyleType& type = cls());
 
 		Widget* content();
 
-		bool leftPressed(float x, float y);
-		bool leftClick(float x, float y);
-		bool rightClick(float x, float y);
+		void leftClick(MouseEvent& mouseEvent);
+		void rightClick(MouseEvent& mouseEvent);
 
-		const string& contentlabel() { return mContent->contentlabel(); }
+		const string& contentlabel() { return m_content->contentlabel(); }
 
 		static StyleType& cls() { static StyleType ty("WrapButton", Sheet::cls()); return ty; }
 
 	protected:
-		Widget* mContent;
+		Widget* m_content;
 	};
 
 	class MK_UI_EXPORT Toggle : public Control
@@ -154,22 +143,22 @@ namespace mk
 		typedef std::function<void(Toggle*)> Trigger;
 
 	public:
-		Toggle(const Trigger& triggerOn, const Trigger& triggerOff, bool isOn = true);
+		Toggle(const Trigger& triggerOn, const Trigger& triggerOff, bool isOn = true, StyleType& type = cls());
 
-		bool on() { return mOn; }
+		bool on() { return m_on; }
 
 		void update(bool on);
 		void toggle();
 
-		bool leftClick(float x, float y);
+		void leftClick(MouseEvent& mouseEvent);
 
 		static StyleType& cls() { static StyleType ty("Toggle", Control::cls()); return ty; }
 
 	protected:
-		Trigger mTriggerOn;
-		Trigger mTriggerOff;
+		Trigger m_triggerOn;
+		Trigger m_triggerOff;
 
-		bool mOn;
+		bool m_on;
 	};
 }
 

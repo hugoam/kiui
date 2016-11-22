@@ -14,7 +14,7 @@ namespace mk
 	class MK_OBJECT_EXPORT Stem : public IdObject, public Modular
 	{
 	public:
-		Stem(Id id, Type& type, Proto* proto);
+		Stem(Id id, Type& type, Proto& proto);
 	};
 
 	class MK_OBJECT_EXPORT Part : public Object
@@ -23,10 +23,10 @@ namespace mk
 		Part(Type& type, Stem& stem);
 		Part(Stem& stem);
 
-		Stem& stem() { return mStem; }
+		Stem& stem() { return m_stem; }
 
 	protected:
-		Stem& mStem;
+		Stem& m_stem;
 	};
 }
 

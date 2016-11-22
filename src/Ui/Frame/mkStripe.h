@@ -52,7 +52,7 @@ namespace mk
 		inline void setForceDirty(Dirty dirty) { if(dirty > d_forceDirty) d_forceDirty = dirty; }
 		inline void clearForceDirty() { d_forceDirty = CLEAN; }
 		
-		inline std::vector<float>& weights() { return *d_weights.get(); }
+		inline std::vector<float>& weights() { return *d_weights; }
 
 		inline float dspace(Dimension dim) { return d_size[dim] - dpadding(dim) - dbackpadding(dim) - (dim == d_length ? 0.f : d_floatDepth); }
 
@@ -121,9 +121,9 @@ namespace mk
 		void dispatchWeights();
 		void dispatchTableWeights();
 
-		Frame* pinpoint(float x, float y, bool opaque);
+		void setWeights(std::vector<float> weights);
 
-		void shrinkSizeDim(Dimension dim, float size);
+		Frame* pinpoint(float x, float y, bool opaque);
 
 	protected:
 		void relayout();

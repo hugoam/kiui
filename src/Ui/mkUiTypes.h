@@ -5,11 +5,13 @@
 #ifndef MK_UITYPES_H_INCLUDED
 #define MK_UITYPES_H_INCLUDED
 
-#include <Ui/Form/mkForm.h>
-#include <Ui/Form/mkRootForm.h>
+#include <Ui/Device/mkDevice.h>
+#include <Ui/Device/mkStack.h>
+#include <Ui/Device/mkHook.h>
+#include <Ui/Device/mkRootDevice.h>
+
 #include <Ui/Widget/mkInput.h>
-#include <Ui/Form/mkWidgets.h>
-#include <Ui/Form/mkHook.h>
+#include <Ui/Widget/mkWidgets.h>
 
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkInk.h>
@@ -39,8 +41,14 @@
 #include <Ui/Scheme/mkTabber.h>
 #include <Ui/Scheme/mkDockspace.h>
 #include <Ui/Scheme/mkDockbar.h>
+#include <Ui/Scheme/mkWindow.h>
+#include <Ui/Scheme/mkNode.h>
 
 #include <Ui/Frame/mkDimString.h>
+
+#include <Ui/Edit/mkDCanvas.h>
+#include <Ui/Edit/mkDObjectEdit.h>
+#include <Ui/Edit/mkDValueEdit.h>
 
 #include <Ui/mkUiWindow.h>
 #include <Ui/mkUiLayout.h>
@@ -50,6 +58,7 @@ namespace mk
 	template <> inline Type& typecls<Dimension>() { static Type ty; return ty; }
 	template <> inline Type& typecls<Sizing>() { static Type ty; return ty; }
 	template <> inline Type& typecls<Pivot>() { static Type ty; return ty; }
+	template <> inline Type& typecls<Align>() { static Type ty; return ty; }
 	template <> inline Type& typecls<Flow>() { static Type ty; return ty; }
 	template <> inline Type& typecls<Space>() { static Type ty; return ty; }
 	template <> inline Type& typecls<Clipping>() { static Type ty; return ty; }

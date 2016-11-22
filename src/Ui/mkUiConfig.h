@@ -5,6 +5,8 @@
 #ifndef MK_UICONFIG_H_INCLUDED
 #define MK_UICONFIG_H_INCLUDED
 
+//#define KIUI_DRAW_CACHE
+
 #include <Object/mkObjectConfig.h>
 
 #if defined _WIN32 || defined __CYGWIN__

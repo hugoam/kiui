@@ -6,59 +6,48 @@
 #include <Object/mkType.h>
 
 #include <Object/mkIndexer.h>
+#include <Object/Reflect/mkImprint.h>
 
 namespace mk
 {
-	size_t Type::sTypeId = 1;
-
 	Type::Type(int)
-		: IdObject(0, *this)
-		, mName("Type")
-		, mProto(nullptr)
-		, mBase(nullptr)
-		, mIndexer(nullptr)
-		, mLibrary(nullptr)
+		: IdObject(0)
+		, m_name("Type")
+		, m_base(nullptr)
+		, m_imprint(make_unique<Imprint>(*this))
+		, m_indexer(make_unique<Indexer>(*this))
+	{
+		m_id = m_indexer->alloc();
+		m_indexer->insert(*this, m_id);
+	}
+
+	Type::Type(TypeKind kind, const string& name)
+		: IdObject(Type::cls())
+		, m_name()
+		, m_base(nullptr)
+		, m_imprint(make_unique<Imprint>(*this))
+		, m_indexer(kind == INDEXED ? make_unique<Indexer>(*this) : nullptr)
 	{}
 
-	Type::Type()
-		: IdObject(sTypeId++, Type::cls())
-		, mName()
-		, mProto(nullptr)
-		, mBase(nullptr)
-		, mIndexer(nullptr)
-		, mLibrary(nullptr)
-	{
-		Indexed<Type>::indexer().insert(*this, mId);
-	}
-
-	Type::Type(Type& base)
+	Type::Type(Type& base, TypeKind kind, const string& name)
 		: Type()
 	{
-		mBase = &base;
-	}
-
-	Type::Type(const string& name)
-		: Type()
-	{
-		mName = name;
-	}
-
-	Type::Type(const string& name, Type& base)
-		: Type(base)
-	{
-		mName = name;
+		m_base = &base;
+		m_indexer.reset(base.m_indexer.get());
 	}
 
 	Type::~Type()
 	{
-		mIndexer = nullptr;
+		m_indexer = nullptr;
 	}
 
-	bool Type::upcast(Type* type)
+	bool Type::upcast(Type& type)
 	{
-		if(mBase)
-			return mBase->upcast(type);
+		if(&type == this)
+			return true;
+		else if(m_base)
+			return m_base->upcast(type);
 		else
-			return type == this;
+			return false;
 	}
 }

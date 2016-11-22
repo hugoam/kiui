@@ -8,8 +8,7 @@
 /* mk headers */
 #include <Object/mkTyped.h>
 #include <Ui/mkUiForward.h>
-#include <Ui/Form/mkForm.h>
-#include <Ui/Form/mkDropper.h>
+#include <Ui/Scheme/mkDropper.h>
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Widget/mkTypeIn.h>
 
@@ -18,7 +17,7 @@ namespace mk
 	class MK_UI_EXPORT List : public ScrollSheet
 	{
 	public:
-		List(FrameType frameType = STRIPE);
+		List(StyleType& type = cls(), FrameType frameType = STRIPE);
 
 		static StyleType& cls() { static StyleType ty("List", ScrollSheet::cls()); return ty; }
 	};
@@ -26,7 +25,7 @@ namespace mk
 	class MK_UI_EXPORT SelectList : public List
 	{
 	public:
-		SelectList();
+		SelectList(StyleType& type = cls());
 
 		Widget& vappend(std::unique_ptr<Widget> widget);
 		unique_ptr<Widget> vrelease(Widget& widget);
@@ -52,32 +51,34 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("FilterInput", Input<string>::cls()); return ty; }
 
 	protected:
-		Sheet& mList;
+		Sheet& m_list;
 	};
 
-	class MK_UI_EXPORT LabelSequence : public Sequence
+	class MK_UI_EXPORT LabelSequence : public Band
 	{
 	public:
 		LabelSequence(StringVector labels = StringVector());
 	};
 
-	class MK_UI_EXPORT ButtonSequence : public Sequence
+	class MK_UI_EXPORT ButtonSequence : public Band
 	{
 	public:
 		ButtonSequence(StringVector labels = StringVector());
 	};
 
-	class MK_UI_EXPORT SortList : public List, public Dropper
+	class MK_UI_EXPORT SortList : public List//, public Dropper
 	{
 	public:
 		SortList();
 
-		Form* swapdrop(Form* form, Dropper* source) { UNUSED(form); UNUSED(source); return nullptr; }
-		bool candrop(Form* form, Dropper* source) { UNUSED(form); UNUSED(source); return false; }
-		void dropin(Form* form, Dropper* source, size_t index) { UNUSED(form); UNUSED(source); UNUSED(index); }
-		void dropout(Form* form, Dropper* source) { UNUSED(form); UNUSED(source); }
+		/*
+		Device* swapdrop(Device* form, Dropper* source) { UNUSED(form); UNUSED(source); return nullptr; }
+		bool candrop(Device* form, Dropper* source) { UNUSED(form); UNUSED(source); return false; }
+		void dropin(Device* form, Dropper* source, size_t index) { UNUSED(form); UNUSED(source); UNUSED(index); }
+		void dropout(Device* form, Dropper* source) { UNUSED(form); UNUSED(source); }
 
 		virtual void moved(size_t from, size_t to) { UNUSED(from); UNUSED(to); }
+		*/
 
 		static StyleType& cls() { static StyleType ty("SortList", List::cls()); return ty; }
 	};

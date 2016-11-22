@@ -19,10 +19,10 @@ namespace mk
 		Docksection(Dockline& dockline, size_t index);
 		~Docksection();
 
-		size_t index() { return mIndex; }
-		Dockline* dockline() { return mDockline; }
+		size_t index() { return m_index; }
+		Dockline* dockline() { return m_dockline; }
 
-		void setDockline(Dockline* dockline) { mDockline = dockline; }
+		void setDockline(Dockline* dockline) { m_dockline = dockline; }
 
 		Widget& vappend(unique_ptr<Widget> widget);
 		unique_ptr<Widget> vrelease(Widget& widget);
@@ -36,20 +36,20 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Docksection", Tabber::cls()); return ty; }
 
 	protected:
-		Dockline* mDockline;
-		size_t mIndex;
+		Dockline* m_dockline;
+		size_t m_index;
 	};
 
 	class MK_UI_EXPORT _I_ Dockline : public GridSheet
 	{
 	public:
-		Dockline(Dockspace& dockspace, Dockline* dockline, Dimension dim, size_t index);
+		Dockline(Dockspace& dockspace, Dockline* dockline, Dimension dim, size_t index, StyleType& type);
 		~Dockline();
 
-		Dimension dim() { return mDim; }
-		size_t index() { return mIndex; }
-		Dockline* dockline() { return mDockline; }
-		Dockspace& dockspace() { return mDockspace; }
+		Dimension dim() { return m_dim; }
+		size_t index() { return m_index; }
+		Dockline* dockline() { return m_dockline; }
+		Dockspace& dockspace() { return m_dockspace; }
 
 		Dockline& insertLine(size_t index, bool replace = false, float span = 1.f);
 		Docksection& insertSection(size_t index, float span = 1.f);
@@ -58,14 +58,15 @@ namespace mk
 		void removeLine(Dockline& dockline);
 
 		Dockline& findLine(std::vector<string>& ids);
+		Dockline& findLine(const string& dockid);
 		Docksection& findOrCreateSection(const string& dockid);
 
 		static StyleType& cls() { static StyleType ty("Dockline", GridSheet::cls()); return ty; }
 
 	protected:
-		Dockspace& mDockspace;
-		Dockline* mDockline;
-		size_t mIndex;
+		Dockspace& m_dockspace;
+		Dockline* m_dockline;
+		size_t m_index;
 	};
 
 	class MK_UI_EXPORT _I_ DocklineX : public Dockline
@@ -97,9 +98,7 @@ namespace mk
 	public:
 		Dockspace();
 
-		Dockline& mainline() { return mMainLine; }
-
-		void addSection(const string& name);
+		Dockline& mainline() { return m_mainLine; }
 
 		Widget& vappend(unique_ptr<Widget> widget);
 		//unique_ptr<Widget> vrelease(Widget& widget);
@@ -107,7 +106,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Dockspace", Sheet::cls()); return ty; }
 
 	protected:
-		MasterDockline& mMainLine;
+		MasterDockline& m_mainLine;
 	};
 }
 

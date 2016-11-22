@@ -10,7 +10,13 @@
 namespace mk
 {
 	Palette::Palette()
+		: size(256)
 	{}
+
+	void Palette::reset()
+	{
+		size = 0;
+	}
 
 	void Palette::load(string file)
 	{
@@ -26,27 +32,33 @@ namespace mk
 		fclose(fpalette);
 	}
 
-	Image256::Image256(size_t width, size_t height, const Palette& palette)
-		: mWidth(width)
-		, mHeight(height)
-		, mPalette(palette)
+	void Palette::add(Colour colour)
 	{
-		mPixels = new size_t[mWidth * mHeight];
+		colours[size] = colour;
+		++size;
+	}
+
+	Image256::Image256(size_t width, size_t height, const Palette& palette)
+		: m_width(width)
+		, m_height(height)
+		, m_palette(palette)
+	{
+		m_pixels = new size_t[m_width * m_height];
 	}
 
 	Image256::~Image256()
 	{
-		delete [] mPixels;
+		delete [] m_pixels;
 	}
 
 	void Image256::write(uint8_t* data)
 	{
 		size_t index = 0;
-		for(size_t y = 0; y < mHeight; ++y)
-			for(size_t x = 0; x < mWidth; ++x, ++index)
+		for(size_t y = 0; y < m_height; ++y)
+			for(size_t x = 0; x < m_width; ++x, ++index)
 			{
-				int colid = mPixels[index];
-				Colour color = colid == 16 ? Colour() : mPalette.colours[colid];
+				int colid = m_pixels[index];
+				Colour color = colid == 16 ? Colour() : m_palette.colours[colid];
 
 				// PF_A8R8G8B8 // Little-Endian
 				*data++ = static_cast<uint8_t>(color.b() * 255);

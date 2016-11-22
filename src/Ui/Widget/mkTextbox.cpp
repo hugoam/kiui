@@ -14,21 +14,15 @@
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 
-#include <Ui/mkUiWindow.h>
-
 #include <Ui/Widget/mkSheet.h>
 
 namespace mk
 {
 	Textbox::Textbox(WValue* input)
-		: TypeIn(input)
-	{
-		mStyle = &cls();
-	}
+		: TypeIn(input, "", cls())
+	{}
 
 	Textbox::Textbox(const string& text)
-		: TypeIn(nullptr, text)
-	{
-		mStyle = &cls();
-	}
+		: TypeIn(nullptr, text, cls())
+	{}
 }

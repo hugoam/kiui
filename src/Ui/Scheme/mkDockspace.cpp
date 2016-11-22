@@ -7,10 +7,7 @@
 
 #include <Object/String/mkStringConvert.h>
 
-#include <Ui/Form/mkWidgets.h>
-
-#include <Ui/Form/mkForm.h>
-#include <Ui/Form/mkRootForm.h>
+#include <Ui/Widget/mkWidgets.h>
 
 #include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
@@ -25,13 +22,10 @@
 namespace mk
 {
 	Docksection::Docksection(Dockline& dockline, size_t index)
-		: Tabber(true)
-		, mDockline(&dockline)
-		, mIndex(index)
-	{
-		mStyle = &cls();
-		mType = &cls();
-	}
+		: Tabber(cls(), true)
+		, m_dockline(&dockline)
+		, m_index(index)
+	{}
 
 	Docksection::~Docksection()
 	{}
@@ -45,8 +39,8 @@ namespace mk
 	{
 		this->rootSheet().append(Tabber::vrelease(window));
 
-		if(mTabs.count() == 0)
-			mDockline->removeSection(*this);
+		if(m_tabs.count() == 0)
+			m_dockline->removeSection(*this);
 	}
 
 	Widget& Docksection::vappend(unique_ptr<Widget> widget)
@@ -58,66 +52,64 @@ namespace mk
 	{
 		unique_ptr<Widget> unique = Tabber::vrelease(widget);
 
-		if(mTabs.count() == 0)
-			mDockline->removeSection(*this);
+		if(m_tabs.count() == 0)
+			m_dockline->removeSection(*this);
 
 		return unique;
 	}
 
 	Docksection& Docksection::docktarget(Dimension dim, bool after)
 	{
-		float span = mFrame->dsize(mDockline->dim()) / mDockline->frame().dsize(mDockline->dim());
-		span = std::min(span, this->frame().dspan(mDockline->dim()) / 2.f);
+		float span = m_frame->dsize(m_dockline->dim()) / m_dockline->frame().dsize(m_dockline->dim());
+		span = std::min(span, this->frame().dspan(m_dockline->dim()) / 2.f);
 
-		if(mDockline->dim() == dim)
+		if(m_dockline->dim() == dim)
 		{
-			mFrame->setSpanDim(mDockline->dim(), mFrame->dspan(mDockline->dim()) - span);
-			return mDockline->insertSection(mFrame->index() + (after ? 1 : 0), span);
+			m_frame->setSpanDim(m_dockline->dim(), m_frame->dspan(m_dockline->dim()) - span);
+			return m_dockline->insertSection(m_frame->index() + (after ? 1 : 0), span);
 		}
 		else
 		{
-			return mDockline->insertLine(mFrame->index(), true, span).insertSection(after ? 1 : 0);
+			return m_dockline->insertLine(m_frame->index(), true, span).insertSection(after ? 1 : 0);
 		}
 	}
 
-	Docksection& Docksection::docktarget(float xPos, float yPos)
+	Docksection& Docksection::docktarget(float x, float y)
 	{
-		float xRel = xPos - mFrame->dabsolute(DIM_X);
-		float yRel = yPos - mFrame->dabsolute(DIM_Y);
+		float xRel = x - m_frame->dabsolute(DIM_X);
+		float yRel = y - m_frame->dabsolute(DIM_Y);
 
-		if(xRel < mFrame->dsize(DIM_X) * 0.25f)
+		if(xRel < m_frame->dsize(DIM_X) * 0.25f)
 			return this->docktarget(DIM_X, false); // dock left
-		else if(xRel > mFrame->dsize(DIM_X) * 0.75f)
+		else if(xRel > m_frame->dsize(DIM_X) * 0.75f)
 			return this->docktarget(DIM_X, true); // dock right
-		else if(yRel < mFrame->dsize(DIM_Y) * 0.25f)
+		else if(yRel < m_frame->dsize(DIM_Y) * 0.25f)
 			return this->docktarget(DIM_Y, false); // dock under
-		else if(yRel > mFrame->dsize(DIM_Y) * 0.75f)
+		else if(yRel > m_frame->dsize(DIM_Y) * 0.75f)
 			return this->docktarget(DIM_Y, true); // dock above
 		else
 			return *this; // dock on
 	}
 
-	Dockline::Dockline(Dockspace& dockspace, Dockline* dockline, Dimension dim, size_t index)
-		: GridSheet(dim)
-		, mDockspace(dockspace)
-		, mDockline(dockline)
-		, mIndex(index)
-	{
-		mType = &cls();
-	}
+	Dockline::Dockline(Dockspace& dockspace, Dockline* dockline, Dimension dim, size_t index, StyleType& type)
+		: GridSheet(dim, type)
+		, m_dockspace(dockspace)
+		, m_dockline(dockline)
+		, m_index(index)
+	{}
 
 	Dockline::~Dockline()
 	{}
 
 	Dockline& Dockline::insertLine(size_t index, bool replace, float span)
 	{
-		Dockline& dockline = mDim == DIM_X ? (Dockline&) this->makeinsert<DocklineY>(index, mDockspace, this, index)
-											: (Dockline&) this->makeinsert<DocklineX>(index, mDockspace, this, index);
+		Dockline& dockline = m_dim == DIM_X ? (Dockline&) this->makeinsert<DocklineY>(index, m_dockspace, this, index)
+											: (Dockline&) this->makeinsert<DocklineX>(index, m_dockspace, this, index);
 
 		if(replace)
-			dockline.frame().setSpanDim(mDim, this->stripe().contents()[index + 1]->dspan(mDim));
+			dockline.frame().setSpanDim(m_dim, this->stripe().contents()[index + 1]->dspan(m_dim));
 		else
-			dockline.frame().setSpanDim(mDim, span);
+			dockline.frame().setSpanDim(m_dim, span);
 
 		if(replace)
 			dockline.append(this->release(index + 1));
@@ -128,39 +120,39 @@ namespace mk
 	Docksection& Dockline::insertSection(size_t index, float span)
 	{
 		Docksection& docksection = this->makeinsert<Docksection>(index, *this, index);
-		docksection.frame().setSpanDim(mDim, span);
+		docksection.frame().setSpanDim(m_dim, span);
 		return docksection;
 	}
 
 	void Dockline::removeSection(Docksection& section)
 	{
 		Frame& givespan = section.frame().index() > 0 ? section.prev().frame() : section.next().frame();
-		givespan.setSpanDim(mDim, givespan.dspan(mDim) + section.frame().dspan(mDim));
+		givespan.setSpanDim(m_dim, givespan.dspan(m_dim) + section.frame().dspan(m_dim));
 
 		section.destroy();
 
-		if(mContents.size() == 1 && mDockline)
-			mDockline->removeLine(*this);
+		if(m_contents.size() == 1 && m_dockline)
+			m_dockline->removeLine(*this);
 	}
 
 	void Dockline::removeLine(Dockline& line)
 	{
 		Widget& section = this->insert(line.release(size_t(0)), line.frame().index());
 		section.as<Docksection>().setDockline(this);
-		section.frame().setSpanDim(mDim, line.frame().dspan(mDim));
+		section.frame().setSpanDim(m_dim, line.frame().dspan(m_dim));
 
 		line.destroy();
 
-		if(mContents.size() == 1 && mDockline)
-			mDockline->removeLine(*this);
+		if(m_contents.size() == 1 && m_dockline)
+			m_dockline->removeLine(*this);
 	}
 
 	Dockline& Dockline::findLine(std::vector<string>& ids)
 	{
 		Dockline* dockline = this;
 
-		ids.pop_back(); // first is us
-		while(ids.size() > 1)
+		//ids.pop_back(); // first is us
+		while(ids.size() > 0)
 		{
 			size_t index = fromString<size_t>(ids.back());
 			if(index < dockline->count())
@@ -173,14 +165,24 @@ namespace mk
 		return *dockline;
 	}
 
-	Docksection& Dockline::findOrCreateSection(const string& dockid)
+	Dockline& Dockline::findLine(const string& dockid)
 	{
 		std::vector<string> ids = splitString(dockid, ".");
 		std::reverse(ids.begin(), ids.end());
 
+		return findLine(ids);
+	}
+
+	Docksection& Dockline::findOrCreateSection(const string& dockid)
+	{
+		std::vector<string> ids = splitString(dockid, ".");
+		string section = ids.back();
+		ids.pop_back();
+		std::reverse(ids.begin(), ids.end());
+
 		Dockline& dockline = this->findLine(ids);
 
-		size_t index = fromString<size_t>(ids.back());
+		size_t index = fromString<size_t>(section);
 		if(index < dockline.count())
 			return dockline.at(index)->as<Docksection>();
 		else
@@ -188,33 +190,29 @@ namespace mk
 	}
 
 	DocklineX::DocklineX(Dockspace& dockspace, Dockline* dockline, size_t index)
-		: Dockline(dockspace, dockline, DIM_X, index)
-	{
-		mStyle = &cls();
-	}
+		: Dockline(dockspace, dockline, DIM_X, index, cls())
+	{}
 
 	DocklineY::DocklineY(Dockspace& dockspace, Dockline* dockline, size_t index)
-		: Dockline(dockspace, dockline, DIM_Y, index)
-	{
-		mStyle = &cls();
-	}
+		: Dockline(dockspace, dockline, DIM_Y, index, cls())
+	{}
 
 	MasterDockline::MasterDockline(Dockspace& dockspace)
 		: DocklineX(dockspace, nullptr, 0)
-	{
-		mStyle = &cls();
-	}
+	{}
 
 	Dockspace::Dockspace()
-		: Sheet()
-		, mMainLine(this->makeappend<MasterDockline>(*this))
-	{
-		mStyle = &cls();
-	}
+		: Sheet(cls())
+		, m_mainLine(this->makeappend<MasterDockline>(*this))
+	{}
 
 	Widget& Dockspace::vappend(unique_ptr<Widget> widget)
 	{
-		Docksection& section = mMainLine.findOrCreateSection(widget->dockid());
+		string dockid = widget->dockid();
+		if (dockid == "")
+			dockid = "0." + toString(m_mainLine.count());
+
+		Docksection& section = m_mainLine.findOrCreateSection(dockid);
 		Window& window = section.emplace<Window>(widget->name(), static_cast<WindowState>(WINDOW_DOCKABLE | WINDOW_DEFAULT), nullptr, &section);
 		window.docked();
 		return window.vappend(std::move(widget));

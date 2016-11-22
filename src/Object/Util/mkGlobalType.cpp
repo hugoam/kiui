@@ -7,5 +7,5 @@
 
 namespace mk
 {
-	std::vector<LazyGlobal*> LazyGlobal::sGlobals;
+
 }

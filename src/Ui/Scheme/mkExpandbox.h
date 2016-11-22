@@ -8,16 +8,15 @@
 /* mk */
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Widget/mkButton.h>
-#include <Ui/Form/mkForm.h>
 
 namespace mk
 {
-	class MK_UI_EXPORT ExpandboxHeader : public Sequence
+	class MK_UI_EXPORT ExpandboxHeader : public Band
 	{
 	public:
 		ExpandboxHeader();
 
-		static StyleType& cls() { static StyleType ty("ExpandboxHeader", Sequence::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ExpandboxHeader", Band::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT ExpandboxBody : public Sheet
@@ -39,10 +38,10 @@ namespace mk
 	class MK_UI_EXPORT Expandbox : public Sheet
 	{
 	public:
-		Expandbox(const string& title, bool collapsed = false, bool build = true);
+		Expandbox(const string& title, bool collapsed = false, bool build = true, StyleType& type = cls());
 		~Expandbox();
 
-		Sheet* header() { return mHeader; }
+		Sheet* header() { return m_header; }
 
 		Widget& vappend(unique_ptr<Widget> widget);
 		unique_ptr<Widget> vrelease(Widget& widget);
@@ -53,12 +52,12 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Expandbox", Sheet::cls()); return ty; }
 
 	protected:
-		string mTitle;
-		Sheet* mHeader;
-		Sheet* mContainer;
-		Toggle* mExpandButton;
-		Label* mTitleLabel;
-		bool mCollapsed;
+		string m_title;
+		Sheet* m_header;
+		Sheet* m_container;
+		Toggle* m_expandButton;
+		Label* m_titleLabel;
+		bool m_collapsed;
 	};
 }
 

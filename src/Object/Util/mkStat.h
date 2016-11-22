@@ -23,23 +23,23 @@ namespace mk
 	class StatDef : public Struct
 	{
 	public:
-		StatDef(T min = T(), T max = T(), T step = T())
-			: mMin(min)
-			, mMax(max)
-			, mStep(step)
+		StatDef(T min = std::numeric_limits<T>::lowest(), T max = std::numeric_limits<T>::max(), T step = T(1))
+			: m_min(min)
+			, m_max(max)
+			, m_step(step)
 		{}
 
-		inline T min() const { return mMin; }
-		inline T max() const { return mMax; }
-		inline T step() const { return mStep; }
+		inline T min() const { return m_min; }
+		inline T max() const { return m_max; }
+		inline T step() const { return m_step; }
 
-		T rincrement(T& value, T amount) const { T diff = std::min(mMax - value, amount); value += diff; update(value); return diff; }
-		T rdecrement(T& value, T amount) const { T diff = std::max(-mMin + value, amount); value -= diff; update(value); return diff; }
+		T rincrement(T& value, T amount) const { T diff = std::min(m_max - value, amount); value += diff; update(value); return diff; }
+		T rdecrement(T& value, T amount) const { T diff = std::max(-m_min + value, amount); value -= diff; update(value); return diff; }
 		void increment(T& value, T amount) const { value += amount; update(value); }
 		void decrement(T& value, T amount) const { value -= amount; update(value); }
 
-		void increment(T& value) const { value += mStep; update(value); }
-		void decrement(T& value) const { value -= mStep; update(value); }
+		void increment(T& value) const { value += m_step; update(value); }
+		void decrement(T& value) const { value -= m_step; update(value); }
 
 		void multiply(T& value, T& base, T multiplier) const { T diff = value - base; base *= multiplier; value = base + diff; update(value); }
 		
@@ -48,18 +48,18 @@ namespace mk
 
 		void update(T& value) const
 		{
-			if(value < mMin)
-				value = mMin;
-			if(value > mMax)
-				value = mMax;
+			if(value < m_min)
+				value = m_min;
+			if(value > m_max)
+				value = m_max;
 		}
 
 		static Type& cls() { static Type ty; return ty; }
 
 	protected:
-		T mMin;
-		T mMax;
-		T mStep;
+		T m_min;
+		T m_max;
+		T m_step;
 	};
 
 	template <class T>
@@ -67,52 +67,52 @@ namespace mk
 	{
 	public:
 		Stat(T base = T())
-			: mBase(base)
-			, mValue(base)
-			//, mUpdateHandlers()
+			: m_base(base)
+			, m_value(base)
+			//, m_updateHandlers()
 		{}
 
-		operator T() const { return mValue; }
+		operator T() const { return m_value; }
 
-		inline T base() const { return mBase; }
-		inline T value() const { return mValue; }
+		inline T base() const { return m_base; }
+		inline T value() const { return m_value; }
 
 		void setModifier(const StatDef<T>& def, void* owner, T amount)
 		{
-			mValue += amount;
+			m_value += amount;
 
-			mModifiers[owner] = amount;
-			def.update(mValue);
+			m_modifiers[owner] = amount;
+			def.update(m_value);
 		}
 
 		void updateModifier(const StatDef<T>& def, void* owner, T amount)
 		{
-			mValue -= mModifiers[owner];
-			mValue += amount;
+			m_value -= m_modifiers[owner];
+			m_value += amount;
 
-			mModifiers[owner] = amount;
-			def.update(mValue);
+			m_modifiers[owner] = amount;
+			def.update(m_value);
 		}
 
 		void removeModifier(const StatDef<T>& def, void* owner)
 		{
-			mValue += mModifiers[owner];
-			mModifiers.erase(owner);
-			def.update(mValue);
+			m_value += m_modifiers[owner];
+			m_modifiers.erase(owner);
+			def.update(m_value);
 		}
 
-		//void addUpdateHandler(const StatObserver<T>& handler) { mUpdateHandlers.push_back(handler); handler(this, mValue); }
+		//void addUpdateHandler(const StatObserver<T>& handler) { m_updateHandlers.push_back(handler); handler(this, m_value); }
 
 		virtual const StatDef<T>& vdef() const = 0;
 
 	protected:
-		T mBase;
-		T mValue;
+		T m_base;
+		T m_value;
 
-		//std::vector<StatObserver<T>> mUpdateHandlers;
+		//std::vector<StatObserver<T>> m_updateHandlers;
 
 		typedef std::map<void*, T> ModifierMap;
-		ModifierMap mModifiers;
+		ModifierMap m_modifiers;
 	};
 
 	template <class T, class T_Def>
@@ -131,17 +131,17 @@ namespace mk
 		inline T max() const { return self()->def().max(); }
 		inline T step() const { return self()->def().step(); }
 
-		inline void modify(T value) { self()->def().modify(this->mValue, this->mBase, value); }
+		inline void modify(T value) { self()->def().modify(this->m_value, this->m_base, value); }
 
-		inline T rincrement(T amount) { return self()->def().rincrement(this->mValue, amount); }
-		inline T rdecrement(T amount) { return self()->def().rdecrement(this->mValue, amount); }
-		inline void increment(T amount) { self()->def().increment(this->mValue, amount); }
-		inline void decrement(T amount) { self()->def().decrement(this->mValue, amount); }
+		inline T rincrement(T amount) { return self()->def().rincrement(this->m_value, amount); }
+		inline T rdecrement(T amount) { return self()->def().rdecrement(this->m_value, amount); }
+		inline void increment(T amount) { self()->def().increment(this->m_value, amount); }
+		inline void decrement(T amount) { self()->def().decrement(this->m_value, amount); }
 
-		inline void increment() { self()->def().increment(this->mValue); }
-		inline void decrement() { self()->def().increment(this->mValue); }
+		inline void increment() { self()->def().increment(this->m_value); }
+		inline void decrement() { self()->def().increment(this->m_value); }
 
-		inline void multiply(T multiplier) { self()->def().multiply(this->mValue, this->mBase, multiplier); }
+		inline void multiply(T multiplier) { self()->def().multiply(this->m_value, this->m_base, multiplier); }
 		
 		inline void setModifier(void* owner, T amount) { Stat<T>::setModifier(self()->def(), owner, amount); }
 		inline void updateModifier(void* owner, T amount) { Stat<T>::updateModifier(self()->def(), owner, amount); }
@@ -163,53 +163,53 @@ namespace mk
 	class AutoStat : public Struct
 	{
 	public:
-		AutoStat(T value = T(), T min = std::numeric_limits<T>::lowest(), T max = std::numeric_limits<T>::max(), T step = T())
-			: mValue(value)
-			, mValueRef(mValue)
-			, mDef(min, max, step)
+		AutoStat(T value = T(), T min = std::numeric_limits<T>::lowest(), T max = std::numeric_limits<T>::max(), T step = T(1))
+			: m_value(value)
+			, m_valueRef(m_value)
+			, m_def(min, max, step)
 		{}
 
 		AutoStat(T& value, const StatDef<T>& def)
-			: mValue()
-			, mValueRef(value)
-			, mDef(def)
+			: m_value()
+			, m_valueRef(value)
+			, m_def(def)
 		{}
 
 		AutoStat(const AutoStat& other)
-			: mValue(other.mValue)
-			, mValueRef(&other.mValue == &other.mValueRef ? mValue : other.mValueRef)
-			, mDef(other.mDef)
+			: m_value(other.m_value)
+			, m_valueRef(&other.m_value == &other.m_valueRef ? m_value : other.m_valueRef)
+			, m_def(other.m_def)
 		{}
 
 		AutoStat& operator=(const AutoStat& other)
 		{
-			mValue = other.mValue;
-			mValueRef = other.mValueRef;
-			mDef = other.mDef;
+			m_value = other.m_value;
+			m_valueRef = other.m_valueRef;
+			m_def = other.m_def;
 			return *this;
 		}
 
-		operator T() const { return mValueRef; }
+		operator T() const { return m_valueRef; }
 
-		inline T value() const { return mValueRef; }
+		inline T value() const { return m_valueRef; }
 
-		inline T min() const { return mDef.min(); }
-		inline T max() const { return mDef.max(); }
-		inline T step() const { return mDef.step(); }
+		inline T min() const { return m_def.min(); }
+		inline T max() const { return m_def.max(); }
+		inline T step() const { return m_def.step(); }
 
-		inline void modify(T value) { mDef.modify(mValueRef, value); }
+		inline void modify(T value) { m_def.modify(m_valueRef, value); }
 
-		inline void increment() { mDef.increment(mValueRef); }
-		inline void decrement() { mDef.decrement(mValueRef); }
+		inline void increment() { m_def.increment(m_valueRef); }
+		inline void decrement() { m_def.decrement(m_valueRef); }
 
-		const StatDef<T>& vdef() const { return mDef; }
+		const StatDef<T>& vdef() const { return m_def; }
 
 		static Type& cls() { static Type ty; return ty; }
 
 	protected:
-		T mValue;
-		T& mValueRef;
-		StatDef<T> mDef;
+		T m_value;
+		T& m_valueRef;
+		StatDef<T> m_def;
 	};
 
 	template class MK_OBJECT_EXPORT AutoStat<int>;

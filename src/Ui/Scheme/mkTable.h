@@ -8,7 +8,6 @@
 /* mk */
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Widget/mkButton.h>
-#include <Ui/Form/mkForm.h>
 
 namespace mk
 {
@@ -39,9 +38,9 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Table", Sheet::cls()); return ty; }
 
 	protected:
-		StringVector mColumns;
-		std::vector<float> mWeights;
-		TableHead& mHead;
+		StringVector m_columns;
+		std::vector<float> m_weights;
+		TableHead& m_head;
 	};
 }
 

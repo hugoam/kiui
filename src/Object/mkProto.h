@@ -11,9 +11,7 @@
 #include <Object/mkIndexer.h>
 
 /* Standard */
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
+#include <vector>
 
 namespace mk
 {
@@ -34,59 +32,53 @@ namespace mk
 			and are not part of the object in itself : they can be here or not here, whereas the parts are always here
 	*/
 
-	class MK_OBJECT_EXPORT _I_ _S_ Proto : public IdObject, public Indexed<Proto>
+	class MK_OBJECT_EXPORT _I_ _S_ Proto : public IdObject
 	{
 	public:
-		_C_ Proto(Type* type);
+		_C_ Proto(Type& type);
 
-		void init(Type* stem, std::vector<Type*> parts) { mStem = stem; for(Type* type : parts) addPart(*type); }
+		void init(Type& stem, std::vector<Type*> parts) { m_stem = &stem; for(Type* type : parts) addPart(*type); }
 
-		_A_ Type* prototype() { return mType; }
-		_A_ Type* stem() { return mStem; }
-		_A_ const std::vector<Type*>& parts() const { return mParts; }
-		_A_ Id id() const { return mId; }
+		_A_ Type& prototype() { return m_type; }
+		_A_ Type* stem() { return m_stem; }
+		_A_ const std::vector<Type*>& parts() const { return m_parts; }
+		_A_ Id id() const { return m_id; }
 
-		inline void addPart(Type& type) { mHashParts[type.id()].type = &type; mHashParts[type.id()].index = mNumParts++; mParts.push_back(&type); }
-		inline bool hasPart(Type& type) { return (mHashParts[type.id()].type != 0); }
-		inline int partIndex(Type& type) { return mHashParts[type.id()].index; }
-		inline size_t numParts() { return mNumParts; }
+		inline void addPart(Type& type) { m_hashParts[type.id()].type = &type; m_hashParts[type.id()].index = m_numParts++; m_parts.push_back(&type); }
+		inline bool hasPart(Type& type) { return (m_hashParts[type.id()].type != 0); }
+		inline int partIndex(Type& type) { return m_hashParts[type.id()].index; }
+		inline size_t numParts() { return m_numParts; }
 
-		static Type& cls() { static Type ty; return ty; }
+		static Type& cls() { static Type ty(INDEXED); return ty; }
 
 	protected:
-		Type* mType;
-		Type* mStem;
-		size_t mNumParts;
-		std::vector<ProtoPart> mHashParts;
-		std::vector<Type*> mParts;
+		Type& m_type;
+		Type* m_stem;
+		size_t m_numParts;
+		std::vector<ProtoPart> m_hashParts;
+		std::vector<Type*> m_parts;
 	};
 
-	class MK_OBJECT_EXPORT ProtoChunk
+	class MK_OBJECT_EXPORT ProtoType : public Type
 	{
 	public:
-		virtual ~ProtoChunk() {}
+		ProtoType();
+
+		Proto& proto() { return m_proto; }
+
+		static Type& cls() { static Type ty(Type::cls()); return ty; }
+
+	protected:
+		Proto m_proto;
 	};
-
-	template <class T, class... Parts>
-	class Prototyped
-	{
-	public:
-		static Proto* proto() { return &sProto; }
-
-	private:
-		static Proto sProto;
-	};
-
-	template <class T, class... Parts>
-	Proto Prototyped<T, Parts...>::sProto(T::cls());
 
 	template <class T, class S, class... Parts>
-	class TPrototype : public Part, public Indexed<T>, public Prototyped<T, Parts...>
+	class TPrototype : public Part
 	{
 	public:
-		TPrototype(Stem* stem) : Part(T::cls(), stem) {}
+		TPrototype(Stem& stem) : Part(T::cls(), stem) {}
 
-		static Type& cls() { static Type ty; return ty; }
+		static ProtoType& cls() { static ProtoType ty; return ty; }
 	};
 }
 

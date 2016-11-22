@@ -9,7 +9,7 @@
 #include <Object/String/mkStringConvert.h>
 #include <Object/Util/mkStatString.h>
 
-#include <Ui/Form/mkWidgets.h>
+#include <Ui/Widget/mkWidgets.h>
 
 #include <Ui/Widget/mkTypeIn.h>
 #include <Ui/Widget/mkSlider.h>
@@ -18,56 +18,57 @@ using namespace std::placeholders;
 
 namespace mk
 {
-	Value::Value(Lref& value, bool edit)
-		: mValue(value)
-		, mUpdate(0)
-		, mEdit(edit)
+	Value::Value(Lref& value, const OnUpdate& onUpdate, bool edit)
+		: m_value(value)
+		, m_update(0)
+		, m_edit(edit)
+		, m_onUpdate(onUpdate)
 	{}
 
-	Value::Value(Lref&& value, bool edit)
-		: mCopy(value)
-		, mValue(mCopy)
-		, mUpdate(0)
-		, mEdit(edit)
+	Value::Value(Lref&& value, const OnUpdate& onUpdate, bool edit)
+		: m_copy(value)
+		, m_value(m_copy)
+		, m_update(0)
+		, m_edit(edit)
+		, m_onUpdate(onUpdate)
 	{}
 
 	void Value::triggerUpdate()
 	{
-		++mUpdate;
+		++m_update;
 		this->notifyUpdate();
 	}
 
 	void Value::triggerModify()
 	{
-		++mUpdate;
+		++m_update;
 		this->notifyUpdate();
 		this->notifyModify();
+
+		if(m_onUpdate)
+			m_onUpdate(m_value);
 	}
 
 	string Value::getString()
 	{
-		return mValue->getString();
+		return m_value->getString();
 	}
 
 	void Value::setString(const string& value)
 	{
-		mValue->setString(value);
+		m_value->setString(value);
 		this->triggerModify();
 	}
 
-	WValue::WValue(Lref& value, bool edit)
-		: Sheet()
-		, Value(value, edit)
-	{
-		mStyle = &cls();
-	}
+	WValue::WValue(Lref& value, StyleType& type, const OnUpdate& onUpdate, bool edit)
+		: Sheet(type)
+		, Value(value, onUpdate, edit)
+	{}
 
-	WValue::WValue(Lref&& value, bool edit)
-		: Sheet()
-		, Value(std::move(value), edit)
-	{
-		mStyle = &cls();
-	}
+	WValue::WValue(Lref&& value, StyleType& type, const OnUpdate& onUpdate, bool edit)
+		: Sheet(type)
+		, Value(std::move(value), onUpdate, edit)
+	{}
 
 	void WValue::notifyUpdate()
 	{

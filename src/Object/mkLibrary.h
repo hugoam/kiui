@@ -22,20 +22,15 @@ namespace mk
 	class Library : public Pool<T>
 	{
 	public:
-		Library() : Pool() { T::cls().setupLibrary(this); }
+		Library() : Pool() {}
 	};
 
 	template <class T>
-	class Librared : public Indexed<T>
+	class Librared
 	{
 	public:
-		static inline Library<T>* library() { return &sLibrary; }
-
-		static Library<T> sLibrary;
+		static inline Library<T>& library() { static Library<T> instance; return instance; }
 	};
-
-	template <class T>
-	Library<T> Librared<T>::sLibrary = Library<T>();
 }
 
 #endif // MK_IDSTORE_H_INCLUDED

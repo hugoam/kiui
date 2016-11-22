@@ -20,13 +20,18 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT Shadow
+	class MK_UI_EXPORT _I_ Shadow : public IdStruct
 	{
 	public:
 		Shadow(float xpos, float ypos, float blur, float spread, Colour colour = Colour::Black)
-			: d_xpos(xpos), d_ypos(ypos), d_blur(blur), d_spread(spread), d_radius(spread + blur), d_colour(colour), d_null(false)
+			: IdStruct(cls())
+			, d_xpos(xpos), d_ypos(ypos), d_blur(blur), d_spread(spread), d_radius(spread + blur), d_colour(colour), d_null(false)
 		{}
-		Shadow() : d_null(true) {}
+
+		Shadow()
+			: IdStruct(cls())
+			, d_null(true)
+		{}
 
 		float d_xpos;
 		float d_ypos;
@@ -35,6 +40,8 @@ namespace mk
 		float d_radius;
 		Colour d_colour;
 		bool d_null;
+
+		static Type& cls() { static Type ty(INDEXED); return ty; }
 	};
 
 	template <class T>
@@ -55,17 +62,17 @@ namespace mk
 		bool set;
 	};
 
-	class MK_UI_EXPORT _I_ LayoutStyle : public IdStruct, public Indexed<LayoutStyle>
+	class MK_UI_EXPORT _I_ LayoutStyle : public IdStruct
 	{
 	public:
 		LayoutStyle()
-			: IdStruct(index<LayoutStyle>(), cls())
+			: IdStruct(cls())
 			, d_flow(FLOW), d_clipping(CLIP), d_opacity(VOID), d_space(AUTO), d_layoutDim(DIM_Y), d_align(DimAlign(LEFT, LEFT))
 			, d_span(DimFloat(1.f, 1.f)), d_pivot(DimPivot(FORWARD, FORWARD)), d_updated(0)
 		{}
 
 		LayoutStyle(const LayoutStyle& other)
-			: IdStruct(index<LayoutStyle>(), cls())
+			: IdStruct(cls())
 		{
 			this->copy(other);
 		}
@@ -125,23 +132,23 @@ namespace mk
 
 		_A_ _M_ size_t d_updated;
 
-		static Type& cls() { static Type ty; return ty; }
+		static Type& cls() { static Type ty(INDEXED); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ InkStyle : public IdStruct, public Indexed<InkStyle>
+	class MK_UI_EXPORT _I_ InkStyle : public IdStruct
 	{
 	public:
 		_C_ InkStyle(const string& name)
-			: IdStruct(index<InkStyle>(), cls())
-			, mName(name)
-			, mEmpty(true), mBackgroundColour(Colour::Transparent), mBorderColour(Colour::Transparent), mTextColour(Colour::Transparent), mImageColour(Colour::Transparent)
-			, mTextFont("dejavu"), mTextSize(14.f), mTextWrap(false)
-			, mAlign(DimAlign(LEFT, LEFT)), mBorderWidth(0.f), mImage(), mCornerRadius(), mWeakCorners(false)
+			: IdStruct(cls())
+			, m_name(name)
+			, m_empty(true), m_backgroundColour(Colour::Transparent), m_borderColour(Colour::Transparent), m_textColour(Colour::Transparent), m_imageColour(Colour::Transparent)
+			, m_textFont("dejavu"), m_textSize(14.f), m_textWrap(false)
+			, m_align(DimAlign(LEFT, LEFT)), m_borderWidth(0.f), m_image(), m_cornerRadius(), m_weakCorners(false)
 		{}
 
 		InkStyle(const InkStyle& other)
-			: IdStruct(index<InkStyle>(), cls())
-			, mName(other.mName)
+			: IdStruct(cls())
+			, m_name(other.m_name)
 		{
 			this->copy(other);
 		}
@@ -150,74 +157,74 @@ namespace mk
 
 		void copy(const InkStyle& other, bool inherit = false)
 		{
-			mBackgroundColour.copy(other.mBackgroundColour, inherit);
-			mBorderColour.copy(other.mBorderColour, inherit);
-			mImageColour.copy(other.mImageColour, inherit);
-			mTextColour.copy(other.mTextColour, inherit);
-			mTextFont.copy(other.mTextFont, inherit);
-			mTextSize.copy(other.mTextSize, inherit);
-			mTextWrap.copy(other.mTextWrap, inherit);
-			mBorderWidth.copy(other.mBorderWidth, inherit);
-			mCornerRadius.copy(other.mCornerRadius, inherit);
-			mWeakCorners.copy(other.mWeakCorners, inherit);
-			mPadding.copy(other.mPadding, inherit);
-			mMargin.copy(other.mMargin, inherit);
-			mAlign.copy(other.mAlign, inherit);
-			mTopdownGradient.copy(other.mTopdownGradient, inherit);
-			mImage.copy(other.mImage, inherit);
-			mOverlay.copy(other.mOverlay, inherit);
-			mTile.copy(other.mTile, inherit);
-			mImageSkin.copy(other.mImageSkin, inherit);
-			mShadow.copy(other.mShadow, inherit);
+			m_backgroundColour.copy(other.m_backgroundColour, inherit);
+			m_borderColour.copy(other.m_borderColour, inherit);
+			m_imageColour.copy(other.m_imageColour, inherit);
+			m_textColour.copy(other.m_textColour, inherit);
+			m_textFont.copy(other.m_textFont, inherit);
+			m_textSize.copy(other.m_textSize, inherit);
+			m_textWrap.copy(other.m_textWrap, inherit);
+			m_borderWidth.copy(other.m_borderWidth, inherit);
+			m_cornerRadius.copy(other.m_cornerRadius, inherit);
+			m_weakCorners.copy(other.m_weakCorners, inherit);
+			m_padding.copy(other.m_padding, inherit);
+			m_margin.copy(other.m_margin, inherit);
+			m_align.copy(other.m_align, inherit);
+			m_topdownGradient.copy(other.m_topdownGradient, inherit);
+			m_image.copy(other.m_image, inherit);
+			m_overlay.copy(other.m_overlay, inherit);
+			m_tile.copy(other.m_tile, inherit);
+			m_imageSkin.copy(other.m_imageSkin, inherit);
+			m_shadow.copy(other.m_shadow, inherit);
 		}
 
-		void setEmpty(bool empty) { mEmpty = empty; }
+		void setEmpty(bool empty) { m_empty = empty; }
 
-		_A_ const string& name() const { return mName; }
-		_A_ bool empty() const { return mEmpty; }
-		_A_ Colour& backgroundColour() { return mBackgroundColour.val; }
-		_A_ Colour& borderColour() { return mBorderColour.val; }
-		_A_ Colour& imageColour() { return mImageColour.val; }
-		_A_ Colour& textColour() { return mTextColour.val; }
-		_A_ const string& textFont() { return mTextFont.val; }
-		_A_ float& textSize() { return mTextSize.val; }
-		_A_ bool& textWrap() { return mTextWrap.val; }
-		_A_ BoxFloat& borderWidth() { return mBorderWidth.val; }
-		_A_ BoxFloat& cornerRadius() { return mCornerRadius.val; }
-		_A_ bool& weakCorners() { return mWeakCorners.val; }
-		_A_ BoxFloat& padding() { return mPadding.val; }
-		_A_ BoxFloat& margin() { return mMargin.val; }
-		_A_ DimAlign& align() { return mAlign.val; }
-		_A_ DimFloat& topdownGradient() { return mTopdownGradient.val; }
-		_A_ Image* image() { return mImage.val; }
-		_A_ Image* overlay() { return mOverlay.val; }
-		_A_ Image* tile() { return mTile.val; }
-		_A_ ImageSkin& imageSkin() { return mImageSkin.val; }
-		_A_ Shadow& shadow() { return mShadow.val; }
+		_A_ const string& name() const { return m_name; }
+		_A_ bool empty() const { return m_empty; }
+		_A_ Colour& backgroundColour() { return m_backgroundColour.val; }
+		_A_ Colour& borderColour() { return m_borderColour.val; }
+		_A_ Colour& imageColour() { return m_imageColour.val; }
+		_A_ Colour& textColour() { return m_textColour.val; }
+		_A_ const string& textFont() { return m_textFont.val; }
+		_A_ float& textSize() { return m_textSize.val; }
+		_A_ bool& textWrap() { return m_textWrap.val; }
+		_A_ BoxFloat& borderWidth() { return m_borderWidth.val; }
+		_A_ BoxFloat& cornerRadius() { return m_cornerRadius.val; }
+		_A_ bool& weakCorners() { return m_weakCorners.val; }
+		_A_ BoxFloat& padding() { return m_padding.val; }
+		_A_ BoxFloat& margin() { return m_margin.val; }
+		_A_ DimAlign& align() { return m_align.val; }
+		_A_ DimFloat& topdownGradient() { return m_topdownGradient.val; }
+		_A_ Image* image() { return m_image.val; }
+		_A_ Image* overlay() { return m_overlay.val; }
+		_A_ Image* tile() { return m_tile.val; }
+		_A_ ImageSkin& imageSkin() { return m_imageSkin.val; }
+		_A_ Shadow& shadow() { return m_shadow.val; }
 
-		string mName;
-		bool mEmpty;
-		StyleAttr<Colour> mBackgroundColour;
-		StyleAttr<Colour> mBorderColour;
-		StyleAttr<Colour> mImageColour;
-		StyleAttr<Colour> mTextColour;
-		StyleAttr<string> mTextFont;
-		StyleAttr<float> mTextSize;
-		StyleAttr<bool> mTextWrap;
-		StyleAttr<BoxFloat> mBorderWidth;
-		StyleAttr<BoxFloat> mCornerRadius;
-		StyleAttr<bool> mWeakCorners;
-		StyleAttr<BoxFloat> mPadding;
-		StyleAttr<BoxFloat> mMargin;
-		StyleAttr<DimAlign> mAlign;
-		StyleAttr<DimFloat> mTopdownGradient;
-		StyleAttr<Image*> mImage;
-		StyleAttr<Image*> mOverlay;
-		StyleAttr<Image*> mTile;
-		StyleAttr<ImageSkin> mImageSkin;
-		StyleAttr<Shadow> mShadow;
+		string m_name;
+		bool m_empty;
+		StyleAttr<Colour> m_backgroundColour;
+		StyleAttr<Colour> m_borderColour;
+		StyleAttr<Colour> m_imageColour;
+		StyleAttr<Colour> m_textColour;
+		StyleAttr<string> m_textFont;
+		StyleAttr<float> m_textSize;
+		StyleAttr<bool> m_textWrap;
+		StyleAttr<BoxFloat> m_borderWidth;
+		StyleAttr<BoxFloat> m_cornerRadius;
+		StyleAttr<bool> m_weakCorners;
+		StyleAttr<BoxFloat> m_padding;
+		StyleAttr<BoxFloat> m_margin;
+		StyleAttr<DimAlign> m_align;
+		StyleAttr<DimFloat> m_topdownGradient;
+		StyleAttr<Image*> m_image;
+		StyleAttr<Image*> m_overlay;
+		StyleAttr<Image*> m_tile;
+		StyleAttr<ImageSkin> m_imageSkin;
+		StyleAttr<Shadow> m_shadow;
 
-		static Type& cls() { static Type ty; return ty; }
+		static Type& cls() { static Type ty(INDEXED); return ty; }
 	};
 
 	typedef std::vector<Style*> StyleVector;
@@ -225,33 +232,33 @@ namespace mk
 	class MK_UI_EXPORT SubSkin
 	{
 	public:
-		SubSkin(WidgetState state, const string& name) : mState(state), mSkin(name) {}
-		SubSkin(WidgetState state, const InkStyle& skin) : mState(state), mSkin(skin) {}
+		SubSkin(WidgetState state, const string& name) : m_state(state), m_skin(name) {}
+		SubSkin(WidgetState state, const InkStyle& skin) : m_state(state), m_skin(skin) {}
 
-		WidgetState mState;
-		InkStyle mSkin;
+		WidgetState m_state;
+		InkStyle m_skin;
 	};
 
 	typedef std::vector<SubSkin> StyleTable;
 
-	class MK_UI_EXPORT _I_ Style : public IdStruct, public Indexed<Style>, public NonCopy
+	class MK_UI_EXPORT _I_ Style : public IdStruct, public NonCopy
 	{
 	public:
 		Style(Type& type, Style* base);
 		Style(const string& name);
 		~Style();
 
-		_A_ const string& name() { return mName.empty() ? mStyleType->name() : mName; }
-		_A_ Style* base() { return mBase; }
-		_A_ LayoutStyle& layout() { return mLayout; }
-		_A_ InkStyle& skin() { return mSkin; }
-		_A_ _M_ size_t updated() { return mUpdated; }
+		_A_ const string& name() { return m_name.empty() ? m_styleType->name() : m_name; }
+		_A_ Style* base() { return m_base; }
+		_A_ LayoutStyle& layout() { return m_layout; }
+		_A_ InkStyle& skin() { return m_skin; }
+		_A_ _M_ size_t updated() { return m_updated; }
 
-		void markUpdate() { ++mUpdated; }
-		void setUpdated(size_t update) { mUpdated = update; }
+		void markUpdate() { ++m_updated; }
+		void setUpdated(size_t update) { m_updated = update; }
 
-		Type* styleType() { return mStyleType; }
-		const StyleTable& subskins() { return mSubskins; }
+		Type* styleType() { return m_styleType; }
+		const StyleTable& subskins() { return m_subskins; }
 		
 		void reset();
 		InkStyle& copy(WidgetState state, InkStyle& original, bool inherit);
@@ -267,17 +274,17 @@ namespace mk
 		void inheritSkins(Style& base);
 		void copySkins(Style& base);
 
-		static Type& cls() { static Type ty; return ty; }
+		static Type& cls() { static Type ty(INDEXED); return ty; }
 
 	protected:
-		Type* mStyleType;
-		Style* mBase;
-		Style* mBaseSkin;
-		string mName;
-		LayoutStyle mLayout;
-		InkStyle mSkin;
-		StyleTable mSubskins;
-		size_t mUpdated;
+		Type* m_styleType;
+		Style* m_base;
+		Style* m_baseSkin;
+		string m_name;
+		LayoutStyle m_layout;
+		InkStyle m_skin;
+		StyleTable m_subskins;
+		size_t m_updated;
 	};
 
 	class MK_UI_EXPORT StyleType : public Type, public Style

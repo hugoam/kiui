@@ -11,17 +11,29 @@
 namespace mk
 {
 	TypeObject::TypeObject(Type& type)
-		: mType(&type)
+		: m_type(type)
+	{}
+
+	IdObject::IdObject(int)
+		: TypeObject(static_cast<Type&>(*this))
 	{}
 
 	IdObject::IdObject(Id id, Type& type)
 		: TypeObject(type)
-		, mId(id)
-	{}
+		, m_id(id == 0 ? type.indexer().alloc() : id)
+	{
+		type.indexer().insert(*this, m_id);
+	}
+
+	IdObject::IdObject(Type& type)
+		: TypeObject(type)
+		, m_id(type.indexer().alloc())
+	{
+		type.indexer().insert(*this, m_id);
+	}
 
 	IdObject::~IdObject()
 	{
-		if(mType->indexer())
-			mType->indexer()->remove(*this);
+		m_type.indexer().remove(*this);
 	}
 }

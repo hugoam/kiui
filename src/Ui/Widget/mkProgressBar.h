@@ -32,21 +32,21 @@ namespace mk
 	class MK_UI_EXPORT ProgressBar : public Sheet
 	{
 	public:
-		ProgressBar(Dimension dim = DIM_X, const Trigger& onUpdated = nullptr);
+		ProgressBar(StyleType& type = cls(), Dimension dim = DIM_X, const Trigger& onUpdated = nullptr);
 
-		float percentage() { return mPercentage; }
+		float percentage() { return m_percentage; }
 		void setPercentage(float percentage);
 
 		static StyleType& cls() { static StyleType ty("ProgressBar", Sheet::cls()); return ty; }
 
 	protected:
-		Dimension mDim;
-		Widget& mFiller;
-		Widget& mSpacer;
+		Dimension m_dim;
+		Widget& m_filler;
+		Widget& m_spacer;
 
-		float mPercentage;
+		float m_percentage;
 
-		Trigger mOnUpdated;
+		Trigger m_onUpdated;
 	};
 
 	class MK_UI_EXPORT ProgressBarX : public ProgressBar

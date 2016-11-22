@@ -22,7 +22,7 @@ namespace mk
 		size_t index() { return d_index; }
 		size_t z() { return d_z; }
 
-		InkLayer& inkLayer() { return *d_inkLayer.get(); }
+		InkLayer& inkLayer() { return *d_inkLayer; }
 		InkTarget* target() { return d_target; }
 		std::vector<Layer*>& layers() { return d_layers; }
 

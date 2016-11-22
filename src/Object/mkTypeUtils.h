@@ -93,7 +93,7 @@ namespace mk
 	template <class T>
 	struct Assign<const std::vector<T>&>
 	{
-		static inline void set(std::vector<T>& ref, const std::vector<T>& val) { ref.clear(); ref.resize(val.size()); for(size_t i = 0; i < val.size(); ++i) Assign<T>::set(ref[i], val[i]); }
+		static inline void set(std::vector<T>& ref, const std::vector<T>& val) { ref.clear(); ref.resize(val.size()); for(size_t i = 0; i < val.size(); ++i) ref[i] = Copy<T>::copy(val[i]); }
 	};
 
 	template <class T, bool isobject = std::is_base_of<Object, T>::value>

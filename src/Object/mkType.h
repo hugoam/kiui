@@ -15,61 +15,66 @@
 
 namespace mk
 {
-	class MK_OBJECT_EXPORT ImprintStub
+	enum TypeKind
 	{
-	public:
-		virtual ~ImprintStub() {}
-		virtual Imprint* imprint() = 0;
+		TYPE,
+		INDEXED,
+		PROTOTYPE
 	};
 
 	class MK_OBJECT_EXPORT _I_ Type : public IdObject
 	{
 	public:
-		Type();
-		Type(Type& base);
-		Type(const string& name);
-		Type(const string& name, Type& base);
+		Type(TypeKind kind = TYPE, const string& name = "");
+		Type(Type& base, TypeKind kind = TYPE, const string& name = "");
 		~Type();
 
+		Type(Type&&) = delete;
+
 		_A_ Id id() const { return IdObject::id(); }
-		_A_ const string& name() const { return mName; }
-		_A_ const Type* base() const { return mBase; }
+		_A_ const string& name() const { return m_name; }
+		_A_ Type* base() const { return m_base; }
 
-		Imprint* imprint() { return mImprint; }
-		Proto* proto() { return mProto; }
-		Indexer* indexer() { return mIndexer; }
-		AbstractPool* library() { return mLibrary; }
+		Imprint& imprint() { return *m_imprint; }
 
-		Type* base() { return mBase; }
+		Indexer& indexer() { return *m_indexer; }
 
-		void setupName(string name) { mName = name; }
-		void setupProto(Proto* proto) { mProto = proto; }
-		void setupIndexer(Indexer* indexer) { mIndexer = indexer; }
-		void setupLibrary(AbstractPool* library) { mLibrary = library; }
+		Type* base() { return m_base; }
 
-		void setupImprint(unique_ptr<ImprintStub> stub) { mImprint = stub->imprint(); mImprintStub = std::move(stub); }
+		void setupName(string name) { m_name = name; }
 
-		bool upcast(Type* type);
+		bool upcast(Type& type);
 
 		static Type& cls() { static Type ty(0); return ty; }
 
-		static size_t maxId() { return sTypeId; }
+	public:
+		template <class T>
+		bool upcast() { return this->upcast(typecls<T>()); }
 
 	private:
 		Type(int);
 
 	protected:
-		string mName;
-		Type* mBase;
+		string m_name;
+		Type* m_base;
 
-		unique_ptr<ImprintStub> mImprintStub;
-		Imprint* mImprint;
-		Proto* mProto;
-		Indexer* mIndexer;
-		AbstractPool* mLibrary;
+		unique_ptr<Imprint> m_imprint;
 
-		static size_t sTypeId;
+		unique_ptr<Indexer> m_indexer;
 	};
+
+	/*class MK_OBJECT_EXPORT IdType : public Type
+	{
+	public:
+		IdType();
+
+		Indexer& indexer() { return *m_indexer; }
+
+	protected:
+		unique_ptr<Indexer> m_indexer;
+	};
+
+	*/
 }
 
 #endif // mkTYPE_INCLUDED

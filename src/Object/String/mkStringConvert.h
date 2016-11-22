@@ -148,8 +148,8 @@ namespace mk
 	template <class T>
 	struct StringConverter<unique_ptr<T>, false, false>
 	{
-		static inline void to(const unique_ptr<T>& val, string& str) { type_to_string(val.get(), str); }
-		static inline string to(const unique_ptr<T>& val) { string str; type_to_string(val.get(), str); return str; }
+		static inline void to(const unique_ptr<T>& val, string& str) { UNUSED(val); UNUSED(str); }
+		static inline string to(const unique_ptr<T>& val) { UNUSED(val); return ""; }
 
 		static inline void from(const string& str, unique_ptr<T>& vec) { UNUSED(str); UNUSED(vec); }
 		static inline unique_ptr<T> from(const string& str) { UNUSED(str); return unique_ptr<T>(); }

@@ -8,66 +8,77 @@
 /* mk */
 #include <Ui/mkUiForward.h>
 #include <Ui/Frame/mkInk.h>
+#include <Ui/Nano/mkNanoWindow.h>
+
+#ifdef KIUI_DRAW_CACHE
+#include <Ui/Nano/nanovg_cache/nanovg.h>
+#else
 #include <Ui/Nano/nanovg/nanovg.h>
+#endif
+
 
 namespace mk
 {
-	class NanoInk : public Inkbox
+	class NanoRenderer : public Renderer
 	{
 	public:
-		NanoInk(Frame& frame, NanoLayer& layer);
-		~NanoInk();
+		NanoRenderer(NanoWindow& window);
 
-		NVGcontext* ctx() { return mCtx; }
+		NVGcontext* ctx() { return m_window.ctx(); }
+		NanoAtlas& atlas() { return m_window.atlas(); }
 
-		void updateContent();
-		void updateFrame();
-		void updateStyle();
+#ifdef KIUI_DRAW_CACHE
+		void createCache(void*& cache, size_t size);
+		void drawCache(void* cache, float x, float y);
+		void destroyCache(void* cache);
 
-		void show();
-		void hide();
+		void beginUpdate(void* cache);
+		void endUpdate(void* cache);
+#else
+		void beginUpdate(float x, float y);
+		void endUpdate();
+#endif
 
-		float contentSize(Dimension dim);
-		size_t caretIndex(float x, float y);
-		void caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight);
+		void clipRect(BoxFloat& rect);
+		void unclipRect();
 
-		Image& fetchImage(Image& image, bool tile = false);
-		void drawImage(const Image& image, float x, float y, float w, float h);
-		void drawImageStretch(const Image& image, float x, float y, float w, float h, float xoff = 0.f, float yoff = 0.f, float xstretch = 1.f, float ystretch = 1.f);
-		void drawSkinImage(ImageSkin::Section section, float x, float y, float w, float h);
+		void clipFrame(BoxFloat& rect, BoxFloat& corners);
+		void clipShape();
+		void unclipShape();
 
-		void splitImageSkin(int image);
+		void pathBezier(float x1, float y1, float c1x, float c1y, float c2x, float c2y, float x2, float y2);
 
-		void setupText();
+		void pathRect(BoxFloat& rect, BoxFloat& corners, float border);
 
-		void drawImage();
-		void drawText();
-		void redrawImage();
-		void redrawText();
+		void drawShadow(BoxFloat& rect, BoxFloat& corner, Shadow& shadows);
+		void drawRect(BoxFloat& rect, BoxFloat& corners, InkStyle& skin);
+		void drawRectClipped(BoxFloat& rect, BoxFloat& corners, InkStyle& skin, BoxFloat& clipRect, BoxFloat& clipCorners);
+		void drawImage(const Image& image, BoxFloat& rect);
+		void drawImageStretch(const Image& image, BoxFloat& rect, float xstretch = 1.f, float ystretch = 1.f);
+		void drawText(float x, float y, const char* start, const char* end, InkStyle& skin);
 
-		static bool sDebugDraw;
-		static int sDebugBatch;
+		void fill(InkStyle& skin, BoxFloat& rect);
+		void stroke(InkStyle& skin);
+
+		void initImage(Image& image, bool tile);
+
+		float textSize(const string& text, Dimension dim, InkStyle& skin);
+
+		void fillText(const string& text, BoxFloat& paddedRect, InkStyle& skin, TextRow& row);
+		void breakText(const string& text, BoxFloat& paddedRect, InkStyle& skin, std::vector<TextRow>& textRows);
+		void breakTextLine(BoxFloat& paddedRect, TextRow& textRow);
 
 	private:
-		void drawImage(int image, float x, float y, float w, float h, float imgx, float imgy, float imgw, float imgh);
+		void setupText(InkStyle& skin);
 
-		void drawCache(NVGdisplayList* cache);
+
+		void drawImage(int image, BoxFloat& rect, BoxFloat& imageRect);
 
 	protected:
-		NVGcontext* mCtx;
-		NVGdisplayList* mImageCache;
-		NVGdisplayList* mTextCache;
-		NanoLayer& mLayer;
-		Image* mImage;
-		Image* mOverlay;
-		Image* mTile;
-		Image* mSkin;
-		bool mTextUpdate;
-		bool mImageUpdate;
-		bool mMoved;
-		std::vector<NVGtextRow> mTextRows;
+		NanoWindow& m_window;
+		NanoAtlas& m_atlas;
+		NVGcontext* m_ctx;
 	};
-
 }
 
 #endif

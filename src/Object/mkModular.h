@@ -18,36 +18,56 @@ namespace mk
 {
 	class MK_OBJECT_EXPORT Modular : public NonCopy
 	{
+	protected:
+		class Plug;
+
 	public:
-		Modular(Proto* proto);
+		Modular(Proto& proto);
 		~Modular();
 
-		Proto* proto() { return mProto; }
+		Proto& proto() { return m_proto; }
 
 		void addPart(Type& type, Part* part);
 		bool hasPart(Type& type);
-		Part* part(Type& type);
+		Part& part(Type& type);
 
 		void pushPlug(unique_ptr<Part> part, Type& type);
 		void removePlug(Type& type);
 		void removePlug(void* plug);
-		Part* plug(Type& type);
+		bool hasPlug(Type& type);
+		Part& plug(Type& type);
 
-		std::vector<Part*>& parts() { return mParts; }
+		std::vector<Part*>& parts() { return m_parts; }
+
+		std::vector<Plug>& plugs() { return m_plugs; }
 
 	public:
 		template <class T>
-		inline T* part() { return static_cast<T*>(part(T::cls())); }
+		inline bool is() { return hasPart(T::cls()); }
 
 		template <class T>
-		inline T* plug() { return static_cast<T*>(plug(T::cls())); }
+		inline T& part() { return static_cast<T&>(part(T::cls())); }
+
+		template <class T>
+		inline T& plug() { return static_cast<T&>(plug(T::cls())); }
 
 	protected:
-		Proto* mProto;
-		std::vector<Part*> mParts;
+		Proto& m_proto;
+		std::vector<Part*> m_parts;
 		
-		class Plug;
-		std::vector<Plug> mPlugs;
+		class Plug : public NonCopy
+		{
+		public:
+			Plug(unique_ptr<Part> p, Type& t) : part(std::move(p)), type(&t) {}
+			Plug(Plug&& other) : part(std::move(other.part)), type(other.type) {}
+
+			Plug& operator=(Plug&& other) { part = std::move(other.part); type = other.type; return *this; }
+
+			unique_ptr<Part> part;
+			Type* type;
+		};
+
+		std::vector<Plug> m_plugs;
 	};
 }
 

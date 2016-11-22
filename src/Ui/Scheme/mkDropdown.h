@@ -8,7 +8,6 @@
 /* mk */
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Widget/mkButton.h>
-#include <Ui/Form/mkForm.h>
 #include <Ui/Scheme/mkList.h>
 
 #include <functional>
@@ -20,19 +19,19 @@ namespace mk
 	public:
 		DropdownHeader(Dropdown& dropdown, bool input);
 
-		Style* hoverCursor() { return mInput ? &CaretCursor::cls() : nullptr; }
-		FilterInput* input() { return mInput; }
+		Style* hoverCursor() { return m_input ? &CaretCursor::cls() : nullptr; }
+		FilterInput* input() { return m_input; }
 
 		void click();
 
 		void onInput(string value);
-		void update(Widget* choice);
+		void updateContent(Widget& choice);
 
 		static StyleType& cls() { static StyleType ty("DropdownHeader", WrapButton::cls()); return ty; }
 
 	protected:
-		Dropdown& mDropdown;
-		FilterInput* mInput;
+		Dropdown& m_dropdown;
+		FilterInput* m_input;
 	};
 
 	class MK_UI_EXPORT DropdownToggle : public Button
@@ -45,7 +44,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("DropdownToggle", Button::cls()); return ty; }
 
 	protected:
-		Dropdown& mDropdown;
+		Dropdown& m_dropdown;
 	};
 
 	class MK_UI_EXPORT DropdownLabel : public Label
@@ -69,23 +68,24 @@ namespace mk
 	public:
 		DropdownList(Dropdown& dropdown);
 
-		bool leftClick(float x, float y);
+		void leftClick(MouseEvent& mouseEvent);
+		void rightClick(MouseEvent& mouseEvent);
 		
 		static StyleType& cls() { static StyleType ty("DropdownList", List::cls()); return ty; }
 
 	protected:
-		Dropdown& mDropdown;
+		Dropdown& m_dropdown;
 	};
 
 	class MK_UI_EXPORT Dropdown : public Sheet
 	{
 	public:
-		Dropdown(const Trigger& onSelected, StringVector choices = StringVector(), bool input = false);
+		Dropdown(const Trigger& onSelected, StringVector choices = StringVector(), bool input = false, StyleType& type = cls());
 		~Dropdown();
 
-		DropdownList& dropbox() { return mList; }
-		DropdownHeader& header() { return mHeader; }
-		bool down() { return mDown; }
+		DropdownList& dropbox() { return m_list; }
+		DropdownHeader& header() { return m_header; }
+		bool down() { return m_down; }
 
 		void dropdown(bool modal = true);
 		void dropup();
@@ -93,17 +93,18 @@ namespace mk
 		Widget& vappend(std::unique_ptr<Widget> widget);
 		unique_ptr<Widget> vrelease(Widget& widget);
 
+		void select(WrapButton& selected);
 		void selected(WrapButton& selected);
 
 		static StyleType& cls() { static StyleType ty("Dropdown", Sheet::cls()); return ty; }
 
 	protected:
-		Trigger mOnSelected;
-		DropdownList& mList;
-		DropdownHeader& mHeader;
-		DropdownToggle& mToggle;
-		WrapButton* mSelected;
-		bool mDown;
+		Trigger m_onSelected;
+		DropdownList& m_list;
+		DropdownHeader& m_header;
+		DropdownToggle& m_toggle;
+		WrapButton* m_selected;
+		bool m_down;
 	};
 
 	class MK_UI_EXPORT Typedown : public Dropdown
@@ -119,12 +120,12 @@ namespace mk
 	public:
 		MenuList(Menu& menu);
 
-		bool leftClick(float x, float y);
+		void leftClick(MouseEvent& mouseEvent);
 
 		static StyleType& cls() { static StyleType ty("MenuList", List::cls()); return ty; }
 
 	protected:
-		Menu& mMenu;
+		Menu& m_menu;
 	};
 
 	class MK_UI_EXPORT SubMenuList : public Object
@@ -144,13 +145,15 @@ namespace mk
 		Widget& vappend(std::unique_ptr<Widget> widget);
 		unique_ptr<Widget> vrelease(Widget& widget);
 
+		void selected(WrapButton& selected);
+
 		static StyleType& cls() { static StyleType ty("Menu", Dropdown::cls()); return ty; }
 
 	protected:
-		bool mSubmenu;
-		Button& mButton;
-		MenuList& mList;
-		bool mDown;
+		bool m_submenu;
+		Button& m_button;
+		MenuList& m_list;
+		bool m_down;
 	};
 }
 

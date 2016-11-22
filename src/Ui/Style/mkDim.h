@@ -105,7 +105,7 @@ namespace mk
 
 	enum _I_ Weight : unsigned int
 	{
-		NONE = 0,
+		NOWEIGHT = 0,
 		LIST = 1,
 		TABLE = 2
 	};
@@ -165,12 +165,29 @@ namespace mk
 		_A_ _M_ float x1() const { return d_values[2]; }
 		_A_ _M_ float y1() const { return d_values[3]; }
 
+		_A_ float x() const { return d_values[0]; }
+		_A_ float y() const { return d_values[1]; }
+		_A_ float w() const { return d_values[2]; }
+		_A_ float h() const { return d_values[3]; }
+
+		_A_ float xx() const { return d_values[0]; }
+		_A_ float xy() const { return d_values[1]; }
+		_A_ float yx() const { return d_values[2]; }
+		_A_ float yy() const { return d_values[3]; }
+
+		_A_ float v0() const { return d_values[0]; }
+		_A_ float v1() const { return d_values[1]; }
+		_A_ float v2() const { return d_values[2]; }
+		_A_ float v3() const { return d_values[3]; }
+
+		void clear() { this->assign(0.f); d_null = true; }
+
 		bool uniform() const { return d_uniform; }
 		bool null() const { return d_null; }
 		bool cnull() const { return (d_values[0] == 0.f && d_values[1] == 0.f && d_values[2] == 0.f && d_values[3] == 0.f); }
 
-		void assign(float x0, float y0, float x1, float y1) { d_values[0] = x0; d_values[1] = y0; d_values[2] = x1; d_values[3] = y1; }
-		void assign(float val) { d_values[0] = val; d_values[1] = val; d_values[2] = val; d_values[3] = val; }
+		void assign(float x0, float y0, float x1, float y1) { d_values[0] = x0; d_values[1] = y0; d_values[2] = x1; d_values[3] = y1; d_null = cnull(); }
+		void assign(float val) { d_values[0] = val; d_values[1] = val; d_values[2] = val; d_values[3] = val; d_null = cnull(); }
 
 		void setX0(float x0) { d_values[0] = x0; d_null = cnull(); }
 		void setY0(float y0) { d_values[1] = y0; d_null = cnull(); }

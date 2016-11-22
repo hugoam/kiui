@@ -8,153 +8,126 @@
 #include <Ui/Widget/mkButton.h>
 
 #include <dirent.h>
-#include <sys/stat.h>
 
 #include <iostream>
 
 namespace mk
 {
 	Dir::Dir(const string& name)
-		: WrapButton(nullptr)
-		, mName(name)
+		: WrapButton(nullptr, Trigger(), cls())
+		, m_name(name)
 	{
-		mStyle = &cls();
 		this->makeappend<Icon>("folder_20");
-		this->makeappend<Label>(mName);
+		this->makeappend<Label>(m_name);
 	}
 
 	void Dir::trigger()
 	{
-		if(mName == ".")
+		if(m_name == ".")
 			return;
-		if(mName == "..")
-			mParent->as<Directory>().moveOut();
+		if(m_name == "..")
+			m_parent->as<Directory>().moveOut();
 		else
-			mParent->as<Directory>().moveIn(mName);
+			m_parent->as<Directory>().moveIn(m_name);
 			
 	}
 
 	File::File(const string& name)
-		: WrapButton(nullptr)
-		, mName(name)
+		: WrapButton(nullptr, Trigger(), cls())
+		, m_name(name)
 	{
-		mStyle = &cls();
 		this->makeappend<Icon>("file_20");
-		this->makeappend<Label>(mName);
+		this->makeappend<Label>(m_name);
 	}
 
 	void File::trigger()
 	{}
 
 	Directory::Directory(const string& path)
-		: ScrollSheet()
-		, mPath(path)
+		: ScrollSheet(cls())
+		, m_path(path)
 	{
-		mStyle = &cls();
 		this->update();
 	}
 
 	void Directory::update()
 	{
-		DIR* dir = opendir(mPath.c_str());
+		DIR* dir = opendir(m_path.c_str());
 		dirent* ent;
-		string fullpath;
-		struct stat buf;
 
-		while((ent = readdir(dir)) != NULL) {
-			fullpath = mPath + "/" + ent->d_name;
-			stat(fullpath.c_str(), &buf);
-			if ((buf.st_mode & S_IFDIR) == S_IFDIR && string(ent->d_name) != ".")
+		while((ent = readdir(dir)) != NULL)
+			if(ent->d_type & DT_DIR && string(ent->d_name) != ".")
 				this->emplace<Dir>(ent->d_name);
-		}
 
 		rewinddir(dir);
 
-		while((ent = readdir(dir)) != NULL) {
-			fullpath = mPath + "/" + ent->d_name;
-			stat(fullpath.c_str(), &buf);
-			if ((buf.st_mode & S_IFREG) == S_IFREG)
+		while((ent = readdir(dir)) != NULL)
+			if(ent->d_type & DT_REG)
 				this->emplace<File>(ent->d_name);
-		}
 
 		closedir(dir);
 	}
 
 	void Directory::setLocation(const string& path)
 	{
-		mPath = path;
+		m_path = path;
 		this->clear();
 		this->update();
 	}
 
 	void Directory::moveIn(const string& subdir)
 	{
-		this->setLocation(mPath + "/" + subdir);
+		this->setLocation(m_path + "/" + subdir);
 	}
 
 	void Directory::moveOut()
 	{
-		size_t pos = mPath.rfind("/");
-		this->setLocation(mPath.substr(0, pos));
+		size_t pos = m_path.rfind("/");
+		this->setLocation(m_path.substr(0, pos));
 	}
 
 	FileBrowser::FileBrowser(const string& path)
-		: Sheet()
-		, mPath(path)
-		, mDirectory(this->makeappend<Directory>(mPath))
-	{
-		mStyle = &cls();
-	}
+		: Sheet(cls())
+		, m_path(path)
+		, m_directory(this->makeappend<Directory>(m_path))
+	{}
 
 	FileNode::FileNode(const string& name)
-		: TreeNode("file_20", name, true)
-	{
-		mStyle = &cls();
-	}
+		: TreeNode("file_20", name, true, cls())
+	{}
 
 	DirectoryNode::DirectoryNode(const string& path, const string& name, bool collapsed)
-		: TreeNode("folder_20", name, collapsed)
-		, mPath(path)
-	{
-		mStyle = &cls();
-		mType = &cls();
-	}
+		: TreeNode("folder_20", name, collapsed, cls())
+		, m_path(path)
+	{}
 
 	void DirectoryNode::expand()
 	{
 		Expandbox::expand();
 
-		for(auto& pt : mContainer->contents())
+		for(auto& pt : m_container->contents())
 			if(&pt->type() == &DirectoryNode::cls())
 				pt->as<DirectoryNode>().update();
 	}
 
 	void DirectoryNode::update()
 	{
-		DIR* dir = opendir(mPath.c_str());
+		DIR* dir = opendir(m_path.c_str());
 		dirent* ent;
-		string fullpath;
-		struct stat buf;
 
-		while((ent = readdir(dir)) != NULL) {
-			fullpath = mPath + "/" + ent->d_name;
-			stat(fullpath.c_str(), &buf);
-			if((buf.st_mode & S_IFDIR) == S_IFDIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
+		while((ent = readdir(dir)) != NULL)
+			if(ent->d_type & DT_DIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
 			{
-				DirectoryNode& node = this->emplace<DirectoryNode>(mPath + "/" + ent->d_name, ent->d_name, true);
-				if(!mCollapsed)
+				DirectoryNode& node = this->emplace<DirectoryNode>(m_path + "/" + ent->d_name, ent->d_name, true);
+				if(!m_collapsed)
 					node.update();
 			}
-		}
 
 		rewinddir(dir);
 
-		while ((ent = readdir(dir)) != NULL) {
-			fullpath = mPath + "/" + ent->d_name;
-			stat(fullpath.c_str(), &buf);
-			if ((buf.st_mode & S_IFREG) == S_IFREG)
-				this->emplace < FileNode > (ent->d_name);
-		}
+		while((ent = readdir(dir)) != NULL)
+			if(ent->d_type & DT_REG)
+				this->emplace<FileNode>(ent->d_name);
 
 		closedir(dir);
 	}

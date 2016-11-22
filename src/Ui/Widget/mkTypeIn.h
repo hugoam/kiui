@@ -8,7 +8,6 @@
 /* mk */
 #include <Ui/mkUiForward.h>
 #include <Ui/Widget/mkSheet.h>
-#include <Ui/Controller/mkController.h>
 #include <Ui/Widget/mkCheckbox.h>
 #include <Ui/Widget/mkValue.h>
 
@@ -16,39 +15,19 @@
 
 namespace mk
 {
-	template <class T, class T_Val = T>
-	class WTypedInput : public WValue
-	{
-	public:
-		WTypedInput(Lref& value, std::function<void(T_Val)> callback = nullptr)
-			: WValue(value)
-			, mOnUpdate(callback)
-		{}
-
-		WTypedInput(T value, std::function<void(T_Val)> callback = nullptr)
-			: WValue(lref(value))
-			, mOnUpdate(callback)
-		{}
-
-		void notifyModify() { if(mOnUpdate) mOnUpdate(mValue->get<T>()); }
-
-	protected:
-		std::function<void(T_Val)> mOnUpdate;
-	};
-
-	class MK_UI_EXPORT _I_ TextSelection : public Widget
+	/*class MK_UI_EXPORT _I_ TextSelection : public Widget
 	{
 	public:
 		TextSelection();
-	};
+	};*/
 
 	class MK_UI_EXPORT _I_ TypeIn : public Sheet
 	{
 	public:
-		TypeIn(WValue* input, const string& text = "");
+		TypeIn(WValue* input, const string& text = "", StyleType& type = cls());
 
 		Style* hoverCursor() { return &CaretCursor::cls(); }
-		const string& label() { return mString; }
+		const string& label() { return m_string; }
 		
 		void nextFrame(size_t tick, size_t delta);
 
@@ -61,81 +40,81 @@ namespace mk
 		void insert(char c);
 		void updateString();
 
-		bool leftClick(float xPos, float yPos);
-		bool keyDown(KeyCode code, char c);
+		void leftClick(MouseEvent& mouseEvent);
+		bool keyDown(KeyEvent keyEvent);
 
-		bool leftDragStart(float xPos, float yPos);
-		bool leftDrag(float xPos, float yPos, float xDif, float yDif);
-		bool leftDragEnd(float xPos, float yPos);
+		void leftDragStart(MouseEvent& mouseEvent);
+		void leftDrag(MouseEvent& mouseEvent);
+		void leftDragEnd(MouseEvent& mouseEvent);
+
+		void setCaret(size_t index);
 
 		static StyleType& cls() { static StyleType ty("TypeIn", Sheet::cls()); return ty; }
 
 	protected:
-		WValue* mInput;
-		string mString;
-		bool mHasPeriod;
-		string mAllowedChars;
-		Caret& mCaret;
-		std::vector<TextSelection*> mSelection;
+		WValue* m_input;
+		string m_string;
+		bool m_hasPeriod;
+		string m_allowedChars;
+		Caret& m_caret;
+		//std::vector<TextSelection*> m_selection;
 	};
 
 	template <class T>
-	class NumberInput : public WTypedInput<AutoStat<T>, T>
+	class NumberInput : public WValue
 	{
 	public:
 		NumberInput(Lref& lref, std::function<void(T)> callback = nullptr)
-			: WTypedInput<AutoStat<T>, T>(lref, callback)
-			, mStat(this->mValue->template ref<AutoStat<T>>())
-			, mTypeIn(this->template makeappend<TypeIn>(this))
-			, mPlus(this->template makeappend<Button>("+", std::bind(&NumberInput<T>::increment, this)))
-			, mMinus(this->template makeappend<Button>("-", std::bind(&NumberInput<T>::decrement, this)))
+			: WValue(lref, this->cls(), [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); })
+			, m_stat(this->m_value->template ref<AutoStat<T>>())
+			, m_typeIn(this->template makeappend<TypeIn>(this))
+			, m_plus(this->template makeappend<Button>("+", std::bind(&NumberInput<T>::increment, this)))
+			, m_minus(this->template makeappend<Button>("-", std::bind(&NumberInput<T>::decrement, this)))
 		{
-			this->mStyle = &cls();
 			this->build();
 		}
 
 		NumberInput(AutoStat<T> value, std::function<void(T)> callback = nullptr)
-			: WTypedInput<AutoStat<T>, T>(value, callback)
-			, mStat(this->mValue->template ref<AutoStat<T>>())
-			, mTypeIn(this->template makeappend<TypeIn>(this))
-			, mPlus(this->template makeappend<Button>("+", std::bind(&NumberInput<T>::increment, this)))
-			, mMinus(this->template makeappend<Button>("-", std::bind(&NumberInput<T>::decrement, this)))
+			: WValue(lref(value), this->cls(), [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); })
+			, m_stat(this->m_value->template ref<AutoStat<T>>())
+			, m_typeIn(this->template makeappend<TypeIn>(this))
+			, m_plus(this->template makeappend<Button>("+", std::bind(&NumberInput<T>::increment, this)))
+			, m_minus(this->template makeappend<Button>("-", std::bind(&NumberInput<T>::decrement, this)))
 		{
-			this->mStyle = &cls();
 			this->build();
 		}
 
 		void build()
 		{
 			if(&typecls<T>() == &typecls<float>() || &typecls<T>() == &typecls<double>())
-				mTypeIn.setAllowedChars("1234567890.");
+				m_typeIn.setAllowedChars("1234567890.");
 			else
-				mTypeIn.setAllowedChars("1234567890");
+				m_typeIn.setAllowedChars("1234567890");
 		}
 
 		void increment()
 		{
-			mStat.increment();
-			mTypeIn.updateString();
+			m_stat.increment();
+			m_typeIn.updateString();
 			this->triggerModify();
 		}
 
 		void decrement()
 		{
-			mStat.decrement();
-			mTypeIn.updateString();
+			m_stat.decrement();
+			m_typeIn.updateString();
 			this->triggerModify();
 		}
 
-		void notifyUpdate() { mTypeIn.updateString(); }
+		void notifyUpdate() { m_typeIn.updateString(); }
 
 		static StyleType& cls() { static StyleType ty("NumberInput<" + typecls<T>().name() + ">", WValue::cls()); return ty; }
 
 	protected:
-		AutoStat<T>& mStat;
-		TypeIn& mTypeIn;
-		Button& mPlus;
-		Button& mMinus;
+		AutoStat<T>& m_stat;
+		TypeIn& m_typeIn;
+		Button& m_plus;
+		Button& m_minus;
 	};
 
 	template <class T>
@@ -143,91 +122,76 @@ namespace mk
 	{};
 
 	template <>
+	class MK_UI_EXPORT _I_ Input<unsigned int> : public NumberInput<unsigned int>
+	{
+	public:
+		using NumberInput<unsigned int>::NumberInput;
+	};
+
+	template <>
 	class MK_UI_EXPORT _I_ Input<int> : public NumberInput<int>
 	{
 	public:
-		Input(Lref& value, std::function<void(int)> callback = nullptr)
-			: NumberInput<int>(value, callback)
-		{}
-
-		Input(AutoStat<int> value, std::function<void(int)> callback = nullptr)
-			: NumberInput<int>(value, callback)
-		{}
+		using NumberInput<int>::NumberInput;
 	};
 
 	template <>
 	class MK_UI_EXPORT _I_ Input<float> : public NumberInput<float>
 	{
 	public:
-		Input(Lref& value, std::function<void(float)> callback = nullptr)
-			: NumberInput<float>(value, callback)
-		{}
-
-		Input(AutoStat<float> value, std::function<void(float)> callback = nullptr)
-			: NumberInput<float>(value, callback)
-		{}
+		using NumberInput<float>::NumberInput;
 	};
 
 	template <>
 	class MK_UI_EXPORT _I_ Input<double> : public NumberInput<double>
 	{
 	public:
-		Input(Lref& value, std::function<void(double)> callback = nullptr)
-			: NumberInput<double>(value, callback)
-		{}
-
-		Input(AutoStat<double> value, std::function<void(double)> callback = nullptr)
-			: NumberInput<double>(value, callback)
-		{}
+		using NumberInput<double>::NumberInput;
 	};
 
 	template <>
-	class MK_UI_EXPORT _I_ Input<bool> : public WTypedInput<bool>
+	class MK_UI_EXPORT _I_ Input<bool> : public WValue
 	{
 	public:
 		Input(Lref& value, std::function<void(bool)> callback = nullptr)
-			: WTypedInput<bool>(value, callback)
-			, mCheckbox(this->makeappend<Checkbox>(this, mValue->get<bool>()))
-		{
-			this->mStyle = &cls();
-		}
+			: WValue(value, this->cls(), [callback](Lref& lref) { callback(lref->get<bool>()); })
+			, m_checkbox(this->makeappend<Checkbox>(this, m_value->get<bool>()))
+		{}
 
 		Input(bool value, std::function<void(bool)> callback = nullptr)
-			: WTypedInput<bool>(value, callback)
-			, mCheckbox(this->makeappend<Checkbox>(this, mValue->get<bool>()))
-		{
-			this->mStyle = &cls();
-		}
+			: WValue(lref(value), this->cls(), [callback](Lref& lref) { callback(lref->get<bool>()); })
+			, m_checkbox(this->makeappend<Checkbox>(this, m_value->get<bool>()))
+		{}
 
-		void notifyUpdate() { mCheckbox.update(mValue->get<bool>()); }
+		void notifyUpdate() { m_checkbox.update(m_value->get<bool>()); }
 
 		static StyleType& cls() { static StyleType ty("Input<bool>", WValue::cls()); return ty; }
 
 	protected:
-		Checkbox& mCheckbox;
+		Checkbox& m_checkbox;
 	};
 
 	template <>
-	class MK_UI_EXPORT _I_ Input<string> : public WTypedInput<string>
+	class MK_UI_EXPORT _I_ Input<string> : public WValue
 	{
 	public:
 		Input(Lref& value, std::function<void(string)> callback = nullptr)
-			: WTypedInput<string>(value, callback)
-			, mTypeIn(this->makeappend<TypeIn>(this))
+			: WValue(value, this->cls(), [callback](Lref& lref) { callback(lref->get<string>()); })
+			, m_typeIn(this->makeappend<TypeIn>(this))
 		{}
 
 		Input(const string& value, std::function<void(string)> callback = nullptr)
-			: WTypedInput<string>(value, callback)
-			, mTypeIn(this->makeappend<TypeIn>(this))
+			: WValue(lref(value), this->cls(), [callback](Lref& lref) { callback(lref->get<string>()); })
+			, m_typeIn(this->makeappend<TypeIn>(this))
 		{}
 
-		TypeIn& typeIn() { return mTypeIn; }
+		TypeIn& typeIn() { return m_typeIn; }
 
-		void notifyUpdate() { mTypeIn.updateString(); }
-		void notifyModify() { if(this->mOnUpdate) this->mOnUpdate(this->mValue->get<string>()); }
+		void notifyUpdate() { m_typeIn.updateString(); }
+		//void notifyModify() { if(this->m_onUpdate) this->m_onUpdate(this->m_value->get<string>()); }
 
 	protected:
-		TypeIn& mTypeIn;
+		TypeIn& m_typeIn;
 	};
 }
 

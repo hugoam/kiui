@@ -14,10 +14,21 @@ namespace mk
 	class MK_UI_EXPORT ContextMenu : public Sheet
 	{
 	public:
-		ContextMenu();
+		ContextMenu(Trigger onClose);
 		~ContextMenu();
 
+		virtual void bind(Sheet& parent, size_t index);
+
+		void clear();
+
+		virtual void leftClick(MouseEvent& mouseEvent);
+		virtual void rightClick(MouseEvent& mouseEvent);
+		virtual void middleClick(MouseEvent& mouseEvent);
+
 		static StyleType& cls() { static StyleType ty("ContextMenu", Sheet::cls()); return ty; }
+
+	protected:
+		Trigger m_onClose;
 	};
 }
 

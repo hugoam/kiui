@@ -46,7 +46,7 @@ namespace mk
 		inline size_t index() { return d_index; }
 		inline bool flow() { return d_flow; }
 
-		inline Inkbox& inkbox() { return *d_inkbox.get(); }
+		inline Inkbox& inkbox() { return *d_inkbox; }
 		inline Style& style() { return *d_style; }
 		inline InkStyle& inkstyle() { return *d_inkstyle; }
 
@@ -138,16 +138,6 @@ namespace mk
 
 		inline float width() { return dsize(DIM_X); }
 		inline float height() { return dsize(DIM_Y); }
-
-		inline float cleft() { return floor(dclippos(DIM_X) + d_inkstyle->margin().x0()); }
-		inline float ctop() { return floor(dclippos(DIM_Y) + d_inkstyle->margin().y0()); }
-		inline float cwidth() { return floor(dclipsize(DIM_X) - d_inkstyle->margin().x0() - d_inkstyle->margin().x1()); }
-		inline float cheight() { return floor(dclipsize(DIM_Y) - d_inkstyle->margin().y0() - d_inkstyle->margin().y1()); }
-
-		inline float pleft() { return d_inkstyle->padding().x0(); }
-		inline float ptop() { return d_inkstyle->padding().y0(); }
-		inline float pwidth() { return width() - d_inkstyle->padding().x0() - d_inkstyle->padding().x1(); }
-		inline float pheight() { return height() - d_inkstyle->padding().y0() - d_inkstyle->padding().y1(); }
 
 		inline float dextent(Dimension dim) { return dsize(dim) + dmargin(dim) * 2.f; }
 		inline float doffset(Dimension dim) { return dposition(dim) + dextent(dim); }

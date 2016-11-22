@@ -9,7 +9,7 @@
 #include <Object/String/mkStringConvert.h>
 #include <Object/Util/mkStatString.h>
 
-#include <Ui/Form/mkWidgets.h>
+#include <Ui/Widget/mkWidgets.h>
 
 #include <Ui/Widget/mkTypeIn.h>
 
@@ -18,7 +18,7 @@ using namespace std::placeholders;
 namespace mk
 {
 	InputRadio::InputRadio(const string& label, StringVector choices, std::function<void(const string&)> callback, bool reverse)
-		: Sequence()
+		: Band()
 	{
 		if(!reverse) this->makeappend<Label>(label);
 		this->makeappend<RadioSwitch>([callback](Widget& widget) { if(callback) callback(widget.label()); }, 0, choices);
@@ -26,7 +26,7 @@ namespace mk
 	}
 
 	InputDropdown::InputDropdown(const string& label, StringVector choices, std::function<void(const string&)> callback, bool textinput, bool reverse)
-		: Sequence()
+		: Band()
 	{
 		if(!reverse) this->makeappend<Label>(label);
 		if(textinput)
@@ -36,34 +36,19 @@ namespace mk
 		if(reverse) this->makeappend<Label>(label);
 	}
 
-	//unique_ptr<Form> dispatchStoreForm(Form* member, Lref& lref, Stock* store) { return make_unique<FStore>(member, member->as<FMember>()->dmember()); }
+	template <class T_Val, class T_Widget>
+	unique_ptr<WValue> valueWidget(Lref& parent, Lref& lref, T_Val val) { UNUSED(parent); UNUSED(val); return make_unique<T_Widget>(lref); }
 
 	template <class T_Val, class T_Widget>
-	WValue& valueWidget(Sheet* parent, Lref& lref, T_Val val) { UNUSED(val); return parent->emplace<T_Widget>(lref); }
+	unique_ptr<WValue> statValueWidget(Lref& parent, Lref& valref, T_Val& val) { UNUSED(parent); UNUSED(valref); return make_unique<T_Widget>(AutoStat<T_Val>(val, StatDef<T_Val>())); }
 
-	template <class T_Val, class T_Widget>
-	WValue& statValueWidget(Sheet* parent, Lref& valref, T_Val val)
-	{
-		/*if(parent->hasAttr("stat"))
-		{
-			AutoStat<typename BareType<T_Val>::type> stat(val, parent->getAttr("stat")->get<StatDef<typename BareType<T_Val>::type>>());
-			return parent->makeappend<FStat<typename BareType<T_Val>::type>>(stat);
-		}
-		else
-		{*/
-			return valueWidget<T_Val, T_Widget>(parent, valref, val);
-		//}
-	}
+	template class Dispatch<DispatchInput, bool&, valueWidget<bool&, Input<bool>>>;
+	template class Dispatch<DispatchInput, unsigned int&, statValueWidget<unsigned int, Input<unsigned int>>>;
+	template class Dispatch<DispatchInput, int&, statValueWidget<int, Input<int>>>;
+	template class Dispatch<DispatchInput, float&, statValueWidget<float, Input<float>>>;
+	template class Dispatch<DispatchInput, double&, statValueWidget<double, Input<double>>>;
+	template class Dispatch<DispatchInput, string&, valueWidget<string&, Input<string>>>;
 
-	//template class Dispatch<ObjectForm, Stock*, dispatchStoreForm>;
-
-	template class Dispatch<ValueWidget, bool&, valueWidget<bool&, Input<bool>>>;
-	template class Dispatch<ValueWidget, unsigned int&, valueWidget<unsigned int&, Input<int>>>;
-	template class Dispatch<ValueWidget, int&, statValueWidget<int&, Input<int>>>;
-	template class Dispatch<ValueWidget, float&, statValueWidget<float&, Input<float>>>;
-	template class Dispatch<ValueWidget, double&, valueWidget<double&, Input<double>>>;
-	template class Dispatch<ValueWidget, string&, valueWidget<string&, Input<string>>>;
-
-	template class Dispatch<ValueWidget, AutoStat<int>&, valueWidget<AutoStat<int>&, StatSlider<float>>>;
-	template class Dispatch<ValueWidget, AutoStat<float>&, valueWidget<AutoStat<float>&, StatSlider<float>>>;
+	template class Dispatch<DispatchInput, AutoStat<int>&, valueWidget<AutoStat<int>&, StatSlider<float>>>;
+	template class Dispatch<DispatchInput, AutoStat<float>&, valueWidget<AutoStat<float>&, StatSlider<float>>>;
 }
