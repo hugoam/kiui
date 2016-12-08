@@ -23,14 +23,14 @@ namespace mk
 
 	Type::Type(TypeKind kind, const string& name)
 		: IdObject(Type::cls())
-		, m_name()
+		, m_name(name)
 		, m_base(nullptr)
 		, m_imprint(make_unique<Imprint>(*this))
 		, m_indexer(kind == INDEXED ? make_unique<Indexer>(*this) : nullptr)
 	{}
 
 	Type::Type(Type& base, TypeKind kind, const string& name)
-		: Type()
+		: Type(kind, name)
 	{
 		m_base = &base;
 		m_indexer.reset(base.m_indexer.get());

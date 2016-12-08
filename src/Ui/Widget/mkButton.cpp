@@ -7,9 +7,10 @@
 
 #include <Ui/Widget/mkWidgets.h>
 
-#include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
+
+#include <Ui/Frame/mkCaption.h>
 
 #include <Ui/mkUiWindow.h>
 
@@ -17,13 +18,8 @@ namespace mk
 {
 	Label::Label(const string& label, StyleType& type, FrameType frameType)
 		: Widget(type, frameType)
-		, m_label(label)
-	{}
-
-	void Label::setLabel(const string& label)
 	{
-		m_label = label;
-		m_frame->setDirty(Frame::DIRTY_WIDGET);
+		this->setLabel(label);
 	}
 
 	Title::Title(const string& label)
@@ -32,24 +28,20 @@ namespace mk
 
 	Icon::Icon(Image& image)
 		: Widget(cls())
-		, m_image(image)
-	{}
+	{
+		this->setImage(&image);
+	}
 
 	Icon::Icon(const string& image)
 		: Icon(findImage(image))
 	{}
 
-	/*void Icon::setImage(const string& image)
-	{
-		m_image = image;
-		m_frame->setDirty(Frame::DIRTY_WIDGET);
-	}*/
-
 	Button::Button(const string& label, const Trigger& trigger, StyleType& type)
 		: Control(type)
 		, WidgetTrigger(trigger)
-		, m_label(label)
-	{}
+	{
+		m_frame->setText(label);
+	}
 
 	void Button::leftClick(MouseEvent& mouseEvent)
 	{
@@ -70,8 +62,9 @@ namespace mk
 
 	ImgButton::ImgButton(Image& image, const Trigger& trigger, StyleType& type)
 		: Button("", trigger, type)
-		, m_image(image)
-	{}
+	{
+		this->setImage(&image);
+	}
 
 	ImgButton::ImgButton(const string& image, const Trigger& trigger, StyleType& type)
 		: ImgButton(findImage(image), trigger, type)

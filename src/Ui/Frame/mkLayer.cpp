@@ -8,22 +8,21 @@
 
 #include <Object/Iterable/mkReverse.h>
 
-#include <Ui/Frame/mkInk.h>
-
 #include <Ui/Widget/mkWidget.h>
 
 #include <iostream>
+#include <algorithm>
 
 namespace mk
 {
-	Layer::Layer(Widget& widget, size_t zorder, InkTarget* target)
+	Layer::Layer(Widget& widget, int zorder)
 		: Stripe(widget)
 		, d_index(0)
-		, d_next(1)
 		, d_z(zorder)
 		, d_numLayers(0)
-		, d_target(target)
 		, d_parentLayer(nullptr)
+		, d_redraw(true)
+		, d_redrawNext(true)
 	{}
 
 	Layer::~Layer()
@@ -32,11 +31,18 @@ namespace mk
 			this->unbind();
 	}
 
+	MasterLayer& Layer::rootLayer()
+	{
+		Layer* layer = this;
+		while(layer->d_parentLayer)
+			layer = layer->d_parentLayer;
+		return layer->as<MasterLayer>();
+	}
+
+
 	void Layer::bind()
 	{
 		this->updateStyle();
-		d_inkLayer = make_unique<InkLayer>(*this, *d_target, d_index);
-		d_inkbox = make_unique<Inkbox>(*this);
 	}
 
 	void Layer::bind(Stripe* parent)
@@ -44,19 +50,10 @@ namespace mk
 		d_parentLayer = &parent->layer();
 		d_parentLayer->add(*this);
 
-		bool migrate = bool(d_inkLayer);
-
-		unique_ptr<InkLayer> oldLayer = std::move(d_inkLayer);
-
-		if(d_target)
-			d_inkLayer = make_unique<InkLayer>(*this, *d_target, d_z ? d_z : d_index);
-		else
-			d_inkLayer = make_unique<InkLayer>(*this, d_parentLayer->inkLayer().target(), d_z ? d_z : d_index);
+		MasterLayer& rootLayer = this->rootLayer();
+		rootLayer.add(*this);
 
 		Frame::bind(parent);
-
-		if(migrate)
-			this->migrate(*this);
 	}
 
 	void Layer::unbind()
@@ -69,9 +66,25 @@ namespace mk
 		}
 	}
 
+
+	void Layer::updateOnce()
+	{
+		Stripe::updateOnce();
+
+		if(d_redrawNext)
+		{
+			d_redraw = true;
+			d_redrawNext = false;
+		}
+		else
+		{
+			d_redraw = false;
+		}
+	}
+
 	void Layer::add(Layer& layer)
 	{
-		d_layers.insert(d_layers.begin() + d_numLayers, &layer);
+		d_sublayers.insert(d_sublayers.begin() + d_numLayers, &layer);
 
 		if(layer.z() == 0)
 		{
@@ -82,21 +95,15 @@ namespace mk
 
 	void Layer::remove(Layer& layer)
 	{
-		d_layers.erase(std::remove(d_layers.begin(), d_layers.end(), &layer), d_layers.end());
+		d_sublayers.erase(std::remove(d_sublayers.begin(), d_sublayers.end(), &layer), d_sublayers.end());
 
 		if(layer.z() == 0)
 			--d_numLayers;
 	}
 
-	void Layer::reorder()
-	{
-		this->reorder(0, d_index, d_next);
-	}
-
 	size_t Layer::reorder(size_t pos, size_t cursor, size_t next)
 	{
 		d_index = cursor;
-		d_next = next;
 
 #if 0 // DEBUG
 		Layer* parent = d_parentLayer;
@@ -106,30 +113,25 @@ namespace mk
 			parent = parent->d_parentLayer;
 		}
 
-		printf("Layer :: reorder index %u\n", d_index);
+		printf("Layer :: %s reorder index %u\n", d_widget.style().name().c_str(), d_index);
 #endif
-
-		if(d_inkLayer)
-			d_inkLayer->setIndex(pos, d_index);
 
 		cursor = next;
 		next = next + d_numLayers;
 
-		for(size_t i = 0; i < d_numLayers; ++i)
+		size_t i = 0;
+		for(; i < d_numLayers; ++i)
 		{
-			next += d_layers[i]->reorder(i, cursor, next);
+			next = d_sublayers[i]->reorder(i, cursor, next);
 			cursor += 1;
 		}
 
-		return next - cursor;
-	}
+		for(; i < d_sublayers.size(); ++i)
+		{
+			d_sublayers[i]->d_index = i;
+		}
 
-	void Layer::nextFrame(size_t tick, size_t delta)
-	{
-		if(d_dirty >= DIRTY_VISIBILITY)
-			d_visible ? d_inkLayer->show() : d_inkLayer->hide();
-
-		Stripe::nextFrame(tick, delta);
+		return next;
 	}
 
 	void Layer::moveToTop()
@@ -137,9 +139,9 @@ namespace mk
 		if(!d_parentLayer)
 			return;
 
-		//Stripe* parent = d_parent;
-		//d_parent->remove(*this);
-		//parent->insert(*this, parent->contents().size());
+		/*Stripe* parent = d_parent;
+		d_parent->remove(*this);
+		parent->append(*this);*/
 
 		d_parentLayer->remove(*this);
 		d_parentLayer->add(*this);
@@ -147,20 +149,47 @@ namespace mk
 
 	Frame* Layer::pinpoint(float x, float y, bool opaque)
 	{
+		/*
+		This is apparently useless since the order of the layers should be the same as the order of the contents of the stripe
+		and Stripe contains the exact same code
+		*/
 		Frame* result = nullptr;
-		for(Layer* layer : reverse_adapt(d_layers))
+		for(Layer* layer : reverse_adapt(d_sublayers))
 			if(layer->visible() && layer->frameType() != LAYER3D)
 			{
 				result = layer->pinpoint(x, y, opaque);
 				if(result)
 					return result;
 			}
+		
 
 		result = Stripe::pinpoint(x, y, opaque);
 		return result;
 	}
 
-	Layer3D::Layer3D(Widget& widget, size_t zorder, InkTarget* target)
-		: Layer(widget, zorder, target)
+	MasterLayer::MasterLayer(Widget& widget)
+		: Layer(widget, 0)
+	{}
+
+	void MasterLayer::add(Layer& layer)
+	{
+		d_layers.push_back(&layer);
+	}
+
+	void MasterLayer::remove(Layer& layer)
+	{
+
+	}
+
+	void MasterLayer::reorder()
+	{
+		Layer::reorder(0, d_index, 1);
+
+		auto goesBefore = [](Layer* a, Layer* b) { return a->index() < b->index(); };
+		std::sort(d_layers.begin(), d_layers.end(), goesBefore);
+	}
+
+	Layer3D::Layer3D(Widget& widget, size_t zorder)
+		: Layer(widget, zorder)
 	{}
 }

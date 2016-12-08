@@ -9,8 +9,6 @@
 #include <Object/mkRef.h>
 
 #include <Ui/Frame/mkFrame.h>
-#include <Ui/Frame/mkInk.h>
-#include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 
 #include <Ui/Widget/mkTypeIn.h>

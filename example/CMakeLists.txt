@@ -1,8 +1,10 @@
-file(GLOB SOURCE_FILES example_nanovg.cpp)
+file(GLOB SOURCE_FILES example_nanovg.cpp example.cpp)
+file(GLOB HEADER_FILES example.h)
 
 add_executable(kiui_example ${SOURCE_FILES})
 
 include_directories(${KIUI_SOURCE_DIR}/src)
+include_directories(${KIUI_SOURCE_DIR}/example)
 
 target_link_libraries(kiui_example kiui)
 

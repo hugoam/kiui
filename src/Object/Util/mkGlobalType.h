@@ -2,11 +2,11 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_GLOBALTYPE_H_INCLUDED
-#define MK_GLOBALTYPE_H_INCLUDED
+#ifndef MK_GLOBALTYPE_H
+#define MK_GLOBALTYPE_H
 
 #include <Object/mkObjectForward.h>
-#include <Object/Util/mkMake.h>
+#include <Object/Util/mkUnique.h>
 
 #include <memory>
 #include <vector>
@@ -32,4 +32,4 @@ namespace mk
 	};
 }
 
-#endif // mkGLOBALTYPE_H_INCLUDED
+#endif

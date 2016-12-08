@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_ITERABLE_H_INCLUDED
-#define MK_ITERABLE_H_INCLUDED
+#ifndef MK_ITERABLE_H
+#define MK_ITERABLE_H
 
 /* mk headers */
 #include <Object/mkObjectForward.h>
@@ -49,4 +49,4 @@ namespace mk
 	};
 }
 
-#endif // MK_ITERABLE_INCLUDED
+#endif // MK_ITERABLE

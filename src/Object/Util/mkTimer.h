@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_TIMER_H_INCLUDED
-#define MK_TIMER_H_INCLUDED
+#ifndef MK_TIMER_H
+#define MK_TIMER_H
 
 /* Basic headers */
 #include <Object/mkTyped.h>
@@ -101,4 +101,4 @@ namespace mk
 //	template <> inline string toString(const TimeSpan& val) { return fixed_vector_to_string<TimeSpan, 2>(val); }
 }
 
-#endif // MK_TIMER_H_INCLUDED
+#endif // MK_TIMER_H

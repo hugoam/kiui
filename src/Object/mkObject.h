@@ -2,11 +2,11 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_OBJECT_H_INCLUDED
-#define MK_OBJECT_H_INCLUDED
+#ifndef MK_OBJECT_H
+#define MK_OBJECT_H
 
 /* mk headers */
-#include <Object/Util/mkMake.h>
+#include <Object/Util/mkUnique.h>
 #include <Object/mkId.h>
 #include <Object/mkObjectForward.h>
 
@@ -86,4 +86,4 @@ namespace mk
 	typedef std::vector<Object*> ObjectVector;
 }
 
-#endif // mkOBJECT_H_INCLUDED
+#endif

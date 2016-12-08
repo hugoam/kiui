@@ -5,7 +5,6 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Widget/mkSheet.h>
 
-#include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 #include <Ui/Frame/mkLayer.h>
@@ -39,15 +38,6 @@ namespace mk
 
 		return copy;
 	}*/
-
-	void Sheet::nextFrame(size_t tick, size_t delta)
-	{
-		Widget::nextFrame(tick, delta);
-		
-		Stripe& stripe = this->stripe();
-		for(size_t i = 0; i < stripe.contents().size(); ++i)
-			stripe.contents()[i]->widget().nextFrame(tick, delta);
-	}
 
 	void Sheet::bind(Sheet& parent, size_t index)
 	{
@@ -139,9 +129,7 @@ namespace mk
 	ScrollSheet::ScrollSheet(StyleType& type, FrameType frameType)
 		: Sheet(type, frameType)
 		, m_scrollArea(this->makeappend<ScrollArea>(*this))
-	{
-		//mScrollbar->hide();
-	}
+	{}
 
 	ScrollSheet::~ScrollSheet()
 	{}
@@ -151,7 +139,7 @@ namespace mk
 		if(this->stripe().cursor() > 0.f && this->stripe().sequenceLength() - this->stripe().cursor() < m_frame->dsize(DIM_Y))
 			this->stripe().setCursor(this->stripe().sequenceLength() - m_frame->dsize(DIM_Y));
 
-		Sheet::nextFrame(tick, delta);
+		//Sheet::nextFrame(tick, delta);
 
 		if(this->stripe().overflow() && m_scrollArea.scrollbar().frame().hidden())
 			m_scrollArea.scrollbar().show();
@@ -232,7 +220,7 @@ namespace mk
 		: Sheet(cls(), LAYER)
 		, m_tooltip(rootSheet.emplace<Tooltip>(rootSheet, ""))
 	{
-		m_frame = make_unique<Layer>(*this, rootSheet.layer().target()->ztop());
+		m_frame = make_unique<Layer>(*this, -1);
 
 		m_hovered = &rootSheet;
 
@@ -246,7 +234,7 @@ namespace mk
 
 		if(m_dirty)
 		{
-			m_frame->inkbox().updateFrame();
+			//m_frame->stencil().updateFrame();
 			m_dirty = false;
 		}
 	}
@@ -300,12 +288,12 @@ namespace mk
 
 	void Caret::nextFrame(size_t tick, size_t delta)
 	{
-		Widget::nextFrame(tick, delta);
+		//Widget::nextFrame(tick, delta);
 
-		if(m_dirty && m_textFrame->inkbox().visible())
+		if(m_dirty && m_textFrame->visible())
 		{
 			float caretX, caretY, caretHeight;
-			m_textFrame->inkbox().caretCoords(m_index, caretX, caretY, caretHeight);
+			m_textFrame->caption().caretCoords(m_index, caretX, caretY, caretHeight);
 			m_frame->setPosition(caretX, caretY);
 			m_frame->setSize(1.f, caretHeight);
 			m_dirty = false;
@@ -315,30 +303,26 @@ namespace mk
 	void Caret::moveRight()
 	{
 		m_index = m_index + 1;
-		m_textFrame->inkbox().selectCaret(m_index);
+		m_textFrame->caption().selectCaret(m_index);
 		m_dirty = true;
 	}
 
 	void Caret::moveLeft()
 	{
 		m_index = m_index - 1;
-		m_textFrame->inkbox().selectCaret(m_index);
+		m_textFrame->caption().selectCaret(m_index);
 		m_dirty = true;
 	}
 
 	Tooltip::Tooltip(RootSheet& rootSheet, const string& label)
 		: Widget(cls(), LAYER)
-		, m_label(label)
 	{
-		m_frame = make_unique<Layer>(*this, rootSheet.layer().target()->ztop()-1);
+		m_frame = make_unique<Layer>(*this, -2);
+		m_frame->setText(label);
 	}
-
-	Tooltip::~Tooltip()
-	{}
 
 	void Tooltip::setLabel(const string& label)
 	{
-		m_label = label;
-		m_frame->setDirty(Frame::DIRTY_WIDGET);
+		m_frame->setText(label);
 	}
 }

@@ -20,6 +20,8 @@ namespace mk
 
 	void DockToggle::click()
 	{
+		this->toggleState(ACTIVATED);
+
 		if(m_dockbox.frame().hidden())
 			m_dockbox.show();
 		else

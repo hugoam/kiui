@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_PROTO_H_INCLUDED
-#define MK_PROTO_H_INCLUDED
+#ifndef MK_PROTO_H
+#define MK_PROTO_H
 
 /* mk */
 #include <Object/mkObjectForward.h>
@@ -82,4 +82,4 @@ namespace mk
 	};
 }
 
-#endif // MK_PROTO_INCLUDED
+#endif // MK_PROTO

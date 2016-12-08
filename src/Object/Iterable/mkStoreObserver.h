@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_STOREOBSERVER_H_INCLUDED
-#define MK_STOREOBSERVER_H_INCLUDED
+#ifndef MK_STOREOBSERVER_H
+#define MK_STOREOBSERVER_H
 
 #include <Object/mkObjectForward.h>
 
@@ -41,4 +41,4 @@ namespace mk
 	template class MK_OBJECT_EXPORT StoreObserver<Object>;
 }
 
-#endif // MK_STOREOBSERVER_H_INCLUDED
+#endif // MK_STOREOBSERVER_H

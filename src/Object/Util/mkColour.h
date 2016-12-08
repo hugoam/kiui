@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_COLOUR_H_INCLUDED
-#define MK_COLOUR_H_INCLUDED
+#ifndef MK_COLOUR_H
+#define MK_COLOUR_H
 
 /* mk headers */
 #include <Object/mkTyped.h>
@@ -59,4 +59,4 @@ namespace mk
 	template <> inline void toString<Colour>(const Colour& val, string& str) { return fixed_vector_to_string<Colour, 4>(val, str); }
 }
 
-#endif // MK_COLOUR_H_INCLUDED
+#endif // MK_COLOUR_H

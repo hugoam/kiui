@@ -7,11 +7,11 @@
 
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkLayer.h>
-#include <Ui/Nano/mkNanoInk.h>
+#include <Ui/Nano/mkNanoRenderer.h>
 
 #include <Ui/Widget/mkWidget.h>
 
-#include <Object/Util/mkMake.h>
+#include <Object/Util/mkUnique.h>
 
 //#define NANOVG_GL_USE_UNIFORMBUFFER 1
 #ifdef NANOVG_GLEW
@@ -22,11 +22,7 @@
 #include <GL/glext.h>
 #endif
 
-#ifdef KIUI_DRAW_CACHE
-#include <Ui/Nano/nanovg_cache/nanovg.h>
-#else
 #include <Ui/Nano/nanovg/nanovg.h>
-#endif
 
 #if KIUI_EMSCRIPTEN
 #define NANOVG_GLES2_IMPLEMENTATION
@@ -35,15 +31,11 @@
 #define NANOVG_GL3_IMPLEMENTATION
 #endif
 
-#ifdef KIUI_DRAW_CACHE
-#include <Ui/Nano/nanovg_cache/nanovg_gl.h>
-#else
 #include <Ui/Nano/nanovg/nanovg_gl.h>
-#endif
-
 #include <Ui/Nano/nanovg/stb_image.h>
 
 #include <Ui/mkUiWindow.h>
+#include <Ui/Widget/mkRootSheet.h>
 
 #include <dirent.h>
 
@@ -240,10 +232,24 @@ namespace mk
 	{
 		float pixelRatio = 1.f;
 
-		Inkbox::sDebugBatch = 0;
+		Stencil::sDebugBatch = 0;
 		nvgBeginFrame(m_ctx, m_uiWindow.width(), m_uiWindow.height(), pixelRatio);
 
-		this->draw();
+		MasterLayer& rootLayer = m_uiWindow.rootSheet().layer();
+		rootLayer.nextFrame(0, 0);
+
+#ifdef KIUI_DRAW_CACHE
+		void* layerCache = nullptr;
+		m_renderer->layerCache(rootLayer, layerCache);
+		m_renderer->drawLayer(layerCache, 0, 0);
+
+		for(Layer* layer : rootLayer.layers())
+			if(layer->visible())
+			{
+				m_renderer->layerCache(*layer, layerCache);
+				m_renderer->drawLayer(layerCache, 0, 0);
+			}
+#endif
 
 		/*nvgGlobalCompositeOperation(ctx(), NVG_SOURCE_IN);
 
@@ -267,13 +273,8 @@ namespace mk
 		static double prevtime = 0.0;
 		if(time - prevtime > 1.0)
 		{
-			//std::cerr << "Frames drawn : " << Inkbox::sDebugBatch << std::endl;
+			//std::cerr << "Frames drawn : " << Stencil::sDebugBatch << std::endl;
 			prevtime = time;
 		}
-	}
-
-	InkTarget& NanoWindow::screenTarget()
-	{
-		return *m_screenTarget;
 	}
 }

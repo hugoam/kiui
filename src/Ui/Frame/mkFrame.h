@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_FRAME_H_INCLUDED
-#define MK_FRAME_H_INCLUDED
+#ifndef MK_FRAME_H
+#define MK_FRAME_H
 
 /* mk */
 #include <Object/mkTyped.h>
@@ -11,12 +11,13 @@
 #include <Object/Util/mkUpdatable.h>
 #include <Ui/mkUiForward.h>
 #include <Ui/Frame/mkUibox.h>
+#include <Ui/Frame/mkDrawFrame.h>
 
 #include <cmath>
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Frame : public Object, public Uibox, public Updatable
+	class MK_UI_EXPORT _I_ Frame : public Object, public Uibox, public DrawFrame, public Updatable
 	{
 	public:
 		Frame(Widget& widget);
@@ -46,11 +47,7 @@ namespace mk
 		inline size_t index() { return d_index; }
 		inline bool flow() { return d_flow; }
 
-		inline Inkbox& inkbox() { return *d_inkbox; }
 		inline Style& style() { return *d_style; }
-		inline InkStyle& inkstyle() { return *d_inkstyle; }
-
-		inline bool bound() { return bool(d_inkbox); }
 
 		void setIndex(size_t index) { d_index = index; }
 		void setDirty(Dirty dirty) { if(dirty > d_dirty) d_dirty = dirty; }
@@ -67,8 +64,6 @@ namespace mk
 		void setVisible();
 		void setInvisible();
 
-		//void moveToTop();
-
 		void transfer(Stripe& stripe, size_t index);
 		void remove();
 
@@ -79,9 +74,6 @@ namespace mk
 
 		bool first();
 		bool last();
-
-		void updateClip();
-		void updateClip(Dimension dim);
 
 		virtual bool nextOffset(Dimension dim, float& pos, float seuil, bool top = false);
 		virtual bool prevOffset(Dimension dim, float& pos, float seuil, bool top = false);
@@ -101,25 +93,18 @@ namespace mk
 		void updateSizing(Dimension dim);
 		void updateFixed(Dimension dim);
 
+		virtual void updateChildren() {}
+
 		virtual void updateSpace();
 		virtual void updateSizing();
 		virtual void updateStyle();
-		virtual void updatePosition();
-		virtual void updateSize();
+
+		void updatePosition();
 		void derivePosition();
 
 		void updateState(WidgetState state);
 
 		float calcAbsolute(Dimension dim);
-
-		enum Clip
-		{
-			VISIBLE,
-			CLIPPED,
-			HIDDEN
-		};
-
-		Clip dclip(Dimension dim) { if(dclipsize(dim) <= 0.f) return HIDDEN; else if(dclipsize(dim) < dsize(dim)) return CLIPPED; else return VISIBLE; }
 
 		void setSizeDim(Dimension dim, float size);
 		void setSpanDim(Dimension dim, float span);
@@ -143,8 +128,6 @@ namespace mk
 		inline float doffset(Dimension dim) { return dposition(dim) + dextent(dim); }
 
 		inline float dabsolute(Dimension dim) { return d_absolute[dim]; }
-		inline float dclippos(Dimension dim) { return d_clipPos[dim]; }
-		inline float dclipsize(Dimension dim) { return d_clipSize[dim]; }
 
 		bool inside(float x, float y);
 
@@ -161,16 +144,11 @@ namespace mk
 		bool d_visible;
 		bool d_flow;
 		DimFloat d_absolute;
-		DimFloat d_clipPos;
-		DimFloat d_clipSize;
 		size_t d_index;
 
 		Style* d_style;
-		InkStyle* d_inkstyle;
 		size_t d_styleStamp;
-
-		unique_ptr<Inkbox> d_inkbox;
 	};
 }
 
-#endif // MK_WIDGET_H_INCLUDED
+#endif // MK_WIDGET_H

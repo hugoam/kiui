@@ -5,7 +5,6 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Widget/mkScrollbar.h>
 
-#include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 
@@ -83,9 +82,9 @@ namespace mk
 
 	void Scrollbar::nextFrame(size_t tick, size_t delta)
 	{
-		Sheet::nextFrame(tick, delta);
-		Stripe& stripe = m_sheet.stripe();
-		m_scroller.updateMetrics(0.f, stripe.sequenceLength() - stripe.dclipsize(DIM_Y), stripe.cursor(), 1.f, stripe.dclipsize(DIM_Y));
+		//Sheet::nextFrame(tick, delta);
+		float visibleSize = m_sheet.stripe().dsize(DIM_Y); // stripe.dclipsize(DIM_Y)
+		m_scroller.updateMetrics(0.f, m_sheet.stripe().sequenceLength() - visibleSize, m_sheet.stripe().cursor(), 1.f, visibleSize);
 	}
 
 	ScrollArea::ScrollArea(Sheet& sheet)

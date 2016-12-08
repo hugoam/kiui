@@ -6,7 +6,6 @@
 #include <Ui/Widget/mkRootSheet.h>
 
 #include <Ui/Device/mkDevice.h>
-#include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 #include <Ui/Frame/mkLayer.h>
@@ -26,15 +25,15 @@
 
 namespace mk
 {
-	RootSheet::RootSheet(UiWindow& window, InkTarget& target, bool absolute)
+	RootSheet::RootSheet(UiWindow& window, bool absolute)
 		: Sheet(cls(), LAYER)
 		, m_window(window)
-		, m_target(target)
 	{
 		if(absolute)
 		{
-			m_frame = make_unique<Layer>(*this, 0, &m_window.inkWindow().screenTarget());
+			m_frame = make_unique<MasterLayer>(*this);
 			m_frame->as<Layer>().bind();
+			m_layer = &m_frame->as<MasterLayer>();
 			m_state = static_cast<WidgetState>(m_state ^ BOUND);
 		}
 
@@ -48,8 +47,6 @@ namespace mk
 
 	void RootSheet::nextFrame(size_t tick, size_t delta)
 	{
-		Sheet::nextFrame(tick, delta);
-
 		m_cursor->nextFrame();
 	}
 

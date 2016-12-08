@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_DISPATCH_H_INCLUDED
-#define MK_DISPATCH_H_INCLUDED
+#ifndef MK_DISPATCH_H
+#define MK_DISPATCH_H
 
 /* mk */
 #include <Object/mkRef.h>
@@ -30,6 +30,20 @@ namespace mk
 		static void branch(Type& type, const std::function<R (C, Lref&)>& func)
 		{
 			m_dispatcher[type.id()] = func;
+		}
+
+		template <class T, typename R(*func)(C, Lref&, T)>
+		static void singleBranch()
+		{
+			m_dispatcher[T::cls().id()] = [](C context, Lref& lref) { func(context, lref, DispatchRef<typename UnrefType<T>::type>::ref(lref)); };
+		}
+
+		template <typename bool(*mask)(Type&), typename R(*func)(C, Lref&)>
+		static void maskBranch()
+		{
+			for(IdObject* type : Type::cls().indexer().objects())
+				if(type && mask(type->as<Type>()))
+					m_dispatcher[type->id()] = func;
 		}
 
 		static R dispatch(C context, Lref& ref)
@@ -98,4 +112,4 @@ namespace mk
 	MaskDispatch<D, mask, f> MaskDispatch<D, mask, f>::branch;
 }
 
-#endif // mkDISPATCH_H_INCLUDED
+#endif

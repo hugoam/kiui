@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_UIFORWARD_H_INCLUDED
-#define MK_UIFORWARD_H_INCLUDED
+#ifndef MK_UIFORWARD_H
+#define MK_UIFORWARD_H
 
 /* mk */
 #include <Object/mkObjectForward.h>
@@ -23,6 +23,9 @@ namespace mk
 	enum Flow : unsigned int;
 	enum BoxLayer : unsigned int;
 	enum Opacity : unsigned int;
+
+	class BoxFloat;
+	class DimFloat;
 
 	class User;
 
@@ -71,16 +74,22 @@ namespace mk
 
 	class NodeCable;
 
-	class Inkbox;
+	class Renderer;
+	class DrawFrame;
+	class Stencil;
+	class Caption;
+
+	class Shadow;
+	class ImageSkin;
 	class InkStyle;
 	class InkTarget;
-	class InkLayer;
 	class InkWindow;
 
 	class Uibox;
 	class Frame;
 	class Stripe;
 	class Layer;
+	class MasterLayer;
 	class LayoutStyle;
 
 	enum WidgetState : unsigned int;
@@ -154,9 +163,9 @@ namespace mk
 	class GlWindow;
 
 	// Edit Devices
-	class NodeInput;
-	class NodeOutput;
-	class DNode;
+	class DNodeInput;
+	class DNodeOutput;
+	class DProcess;
 	class DCanvas;
 
 	class DMethod;
@@ -181,4 +190,4 @@ namespace mk
 	class Controller;
 }
 
-#endif // MK_UIFORWARD_H_INCLUDED
+#endif // MK_UIFORWARD_H

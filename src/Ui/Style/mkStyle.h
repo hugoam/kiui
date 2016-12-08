@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_STYLE_H_INCLUDED
-#define MK_STYLE_H_INCLUDED
+#ifndef MK_STYLE_H
+#define MK_STYLE_H
 
 /* mk */
 #include <Object/mkTyped.h>
@@ -67,7 +67,7 @@ namespace mk
 	public:
 		LayoutStyle()
 			: IdStruct(cls())
-			, d_flow(FLOW), d_clipping(CLIP), d_opacity(VOID), d_space(AUTO), d_layoutDim(DIM_Y), d_align(DimAlign(LEFT, LEFT))
+			, d_flow(FLOW), d_clipping(CLIP), d_opacity(CLEAR), d_space(AUTO), d_layoutDim(DIM_Y), d_align(DimAlign(LEFT, LEFT))
 			, d_span(DimFloat(1.f, 1.f)), d_pivot(DimPivot(FORWARD, FORWARD)), d_updated(0)
 		{}
 
@@ -297,4 +297,4 @@ namespace mk
 	};
 }
 
-#endif // MK_STYLE_H_INCLUDED
+#endif // MK_STYLE_H

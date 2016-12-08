@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_BOX_H_INCLUDED
-#define MK_BOX_H_INCLUDED
+#ifndef MK_BOX_H
+#define MK_BOX_H
 
 /* mk */
 #include <Object/mkId.h>
@@ -46,7 +46,8 @@ namespace mk
 		inline bool unflow() { return d_layout->d_flow == FREE || d_layout->d_flow == FREE_FILL; }
 		inline bool floats() { return d_layout->d_flow == FLOAT_DEPTH || d_layout->d_flow == FLOAT_LENGTH; }
 		inline bool clip() { return d_layout->d_clipping == CLIP; }
-		inline bool opaque() { return d_opacity <= GLASSY; }
+		inline bool opaque() { return d_opacity == OPAQUE; }
+		inline bool hollow() { return d_opacity == HOLLOW; }
 
 		inline void setOpacity(Opacity opacity) { d_opacity = opacity; }
 
@@ -61,4 +62,4 @@ namespace mk
 	};
 }
 
-#endif // MK_BOX_H_INCLUDED
+#endif // MK_BOX_H

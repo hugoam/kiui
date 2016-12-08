@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_REVERSE_H_INCLUDED
-#define MK_REVERSE_H_INCLUDED
+#ifndef MK_REVERSE_H
+#define MK_REVERSE_H
 
 namespace mk
 {
@@ -24,4 +24,4 @@ namespace mk
 
 }
 
-#endif // MK_REVERSE_H_INCLUDED
+#endif // MK_REVERSE_H

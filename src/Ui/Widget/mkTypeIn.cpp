@@ -11,7 +11,6 @@
 
 #include <Ui/Widget/mkWidgets.h>
 
-#include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 
@@ -19,23 +18,28 @@
 
 namespace mk
 {
-	TypeIn::TypeIn(WValue* input, const string& text, StyleType& type)
+	TypeIn::TypeIn(string& string, StyleType& type)
 		: Sheet(type)
-		, m_input(input)
+		, m_input(nullptr)
+		, m_string(string)
 		, m_hasPeriod(false)
 		, m_caret(this->makeappend<Caret>(m_frame.get()))
 	{
-		if(m_input)
-			m_string = m_input->value()->getString();
-		else
-			m_string = text;
-		
+		m_frame->setText(string);
+		m_caret.hide();
+	}
+
+	TypeIn::TypeIn(WValue& input, StyleType& type)
+		: TypeIn(m_valueString, type)
+	{
+		m_input = &input;
+		m_valueString = m_input->value()->getString();
 		m_caret.hide();
 	}
 
 	void TypeIn::nextFrame(size_t tick, size_t delta)
 	{
-		Sheet::nextFrame(tick, delta);
+		//Sheet::nextFrame(tick, delta);
 
 		if(m_state & CONTROL)
 		{
@@ -55,6 +59,9 @@ namespace mk
 
 	void TypeIn::unfocused()
 	{
+		m_frame->caption().selectFirst(0);
+		m_frame->caption().selectSecond(0);
+
 		if(!m_caret.frame().hidden())
 			m_caret.hide();
 	}
@@ -66,18 +73,18 @@ namespace mk
 
 	void TypeIn::erase()
 	{
-		if(m_caret.index() == 0 && m_frame->inkbox().selectStart() == m_frame->inkbox().selectEnd())
+		if(m_caret.index() == 0 && m_frame->caption().selectStart() == m_frame->caption().selectEnd())
 			return;
 
-		if(m_frame->inkbox().selectStart() == m_frame->inkbox().selectEnd())
+		if(m_frame->caption().selectStart() == m_frame->caption().selectEnd())
 		{
-			m_string.erase(m_string.begin() + m_frame->inkbox().selectStart() - 1);
+			m_string.erase(m_string.begin() + m_frame->caption().selectStart() - 1);
 			this->setCaret(m_caret.index() - 1);
 		}
 		else
 		{
-			m_string.erase(m_string.begin() + m_frame->inkbox().selectStart(), m_string.begin() + m_frame->inkbox().selectEnd());
-			this->setCaret(m_frame->inkbox().selectStart());
+			m_string.erase(m_string.begin() + m_frame->caption().selectStart(), m_string.begin() + m_frame->caption().selectEnd());
+			this->setCaret(m_frame->caption().selectStart());
 		}
 	}
 
@@ -95,26 +102,25 @@ namespace mk
 
 	void TypeIn::leftClick(MouseEvent& mouseEvent)
 	{
-		size_t index = m_frame->inkbox().caretIndex(mouseEvent.posX - m_frame->dabsolute(DIM_X), mouseEvent.posY - m_frame->dabsolute(DIM_Y));
+		size_t index = m_frame->caption().caretIndex(mouseEvent.posX - m_frame->dabsolute(DIM_X), mouseEvent.posY - m_frame->dabsolute(DIM_Y));
 		this->setCaret(index);
 		if(!(m_state & CONTROL))
-			this->takeControl(CM_CONTROL);
+			this->takeControl(CM_CONTROL, InputEvent::DEVICE_KEYBOARD);
 	}
 
 	void TypeIn::leftDragStart(MouseEvent& mouseEvent)
 	{
-		size_t index = m_frame->inkbox().caretIndex(mouseEvent.posX - m_frame->dabsolute(DIM_X), mouseEvent.posY - m_frame->dabsolute(DIM_Y));
+		size_t index = m_frame->caption().caretIndex(mouseEvent.posX - m_frame->dabsolute(DIM_X), mouseEvent.posY - m_frame->dabsolute(DIM_Y));
 		m_caret.setIndex(index);
-		m_frame->inkbox().selectFirst(index);
+		m_frame->caption().selectFirst(index);
 		if(!(m_state & CONTROL))
-			this->takeControl(CM_CONTROL);
+			this->takeControl(CM_CONTROL, InputEvent::DEVICE_KEYBOARD);
 	}
 
 	void TypeIn::leftDrag(MouseEvent& mouseEvent)
 	{
-		UNUSED(mouseEvent);
-		size_t index = m_frame->inkbox().caretIndex(mouseEvent.posX - m_frame->dabsolute(DIM_X), mouseEvent.posY - m_frame->dabsolute(DIM_Y));
-		m_frame->inkbox().selectSecond(index);
+		size_t index = m_frame->caption().caretIndex(mouseEvent.posX - m_frame->dabsolute(DIM_X), mouseEvent.posY - m_frame->dabsolute(DIM_Y));
+		m_frame->caption().selectSecond(index);
 		m_caret.setIndex(index);
 	}
 
@@ -123,8 +129,10 @@ namespace mk
 		UNUSED(mouseEvent);
 	}
 
-	bool TypeIn::keyDown(KeyEvent keyEvent)
+	void TypeIn::keyDown(KeyEvent& keyEvent)
 	{
+		keyEvent.abort = true;
+
 		if(keyEvent.code == KC_LEFT && m_caret.index() > 0)
 		{
 			m_caret.moveLeft();
@@ -145,7 +153,7 @@ namespace mk
 		else if(keyEvent.c != 0 && (m_allowedChars.size() == 0 || m_allowedChars.find(keyEvent.c) != string::npos))
 		{
 			if(keyEvent.c == '.' && m_string.find('.') != string::npos)
-				return true;
+				return;
 
 			this->insert(keyEvent.c);
 		}
@@ -153,13 +161,11 @@ namespace mk
 		if(m_input)
 			m_input->setString(m_string);
 		this->markDirty();
-		
-		return true;
 	}
 
 	void TypeIn::setCaret(size_t index)
 	{
 		m_caret.setIndex(index);
-		m_frame->inkbox().selectFirst(index);
+		m_frame->caption().selectFirst(index);
 	}
 }

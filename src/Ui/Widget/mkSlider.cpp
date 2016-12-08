@@ -10,7 +10,6 @@
 
 #include <Ui/Widget/mkWidgets.h>
 
-#include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 
@@ -25,7 +24,9 @@ namespace mk
 		, m_dim(dim)
 		, m_startPos(0.f)
 		, m_startOffset(0.f)
-	{}
+	{
+		m_frame->setEmpty();
+	}
 
 	float SliderKnob::offset(float pos)
 	{
@@ -89,7 +90,7 @@ namespace mk
 	void Slider::nextFrame(size_t tick, size_t delta)
 	{
 		bool dirty = m_frame->dirty() >= Frame::DIRTY_FRAME;
-		Sheet::nextFrame(tick, delta);
+		//Widget::nextFrame(tick, delta);
 		if(dirty)
 			this->updateKnob();
 	}

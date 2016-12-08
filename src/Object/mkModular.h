@@ -2,13 +2,13 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_MODULAR_H_INCLUDED
-#define MK_MODULAR_H_INCLUDED
+#ifndef MK_MODULAR_H
+#define MK_MODULAR_H
 
 /* mk */
 #include <Object/mkObjectForward.h>
 #include <Object/Util/mkNonCopy.h>
-#include <Object/Util/mkMake.h>
+#include <Object/Util/mkUnique.h>
 
 /* Standard */
 #include <vector>
@@ -71,4 +71,4 @@ namespace mk
 	};
 }
 
-#endif // mkMODULAR_H_INCLUDED
+#endif

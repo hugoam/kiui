@@ -10,13 +10,12 @@
 #include <Ui/Device/mkRootDevice.h>
 
 #include <Object/String/mkString.h>
-#include <Object/Util/mkMake.h>
+#include <Object/Util/mkUnique.h>
 
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Widget/mkRootSheet.h>
 
-#include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 
@@ -28,6 +27,8 @@
 #include <Ui/Widget/mkContextMenu.h>
 
 #include <Ui/Controller/mkController.h>
+
+#include <Ui/Edit/mkDValueEdit.h>
 
 #include <iostream>
 
@@ -43,6 +44,7 @@ namespace mk
 		, m_inkWindow(nullptr)
 		, m_inputWindow(nullptr)
 	{
+		//declareDValueEdit();
 	}
 
 	UiWindow::~UiWindow()
@@ -69,7 +71,7 @@ namespace mk
 	{
 		m_styler->prepare();
 
-		m_rootSheet = make_unique<RootSheet>(*this, m_inkWindow->screenTarget());
+		m_rootSheet = make_unique<RootSheet>(*this);
 		m_rootDevice = make_unique<RootDevice>(*this, *m_rootSheet);
 
 		m_mouse = make_unique<Mouse>(*m_rootSheet);
@@ -104,7 +106,7 @@ namespace mk
 		m_mouse->nextFrame();
 		m_keyboard->nextFrame();
 
-		m_rootSheet->nextFrame(tick, delta);
+		//m_rootSheet->nextFrame(tick, delta);
 
 		return !m_shutdownRequested;
 	}

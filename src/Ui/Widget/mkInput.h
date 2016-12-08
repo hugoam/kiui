@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_INPUT_H_INCLUDED
-#define MK_INPUT_H_INCLUDED
+#ifndef MK_INPUT_H
+#define MK_INPUT_H
 
 /* mk headers */
 #include <Object/mkTyped.h>
@@ -101,4 +101,4 @@ namespace mk
 	};
 }
 
-#endif // MK_INPUT_H_INCLUDED
+#endif // MK_INPUT_H

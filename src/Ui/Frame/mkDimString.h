@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_TIMESTRING_H_INCLUDED
-#define MK_TIMESTRING_H_INCLUDED
+#ifndef MK_DIMSTRING_H
+#define MK_DIMSTRING_H
 
 /* Basic headers */
 #include <Ui/Frame/mkUibox.h>
@@ -12,7 +12,6 @@
 namespace mk
 {
 	template <> inline void fromString(const string& str, DimFloat& vec) { string_to_fixed_vector<DimFloat, float>(str, vec); }
-	template <> inline string toString(const DimFloat& val) { return fixed_vector_to_string<DimFloat, 2>(val); }
 }
 
-#endif // MK_TIMESTRING_H_INCLUDED
+#endif

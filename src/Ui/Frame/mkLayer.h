@@ -2,67 +2,82 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_LAYER_H_INCLUDED
-#define MK_LAYER_H_INCLUDED
+#ifndef MK_LAYER_H
+#define MK_LAYER_H
 
 /* mk headers */
 #include <Ui/Frame/mkStripe.h>
-#include <Ui/Frame/mkInk.h>
 
 namespace mk
 {
 	class MK_UI_EXPORT Layer : public Stripe
 	{
 	public:
-		Layer(Widget& widget, size_t zorder = 0, InkTarget* target = nullptr);
+		Layer(Widget& widget, int zorder = 0);
 		~Layer();
 
 		FrameType frameType() { return LAYER; }
 
 		size_t index() { return d_index; }
-		size_t z() { return d_z; }
+		int z() { return d_z; }
 
-		InkLayer& inkLayer() { return *d_inkLayer; }
-		InkTarget* target() { return d_target; }
-		std::vector<Layer*>& layers() { return d_layers; }
+		std::vector<Layer*>& sublayers() { return d_sublayers; }
 
-		Layer& rootLayer() { if(!d_parentLayer) return *this; Layer* root = d_parentLayer; while(root->d_parentLayer) root = root->d_parentLayer; return *root; }
+		bool redraw() { return d_redraw; }
+		void setRedraw() { d_redrawNext = true; }
+
+		MasterLayer& rootLayer();
 
 		void bind();
 
 		void bind(Stripe* parent);
 		void unbind();
 
-		void nextFrame(size_t tick, size_t delta);
-
 		void add(Layer& layer);
 		void remove(Layer& layer);
 
-		void reorder();
 		size_t reorder(size_t pos, size_t index, size_t next);
 		void moveToTop();
+
+		virtual void updateOnce();
 
 		Frame* pinpoint(float x, float y, bool opaque);
 
 	protected:
 		size_t d_index;
-		size_t d_next;
-		size_t d_z;
+		int d_z;
 		size_t d_numLayers;
-		InkTarget* d_target;
 		Layer* d_parentLayer;
+		std::vector<Layer*> d_sublayers;
+
+		bool d_redraw;
+		bool d_redrawNext;
+	};
+
+	class MK_UI_EXPORT MasterLayer : public Layer
+	{
+	public:
+		MasterLayer(Widget& widget);
+
+		void add(Layer& layer);
+		void remove(Layer& layer);
+
+		const std::vector<Layer*>& layers() { return d_layers; }
+
+		void reorder();
+
+	protected:
 		std::vector<Layer*> d_layers;
-		unique_ptr<InkLayer> d_inkLayer;
 	};
 
 	class MK_UI_EXPORT Layer3D : public Layer
 	{
 	public:
-		Layer3D(Widget& widget, size_t zorder = 0, InkTarget* target = nullptr);
+		Layer3D(Widget& widget, size_t zorder = 0);
 
 		FrameType frameType() { return LAYER3D; }
 	};
 }
 
 
-#endif // MK_LAYER_H_INCLUDED
+#endif // MK_LAYER_H

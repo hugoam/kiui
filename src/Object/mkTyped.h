@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_TYPED_H_INCLUDED
-#define MK_TYPED_H_INCLUDED
+#ifndef MK_TYPED_H
+#define MK_TYPED_H
 
 /* mk */
 #include <Object/mkObjectForward.h>
@@ -34,4 +34,4 @@ namespace mk
 	template <> MK_OBJECT_EXPORT inline Type& typecls<std::vector<Object*>>() { static Type ty; return ty; }
 }
 
-#endif // MK_TYPED_INCLUDED
+#endif // MK_TYPED

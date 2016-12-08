@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_UICONFIG_H_INCLUDED
-#define MK_UICONFIG_H_INCLUDED
+#ifndef MK_UICONFIG_H
+#define MK_UICONFIG_H
 
 //#define KIUI_DRAW_CACHE
 
@@ -34,4 +34,4 @@
   #endif
 #endif
 
-#endif // MK_UICONFIG_H_INCLUDED
+#endif // MK_UICONFIG_H

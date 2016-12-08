@@ -3,7 +3,7 @@
 //  This notice and the license may not be removed or altered from any source distribution.
 
 #include <Ui/mkUiConfig.h>
-#include <Ui/Form/mkWidgets.h>
+#include <Ui/Widget/mkWidgets.h>
 
 #include <Ui/Widget/mkTextbox.h>
 #include <Ui/Widget/mkProgressBar.h>
@@ -14,29 +14,21 @@
 
 namespace mk
 {
-	Control::Control()
-		: Widget()
-	{
-		mStyle = &cls();
-	}
+	Control::Control(StyleType& type)
+		: Widget(type)
+	{}
 
 	Page::Page(const string& name, const string& dockid)
-		: ScrollSheet()
-		, mName(name)
-		, mDockId(dockid)
-	{
-		mStyle = &cls();
-	}
+		: ScrollSheet(cls())
+		, m_name(name)
+		, m_dockId(dockid)
+	{}
 
 	Dialog::Dialog()
-		: Sheet()
-	{
-		mStyle = &cls();
-	}
+		: Sheet(cls())
+	{}
 
 	Header::Header()
-		: Sheet()
-	{
-		mStyle = &cls();
-	}
+		: Sheet(cls())
+	{}
 }

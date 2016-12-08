@@ -2,12 +2,13 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_INPUTDISPATCHER_H_INCLUDED
-#define MK_INPUTDISPATCHER_H_INCLUDED
+#ifndef MK_INPUTDISPATCHER_H
+#define MK_INPUTDISPATCHER_H
 
 /* mk */
-#include <Ui/Input/mkKeyCode.h>
 #include <Ui/mkUiForward.h>
+#include <Ui/Input/mkKeyCode.h>
+#include <Ui/Input/mkInputDevice.h>
 
 namespace mk
 {
@@ -31,9 +32,10 @@ namespace mk
 
 		virtual InputReceiver* dispatchEvent(InputEvent& inputEvent) { UNUSED(inputEvent); return this; }
 		virtual InputReceiver* controlEvent(InputEvent& inputEvent) { UNUSED(inputEvent); return this; }
+		virtual InputReceiver* receiveEvent(InputEvent& inputEvent) { UNUSED(inputEvent); return this; }
 		virtual InputReceiver* propagateEvent(InputEvent& inputEvent) { UNUSED(inputEvent); return this; }
 
-		virtual void takeControl(ControlMode mode) = 0;
+		virtual void takeControl(ControlMode mode, InputEvent::DeviceType device = InputEvent::ALL_DEVICES) = 0;
 		virtual void yieldControl() = 0;
 	};
 
@@ -48,13 +50,14 @@ namespace mk
 
 		InputReceiver* dispatchEvent(InputEvent& inputEvent);
 		InputReceiver* controlEvent(InputEvent& inputEvent);
+		InputReceiver* receiveEvent(InputEvent& inputEvent);
 		InputReceiver* propagateEvent(InputEvent& inputEvent);
 
-		void setController(InputFrame& inputFrame);
-
-		void takeControl(ControlMode mode);
+		void takeControl(ControlMode mode, InputEvent::DeviceType device = InputEvent::ALL_DEVICES);
 		void takeControl(InputFrame& inputFrame);
 		void yieldControl();
+
+		bool consumes(InputEvent::DeviceType device);
 
 		virtual void control() {};
 		virtual void uncontrol() {};
@@ -67,13 +70,17 @@ namespace mk
 		InputFrame* m_controlled;
 		InputFrame* m_parentFrame;
 		ControlMode m_controlMode;
+		InputEvent::DeviceType m_deviceFilter;
 	};
 
 
 	class MK_UI_EXPORT InputWidget : public InputFrame
 	{
 	public:
-		InputReceiver* dispatchEvent(InputEvent& inputEvent);
+		InputReceiver* receiveEvent(InputEvent& inputEvent);
+
+		virtual void keyUp(KeyEvent& keyEvent) { UNUSED(keyEvent); };
+		virtual void keyDown(KeyEvent& keyEvent) { UNUSED(keyEvent); };
 
 		virtual void mouseMoved(MouseEvent& mouseEvent);
 
@@ -103,4 +110,4 @@ namespace mk
 	};
 }
 
-#endif // MK_INPUTDISPATCHER_H_INCLUDED
+#endif // MK_INPUTDISPATCHER_H

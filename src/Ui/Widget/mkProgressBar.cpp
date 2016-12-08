@@ -5,7 +5,6 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Widget/mkProgressBar.h>
 
-#include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 

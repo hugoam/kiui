@@ -250,7 +250,7 @@ namespace mk
 		RootSheet::cls().layout().d_opacity = OPAQUE;
 		RootSheet::cls().layout().d_clipping = NOCLIP;
 
-		DropdownToggle::cls().layout().d_opacity = GLASSY;
+		DropdownToggle::cls().layout().d_opacity = OPAQUE;
 
 		WValue::cls().layout().d_layoutDim = DIM_X;
 

@@ -2,15 +2,15 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_OBJECTREF_H_INCLUDED
-#define MK_OBJECTREF_H_INCLUDED
+#ifndef MK_OBJECTREF_H
+#define MK_OBJECTREF_H
 
 /* mk headers */
 #include <Object/mkObjectForward.h>
 #include <Object/mkTyped.h>
 #include <Object/mkTypeUtils.h>
 #include <Object/String/mkString.h>
-#include <Object/Util/mkMake.h>
+#include <Object/Util/mkUnique.h>
 
 /* Standard */
 #include <memory>
@@ -184,4 +184,4 @@ namespace mk
 	}
 }
 
-#endif // MK_OBJECTREF_H_INCLUDED
+#endif // MK_OBJECTREF_H

@@ -14,8 +14,8 @@ namespace mk
 	class MK_UI_EXPORT _I_ Textbox : public TypeIn
 	{
 	public:
-		Textbox(WValue* input);
-		Textbox(const string& text);
+		Textbox(WValue& input);
+		Textbox(string& text);
 
 		static StyleType& cls() { static StyleType ty("Textbox", TypeIn::cls()); return ty; }
 

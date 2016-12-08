@@ -139,7 +139,7 @@ namespace mk
 	{
 	public:
 		StatSlider(Lref& lref, std::function<void(T)> callback = nullptr, Dimension dim = DIM_X)
-			: WValue(lref, this->cls(), [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); })
+			: WValue(lref, this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); } : OnUpdate())
 			, m_stat(this->m_value->template ref<AutoStat<T>>())
 			, m_dim(dim)
 			, m_display(this->template makeappend<SliderDisplay>(toString(m_stat.value())))
@@ -150,7 +150,7 @@ namespace mk
 		}
 
 		StatSlider(AutoStat<T> value, std::function<void(T)> callback = nullptr, Dimension dim = DIM_X)
-			: WValue(lref(value), this->cls(), [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); })
+			: WValue(lref(value), this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); } : OnUpdate())
 			, m_stat(this->m_value->template ref<AutoStat<T>>())
 			, m_dim(dim)
 			, m_display(this->template makeappend<SliderDisplay>(toString(m_stat.value())))

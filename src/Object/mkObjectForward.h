@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_OBJECTFORWARD_H_INCLUDED
-#define MK_OBJECTFORWARD_H_INCLUDED
+#ifndef MK_OBJECTFORWARD_H
+#define MK_OBJECTFORWARD_H
 
 #include <string>
 #include <type_traits>
@@ -96,9 +96,7 @@ namespace mk
 	class Library;
 
 	class Injector;
-	class Maker;
 
-	class Creator;
 	class DataSource;
 	class DataLoader;
 	class LoaderMember;
@@ -109,6 +107,8 @@ namespace mk
 	class Procedure;
 	class ProcedureType;
 
+	class Function;
+
 	class Member;
 	class Method;
 	class Imprint;
@@ -117,9 +117,15 @@ namespace mk
 	class Echomember;
 	class Echomethod;
 
+	class Param;
+	class InputParam;
+	class OutputParam;
+	class Process;
+	class Script;
+
 	class Image256;
 
 	class Module;
 }
 
-#endif // mkOBJECTFORWARD_H_INCLUDED
+#endif

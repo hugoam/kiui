@@ -5,9 +5,9 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/mkUiTypes.h>
 
-#include <Ui/mkUi.h>
-
 #include <Ui/Nano/mkGlWindow.h>
+
+#include <example.h>
 
 #ifdef KIUI_EMSCRIPTEN
 #define KIUI_EXAMPLE_RESSOURCE_PATH "/data/"
@@ -30,9 +30,9 @@ int main(int argc, char *argv[])
 	glwindow.initContext();
 
 	mk::UiWindow& uiwindow = glwindow.uiWindow();
-	uiwindow.init();
+	//uiwindow.init();
 
-	mk::Form& root = uiwindow.rootForm();
+	mk::Device& root = uiwindow.rootDevice();
 	createUiTest(root);
 
 #ifdef KIUI_EMSCRIPTEN

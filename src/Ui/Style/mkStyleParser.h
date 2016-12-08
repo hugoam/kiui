@@ -2,12 +2,12 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_STYLEPARSER_H_INCLUDED
-#define MK_STYLEPARSER_H_INCLUDED
+#ifndef MK_STYLEPARSER_H
+#define MK_STYLEPARSER_H
 
 /* mk */
 #include <Ui/mkUiForward.h>
-#include <Object/Util/mkMake.h>
+#include <Object/Util/mkUnique.h>
 
 namespace mk
 {
@@ -56,4 +56,4 @@ namespace mk
 	};
 }
 
-#endif // MK_STYLEPARSER_H_INCLUDED
+#endif // MK_STYLEPARSER_H

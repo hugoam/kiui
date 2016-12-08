@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_INDEXER_H_INCLUDED
-#define MK_INDEXER_H_INCLUDED
+#ifndef MK_INDEXER_H
+#define MK_INDEXER_H
 
 /* mk */
 #include <Object/mkObjectForward.h>
@@ -32,7 +32,7 @@ namespace mk
 		void add(Object& object) { this->add(object.as<IdObject>()); }
 		void remove(Object& object) { this->remove(object.as<IdObject>()); }
 
-		void add(IdObject& object) { this->resize(object); m_objects[object.id()] = &object; ++m_count; notifyAdd(object); }
+		void add(IdObject& object) { this->resize(object.id()); m_objects[object.id()] = &object; ++m_count; notifyAdd(object); }
 		void insert(IdObject& object, Id id) { this->resize(id); m_objects[id] = &object; ++m_count; notifyAdd(object); }
 		void remove(IdObject& object) { m_objects[object.id()] = nullptr; --m_count; notifyRemove(object); }
 		bool has(IdObject& object) { return std::find(m_objects.begin(), m_objects.end(), &object) != m_objects.end(); }
@@ -40,8 +40,7 @@ namespace mk
 		IdObject* atSafe(Id id) { if(id < m_objects.size()) return m_objects[id]; else return nullptr; }
 		Id alloc() { return m_next++; }
 
-		inline void resize(IdObject& object) { if(object.id() >= m_objects.size()) m_objects.resize(object.id() * 2); }
-		inline void resize(Id id) { if(id >= m_objects.size()) m_objects.resize(id * 2); }
+		inline void resize(Id id) { if(id >= m_objects.size()) m_objects.resize(id+1); }
 
 		size_t size() const { return m_count; }
 		void iterate(const std::function<void(Object&)>& callback) const { for(Object* object : m_objects) if(object) callback(*object); }
@@ -49,13 +48,13 @@ namespace mk
 
 		void clear() { m_objects.clear(); m_count = 0; }
 
-		void notifyAdd(Object&/* object*/)
+		void notifyAdd(Object& /*object*/)
 		{
 			//for(StoreObserver<Object>* observer : m_observers)
 			//	observer->handleAdd(object);
 		}
 
-		void notifyRemove(Object&/* object*/)
+		void notifyRemove(Object& /*object*/)
 		{
 			//for(StoreObserver<Object>* observer : m_observers)
 			//	observer->handleRemove(object);
@@ -91,4 +90,4 @@ namespace mk
 	};
 }
 
-#endif // MK_INDEXER_H_INCLUDED
+#endif // MK_INDEXER_H

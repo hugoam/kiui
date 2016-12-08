@@ -15,20 +15,14 @@
 
 namespace mk
 {
-	/*class MK_UI_EXPORT _I_ TextSelection : public Widget
-	{
-	public:
-		TextSelection();
-	};*/
-
 	class MK_UI_EXPORT _I_ TypeIn : public Sheet
 	{
 	public:
-		TypeIn(WValue* input, const string& text = "", StyleType& type = cls());
+		TypeIn(string& string, StyleType& type = cls());
+		TypeIn(WValue& input, StyleType& type = cls());
 
 		Style* hoverCursor() { return &CaretCursor::cls(); }
-		const string& label() { return m_string; }
-		
+
 		void nextFrame(size_t tick, size_t delta);
 
 		void setAllowedChars(const string& chars);
@@ -41,7 +35,7 @@ namespace mk
 		void updateString();
 
 		void leftClick(MouseEvent& mouseEvent);
-		bool keyDown(KeyEvent keyEvent);
+		void keyDown(KeyEvent& keyEvent);
 
 		void leftDragStart(MouseEvent& mouseEvent);
 		void leftDrag(MouseEvent& mouseEvent);
@@ -53,10 +47,13 @@ namespace mk
 
 	protected:
 		WValue* m_input;
-		string m_string;
+		string& m_string;
 		bool m_hasPeriod;
 		string m_allowedChars;
 		Caret& m_caret;
+
+		string m_valueString;
+
 		//std::vector<TextSelection*> m_selection;
 	};
 
@@ -65,9 +62,9 @@ namespace mk
 	{
 	public:
 		NumberInput(Lref& lref, std::function<void(T)> callback = nullptr)
-			: WValue(lref, this->cls(), [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); })
+			: WValue(lref, this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); } : OnUpdate())
 			, m_stat(this->m_value->template ref<AutoStat<T>>())
-			, m_typeIn(this->template makeappend<TypeIn>(this))
+			, m_typeIn(this->template makeappend<TypeIn>(*this))
 			, m_plus(this->template makeappend<Button>("+", std::bind(&NumberInput<T>::increment, this)))
 			, m_minus(this->template makeappend<Button>("-", std::bind(&NumberInput<T>::decrement, this)))
 		{
@@ -75,9 +72,9 @@ namespace mk
 		}
 
 		NumberInput(AutoStat<T> value, std::function<void(T)> callback = nullptr)
-			: WValue(lref(value), this->cls(), [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); })
+			: WValue(lref(value), this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); } : OnUpdate())
 			, m_stat(this->m_value->template ref<AutoStat<T>>())
-			, m_typeIn(this->template makeappend<TypeIn>(this))
+			, m_typeIn(this->template makeappend<TypeIn>(*this))
 			, m_plus(this->template makeappend<Button>("+", std::bind(&NumberInput<T>::increment, this)))
 			, m_minus(this->template makeappend<Button>("-", std::bind(&NumberInput<T>::decrement, this)))
 		{
@@ -154,12 +151,12 @@ namespace mk
 	{
 	public:
 		Input(Lref& value, std::function<void(bool)> callback = nullptr)
-			: WValue(value, this->cls(), [callback](Lref& lref) { callback(lref->get<bool>()); })
+			: WValue(value, this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<bool>()); } : OnUpdate())
 			, m_checkbox(this->makeappend<Checkbox>(this, m_value->get<bool>()))
 		{}
 
 		Input(bool value, std::function<void(bool)> callback = nullptr)
-			: WValue(lref(value), this->cls(), [callback](Lref& lref) { callback(lref->get<bool>()); })
+			: WValue(lref(value), this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<bool>()); } : OnUpdate())
 			, m_checkbox(this->makeappend<Checkbox>(this, m_value->get<bool>()))
 		{}
 
@@ -176,13 +173,13 @@ namespace mk
 	{
 	public:
 		Input(Lref& value, std::function<void(string)> callback = nullptr)
-			: WValue(value, this->cls(), [callback](Lref& lref) { callback(lref->get<string>()); })
-			, m_typeIn(this->makeappend<TypeIn>(this))
+			: WValue(value, this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<string>()); } : OnUpdate())
+			, m_typeIn(this->makeappend<TypeIn>(*this))
 		{}
 
 		Input(const string& value, std::function<void(string)> callback = nullptr)
-			: WValue(lref(value), this->cls(), [callback](Lref& lref) { callback(lref->get<string>()); })
-			, m_typeIn(this->makeappend<TypeIn>(this))
+			: WValue(lref(value), this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<string>()); } : OnUpdate())
+			, m_typeIn(this->makeappend<TypeIn>(*this))
 		{}
 
 		TypeIn& typeIn() { return m_typeIn; }

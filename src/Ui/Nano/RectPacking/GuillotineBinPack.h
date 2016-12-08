@@ -5,7 +5,8 @@
 
 	This work is released to Public Domain, do whatever you want with it.
 */
-#pragma once
+#ifndef MK_GUILLOTINEBINPACK_H
+#define MK_GUILLOTINEBINPACK_H
 
 #include <vector>
 
@@ -129,3 +130,5 @@ private:
 	/// Splits the given L-shaped free rectangle into two new free rectangles along the given fixed split axis.
 	void SplitFreeRectAlongAxis(const BPRect &freeRect, const BPRect &placedRect, bool splitHorizontal);
 };
+
+#endif

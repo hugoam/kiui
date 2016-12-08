@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_STRIPE_H_INCLUDED
-#define MK_STRIPE_H_INCLUDED
+#ifndef MK_STRIPE_H
+#define MK_STRIPE_H
 
 /* mk headers */
 #include <Ui/Frame/mkFrame.h>
@@ -71,6 +71,8 @@ namespace mk
 		inline float offsetSequence(Frame& frame) { Frame* before = frame.before(); return before ? offsetSequenceNext(frame, *before) : offsetSequenceFirst(frame); }
 
 		inline float dpivotposition(Frame& frame, Dimension dim) { return d_layout->pivot()[dim] ? dsize(dim) - frame.dsize(dim) - frame.dposition(dim) : frame.dposition(dim); }
+
+		virtual void updateChildren();
 
 		void positionLength(Frame& frame);
 		void positionDepth(Frame& frame);
@@ -156,4 +158,4 @@ namespace mk
 	};
 }
 
-#endif // MK_SEQUENCECONTAINER_H_INCLUDED
+#endif // MK_SEQUENCECONTAINER_H

@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_UI_H_INCLUDED
-#define MK_UI_H_INCLUDED
+#ifndef MK_UI_H
+#define MK_UI_H
 
 #include <Ui/mkUiForward.h>
 
@@ -12,6 +12,7 @@ namespace mk
 	MK_UI_EXPORT void switchUiTheme(UiWindow& uiWindow, const string& name);
 	MK_UI_EXPORT void selectUiTheme(Sheet& sheet, Widget& selected);
 	MK_UI_EXPORT void pickUiSample(Sheet& sheet, Widget& selected);
+	MK_UI_EXPORT Sheet& createUiEdit(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiStyleEdit(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestScrollList(Sheet& parent);
 	MK_UI_EXPORT Sheet& createUiTestCustomList(Sheet& parent);
@@ -32,4 +33,4 @@ namespace mk
 	MK_UI_EXPORT void createUiTest(Device& parent);
 }
 
-#endif // MK_UI_H_INCLUDED
+#endif // MK_UI_H

@@ -17,15 +17,9 @@ namespace mk
 	public:
 		Label(const string& label, StyleType& type = cls(), FrameType frameType = FRAME);
 
-		const string& label() { return m_label; }
-		unique_ptr<Widget> clone() { return make_unique<Label>(m_label); }
-
-		void setLabel(const string& label);
+		unique_ptr<Widget> clone() { return make_unique<Label>(this->label()); }
 
 		static StyleType& cls() { static StyleType ty("Label", Widget::cls()); return ty; }
-
-	protected:
-		string m_label;
 	};
 
 	class MK_UI_EXPORT Title : public Label
@@ -42,14 +36,8 @@ namespace mk
 		Icon(Image& image);
 		Icon(const string& image);
 
-		Image* image() { return &m_image; }
-
-		//void setImage(Image& image);
 
 		static StyleType& cls() { static StyleType ty("Icon", Widget::cls()); return ty; }
-
-	protected:
-		Image& m_image;
 	};
 
 	template <class T_Widget>
@@ -81,18 +69,16 @@ namespace mk
 	public:
 		Button(const string& label, const Trigger& trigger = Trigger(), StyleType& type = cls());
 
-		const string& label() { return m_label; }
 		const string& tooltip() { return m_tooltip; }
 
 		void leftClick(MouseEvent& mouseEvent);
 		void rightClick(MouseEvent& mouseEvent);
 
-		unique_ptr<Widget> clone() { return make_unique<Button>(m_label, m_trigger, cls()); }
+		unique_ptr<Widget> clone() { return make_unique<Button>(this->label(), m_trigger, cls()); }
 
 		static StyleType& cls() { static StyleType ty("Button", Control::cls()); return ty; }
 
 	protected:
-		string m_label;
 		string m_tooltip;
 	};
 
@@ -105,13 +91,11 @@ namespace mk
 		ImgButton(Image& image, const Trigger& trigger = Trigger(), StyleType& type = cls());
 		ImgButton(const string& image, const Trigger& trigger = Trigger(), StyleType& type = cls());
 
-		Image* image() { return &m_image; }
 		const string& tooltip() { return m_tooltip; }
 
 		static StyleType& cls() { static StyleType ty("ImgButton", Button::cls()); return ty; }
 
 	protected:
-		Image& m_image;
 		string m_tooltip;
 	};
 

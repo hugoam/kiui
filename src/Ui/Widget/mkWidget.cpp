@@ -8,7 +8,6 @@
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Widget/mkRootSheet.h>
 
-#include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 #include <Ui/Frame/mkLayer.h>
@@ -39,6 +38,31 @@ namespace mk
 	Widget::~Widget()
 	{
 		this->cleanup();
+	}
+
+	const string& Widget::label()
+	{
+		return m_frame->text();
+	}
+
+	void Widget::setLabel(const string& label)
+	{
+		m_frame->setText(label);
+	}
+
+	Image* Widget::image()
+	{
+		return m_frame->image();
+	}
+
+	void Widget::setImage(Image* image)
+	{
+		m_frame->setImage(image);
+	}
+
+	const string& Widget::contentlabel()
+	{
+		return m_frame->text();
 	}
 
 	void Widget::cleanup()
@@ -143,13 +167,6 @@ namespace mk
 			return style;
 	}
 
-	Image* Widget::image()
-	{
-		if(m_frame->inkstyle().image())
-			return m_frame->inkstyle().image();
-		return nullptr;
-	}
-
 	RootSheet& Widget::rootSheet()
 	{
 		return m_parent->rootSheet();
@@ -180,11 +197,6 @@ namespace mk
 			m_frame->updateState(m_state);
 	}
 
-	void Widget::nextFrame(size_t tick, size_t delta)
-	{
-		m_frame->nextFrame(tick, delta);
-	}
-
 	Widget* Widget::pinpoint(float x, float y)
 	{
 		Frame* target = m_frame->pinpoint(x, y, true);
@@ -206,7 +218,7 @@ namespace mk
 
 	InputReceiver* Widget::controlEvent(InputEvent& inputEvent)
 	{
-		if(m_controller)
+		if(m_controller && m_controller->consumes(inputEvent.deviceType))
 			return m_controller->controlEvent(inputEvent);
 
 		if(inputEvent.deviceType >= InputEvent::DEVICE_MOUSE && m_controlMode < CM_ABSOLUTE)
@@ -258,23 +270,27 @@ namespace mk
 	void Widget::control()
 	{
 		this->toggleState(CONTROL);
+		this->toggleState(FOCUSED);
 		this->focused();
 	}
 
 	void Widget::uncontrol()
 	{
 		this->toggleState(CONTROL);
+		this->toggleState(FOCUSED);
 		this->unfocused();
 	}
 
 	void Widget::mouseEntered(MouseEvent& mouseEvent)
 	{
+		//std::cerr << ">>>>> HOVERED " << this->style().name() << std::endl;
 		UNUSED(mouseEvent);
 		this->hover();
 	}
 
 	void Widget::mouseLeaved(MouseEvent& mouseEvent)
 	{
+		//std::cerr << "<<<<< UNHOVERED " << this->style().name() << std::endl;
 		UNUSED(mouseEvent);
 		this->unhover();
 	}

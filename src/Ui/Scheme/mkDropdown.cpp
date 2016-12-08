@@ -7,7 +7,6 @@
 
 #include <Ui/Widget/mkWidgets.h>
 
-#include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 #include <Ui/Frame/mkLayer.h>
@@ -44,8 +43,8 @@ namespace mk
 	Widget& Dropdown::vappend(std::unique_ptr<Widget> widget)
 	{
 		WrapButton& button = m_list.emplace<DropdownChoice>(std::move(widget), std::bind(&Dropdown::selected, this, _1));
-		//if(m_selected == nullptr)
-		//	this->select(button);
+		if(m_selected == nullptr)
+			this->select(button);
 
 		return button;
 	}
@@ -58,7 +57,7 @@ namespace mk
 	void Dropdown::dropup()
 	{
 		m_list.hide();
-		if(m_list.state() & MODAL)
+		if(m_list.state() & CONTROL)
 			m_list.yieldControl();
 		m_down = false;
 	}
@@ -84,9 +83,6 @@ namespace mk
 		m_selected = &button;
 		m_selected->toggleState(ACTIVATED);
 		m_header.updateContent(*button.content());
-
-		if(m_onSelected)
-			m_onSelected(*button.content());
 	}
 
 	void Dropdown::selected(WrapButton& button)
@@ -95,6 +91,9 @@ namespace mk
 			this->dropup();
 
 		this->select(button);
+
+		if(m_onSelected)
+			m_onSelected(*button.content());
 	}
 
 	DropdownHeader::DropdownHeader(Dropdown& dropdown, bool input)

@@ -7,8 +7,6 @@
 
 #include <Object/Iterable/mkReverse.h>
 
-#include <Ui/Frame/mkInk.h>
-
 #include <Ui/Widget/mkWidget.h>
 
 #include <algorithm>
@@ -18,6 +16,8 @@ namespace mk
 {
 	Stripe::Stripe(Widget& widget)
 		: Frame(widget)
+		, d_depth(DIM_X)
+		, d_length(DIM_Y)
 		, d_cursor(0.f)
 		, d_contents()
 		, d_sequence(d_contents)
@@ -87,6 +87,14 @@ namespace mk
 	{
 		std::swap(d_contents[from], d_contents[to]);
 		this->reindex(from < to ? from : to);
+	}
+
+	void Stripe::updateChildren()
+	{
+		// cannot use range-based iteration because updateStyle() causes removing and reinserting in this vector
+		for(size_t i = 0; i < d_contents.size(); ++i)
+			//if(d_contents[i]->frameType() < LAYER)
+				d_contents[i]->nextFrame(0, 0);
 	}
 
 	void Stripe::recomputeLength()
@@ -372,7 +380,7 @@ namespace mk
 
 	Frame* Stripe::pinpoint(float x, float y, bool opaque)
 	{
-		if(!this->inside(x, y))
+		if(this->hollow() || !this->inside(x, y))
 			return nullptr;
 
 		Frame* target;
@@ -444,7 +452,7 @@ namespace mk
 	{
 		float pos = 0.f;
 		this->nextOffset(d_length, pos, d_cursor, true);
-		d_cursor = std::min(d_sequenceLength - d_clipSize[DIM_Y], pos);
+		d_cursor = std::min(d_sequenceLength - d_size[DIM_Y], pos);
 		this->setDirty(DIRTY_OFFSET);
 	}
 }

@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_UITYPES_H_INCLUDED
-#define MK_UITYPES_H_INCLUDED
+#ifndef MK_UITYPES_H
+#define MK_UITYPES_H
 
 #include <Ui/Device/mkDevice.h>
 #include <Ui/Device/mkStack.h>
@@ -14,7 +14,8 @@
 #include <Ui/Widget/mkWidgets.h>
 
 #include <Ui/Frame/mkFrame.h>
-#include <Ui/Frame/mkInk.h>
+#include <Ui/Frame/mkCaption.h>
+#include <Ui/Frame/mkStencil.h>
 
 #include <Ui/Style/mkStyleParser.h>
 
@@ -49,6 +50,7 @@
 #include <Ui/Edit/mkDCanvas.h>
 #include <Ui/Edit/mkDObjectEdit.h>
 #include <Ui/Edit/mkDValueEdit.h>
+#include <Ui/Edit/mkDUiEdit.h>
 
 #include <Ui/mkUiWindow.h>
 #include <Ui/mkUiLayout.h>
@@ -69,4 +71,4 @@ namespace mk
 	template <> inline Type& typecls<WidgetState>() { static Type ty; return ty; }
 }
 
-#endif // MK_UITYPES_H_INCLUDED
+#endif // MK_UITYPES_H

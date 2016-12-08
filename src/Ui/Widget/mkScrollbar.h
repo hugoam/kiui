@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_SCROLLBAR_H_INCLUDED
-#define MK_SCROLLBAR_H_INCLUDED
+#ifndef MK_SCROLLBAR_H
+#define MK_SCROLLBAR_H
 
 /* mk */
 #include <Object/mkId.h>
@@ -115,4 +115,4 @@ namespace mk
 	};
 }
 
-#endif // MK_SCROLLBAR_H_INCLUDED
+#endif // MK_SCROLLBAR_H

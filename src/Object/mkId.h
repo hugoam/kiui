@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_ID_H_INCLUDED
-#define MK_ID_H_INCLUDED
+#ifndef MK_ID_H
+#define MK_ID_H
 
 /** Basic headers **/
 #include <vector>
@@ -18,4 +18,4 @@ namespace mk
 	typedef std::list<Id> IdList;
 }
 
-#endif // mkID_H_INCLUDED
+#endif

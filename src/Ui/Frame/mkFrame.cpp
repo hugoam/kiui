@@ -9,7 +9,6 @@
 #include <Object/Iterable/mkReverse.h>
 
 #include <Ui/Widget/mkWidget.h>
-#include <Ui/Frame/mkInk.h>
 
 #include <Ui/Frame/mkStripe.h>
 #include <Ui/Frame/mkLayer.h>
@@ -26,16 +25,14 @@ namespace mk
 
 	Frame::Frame(Widget& widget)
 		: Uibox()
+		, DrawFrame(*this)
 		, d_widget(widget)
 		, d_parent(nullptr)
 		, d_dirty(DIRTY_VISIBILITY)
 		, d_hidden(false)
 		, d_visible(true)
-		, d_clipPos(0.f, 0.f)
-		, d_clipSize(0.f, 0.f)
 		, d_index(0)
 		, d_style(nullptr)
-		, d_inkstyle(nullptr)
 		, d_styleStamp(0)
 	{}
 
@@ -94,7 +91,7 @@ namespace mk
 
 	void Frame::updateSpace()
 	{
-		if(d_widget.image() || !d_widget.label().empty())
+		if(!m_text.empty() || m_image != nullptr || d_inkstyle->image() != nullptr)
 			d_space = BLOCK;
 		else
 			d_space = BOARD;
@@ -104,17 +101,16 @@ namespace mk
 	{
 		d_style = &d_widget.fetchOverride(d_widget.style());
 		d_layout = &d_style->layout();
-		d_inkstyle = &d_style->subskin(d_widget.state());
 		d_styleStamp = d_style->updated();
-
+		
 		d_flow = d_layout->d_flow == FLOW;
 		d_opacity = d_layout->d_opacity;
 		if(d_span.null())
 			d_span = d_layout->d_span;
 
-		this->updateSizing();
+		this->updateInkstyle(d_style->subskin(d_widget.state()));
 
-		this->setDirty(DIRTY_SKIN);
+		this->updateSizing();
 	}
 
 	void Frame::updateSizing()
@@ -142,7 +138,6 @@ namespace mk
 			if(d_layout->d_space != BOARD || d_size[dim] == 0.f)
 			{
 				d_size[dim] = d_layout->size()[dim];
-				d_clipSize[dim] = d_layout->size()[dim];
 				this->setDirty(DIRTY_FRAME);
 				this->resized(dim);
 			}
@@ -154,7 +149,6 @@ namespace mk
 	{
 		d_parent = parent;
 		this->updateStyle();
-		d_inkbox = make_unique<Inkbox>(*this); //this->layer().inkLayer()
 
 		this->setVisible(d_parent->visible());
 	}
@@ -163,7 +157,6 @@ namespace mk
 	{
 		d_parent = nullptr;
 		d_visible = false;
-		d_inkbox.reset();
 	}
 
 	void Frame::remove()
@@ -200,35 +193,21 @@ namespace mk
 		return d_index == d_parent->sequence().size()-1;
 	}
 
-	void Frame::updateClip()
-	{
-		if(!d_parent || !d_visible || !clip())
-			return;
-
-		bool clipped = !d_inkbox->visible(); // We are visible, so the inkbox not visible means we were clipped
-
-		this->updateClip(DIM_X);
-		this->updateClip(DIM_Y);
-
-		if((dclip(DIM_X) == HIDDEN || dclip(DIM_Y) == HIDDEN) && !clipped)
-			d_inkbox->hide();
-		else if(dclip(DIM_X) != HIDDEN && dclip(DIM_Y) != HIDDEN && clipped)
-			d_inkbox->show();
-	}
-
-	void Frame::updateClip(Dimension dim)
-	{
-		d_clipPos[dim] = std::max(d_parent->d_clipPos[dim] - d_position[dim], 0.f);
-		d_clipSize[dim] = std::min(d_size[dim], d_parent->d_clipPos[dim] + d_parent->d_clipSize[dim] - d_position[dim]) - d_clipPos[dim];
-		d_clipSize[dim] = std::max(d_clipSize[dim], 0.f);
-	}
-
 	void Frame::nextFrame(size_t tick, size_t delta)
 	{
 		UNUSED(tick); UNUSED(delta);
 
+		d_widget.nextFrame(tick, delta);
+
 		if(d_style->updated() > d_styleStamp)
 			this->resetStyle();
+
+		if(d_frame.dirty() >= Frame::DIRTY_POSITION)
+			this->layer().setRedraw();
+
+		this->beginDraw();
+		this->updateChildren();
+		this->endDraw();
 
 		this->updateOnce();
 	}
@@ -238,20 +217,10 @@ namespace mk
 		if(d_parent)
 			this->setDirty(d_parent->forceDirty());
 
-		if(d_dirty >= DIRTY_VISIBILITY)
-			d_visible ? d_inkbox->show() : d_inkbox->hide();
-		if(d_dirty >= DIRTY_SKIN)
-			d_inkbox->updateStyle();
-		if(d_dirty >= DIRTY_WIDGET)
-			this->updateSize();
 		if(d_dirty >= DIRTY_POSITION)
 			this->updatePosition();
-		if(d_dirty >= DIRTY_CLIP)
-			this->updateClip();
 		if(d_dirty >= DIRTY_ABSOLUTE)
 			this->derivePosition();
-		if(d_dirty >= DIRTY_ABSOLUTE)
-			d_inkbox->updateFrame();
 
 		d_dirty = CLEAN;
 	}
@@ -268,7 +237,6 @@ namespace mk
 		if(this->frameType() == LAYER)
 			return;
 
-		d_inkbox = make_unique<Inkbox>(*this);
 		this->setDirty(DIRTY_VISIBILITY);
 	}
 
@@ -287,26 +255,9 @@ namespace mk
 		d_absolute[DIM_Y] = this->calcAbsolute(DIM_Y);
 	}
 
-	void Frame::updateSize()
-	{
-		d_inkbox->updateContent();
-
-		if(dshrink(DIM_X) && (this->frameType() == FRAME || this->as<Stripe>().sequence().size() == 0))
-			this->setSizeDim(DIM_X, d_inkbox->contentSize(DIM_X) + d_inkstyle->padding().x0() + d_inkstyle->padding().x1());
-		if(dshrink(DIM_Y) && (this->frameType() == FRAME || this->as<Stripe>().sequence().size() == 0))
-			this->setSizeDim(DIM_Y, d_inkbox->contentSize(DIM_Y) + d_inkstyle->padding().y0() + d_inkstyle->padding().y1());
-	}
-
 	void Frame::updateState(WidgetState state)
 	{
-		InkStyle* inkstyle = d_inkstyle;
-		d_inkstyle = &d_style->subskin(state);
-
-		if(d_inkstyle != inkstyle)
-		{
-			this->setDirty(DIRTY_SKIN);
-			std::cerr << ">>>>>> SKIN " << d_inkstyle->name() << std::endl;
-		}
+		this->updateInkstyle(d_style->subskin(state));
 	}
 
 	void Frame::setSizeDim(Dimension dim, float size)
@@ -318,10 +269,9 @@ namespace mk
 		d_size[dim] = size;
 		this->setDirty(DIRTY_FRAME);
 
-		if(dexpand(dim) || !flow())
-			d_clipSize[dim] = size;
-
-		if(d_parent)
+		// @kludge checking state because of double loop bind -> updateStyle -> setSizeDim -> childSized and insert -> childShown adding size twice
+		// one option is reversing the parent part of updateStyle() so that the stripe takes care of it on insert (setting override style, space, sizing, and size)
+		if(d_widget.state() & BOUND && d_parent)
 			d_parent->childSized(*this, dim, delta);
 		this->resized(dim);
 	}
@@ -341,7 +291,6 @@ namespace mk
 	void Frame::setPositionDim(Dimension dim, float position)
 	{
 		d_position[dim] = position;
-		d_clipPos[dim] = 0.f;
 		this->setDirty(DIRTY_POSITION); // @note was DIRTY_ABSOLUTE (performance hazard with current setting)
 	}
 

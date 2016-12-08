@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_SHEET_H_INCLUDED
-#define MK_SHEET_H_INCLUDED
+#ifndef MK_SHEET_H
+#define MK_SHEET_H
 
 /* mk */
 #include <Object/mkId.h>
@@ -24,8 +24,6 @@ namespace mk
 	public:
 		Sheet(StyleType& type = cls(), FrameType frameType = STRIPE);
 		~Sheet();
-
-		void nextFrame(size_t tick, size_t delta);
 
 		inline Stripe& stripe() { return m_frame->as<Stripe>(); }
 		inline const std::vector<unique_ptr<Widget>>& contents() { return m_contents; }
@@ -224,16 +222,10 @@ namespace mk
 	{
 	public:
 		Tooltip(RootSheet& rootSheet, const string& label);
-		~Tooltip();
-
-		const string& label() { return m_label; }
 
 		void setLabel(const string& label);
 
 		static StyleType& cls() { static StyleType ty("Tooltip", Widget::cls()); return ty; }
-
-	protected:
-		string m_label;
 	};
 
 	class MK_UI_EXPORT Band : public Sheet
@@ -245,4 +237,4 @@ namespace mk
 	};
 }
 
-#endif // MK_SHEET_H_INCLUDED
+#endif // MK_SHEET_H

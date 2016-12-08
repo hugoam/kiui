@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_DIM_H_INCLUDED
-#define MK_DIM_H_INCLUDED
+#ifndef MK_DIM_H
+#define MK_DIM_H
 
 /* mk */
 #include <Object/mkId.h>
@@ -20,7 +20,6 @@
 
 #if defined _WIN32
 #undef OPAQUE
-#undef VOID
 #endif
 
 namespace mk
@@ -99,8 +98,8 @@ namespace mk
 	enum _I_ Opacity : unsigned int
 	{
 		OPAQUE = 0,
-		GLASSY = 1,
-		VOID = 2
+		CLEAR = 1,
+		HOLLOW = 2
 	};
 
 	enum _I_ Weight : unsigned int
@@ -248,4 +247,4 @@ namespace mk
 	};
 }
 
-#endif // MK_DIM_H_INCLUDED
+#endif // MK_DIM_H

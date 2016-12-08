@@ -9,7 +9,6 @@
 
 #include <Ui/Widget/mkWidgets.h>
 
-#include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 #include <Ui/Frame/mkLayer.h>
@@ -73,7 +72,6 @@ namespace mk
 		if(m_window.dock())
 			m_window.undock();
 
-		m_window.frame().layer().setOpacity(VOID);
 		m_window.frame().layer().moveToTop();
 	}
 
@@ -86,6 +84,8 @@ namespace mk
 
 	void WindowHeader::leftDragEnd(MouseEvent& mouseEvent)
 	{
+		m_window.frame().layer().setOpacity(HOLLOW);
+
 		if(m_window.dockable())
 		{
 			Widget* widget = this->rootSheet().pinpoint(mouseEvent.posX, mouseEvent.posY);
@@ -178,7 +178,7 @@ namespace mk
 		, m_body(this->makeappend<WindowBody>())
 		, m_footer(this->makeappend<WindowFooter>(*this))
 	{
-		m_style = dock ? &DockWindow::cls() : &Window::cls();
+		//m_style = dock ? &DockWindow::cls() : &Window::cls();
 		if(!this->sizable())
 			m_footer.hide();
 	}

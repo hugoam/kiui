@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_CONTROLLER_H_INCLUDED
-#define MK_CONTROLLER_H_INCLUDED
+#ifndef MK_CONTROLLER_H
+#define MK_CONTROLLER_H
 
 /* mk */
 #include <Ui/Input/mkKeyCode.h>
@@ -46,4 +46,4 @@ namespace mk
 	};
 }
 
-#endif // MK_CONTROLLER_H_INCLUDED
+#endif // MK_CONTROLLER_H

@@ -18,7 +18,7 @@ namespace mk
 	template <> Flow fromString<Flow>(const string& str) { if(str == "FLOW") return FLOW; else if(str == "OVERLAY") return OVERLAY; return FLOW; }
 	template <> Space fromString<Space>(const string& str) { if(str == "AUTO") return AUTO; if(str == "BLOCK") return BLOCK; else if(str == "FIT") return FIT; else if(str == "DIV") return DIV; else if(str == "SPACE") return SPACE; else if(str == "BOARD") return BOARD; return AUTO; }
 	template <> Clipping fromString<Clipping>(const string& str) { if(str == "NOCLIP") return NOCLIP; else if(str == "CLIP") return CLIP; return NOCLIP; }
-	template <> Opacity fromString<Opacity>(const string& str) { if(str == "OPAQUE") return OPAQUE; else if(str == "VOID") return VOID; return OPAQUE; }
+	template <> Opacity fromString<Opacity>(const string& str) { if(str == "OPAQUE") return OPAQUE; else if(str == "CLEAR") return CLEAR; else if(str == "HOLLOW") return HOLLOW;  return OPAQUE; }
 	template <> Dimension fromString<Dimension>(const string& str) { if(str == "DIM_X") return DIM_X; else if(str == "DIM_Y") return DIM_Y; return DIM_X; }
 	template <> Sizing fromString<Sizing>(const string& str) { if(str == "FIXED") return FIXED; else if(str == "MANUAL") return MANUAL; else if(str == "SHRINK") return SHRINK; else if(str == "EXPAND") return EXPAND; return FIXED; }
 	template <> Align fromString<Align>(const string& str) { if(str == "CENTER") return CENTER; else if(str == "LEFT") return LEFT; else if(str == "RIGHT") return RIGHT; return LEFT; }
@@ -184,7 +184,7 @@ namespace mk
 			string suffix = "_" + replaceAll(strState, "|", "_");
 			InkStyle& inkstyle = m_style->decline(state);
 			inkstyle.m_imageSkin = m_skin->m_imageSkin;
-			inkstyle.m_imageSkin.val.setImage(findImage(m_skin->m_imageSkin.val.d_image->d_name + suffix));
+			inkstyle.m_imageSkin.val.setupImage(findImage(m_skin->m_imageSkin.val.d_image->d_name + suffix));
 		}
 	}
 
@@ -207,7 +207,7 @@ namespace mk
 		else if(key == "clipping")
 			m_style->layout().d_clipping = fromString<Clipping>(value); // NOCLIP | CLIP
 		else if(key == "opacity")
-			m_style->layout().d_opacity = fromString<Opacity>(value); // OPAQUE | VOID
+			m_style->layout().d_opacity = fromString<Opacity>(value); // OPAQUE | CLEAR | HOLLOW
 		else if(key == "space")
 			m_style->layout().d_space = fromString<Space>(value); // AUTO | BLOCK | FIT | DIV | SPACE | BOARD
 		else if(key == "sizing")

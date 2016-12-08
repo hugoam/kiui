@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_WIDGET_H_INCLUDED
-#define MK_WIDGET_H_INCLUDED
+#ifndef MK_WIDGET_H
+#define MK_WIDGET_H
 
 /* mk */
 #include <Object/mkTyped.h>
@@ -47,6 +47,12 @@ namespace mk
 		_A_ _M_ inline Style& style() { return *m_style; }
 		_A_ inline Device* device() { return m_device; }
 
+		const string& label();
+		void setLabel(const string& label);
+
+		Image* image();
+		void setImage(Image* image);
+
 		void setStyle(Style& style);
 
 		void setDevice(Device& device) { m_device = &device; }
@@ -56,13 +62,11 @@ namespace mk
 		virtual Style& fetchOverride(Style& style);
 
 		virtual const string& name() { return sNullString; }
-		virtual const string& label() { return sNullString; }
 		virtual const string& tooltip() { return sNullString; }
 		virtual const string& dockid() { return sNullString; }
 		virtual Style* hoverCursor() { return nullptr; }
-		virtual Image* image(); // { return sNullString; }
 
-		virtual const string& contentlabel() { return this->label(); }
+		virtual const string& contentlabel();
 
 		virtual RootSheet& rootSheet();
 
@@ -88,7 +92,7 @@ namespace mk
 		void resetStyle(Style& style);
 		void resetSkin(Style& style);
 
-		void nextFrame(size_t tick, size_t delta);
+		void nextFrame(size_t tick, size_t delta) { UNUSED(tick); UNUSED(delta); }
 
 		void toggleState(WidgetState state);
 
@@ -116,7 +120,7 @@ namespace mk
 
 		bool contains(Widget& widget);
 
-		virtual void customDraw() {}
+		virtual void customDraw(Renderer& renderer) { UNUSED(renderer); }
 
 		InputReceiver* controlEvent(InputEvent& inputEvent);
 		InputReceiver* propagateEvent(InputEvent& inputEvent);
@@ -151,4 +155,4 @@ namespace mk
 	};
 }
 
-#endif // MK_WIDGET_H_INCLUDED
+#endif // MK_WIDGET_H

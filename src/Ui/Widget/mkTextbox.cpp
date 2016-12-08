@@ -10,7 +10,6 @@
 #include <Object/mkRef.h>
 
 #include <Ui/Frame/mkFrame.h>
-#include <Ui/Frame/mkInk.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 
@@ -18,11 +17,11 @@
 
 namespace mk
 {
-	Textbox::Textbox(WValue* input)
-		: TypeIn(input, "", cls())
+	Textbox::Textbox(WValue& input)
+		: TypeIn(input, cls())
 	{}
 
-	Textbox::Textbox(const string& text)
-		: TypeIn(nullptr, text, cls())
+	Textbox::Textbox(string& text)
+		: TypeIn(text, cls())
 	{}
 }

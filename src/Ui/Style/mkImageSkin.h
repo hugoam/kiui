@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_IMAGESKIN_H_INCLUDED
-#define MK_IMAGESKIN_H_INCLUDED
+#ifndef MK_IMAGESKIN_H
+#define MK_IMAGESKIN_H
 
 /* mk */
 #include <Object/mkId.h>
@@ -95,7 +95,7 @@ namespace mk
 			, d_images(9)
 			, d_stretch(stretch)
 		{
-			this->setImage(*d_image);
+			this->setupImage(*d_image);
 		}
 
 		ImageSkin()
@@ -104,7 +104,7 @@ namespace mk
 
 		bool null() const { return d_image == nullptr; }
 
-		void setImage(Image& image)
+		void setupImage(Image& image)
 		{
 			d_image = &image;
 			d_images[TOP_LEFT].d_name = image.d_name + "_topleft";
@@ -121,9 +121,11 @@ namespace mk
 
 			for(size_t i = 0; i < 9; ++i)
 				d_images[i].d_index = d_image->d_index;
+
+			this->setupSize(image.d_width, image.d_height);
 		}
 
-		void prepare(int width, int height)
+		void setupSize(int width, int height)
 		{
 			d_width = width;
 			d_height = height;
@@ -186,4 +188,4 @@ namespace mk
 	};
 }
 
-#endif // MK_IMAGESKIN_H_INCLUDED
+#endif // MK_IMAGESKIN_H

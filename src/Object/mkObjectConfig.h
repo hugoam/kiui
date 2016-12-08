@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef MK_OBJECTCONFIG_H_INCLUDED
-#define MK_OBJECTCONFIG_H_INCLUDED
+#ifndef MK_OBJECTCONFIG_H
+#define MK_OBJECTCONFIG_H
 
 #include <Object/mkPragma.h>
 
@@ -50,4 +50,4 @@
 
 #define MK_FUNC_EXPORT __cdecl
 
-#endif // mkOBJECTCONFIG_H_INCLUDED
+#endif

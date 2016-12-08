@@ -3,7 +3,7 @@
 //  This notice and the license may not be removed or altered from any source distribution.
 
 #include <Ui/mkUiConfig.h>
-#include <Ui/Nano/mkNanoInk.h>
+#include <Ui/Nano/mkNanoRenderer.h>
 
 #include <Object/Util/mkColour.h>
 #include <Ui/Frame/mkFrame.h>
@@ -12,11 +12,7 @@
 
 #include <Ui/Nano/mkNanoWindow.h>
 
-#ifdef KIUI_DRAW_CACHE
-#include <Ui/Nano/nanovg_cache/nanovg.h>
-#else
 #include <Ui/Nano/nanovg/nanovg.h>
-#endif
 
 #include <cmath>
 
@@ -32,11 +28,7 @@ namespace mk
 
 	void nvgRoundedBox(NVGcontext *ctx, float x, float y, float w, float h, float cr0, float cr1, float cr2, float cr3)
 	{
-#ifdef KIUI_DRAW_CACHE
-		nvgRoundedRect4(ctx, x, y, w, h, cr0, cr1, cr2, cr3);
-#else
 		nvgRoundedRectVarying(ctx, x, y, w, h, cr0, cr1, cr2, cr3);
-#endif
 	}
 
 	NVGcolor nvgColour(const Colour& colour)
@@ -59,27 +51,6 @@ namespace mk
 		, m_ctx(window.ctx())
 	{}
 
-#ifdef KIUI_DRAW_CACHE
-	void NanoRenderer::createCache(void*& cache, size_t size)
-	{
-		if(!cache)
-			cache = nvgCreateDisplayList(11);
-	}
-
-	void NanoRenderer::drawCache(void* cache, float x, float y)
-	{
-		nvgSave(ctx());
-		nvgTranslate(ctx(), x, y);
-		nvgDrawDisplayList(ctx(), (NVGdisplayList*) cache);
-		nvgRestore(ctx());
-	}
-
-	void NanoRenderer::destroyCache(void* cache)
-	{
-		nvgDeleteDisplayList((NVGdisplayList*) cache);
-	}
-#endif
-
 	void NanoRenderer::initImage(Image& image, bool tile)
 	{
 		if(image.d_index)
@@ -97,7 +68,8 @@ namespace mk
 
 	void NanoRenderer::clipRect(BoxFloat& rect)
 	{
-		nvgScissor(ctx(), rect.x(), rect.y(), rect.w(), rect.h());
+		//nvgScissor(ctx(), rect.x(), rect.y(), rect.w(), rect.h());
+		nvgIntersectScissor(ctx(), rect.x(), rect.y(), rect.w(), rect.h());
 	}
 
 	void NanoRenderer::unclipRect()
@@ -107,22 +79,23 @@ namespace mk
 
 	void NanoRenderer::clipFrame(BoxFloat& rect, BoxFloat& corners)
 	{
-		nvgGlobalCompositeOperation(ctx(), NVG_SOURCE_IN);
-
+		/*nvgBeginPath(ctx());
 		pathRect(rect, corners, 0.f);
 
 		nvgFillColor(ctx(), nvgColour(Colour::Black));
 		nvgFill(ctx());
+
+		nvgGlobalCompositeOperation(ctx(), NVG_SOURCE_IN);*/
 	}
 
 	void NanoRenderer::clipShape()
 	{
-		nvgGlobalCompositeOperation(ctx(), NVG_SOURCE_IN);
+		/*nvgGlobalCompositeOperation(ctx(), NVG_SOURCE_IN);*/
 	}
 
 	void NanoRenderer::unclipShape()
 	{
-		nvgGlobalCompositeOperation(ctx(), NVG_SOURCE_OVER);
+		/*nvgGlobalCompositeOperation(ctx(), NVG_SOURCE_OVER);*/
 	}
 
 	void NanoRenderer::pathBezier(float x1, float y1, float c1x, float c1y, float c2x, float c2y, float x2, float y2)
@@ -310,7 +283,8 @@ namespace mk
 			textRows.back().end = nvgTextRow.end;
 			textRows.back().rect.assign(paddedRect.x(), paddedRect.y() + y, nvgTextRow.maxx, lineh);
 
-			this->breakTextLine(paddedRect, textRows.back());
+			if(nvgTextRow.start != nvgTextRow.end)
+				this->breakTextLine(paddedRect, textRows.back());
 
 			y += lineh;
 		}
@@ -330,7 +304,7 @@ namespace mk
 			NVGglyphPosition& glyph = positions[i];
 			TextGlyph& out = textRow.glyphs[i];
 			out.position = textRow.start + i;
-			out.rect.assign(paddedRect.x() + glyph.minx, textRow.rect.y(), glyph.maxx - glyph.minx, textRow.rect.h());
+			out.rect.assign(glyph.minx, textRow.rect.y(), glyph.maxx - glyph.minx, textRow.rect.h());
 		}
 	}
 
@@ -343,14 +317,42 @@ namespace mk
 	}
 
 #ifdef KIUI_DRAW_CACHE
-	void NanoRenderer::beginUpdate(void* cache)
+	void NanoRenderer::layerCache(Layer& layer, void*& cache)
 	{
-		nvgResetDisplayList((NVGdisplayList*) cache);
-		nvgBindDisplayList(ctx(), (NVGdisplayList*) cache);
+		if(m_layers.find(&layer) == m_layers.end())
+			m_layers[&layer] = nvgCreateDisplayList(-1);
+
+		cache = m_layers[&layer];
 	}
 
-	void NanoRenderer::endUpdate(void* cache)
+	void NanoRenderer::drawLayer(void* layerCache, float x, float y)
 	{
+		nvgSave(ctx());
+		nvgTranslate(ctx(), x, y);
+		nvgDrawDisplayList(ctx(), (NVGdisplayList*)layerCache);
+		nvgRestore(ctx());
+	}
+
+	void NanoRenderer::beginLayer(void* layerCache)
+	{
+		nvgResetDisplayList((NVGdisplayList*)layerCache);
+	}
+
+	void NanoRenderer::endLayer()
+	{
+
+	}
+
+	void NanoRenderer::beginUpdate(void* layerCache, float x, float y)
+	{
+		nvgBindDisplayList(ctx(), (NVGdisplayList*)layerCache);
+		nvgSave(ctx());
+		nvgTranslate(ctx(), x, y);
+	}
+
+	void NanoRenderer::endUpdate()
+	{
+		nvgRestore(ctx());
 		nvgBindDisplayList(ctx(), nullptr);
 	}
 #else
