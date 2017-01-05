@@ -50,13 +50,13 @@ endif ()
 
 add_library(${PROJECT_NAME} ${LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(${PROJECT_NAME} toyobj)
-target_link_libraries(${PROJECT_NAME} ${GLFW_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES})
-
 include_directories(${TOYOBJ_INCLUDE_DIR})
 include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(${GLFW_INCLUDE_DIR})
+
+target_link_libraries(${PROJECT_NAME} toyobj)
+target_link_libraries(${PROJECT_NAME} ${GLFW_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES})
 
 
 set(${PROJECT_NAME_UPPER}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}

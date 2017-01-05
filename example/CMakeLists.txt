@@ -1,8 +1,10 @@
 project(toyui_example)
 
+string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-file(GLOB SOURCE_FILES example_nanovg.cpp 
+file(GLOB SOURCE_FILES example.cpp 
                        mkUiExample.cpp)
 file(GLOB HEADER_FILES mkUiExampleConfig.h
                        mkUiExample.h)
@@ -26,6 +28,10 @@ include_directories(${TOYUI_INCLUDE_DIR})
 
 target_link_libraries(toyui_example toyui)
 
+
+set(${PROJECT_NAME_UPPER}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}
+    CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)
+    
 if (WIN32)
     install(TARGETS toyui_example INCLUDES DESTINATION include ARCHIVE DESTINATION lib RUNTIME DESTINATION bin)
 else ()
