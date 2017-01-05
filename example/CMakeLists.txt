@@ -26,4 +26,8 @@ include_directories(${TOYUI_INCLUDE_DIR})
 
 target_link_libraries(toyui_example toyui)
 
-install(TARGETS toyui_example RUNTIME DESTINATION bin)
+if (WIN32)
+    install(TARGETS toyog_example INCLUDES DESTINATION include ARCHIVE DESTINATION lib RUNTIME DESTINATION bin)
+else ()
+    install(TARGETS toyog_example LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
+endif ()
