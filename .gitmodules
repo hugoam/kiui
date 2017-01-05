@@ -1,0 +1,3 @@
+[submodule "toyobj"]
+	path = sub/toyobj
+	url = git://github.com/hugoam/toy-obj
