@@ -31,7 +31,7 @@ namespace mk
 	GlRenderer::GlRenderer(UiWindow& uiWindow, RenderWindow& renderWindow)
 		: m_uiWindow(uiWindow)
 		, m_renderWindow(renderWindow)
-		, m_resourcePath("../data/")
+		, m_resourcePath(uiWindow.resourcePath())
 	{
 		this->initContext();
 	}
