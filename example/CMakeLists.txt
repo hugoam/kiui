@@ -1,13 +1,29 @@
-file(GLOB SOURCE_FILES example_nanovg.cpp example.cpp)
-file(GLOB HEADER_FILES example.h)
+project(toyui_example)
 
-add_executable(kiui_example ${SOURCE_FILES})
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-include_directories(${KIUI_SOURCE_DIR}/src)
-include_directories(${KIUI_SOURCE_DIR}/example)
+file(GLOB SOURCE_FILES example_nanovg.cpp 
+                       mkUiExample.cpp)
+file(GLOB HEADER_FILES mkUiExampleConfig.h
+                       mkUiExample.h)
 
-target_link_libraries(kiui_example kiui)
+if (WIN32)
+    add_definitions(-DTOYUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}/data/")
+else ()
+    add_definitions(-DTOYUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}/kiui/data/")
+endif ()
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+option(TOYUI_EXAMPLE_LIB "Build toyui example as static lib")
+if(TOYUI_EXAMPLE_LIB)
+    add_definitions("-DUIEXAMPLE_EXPORT")
+    add_library(toyui_example STATIC ${SOURCE_FILES} ${HEADER_FILES})
+else ()
+    add_executable(toyui_example ${SOURCE_FILES} ${HEADER_FILES})
+endif ()
 
-install(TARGETS kiui_example RUNTIME DESTINATION bin)
+include_directories(${TOYOBJ_INCLUDE_DIR})
+include_directories(${TOYUI_INCLUDE_DIR})
+
+target_link_libraries(toyui_example toyui)
+
+install(TARGETS toyui_example RUNTIME DESTINATION bin)

@@ -2,12 +2,11 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#include <Ui/mkUiConfig.h>
-#include <Ui/mkUiTypes.h>
+#include <mkUiExampleConfig.h>
+#include <mkUiExample.h>
 
 #include <Ui/Nano/mkGlWindow.h>
-
-#include <example.h>
+#include <Ui/mkUiTypes.h>
 
 #ifdef KIUI_EMSCRIPTEN
 #define KIUI_EXAMPLE_RESSOURCE_PATH "/data/"
@@ -21,7 +20,7 @@ void iterate()
 #endif
 
 #ifndef KIUI_EXAMPLE_RESSOURCE_PATH
-  #define KIUI_EXAMPLE_RESSOURCE_PATH "../data/"
+  #define KIUI_EXAMPLE_RESSOURCE_PATH "../../data/"
 #endif
 
 int main(int argc, char *argv[])
@@ -30,10 +29,8 @@ int main(int argc, char *argv[])
 	glwindow.initContext();
 
 	mk::UiWindow& uiwindow = glwindow.uiWindow();
-	//uiwindow.init();
-
-	mk::Device& root = uiwindow.rootDevice();
-	createUiTest(root);
+	mk::Sheet& rootSheet = uiwindow.rootSheet();
+	createUiTest(rootSheet);
 
 #ifdef KIUI_EMSCRIPTEN
 	gGlWindow = &glwindow;

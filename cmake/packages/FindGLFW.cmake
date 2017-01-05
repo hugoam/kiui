@@ -19,11 +19,16 @@ else ()
             /usr
     )
 
+    set (PROGRAMFILESX86 "PROGRAMFILES(X86)")
+    
     if (WIN32)
-        set(GLFW_INCLUDE_PATHS $ENV{PROGRAMFILES}/GLFW/include ${GLFW_INCLUDE_PATHS})
-        set(GLFW_LIB_PATHS $ENV{PROGRAMFILES}/GLFW/lib ${GLFW_LIB_PATHS})
+        set(GLFW_INCLUDE_PATHS $ENV{${PROGRAMFILESX86}}/GLFW/include 
+                               $ENV{PROGRAMFILES}/GLFW/include
+                               ${GLFW_INCLUDE_PATHS})
+        set(GLFW_LIB_PATHS $ENV{${PROGRAMFILESX86}}/GLFW/lib 
+                           $ENV{PROGRAMFILES}/GLFW/lib
+                           ${GLFW_LIB_PATHS})
     endif ()
-
 
     find_path(GLFW_INCLUDE_DIR NAMES GLFW/glfw3.h PATHS ${GLFW_INCLUDE_PATHS} NO_DEFAULT_PATH)
 
