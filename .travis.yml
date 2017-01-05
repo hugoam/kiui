@@ -3,7 +3,7 @@ language: cpp
 addons:
   apt:
     sources:
-      - llvm-toolchain-precise
+      - llvm-toolchain-precise-3.7
       - ubuntu-toolchain-r-test
       - george-edison55-precise-backports
     packages:
@@ -12,7 +12,6 @@ addons:
       - gcc-5
       - cmake
       - cmake-data
-
             
 compiler:
   - gcc
