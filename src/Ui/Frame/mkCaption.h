@@ -9,7 +9,6 @@
 #include <Object/mkIndexer.h>
 #include <Object/Util/mkNonCopy.h>
 #include <Ui/mkUiForward.h>
-#include <Ui/Frame/mkRenderFrame.h>
 #include <Ui/Style/mkDim.h>
 
 namespace mk
@@ -24,36 +23,47 @@ namespace mk
 	{
 		const char* start;
 		const char* end;
+		size_t startIndex;
+		size_t endIndex;
 		BoxFloat rect;
+		BoxFloat caret;
 		BoxFloat selected;
 
 		std::vector<TextGlyph> glyphs;
 	};
 
-	class MK_UI_EXPORT Caption : public RenderFrame
+	class MK_UI_EXPORT Caption
 	{
 	public:
-		Caption(Frame& frame);
+		Caption(DrawFrame& frame);
 		~Caption();
 
-		size_t selectStart() { return m_selectFirst < m_selectSecond ? m_selectFirst : m_selectSecond; }
-		size_t selectEnd() { return m_selectSecond > m_selectFirst ? m_selectSecond : m_selectFirst; }
+		int selectStart() { return m_selectStart; }
+		int selectEnd() { return m_selectEnd; }
+		int caret() { return m_caret; }
 
-		void redraw(Renderer& target, BoxFloat& rect, BoxFloat& paddedRect, BoxFloat& contentRect);
+		void selectStart(int value) { m_selectStart = value; }
+		void selectEnd(int value) { m_selectEnd = value; }
+		void caret(int value) { m_caret = value; }
 
-		void selectCaret(size_t index) { m_selectFirst = index; m_selectSecond = index; this->updateSelection(); }
-		void selectFirst(size_t start) { m_selectFirst = start; m_selectSecond = start; this->updateSelection(); }
-		void selectSecond(size_t end) { m_selectSecond = end; this->updateSelection(); }
+		float textSize(Dimension dim);
 
-		void updateTextRows(Renderer& target, BoxFloat& paddedRect);
+		void redraw(Renderer& target, const BoxFloat& rect, const BoxFloat& paddedRect, const BoxFloat& contentRect);
+
+		void updateTextRows(Renderer& target, const DimFloat& space);
 		void updateSelection();
 
+		TextRow& textRow(size_t index);
+
 		size_t caretIndex(float x, float y);
-		void caretCoords(size_t index, float& caretX, float& caretY, float& caretHeight);
+		void caretCoords(float& x, float& y);
 
 	protected:
-		size_t m_selectFirst;
-		size_t m_selectSecond;
+		DrawFrame& m_frame;
+
+		int m_selectStart;
+		int m_selectEnd;
+		int m_caret;
 
 		std::vector<TextRow> m_textRows;
 	};

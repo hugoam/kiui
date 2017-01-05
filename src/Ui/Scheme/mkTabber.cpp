@@ -107,6 +107,6 @@ namespace mk
 
 	void Tabber::showTab(size_t index)
 	{
-		this->showTab(m_tabs.at(index)->as<Tab>());
+		this->showTab(m_tabs.at(index).as<Tab>());
 	}
 }

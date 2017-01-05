@@ -155,7 +155,7 @@ namespace mk
 		{
 			size_t index = fromString<size_t>(ids.back());
 			if(index < dockline->count())
-				dockline = &dockline->at(index)->as<Dockline>();
+				dockline = &dockline->at(index).as<Dockline>();
 			else
 				dockline = &dockline->insertLine(index);
 			ids.pop_back();
@@ -183,7 +183,7 @@ namespace mk
 
 		size_t index = fromString<size_t>(section);
 		if(index < dockline.count())
-			return dockline.at(index)->as<Docksection>();
+			return dockline.at(index).as<Docksection>();
 		else
 			return dockline.insertSection(index);
 	}

@@ -8,14 +8,34 @@
 /* mk */
 #include <Ui/mkUiForward.h>
 #include <Ui/Widget/mkSheet.h>
+#include <Ui/Widget/mkCursor.h>
 #include <Ui/Widget/mkButton.h>
 
 namespace mk
 {
-	class MK_UI_EXPORT Canvas : public Sheet
+	class MK_UI_EXPORT Plan : public Sheet
 	{
 	public:
-		Canvas(Trigger contextTrigger = Trigger());
+		Plan();
+
+		void updateBounds();
+
+		static StyleType& cls() { static StyleType ty("Plan", Sheet::cls()); return ty; }
+	
+	protected:
+		BoxFloat m_bounds;
+	};
+
+	class MK_UI_EXPORT Canvas : public ScrollSheet
+	{
+	public:
+		Canvas(const string& title, Trigger contextTrigger = Trigger());
+
+		const string& name();
+
+		void nextFrame(size_t tick, size_t delta);
+
+		Widget& vappend(unique_ptr<Widget> widget);
 
 		void rightClick(MouseEvent& mouseEvent);
 		void mouseWheel(MouseEvent& mouseEvent);
@@ -23,7 +43,9 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Canvas", Sheet::cls()); return ty; }
 
 	protected:
+		string m_name;
 		Trigger m_contextTrigger;
+		Plan& m_plan;
 	};
 
 	class MK_UI_EXPORT NodePlugKnob : public Widget
@@ -42,7 +64,13 @@ namespace mk
 	public:
 		NodePlug(const string& name, bool input, ConnectTrigger onConnect = ConnectTrigger());
 
+		const string& tooltip() { return m_tooltip; }
+
 		bool input() { return m_input; }
+
+		void setTooltip(const string& tooltip) { m_tooltip = tooltip; }
+
+		Sheet& canvas();
 
 		void leftDragStart(MouseEvent& mouseEvent);
 		void leftDrag(MouseEvent& mouseEvent);
@@ -58,13 +86,14 @@ namespace mk
 
 	protected:
 		string m_name;
+		string m_tooltip;
 		bool m_input;
 		Label& m_title;
 		NodePlugKnob& m_knob;
 
 		ConnectTrigger m_onConnect;
 
-		NodePlug* m_connectProxy;
+		NodeCable* m_cableProxy;
 
 		std::vector<NodeCable*> m_cables;
 	};
@@ -84,18 +113,18 @@ namespace mk
 	class MK_UI_EXPORT NodeCable : public Widget
 	{
 	public:
-		NodeCable(NodePlug& plugOut, NodePlug& plugIn);
+		NodeCable(Widget& plugOut, Widget& plugIn);
 
-		NodePlug& plugOut() { return m_plugOut; }
-		NodePlug& plugIn() { return m_plugIn; }
+		Widget& plugOut() { return m_plugOut; }
+		Widget& plugIn() { return m_plugIn; }
 
 		void customDraw(Renderer& renderer);
 
 		static StyleType& cls() { static StyleType ty("NodeCable", Sheet::cls()); return ty; }
 
 	protected:
-		NodePlug& m_plugOut;
-		NodePlug& m_plugIn;
+		Widget& m_plugOut;
+		Widget& m_plugIn;
 	};
 
 	class MK_UI_EXPORT NodeBody : public Sheet
@@ -129,7 +158,7 @@ namespace mk
 	class MK_UI_EXPORT Node : public LayerSheet
 	{
 	public:
-		Node(const string& title, bool position = false, float x = 0.f, float y = 0.f);
+		Node(const string& title);
 		~Node();
 
 		const string& name();

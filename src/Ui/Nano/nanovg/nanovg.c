@@ -232,6 +232,7 @@ static void nvg__renderTriangles(NVGcontext* ctx, NVGpaint* paint, NVGscissor* s
 }
 
 static NVGscissor* nvg__combineScissor(const NVGscissor * rhs, const NVGscissor * lhs, NVGscissor * result);
+static void nvg__scissorRect(const NVGscissor * scissor, const float * tx, float * rect);
 
 static float nvg__sqrtf(float a) { return sqrtf(a); }
 static float nvg__modf(float a, float b) { return fmodf(a, b); }
@@ -1135,19 +1136,50 @@ void nvgTransform(NVGcontext* ctx, float a, float b, float c, float d, float e, 
 #endif
 }
 
-void nvgResetTransform(NVGcontext* ctx)
+/*void nvgResetTransform(NVGcontext* ctx)
 {
 	NVGstate* state = nvg__getState(ctx);
 	nvgTransformIdentity(state->xform);
-    
+
 #if NVG_TRANSFORM_IN_BACKEND
-    nvgTransformInverse(state->invxform, state->xform);
+	nvgTransformInverse(state->invxform, state->xform);
 #endif
+}*/
+
+void nvgResetTransform(NVGcontext* ctx)
+{
+	NVGstate* state = nvg__getState(ctx);
+
+	float rect[4];
+
+	if(state->scissor.extent[0] >= 0)
+	{
+		nvg__scissorRect(&state->scissor, state->invxform, rect);
+	}
+
+	nvgTransformIdentity(state->xform);
+
+#if NVG_TRANSFORM_IN_BACKEND
+	nvgTransformInverse(state->invxform, state->xform);
+#endif
+
+	if(state->scissor.extent[0] >= 0)
+	{
+		nvgRoundedScissor(ctx, rect[0], rect[1], rect[2], rect[3], state->scissor.corners[0], state->scissor.corners[1], state->scissor.corners[2], state->scissor.corners[3]);
+	}
 }
 
 void nvgTranslate(NVGcontext* ctx, float x, float y)
 {
 	NVGstate* state = nvg__getState(ctx);
+
+	/*float rect[4];
+
+	if(state->scissor.extent[0] >= 0)
+	{
+		nvg__scissorRect(&state->scissor, state->invxform, rect);
+	}*/
+
 	float t[6];
 	nvgTransformTranslate(t, x,y);
 	nvgTransformPremultiply(state->xform, t);
@@ -1155,6 +1187,11 @@ void nvgTranslate(NVGcontext* ctx, float x, float y)
 #if NVG_TRANSFORM_IN_BACKEND
     nvgTransformInverse(state->invxform, state->xform);
 #endif
+
+	/*if(state->scissor.extent[0] >= 0)
+	{
+		nvgRoundedScissor(ctx, rect[0], rect[1], rect[2], rect[3], state->scissor.corners[0], state->scissor.corners[1], state->scissor.corners[2], state->scissor.corners[3]);
+	}*/
 }
 
 void nvgRotate(NVGcontext* ctx, float angle)
@@ -1417,7 +1454,7 @@ NVGpaint nvgImagePattern(NVGcontext* ctx,
 	return p;
 }
 
-static void nvg__rectScissor(const float * rect, NVGscissor * scissor, const float * tx)
+static void nvg__rectScissor(const float * rect, const float * corners, NVGscissor * scissor, const float * tx)
 {
 	float w = nvg__maxf(0.0f, rect[2]);
 	float h = nvg__maxf(0.0f, rect[3]);
@@ -1429,15 +1466,26 @@ static void nvg__rectScissor(const float * rect, NVGscissor * scissor, const flo
 	
 	scissor->extent[0] = w*0.5f;
 	scissor->extent[1] = h*0.5f;
+
+	scissor->corners[0] = corners[0];
+	scissor->corners[1] = corners[1];
+	scissor->corners[2] = corners[2];
+	scissor->corners[3] = corners[3];
 }
 
 // Scissoring
 void nvgScissor(NVGcontext* ctx, float x, float y, float w, float h)
 {
+	nvgRoundedScissor(ctx, x, y, w, h, 0.f, 0.f, 0.f, 0.f);
+}
+
+void nvgRoundedScissor(NVGcontext* ctx, float x, float y, float w, float h, float c0, float c1, float c2, float c3)
+{
 	NVGstate* state = nvg__getState(ctx);
-	
-	float rect[] = {x, y, w, h};
-	nvg__rectScissor(rect, &state->scissor, state->xform);
+
+	float rect[] = { x, y, w, h };
+	float corners[] = { c0, c1, c2, c3 };
+	nvg__rectScissor(rect, corners, &state->scissor, state->xform);
 }
 
 static void nvg__isectRects(float* dst,
@@ -1480,30 +1528,45 @@ static void nvg__scissorRect(const NVGscissor * scissor, const float * tx, float
 	rect[3] = tey*2;
 }
 
+void nvgCurrentScissor(NVGcontext* ctx, float* scissorRect)
+{
+	NVGstate* state = nvg__getState(ctx);
+	if(state->scissor.extent[0] >= 0)
+	{
+		nvg__scissorRect(&state->scissor, state->invxform, scissorRect);
+	}
+}
+
 void nvgIntersectScissor(NVGcontext* ctx, float x, float y, float w, float h)
+{
+	nvgIntersectRoundedScissor(ctx, x, y, w, h, 0.f, 0.f, 0.f, 0.f);
+}
+
+void nvgIntersectRoundedScissor(NVGcontext* ctx, float x, float y, float w, float h, float c0, float c1, float c2, float c3)
 {
 	NVGstate* state = nvg__getState(ctx);
 #if !NVG_TRANSFORM_IN_BACKEND
 	float invxform[6];
 #endif
 	float rect[4], r[4];
-	
+
 	// If no previous scissor has been set, set the scissor as current scissor.
-	if (state->scissor.extent[0] < 0) {
-		nvgScissor(ctx, x, y, w, h);
+	if(state->scissor.extent[0] < 0) {
+		nvgRoundedScissor(ctx, x, y, w, h, c0, c1, c2, c3);
 		return;
 	}
-	
+
 #if NVG_TRANSFORM_IN_BACKEND
-    nvg__scissorRect(&state->scissor, state->invxform, r);
+	nvg__scissorRect(&state->scissor, state->invxform, r);
 #else
 	nvgTransformInverse(invxform, state->xform);
 	nvg__scissorRect(&state->scissor, invxform, r);
 #endif
-    
-	nvg__isectRects(rect,r[0],r[1], r[2], r[3], x,y,w,h);
-	nvgScissor(ctx, rect[0], rect[1], rect[2], rect[3]);
+
+	nvg__isectRects(rect, r[0], r[1], r[2], r[3], x, y, w, h);
+	nvgRoundedScissor(ctx, rect[0], rect[1], rect[2], rect[3], c0, c1, c2, c3);
 }
+
 
 static void nvg__resetScissor(NVGscissor * scissor)
 {
@@ -1522,8 +1585,9 @@ NVGscissor* nvg__combineScissor(const NVGscissor * rhs, const NVGscissor * lhs, 
 	nvg__isectRects(rectResult,
 					rectRhs[0], rectRhs[1], rectRhs[2], rectRhs[3],
 					rectLhs[0], rectLhs[1], rectLhs[2], rectLhs[3]);
-	
-	nvg__rectScissor(rectResult, result, NULL);
+
+	float corners[] = { 0.f, 0.f, 0.f, 0.f };
+	nvg__rectScissor(rectResult, corners, result, NULL);
 	return result;
 }
 

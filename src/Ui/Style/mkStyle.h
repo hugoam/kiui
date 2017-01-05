@@ -67,7 +67,7 @@ namespace mk
 	public:
 		LayoutStyle()
 			: IdStruct(cls())
-			, d_flow(FLOW), d_clipping(CLIP), d_opacity(CLEAR), d_space(AUTO), d_layoutDim(DIM_Y), d_align(DimAlign(LEFT, LEFT))
+			, d_flow(FLOW), d_clipping(NOCLIP), d_opacity(CLEAR), d_space(AUTO), d_layoutDim(DIM_Y), d_align(DimAlign(LEFT, LEFT))
 			, d_span(DimFloat(1.f, 1.f)), d_pivot(DimPivot(FORWARD, FORWARD)), d_updated(0)
 		{}
 
@@ -142,8 +142,9 @@ namespace mk
 			: IdStruct(cls())
 			, m_name(name)
 			, m_empty(true), m_backgroundColour(Colour::Transparent), m_borderColour(Colour::Transparent), m_textColour(Colour::Transparent), m_imageColour(Colour::Transparent)
-			, m_textFont("dejavu"), m_textSize(14.f), m_textWrap(false)
-			, m_align(DimAlign(LEFT, LEFT)), m_borderWidth(0.f), m_image(), m_cornerRadius(), m_weakCorners(false)
+			, m_textFont("dejavu"), m_textSize(14.f), m_textBreak(true), m_textWrap(false)
+			, m_align(DimAlign(LEFT, LEFT)), m_linearGradient(DimFloat(0.f, 0.f)), m_linearGradientDim(DIM_Y)
+			, m_borderWidth(0.f), m_image(), m_cornerRadius(), m_weakCorners(false)
 		{}
 
 		InkStyle(const InkStyle& other)
@@ -163,6 +164,7 @@ namespace mk
 			m_textColour.copy(other.m_textColour, inherit);
 			m_textFont.copy(other.m_textFont, inherit);
 			m_textSize.copy(other.m_textSize, inherit);
+			m_textBreak.copy(other.m_textBreak, inherit);
 			m_textWrap.copy(other.m_textWrap, inherit);
 			m_borderWidth.copy(other.m_borderWidth, inherit);
 			m_cornerRadius.copy(other.m_cornerRadius, inherit);
@@ -170,7 +172,8 @@ namespace mk
 			m_padding.copy(other.m_padding, inherit);
 			m_margin.copy(other.m_margin, inherit);
 			m_align.copy(other.m_align, inherit);
-			m_topdownGradient.copy(other.m_topdownGradient, inherit);
+			m_linearGradient.copy(other.m_linearGradient, inherit);
+			m_linearGradientDim.copy(other.m_linearGradientDim, inherit);
 			m_image.copy(other.m_image, inherit);
 			m_overlay.copy(other.m_overlay, inherit);
 			m_tile.copy(other.m_tile, inherit);
@@ -188,6 +191,7 @@ namespace mk
 		_A_ Colour& textColour() { return m_textColour.val; }
 		_A_ const string& textFont() { return m_textFont.val; }
 		_A_ float& textSize() { return m_textSize.val; }
+		_A_ bool& textBreak() { return m_textBreak.val; }
 		_A_ bool& textWrap() { return m_textWrap.val; }
 		_A_ BoxFloat& borderWidth() { return m_borderWidth.val; }
 		_A_ BoxFloat& cornerRadius() { return m_cornerRadius.val; }
@@ -195,7 +199,8 @@ namespace mk
 		_A_ BoxFloat& padding() { return m_padding.val; }
 		_A_ BoxFloat& margin() { return m_margin.val; }
 		_A_ DimAlign& align() { return m_align.val; }
-		_A_ DimFloat& topdownGradient() { return m_topdownGradient.val; }
+		_A_ DimFloat& linearGradient() { return m_linearGradient.val; }
+		_A_ Dimension& linearGradientDim() { return m_linearGradientDim.val; }
 		_A_ Image* image() { return m_image.val; }
 		_A_ Image* overlay() { return m_overlay.val; }
 		_A_ Image* tile() { return m_tile.val; }
@@ -210,6 +215,7 @@ namespace mk
 		StyleAttr<Colour> m_textColour;
 		StyleAttr<string> m_textFont;
 		StyleAttr<float> m_textSize;
+		StyleAttr<bool> m_textBreak;
 		StyleAttr<bool> m_textWrap;
 		StyleAttr<BoxFloat> m_borderWidth;
 		StyleAttr<BoxFloat> m_cornerRadius;
@@ -217,7 +223,8 @@ namespace mk
 		StyleAttr<BoxFloat> m_padding;
 		StyleAttr<BoxFloat> m_margin;
 		StyleAttr<DimAlign> m_align;
-		StyleAttr<DimFloat> m_topdownGradient;
+		StyleAttr<DimFloat> m_linearGradient;
+		StyleAttr<Dimension> m_linearGradientDim;
 		StyleAttr<Image*> m_image;
 		StyleAttr<Image*> m_overlay;
 		StyleAttr<Image*> m_tile;

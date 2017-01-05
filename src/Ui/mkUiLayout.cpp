@@ -104,8 +104,6 @@ namespace mk
 		Dialog::cls().layout().d_padding = BoxFloat(25.f, 12.f, 25.f, 12.f);
 		Dialog::cls().layout().d_spacing = DimFloat(6.f, 6.f);
 
-		Caret::cls().layout().d_flow = FREE;
-
 		Window::cls().layout().d_flow = FREE;
 		Window::cls().layout().d_opacity = OPAQUE;
 		Window::cls().layout().d_layoutDim = DIM_Y;
@@ -133,6 +131,10 @@ namespace mk
 
 		NodePlugKnob::cls().layout().d_space = BLOCK;
 
+		NodeCable::cls().layout().d_flow = FREE;
+		NodeCable::cls().layout().d_space = BLOCK;
+
+		Canvas::cls().layout().d_clipping = CLIP;
 		Canvas::cls().layout().d_space = BOARD;
 		Canvas::cls().layout().d_opacity = OPAQUE;
 
@@ -166,6 +168,7 @@ namespace mk
 		List::cls().layout().d_space = BOARD;
 
 		Textbox::cls().layout().d_space = BOARD;
+		Text::cls().layout().d_space = DIV;
 
 		Page::cls().layout().d_space = FIT;
 
@@ -201,9 +204,6 @@ namespace mk
 
 		Scroller::cls().layout().d_space = BOARD;
 
-		Caret::cls().layout().d_space = BLOCK;
-		Caret::cls().layout().d_size = DimFloat(1.f, 1.f);
-
 		DropdownHeader::cls().layout().d_space = SPACE;
 
 		DropdownList::cls().layout().d_space = SPACE;
@@ -233,6 +233,7 @@ namespace mk
 		ScrollerX::cls().layout().d_layoutDim = DIM_X;
 		ScrollerY::cls().layout().d_layoutDim = DIM_Y;
 
+		//DynamicImage::cls().skin().m_empty = false;
 		Icon::cls().skin().m_empty = false;
 
 		Dir::cls().layout().d_layoutDim = DIM_X;
@@ -308,6 +309,8 @@ namespace mk
 		MenuList::cls().layout().d_flow = ALIGN;
 		MenuList::cls().layout().d_clipping = NOCLIP;
 
+		ScrollSheet::cls().layout().d_clipping = CLIP;
+
 		Scrollbar::cls().layout().d_layoutDim = DIM_Y;
 
 		Tab::cls().layout().d_padding = BoxFloat(0.f, 4.f, 0.f, 0.f);
@@ -337,8 +340,9 @@ namespace mk
 		CaretCursor::cls().skin().m_image = &findImage("caret_white");
 		CaretCursor::cls().skin().m_padding = BoxFloat(-4.f, -9.f, +4.f, +9.f);
 
-		Caret::cls().skin().m_backgroundColour = Colour::White;
+		//Caret::cls().skin().m_backgroundColour = Colour::White;
 
+		Text::cls().skin().m_textWrap = true;
 		Textbox::cls().skin().m_textWrap = true;
 
 		Page::cls().layout().d_spacing = DimFloat(4.f, 6.f);
@@ -357,6 +361,9 @@ namespace mk
 
 		this->override(Scroller::cls(), SliderKnobX::cls(), ScrollerKnobX::cls());
 		this->override(Scroller::cls(), SliderKnobY::cls(), ScrollerKnobY::cls());
+
+		//Plan::cls().skin().m_borderColour = Colour::Red;
+		//Plan::cls().skin().m_borderWidth = 1.f;
 	}
 
 	void Styler::defaultSkins()
@@ -488,8 +495,6 @@ namespace mk
 		ExpandboxBody::cls().skin().m_backgroundColour = Colour::DarkGrey;
 
 		TreeNodeBody::cls().skin().m_backgroundColour = Colour::Transparent;
-
-		Caret::cls().skin().m_backgroundColour = Colour::Black;
 
 		TypeIn::cls().skin().m_backgroundColour = Colour::LightGrey;
 		TypeIn::cls().skin().m_cornerRadius = BoxFloat(3.f, 3.f, 3.f, 3.f);

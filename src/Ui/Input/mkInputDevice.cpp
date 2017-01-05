@@ -7,6 +7,7 @@
 
 #include <Ui/Widget/mkRootSheet.h>
 #include <Ui/Widget/mkSheet.h>
+#include <Ui/Widget/mkCursor.h>
 
 #include <cassert>
 
@@ -219,7 +220,7 @@ namespace mk
 
 	void MouseButton::dragStart(MouseEvent& mouseEvent)
 	{
-		MouseDragStartEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY);
+		MouseDragStartEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY, m_pressedX, m_pressedY);
 		//m_pressedFrame->dispatchEvent(dragEvent); 
 		m_pressedFrame->receiveEvent(dragEvent);
 		// switch to receiveEvent -> composite events maybe don't even need propagation
@@ -243,9 +244,9 @@ namespace mk
 
 	void MouseButton::click(MouseEvent& mouseEvent)
 	{
-		MouseClickEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY);
-		//m_pressedFrame->dispatchEvent(dragEvent);
-		m_pressedFrame->receiveEvent(dragEvent);
+		MouseClickEvent clickEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY);
+		m_pressedFrame->dispatchEvent(clickEvent);
+		//m_pressedFrame->receiveEvent(clickEvent);
 		// switch to receiveEvent ? composite events maybe don't even need propagation
 	}
 

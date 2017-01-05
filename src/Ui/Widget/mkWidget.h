@@ -56,6 +56,7 @@ namespace mk
 		void setStyle(Style& style);
 
 		void setDevice(Device& device) { m_device = &device; }
+		void resetDevice() { m_device = nullptr; }
 
 		virtual unique_ptr<Widget> clone() { return make_unique<Widget>(); }
 

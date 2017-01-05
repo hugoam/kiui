@@ -9,13 +9,9 @@
 #include <Object/mkId.h>
 #include <Object/String/mkString.h>
 #include <Object/Util/mkUpdatable.h>
-#include <Object/Util/mkTimer.h>
 #include <Ui/mkUiForward.h>
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Frame/mkStripe.h>
-
-#include <memory>
-#include <deque>
 
 namespace mk
 {
@@ -29,10 +25,12 @@ namespace mk
 		inline const std::vector<unique_ptr<Widget>>& contents() { return m_contents; }
 		inline size_t count() { return m_contents.size(); }
 
-		inline Widget* at(size_t index) { return m_contents.at(index).get(); }
+		inline Widget& at(size_t index) { return *m_contents.at(index); }
 
-		void bind(Sheet& parent, size_t index);
-		void rebind(Sheet& parent, size_t index);
+		virtual void cleanup();
+
+		virtual void bind(Sheet& parent, size_t index);
+		virtual void rebind(Sheet& parent, size_t index);
 
 		virtual Widget& vappend(unique_ptr<Widget> widget) { return append(std::move(widget)); }
 		virtual unique_ptr<Widget> vrelease(Widget& widget) { return widget.unbind(); }
@@ -45,8 +43,6 @@ namespace mk
 		void swap(size_t from, size_t to);
 
 		void clear();
-
-		void cleanup();
 
 		template <class T, class... Args>
 		inline T& emplace(Args&&... args)
@@ -134,98 +130,6 @@ namespace mk
 		Dimension m_dim;
 		Widget* m_resizing;
 		Style& m_hoverCursor;
-	};
-
-	class MK_UI_EXPORT _I_ Cursor : public Sheet
-	{
-	public:
-		Cursor(RootSheet& rootSheet);
-
-		void nextFrame();
-		void setPosition(float x, float y);
-
-		void hover(Widget& hovered);
-		void unhover();
-
-		void tooltipOn();
-		void tooltipOff();
-
-		static StyleType& cls() { static StyleType ty("Cursor", Widget::cls()); return ty; }
-
-	protected:
-		bool m_dirty;
-		Widget* m_hovered;
-		Tooltip& m_tooltip;
-		Clock m_tooltipClock;
-	};
-
-	class MK_UI_EXPORT ResizeCursorX : public Object
-	{
-	public:
-		static StyleType& cls() { static StyleType ty("ResizeCursorX", Cursor::cls()); return ty; }
-	};
-
-	class MK_UI_EXPORT ResizeCursorY
-	{
-	public:
-		static StyleType& cls() { static StyleType ty("ResizeCursorY", Cursor::cls()); return ty; }
-	};
-
-	class MK_UI_EXPORT MoveCursor : public Object
-	{
-	public:
-		static StyleType& cls() { static StyleType ty("MoveCursor", Cursor::cls()); return ty; }
-	};
-
-	class MK_UI_EXPORT ResizeCursorDiagLeft : public Object
-	{
-	public:
-		static StyleType& cls() { static StyleType ty("ResizeCursorDiagLeft", Cursor::cls()); return ty; }
-	};
-
-	class MK_UI_EXPORT ResizeCursorDiagRight : public Object
-	{
-	public:
-		static StyleType& cls() { static StyleType ty("ResizeCursorDiagRight", Cursor::cls()); return ty; }
-	};
-
-	class MK_UI_EXPORT CaretCursor : public Object
-	{
-	public:
-		static StyleType& cls() { static StyleType ty("CaretCursor", Cursor::cls()); return ty; }
-	};
-
-	class MK_UI_EXPORT _I_ Caret : public Widget
-	{
-	public:
-		Caret(Frame* textFrame);
-
-		size_t index() { return m_index; }
-
-		void setIndex(size_t index) { m_index = index; m_dirty = true; }
-		
-		void moveTo(size_t index);
-		void moveRight();
-		void moveLeft();
-
-		void nextFrame(size_t tick, size_t delta);
-
-		static StyleType& cls() { static StyleType ty("Caret", Widget::cls()); return ty; }
-
-	protected:
-		Frame* m_textFrame;
-		size_t m_index;
-		bool m_dirty;
-	};
-
-	class MK_UI_EXPORT _I_ Tooltip : public Widget
-	{
-	public:
-		Tooltip(RootSheet& rootSheet, const string& label);
-
-		void setLabel(const string& label);
-
-		static StyleType& cls() { static StyleType ty("Tooltip", Widget::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT Band : public Sheet

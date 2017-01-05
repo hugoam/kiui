@@ -23,10 +23,9 @@ namespace mk
 		, m_input(nullptr)
 		, m_string(string)
 		, m_hasPeriod(false)
-		, m_caret(this->makeappend<Caret>(m_frame.get()))
 	{
 		m_frame->setText(string);
-		m_caret.hide();
+		m_frame->setTextLines(1);
 	}
 
 	TypeIn::TypeIn(WValue& input, StyleType& type)
@@ -34,36 +33,21 @@ namespace mk
 	{
 		m_input = &input;
 		m_valueString = m_input->value()->getString();
-		m_caret.hide();
+		m_frame->setText(m_valueString);
 	}
 
 	void TypeIn::nextFrame(size_t tick, size_t delta)
 	{
 		//Sheet::nextFrame(tick, delta);
-
-		if(m_state & CONTROL)
-		{
-			bool odd = (tick / 25) % 2;
-			if(odd && m_caret.frame().hidden())
-				m_caret.show();
-			else if(!odd && !m_caret.frame().hidden())
-				m_caret.hide();
-		}
 	}
 
 	void TypeIn::focused()
 	{
-		if(m_caret.frame().hidden())
-			m_caret.show();
 	}
 
 	void TypeIn::unfocused()
 	{
-		m_frame->caption().selectFirst(0);
-		m_frame->caption().selectSecond(0);
-
-		if(!m_caret.frame().hidden())
-			m_caret.hide();
+		this->selectCaret(-1);
 	}
 
 	void TypeIn::setAllowedChars(const string& chars)
@@ -73,37 +57,41 @@ namespace mk
 
 	void TypeIn::erase()
 	{
-		if(m_caret.index() == 0 && m_frame->caption().selectStart() == m_frame->caption().selectEnd())
+		if(m_frame->caption().caret() == 0 && m_frame->caption().selectStart() == m_frame->caption().selectEnd())
 			return;
 
 		if(m_frame->caption().selectStart() == m_frame->caption().selectEnd())
 		{
 			m_string.erase(m_string.begin() + m_frame->caption().selectStart() - 1);
-			this->setCaret(m_caret.index() - 1);
+			this->moveCaretLeft();
 		}
 		else
 		{
 			m_string.erase(m_string.begin() + m_frame->caption().selectStart(), m_string.begin() + m_frame->caption().selectEnd());
-			this->setCaret(m_frame->caption().selectStart());
+			this->moveCaretTo(m_frame->caption().selectStart());
 		}
+
+		m_frame->setText(m_string);
 	}
 
 	void TypeIn::insert(char c)
 	{
-		m_string.insert(m_string.begin() + m_caret.index(), c);
-		this->setCaret(m_caret.index() + 1);
+		m_string.insert(m_string.begin() + m_frame->caption().caret(), c);
+		m_frame->setText(m_string);
+		this->moveCaretRight();
 	}
 
 	void TypeIn::updateString()
 	{
 		m_string = m_input->value()->getString();
+		m_frame->setText(m_string);
 		this->markDirty();
 	}
 
 	void TypeIn::leftClick(MouseEvent& mouseEvent)
 	{
 		size_t index = m_frame->caption().caretIndex(mouseEvent.posX - m_frame->dabsolute(DIM_X), mouseEvent.posY - m_frame->dabsolute(DIM_Y));
-		this->setCaret(index);
+		this->moveCaretTo(index);
 		if(!(m_state & CONTROL))
 			this->takeControl(CM_CONTROL, InputEvent::DEVICE_KEYBOARD);
 	}
@@ -111,8 +99,7 @@ namespace mk
 	void TypeIn::leftDragStart(MouseEvent& mouseEvent)
 	{
 		size_t index = m_frame->caption().caretIndex(mouseEvent.posX - m_frame->dabsolute(DIM_X), mouseEvent.posY - m_frame->dabsolute(DIM_Y));
-		m_caret.setIndex(index);
-		m_frame->caption().selectFirst(index);
+		this->selectFirst(index);
 		if(!(m_state & CONTROL))
 			this->takeControl(CM_CONTROL, InputEvent::DEVICE_KEYBOARD);
 	}
@@ -120,8 +107,7 @@ namespace mk
 	void TypeIn::leftDrag(MouseEvent& mouseEvent)
 	{
 		size_t index = m_frame->caption().caretIndex(mouseEvent.posX - m_frame->dabsolute(DIM_X), mouseEvent.posY - m_frame->dabsolute(DIM_Y));
-		m_frame->caption().selectSecond(index);
-		m_caret.setIndex(index);
+		this->selectSecond(index);
 	}
 
 	void TypeIn::leftDragEnd(MouseEvent& mouseEvent)
@@ -133,18 +119,21 @@ namespace mk
 	{
 		keyEvent.abort = true;
 
-		if(keyEvent.code == KC_LEFT && m_caret.index() > 0)
+		if(keyEvent.code == KC_LEFT)
 		{
-			m_caret.moveLeft();
+			this->moveCaretLeft();
 		}
-		else if(keyEvent.code == KC_RIGHT && m_caret.index() < m_string.size())
+		else if(keyEvent.code == KC_RIGHT)
 		{
-			m_caret.moveRight();
+			this->moveCaretRight();
 		}
-		else if(keyEvent.code == KC_RETURN)
+		else if(keyEvent.code == KC_RETURN && (m_allowedChars.size() == 0 || m_allowedChars.find('\n') != string::npos))
 		{
 			this->insert('\n');
-			//this->unfocus();
+		}
+		else if(keyEvent.code == KC_ESCAPE)
+		{
+			this->yieldControl();
 		}
 		else if(keyEvent.code == KC_BACK)
 		{
@@ -163,9 +152,49 @@ namespace mk
 		this->markDirty();
 	}
 
-	void TypeIn::setCaret(size_t index)
+	void TypeIn::selectCaret(int index)
 	{
-		m_caret.setIndex(index);
-		m_frame->caption().selectFirst(index);
+		m_frame->caption().caret(index);
+		m_frame->caption().selectStart(index);
+		m_frame->caption().selectEnd(index);
+		m_frame->caption().updateSelection();
+	}
+
+	void TypeIn::selectFirst(size_t first)
+	{
+		m_selectFirst = first;
+		m_frame->caption().selectStart(first);
+		m_frame->caption().selectEnd(first);
+		m_frame->caption().updateSelection();
+	}
+
+	void TypeIn::selectSecond(size_t second)
+	{
+		m_selectSecond = second;
+		
+		m_frame->caption().selectStart(m_selectFirst < m_selectSecond ? m_selectFirst : m_selectSecond);
+		m_frame->caption().selectEnd(m_selectFirst < m_selectSecond ? m_selectSecond : m_selectFirst);
+
+		TextRow& secondRow = m_frame->caption().textRow(second);
+		m_frame->caption().caret(m_selectFirst < m_selectSecond ? std::min(m_selectSecond + 1, secondRow.endIndex) : m_selectSecond);
+		m_frame->caption().updateSelection();
+	}
+
+	void TypeIn::moveCaretTo(size_t index)
+	{
+		this->selectCaret(index);
+		this->selectFirst(index);
+	}
+
+	void TypeIn::moveCaretRight()
+	{
+		size_t index = std::min(int(m_frame->text().size()), m_frame->caption().caret() + 1);
+		this->selectCaret(index);
+	}
+
+	void TypeIn::moveCaretLeft()
+	{
+		size_t index = std::max(0, m_frame->caption().caret() - 1);
+		this->selectCaret(index);
 	}
 }

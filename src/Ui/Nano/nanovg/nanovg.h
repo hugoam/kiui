@@ -403,6 +403,7 @@ extern "C" {
 	// Sets the current scissor rectangle.
 	// The scissor rectangle is transformed by the current transform.
 	void nvgScissor(NVGcontext* ctx, float x, float y, float w, float h);
+	void nvgRoundedScissor(NVGcontext* ctx, float x, float y, float w, float h, float c0, float c1, float c2, float c3);
 
 	// Intersects current scissor rectangle with the specified rectangle.
 	// The scissor rectangle is transformed by the current transform.
@@ -411,9 +412,12 @@ extern "C" {
 	// rectangle and the previous scissor rectangle transformed in the current
 	// transform space. The resulting shape is always rectangle.
 	void nvgIntersectScissor(NVGcontext* ctx, float x, float y, float w, float h);
+	void nvgIntersectRoundedScissor(NVGcontext* ctx, float x, float y, float w, float h, float c0, float c1, float c2, float c3);
 
 	// Reset and disables scissoring.
 	void nvgResetScissor(NVGcontext* ctx);
+
+	void nvgCurrentScissor(NVGcontext* ctx, float* scissor);
 
 	//
 	// Paths
@@ -603,6 +607,7 @@ extern "C" {
 	struct NVGscissor {
 		float xform[6];
 		float extent[2];
+		float corners[4];
 	};
 	typedef struct NVGscissor NVGscissor;
 

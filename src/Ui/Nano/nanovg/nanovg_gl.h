@@ -199,6 +199,7 @@ struct GLNVGfragUniforms {
 	struct NVGcolor outerCol;
 	float scissorExt[2];
 	float scissorScale[2];
+	float scissorCorners[4];
 	float extent[2];
 	float radius;
 	float feather;
@@ -209,7 +210,7 @@ struct GLNVGfragUniforms {
 #else
 	// note: after modifying layout or size of uniform array,
 	// don't forget to also update the fragment shader source!
-#define NANOVG_GL_UNIFORMARRAY_SIZE 11
+#define NANOVG_GL_UNIFORMARRAY_SIZE 12
 	union {
 		struct {
 			float scissorMat[12]; // matrices are actually 3 vec4s
@@ -218,6 +219,7 @@ struct GLNVGfragUniforms {
 			struct NVGcolor outerCol;
 			float scissorExt[2];
 			float scissorScale[2];
+			float scissorCorners[4];
 			float extent[2];
 			float radius;
 			float feather;
@@ -533,7 +535,7 @@ static int glnvg__renderCreate(void* uptr)
 #if NANOVG_GL_USE_UNIFORMBUFFER
 		"#define USE_UNIFORMBUFFER 1\n"
 #else
-		"#define UNIFORMARRAY_SIZE 11\n"
+		"#define UNIFORMARRAY_SIZE 12\n"
 #endif
 		"\n";
 
@@ -580,6 +582,7 @@ static int glnvg__renderCreate(void* uptr)
 		"		vec4 outerCol;\n"
 		"		vec2 scissorExt;\n"
 		"		vec2 scissorScale;\n"
+		"		vec4 scissorCorners;\n"
 		"		vec2 extent;\n"
 		"		float radius;\n"
 		"		float feather;\n"
@@ -609,13 +612,14 @@ static int glnvg__renderCreate(void* uptr)
 		"	#define outerCol frag[7]\n"
 		"	#define scissorExt frag[8].xy\n"
 		"	#define scissorScale frag[8].zw\n"
-		"	#define extent frag[9].xy\n"
-		"	#define radius frag[9].z\n"
-		"	#define feather frag[9].w\n"
-		"	#define strokeMult frag[10].x\n"
-		"	#define strokeThr frag[10].y\n"
-		"	#define texType int(frag[10].z)\n"
-		"	#define type int(frag[10].w)\n"
+		"	#define scissorCorners frag[9].xyzw\n"
+		"	#define extent frag[10].xy\n"
+		"	#define radius frag[10].z\n"
+		"	#define feather frag[10].w\n"
+		"	#define strokeMult frag[11].x\n"
+		"	#define strokeThr frag[11].y\n"
+		"	#define texType int(frag[11].z)\n"
+		"	#define type int(frag[11].w)\n"
 		"#endif\n"
 		"\n"
 		"float sdroundrect(vec2 pt, vec2 ext, float rad) {\n"
@@ -626,9 +630,13 @@ static int glnvg__renderCreate(void* uptr)
 		"\n"
 		"// Scissoring\n"
 		"float scissorMask(vec2 p) {\n"
-		"	vec2 sc = (abs((scissorMat * vec3(p,1.0)).xy) - scissorExt);\n"
-		"	sc = vec2(0.5,0.5) - sc * scissorScale;\n"
+		"	vec2 sc = (abs((scissorMat * vec3(p,1.0)).xy) - scissorExt) * scissorScale;\n"
+		"	sc = vec2(0.5,0.5) - sc;\n"
 		"	return clamp(sc.x,0.0,1.0) * clamp(sc.y,0.0,1.0);\n"
+		/*"	float r = scissorCorners.x;\n"
+		"	vec2 d = (abs((scissorMat * vec3(p, 1.0)).xy) - (scissorExt - r)) * scissorScale;\n"
+		"   float dist = length(max(d, 0.0)) - r;\n"
+		"	return clamp(1.0 - dist, 0.0, 1.0);\n"*/
 		"}\n"
 		"#ifdef EDGE_AA\n"
 		"// Stroke - from [0..1] to clipped pyramid, where the slope is 1px.\n"
@@ -949,6 +957,10 @@ static int glnvg__convertPaint(GLNVGcontext* gl, GLNVGfragUniforms* frag, NVGpai
 		frag->scissorExt[1] = scissor->extent[1];
 		frag->scissorScale[0] = sqrtf(scissor->xform[0] * scissor->xform[0] + scissor->xform[2] * scissor->xform[2]) / fringe;
 		frag->scissorScale[1] = sqrtf(scissor->xform[1] * scissor->xform[1] + scissor->xform[3] * scissor->xform[3]) / fringe;
+		frag->scissorCorners[0] = scissor->corners[0];
+		frag->scissorCorners[1] = scissor->corners[1];
+		frag->scissorCorners[2] = scissor->corners[2];
+		frag->scissorCorners[3] = scissor->corners[3];
 	}
 
 	memcpy(frag->extent, paint->extent, sizeof(frag->extent));

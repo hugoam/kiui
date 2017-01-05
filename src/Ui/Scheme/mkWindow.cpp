@@ -205,7 +205,7 @@ namespace mk
 
 	void Window::toggleClosable()
 	{
-		m_header.closeButton()->frame().visible() ? m_header.closeButton()->hide() : m_header.closeButton()->show();
+		m_header.closeButton()->frame().hidden() ? m_header.closeButton()->show() : m_header.closeButton()->hide();
 	}
 
 	void Window::toggleMovable()

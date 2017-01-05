@@ -22,14 +22,10 @@ namespace mk
 		, d_numLayers(0)
 		, d_parentLayer(nullptr)
 		, d_redraw(true)
-		, d_redrawNext(true)
 	{}
 
 	Layer::~Layer()
-	{
-		if(d_parentLayer)
-			this->unbind();
-	}
+	{}
 
 	MasterLayer& Layer::rootLayer()
 	{
@@ -50,9 +46,6 @@ namespace mk
 		d_parentLayer = &parent->layer();
 		d_parentLayer->add(*this);
 
-		MasterLayer& rootLayer = this->rootLayer();
-		rootLayer.add(*this);
-
 		Frame::bind(parent);
 	}
 
@@ -63,22 +56,6 @@ namespace mk
 		{
 			d_parentLayer->remove(*this);
 			d_parentLayer = nullptr;
-		}
-	}
-
-
-	void Layer::updateOnce()
-	{
-		Stripe::updateOnce();
-
-		if(d_redrawNext)
-		{
-			d_redraw = true;
-			d_redrawNext = false;
-		}
-		else
-		{
-			d_redraw = false;
 		}
 	}
 
@@ -98,37 +75,26 @@ namespace mk
 		d_sublayers.erase(std::remove(d_sublayers.begin(), d_sublayers.end(), &layer), d_sublayers.end());
 
 		if(layer.z() == 0)
+		{
 			--d_numLayers;
+			this->rootLayer().reorder();
+		}
 	}
 
-	size_t Layer::reorder(size_t pos, size_t cursor, size_t next)
+	size_t Layer::reorder(size_t pos, size_t cursor, size_t next, std::vector<Layer*>& layers)
 	{
 		d_index = cursor;
+		layers.push_back(this);
 
-#if 0 // DEBUG
-		Layer* parent = d_parentLayer;
-		while(parent)
-		{
-			printf("  ");
-			parent = parent->d_parentLayer;
-		}
-
-		printf("Layer :: %s reorder index %u\n", d_widget.style().name().c_str(), d_index);
-#endif
-
-		cursor = next;
-		next = next + d_numLayers;
+		//cursor = next;
+		cursor += 1;
+		//next = next + d_numLayers;
 
 		size_t i = 0;
-		for(; i < d_numLayers; ++i)
-		{
-			next = d_sublayers[i]->reorder(i, cursor, next);
-			cursor += 1;
-		}
-
 		for(; i < d_sublayers.size(); ++i)
 		{
-			d_sublayers[i]->d_index = i;
+			next = d_sublayers[i]->reorder(i, cursor, next, layers);
+			cursor += 1;
 		}
 
 		return next;
@@ -149,10 +115,6 @@ namespace mk
 
 	Frame* Layer::pinpoint(float x, float y, bool opaque)
 	{
-		/*
-		This is apparently useless since the order of the layers should be the same as the order of the contents of the stripe
-		and Stripe contains the exact same code
-		*/
 		Frame* result = nullptr;
 		for(Layer* layer : reverse_adapt(d_sublayers))
 			if(layer->visible() && layer->frameType() != LAYER3D)
@@ -161,7 +123,6 @@ namespace mk
 				if(result)
 					return result;
 			}
-		
 
 		result = Stripe::pinpoint(x, y, opaque);
 		return result;
@@ -171,22 +132,27 @@ namespace mk
 		: Layer(widget, 0)
 	{}
 
-	void MasterLayer::add(Layer& layer)
-	{
-		d_layers.push_back(&layer);
-	}
-
-	void MasterLayer::remove(Layer& layer)
-	{
-
-	}
-
 	void MasterLayer::reorder()
 	{
-		Layer::reorder(0, d_index, 1);
+		d_layers.clear();
+		Layer::reorder(0, d_index, 1, d_layers);
 
 		auto goesBefore = [](Layer* a, Layer* b) { return a->index() < b->index(); };
 		std::sort(d_layers.begin(), d_layers.end(), goesBefore);
+
+#if 0 // DEBUG
+		for(Layer* layer: d_layers)
+		{
+			Layer* parent = layer->parentLayer();
+			while(parent)
+			{
+				printf("  ");
+				parent = parent->parentLayer();
+			}
+
+			printf("Layer :: %s reorder index %u\n", layer->widget().style().name().c_str(), layer->index());
+		}
+#endif
 	}
 
 	Layer3D::Layer3D(Widget& widget, size_t zorder)

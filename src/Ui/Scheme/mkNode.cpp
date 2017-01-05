@@ -11,14 +11,57 @@
 
 #include <Ui/Widget/mkRootSheet.h>
 
+#include <iostream>
+
 using namespace std::placeholders;
 
 namespace mk
 {
-	Canvas::Canvas(Trigger contextTrigger)
+	Plan::Plan()
 		: Sheet(cls())
-		, m_contextTrigger(contextTrigger)
 	{}
+
+	void Plan::updateBounds()
+	{
+		float margin = 50.f;
+
+		m_bounds.clear();
+
+		for(Frame* frame : m_frame->as<Stripe>().contents())
+		{
+			m_bounds[DIM_X] = std::min(frame->dposition(DIM_X) - margin, m_bounds[DIM_X]);
+			m_bounds[DIM_Y] = std::min(frame->dposition(DIM_Y) - margin, m_bounds[DIM_Y]);
+			m_bounds[DIM_XX] = std::max(frame->dposition(DIM_X) + frame->dsize(DIM_X) + margin, m_bounds[DIM_XX]);
+			m_bounds[DIM_YY] = std::max(frame->dposition(DIM_Y) + frame->dsize(DIM_Y) + margin, m_bounds[DIM_YY]);
+		}
+
+		//m_frame->setPosition(m_bounds.x(), m_bounds.y());
+		m_frame->setSize(m_bounds.x1() - m_bounds.x0(), m_bounds.y1() - m_bounds.y0());
+	}
+
+	Canvas::Canvas(const string& title, Trigger contextTrigger)
+		: ScrollSheet(cls())
+		, m_name(title)
+		, m_contextTrigger(contextTrigger)
+		, m_plan(this->makeappend<Plan>())
+	{}
+
+	const string& Canvas::name()
+	{
+		return m_name;
+	}
+
+	void Canvas::nextFrame(size_t tick, size_t delta)
+	{
+		m_plan.updateBounds();
+
+		ScrollSheet::nextFrame(tick, delta);
+	}
+
+	Widget& Canvas::vappend(unique_ptr<Widget> widget)
+	{
+		return m_plan.append(std::move(widget));
+	}
 
 	void Canvas::rightClick(MouseEvent& mouseEvent)
 	{
@@ -27,7 +70,28 @@ namespace mk
 
 	void Canvas::mouseWheel(MouseEvent& mouseEvent)
 	{
+		return;
+		 
+		DimFloat position = m_plan.frame().position();
+		float scale = m_plan.frame().scale();
+		float deltaScale = mouseEvent.deltaZ * 0.01f * scale;
+		scale += deltaScale;
+		m_plan.frame().setScale(scale);
 
+		DimFloat deltaSize = m_plan.frame().size();
+		deltaSize[DIM_X] *= deltaScale;
+		deltaSize[DIM_Y] *= deltaScale;
+
+		DimFloat mousePos(mouseEvent.posX - m_plan.frame().dabsolute(DIM_X), mouseEvent.posY - m_plan.frame().dabsolute(DIM_Y));
+		DimFloat halfSize(m_plan.frame().dsize(DIM_X) * 0.5f, m_plan.frame().dsize(DIM_Y) * 0.5f);
+
+		DimFloat deltaCenter((mousePos[DIM_X] - halfSize[DIM_X]) / halfSize[DIM_X], (mousePos[DIM_Y] - halfSize[DIM_Y]) / halfSize[DIM_Y]);
+
+		std::cerr << "Mouse Pos : " << mousePos[DIM_X] << ", " << mousePos[DIM_Y] << std::endl;
+		std::cerr << "Half Size : " << halfSize[DIM_X] << ", " << halfSize[DIM_Y] << std::endl;
+		std::cerr << "Delta Center: " << deltaCenter[DIM_X] << ", " << deltaCenter[DIM_Y] << std::endl;
+
+		m_plan.frame().setPosition(position[DIM_X] - deltaSize[DIM_X] * 0.5f * deltaCenter[DIM_X], position[DIM_Y] - deltaSize[DIM_Y] * 0.5f * deltaCenter[DIM_Y]);
 	}
 
 	NodePlugKnob::NodePlugKnob()
@@ -41,20 +105,29 @@ namespace mk
 		, m_title(this->makeappend<Label>(m_name))
 		, m_knob(this->makeappend<NodePlugKnob>())
 		, m_onConnect(onConnect)
-		, m_connectProxy(nullptr)
+		, m_cableProxy(nullptr)
 	{
 		if(input)
 			this->swap(0, 1);
+	}
+
+	Sheet& NodePlug::canvas()
+	{
+		Sheet& node = *this->parent()->parent();
+		Sheet& canvas = *node.parent();
+		return canvas;
 	}
 
 	void NodePlug::leftDragStart(MouseEvent& mouseEvent)
 	{
 		mouseEvent.abort = true;
 
-		m_connectProxy = &this->rootSheet().cursor().emplace<NodePlug>("ProxyPlug", !m_input);
-		m_connectProxy->hide();
+		Cursor& cursor = this->rootSheet().cursor();
 
-		this->connect(*m_connectProxy);
+		if(m_input)
+			m_cableProxy = &this->canvas().emplace<NodeCable>(cursor, *this);
+		else
+			m_cableProxy = &this->canvas().emplace<NodeCable>(*this, cursor);
 	}
 
 	void NodePlug::leftDrag(MouseEvent& mouseEvent)
@@ -76,8 +149,7 @@ namespace mk
 			this->connect(plug);
 		}
 
-		this->disconnect(*m_connectProxy);
-		this->rootSheet().cursor().release(*m_connectProxy);
+		this->canvas().release(*m_cableProxy);
 	}
 
 	void NodePlug::connect(NodePlug& plug)
@@ -99,9 +171,11 @@ namespace mk
 
 	void NodePlug::connectOut(NodePlug& plugIn)
 	{
-		m_cables.push_back(&this->makeappend<NodeCable>(*this, plugIn));
+		Sheet& node = *this->parent()->parent();
+		Sheet& canvas = *node.parent();
+		m_cables.push_back(&canvas.emplace<NodeCable>(*this, plugIn));
 
-		if(&plugIn != m_connectProxy && m_onConnect)
+		if(m_onConnect)
 			m_onConnect(*this, plugIn);
 	}
 
@@ -111,7 +185,9 @@ namespace mk
 			if(&cable->plugIn() == &plugIn)
 			{
 				m_cables.erase(std::find(m_cables.begin(), m_cables.end(), cable));
-				this->release(*cable);
+				Sheet& node = *this->parent()->parent();
+				Sheet& canvas = *node.parent();
+				canvas.release(*cable);
 				return;
 			}
 	}
@@ -124,7 +200,7 @@ namespace mk
 		: NodePlug(name, false, onConnect)
 	{}
 
-	NodeCable::NodeCable(NodePlug& plugOut, NodePlug& plugIn)
+	NodeCable::NodeCable(Widget& plugOut, Widget& plugIn)
 		: Widget(cls())
 		, m_plugOut(plugOut)
 		, m_plugIn(plugIn)
@@ -132,17 +208,20 @@ namespace mk
 
 	void NodeCable::customDraw(Renderer& renderer)
 	{
+		Sheet& canvas = *this->parent();
+
+		Frame& frameCanvas = canvas.frame();
 		Frame& frameOut = m_plugOut.frame();
 		Frame& frameIn = m_plugIn.frame();
 
-		float x1 = frameOut.right();
-		float y1 = frameOut.top() + frameOut.height() / 2;
+		float x1 = frameOut.right() - frameCanvas.left();
+		float y1 = frameOut.top() + frameOut.height() / 2 - frameCanvas.top();
 
 		float c1x = x1 + 100.f;
 		float c1y = y1;
 
-		float x2 = frameIn.left();
-		float y2 = frameIn.top() + frameIn.height() / 2;
+		float x2 = frameIn.left() - frameCanvas.left();
+		float y2 = frameIn.top() + frameIn.height() / 2 - frameCanvas.top();
 
 		float c2x = x2 - 100.f;
 		float c2y = y2;
@@ -165,17 +244,14 @@ namespace mk
 		: Sheet(cls())
 	{}
 
-	Node::Node(const string& title, bool position, float x, float y)
+	Node::Node(const string& title)
 		: LayerSheet(cls())
 		, m_name(title)
 		, m_content(nullptr)
 		, m_inputs(this->makeappend<NodeIn>())
 		, m_body(this->makeappend<NodeBody>(*this))
 		, m_outputs(this->makeappend<NodeOut>())
-	{
-		if(position)
-			m_frame->setPosition(x, y);
-	}
+	{}
 
 	Node::~Node()
 	{}

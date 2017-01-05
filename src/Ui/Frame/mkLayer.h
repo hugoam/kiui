@@ -20,11 +20,12 @@ namespace mk
 
 		size_t index() { return d_index; }
 		int z() { return d_z; }
+		Layer* parentLayer() { return d_parentLayer; }
 
 		std::vector<Layer*>& sublayers() { return d_sublayers; }
 
 		bool redraw() { return d_redraw; }
-		void setRedraw() { d_redrawNext = true; }
+		void setRedraw() { d_redraw = true; }
 
 		MasterLayer& rootLayer();
 
@@ -36,10 +37,8 @@ namespace mk
 		void add(Layer& layer);
 		void remove(Layer& layer);
 
-		size_t reorder(size_t pos, size_t index, size_t next);
+		size_t reorder(size_t pos, size_t index, size_t next, std::vector<Layer*>& layers);
 		void moveToTop();
-
-		virtual void updateOnce();
 
 		Frame* pinpoint(float x, float y, bool opaque);
 
@@ -51,16 +50,12 @@ namespace mk
 		std::vector<Layer*> d_sublayers;
 
 		bool d_redraw;
-		bool d_redrawNext;
 	};
 
 	class MK_UI_EXPORT MasterLayer : public Layer
 	{
 	public:
 		MasterLayer(Widget& widget);
-
-		void add(Layer& layer);
-		void remove(Layer& layer);
 
 		const std::vector<Layer*>& layers() { return d_layers; }
 

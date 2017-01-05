@@ -45,7 +45,7 @@ namespace mk
 		inline float sequenceLength() { return d_sequenceLength; }
 		inline Dimension layoutDim() { return d_layout->d_layoutDim; }
 		inline bool overflow() { return d_sequenceLength > dsize(d_length); }
-		inline float cursor() { return d_cursor; }
+		inline float cursor() { return d_cursor[d_length]; }
 		inline float spacing() { return d_layout->spacing()[d_length]; }
 
 		inline Dirty forceDirty() { return d_forceDirty; }
@@ -66,18 +66,19 @@ namespace mk
 
 		inline float offset(Frame& frame, Dimension dim) { return (frame.flow() ? dpadding(dim) + frame.dmargin(dim) : 0.f) + align(frame, dim); }
 
-		inline float offsetSequenceFirst(Frame& frame) { return -d_cursor + dpadding(d_length) + frame.dmargin(d_length) + alignSequence(frame); }
+		inline float offsetSequenceFirst(Frame& frame) { return -d_cursor[d_length] + dpadding(d_length) + frame.dmargin(d_length) + alignSequence(frame); }
 		inline float offsetSequenceNext(Frame& frame, Frame& prev) { return prev.doffset(d_length) + this->spacing() - alignSequence(prev) + alignSequence(frame); }
 		inline float offsetSequence(Frame& frame) { Frame* before = frame.before(); return before ? offsetSequenceNext(frame, *before) : offsetSequenceFirst(frame); }
 
 		inline float dpivotposition(Frame& frame, Dimension dim) { return d_layout->pivot()[dim] ? dsize(dim) - frame.dsize(dim) - frame.dposition(dim) : frame.dposition(dim); }
 
-		virtual void updateChildren();
+		virtual void nextFrame(size_t tick, size_t delta);
+		virtual void render();
 
 		void positionLength(Frame& frame);
 		void positionDepth(Frame& frame);
 
-		void setCursor(float cursor) { d_cursor = cursor; this->setDirty(DIRTY_OFFSET); }
+		void setCursor(Dimension dim, float cursor) { d_cursor[dim] = cursor; this->setDirty(DIRTY_OFFSET); }
 
 		void append(Frame& widget);
 		void insert(Frame& widget, size_t index);
@@ -85,8 +86,6 @@ namespace mk
 		void clear();
 
 		void move(size_t from, size_t to);
-
-		void setVisible(bool visible);
 
 		void migrate(Stripe& stripe);
 
@@ -117,8 +116,6 @@ namespace mk
 		void updateStyle();
 		void updateSizing();
 
-		void updateSize();
-
 		void initWeights();
 		void dispatchWeights();
 		void dispatchTableWeights();
@@ -142,7 +139,7 @@ namespace mk
 	protected:
 		Dimension d_depth;
 		Dimension d_length;
-		float d_cursor;
+		DimFloat d_cursor;
 
 		FrameVector d_contents;
 		FlowSequence d_sequence;

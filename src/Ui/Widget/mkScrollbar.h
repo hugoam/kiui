@@ -84,7 +84,7 @@ namespace mk
 	class MK_UI_EXPORT _I_ Scrollbar : public Sheet
 	{
 	public:
-		Scrollbar(Sheet& sheet);
+		Scrollbar(Sheet& sheet, Dimension dim = DIM_Y);
 		~Scrollbar();
 
 		void scrollup();
@@ -95,6 +95,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Scrollbar", Sheet::cls()); return ty; }
 
 	protected:
+		Dimension m_dim;
 		Sheet& m_sheet;
 		Button& m_up;
 		Scroller& m_scroller;

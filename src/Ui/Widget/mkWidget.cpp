@@ -28,6 +28,7 @@ namespace mk
 		, m_style(&type)
 		, m_frame(nullptr)
 		, m_state(UNBOUND)
+		, m_device(nullptr)
 	{
 		if(frameType == STRIPE)
 			m_frame = make_unique<Stripe>(*this);
@@ -70,6 +71,7 @@ namespace mk
 		if(m_state & PRESSED || m_state & HOVERED)
 			this->uiWindow().handleDestroyWidget(*this);
 
+		m_frame->remove();
 		m_state = UNBOUND;
 	}
 
@@ -83,7 +85,7 @@ namespace mk
 		else
 			m_frame->as<Layer>().bind();
 
-		m_state = static_cast<WidgetState>(m_state ^ BOUND);
+		this->toggleState(BOUND);
 
 		this->bound();
 	}
@@ -99,7 +101,7 @@ namespace mk
 	unique_ptr<Widget> Widget::unbind()
 	{
 		//this->cleanup();
-		m_state = static_cast<WidgetState>(m_state ^ BOUND);
+		this->toggleState(BOUND);
 		return m_parent->as<Sheet>().release(*this);
 	}
 

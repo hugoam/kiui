@@ -43,10 +43,12 @@ namespace mk
 	{
 	public:
 		InputFrame();
+		~InputFrame();
 
 		InputFrame* parentFrame() { return m_parentFrame; }
 
 		InputFrame& rootFrame();
+		InputFrame& rootController();
 
 		InputReceiver* dispatchEvent(InputEvent& inputEvent);
 		InputReceiver* controlEvent(InputEvent& inputEvent);

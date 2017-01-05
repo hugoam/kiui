@@ -156,6 +156,8 @@ namespace mk
 		BoxFloat(float uniform) : BoxFloat(uniform, uniform, uniform, uniform) {}
 		BoxFloat() : BoxFloat(0.f) { d_null = true; }
 
+		BoxFloat& operator=(const BoxFloat& other) { this->assign(other.v0(), other.v1(), other.v2(), other.v3()); return *this; }
+
 		float operator [](size_t i) const { return d_values[i]; }
 		float& operator [](size_t i) { d_null = false; return d_values[i]; }
 

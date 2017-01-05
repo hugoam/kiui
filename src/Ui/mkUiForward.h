@@ -97,6 +97,7 @@ namespace mk
 	class Widget;
 	class Sheet;
 	class RootSheet;
+	class Cursor;
 
 	class Label;
 	class Title;
@@ -131,8 +132,6 @@ namespace mk
 	class Dockbox;
 	class Dockbar;
 
-	class Cursor;
-
 	class Skinner;
 	class Styler;
 	class UiWindow;
@@ -163,10 +162,11 @@ namespace mk
 	class GlWindow;
 
 	// Edit Devices
-	class DNodeInput;
-	class DNodeOutput;
+	class DProcessInput;
+	class DProcessOutput;
 	class DProcess;
-	class DCanvas;
+	class DScriptCanvas;
+	class DScriptEditor;
 
 	class DMethod;
 	class DMethodBind;

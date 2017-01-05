@@ -18,7 +18,7 @@ namespace mk
 		: Frame(widget)
 		, d_depth(DIM_X)
 		, d_length(DIM_Y)
-		, d_cursor(0.f)
+		, d_cursor(0.f, 0.f)
 		, d_contents()
 		, d_sequence(d_contents)
 		, d_sequenceLength(0)
@@ -89,12 +89,25 @@ namespace mk
 		this->reindex(from < to ? from : to);
 	}
 
-	void Stripe::updateChildren()
+	void Stripe::nextFrame(size_t tick, size_t delta)
 	{
+		Frame::nextFrame(tick, delta);
+
 		// cannot use range-based iteration because updateStyle() causes removing and reinserting in this vector
 		for(size_t i = 0; i < d_contents.size(); ++i)
-			//if(d_contents[i]->frameType() < LAYER)
-				d_contents[i]->nextFrame(0, 0);
+			d_contents[i]->nextFrame(tick, delta);
+	}
+
+
+	void Stripe::render()
+	{
+		this->beginDraw();
+
+		for(size_t i = 0; i < d_contents.size(); ++i)
+			if(!d_contents[i]->hidden())
+				d_contents[i]->render();
+
+		this->endDraw();
 	}
 
 	void Stripe::recomputeLength()
@@ -117,11 +130,6 @@ namespace mk
 				d_maxDepth = std::max(d_maxDepth, frame->dextent(d_depth));
 
 		this->updateDepth();
-	}
-
-	void Stripe::updateSize()
-	{
-		Frame::updateSize();
 	}
 
 	void Stripe::updateLength()
@@ -279,14 +287,6 @@ namespace mk
 		Frame::updateSizing();
 	}
 
-	void Stripe::setVisible(bool visible)
-	{
-		Frame::setVisible(visible);
-
-		for(Frame* frame : d_contents)
-			frame->setVisible(visible);
-	}
-
 	void Stripe::migrate(Stripe& stripe)
 	{
 		Frame::migrate(stripe);
@@ -371,7 +371,7 @@ namespace mk
 
 	void Stripe::resized(Dimension dim)
 	{
-		UNUSED(dim);
+		Frame::resized(dim);
 		if(dim == d_length)
 			this->expandLength();
 		else
@@ -380,12 +380,12 @@ namespace mk
 
 	Frame* Stripe::pinpoint(float x, float y, bool opaque)
 	{
-		if(this->hollow() || !this->inside(x, y))
-			return nullptr;
+		//if(this->hollow() || !this->inside(x, y))
+		//	return nullptr;
 
 		Frame* target;
 		for(Frame* frame : reverse_adapt(d_contents))
-			if(frame->visible() && frame->frameType() != LAYER3D)
+			if(!frame->hidden() && frame->frameType() != LAYER3D)
 			{
 				target = frame->pinpoint(x, y, opaque);
 				if(target)
@@ -443,16 +443,16 @@ namespace mk
 	void Stripe::cursorUp()
 	{
 		float pos = 0.f;
-		this->prevOffset(d_length, pos, d_cursor, true);
-		d_cursor = std::max(0.f, pos);
+		this->prevOffset(d_length, pos, d_cursor[d_length], true);
+		d_cursor[d_length] = std::max(0.f, pos);
 		this->setDirty(DIRTY_OFFSET);
 	}
 
 	void Stripe::cursorDown()
 	{
 		float pos = 0.f;
-		this->nextOffset(d_length, pos, d_cursor, true);
-		d_cursor = std::min(d_sequenceLength - d_size[DIM_Y], pos);
+		this->nextOffset(d_length, pos, d_cursor[d_length], true);
+		d_cursor[d_length] = std::min(d_sequenceLength - d_size[DIM_Y], pos);
 		this->setDirty(DIRTY_OFFSET);
 	}
 }

@@ -164,11 +164,13 @@ namespace mk
 		stbi_image_free(img);
 	}
 
-	ImageRect& NanoAtlas::findSpriteRect(const string& name)
+	ImageRect* NanoAtlas::findSpriteRect(const string& name)
 	{
 		for(ImageRect& sprite : m_sprites)
 			if(sprite.subfolder + sprite.image == name)
-				return sprite;
+				return &sprite;
+
+		return nullptr;
 	}
 
 	void NanoAtlas::appendSprite(const string& name, const string& group)
@@ -223,50 +225,43 @@ namespace mk
 #endif
 	}
 
-	NVGcolor nvgColor(const Colour& colour)
+	Image& NanoWindow::createImage(const string& name, int width, int height, uint8_t* data)
 	{
-		return nvgRGBAf(colour.r(), colour.g(), colour.b(), colour.a());
+		m_images.emplace_back(name, width, height);
+		Image& image = m_images.back();
+		image.d_index = nvgCreateImageRGBA(m_ctx, width, height, 0, data);
+		return image;
+	}
+
+	void NanoWindow::removeImage(const Image& image)
+	{
+		nvgDeleteImage(m_ctx, image.d_index);
 	}
 
 	void NanoWindow::nextFrame(double time, double delta)
 	{
 		float pixelRatio = 1.f;
 
-		Stencil::sDebugBatch = 0;
+		DrawFrame::sDebugBatch = 0;
 		nvgBeginFrame(m_ctx, m_uiWindow.width(), m_uiWindow.height(), pixelRatio);
 
 		MasterLayer& rootLayer = m_uiWindow.rootSheet().layer();
-		rootLayer.nextFrame(0, 0);
+		rootLayer.render();
 
 #ifdef KIUI_DRAW_CACHE
 		void* layerCache = nullptr;
 		m_renderer->layerCache(rootLayer, layerCache);
-		m_renderer->drawLayer(layerCache, 0, 0);
+		m_renderer->drawLayer(layerCache, 0.f, 0.f);
 
 		for(Layer* layer : rootLayer.layers())
 			if(layer->visible())
 			{
+				//std::cerr << "Draw Layer" << layer->dabsolute(DIM_X) << " , " << layer->dabsolute(DIM_Y) << std::endl;
 				m_renderer->layerCache(*layer, layerCache);
-				m_renderer->drawLayer(layerCache, 0, 0);
+				//m_renderer->drawLayer(layerCache, floor(layer->dabsolute(DIM_X)), floor(layer->dabsolute(DIM_Y)));
+				m_renderer->drawLayer(layerCache, 0.f, 0.f);
 			}
 #endif
-
-		/*nvgGlobalCompositeOperation(ctx(), NVG_SOURCE_IN);
-
-		// clipping shape
-		nvgBeginPath(ctx());
-		nvgRoundedRect(ctx(), 115, 35, 304, 156, 10);
-		nvgFillColor(ctx(), nvgColor(Colour::Black));
-		nvgFill(ctx());
-
-		// filling whole screen with red, we want that clipped into the previous shape
-		// nvgBeginPath(ctx()); // when calling nvgBeginPath() between two shapes NVG_SOURCE_IN doesn't seem to be applied
-		nvgRect(ctx(), 0, 0, m_uiWindow.width(), m_uiWindow.height());
-		nvgFillColor(ctx(), nvgColor(Colour::Red));
-		nvgFill(ctx());
-		nvgClosePath(ctx());
-
-		nvgGlobalCompositeOperation(ctx(), NVG_SOURCE_OVER);*/
 
 		nvgEndFrame(m_ctx);
 

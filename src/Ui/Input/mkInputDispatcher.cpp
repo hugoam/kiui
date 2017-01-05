@@ -21,9 +21,22 @@ namespace mk
 		, m_deviceFilter(InputEvent::ALL_DEVICES)
 	{}
 
+	InputFrame::~InputFrame()
+	{
+		if(m_controlled)
+			this->yieldControl();
+	}
+
 	InputFrame& InputFrame::rootFrame()
 	{
 		return m_parentFrame ? m_parentFrame->rootFrame() : *this;
+	}
+
+	InputFrame& InputFrame::rootController()
+	{
+		if(m_controlled)
+			return *this;
+		return m_parentFrame ? m_parentFrame->rootController() : *this;
 	}
 
 	InputReceiver* InputFrame::controlEvent(InputEvent& inputEvent)
@@ -64,7 +77,8 @@ namespace mk
 	{
 		m_controlMode = mode;
 		m_deviceFilter = device;
-		InputFrame& root = this->rootFrame();
+		//InputFrame& root = this->rootFrame();
+		InputFrame& root = this->rootController();
 		if(&root != this)
 			this->takeControl(root);
 	}
@@ -128,6 +142,13 @@ namespace mk
 		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE && inputEvent.eventType == InputEvent::EVENT_LEAVED)
 			this->mouseLeaved(static_cast<MouseEvent&>(inputEvent));
 
+		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_LEFT_BUTTON && inputEvent.eventType == InputEvent::EVENT_STROKED)
+			this->leftClick(static_cast<MouseEvent&>(inputEvent));
+		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_RIGHT_BUTTON && inputEvent.eventType == InputEvent::EVENT_STROKED)
+			this->rightClick(static_cast<MouseEvent&>(inputEvent));
+		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_MIDDLE_BUTTON && inputEvent.eventType == InputEvent::EVENT_STROKED)
+			this->middleClick(static_cast<MouseEvent&>(inputEvent));
+
 		else
 			inputEvent.abort = true;
 
@@ -141,12 +162,7 @@ namespace mk
 		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_MIDDLE_BUTTON && inputEvent.eventType == InputEvent::EVENT_MOVED)
 			this->mouseWheel(static_cast<MouseEvent&>(inputEvent));
 
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_LEFT_BUTTON && inputEvent.eventType == InputEvent::EVENT_STROKED)
-			this->leftClick(static_cast<MouseEvent&>(inputEvent));
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_RIGHT_BUTTON && inputEvent.eventType == InputEvent::EVENT_STROKED)
-			this->rightClick(static_cast<MouseEvent&>(inputEvent));
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_MIDDLE_BUTTON && inputEvent.eventType == InputEvent::EVENT_STROKED)
-			this->middleClick(static_cast<MouseEvent&>(inputEvent));
+
 
 		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_LEFT_BUTTON && inputEvent.eventType == InputEvent::EVENT_DRAGGED_START)
 			this->leftDragStart(static_cast<MouseEvent&>(inputEvent));

@@ -89,9 +89,8 @@ namespace mk
 
 	void Slider::nextFrame(size_t tick, size_t delta)
 	{
-		bool dirty = m_frame->dirty() >= Frame::DIRTY_FRAME;
-		//Widget::nextFrame(tick, delta);
-		if(dirty)
+		UNUSED(tick); UNUSED(delta);
+		if(m_frame->dirty() >= Frame::DIRTY_FRAME)
 			this->updateKnob();
 	}
 
@@ -138,7 +137,7 @@ namespace mk
 
 	void Slider::updateKnob()
 	{
-		if(!(m_state & BOUND) || !m_frame->visible())
+		if(!(m_state & BOUND) || m_frame->hidden())
 			return;
 
 		if(m_button.frame().dmanual(m_dim))

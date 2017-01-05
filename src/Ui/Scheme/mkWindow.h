@@ -8,6 +8,7 @@
 /* mk */
 #include <Ui/mkUiForward.h>
 #include <Ui/Widget/mkSheet.h>
+#include <Ui/Widget/mkCursor.h>
 #include <Ui/Widget/mkButton.h>
 
 namespace mk

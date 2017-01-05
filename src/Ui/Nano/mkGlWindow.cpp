@@ -228,7 +228,7 @@ namespace mk
 
 		m_uiWindow = make_unique<UiWindow>(m_resourcePath);
 		m_nanoWindow = make_unique<NanoWindow>(*m_uiWindow, m_resourcePath);
-		m_uiWindow->setup(*this, *m_nanoWindow, this);
+		m_uiWindow->setup(*this, *m_nanoWindow, *this);
 
 		glfwSwapInterval(0);
 		glfwSetTime(0);

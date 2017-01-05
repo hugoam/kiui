@@ -5,13 +5,6 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Widget/mkWidgets.h>
 
-#include <Ui/Widget/mkTextbox.h>
-#include <Ui/Widget/mkProgressBar.h>
-
-#include <Object/String/mkStringConvert.h>
-
-#include <Object/Image/mkImage.h>
-
 namespace mk
 {
 	Control::Control(StyleType& type)

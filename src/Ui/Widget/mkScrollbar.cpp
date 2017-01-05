@@ -54,11 +54,12 @@ namespace mk
 		m_parent->as<Scrollbar>().scroll(value);
 	}
 
-	Scrollbar::Scrollbar(Sheet& sheet)
+	Scrollbar::Scrollbar(Sheet& sheet, Dimension dim)
 		: Sheet(cls())
+		, m_dim(dim)
 		, m_sheet(sheet)
 		, m_up(this->makeappend<ScrollUp>(std::bind(&Scrollbar::scrollup, this)))
-		, m_scroller(this->makeappend<ScrollerY>())
+		, m_scroller(dim == DIM_X ? (Scroller&) this->makeappend<ScrollerX>() : (Scroller&) this->makeappend<ScrollerY>())
 		, m_down(this->makeappend<ScrollDown>(std::bind(&Scrollbar::scrolldown, this)))
 	{}
 
@@ -77,12 +78,12 @@ namespace mk
 
 	void Scrollbar::scroll(float offset)
 	{
-		m_sheet.stripe().setCursor(offset);
+		m_sheet.stripe().setCursor(m_dim, offset);
 	}
 
 	void Scrollbar::nextFrame(size_t tick, size_t delta)
 	{
-		//Sheet::nextFrame(tick, delta);
+		UNUSED(tick); UNUSED(delta);
 		float visibleSize = m_sheet.stripe().dsize(DIM_Y); // stripe.dclipsize(DIM_Y)
 		m_scroller.updateMetrics(0.f, m_sheet.stripe().sequenceLength() - visibleSize, m_sheet.stripe().cursor(), 1.f, visibleSize);
 	}

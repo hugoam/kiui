@@ -9,13 +9,12 @@
 #include <Object/mkIndexer.h>
 #include <Object/Util/mkNonCopy.h>
 #include <Ui/mkUiForward.h>
-#include <Ui/Frame/mkRenderFrame.h>
 #include <Ui/Frame/mkRenderer.h>
 #include <Ui/Style/mkImageSkin.h>
 
 namespace mk
 {
-	class MK_UI_EXPORT Stencil : public RenderFrame
+	class MK_UI_EXPORT Stencil
 	{
 	public:
 		Stencil(Frame& frame);
@@ -28,11 +27,9 @@ namespace mk
 		void setHardClip(const BoxFloat& hardClip);
 
 	protected:
-		BoxFloat m_hardClip;
+		Frame& m_frame;
 
-	public:
-		static bool sDebugDraw;
-		static int sDebugBatch;
+		BoxFloat m_hardClip;
 	};
 }
 

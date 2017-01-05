@@ -12,6 +12,8 @@
 #include <Ui/mkUiWindow.h>
 #include <Ui/Widget/mkRootSheet.h>
 
+#include <iostream>
+
 namespace mk
 {
 	InkWindow::InkWindow(UiWindow& uiWindow, unique_ptr<Renderer> renderer)
@@ -27,12 +29,19 @@ namespace mk
 	}
 
 	Renderer* DrawFrame::sRenderer = nullptr;
+	int DrawFrame::sDebugBatch = 0;
+
+	bool DrawFrame::sDebugDrawFrameRect = false;
+	bool DrawFrame::sDebugDrawPaddedRect = false;
+	bool DrawFrame::sDebugDrawContentRect = false;
+	bool DrawFrame::sDebugDrawClipRect = false;
 
 	DrawFrame::DrawFrame(Frame& frame)
 		: d_frame(frame)
 		, d_stencil(frame)
 		, d_caption(frame)
 		, m_text()
+		, m_textLines(0)
 		, m_image(nullptr)
 		, d_inkstyle(nullptr)
 	{}
@@ -40,41 +49,65 @@ namespace mk
 	void DrawFrame::setText(const string& text)
 	{
 		m_text = text;
-		this->updateSize();
+		this->updateFrameSize();
 	}
 
 	void DrawFrame::setImage(Image* image)
 	{
 		m_image = image;
-		this->updateSize();
+		this->updateFrameSize();
 	}
 
-	void DrawFrame::updateSize()
+	void DrawFrame::setTextLines(size_t lines)
+	{
+		m_textLines = lines;
+		this->updateFrameSize();
+	}
+
+	void DrawFrame::updateContentSize()
+	{
+		float paddedWidth = floor(d_frame.width() - d_inkstyle->padding().x0() - d_inkstyle->padding().x1());
+		float paddedHeight = floor(d_frame.height() - d_inkstyle->padding().y0() - d_inkstyle->padding().y1());
+
+		DimFloat paddedSize(paddedWidth, paddedHeight);
+
+		d_caption.updateTextRows(*sRenderer, paddedSize);
+
+		this->updateFrameSize(DIM_X);
+		this->updateFrameSize(DIM_Y);
+	}
+
+	void DrawFrame::updateFrameSize()
 	{
 		if(!d_inkstyle)
 			return;
 
-		DimFloat contentSize;
-		this->contentSize(DIM_X, contentSize);
-		this->contentSize(DIM_Y, contentSize);
+		this->updateContentSize();
 
-		contentSize[DIM_X] = contentSize[DIM_X] + d_inkstyle->padding().x0() + d_inkstyle->padding().x1();
-		contentSize[DIM_Y] = contentSize[DIM_Y] + d_inkstyle->padding().y0() + d_inkstyle->padding().y1();
+		this->updateFrameSize(DIM_X);
+		this->updateFrameSize(DIM_Y);
+	}
 
+	void DrawFrame::updateFrameSize(Dimension dim)
+	{
 		bool wrapContent = (d_frame.frameType() == FRAME || d_frame.as<Stripe>().sequence().size() == 0);
+		if(!(d_frame.dshrink(dim) && wrapContent))
+			return;
 
-		if(d_frame.dshrink(DIM_X) && wrapContent)
-			d_frame.setSizeDim(DIM_X, contentSize[DIM_X]);
-		if(d_frame.dshrink(DIM_Y) && wrapContent)
-			d_frame.setSizeDim(DIM_Y, contentSize[DIM_Y]);
+		DimFloat contentSize;
+		this->contentSize(dim, contentSize);
+
+		d_frame.setSizeDim(dim, contentSize[dim] + d_inkstyle->padding()[dim] + d_inkstyle->padding()[dim + 2]);
 	}
 
 	void DrawFrame::contentSize(Dimension dim, DimFloat& size)
 	{
 		if(!m_text.empty())
-			size[dim] = sRenderer->textSize(m_text, dim, *d_inkstyle);
+			size[dim] = d_caption.textSize(dim);
 		else if(m_image)
 			size[dim] = dim == DIM_X ? float(m_image->d_width) : float(m_image->d_height);
+		else if(m_textLines && dim == DIM_Y)
+			size[dim] = sRenderer->textLineHeight(*d_inkstyle) * m_textLines;
 		else if(d_inkstyle->image())
 			size[dim] = dim == DIM_X ? float(d_inkstyle->image()->d_width) : float(d_inkstyle->image()->d_height);
 		else if(!d_inkstyle->imageSkin().null())
@@ -99,14 +132,31 @@ namespace mk
 
 	void DrawFrame::beginDraw()
 	{
+		//Renderer& renderer = d_frame.layer().rootLayer().target()->renderer();
+		Renderer& renderer = *sRenderer;
+
+		float x = floor(d_frame.dposition(DIM_X));
+		float y = floor(d_frame.dposition(DIM_Y));
+
+#ifdef KIUI_DRAW_CACHE
+		void* layerCache = nullptr;
+		renderer.layerCache(d_frame.layer(), layerCache);
+
+		if(d_frame.frameType() >= LAYER)
+			renderer.beginLayer(layerCache, x, y, d_frame.scale());
+		else
+			renderer.beginUpdate(layerCache, x, y, d_frame.scale());
+
+#else
+		renderer.beginUpdate(x, y);
+#endif
+
 		if(!d_frame.layer().redraw())
 			return;
 
-		if(!d_frame.visible())
-			return;
+		++sDebugBatch;
 
-		//Renderer& renderer = d_frame.layer().rootLayer().target()->renderer();
-		Renderer& renderer = *sRenderer;
+		d_frame.widget().customDraw(renderer);
 
 		float left = floor(d_inkstyle->margin().x0());
 		float top = floor(d_inkstyle->margin().y0());
@@ -132,66 +182,49 @@ namespace mk
 
 		BoxFloat contentRect(contentPos.x(), contentPos.y(), contentSize.x(), contentSize.y());
 
-		float x = floor(d_frame.dposition(DIM_X));
-		float y = floor(d_frame.dposition(DIM_Y));
-
-#ifdef KIUI_DRAW_CACHE
-		void* layerCache = nullptr;
-		renderer.layerCache(d_frame.layer(), layerCache);
-
-		if(d_frame.frameType() >= LAYER)
-			renderer.beginLayer(layerCache);
-
-		renderer.beginUpdate(layerCache, x, y);
-#else
-		renderer.beginUpdate(x, y);
-#endif
-
-		if(d_frame.frameType() >= LAYER)
-			renderer.unclipRect();
-
-		this->draw(d_stencil, renderer, rect, paddedRect, contentRect);
-		this->draw(d_caption, renderer, rect, paddedRect, contentRect);
-
-		d_frame.widget().customDraw(renderer);
-
 		if(d_frame.clip())
 			renderer.clipRect(rect);
-	}
 
-	void DrawFrame::draw(RenderFrame& frame, Renderer& target, BoxFloat& rect, BoxFloat& paddedRect, BoxFloat& contentRect)
-	{
-		// add clipping test > m_frame.clipped()
 		if(d_frame.inkstyle().m_empty)
 			return;
 
-		frame.redraw(target, rect, paddedRect, contentRect);
+		// add clipping test > m_frame.clipped()
+
+		d_stencil.redraw(renderer, rect, paddedRect, contentRect);
+		d_caption.redraw(renderer, rect, paddedRect, contentRect);
+
+#if 1 // DEBUG
+		if(sDebugDrawFrameRect)
+			renderer.debugRect(rect, Colour::Red);
+		if(sDebugDrawPaddedRect)
+			renderer.debugRect(paddedRect, Colour::Green);
+		if(sDebugDrawContentRect)
+			renderer.debugRect(contentRect, Colour::Blue);
+		if(sDebugDrawClipRect && d_frame.clip())
+			renderer.debugRect(rect, Colour::Red);
+#endif
 	}
 
 	void DrawFrame::endDraw()
 	{
-		if(!d_frame.layer().redraw())
-			return;
-
-		if(!d_frame.visible())
-			return;
-
 		//Renderer& renderer = d_frame.layer().rootLayer().target()->renderer();
 		Renderer& renderer = *sRenderer;
 
 		renderer.endUpdate();
 	}
 
-	void DrawFrame::updateInkstyle(InkStyle& inkstyle)
+	void DrawFrame::resetInkstyle(InkStyle& inkstyle)
 	{
-		if(d_inkstyle == &inkstyle)
-			return;
-
 		d_inkstyle = &inkstyle;
-		this->updateSize();
+		this->updateFrameSize();
 
 		d_frame.setDirty(Frame::DIRTY_SKIN); // only used to redraw ourselves
-
 		//std::cerr << ">>>>>> SKIN " << d_inkstyle->name() << std::endl;
+	}
+
+	void DrawFrame::updateInkstyle(InkStyle& inkstyle)
+	{
+		if(d_inkstyle != &inkstyle)
+			this->resetInkstyle(inkstyle);
 	}
 }

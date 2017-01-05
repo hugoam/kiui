@@ -24,56 +24,64 @@ namespace mk
 
 #ifdef KIUI_DRAW_CACHE
 		virtual void layerCache(Layer& layer, void*& layerCache);
-		virtual void drawLayer(void* layerCache, float x, float y);
+		virtual void drawLayer(void* layerCache, float x, float y, float scale);
 
-		virtual void beginLayer(void* layerCache);
+		virtual void beginLayer(void* layerCache, float x, float y, float scale);
 		virtual void endLayer();
 
-		virtual void beginUpdate(void* layerCache, float x, float y);
+		virtual void beginUpdate(void* layerCache, float x, float y, float scale);
 		virtual void endUpdate();
 #else
 		virtual void beginUpdate(float x, float y);
 		virtual void endUpdate();
 #endif
 
-		virtual void clipRect(BoxFloat& rect);
+		virtual void clipRect(const BoxFloat& rect);
 		virtual void unclipRect();
 
-		virtual void clipFrame(BoxFloat& rect, BoxFloat& corners);
-		virtual void clipShape();
-		virtual void unclipShape();
+		virtual void clipFrame(const BoxFloat& rect, const BoxFloat& corners);
+		virtual void unclipFrame();
 
 		virtual void pathBezier(float x1, float y1, float c1x, float c1y, float c2x, float c2y, float x2, float y2);
 
-		virtual void pathRect(BoxFloat& rect, BoxFloat& corners, float border);
+		virtual void pathRect(const BoxFloat& rect, const BoxFloat& corners, float border);
 
-		virtual void drawShadow(BoxFloat& rect, BoxFloat& corner, Shadow& shadows);
-		virtual void drawRect(BoxFloat& rect, BoxFloat& corners, InkStyle& skin);
-		virtual void drawRectClipped(BoxFloat& rect, BoxFloat& corners, InkStyle& skin, BoxFloat& clipRect, BoxFloat& clipCorners);
-		virtual void drawImage(const Image& image, BoxFloat& rect);
-		virtual void drawImageStretch(const Image& image, BoxFloat& rect, float xstretch = 1.f, float ystretch = 1.f);
+		virtual void drawShadow(const BoxFloat& rect, const BoxFloat& corner, const Shadow& shadows);
+		virtual void drawRect(const BoxFloat& rect, const BoxFloat& corners, InkStyle& skin);
+		virtual void drawImage(const Image& image, const BoxFloat& rect);
+		virtual void drawImageStretch(const Image& image, const BoxFloat& rect, float xstretch = 1.f, float ystretch = 1.f);
 		virtual void drawText(float x, float y, const char* start, const char* end, InkStyle& skin);
 
-		virtual void fill(InkStyle& skin, BoxFloat& rect);
+		virtual void debugRect(const BoxFloat& rect, const Colour& colour);
+
+		virtual void fill(InkStyle& skin, const BoxFloat& rect);
 		virtual void stroke(InkStyle& skin);
 
 		virtual void initImage(Image& image, bool tile);
 
-		virtual float textSize(const string& text, Dimension dim, InkStyle& skin);
+		virtual void fillText(const string& text, const BoxFloat& rect, InkStyle& skin, TextRow& row);
 
-		virtual void fillText(const string& text, BoxFloat& paddedRect, InkStyle& skin, TextRow& row);
-		virtual void breakText(const string& text, BoxFloat& paddedRect, InkStyle& skin, std::vector<TextRow>& textRows);
-		virtual void breakTextLine(BoxFloat& paddedRect, TextRow& textRow);
+		virtual void breakText(const string& text, const DimFloat& space, InkStyle& skin, std::vector<TextRow>& textRows);
+		virtual void breakTextLine(const BoxFloat& rect, TextRow& textRow);
+
+		virtual void breakTextWidth(const char* string, const char* end, const BoxFloat& rect, InkStyle& skin, TextRow& textRow);
+		virtual void breakTextReturns(const char* string, const char* end, const BoxFloat& rect, InkStyle& skin, TextRow& textRow);
+
+		virtual float textLineHeight(InkStyle& skin);
+		virtual float textSize(const string& text, Dimension dim, InkStyle& skin);
 
 	private:
 		void setupText(InkStyle& skin);
 
-		void drawImage(int image, BoxFloat& rect, BoxFloat& imageRect);
+		void drawImage(int image, const BoxFloat& rect, const BoxFloat& imageRect);
 
 	protected:
 		NanoWindow& m_window;
 		NanoAtlas& m_atlas;
 		NVGcontext* m_ctx;
+
+		NVGalign m_alignH;
+		float m_lineHeight;
 
 		std::map<Layer*, NVGdisplayList*> m_layers;
 	};

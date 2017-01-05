@@ -7,8 +7,6 @@
 
 #include <Ui/mkUiLayout.h>
 
-#include <Ui/Device/mkRootDevice.h>
-
 #include <Object/String/mkString.h>
 #include <Object/Util/mkUnique.h>
 
@@ -28,8 +26,6 @@
 
 #include <Ui/Controller/mkController.h>
 
-#include <Ui/Edit/mkDValueEdit.h>
-
 #include <iostream>
 
 namespace mk
@@ -43,20 +39,18 @@ namespace mk
 		, m_renderWindow(nullptr)
 		, m_inkWindow(nullptr)
 		, m_inputWindow(nullptr)
-	{
-		//declareDValueEdit();
-	}
+	{}
 
 	UiWindow::~UiWindow()
 	{
 		m_rootSheet->clear();
 	}
 
-	void UiWindow::setup(RenderWindow& renderWindow, InkWindow& inkWindow, InputWindow* inputWindow)
+	void UiWindow::setup(RenderWindow& renderWindow, InkWindow& inkWindow, InputWindow& inputWindow)
 	{
 		m_renderWindow = &renderWindow;
 		m_inkWindow = &inkWindow;
-		m_inputWindow = inputWindow;
+		m_inputWindow = &inputWindow;
 
 		m_width = float(renderWindow.width());
 		m_height = float(renderWindow.height());
@@ -72,12 +66,10 @@ namespace mk
 		m_styler->prepare();
 
 		m_rootSheet = make_unique<RootSheet>(*this);
-		m_rootDevice = make_unique<RootDevice>(*this, *m_rootSheet);
+		//m_rootDevice = make_unique<RootDevice>(*this, *m_rootSheet);
 
 		m_mouse = make_unique<Mouse>(*m_rootSheet);
 		m_keyboard = make_unique<Keyboard>(*m_rootSheet);
-
-		m_rootDevice->declareDefaultMappings();
 
 		m_inputWindow->initInput(*m_mouse, *m_keyboard, m_renderWindow->handle());
 
@@ -106,7 +98,7 @@ namespace mk
 		m_mouse->nextFrame();
 		m_keyboard->nextFrame();
 
-		//m_rootSheet->nextFrame(tick, delta);
+		m_rootSheet->layer().nextFrame(tick, delta);
 
 		return !m_shutdownRequested;
 	}

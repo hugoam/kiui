@@ -43,7 +43,6 @@ namespace mk
 		inline Stripe* parent() { return d_parent; }
 		inline Dirty dirty() { return d_dirty; }
 		inline bool hidden() { return d_hidden; }
-		inline bool visible() { return d_visible; }
 		inline size_t index() { return d_index; }
 		inline bool flow() { return d_flow; }
 
@@ -61,8 +60,7 @@ namespace mk
 		void show();
 		void hide();
 
-		void setVisible();
-		void setInvisible();
+		bool visible();
 
 		void transfer(Stripe& stripe, size_t index);
 		void remove();
@@ -78,13 +76,12 @@ namespace mk
 		virtual bool nextOffset(Dimension dim, float& pos, float seuil, bool top = false);
 		virtual bool prevOffset(Dimension dim, float& pos, float seuil, bool top = false);
 
-		virtual void setVisible(bool visible);
-
 		virtual Frame* pinpoint(float x, float y, bool opaque);
 
 		virtual void migrate(Stripe& stripe);
 
 		virtual void nextFrame(size_t tick, size_t delta);
+		virtual void render();
 
 		void resetStyle();
 
@@ -93,18 +90,13 @@ namespace mk
 		void updateSizing(Dimension dim);
 		void updateFixed(Dimension dim);
 
-		virtual void updateChildren() {}
-
 		virtual void updateSpace();
 		virtual void updateSizing();
 		virtual void updateStyle();
 
 		void updatePosition();
-		void derivePosition();
 
 		void updateState(WidgetState state);
-
-		float calcAbsolute(Dimension dim);
 
 		void setSizeDim(Dimension dim, float size);
 		void setSpanDim(Dimension dim, float span);
@@ -127,23 +119,21 @@ namespace mk
 		inline float dextent(Dimension dim) { return dsize(dim) + dmargin(dim) * 2.f; }
 		inline float doffset(Dimension dim) { return dposition(dim) + dextent(dim); }
 
-		inline float dabsolute(Dimension dim) { return d_absolute[dim]; }
+		float dabsolute(Dimension dim);
 
 		bool inside(float x, float y);
 
 		static Type& cls() { static Type ty; return ty; }
 
 	public:
-		virtual void resized(Dimension dim) { UNUSED(dim); }
+		virtual void resized(Dimension dim);
 
 	protected:
 		Widget& d_widget;
 		Stripe* d_parent;
 		Dirty d_dirty;
 		bool d_hidden;
-		bool d_visible;
 		bool d_flow;
-		DimFloat d_absolute;
 		size_t d_index;
 
 		Style* d_style;

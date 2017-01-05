@@ -9,6 +9,7 @@
 #include <Ui/mkUiForward.h>
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Widget/mkSheet.h>
+#include <Ui/Widget/mkValue.h>
 
 namespace mk
 {
@@ -20,6 +21,14 @@ namespace mk
 		unique_ptr<Widget> clone() { return make_unique<Label>(this->label()); }
 
 		static StyleType& cls() { static StyleType ty("Label", Widget::cls()); return ty; }
+	};
+
+	class MK_UI_EXPORT Text : public Label
+	{
+	public:
+		Text(const string& label, StyleType& type = cls(), FrameType frameType = FRAME);
+
+		static StyleType& cls() { static StyleType ty("Text", Label::cls()); return ty; }
 	};
 
 	class MK_UI_EXPORT Title : public Label
@@ -35,7 +44,6 @@ namespace mk
 	public:
 		Icon(Image& image);
 		Icon(const string& image);
-
 
 		static StyleType& cls() { static StyleType ty("Icon", Widget::cls()); return ty; }
 	};

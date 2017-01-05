@@ -12,6 +12,7 @@ namespace mk
 		, d_size(0.f, 0.f)
 		, d_space(FIT)
 		, d_sizing(SHRINK, SHRINK)
+		, d_scale(1.f)
 		, d_layout(nullptr)
 	{}
 

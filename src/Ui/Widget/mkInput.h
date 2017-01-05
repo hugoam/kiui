@@ -23,6 +23,9 @@ namespace mk
 {
 	class MK_UI_EXPORT DispatchInput : public HashDispatch<DispatchInput, Lref&, unique_ptr<WValue>>
 	{};
+	
+	class MK_UI_EXPORT DispatchDisplay : public HashDispatch<DispatchDisplay, Lref&, unique_ptr<Widget>>
+	{};
 
 	template <>
 	class MK_UI_EXPORT _I_ Input<Colour> : public WValue

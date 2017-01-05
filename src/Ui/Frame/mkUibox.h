@@ -27,6 +27,7 @@ namespace mk
 		LayoutStyle& layout() { return *d_layout; }
 
 		inline DimFloat position() { return d_position; }
+		inline DimFloat size() { return d_size; }
 
 		inline float dposition(Dimension dim) { return d_position[dim]; }
 		inline float dsize(Dimension dim) { return d_size[dim]; }
@@ -49,7 +50,10 @@ namespace mk
 		inline bool opaque() { return d_opacity == OPAQUE; }
 		inline bool hollow() { return d_opacity == HOLLOW; }
 
+		inline float scale() { return d_scale; }
+
 		inline void setOpacity(Opacity opacity) { d_opacity = opacity; }
+		inline void setScale(float scale) { d_scale = scale; }
 
 	protected:
 		DimFloat d_position;
@@ -58,6 +62,7 @@ namespace mk
 		Space d_space;
 		DimSizing d_sizing;
 		Opacity d_opacity;
+		float d_scale;
 		LayoutStyle* d_layout;
 	};
 }

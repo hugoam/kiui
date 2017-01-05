@@ -262,7 +262,7 @@ namespace mk
 		else if(key == "skin_margin")
 			m_skin->m_margin = fromString<BoxFloat>(value); // x, y, z, w
 		else if(key == "topdown_gradient")
-			m_skin->m_topdownGradient = fromString<DimFloat>(value); // top, down
+			m_skin->m_linearGradient = fromString<DimFloat>(value); // top, down
 		else if(key == "image")
 			m_skin->m_image = &findImage(value); // image.png
 		else if(key == "overlay")

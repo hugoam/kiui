@@ -119,7 +119,7 @@ namespace mk
 
 	struct MK_UI_EXPORT MouseDragStartEvent : public MouseEvent
 	{
-		MouseDragStartEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_DRAGGED_START, x, y) {}
+		MouseDragStartEvent(DeviceType deviceType, float x, float y, float startX, float startY) : MouseEvent(deviceType, EVENT_DRAGGED_START, x, y) { lastPressedX = startX; lastPressedY = startY; }
 	};
 
 	struct MK_UI_EXPORT MouseDragEndEvent : public MouseEvent

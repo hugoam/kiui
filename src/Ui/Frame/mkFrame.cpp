@@ -30,7 +30,6 @@ namespace mk
 		, d_parent(nullptr)
 		, d_dirty(DIRTY_VISIBILITY)
 		, d_hidden(false)
-		, d_visible(true)
 		, d_index(0)
 		, d_style(nullptr)
 		, d_styleStamp(0)
@@ -51,7 +50,7 @@ namespace mk
 	{
 		if(!d_parent)
 		{
-			this->updateStyle();
+			//this->updateStyle();
 			return;
 		}
 
@@ -108,7 +107,7 @@ namespace mk
 		if(d_span.null())
 			d_span = d_layout->d_span;
 
-		this->updateInkstyle(d_style->subskin(d_widget.state()));
+		this->resetInkstyle(d_style->subskin(d_widget.state()));
 
 		this->updateSizing();
 	}
@@ -132,36 +131,29 @@ namespace mk
 
 	void Frame::updateFixed(Dimension dim)
 	{
-		if(d_layout->size()[dim])
-		{
-			d_sizing[dim] = FIXED;
-			if(d_layout->d_space != BOARD || d_size[dim] == 0.f)
-			{
-				d_size[dim] = d_layout->size()[dim];
-				this->setDirty(DIRTY_FRAME);
-				this->resized(dim);
-			}
-			//this->setSizeDim(dim, d_layout->size()[dim]);
-		}
+		if(!d_layout->size()[dim])
+			return;
+
+		d_sizing[dim] = FIXED;
+		if(d_layout->d_space != BOARD || d_size[dim] == 0.f)
+			this->setSizeDim(dim, d_layout->size()[dim]);
 	}
 
 	void Frame::bind(Stripe* parent)
 	{
 		d_parent = parent;
 		this->updateStyle();
-
-		this->setVisible(d_parent->visible());
 	}
 	
 	void Frame::unbind()
 	{
 		d_parent = nullptr;
-		d_visible = false;
 	}
 
 	void Frame::remove()
 	{
-		d_parent->remove(*this);
+		if(d_parent)
+			d_parent->remove(*this);
 	}
 
 	Frame* Frame::before()
@@ -202,14 +194,13 @@ namespace mk
 		if(d_style->updated() > d_styleStamp)
 			this->resetStyle();
 
-		if(d_frame.dirty() >= Frame::DIRTY_POSITION)
-			this->layer().setRedraw();
-
-		this->beginDraw();
-		this->updateChildren();
-		this->endDraw();
-
 		this->updateOnce();
+	}
+
+	void Frame::render()
+	{
+		this->beginDraw();
+		this->endDraw();
 	}
 
 	void Frame::updateOnce()
@@ -219,8 +210,8 @@ namespace mk
 
 		if(d_dirty >= DIRTY_POSITION)
 			this->updatePosition();
-		if(d_dirty >= DIRTY_ABSOLUTE)
-			this->derivePosition();
+		if(d_frame.dirty() >= DIRTY_OFFSET)
+			this->layer().setRedraw();
 
 		d_dirty = CLEAN;
 	}
@@ -249,15 +240,14 @@ namespace mk
 		d_parent->positionLength(*this);
 	}
 
-	void Frame::derivePosition()
-	{
-		d_absolute[DIM_X] = this->calcAbsolute(DIM_X);
-		d_absolute[DIM_Y] = this->calcAbsolute(DIM_Y);
-	}
-
 	void Frame::updateState(WidgetState state)
 	{
 		this->updateInkstyle(d_style->subskin(state));
+	}
+
+	void Frame::resized(Dimension dim)
+	{
+		this->updateContentSize();
 	}
 
 	void Frame::setSizeDim(Dimension dim, float size)
@@ -291,14 +281,13 @@ namespace mk
 	void Frame::setPositionDim(Dimension dim, float position)
 	{
 		d_position[dim] = position;
-		this->setDirty(DIRTY_POSITION); // @note was DIRTY_ABSOLUTE (performance hazard with current setting)
+		this->setDirty(DIRTY_ABSOLUTE);
 	}
 
 	void Frame::show()
 	{
 		d_hidden = false;
-		if(!d_visible)
-			this->setVisible(true);
+		this->setDirty(DIRTY_VISIBILITY);
 		if(d_parent)
 			d_parent->childShown(*this);
 	}
@@ -306,36 +295,20 @@ namespace mk
 	void Frame::hide()
 	{
 		d_hidden = true;
-		if(d_visible)
-			this->setVisible(false);
+		this->setDirty(DIRTY_VISIBILITY);
 		if(d_parent)
 			d_parent->childHidden(*this);
 	}
 
-	void Frame::setVisible(bool visible)
+	bool Frame::visible()
 	{
-		visible ? this->setVisible() : this->setInvisible();
+		if(d_hidden)
+			return false;
+		else
+			return d_parent ? d_parent->visible() : !d_hidden;
 	}
 
-	void Frame::setVisible()
-	{
-		if(d_visible || d_hidden || (d_parent && !d_parent->visible()))
-			return;
-
-		d_visible = true;
-		this->setDirty(DIRTY_VISIBILITY);
-	}
-
-	void Frame::setInvisible()
-	{
-		if(d_visible == false)
-			return;
-
-		d_visible = false;
-		this->setDirty(DIRTY_VISIBILITY);
-	}
-
-	float Frame::calcAbsolute(Dimension dim)
+	float Frame::dabsolute(Dimension dim)
 	{
 		if(d_parent)
 			return d_parent->dabsolute(dim) + d_parent->dpivotposition(*this, dim);

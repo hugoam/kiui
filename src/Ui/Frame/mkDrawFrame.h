@@ -21,6 +21,9 @@ namespace mk
 
 		void addImage(const string& image, int width, int height);
 
+		virtual Image& createImage(const string& image, int width, int height, uint8_t* data) = 0;
+		virtual void removeImage(const Image& image) = 0;
+
 		static Type& cls() { static Type ty; return ty; }
 
 	protected:
@@ -45,16 +48,21 @@ namespace mk
 		Image* image() { return m_image; }
 		void setImage(Image* image);
 
+		void setTextLines(size_t lines);
+
 		inline InkStyle& inkstyle() { return *d_inkstyle; }
 
 		void beginDraw();
 		void endDraw();
 
-		void draw(RenderFrame& frame, Renderer& target, BoxFloat& rect, BoxFloat& paddedRect, BoxFloat& contentRect);
-
 		void updateInkstyle(InkStyle& inkstyle);
+		void resetInkstyle(InkStyle& inkstyle);
 
-		void updateSize();
+		void updateContentSize();
+		void updateFrameSize();
+
+		void updateFrameSize(Dimension dim);
+
 		void contentSize(Dimension dim, DimFloat& size);
 		void contentPos(const BoxFloat& paddedRect, const DimFloat& size, Dimension dim, DimFloat& pos);
 
@@ -66,12 +74,19 @@ namespace mk
 		//Image d_image;
 
 		string m_text;
+		size_t m_textLines;
 		Image* m_image;
 
 		InkStyle* d_inkstyle;
 
 	public:
 		static Renderer* sRenderer;
+		static int sDebugBatch;
+
+		static bool sDebugDrawFrameRect;
+		static bool sDebugDrawPaddedRect;
+		static bool sDebugDrawContentRect;
+		static bool sDebugDrawClipRect;
 	};
 }
 

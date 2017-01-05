@@ -27,12 +27,12 @@ namespace mk
 	public:
 		Image(const string& name, int width = 0, int height = 0)
 			: IdStruct(cls())
-			, d_name(name), d_left(0), d_top(0), d_width(width), d_height(height), d_index(0)
+			, d_name(name), d_left(0), d_top(0), d_width(width), d_height(height), d_index(0), d_atlas(0)
 		{}
 
 		Image()
 			: IdStruct(cls())
-			, d_name(), d_left(0), d_top(0), d_width(0), d_height(0), d_index(0)
+			, d_name(), d_left(0), d_top(0), d_width(0), d_height(0), d_index(0), d_atlas(0)
 		{}
 
 		Image(const Image& other)
@@ -56,7 +56,9 @@ namespace mk
 		int d_top;
 		int d_width;
 		int d_height;
+		
 		int d_index;
+		int d_atlas;
 
 		bool d_stretch;
 
@@ -120,7 +122,10 @@ namespace mk
 			d_images[FILL].d_name = image.d_name + "_fill";
 
 			for(size_t i = 0; i < 9; ++i)
+			{
 				d_images[i].d_index = d_image->d_index;
+				d_images[i].d_atlas = d_image->d_atlas;
+			}
 
 			this->setupSize(image.d_width, image.d_height);
 		}

@@ -8,7 +8,6 @@
 /* mk headers */
 #include <Object/mkTyped.h>
 #include <Ui/mkUiForward.h>
-#include <Ui/Scheme/mkDropper.h>
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Widget/mkTypeIn.h>
 

@@ -5,7 +5,6 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Widget/mkRootSheet.h>
 
-#include <Ui/Device/mkDevice.h>
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 #include <Ui/Frame/mkLayer.h>
@@ -47,6 +46,7 @@ namespace mk
 
 	void RootSheet::nextFrame(size_t tick, size_t delta)
 	{
+		//m_layer->nextFrame(tick, delta);
 		m_cursor->nextFrame();
 	}
 

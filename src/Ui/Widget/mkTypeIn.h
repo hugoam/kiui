@@ -8,6 +8,7 @@
 /* mk */
 #include <Ui/mkUiForward.h>
 #include <Ui/Widget/mkSheet.h>
+#include <Ui/Widget/mkCursor.h>
 #include <Ui/Widget/mkCheckbox.h>
 #include <Ui/Widget/mkValue.h>
 
@@ -41,7 +42,13 @@ namespace mk
 		void leftDrag(MouseEvent& mouseEvent);
 		void leftDragEnd(MouseEvent& mouseEvent);
 
-		void setCaret(size_t index);
+		void selectCaret(int index);
+		void selectFirst(size_t start);
+		void selectSecond(size_t end);
+
+		void moveCaretTo(size_t index);
+		void moveCaretRight();
+		void moveCaretLeft();
 
 		static StyleType& cls() { static StyleType ty("TypeIn", Sheet::cls()); return ty; }
 
@@ -50,9 +57,11 @@ namespace mk
 		string& m_string;
 		bool m_hasPeriod;
 		string m_allowedChars;
-		Caret& m_caret;
 
 		string m_valueString;
+
+		size_t m_selectFirst;
+		size_t m_selectSecond;
 
 		//std::vector<TextSelection*> m_selection;
 	};

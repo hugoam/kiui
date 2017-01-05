@@ -20,7 +20,7 @@ namespace mk
 		UiWindow(const string& resourcePath = "", User* user = nullptr);
 		~UiWindow();
 
-		void setup(RenderWindow& renderWindow, InkWindow& inkWindow, InputWindow* inputWindow);
+		void setup(RenderWindow& renderWindow, InkWindow& inkWindow, InputWindow& inputWindow);
 		void init();
 
 		const string& resourcePath() { return m_resourcePath; }
@@ -31,7 +31,7 @@ namespace mk
 		RenderWindow& renderWindow() { return *m_renderWindow; }
 		InkWindow& inkWindow() { return *m_inkWindow; }
 		RootSheet& rootSheet() { return *m_rootSheet; }
-		RootDevice& rootDevice() { return *m_rootDevice; }
+		//RootDevice& rootDevice() { return *m_rootDevice; }
 
 		Mouse& mouse() { return *m_mouse; }
 		Keyboard& keyboard() { return *m_keyboard; }
@@ -62,7 +62,7 @@ namespace mk
 
 		unique_ptr<Styler> m_styler;
 
-		unique_ptr<RootDevice> m_rootDevice;
+		//unique_ptr<RootDevice> m_rootDevice;
 		unique_ptr<RootSheet> m_rootSheet;
 
 		unique_ptr<Mouse> m_mouse;

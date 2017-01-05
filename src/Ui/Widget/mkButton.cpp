@@ -22,6 +22,10 @@ namespace mk
 		this->setLabel(label);
 	}
 
+	Text::Text(const string& label, StyleType& type, FrameType frameType)
+		: Label(label, type, frameType)
+	{}
+
 	Title::Title(const string& label)
 		: Label(label, cls())
 	{}

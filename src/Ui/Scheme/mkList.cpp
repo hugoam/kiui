@@ -8,6 +8,7 @@
 #include <Ui/Widget/mkWidgets.h>
 
 #include <iostream>
+#include <locale>
 
 using namespace std::placeholders;
 
@@ -66,7 +67,7 @@ namespace mk
 	bool FilterInput::fitsFilter(const string& filter, const string& value)
 	{
 		for(size_t i = 0; i < filter.size(); ++i)
-			if(filter[i] != value[i])
+			if(std::tolower(filter[i], std::locale()) != std::tolower(value[i], std::locale()))
 				return false;
 
 		return true;

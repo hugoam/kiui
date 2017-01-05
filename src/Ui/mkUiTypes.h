@@ -5,10 +5,7 @@
 #ifndef MK_UITYPES_H
 #define MK_UITYPES_H
 
-#include <Ui/Device/mkDevice.h>
-#include <Ui/Device/mkStack.h>
-#include <Ui/Device/mkHook.h>
-#include <Ui/Device/mkRootDevice.h>
+#include <Object/mkObjectTypes.h>
 
 #include <Ui/Widget/mkInput.h>
 #include <Ui/Widget/mkWidgets.h>
@@ -22,6 +19,7 @@
 #include <Ui/Widget/mkWidget.h>
 #include <Ui/Widget/mkSheet.h>
 #include <Ui/Widget/mkRootSheet.h>
+#include <Ui/Widget/mkCursor.h>
 
 #include <Ui/Widget/mkButton.h>
 #include <Ui/Widget/mkSlider.h>
@@ -46,11 +44,6 @@
 #include <Ui/Scheme/mkNode.h>
 
 #include <Ui/Frame/mkDimString.h>
-
-#include <Ui/Edit/mkDCanvas.h>
-#include <Ui/Edit/mkDObjectEdit.h>
-#include <Ui/Edit/mkDValueEdit.h>
-#include <Ui/Edit/mkDUiEdit.h>
 
 #include <Ui/mkUiWindow.h>
 #include <Ui/mkUiLayout.h>

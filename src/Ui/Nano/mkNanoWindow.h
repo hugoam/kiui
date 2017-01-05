@@ -38,9 +38,8 @@ namespace mk
 		void fitImage(ImageRect& image);
 		void blitImage(ImageRect& image);
 
-		ImageRect& findSpriteRect(const string& image);
+		ImageRect* findSpriteRect(const string& image);
 		void appendSprite(const string& image, const string& group);
-		void defineSprite(const string& image, float left, float top, float width, float height);
 
 		std::vector<ImageRect>& sprites() { return m_sprites; }
 
@@ -64,7 +63,8 @@ namespace mk
 
 		void nextFrame(double time, double delta);
 
-		InkTarget& screenTarget();
+		Image& createImage(const string& image, int width, int height, uint8_t* data);
+		void removeImage(const Image& image);
 
 		string resourcePath() { return m_resourcePath; }
 		NVGcontext* ctx() { return m_ctx; }

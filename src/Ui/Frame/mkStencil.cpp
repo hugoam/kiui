@@ -16,11 +16,8 @@ using namespace std::placeholders;
 
 namespace mk
 {
-	bool Stencil::sDebugDraw = false;
-	int Stencil::sDebugBatch = 0;
-
 	Stencil::Stencil(Frame& frame)
-		: RenderFrame(frame)
+		: m_frame(frame)
 		, m_hardClip()
 	{}
 
@@ -39,26 +36,26 @@ namespace mk
 		if(!m_hardClip.null())
 			return;
 
-		++sDebugBatch;
-
 		InkStyle& skin = m_frame.inkstyle();
-		BoxFloat& corners = skin.cornerRadius();
 
 		// Shadow
 		if(!skin.shadow().d_null)
 		{
-			target.drawShadow(rect, corners, skin.shadow());
+			target.drawShadow(rect, skin.cornerRadius(), skin.shadow());
 		}
 
 		// Rect
 		if((skin.borderWidth().x0() || skin.backgroundColour().a() > 0.f) && skin.m_weakCorners)
 		{
-			//BoxFloat clipBox(m_frame.parent()->dabsolute(DIM_X) - x, m_frame.parent()->dabsolute(DIM_Y) - y, m_frame.parent()->width(), m_frame.parent()->height());
-			//target.drawRectClipped(rect, corners, skin, clipBox, m_frame.parent()->inkstyle().cornerRadius());
+			BoxFloat clipBox(-m_frame.dposition(DIM_X), -m_frame.dposition(DIM_Y), m_frame.parent()->width(), m_frame.parent()->height());
+			if(m_frame.widget().style().name() == "FillerX")
+				int i = 0;
+			target.clipFrame(clipBox, m_frame.parent()->inkstyle().cornerRadius());
 		}
+		
 		if((skin.borderWidth().x0() || skin.backgroundColour().a() > 0.f))
 		{
-			target.drawRect(rect, corners, skin);
+			target.drawRect(rect, skin.cornerRadius(), skin);
 		}
 
 		// ImageSkin
@@ -79,33 +76,12 @@ namespace mk
 		}
 
 		// Image
-		if(m_frame.inkstyle().image())
-			target.drawImage(*m_frame.inkstyle().image(), contentRect);
-		if(m_frame.inkstyle().overlay())
-			target.drawImage(*m_frame.inkstyle().overlay(), contentRect);
-		if(m_frame.inkstyle().tile())
-			target.drawImage(*m_frame.inkstyle().tile(), rect);
-
-#if 1 // DEBUG
-		if(sDebugDraw)
-		{
-			static InkStyle frameStyle("debugFrameStyle");
-			static InkStyle paddingStyle("debugPaddingStyle");
-			static InkStyle contentStyle("debugPaddingStyle");
-
-			frameStyle.m_borderWidth = 1.f;
-			paddingStyle.m_borderWidth = 1.f;
-			contentStyle.m_borderWidth = 1.f;
-
-			frameStyle.m_borderColour = Colour::Red;
-			paddingStyle.m_borderColour = Colour::Green;
-			contentStyle.m_borderColour = Colour::Blue;
-
-			target.drawRect(rect, BoxFloat(), frameStyle);
-			target.drawRect(paddedRect, BoxFloat(), paddingStyle);
-			target.drawRect(contentRect, BoxFloat(), contentStyle);
-		}
-#endif
+		if(skin.image())
+			target.drawImage(*skin.image(), contentRect);
+		if(skin.overlay())
+			target.drawImage(*skin.overlay(), contentRect);
+		if(skin.tile())
+			target.drawImage(*skin.tile(), rect);
 	}
 
 	void Stencil::drawSkinImage(Renderer& target, ImageSkin::Section section, int left, int top, int width, int height)
