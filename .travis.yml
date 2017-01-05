@@ -1,18 +1,26 @@
 language: cpp
 
+addons:
+  apt:
+    sources:
+      - llvm-toolchain-precise
+      - ubuntu-toolchain-r-test
+      - george-edison55-precise-backports
+    packages:
+      - clang-3.7
+      - g++-5
+      - gcc-5
+      - cmake
+      - cmake-data
+
+            
 compiler:
   - gcc
   - clang
-    
+
 install:
-  - sudo add-apt-repository ppa:smspillaz/cmake-2.8.12 -y
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-  - sudo apt-get update -qq
-  - sudo apt-get purge cmake -qq
-  - sudo apt-get install cmake -qq
-  - if [ "$CXX" = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev; fi
-  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+  - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
 
 before_script:
   - git clone https://github.com/glfw/glfw
