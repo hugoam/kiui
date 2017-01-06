@@ -70,6 +70,7 @@ namespace mk
 		for(Object* object : Image::cls().indexer().objects())
 			if(object && object->as<Image>().d_name == name)
 				return object->as<Image>();
+		static Image null; return null;
 	}
 
 	class _I_ ImageSkin : public Struct
