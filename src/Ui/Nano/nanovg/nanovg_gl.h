@@ -2028,7 +2028,7 @@ static void glnvg__renderFill(void* uptr, NVGpaint* paint, NVGscissor* scissor, 
 	call->triangleOffset = offset;
 	call->triangleCount = 6;
 	quad = &gl->verts[call->triangleOffset];
-	const float * b = bounds;
+	const float * b; b = bounds;
 
 #if !NANOVG_GL_TRANSFORM_IN_VERTEX_SHADER && NVG_TRANSFORM_IN_BACKEND
 	float txBounds[4];
