@@ -15,8 +15,9 @@ else ()
     add_definitions(-DTOYUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}/kiui/data/")
 endif ()
 
-option(TOYUI_EXAMPLE_LIB "Build toyui example as static lib")
-if(TOYUI_EXAMPLE_LIB)
+
+option(TOYUI_EXAMPLE_LIB "Build toyui example as shared library" ${TOYUI_FORCE_EXAMPLE_LIB})
+if (TOYUI_EXAMPLE_LIB)
     add_definitions("-DUIEXAMPLE_EXPORT")
     add_library(toyui_example SHARED ${SOURCE_FILES} ${HEADER_FILES})
 else ()
