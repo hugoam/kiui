@@ -33,11 +33,11 @@ namespace mk
 		unsigned int m_width;
 		unsigned int m_height;
 		string m_title;
+		size_t m_handle;
+
 		bool m_resized;
 		bool m_active;
 		bool m_shutdown;
-
-		size_t m_handle;
 	};
 }
 

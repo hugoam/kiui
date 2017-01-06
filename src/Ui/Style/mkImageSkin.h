@@ -93,9 +93,9 @@ namespace mk
 			: d_image(&findImage(image))
 			, d_top(top), d_right(right), d_bottom(bottom), d_left(left)
 			, d_margin(margin)
-			, d_prepared(false)
-			, d_images(9)
 			, d_stretch(stretch)
+			, d_images(9)
+			, d_prepared(false)
 		{
 			this->setupImage(*d_image);
 		}

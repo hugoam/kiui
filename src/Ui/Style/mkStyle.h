@@ -141,10 +141,12 @@ namespace mk
 		_C_ InkStyle(const string& name)
 			: IdStruct(cls())
 			, m_name(name)
-			, m_empty(true), m_backgroundColour(Colour::Transparent), m_borderColour(Colour::Transparent), m_textColour(Colour::Transparent), m_imageColour(Colour::Transparent)
+			, m_empty(true), m_backgroundColour(Colour::Transparent), m_borderColour(Colour::Transparent), m_imageColour(Colour::Transparent), m_textColour(Colour::Transparent)
 			, m_textFont("dejavu"), m_textSize(14.f), m_textBreak(true), m_textWrap(false)
+			, m_borderWidth(0.f), m_cornerRadius(), m_weakCorners(false)
+			, m_padding(0.f), m_margin(0.f)
 			, m_align(DimAlign(LEFT, LEFT)), m_linearGradient(DimFloat(0.f, 0.f)), m_linearGradientDim(DIM_Y)
-			, m_borderWidth(0.f), m_image(), m_cornerRadius(), m_weakCorners(false)
+			, m_image(nullptr), m_overlay(nullptr), m_tile(nullptr)
 		{}
 
 		InkStyle(const InkStyle& other)

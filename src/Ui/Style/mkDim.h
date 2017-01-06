@@ -14,7 +14,7 @@
 #include <Object/Util/mkColour.h>
 #include <Ui/mkUiForward.h>
 
-/* Standards */
+/* std */
 #include <array>
 #include <map>
 
@@ -113,11 +113,7 @@ namespace mk
 	class _I_ Dim
 	{
 	public:
-#ifndef _MSC_VER
 		Dim(T x, T y) : d_values{{ x, y }} {}
-#else
-		Dim(T x, T y) : d_values(std::array<T, 2>{ x, y }) {}
-#endif
 		Dim() : Dim(T(), T()) {}
 
 		bool null() const { return d_values[0] == T() && d_values[1] == T(); }
@@ -147,11 +143,8 @@ namespace mk
 	class _I_ BoxFloat : public Struct
 	{
 	public:
-#ifndef _MSC_VER
 		_C_ BoxFloat(float x0, float y0, float x1, float y1) : d_values{{ x0, y0, x1, y1 }}, d_uniform(false), d_null(cnull()) {}
-#else
-		_C_ BoxFloat(float x0, float y0, float x1, float y1) : d_values(std::array<float, 4>{ x0, y0, x1, y1 }), d_uniform(false), d_null(cnull()) {}
-#endif
+
 		BoxFloat(int x0, int y0, int x1, int y1) : BoxFloat(float(x0), float(y0), float(x1), float(y1)) {}
 		BoxFloat(float uniform) : BoxFloat(uniform, uniform, uniform, uniform) {}
 		BoxFloat() : BoxFloat(0.f) { d_null = true; }
