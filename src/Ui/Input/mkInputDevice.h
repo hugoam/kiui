@@ -222,8 +222,8 @@ namespace mk
 
 	protected:
 		MouseButton m_leftButton;
-		MouseButton m_middleButton;
 		MouseButton m_rightButton;
+		MouseButton m_middleButton;
 
 		float m_lastX;
 		float m_lastY;

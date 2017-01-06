@@ -145,8 +145,8 @@ namespace mk
 		FlowSequence d_sequence;
 
 		float d_sequenceLength;
-		float d_floatDepth;
 		float d_freeSpace;
+		float d_floatDepth;
 		float d_maxDepth;
 
 		Dirty d_forceDirty;

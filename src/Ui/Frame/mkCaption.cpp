@@ -169,7 +169,7 @@ namespace mk
 		const char* start = m_frame.text().c_str();
 
 		for(TextRow& row : m_textRows)
-			if(index <= row.end - start)
+			if(index <= size_t(row.end - start))
 				return row;
 
 		return m_textRows.back();

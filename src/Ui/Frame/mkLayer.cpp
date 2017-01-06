@@ -83,6 +83,8 @@ namespace mk
 
 	size_t Layer::reorder(size_t pos, size_t cursor, size_t next, std::vector<Layer*>& layers)
 	{
+		UNUSED(pos);
+
 		d_index = cursor;
 		layers.push_back(this);
 

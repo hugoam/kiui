@@ -224,7 +224,7 @@ namespace mk
 		glfwGetFramebufferSize(m_glWindow, &m_fbWidth, &m_fbHeight);
 
 		// Calculate pixel ration for hi-dpi devices.
-		float pxRatio = (float)m_fbWidth / (float)winWidth;
+		// float pxRatio = (float)m_fbWidth / (float)winWidth;
 
 		m_uiWindow = make_unique<UiWindow>(m_resourcePath);
 		m_nanoWindow = make_unique<NanoWindow>(*m_uiWindow, m_resourcePath);
@@ -319,7 +319,7 @@ namespace mk
 
 	void GlWindow::injectKey(int key, int scancode, int action, int mods)
 	{
-		UNUSED(key); UNUSED(mods);
+		UNUSED(scancode); UNUSED(mods);
 		if(action == GLFW_PRESS)
 			m_keyboard->dispatchKeyPressed(convertGlfwKey(key), (char) 0);
 		else if(action == GLFW_RELEASE)

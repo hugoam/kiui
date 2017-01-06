@@ -33,6 +33,8 @@ namespace mk
 
 	void Stencil::redraw(Renderer& target, BoxFloat& rect, BoxFloat& paddedRect, BoxFloat& contentRect)
 	{
+		UNUSED(paddedRect);
+
 		if(!m_hardClip.null())
 			return;
 
@@ -48,8 +50,6 @@ namespace mk
 		if((skin.borderWidth().x0() || skin.backgroundColour().a() > 0.f) && skin.m_weakCorners)
 		{
 			BoxFloat clipBox(-m_frame.dposition(DIM_X), -m_frame.dposition(DIM_Y), m_frame.parent()->width(), m_frame.parent()->height());
-			if(m_frame.widget().style().name() == "FillerX")
-				int i = 0;
 			target.clipFrame(clipBox, m_frame.parent()->inkstyle().cornerRadius());
 		}
 		

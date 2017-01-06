@@ -230,6 +230,8 @@ namespace mk
 
 	void NanoRenderer::breakTextWidth(const char* first, const char* end, const BoxFloat& rect, InkStyle& skin, TextRow& row)
 	{
+		UNUSED(skin);
+
 		NVGtextRow nvgTextRow;
 		nvgTextBreakLines(ctx(), first, end, rect.w(), &nvgTextRow, 1);
 

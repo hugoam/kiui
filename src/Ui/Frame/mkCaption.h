@@ -38,9 +38,9 @@ namespace mk
 		Caption(DrawFrame& frame);
 		~Caption();
 
+		int caret() { return m_caret; }
 		int selectStart() { return m_selectStart; }
 		int selectEnd() { return m_selectEnd; }
-		int caret() { return m_caret; }
 
 		void selectStart(int value) { m_selectStart = value; }
 		void selectEnd(int value) { m_selectEnd = value; }
@@ -61,9 +61,9 @@ namespace mk
 	protected:
 		DrawFrame& m_frame;
 
+		int m_caret;
 		int m_selectStart;
 		int m_selectEnd;
-		int m_caret;
 
 		std::vector<TextRow> m_textRows;
 	};

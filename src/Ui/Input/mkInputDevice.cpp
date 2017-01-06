@@ -54,8 +54,8 @@ namespace mk
 	Mouse::Mouse(RootSheet& rootSheet)
 		: InputDevice(rootSheet)
 		, m_leftButton(*this, InputEvent::DEVICE_MOUSE_LEFT_BUTTON)
-		, m_rightButton(*this, InputEvent::DEVICE_MOUSE_RIGHT_BUTTON)
 		, m_middleButton(*this, InputEvent::DEVICE_MOUSE_MIDDLE_BUTTON)
+		, m_rightButton(*this, InputEvent::DEVICE_MOUSE_RIGHT_BUTTON)
 		, m_lastX(0.f)
 		, m_lastY(0.f)
 	{}

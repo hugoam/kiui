@@ -247,6 +247,7 @@ namespace mk
 
 	void Frame::resized(Dimension dim)
 	{
+		UNUSED(dim);
 		this->updateContentSize();
 	}
 
