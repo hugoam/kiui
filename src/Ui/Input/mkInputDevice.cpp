@@ -179,8 +179,8 @@ namespace mk
 
 		if(m_dragging)
 			this->dragMove(mouseEvent);
-		else if(m_pressed && (abs(mouseEvent.posX - m_pressedX) > threshold
-						   || abs(mouseEvent.posY - m_pressedY) > threshold))
+		else if(m_pressed && (std::abs(mouseEvent.posX - m_pressedX) > threshold
+						   || std::abs(mouseEvent.posY - m_pressedY) > threshold))
 		{
 			m_dragging = true;
 			this->dragStart(mouseEvent);
