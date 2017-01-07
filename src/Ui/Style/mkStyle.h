@@ -20,7 +20,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Shadow : public IdStruct
+	class _I_ MK_UI_EXPORT Shadow : public IdStruct
 	{
 	public:
 		Shadow(float xpos, float ypos, float blur, float spread, Colour colour = Colour::Black)
@@ -62,7 +62,7 @@ namespace mk
 		bool set;
 	};
 
-	class MK_UI_EXPORT _I_ LayoutStyle : public IdStruct
+	class _I_ MK_UI_EXPORT LayoutStyle : public IdStruct
 	{
 	public:
 		LayoutStyle()
@@ -135,7 +135,7 @@ namespace mk
 		static Type& cls() { static Type ty(INDEXED); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ InkStyle : public IdStruct
+	class _I_ MK_UI_EXPORT InkStyle : public IdStruct
 	{
 	public:
 		_C_ InkStyle(const string& name)
@@ -250,7 +250,7 @@ namespace mk
 
 	typedef std::vector<SubSkin> StyleTable;
 
-	class MK_UI_EXPORT _I_ Style : public IdStruct, public NonCopy
+	class _I_ MK_UI_EXPORT Style : public IdStruct, public NonCopy
 	{
 	public:
 		Style(Type& type, Style* base);

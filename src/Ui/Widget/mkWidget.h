@@ -35,7 +35,7 @@ namespace mk
 		MODAL = 1 << 9
 	};
 
-	class MK_UI_EXPORT _I_ Widget : public TypeObject, public InputWidget, public Updatable
+	class _I_ MK_UI_EXPORT Widget : public TypeObject, public InputWidget, public Updatable
 	{
 	public:
 		Widget(StyleType& type = cls(), FrameType frameType = FRAME);
@@ -45,7 +45,7 @@ namespace mk
 		_A_ inline Frame& frame() { return *m_frame; }
 		_A_ inline WidgetState state() { return m_state; }
 		_A_ _M_ inline Style& style() { return *m_style; }
-		_A_ inline Device* device() { return m_device; }
+		inline Device* device() { return m_device; }
 
 		const string& label();
 		void setLabel(const string& label);

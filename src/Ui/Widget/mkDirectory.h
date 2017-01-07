@@ -15,7 +15,7 @@ struct dirent;
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Dir : public WrapButton
+	class _I_ MK_UI_EXPORT Dir : public WrapButton
 	{
 	public:
 		Dir(const string& name);
@@ -28,7 +28,7 @@ namespace mk
 		string m_name;
 	};
 
-	class MK_UI_EXPORT _I_ File : public WrapButton
+	class _I_ MK_UI_EXPORT File : public WrapButton
 	{
 	public:
 		File(const string& name);
@@ -41,7 +41,7 @@ namespace mk
 		string m_name;
 	};
 
-	class MK_UI_EXPORT _I_ Directory : public ScrollSheet
+	class _I_ MK_UI_EXPORT Directory : public ScrollSheet
 	{
 	public:
 		Directory(const string& path);
@@ -58,7 +58,7 @@ namespace mk
 		string m_path;
 	};
 
-	class MK_UI_EXPORT _I_ FileBrowser : public Sheet
+	class _I_ MK_UI_EXPORT FileBrowser : public Sheet
 	{
 	public:
 		FileBrowser(const string& path);
@@ -70,7 +70,7 @@ namespace mk
 		Directory& m_directory;
 	};
 
-	class MK_UI_EXPORT _I_ FileNode : public TreeNode
+	class _I_ MK_UI_EXPORT FileNode : public TreeNode
 	{
 	public:
 		FileNode(const string& name);
@@ -78,7 +78,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("FileNode", TreeNode::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ DirectoryNode : public TreeNode
+	class _I_ MK_UI_EXPORT DirectoryNode : public TreeNode
 	{
 	public:
 		DirectoryNode(const string& path, const string& name, bool collapsed);

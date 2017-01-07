@@ -11,7 +11,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Checkbox : public Toggle
+	class _I_ MK_UI_EXPORT Checkbox : public Toggle
 	{
 	public:
 		Checkbox(WValue* input, bool on);

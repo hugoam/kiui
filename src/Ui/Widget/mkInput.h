@@ -28,7 +28,7 @@ namespace mk
 	{};
 
 	template <>
-	class MK_UI_EXPORT _I_ Input<Colour> : public WValue
+	class _I_ MK_UI_EXPORT Input<Colour> : public WValue
 	{
 	public:
 		Input(Colour value, std::function<void(Colour)> callback = nullptr)

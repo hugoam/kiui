@@ -191,8 +191,8 @@ namespace mk
 		SliderDisplay& m_display;
 	};
 
-	template class MK_UI_EXPORT _I_ StatSlider<float>;
-	template class MK_UI_EXPORT _I_ StatSlider<int>;
+	template class _I_ MK_UI_EXPORT StatSlider<float>;
+	template class _I_ MK_UI_EXPORT StatSlider<int>;
 }
 
 #endif

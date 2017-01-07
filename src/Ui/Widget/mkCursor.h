@@ -12,7 +12,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Cursor : public Sheet
+	class _I_ MK_UI_EXPORT Cursor : public Sheet
 	{
 	public:
 		Cursor(RootSheet& rootSheet);
@@ -71,7 +71,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("CaretCursor", Cursor::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ Tooltip : public Widget
+	class _I_ MK_UI_EXPORT Tooltip : public Widget
 	{
 	public:
 		Tooltip(RootSheet& rootSheet, const string& label);

@@ -13,7 +13,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Docksection : public Tabber
+	class _I_ MK_UI_EXPORT Docksection : public Tabber
 	{
 	public:
 		Docksection(Dockline& dockline, size_t index);
@@ -40,7 +40,7 @@ namespace mk
 		size_t m_index;
 	};
 
-	class MK_UI_EXPORT _I_ Dockline : public GridSheet
+	class _I_ MK_UI_EXPORT Dockline : public GridSheet
 	{
 	public:
 		Dockline(Dockspace& dockspace, Dockline* dockline, Dimension dim, size_t index, StyleType& type);
@@ -69,7 +69,7 @@ namespace mk
 		size_t m_index;
 	};
 
-	class MK_UI_EXPORT _I_ DocklineX : public Dockline
+	class _I_ MK_UI_EXPORT DocklineX : public Dockline
 	{
 	public:
 		DocklineX(Dockspace& dockspace, Dockline* dockline, size_t index);
@@ -77,7 +77,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("DocklineX", Dockline::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ DocklineY : public Dockline
+	class _I_ MK_UI_EXPORT DocklineY : public Dockline
 	{
 	public:
 		DocklineY(Dockspace& dockspace, Dockline* dockline, size_t index);
@@ -85,7 +85,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("DocklineY", Dockline::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ MasterDockline : public DocklineX
+	class _I_ MK_UI_EXPORT MasterDockline : public DocklineX
 	{
 	public:
 		MasterDockline(Dockspace& dockspace);
@@ -93,7 +93,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("MasterDockline", DocklineX::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ Dockspace : public Sheet
+	class _I_ MK_UI_EXPORT Dockspace : public Sheet
 	{
 	public:
 		Dockspace();

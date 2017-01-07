@@ -22,7 +22,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Image : public IdStruct
+	class _I_ MK_UI_EXPORT Image : public IdStruct
 	{
 	public:
 		Image(const string& name, int width = 0, int height = 0)

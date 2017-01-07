@@ -11,7 +11,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ TableHead : public GridSheet
+	class _I_ MK_UI_EXPORT TableHead : public GridSheet
 	{
 	public:
 		TableHead();
@@ -21,7 +21,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("TableHead", GridSheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ ColumnHeader : public Label
+	class _I_ MK_UI_EXPORT ColumnHeader : public Label
 	{
 	public:
 		ColumnHeader(const string& label);
@@ -29,7 +29,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("ColumnHeader", Label::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ Table : public Sheet
+	class _I_ MK_UI_EXPORT Table : public Sheet
 	{
 	public:
 		Table(StringVector columns, std::vector<float> weights);

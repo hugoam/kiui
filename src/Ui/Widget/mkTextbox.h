@@ -11,7 +11,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Textbox : public TypeIn
+	class _I_ MK_UI_EXPORT Textbox : public TypeIn
 	{
 	public:
 		Textbox(WValue& input);

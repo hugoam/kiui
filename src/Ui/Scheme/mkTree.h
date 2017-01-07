@@ -13,7 +13,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ TreeNodeHeader : public WrapButton
+	class _I_ MK_UI_EXPORT TreeNodeHeader : public WrapButton
 	{
 	public:
 		TreeNodeHeader(const Trigger& trigger);
@@ -21,7 +21,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("TreeNodeHeader", WrapButton::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ TreeNodeBody : public Sheet
+	class _I_ MK_UI_EXPORT TreeNodeBody : public Sheet
 	{
 	public:
 		TreeNodeBody();
@@ -29,7 +29,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("TreeNodeBody", Sheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ TreeNodeToggle : public Toggle
+	class _I_ MK_UI_EXPORT TreeNodeToggle : public Toggle
 	{
 	public:
 		TreeNodeToggle(const Trigger& triggerOn, const Trigger& triggerOff, bool on);
@@ -37,7 +37,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("TreeNodeToggle", Toggle::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ TreeNode : public Expandbox
+	class _I_ MK_UI_EXPORT TreeNode : public Expandbox
 	{
 	public:
 		TreeNode(const string& image, const string& title, bool collapsed = false, StyleType& type = cls());
@@ -57,7 +57,7 @@ namespace mk
 		Icon* m_icon;
 	};
 
-	class MK_UI_EXPORT _I_ Tree : public ScrollSheet
+	class _I_ MK_UI_EXPORT Tree : public ScrollSheet
 	{
 	public:
 		Tree(const std::function<void (TreeNode&)>& onSelected = nullptr);

@@ -15,7 +15,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Sheet : public Widget
+	class _I_ MK_UI_EXPORT Sheet : public Widget
 	{
 	public:
 		Sheet(StyleType& type = cls(), FrameType frameType = STRIPE);
@@ -69,7 +69,7 @@ namespace mk
 		std::vector<unique_ptr<Widget>> m_contents;
 	};
 
-	class MK_UI_EXPORT _I_ LayerSheet : public Sheet
+	class _I_ MK_UI_EXPORT LayerSheet : public Sheet
 	{
 	public:
 		LayerSheet(StyleType& type = cls());
@@ -77,7 +77,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("LayerSheet", Sheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ Board : public Sheet
+	class _I_ MK_UI_EXPORT Board : public Sheet
 	{
 	public:
 		Board(StyleType& type = cls());
@@ -85,7 +85,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Board", Sheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ WrapSheet : public Sheet
+	class _I_ MK_UI_EXPORT WrapSheet : public Sheet
 	{
 	public:
 		WrapSheet(StyleType& type = cls());
@@ -93,7 +93,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("WrapSheet", Sheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ ScrollSheet : public Sheet
+	class _I_ MK_UI_EXPORT ScrollSheet : public Sheet
 	{
 	public:
 		ScrollSheet(StyleType& type = cls(), FrameType frameType = STRIPE);
@@ -111,7 +111,7 @@ namespace mk
 		ScrollArea& m_scrollArea;
 	};
 
-	class MK_UI_EXPORT GridSheet : public Sheet
+	class _I_ MK_UI_EXPORT GridSheet : public Sheet
 	{
 	public:
 		GridSheet(Dimension dim, StyleType& type = cls());
@@ -132,7 +132,7 @@ namespace mk
 		Style& m_hoverCursor;
 	};
 
-	class MK_UI_EXPORT Band : public Sheet
+	class _I_ MK_UI_EXPORT Band : public Sheet
 	{
 	public:
 		Band(StyleType& type = cls());

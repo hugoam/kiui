@@ -81,7 +81,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("ScrollDown", Button::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ Scrollbar : public Sheet
+	class _I_ MK_UI_EXPORT Scrollbar : public Sheet
 	{
 	public:
 		Scrollbar(Sheet& sheet, Dimension dim = DIM_Y);

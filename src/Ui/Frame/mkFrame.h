@@ -17,7 +17,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Frame : public Object, public Uibox, public DrawFrame, public Updatable
+	class _I_ MK_UI_EXPORT Frame : public Object, public Uibox, public DrawFrame, public Updatable
 	{
 	public:
 		Frame(Widget& widget);

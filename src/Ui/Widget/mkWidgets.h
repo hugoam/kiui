@@ -18,7 +18,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Page : public ScrollSheet
+	class _I_ MK_UI_EXPORT Page : public ScrollSheet
 	{
 	public:
 		Page(const string& name, const string& dockid = "");
@@ -33,7 +33,7 @@ namespace mk
 		string m_dockId;
 	};
 
-	class MK_UI_EXPORT _I_ Dialog : public Sheet
+	class _I_ MK_UI_EXPORT Dialog : public Sheet
 	{
 	public:
 		Dialog();
@@ -41,7 +41,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Dialog", Sheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ Header : public Sheet
+	class _I_ MK_UI_EXPORT Header : public Sheet
 	{
 	public:
 		Header();

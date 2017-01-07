@@ -19,7 +19,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("TabHeader", Button::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ Tab : public Sheet
+	class _I_ MK_UI_EXPORT Tab : public Sheet
 	{
 	public:
 		Tab(Button& header, bool active);
@@ -35,7 +35,7 @@ namespace mk
 		bool m_active;
 	};
 
-	class MK_UI_EXPORT _I_ TabberHead : public Band
+	class _I_ MK_UI_EXPORT TabberHead : public Band
 	{
 	public:
 		TabberHead();
@@ -43,7 +43,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("TabberHead", Band::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ TabberBody : public Sheet
+	class _I_ MK_UI_EXPORT TabberBody : public Sheet
 	{
 	public:
 		TabberBody();
@@ -51,7 +51,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("TabberBody", Sheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT Tabber : public Sheet
+	class _I_ MK_UI_EXPORT Tabber : public Sheet
 	{
 	public:
 		Tabber(StyleType& type = cls(), bool downtabs = false);

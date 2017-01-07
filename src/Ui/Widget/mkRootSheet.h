@@ -16,7 +16,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ RootSheet : public Sheet
+	class _I_ MK_UI_EXPORT RootSheet : public Sheet
 	{
 	public:
 		RootSheet(UiWindow& window, bool absolute = true);

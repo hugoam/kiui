@@ -16,7 +16,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ TypeIn : public Sheet
+	class _I_ MK_UI_EXPORT TypeIn : public Sheet
 	{
 	public:
 		TypeIn(string& string, StyleType& type = cls());
@@ -128,35 +128,35 @@ namespace mk
 	{};
 
 	template <>
-	class MK_UI_EXPORT _I_ Input<unsigned int> : public NumberInput<unsigned int>
+	class _I_ MK_UI_EXPORT Input<unsigned int> : public NumberInput<unsigned int>
 	{
 	public:
 		using NumberInput<unsigned int>::NumberInput;
 	};
 
 	template <>
-	class MK_UI_EXPORT _I_ Input<int> : public NumberInput<int>
+	class _I_ MK_UI_EXPORT Input<int> : public NumberInput<int>
 	{
 	public:
 		using NumberInput<int>::NumberInput;
 	};
 
 	template <>
-	class MK_UI_EXPORT _I_ Input<float> : public NumberInput<float>
+	class _I_ MK_UI_EXPORT Input<float> : public NumberInput<float>
 	{
 	public:
 		using NumberInput<float>::NumberInput;
 	};
 
 	template <>
-	class MK_UI_EXPORT _I_ Input<double> : public NumberInput<double>
+	class _I_ MK_UI_EXPORT Input<double> : public NumberInput<double>
 	{
 	public:
 		using NumberInput<double>::NumberInput;
 	};
 
 	template <>
-	class MK_UI_EXPORT _I_ Input<bool> : public WValue
+	class _I_ MK_UI_EXPORT Input<bool> : public WValue
 	{
 	public:
 		Input(Lref& value, std::function<void(bool)> callback = nullptr)
@@ -178,7 +178,7 @@ namespace mk
 	};
 
 	template <>
-	class MK_UI_EXPORT _I_ Input<string> : public WValue
+	class _I_ MK_UI_EXPORT Input<string> : public WValue
 	{
 	public:
 		Input(Lref& value, std::function<void(string)> callback = nullptr)

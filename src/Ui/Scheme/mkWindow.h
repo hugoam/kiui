@@ -26,7 +26,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("Popup", LayerSheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ WindowHeader : public Band
+	class _I_ MK_UI_EXPORT WindowHeader : public Band
 	{
 	public:
 		WindowHeader(Window& window);
@@ -51,7 +51,7 @@ namespace mk
 		string m_tooltip;
 	};
 
-	class MK_UI_EXPORT _I_ WindowSizer : public Widget
+	class _I_ MK_UI_EXPORT WindowSizer : public Widget
 	{
 	public:
 		WindowSizer(Window& window, StyleType& type, bool left);
@@ -69,7 +69,7 @@ namespace mk
 		bool m_resizeLeft;
 	};
 
-	class MK_UI_EXPORT _I_ WindowSizerLeft : public WindowSizer
+	class _I_ MK_UI_EXPORT WindowSizerLeft : public WindowSizer
 	{
 	public:
 		WindowSizerLeft(Window& window);
@@ -77,7 +77,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("WindowSizerLeft", WindowSizer::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ WindowSizerRight : public WindowSizer
+	class _I_ MK_UI_EXPORT WindowSizerRight : public WindowSizer
 	{
 	public:
 		WindowSizerRight(Window& window);
@@ -85,7 +85,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("WindowSizerRight", WindowSizer::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ WindowFooter : public Sheet
+	class _I_ MK_UI_EXPORT WindowFooter : public Sheet
 	{
 	public:
 		WindowFooter(Window& window);
@@ -97,7 +97,7 @@ namespace mk
 		WindowSizer& m_secondSizer;
 	};
 
-	class MK_UI_EXPORT _I_ WindowBody : public Sheet
+	class _I_ MK_UI_EXPORT WindowBody : public Sheet
 	{
 	public:
 		WindowBody();
@@ -105,7 +105,7 @@ namespace mk
 		static StyleType& cls() { static StyleType ty("WindowBody", Sheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ CloseButton : public Button
+	class _I_ MK_UI_EXPORT CloseButton : public Button
 	{
 	public:
 		CloseButton(const Trigger& trigger);
@@ -127,7 +127,7 @@ namespace mk
 		WINDOW_DEFAULT = WINDOW_MOVABLE | WINDOW_SIZABLE | WINDOW_CLOSABLE
 	};
 
-	class MK_UI_EXPORT Window : public LayerSheet
+	class _I_ MK_UI_EXPORT Window : public LayerSheet
 	{
 	public:
 		Window(const string& title, WindowState state = WINDOW_DEFAULT, const Trigger& onClose = nullptr, Docksection* dock = nullptr, StyleType& type = cls());
@@ -183,13 +183,13 @@ namespace mk
 		Docksection* m_dock;
 	};
 
-	class MK_UI_EXPORT _I_ DockWindow : public Object
+	class _I_ MK_UI_EXPORT DockWindow : public Object
 	{
 	public:
 		static StyleType& cls() { static StyleType ty("DockWindow", Sheet::cls()); return ty; }
 	};
 
-	class MK_UI_EXPORT _I_ ShrinkWindow : public Object
+	class _I_ MK_UI_EXPORT ShrinkWindow : public Object
 	{
 	public:
 		static StyleType& cls() { static StyleType ty("ShrinkWindow", Window::cls()); return ty; }
