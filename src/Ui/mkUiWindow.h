@@ -10,6 +10,7 @@
 #include <Object/Util/mkTimer.h>
 #include <Ui/mkUiForward.h>
 #include <Ui/Input/mkInputDevice.h>
+#include <Ui/Device/mkRootDevice.h>
 #include <Ui/mkRenderWindow.h>
 
 namespace mk
@@ -31,7 +32,7 @@ namespace mk
 		RenderWindow& renderWindow() { return *m_renderWindow; }
 		InkWindow& inkWindow() { return *m_inkWindow; }
 		RootSheet& rootSheet() { return *m_rootSheet; }
-		//RootDevice& rootDevice() { return *m_rootDevice; }
+		RootDevice& rootDevice() { return *m_rootDevice; }
 
 		Mouse& mouse() { return *m_mouse; }
 		Keyboard& keyboard() { return *m_keyboard; }
@@ -62,7 +63,7 @@ namespace mk
 
 		unique_ptr<Styler> m_styler;
 
-		//unique_ptr<RootDevice> m_rootDevice;
+		unique_ptr<RootDevice> m_rootDevice;
 		unique_ptr<RootSheet> m_rootSheet;
 
 		unique_ptr<Mouse> m_mouse;

@@ -66,7 +66,7 @@ namespace mk
 		m_styler->prepare();
 
 		m_rootSheet = make_unique<RootSheet>(*this);
-		//m_rootDevice = make_unique<RootDevice>(*this, *m_rootSheet);
+		m_rootDevice = make_unique<RootDevice>(*this, *m_rootSheet);
 
 		m_mouse = make_unique<Mouse>(*m_rootSheet);
 		m_keyboard = make_unique<Keyboard>(*m_rootSheet);
