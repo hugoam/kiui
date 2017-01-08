@@ -4,8 +4,7 @@
 /* EditorApp */
 #include <Object/Iterable/mkStoreObserver.h>
 #include <Object/Reflect/mkEcho.h>
-#include <Edit/mkEditConfig.h>
-#include <Edit/mkEditForward.h>
+#include <Ui/mkUiForward.h>
 #include <Ui/Device/mkStack.h>
 
 /* Standard */

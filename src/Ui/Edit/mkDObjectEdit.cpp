@@ -6,7 +6,6 @@
 #include <Object/Reflect/mkMethod.h>
 #include <Object/String/mkString.h>
 #include <Object/String/mkStringConvert.h>
-#include <Object/mkLibrary.h>
 #include <Object/Reflect/mkInjector.h>
 
 #include <Object/mkStem.h>
