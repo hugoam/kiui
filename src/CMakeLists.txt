@@ -5,6 +5,8 @@ string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 file(GLOB HEADER_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Controller/*.h"
+						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Device/*.h"
+						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Edit/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Frame/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Input/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Nano/*.h"
@@ -14,6 +16,8 @@ file(GLOB HEADER_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Controller/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/*.h")
 
 file(GLOB SOURCE_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Controller/*.cpp"
+						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Device/*.cpp"
+						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Edit/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Frame/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Input/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Nano/*.cpp"
