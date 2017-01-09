@@ -55,6 +55,10 @@ namespace mk
 		, m_user(&uiWindow.user())
 		, m_lastTick(0)
 	{
+		declareDValueEdit();
+		declareDValueDisplay();
+		declareDefaultMappings();
+
 		m_sheet = &m_rootSheet;
 	}
 

@@ -13,7 +13,7 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT _I_ Hook : public Device
+	class _I_ MK_UI_EXPORT Hook : public Device
 	{
 	public:
 		Hook(Device& parent, Echobject& echobject);

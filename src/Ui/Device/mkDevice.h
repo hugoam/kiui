@@ -35,7 +35,7 @@ namespace mk
 		DeviceMapping* m_mapping;
 	};
 
-	class MK_UI_EXPORT _I_ Device : public TypeObject, public Updatable
+	class _I_ MK_UI_EXPORT Device : public TypeObject, public Updatable
 	{
 	public:
 		Device(Device& parent, DeviceType& deviceType);
