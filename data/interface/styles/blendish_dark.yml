@@ -142,6 +142,22 @@ CloseButton :
     image : close_15
     hovered :
         background_colour : 1.0,0.0,0.0,1.0
+        
+Node :
+    inherit_skin : Window
+    
+NodeBody :
+    inherit_skin : WindowHeader
+    
+NodePlugKnob :
+    image : tbb/plug_knob
+        
+NodeCable :
+    border_width : 2.0,2.0,2.0,2.0
+    border_colour : 1.0,1.0,1.0,1.0
+    
+Canvas :
+    background_colour : 0.0,0.0,0.0,1.0
     
 Expandbox :
     background_colour : 0.0,0.0,0.0,0.0
@@ -155,6 +171,7 @@ ExpandboxHeader :
         
 TreeNodeHeader :
     inherit_skin : ExpandboxHeader
+    skin_padding : 0.0,0.0,0.0,0.0
     activated :
         background_colour : 1.0,1.0,1.0,0.3
         

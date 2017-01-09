@@ -17,6 +17,7 @@ Window :
     image_skin : tbb/window, 16, 16, 16, 16, 12
     activated :
         image_skin : tbb/window_active, 16, 16, 16, 16, 12
+        
 
 DockWindow :
     image_skin : tbb/window, 16, 16, 16, 16, 12
@@ -40,6 +41,25 @@ WindowSizerRight :
     
 WindowBody :
     padding : 10.0,4.0,10.0,10.0
+    
+Node :
+    inherit_skin : Window
+    
+NodeBody :
+    inherit_skin : WindowHeader
+    
+NodeIn :
+    inherit_skin : WindowHeader
+    
+NodeOut :
+    inherit_skin : WindowHeader
+    
+NodePlugKnob :
+    image : tbb/plug_knob
+    
+NodeCable :
+    border_width : 2.0,2.0,2.0,2.0
+    border_colour : 1.0,1.0,1.0,1.0
     
 Tab :
     inherit_skin : Frame
@@ -133,7 +153,7 @@ ScrollerKnobY :
     image_skin : tbb/scroll_fg_y, 11, 11, 11, 11, 5
     
 SliderX :
-    image_skin : tbb/slider_bg_x, 9, 9, 9, 9, 0, DIM_X
+    image_skin : tbb/slider_bg_x, 9, 9, 9, 9, 6, DIM_X
     align : LEFT, CENTER
     
 SliderKnobX :

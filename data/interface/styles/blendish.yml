@@ -156,6 +156,20 @@ CloseButton :
     hovered :
         background_colour : 1.0,0.0,0.0,1.0
         
+        
+Node :
+    inherit_skin : Window
+    
+NodeBody :
+    inherit_skin : WindowHeader
+    
+NodePlugKnob :
+    image : tbb/plug_knob
+        
+NodeCable :
+    border_width : 2.0,2.0,2.0,2.0
+    border_colour : 1.0,1.0,1.0,1.0
+    
 Expandbox :
     background_colour : 0.447,0.447,0.447,1.0
     topdown_gradient : 5,0
@@ -201,7 +215,7 @@ RadioSwitch :
     corner_radius : 4.0,4.0,4.0,4.0
     
 RadioChoice :
-    copy_skin : Toggle
+    inherit_skin : Toggle
     corner_radius : 0.0,0.0,0.0,0.0
     
 FillerX :

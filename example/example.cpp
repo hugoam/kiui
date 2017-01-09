@@ -9,7 +9,7 @@
 #include <Ui/mkUiTypes.h>
 
 #ifdef KIUI_EMSCRIPTEN
-#define KIUI_EXAMPLE_RESSOURCE_PATH "/data/"
+#define TOYUI_EXAMPLE_RESSOURCE_PATH "/data/"
 #include <emscripten/emscripten.h>
 
 mk::GlWindow* gGlWindow;
@@ -19,13 +19,13 @@ void iterate()
 }
 #endif
 
-#ifndef KIUI_EXAMPLE_RESSOURCE_PATH
-  #define KIUI_EXAMPLE_RESSOURCE_PATH "../../data/"
+#ifndef TOYUI_EXAMPLE_RESSOURCE_PATH
+  #define TOYUI_EXAMPLE_RESSOURCE_PATH "../../data/"
 #endif
 
 int main(int argc, char *argv[])
 {
-	mk::GlWindow glwindow(1200, 800, "kiUi demo", KIUI_EXAMPLE_RESSOURCE_PATH);
+	mk::GlWindow glwindow(1200, 800, "kiUi demo", TOYUI_EXAMPLE_RESSOURCE_PATH);
 	glwindow.initContext();
 
 	mk::UiWindow& uiwindow = glwindow.uiWindow();

@@ -88,7 +88,7 @@ namespace mk
 			.mapper([](Device& device) { return make_unique<Sheet>(); });
 
 		DValue::cls().map()
-			.mapper([](Device& device) { return DispatchInput::dispatch(Lref(), device.as<DValue>().value()); })
+			.mapper([](Device& device) { Lref context;  return DispatchInput::dispatch(context, device.as<DValue>().value()); })
 			.structure([](Device& device, Sheet& sheet) -> Sheet& { sheet.as<WValue>().onUpdate([&device](Lref& lref) {device.as<DValue>().handleValueChanged(); }); return sheet; });
 
 		DEmpty::cls().map()

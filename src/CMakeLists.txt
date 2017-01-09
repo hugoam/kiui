@@ -34,6 +34,8 @@ file(GLOB SOURCE_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Controller/*.cpp"
 add_definitions("-DUI_EXPORT")
 
 add_definitions("-DNANOVG_GLEW")
+
+add_definitions("-DGLEW_STATIC")
 add_definitions("-DYAML_DECLARE_STATIC")
 
 if (MSVC)

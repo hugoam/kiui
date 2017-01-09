@@ -67,7 +67,8 @@ namespace mk
 
 	inline Image& findImage(const string& name)
 	{
-		for(Object* object : Image::cls().indexer().objects())
+		Indexer& indexer = Image::cls().indexer();
+		for(Object* object : indexer.objects())
 			if(object && object->as<Image>().d_name == name)
 				return object->as<Image>();
 		static Image null; return null;
