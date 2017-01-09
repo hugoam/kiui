@@ -1,13 +1,13 @@
 import imp
 import os
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
+root_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+generator_path = os.path.join(root_path, 'sub', 'toyobj', 'src', 'Generator', 'imprint_generator.py')
 
-imp.load_source('toyobj_imprints', '../sub/toyobj/src/generate_imprints.py')
+imprint_generator = imp.load_source('imprint_generator', generator_path)
 
-from toyobj_imprints import root, toyobj
-from imprint_generator import Module, generate_module
-                
-toyui = Module(root, 'mk', 'mk', 'Ui', [toyobj], dir_path)
-            
-generate_module(toyui)
+imprint_generator.add_module('toyobj', os.path.join(root_path, 'sub', 'toyobj', 'src', 'generator.py'))
+imprint_generator.add_module('toyui', os.path.join(root_path, 'src', 'generator.py'))
+
+imprint_generator.generate_all_modules()
+
