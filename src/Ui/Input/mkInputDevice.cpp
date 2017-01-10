@@ -205,6 +205,7 @@ namespace mk
 		MouseReleaseEvent mouseEvent(m_deviceType, x, y);
 		m_mouse.transformMouseEvent(mouseEvent);
 
+		m_rootFrame.dispatchEvent(mouseEvent);
 		m_pressedFrame->dispatchEvent(mouseEvent);
 
 		if(m_dragging)

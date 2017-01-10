@@ -140,7 +140,7 @@ namespace mk
 
 	MasterLayer::MasterLayer(Widget& widget)
 		: Layer(widget, 0)
-		, d_target(widget.uiWindow().renderer(), *this)
+		, d_target(widget.uiWindow().renderer(), *this, true)
 	{}
 
 	void MasterLayer::reorder()

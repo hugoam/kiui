@@ -12,18 +12,10 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT GlRenderTarget : public RenderTarget
-	{
-	public:
-		GlRenderTarget(MasterLayer& masterLayer);
-
-		void render();
-	};
-
 	class MK_UI_EXPORT GlRenderer : public NanoRenderer
 	{
 	public:
-		GlRenderer(UiWindow& uiWindow, RenderWindow& renderWindow);
+		GlRenderer(UiWindow& uiWindow);
 		~GlRenderer();
 
 		UiWindow& uiWindow() { return m_uiWindow; }
@@ -38,10 +30,6 @@ namespace mk
 		void initGlew();
 
 	protected:
-		UiWindow& m_uiWindow;
-		RenderWindow& m_renderWindow;
-		string m_resourcePath;
-
 		Clock m_clock;
 	};
 

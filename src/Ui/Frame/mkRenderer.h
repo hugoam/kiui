@@ -17,13 +17,18 @@ namespace mk
 	class MK_UI_EXPORT RenderTarget
 	{
 	public:
-		RenderTarget(Renderer& renderer, MasterLayer& masterLayer);
+		RenderTarget(Renderer& renderer, MasterLayer& masterLayer, bool gammaCorrected);
+
+		bool gammaCorrected() { return m_gammaCorrected; }
+		void setGammaCorrected(bool enabled) { m_gammaCorrected = enabled; }
 
 		void render();
 
 	protected:
 		Renderer& m_renderer;
 		MasterLayer& m_masterLayer;
+
+		bool m_gammaCorrected;
 	};
 
 	class MK_UI_EXPORT Renderer

@@ -13,9 +13,10 @@
 
 namespace mk
 {
-	RenderTarget::RenderTarget(Renderer& renderer, MasterLayer& masterLayer)
+	RenderTarget::RenderTarget(Renderer& renderer, MasterLayer& masterLayer, bool gammaCorrected)
 		: m_renderer(renderer)
 		, m_masterLayer(masterLayer)
+		, m_gammaCorrected(gammaCorrected)
 	{}
 
 	void RenderTarget::render()

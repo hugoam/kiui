@@ -44,7 +44,6 @@ namespace mk
 
 	void SliderKnob::leftDrag(MouseEvent& mouseEvent)
 	{
-		UNUSED(mouseEvent);
 		m_parent->as<Slider>().offsetChange(offset(m_dim == DIM_X ? mouseEvent.posX : mouseEvent.posY), false);
 	}
 

@@ -20,11 +20,9 @@
 
 namespace mk
 {
-	GlRenderer::GlRenderer(UiWindow& uiWindow, RenderWindow& renderWindow)
+	GlRenderer::GlRenderer(UiWindow& uiWindow)
 		: NanoRenderer(uiWindow)
-		, m_uiWindow(uiWindow)
-		, m_renderWindow(renderWindow)
-		, m_resourcePath(uiWindow.resourcePath())
+		, m_clock()
 	{
 		this->init();
 	}
@@ -54,7 +52,8 @@ namespace mk
 	{
 		this->logFPS();
 
-		glDisable(GL_FRAMEBUFFER_SRGB);
+		if(masterLayer.target().gammaCorrected())
+			glDisable(GL_FRAMEBUFFER_SRGB);
 
 		// Update and render
 		glViewport(0, 0, masterLayer.width(), masterLayer.height());
@@ -64,7 +63,8 @@ namespace mk
 
 		NanoRenderer::render(masterLayer);
 
-		glEnable(GL_FRAMEBUFFER_SRGB);
+		if(masterLayer.target().gammaCorrected())
+			glEnable(GL_FRAMEBUFFER_SRGB);
 	}
 
 	void GlRenderer::logFPS()

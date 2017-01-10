@@ -207,7 +207,7 @@ namespace mk
 		glfwSetInputMode(m_glWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 		m_uiWindow = make_unique<UiWindow>(m_resourcePath);
-		m_renderer = make_unique<GlRenderer>(*m_uiWindow, *this);
+		m_renderer = make_unique<GlRenderer>(*m_uiWindow);
 
 		m_uiWindow->setup(*this, *this, *m_renderer);
 		this->updateSize();
