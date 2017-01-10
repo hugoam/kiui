@@ -99,15 +99,15 @@ namespace mk
 	}
 
 
-	void Stripe::render()
+	void Stripe::render(Renderer& renderer)
 	{
-		this->beginDraw();
+		this->beginDraw(renderer);
 
 		for(size_t i = 0; i < d_contents.size(); ++i)
 			if(!d_contents[i]->hidden())
-				d_contents[i]->render();
+				d_contents[i]->render(renderer);
 
-		this->endDraw();
+		this->endDraw(renderer);
 	}
 
 	void Stripe::recomputeLength()
@@ -385,7 +385,7 @@ namespace mk
 
 		Frame* target;
 		for(Frame* frame : reverse_adapt(d_contents))
-			if(!frame->hidden() && frame->frameType() != LAYER3D)
+			if(!frame->hidden() && frame->frameType() < MASTER_LAYER)
 			{
 				target = frame->pinpoint(x, y, opaque);
 				if(target)

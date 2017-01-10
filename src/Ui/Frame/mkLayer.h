@@ -57,20 +57,24 @@ namespace mk
 	public:
 		MasterLayer(Widget& widget);
 
+		FrameType frameType() { return MASTER_LAYER; }
+
+		RenderTarget& target() { return d_target; }
 		const std::vector<Layer*>& layers() { return d_layers; }
 
 		void reorder();
 
 	protected:
 		std::vector<Layer*> d_layers;
+		RenderTarget d_target;
 	};
 
-	class MK_UI_EXPORT Layer3D : public Layer
+	class MK_UI_EXPORT Layer3D : public MasterLayer
 	{
 	public:
-		Layer3D(Widget& widget, size_t zorder = 0);
+		Layer3D(Widget& widget);
 
-		FrameType frameType() { return LAYER3D; }
+		FrameType frameType() { return SPACE_LAYER; }
 	};
 }
 

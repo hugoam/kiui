@@ -54,18 +54,22 @@ namespace mk
 
 	InputReceiver* InputFrame::dispatchEvent(InputEvent& inputEvent)
 	{
-		InputFrame& rootReceiver = this->rootFrame();
+		InputFrame& rootReceiver = inputEvent.rootFrame ? *inputEvent.rootFrame : this->rootFrame();
 		InputReceiver* topReceiver = this->controlEvent(inputEvent);
+		InputReceiver* consumer = topReceiver;
 		InputReceiver* receiver = topReceiver;
 
 		while(receiver != &rootReceiver)
 		{
-			receiver->receiveEvent(inputEvent);
+			if(!inputEvent.consumed)
+				consumer = receiver->receiveEvent(inputEvent);
+			else 
+				receiver->receiveEvent(inputEvent);
 			if(inputEvent.abort) break;
 			receiver = receiver->propagateEvent(inputEvent);
 		}
 
-		return topReceiver;
+		return consumer;
 	}
 
 	InputReceiver* InputFrame::receiveEvent(InputEvent& inputEvent)
@@ -124,6 +128,11 @@ namespace mk
 
 	InputReceiver* InputWidget::receiveEvent(InputEvent& inputEvent)
 	{
+		if(inputEvent.consumed /*&& inputEvent.eventType != InputEvent::EVENT_MOVED*/)
+			return this;
+
+		inputEvent.consumed = true;
+
 		if(m_controlMode >= CM_MODAL)
 			inputEvent.abort = true;
 

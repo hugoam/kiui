@@ -9,6 +9,9 @@
 #include <Object/Iterable/mkReverse.h>
 
 #include <Ui/Widget/mkWidget.h>
+#include <Ui/Frame/mkRenderer.h>
+
+#include <Ui/mkUiWindow.h>
 
 #include <iostream>
 #include <algorithm>
@@ -30,11 +33,10 @@ namespace mk
 	MasterLayer& Layer::rootLayer()
 	{
 		Layer* layer = this;
-		while(layer->d_parentLayer)
+		while(layer->frameType() < MASTER_LAYER)
 			layer = layer->d_parentLayer;
 		return layer->as<MasterLayer>();
 	}
-
 
 	void Layer::bind()
 	{
@@ -83,6 +85,12 @@ namespace mk
 
 	size_t Layer::reorder(size_t pos, size_t cursor, size_t next, std::vector<Layer*>& layers)
 	{
+		/*if(this->frameType() >= MASTER_LAYER)
+		{
+			this->as<MasterLayer>().reorder();
+			return next;
+		}*/
+
 		UNUSED(pos);
 
 		d_index = cursor;
@@ -119,7 +127,7 @@ namespace mk
 	{
 		Frame* result = nullptr;
 		for(Layer* layer : reverse_adapt(d_sublayers))
-			if(layer->visible() && layer->frameType() != LAYER3D)
+			if(layer->visible() && layer->frameType() < MASTER_LAYER)
 			{
 				result = layer->pinpoint(x, y, opaque);
 				if(result)
@@ -132,6 +140,7 @@ namespace mk
 
 	MasterLayer::MasterLayer(Widget& widget)
 		: Layer(widget, 0)
+		, d_target(widget.uiWindow().renderer(), *this)
 	{}
 
 	void MasterLayer::reorder()
@@ -157,7 +166,7 @@ namespace mk
 #endif
 	}
 
-	Layer3D::Layer3D(Widget& widget, size_t zorder)
-		: Layer(widget, zorder)
+	Layer3D::Layer3D(Widget& widget)
+		: MasterLayer(widget)
 	{}
 }

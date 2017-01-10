@@ -8,19 +8,32 @@
 /* mk */
 #include <Ui/mkUiForward.h>
 #include <Ui/Frame/mkRenderer.h>
-#include <Ui/Nano/mkNanoWindow.h>
 
 #include <Ui/Nano/nanovg/nanovg.h>
 
 namespace mk
 {
-	class NanoRenderer : public Renderer
+	class MK_UI_EXPORT NanoRenderer : public Renderer
 	{
 	public:
-		NanoRenderer(NanoWindow& window);
+		NanoRenderer(UiWindow& uiWindow);
+		~NanoRenderer();
 
-		NVGcontext* ctx() { return m_window.ctx(); }
-		NanoAtlas& atlas() { return m_window.atlas(); }
+		// init
+		virtual void setupContext();
+		virtual void releaseContext();
+
+		// setup
+		virtual void loadImageRGBA(Image& image, const unsigned char* data);
+		virtual void loadImage(Image& image);
+		virtual void unloadImage(Image& image);
+
+		// rendering
+		virtual void render(MasterLayer& layer);
+
+		// drawing
+		virtual void beginTarget();
+		virtual void endTarget();
 
 #ifdef KIUI_DRAW_CACHE
 		virtual void layerCache(Layer& layer, void*& layerCache);
@@ -57,8 +70,6 @@ namespace mk
 		virtual void fill(InkStyle& skin, const BoxFloat& rect);
 		virtual void stroke(InkStyle& skin);
 
-		virtual void initImage(Image& image, bool tile);
-
 		virtual void fillText(const string& text, const BoxFloat& rect, InkStyle& skin, TextRow& row);
 
 		virtual void breakText(const string& text, const DimFloat& space, InkStyle& skin, std::vector<TextRow>& textRows);
@@ -76,8 +87,6 @@ namespace mk
 		void drawImage(int image, const BoxFloat& rect, const BoxFloat& imageRect);
 
 	protected:
-		NanoWindow& m_window;
-		NanoAtlas& m_atlas;
 		NVGcontext* m_ctx;
 
 		NVGalign m_alignH;

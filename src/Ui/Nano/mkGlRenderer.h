@@ -6,33 +6,41 @@
 #define MK_NANOGLRENDERER_H
 
 /* mk Og */
-#include <Ui/mkUiForward.h>
-#include <Ui/Nano/mkNanoWindow.h>
 #include <Object/Util/mkTimer.h>
+#include <Ui/mkUiForward.h>
+#include <Ui/Nano/mkNanoRenderer.h>
 
 namespace mk
 {
-	class MK_UI_EXPORT GlRenderer
+	class MK_UI_EXPORT GlRenderTarget : public RenderTarget
+	{
+	public:
+		GlRenderTarget(MasterLayer& masterLayer);
+
+		void render();
+	};
+
+	class MK_UI_EXPORT GlRenderer : public NanoRenderer
 	{
 	public:
 		GlRenderer(UiWindow& uiWindow, RenderWindow& renderWindow);
 		~GlRenderer();
 
 		UiWindow& uiWindow() { return m_uiWindow; }
-		NanoWindow& nanoWindow() { return *m_nanoWindow; }
 
-		void initContext();
+		void init();
 
-		void renderFrame();
+		void render(MasterLayer& layer);
 
-		static void initGlew();
+		void logFPS();
+
+	protected:
+		void initGlew();
 
 	protected:
 		UiWindow& m_uiWindow;
 		RenderWindow& m_renderWindow;
 		string m_resourcePath;
-
-		unique_ptr<NanoWindow> m_nanoWindow;
 
 		Clock m_clock;
 	};

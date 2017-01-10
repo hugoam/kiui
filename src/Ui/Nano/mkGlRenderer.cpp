@@ -2,49 +2,40 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-//#define NANOVG_GL_USE_UNIFORMBUFFER 1
 #ifdef NANOVG_GLEW
-#include <Ui/Nano/nanovg/glew.h>
+	#include <Ui/Nano/nanovg/glew.h>
 #elif defined(KIUI_EMSCRIPTEN)
-#define GL_GLEXT_PROTOTYPES
-#include <GL/gl.h>
-#include <GL/glext.h>
+	#define GL_GLEXT_PROTOTYPES
+	#include <GL/gl.h>
+	#include <GL/glext.h>
 #endif
 
 #include <Ui/mkUiConfig.h>
 #include <Ui/Nano/mkGlRenderer.h>
 
+#include <Ui/Frame/mkLayer.h>
 #include <Ui/mkUiWindow.h>
 
 #include <iostream>
 
-#ifndef KIUI_EMSCRIPTEN
-#define CAP_FRAMERATE
-#endif
-
-#ifdef CAP_FRAMERATE
-#include <thread>
-#endif
-
 namespace mk
 {
 	GlRenderer::GlRenderer(UiWindow& uiWindow, RenderWindow& renderWindow)
-		: m_uiWindow(uiWindow)
+		: NanoRenderer(uiWindow)
+		, m_uiWindow(uiWindow)
 		, m_renderWindow(renderWindow)
 		, m_resourcePath(uiWindow.resourcePath())
 	{
-		this->initContext();
+		this->init();
 	}
 
 	GlRenderer::~GlRenderer()
 	{
 	}
 
-	void GlRenderer::initContext()
+	void GlRenderer::init()
 	{
 		initGlew();
-
-		m_nanoWindow = make_unique<NanoWindow>(m_uiWindow, m_resourcePath);
 	}
 
 	void GlRenderer::initGlew()
@@ -59,7 +50,24 @@ namespace mk
 #endif
 	}
 
-	void GlRenderer::renderFrame()
+	void GlRenderer::render(MasterLayer& masterLayer)
+	{
+		this->logFPS();
+
+		glDisable(GL_FRAMEBUFFER_SRGB);
+
+		// Update and render
+		glViewport(0, 0, masterLayer.width(), masterLayer.height());
+
+		glClearColor(0.f, 0.f, 0.f, 1.0f);
+		glClear(GL_STENCIL_BUFFER_BIT); // GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT
+
+		NanoRenderer::render(masterLayer);
+
+		glEnable(GL_FRAMEBUFFER_SRGB);
+	}
+
+	void GlRenderer::logFPS()
 	{
 		static size_t frames = 0;
 		static double prevtime;
@@ -72,21 +80,6 @@ namespace mk
 			prevtime = time;
 			frames = 0;
 		}
-
-		// if (gammaCorrection)
-		glDisable(GL_FRAMEBUFFER_SRGB);
-
-		// Update and render
-		glViewport(0, 0, m_uiWindow.width(), m_uiWindow.height());
-
-		glClearColor(0.f, 0.f, 0.f, 1.0f);
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		glClear(GL_STENCIL_BUFFER_BIT);
-
-		m_nanoWindow->nextFrame(time, delta);
-
-		// if (gammaCorrection)
-		glEnable(GL_FRAMEBUFFER_SRGB);
 
 		++frames;
 	}

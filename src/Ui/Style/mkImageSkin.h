@@ -6,65 +6,21 @@
 #define MK_IMAGESKIN_H
 
 /* mk */
-#include <Object/mkId.h>
-#include <Object/String/mkString.h>
-#include <Object/mkTyped.h>
+#include <Object/mkObject.h>
 #include <Object/mkIndexer.h>
+#include <Object/String/mkString.h>
 #include <Object/Util/mkGlobalType.h>
 #include <Object/Util/mkColour.h>
-#include <Ui/Style/mkDim.h>
 #include <Ui/mkUiForward.h>
+#include <Ui/Style/mkDim.h>
+#include <Ui/mkImage.h>
 
-/* Standards */
-#include <array>
-#include <map>
+/* std */
+#include <vector>
 #include <functional>
 
 namespace mk
 {
-	class _I_ MK_UI_EXPORT Image : public IdStruct
-	{
-	public:
-		Image(const string& name, int width = 0, int height = 0)
-			: IdStruct(cls())
-			, d_name(name), d_left(0), d_top(0), d_width(width), d_height(height), d_index(0), d_atlas(0)
-		{}
-
-		Image()
-			: IdStruct(cls())
-			, d_name(), d_left(0), d_top(0), d_width(0), d_height(0), d_index(0), d_atlas(0)
-		{}
-
-		Image(const Image& other)
-			: IdStruct(other)
-		{
-			*this = other;
-		}
-
-		Image(Image&& other)
-			: IdStruct(cls())
-		{
-			*this = other;
-		}
-
-		Image& operator=(const Image&) = default;
-
-		bool null() const { return d_name.empty(); }
-
-		string d_name;
-		int d_left;
-		int d_top;
-		int d_width;
-		int d_height;
-		
-		int d_index;
-		int d_atlas;
-
-		bool d_stretch;
-
-		static Type& cls() { static Type ty(INDEXED); return ty; }
-	};
-
 	inline Image& findImage(const string& name)
 	{
 		Indexer& indexer = Image::cls().indexer();

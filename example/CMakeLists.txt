@@ -12,9 +12,9 @@ file(GLOB HEADER_FILES mkUiExampleConfig.h
 add_definitions("-DUIEXAMPLE_EXPORT")
     
 if (WIN32)
-    add_definitions(-DTOYUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}/data/")
+    add_definitions(-DTOYUI_EXAMPLE_RESOURCE_PATH="${CMAKE_INSTALL_PREFIX}/data/")
 else ()
-    add_definitions(-DTOYUI_EXAMPLE_RESSOURCE_PATH="${CMAKE_INSTALL_PREFIX}/kiui/data/")
+    add_definitions(-DTOYUI_EXAMPLE_RESOURCE_PATH="${CMAKE_INSTALL_PREFIX}/kiui/data/")
 endif ()
 
 

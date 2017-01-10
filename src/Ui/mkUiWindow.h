@@ -12,6 +12,9 @@
 #include <Ui/Input/mkInputDevice.h>
 #include <Ui/Device/mkRootDevice.h>
 #include <Ui/mkRenderWindow.h>
+#include <Ui/mkImageAtlas.h>
+
+#include <vector>
 
 namespace mk
 {
@@ -21,27 +24,31 @@ namespace mk
 		UiWindow(const string& resourcePath = "", User* user = nullptr);
 		~UiWindow();
 
-		void setup(RenderWindow& renderWindow, InkWindow& inkWindow, InputWindow& inputWindow);
+		void setup(RenderWindow& renderWindow, InputWindow& inputWindow, Renderer& renderer);
 		void init();
 
-		const string& resourcePath() { return m_resourcePath; }
+		std::vector<Image>& images() { return m_images; }
+		ImageAtlas& imageAtlas() { return m_atlas; }
 
-		float width() { return m_width; }
-		float height() { return m_height; }
+		const string& resourcePath() const { return m_resourcePath; }
 
-		RenderWindow& renderWindow() { return *m_renderWindow; }
-		InkWindow& inkWindow() { return *m_inkWindow; }
-		RootSheet& rootSheet() { return *m_rootSheet; }
-		RootDevice& rootDevice() { return *m_rootDevice; }
+		float width() const { return m_width; }
+		float height() const { return m_height; }
 
-		Mouse& mouse() { return *m_mouse; }
-		Keyboard& keyboard() { return *m_keyboard; }
+		RenderWindow& renderWindow() const { return *m_renderWindow; }
+		Renderer& renderer() const { return *m_renderer; }
 
-		User& user() { return *m_user; }
+		RootSheet& rootSheet() const { return *m_rootSheet; }
+		RootDevice& rootDevice() const { return *m_rootDevice; }
 
-		Styler& styler() { return *m_styler; }
+		Mouse& mouse() const { return *m_mouse; }
+		Keyboard& keyboard() const { return *m_keyboard; }
 
-		bool shutdownRequested() { return m_shutdownRequested; }
+		User& user() const { return *m_user; }
+
+		Styler& styler() const { return *m_styler; }
+
+		bool shutdownRequested() const { return m_shutdownRequested; }
 
 		void resize(size_t width, size_t height);
 
@@ -51,15 +58,23 @@ namespace mk
 
 		void handleDestroyWidget(Widget& widget);
 
+		Image& createImage(const string& image, int width, int height, uint8_t* data);
+
+	protected:
+		void initResources();
+
 	protected:
 		string m_resourcePath;
+		std::vector<Image> m_images;
+
+		ImageAtlas m_atlas;
 
 		float m_width;
 		float m_height;
 
 		RenderWindow* m_renderWindow;
-		InkWindow* m_inkWindow;
 		InputWindow* m_inputWindow;
+		Renderer* m_renderer;
 
 		unique_ptr<Styler> m_styler;
 

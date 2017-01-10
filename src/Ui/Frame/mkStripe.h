@@ -73,7 +73,7 @@ namespace mk
 		inline float dpivotposition(Frame& frame, Dimension dim) { return d_layout->pivot()[dim] ? dsize(dim) - frame.dsize(dim) - frame.dposition(dim) : frame.dposition(dim); }
 
 		virtual void nextFrame(size_t tick, size_t delta);
-		virtual void render();
+		virtual void render(Renderer& renderer);
 
 		void positionLength(Frame& frame);
 		void positionDepth(Frame& frame);

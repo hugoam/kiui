@@ -17,40 +17,64 @@
 #include <Ui/Frame/mkFrame.h>
 #include <Ui/Frame/mkStripe.h>
 
-#include <Ui/Scheme/mkTabber.h>
-#include <Ui/Scheme/mkDropdown.h>
-#include <Ui/Widget/mkButton.h>
-#include <Ui/Scheme/mkWindow.h>
-#include <Ui/Widget/mkTypeIn.h>
-#include <Ui/Widget/mkContextMenu.h>
-
 #include <Ui/Controller/mkController.h>
+
+#include <Ui/Nano/nanovg/stb_image.h>
+#include <dirent.h>
 
 #include <iostream>
 
 namespace mk
 {
+	void spritesInFolder(std::vector<Image>& images, const string& path, const string& subfolder)
+	{
+		DIR* dir = opendir(path.c_str());
+		dirent* ent;
+
+		while((ent = readdir(dir)) != NULL)
+			if(ent->d_type & DT_REG)
+			{
+				string fullpath = path + subfolder + ent->d_name;
+				string name = subfolder + replaceAll(ent->d_name, ".png", "");
+
+				int width, height, n;
+				unsigned char* img = stbi_load(fullpath.c_str(), &width, &height, &n, 4);
+				stbi_image_free(img);
+
+				images.emplace_back(name, fullpath, width, height);
+			}
+				
+
+		closedir(dir);
+	}
+
 	UiWindow::UiWindow(const string& resourcePath, User* user)
 		: m_resourcePath(resourcePath)
+		, m_images()
+		, m_atlas(1024, 1024)
 		, m_styler(make_unique<Styler>())
 		, m_shutdownRequested(false)
 		, m_rootSheet(nullptr)
 		, m_user(user)
 		, m_renderWindow(nullptr)
-		, m_inkWindow(nullptr)
 		, m_inputWindow(nullptr)
-	{}
+	{
+		this->initResources();
+	}
 
 	UiWindow::~UiWindow()
 	{
+		for(Image& image : m_images)
+			m_renderer->unloadImage(image);
+
 		m_rootSheet->clear();
 	}
 
-	void UiWindow::setup(RenderWindow& renderWindow, InkWindow& inkWindow, InputWindow& inputWindow)
+	void UiWindow::setup(RenderWindow& renderWindow, InputWindow& inputWindow, Renderer& renderer)
 	{
 		m_renderWindow = &renderWindow;
-		m_inkWindow = &inkWindow;
 		m_inputWindow = &inputWindow;
+		m_renderer = &renderer;
 
 		m_width = float(renderWindow.width());
 		m_height = float(renderWindow.height());
@@ -63,6 +87,13 @@ namespace mk
 
 	void UiWindow::init()
 	{
+		m_renderer->setupContext();
+
+		m_renderer->loadImageRGBA(m_atlas.image(), m_atlas.data());
+
+		for(Image& image : m_images)
+			m_renderer->loadImage(image);
+
 		m_styler->prepare();
 
 		m_rootSheet = make_unique<RootSheet>(*this);
@@ -76,6 +107,30 @@ namespace mk
 		m_rootSheet->frame().setSize(m_width, m_height);
 
 		this->resize(size_t(m_width), size_t(m_height));
+	}
+
+	void UiWindow::initResources()
+	{
+		string spritePath = m_resourcePath + "interface/uisprites/";
+
+		DIR* dir = opendir(spritePath.c_str());
+		dirent* ent;
+
+		spritesInFolder(m_images, spritePath, "");
+
+		while((ent = readdir(dir)) != NULL)
+			if(ent->d_type & DT_DIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
+				spritesInFolder(m_images, spritePath + ent->d_name, string(ent->d_name) + "/");
+
+		closedir(dir);
+	}
+
+	Image& UiWindow::createImage(const string& name, int width, int height, uint8_t* data)
+	{
+		m_images.emplace_back(name, name, width, height);
+		Image& image = m_images.back();
+		m_renderer->loadImageRGBA(image, data);
+		return image;
 	}
 
 	void UiWindow::resize(size_t width, size_t height)

@@ -197,10 +197,10 @@ namespace mk
 		this->updateOnce();
 	}
 
-	void Frame::render()
+	void Frame::render(Renderer& renderer)
 	{
-		this->beginDraw();
-		this->endDraw();
+		this->beginDraw(renderer);
+		this->endDraw(renderer);
 	}
 
 	void Frame::updateOnce()
@@ -311,7 +311,7 @@ namespace mk
 
 	float Frame::dabsolute(Dimension dim)
 	{
-		if(d_parent)
+		if(d_parent && this->frameType() < MASTER_LAYER)
 			return d_parent->dabsolute(dim) + d_parent->dpivotposition(*this, dim);
 		else
 			return dposition(dim);

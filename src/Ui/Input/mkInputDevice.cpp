@@ -11,6 +11,8 @@
 
 #include <cassert>
 
+#include <iostream>
+
 namespace mk
 {
 	InputDevice::InputDevice(RootSheet& rootSheet)
@@ -221,24 +223,24 @@ namespace mk
 	void MouseButton::dragStart(MouseEvent& mouseEvent)
 	{
 		MouseDragStartEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY, m_pressedX, m_pressedY);
-		//m_pressedFrame->dispatchEvent(dragEvent); 
-		m_pressedFrame->receiveEvent(dragEvent);
+		m_pressedFrame->dispatchEvent(dragEvent); 
+		//m_pressedFrame->receiveEvent(dragEvent);
 		// switch to receiveEvent -> composite events maybe don't even need propagation
 	}
 
 	void MouseButton::dragEnd(MouseEvent& mouseEvent)
 	{
 		MouseDragEndEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY);
-		//m_pressedFrame->dispatchEvent(dragEvent); 
-		m_pressedFrame->receiveEvent(dragEvent);
+		m_pressedFrame->dispatchEvent(dragEvent); 
+		//m_pressedFrame->receiveEvent(dragEvent);
 		// switch to receiveEvent ? composite events maybe don't even need propagation
 	}
 
 	void MouseButton::dragMove(MouseEvent& mouseEvent)
 	{
 		MouseDragEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY, mouseEvent.deltaX, mouseEvent.deltaY);
-		//m_pressedFrame->dispatchEvent(dragEvent);
-		m_pressedFrame->receiveEvent(dragEvent);
+		m_pressedFrame->dispatchEvent(dragEvent);
+		//m_pressedFrame->receiveEvent(dragEvent);
 		// switch to receiveEvent ? composite events maybe don't even need propagation
 	}
 

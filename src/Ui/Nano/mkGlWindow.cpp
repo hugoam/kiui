@@ -2,13 +2,13 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-//#define NANOVG_GL_USE_UNIFORMBUFFER 1
+
 #ifdef NANOVG_GLEW
-#include <Ui/Nano/nanovg/glew.h>
+	#include <Ui/Nano/nanovg/glew.h>
 #elif defined(KIUI_EMSCRIPTEN)
-#define GL_GLEXT_PROTOTYPES
-#include <GL/gl.h>
-#include <GL/glext.h>
+	#define GL_GLEXT_PROTOTYPES
+	#include <GL/gl.h>
+	#include <GL/glext.h>
 #endif
 
 #include <GLFW/glfw3.h>
@@ -16,17 +16,12 @@
 #include <Ui/mkUiConfig.h>
 #include <Ui/Nano/mkGlWindow.h>
 
+#include <Ui/Nano/mkGlRenderer.h>
+#include <Ui/Frame/mkRenderer.h>
+
 #include <Ui/mkUiWindow.h>
 
 #include <iostream>
-
-#ifndef KIUI_EMSCRIPTEN
-//#define CAP_FRAMERATE
-#endif
-
-#ifdef CAP_FRAMERATE
-#include <thread>
-#endif
 
 void errorcb(int error, const char* desc)
 {
@@ -211,24 +206,11 @@ namespace mk
 		glfwMakeContextCurrent(m_glWindow);
 		glfwSetInputMode(m_glWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-#ifdef NANOVG_GLEW
-		if(glewInit() != GLEW_OK) {
-			printf("Could not init glew.\n");
-			return;
-		}
-#endif
-
-		int winWidth, winHeight;
-
-		glfwGetWindowSize(m_glWindow, &winWidth, &winHeight);
-		glfwGetFramebufferSize(m_glWindow, &m_fbWidth, &m_fbHeight);
-
-		// Calculate pixel ration for hi-dpi devices.
-		// float pxRatio = (float)m_fbWidth / (float)winWidth;
-
 		m_uiWindow = make_unique<UiWindow>(m_resourcePath);
-		m_nanoWindow = make_unique<NanoWindow>(*m_uiWindow, m_resourcePath);
-		m_uiWindow->setup(*this, *m_nanoWindow, *this);
+		m_renderer = make_unique<GlRenderer>(*m_uiWindow, *this);
+
+		m_uiWindow->setup(*this, *this, *m_renderer);
+		this->updateSize();
 
 		glfwSwapInterval(0);
 		glfwSetTime(0);
@@ -243,47 +225,29 @@ namespace mk
 
 	bool GlWindow::renderFrame()
 	{
-		static size_t frames = 0;
-		static double prevtime;
-
-		double time = glfwGetTime();
-		double delta = time - prevtime;
-		if(time - prevtime >= 4.f)
-		{
-			printf("fps %f\n", (frames / (time - prevtime)));
-			prevtime = time;
-			frames = 0;
-		}
-
-		// Update and render
-		glViewport(0, 0, m_fbWidth, m_fbHeight);
-
-		glClearColor(0.f, 0.f, 0.f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
 		bool pursue = m_uiWindow->nextFrame();
-		m_nanoWindow->nextFrame(time, delta);
-
-#ifdef CAP_FRAMERATE
-		double deltaf = 16.66666667 - ((glfwGetTime() - time) * 1000.f);
-
-		if(deltaf > 0.f)
-			std::this_thread::sleep_for(std::chrono::milliseconds(int(deltaf)));
-#endif
+		
+		//RenderTarget& renderTarget;
+		//for(RenderTarget& renderTarget : m_renderTargets)
+			//renderTarget.render();
 
 		glfwSwapBuffers(m_glWindow);
 		glfwPollEvents();
-
-		++frames;
 
 		return pursue;
 	}
 
 	void GlWindow::updateSize()
 	{
-		int width, height;
-		glfwGetWindowSize(m_glWindow, &width, &height);
-		m_uiWindow->resize(m_width, m_height);
+		int winWidth, winHeight;
+		int fbWidth, fbHeight;
+		glfwGetWindowSize(m_glWindow, &winWidth, &winHeight);
+		glfwGetFramebufferSize(m_glWindow, &fbWidth, &fbHeight);
+
+		// Calculate pixel ration for hi-dpi devices.
+		float pxRatio = (float)fbWidth / (float)winWidth;
+
+		m_uiWindow->resize(winWidth, winHeight);
 	}
 
 	void GlWindow::resize(size_t width, size_t height)

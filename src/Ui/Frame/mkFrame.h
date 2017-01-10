@@ -81,7 +81,7 @@ namespace mk
 		virtual void migrate(Stripe& stripe);
 
 		virtual void nextFrame(size_t tick, size_t delta);
-		virtual void render();
+		virtual void render(Renderer& renderer);
 
 		void resetStyle();
 

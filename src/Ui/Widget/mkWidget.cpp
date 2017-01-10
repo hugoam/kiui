@@ -80,10 +80,10 @@ namespace mk
 		m_parent = &parent;
 		m_parentFrame = &parent;
 
-		if(m_frame->frameType() != LAYER3D)
+		//if(m_frame->frameType() != SPACE_LAYER)
 			m_parent->stripe().insert(*m_frame, index);
-		else
-			m_frame->as<Layer>().bind();
+		//else
+		//	m_frame->as<Layer>().bind();
 
 		this->toggleState(BOUND);
 

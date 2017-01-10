@@ -6,8 +6,27 @@
 #include <Ui/Frame/mkRenderer.h>
 
 #include <Ui/Frame/mkFrame.h>
+#include <Ui/Frame/mkLayer.h>
+
+#include <Ui/Widget/mkWidget.h>
+#include <Ui/mkUiWindow.h>
 
 namespace mk
 {
+	RenderTarget::RenderTarget(Renderer& renderer, MasterLayer& masterLayer)
+		: m_renderer(renderer)
+		, m_masterLayer(masterLayer)
+	{}
 
+	void RenderTarget::render()
+	{
+		Renderer& renderer = m_masterLayer.widget().uiWindow().renderer();
+		renderer.render(m_masterLayer);
+	}
+
+	Renderer::Renderer(UiWindow& uiWindow)
+		: m_uiWindow(uiWindow)
+	{
+		DrawFrame::sRenderer = this;
+	}
 }

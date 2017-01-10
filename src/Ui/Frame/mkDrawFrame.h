@@ -14,24 +14,6 @@
 
 namespace mk
 {
-	class MK_UI_EXPORT InkWindow : public Object
-	{
-	public:
-		InkWindow(UiWindow& uiWindow, unique_ptr<Renderer> renderer);
-
-		void addImage(const string& image, int width, int height);
-
-		virtual Image& createImage(const string& image, int width, int height, uint8_t* data) = 0;
-		virtual void removeImage(const Image& image) = 0;
-
-		static Type& cls() { static Type ty; return ty; }
-
-	protected:
-		UiWindow& m_uiWindow;
-		unique_ptr<Renderer> m_renderer;
-		std::vector<Image> m_images;
-	};
-
 	class MK_UI_EXPORT DrawFrame
 	{
 	public:
@@ -52,8 +34,8 @@ namespace mk
 
 		inline InkStyle& inkstyle() { return *d_inkstyle; }
 
-		void beginDraw();
-		void endDraw();
+		void beginDraw(Renderer& renderer);
+		void endDraw(Renderer& renderer);
 
 		void updateInkstyle(InkStyle& inkstyle);
 		void resetInkstyle(InkStyle& inkstyle);
@@ -81,7 +63,6 @@ namespace mk
 
 	public:
 		static Renderer* sRenderer;
-		static int sDebugBatch;
 
 		static bool sDebugDrawFrameRect;
 		static bool sDebugDrawPaddedRect;

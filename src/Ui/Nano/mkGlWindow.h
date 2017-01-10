@@ -7,8 +7,8 @@
 
 /* mk Og */
 #include <Ui/mkUiForward.h>
-#include <Ui/Nano/mkNanoWindow.h>
 #include <Ui/mkRenderWindow.h>
+#include <Ui/Frame/mkRenderer.h>
 #include <Ui/Input/mkInputDispatcher.h>
 
 namespace mk
@@ -38,12 +38,10 @@ namespace mk
 
 	protected:
 		string m_resourcePath;
-		unique_ptr<NanoWindow> m_nanoWindow;
 		unique_ptr<UiWindow> m_uiWindow;
+		unique_ptr<GlRenderer> m_renderer;
 
 		GLFWwindow* m_glWindow;
-		int m_fbWidth;
-		int m_fbHeight;
 
 		float m_mouseX;
 		float m_mouseY;

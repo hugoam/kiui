@@ -24,8 +24,8 @@
 
 namespace mk
 {
-	RootSheet::RootSheet(UiWindow& window, bool absolute)
-		: Sheet(cls(), LAYER)
+	RootSheet::RootSheet(UiWindow& window, StyleType& type, bool absolute)
+		: Sheet(type, LAYER)
 		, m_window(window)
 	{
 		if(absolute)

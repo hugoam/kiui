@@ -39,6 +39,7 @@ namespace mk
 			EVENT_DRAGGED_END
 		};
 
+		InputFrame* rootFrame;
 		DeviceType deviceType;
 		EventType eventType;
 		bool consumed;
@@ -46,7 +47,7 @@ namespace mk
 
 		std::vector<Widget*> visited;
 
-		InputEvent(DeviceType deviceType, EventType eventType) : deviceType(deviceType), eventType(eventType), consumed(false), abort(false) {}
+		InputEvent(DeviceType deviceType, EventType eventType) : rootFrame(nullptr), deviceType(deviceType), eventType(eventType), consumed(false), abort(false) {}
 	};
 
 	struct MK_UI_EXPORT KeyEvent : public InputEvent

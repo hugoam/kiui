@@ -14,10 +14,39 @@
 
 namespace mk
 {
+	class MK_UI_EXPORT RenderTarget
+	{
+	public:
+		RenderTarget(Renderer& renderer, MasterLayer& masterLayer);
+
+		void render();
+
+	protected:
+		Renderer& m_renderer;
+		MasterLayer& m_masterLayer;
+	};
+
 	class MK_UI_EXPORT Renderer
 	{
 	public:
+		Renderer(UiWindow& uiWindow);
 		virtual ~Renderer() {}
+
+		// init
+		virtual void setupContext() = 0;
+		virtual void releaseContext() = 0;
+
+		// setup
+		virtual void loadImageRGBA(Image& image, const unsigned char* data) = 0;
+		virtual void loadImage(Image& image) = 0;
+		virtual void unloadImage(Image& image) = 0;
+
+		// rendering
+		virtual void render(MasterLayer& layer) = 0;
+
+		// drawing
+		virtual void beginTarget() = 0;
+		virtual void endTarget() = 0;
 
 #ifdef KIUI_DRAW_CACHE
 		virtual void layerCache(Layer& layer, void*& layerCache) = 0;
@@ -59,6 +88,10 @@ namespace mk
 
 		virtual float textLineHeight(InkStyle& skin) = 0;
 		virtual float textSize(const string& text, Dimension dim, InkStyle& skin) = 0;
+
+	protected:
+		UiWindow& m_uiWindow;
+		int m_debugBatch;
 	};
 }
 

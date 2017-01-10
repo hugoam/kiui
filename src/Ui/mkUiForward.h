@@ -43,38 +43,10 @@ namespace mk
 	class InputFrame;
 	class InputWidget;
 
+	class Controller;
+
 	class Style;
 
-	class Button;
-	class Label;
-	class Image;
-	class DynamicImage;
-
-	class Dropper;
-
-	class Tooltip;
-	class Bar;
-
-	class Collection;
-	class Scheme;
-
-	class Tabber;
-	class Dropdown;
-	class Expandbox;
-	class RadioSwitch;
-
-	class List;
-	class Table;
-	class Tree;
-	class TreeNode;
-
-	class Window;
-	class Node;
-	class Canvas;
-
-	class NodeCable;
-
-	class Renderer;
 	class DrawFrame;
 	class Stencil;
 	class Caption;
@@ -82,8 +54,6 @@ namespace mk
 	class Shadow;
 	class ImageSkin;
 	class InkStyle;
-	class InkTarget;
-	class InkWindow;
 
 	class Uibox;
 	class Frame;
@@ -99,12 +69,20 @@ namespace mk
 	class RootSheet;
 	class Cursor;
 
+	class Tooltip;
+
 	class Label;
 	class Title;
 	class Icon;
+	class DynamicImage;
 	class Button;
 	class WrapButton;
 	class Toggle;
+
+	class Bar;
+	class Band;
+	class Board;
+
 	class Slider;
 	class SliderKnob;
 	class Scroller;
@@ -114,16 +92,29 @@ namespace mk
 	template <class T>
 	class StatSlider;
 
+	class Dropper;
+
+	class Tabber;
+	class Dropdown;
+	class Expandbox;
+	class RadioSwitch;
+
+	class List;
+	class Table;
+	class Tree;
+	class TreeNode;
+
+	class Window;
+
+	class Node;
+	class NodeCable;
+	class Canvas;
+
 	class Dropdown;
 	class DropdownList;
 
 	class Menu;
 	class MenuList;
-
-	class Expandbox;
-
-	class Tabber;
-	class Window;
 
 	class Docksection;
 	class Dockline;
@@ -131,6 +122,13 @@ namespace mk
 
 	class Dockbox;
 	class Dockbar;
+
+	class Image;
+	class ImageAtlas;
+
+	class RenderWindow;
+	class Renderer;
+	class RenderTarget;
 
 	class Skinner;
 	class Styler;
@@ -150,13 +148,9 @@ namespace mk
 	class SelectStack;
 	class PickStack;
 
-	class RenderWindow;
-
 	// Renderer
-	class NanoGl;
+	class NanoContext;
 	class NanoRenderer;
-	class NanoWindow;
-	class NanoAtlas;
 
 	class GlRenderer;
 	class GlWindow;
@@ -186,8 +180,6 @@ namespace mk
 
 	class DRootObjectCreate;
 	class DObjectCreate;
-
-	class Controller;
 }
 
 #endif // MK_UIFORWARD_H

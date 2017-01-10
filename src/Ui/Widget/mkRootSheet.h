@@ -19,10 +19,9 @@ namespace mk
 	class _I_ MK_UI_EXPORT RootSheet : public Sheet
 	{
 	public:
-		RootSheet(UiWindow& window, bool absolute = true);
+		RootSheet(UiWindow& window, StyleType& type = cls(), bool absolute = true);
 		~RootSheet();
 
-		FrameType frameType() { return LAYER; }
 		UiWindow& uiWindow() { return m_window; }
 		RootSheet& rootSheet() { return *this; }
 		MasterLayer& layer() { return *m_layer; }

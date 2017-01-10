@@ -16,20 +16,7 @@
 
 namespace mk
 {
-	InkWindow::InkWindow(UiWindow& uiWindow, unique_ptr<Renderer> renderer)
-		: m_uiWindow(uiWindow)
-		, m_renderer(std::move(renderer))
-	{
-		DrawFrame::sRenderer = &*m_renderer;
-	}
-
-	void InkWindow::addImage(const string& image, int width, int height)
-	{
-		m_images.emplace_back(image, width, height);
-	}
-
 	Renderer* DrawFrame::sRenderer = nullptr;
-	int DrawFrame::sDebugBatch = 0;
 
 	bool DrawFrame::sDebugDrawFrameRect = false;
 	bool DrawFrame::sDebugDrawPaddedRect = false;
@@ -130,17 +117,17 @@ namespace mk
 			pos[dim] = paddedRect[dim] + paddedRect[dim + 2] - size[dim];
 	}
 
-	void DrawFrame::beginDraw()
+	void DrawFrame::beginDraw(Renderer& renderer)
 	{
-		//Renderer& renderer = d_frame.layer().rootLayer().target()->renderer();
-		Renderer& renderer = *sRenderer;
-
 		float x = floor(d_frame.dposition(DIM_X));
 		float y = floor(d_frame.dposition(DIM_Y));
 
 #ifdef KIUI_DRAW_CACHE
 		void* layerCache = nullptr;
 		renderer.layerCache(d_frame.layer(), layerCache);
+
+		if(d_frame.frameType() > LAYER)
+			renderer.beginTarget();
 
 		if(d_frame.frameType() >= LAYER)
 			renderer.beginLayer(layerCache, x, y, d_frame.scale());
@@ -153,8 +140,6 @@ namespace mk
 
 		if(!d_frame.layer().redraw())
 			return;
-
-		++sDebugBatch;
 
 		d_frame.widget().customDraw(renderer);
 
@@ -205,12 +190,12 @@ namespace mk
 #endif
 	}
 
-	void DrawFrame::endDraw()
+	void DrawFrame::endDraw(Renderer& renderer)
 	{
-		//Renderer& renderer = d_frame.layer().rootLayer().target()->renderer();
-		Renderer& renderer = *sRenderer;
-
 		renderer.endUpdate();
+
+		if(d_frame.frameType() > LAYER)
+			renderer.endTarget();
 	}
 
 	void DrawFrame::resetInkstyle(InkStyle& inkstyle)
