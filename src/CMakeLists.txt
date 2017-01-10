@@ -34,9 +34,13 @@ file(GLOB SOURCE_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Controller/*.cpp"
 add_definitions("-DUI_EXPORT")
 
 add_definitions("-DNANOVG_GLEW")
-
-add_definitions("-DGLEW_STATIC")
 add_definitions("-DYAML_DECLARE_STATIC")
+
+option(TOYUI_GLEW_IN_SOURCE "Build glew in source" ON)
+if (TOYUI_GLEW_IN_SOURCE)
+    add_definitions("-DGLEW_STATIC")
+endif ()
+
 
 if (MSVC)
 	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
@@ -47,22 +51,22 @@ if (MSVC)
 	endif()
 endif ()
 
-option(${PROJECT_NAME_UPPER}_STATIC "Build static lib instead dynamic one")
+option(${PROJECT_NAME_UPPER}_STATIC "Build static lib instead dynamic one" OFF)
 set(LIB_TYPE SHARED)
 if (${PROJECT_NAME_UPPER}_STATIC)
 	set(LIB_TYPE STATIC)
-    set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    set_target_properties(toyui PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif ()
 
-add_library(${PROJECT_NAME} ${LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
+add_library(toyui ${LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
 include_directories(${TOYOBJ_INCLUDE_DIR})
 include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(${GLFW_INCLUDE_DIR})
 
-target_link_libraries(${PROJECT_NAME} toyobj)
-target_link_libraries(${PROJECT_NAME} ${GLFW_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES})
+target_link_libraries(toyui toyobj)
+target_link_libraries(toyui ${GLFW_LIBRARIES})
+target_link_libraries(toyui ${OPENGL_LIBRARIES})
 
 
 set(${PROJECT_NAME_UPPER}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}
@@ -71,7 +75,7 @@ set(${PROJECT_NAME_UPPER}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION include/kiui)
 
 if (WIN32)
-	install(TARGETS ${PROJECT_NAME} INCLUDES DESTINATION include ARCHIVE DESTINATION lib RUNTIME DESTINATION bin)
+	install(TARGETS toyui INCLUDES DESTINATION include ARCHIVE DESTINATION lib RUNTIME DESTINATION bin)
 else ()
-	install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
+	install(TARGETS toyui LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 endif ()
