@@ -17,6 +17,7 @@ namespace mk
 	ImageAtlas::ImageAtlas(size_t width, size_t height)
 		: m_width(width)
 		, m_height(height)
+		, m_image("ImageAtlas", "", width, height)
 		, m_rectPacker(width, height)
 	{
 	}

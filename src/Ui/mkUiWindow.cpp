@@ -34,9 +34,11 @@ namespace mk
 		while((ent = readdir(dir)) != NULL)
 			if(ent->d_type & DT_REG)
 			{
-				string fullpath = path + subfolder + ent->d_name;
+				string fullpath = path + ent->d_name;
 				string name = subfolder + replaceAll(ent->d_name, ".png", "");
 
+				if(subfolder != "")
+					int i = 0;
 				int width, height, n;
 				unsigned char* img = stbi_load(fullpath.c_str(), &width, &height, &n, 4);
 				stbi_image_free(img);
@@ -89,10 +91,12 @@ namespace mk
 	{
 		m_renderer->setupContext();
 
-		m_renderer->loadImageRGBA(m_atlas.image(), m_atlas.data());
+		m_atlas.generateAtlas(m_images);
 
 		for(Image& image : m_images)
 			m_renderer->loadImage(image);
+
+		m_renderer->loadImageRGBA(m_atlas.image(), m_atlas.data());
 
 		m_styler->prepare();
 
@@ -120,7 +124,7 @@ namespace mk
 
 		while((ent = readdir(dir)) != NULL)
 			if(ent->d_type & DT_DIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
-				spritesInFolder(m_images, spritePath + ent->d_name, string(ent->d_name) + "/");
+				spritesInFolder(m_images, spritePath + ent->d_name + "/", string(ent->d_name) + "/");
 
 		closedir(dir);
 	}
