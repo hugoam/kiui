@@ -30,6 +30,10 @@ file(GLOB SOURCE_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Controller/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Widget/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/*.cpp")
 
+option(TOYUI_PRINT_SOURCES "Print source files list" OFF)
+if (TOYUI_PRINT_SOURCES)             
+    message(${SOURCE_FILES})
+endif ()
 
 add_definitions("-DUI_EXPORT")
 
