@@ -25,8 +25,8 @@ namespace mk
 		renderer.render(m_masterLayer);
 	}
 
-	Renderer::Renderer(UiWindow& uiWindow)
-		: m_uiWindow(uiWindow)
+	Renderer::Renderer(const string& resourcePath)
+		: m_resourcePath(resourcePath)
 	{
 		DrawFrame::sRenderer = this;
 	}

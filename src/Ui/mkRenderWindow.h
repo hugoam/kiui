@@ -5,34 +5,40 @@
 #ifndef MK_RENDERWINDOW_H
 #define MK_RENDERWINDOW_H
 
+#include <Object/String/mkString.h>
+
 namespace mk
 {
 	class MK_UI_EXPORT RenderWindow
 	{
 	public:
-		RenderWindow(unsigned int width, unsigned int height, string title, size_t handle)
-			: m_width(width)
+		RenderWindow(const string& title, int width, int height, size_t handle)
+			: m_title(title)
+			, m_width(width)
 			, m_height(height)
-			, m_title(title)
 			, m_handle(handle)
 			, m_resized(false)
 			, m_active(true)
 			, m_shutdown(false)
 		{}
-		
-		size_t handle() { return m_handle; }
+
+		virtual bool nextFrame() = 0;
+
+		string title() { return m_title; }
 		
 		unsigned int width() { return m_width; }
 		unsigned int height() { return m_height; }
+
+		size_t handle() { return m_handle; }
 
 		bool resized() { return m_resized; }
 		bool active() { return m_active; }
 		bool shutdown() { return m_shutdown; }
 
 	protected:
+		string m_title;
 		unsigned int m_width;
 		unsigned int m_height;
-		string m_title;
 		size_t m_handle;
 
 		bool m_resized;

@@ -15,7 +15,9 @@ namespace mk
 	class MK_UI_EXPORT InputWindow
 	{
 	public:
-		virtual void initInput(Mouse& mouse, Keyboard& keyboard, size_t wndHandle) = 0;
+		virtual bool nextFrame() = 0;
+
+		virtual void initInput(Mouse& mouse, Keyboard& keyboard) = 0;
 		virtual void resize(size_t width, size_t height) = 0;
 	};
 

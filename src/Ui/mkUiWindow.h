@@ -21,11 +21,8 @@ namespace mk
 	class MK_UI_EXPORT UiWindow
 	{
 	public:
-		UiWindow(const string& resourcePath = "", User* user = nullptr);
+		UiWindow(RenderWindow& renderWindow, InputWindow& inputWindow, Renderer& renderer, const string& resourcePath, User* user = nullptr);
 		~UiWindow();
-
-		void setup(RenderWindow& renderWindow, InputWindow& inputWindow, Renderer& renderer);
-		void init();
 
 		std::vector<Image>& images() { return m_images; }
 		ImageAtlas& imageAtlas() { return m_atlas; }
@@ -35,8 +32,8 @@ namespace mk
 		float width() const { return m_width; }
 		float height() const { return m_height; }
 
-		RenderWindow& renderWindow() const { return *m_renderWindow; }
-		Renderer& renderer() const { return *m_renderer; }
+		RenderWindow& renderWindow() const { return m_renderWindow; }
+		Renderer& renderer() const { return m_renderer; }
 
 		RootSheet& rootSheet() const { return *m_rootSheet; }
 		RootDevice& rootDevice() const { return *m_rootDevice; }
@@ -50,6 +47,8 @@ namespace mk
 
 		bool shutdownRequested() const { return m_shutdownRequested; }
 
+		void init();
+
 		void resize(size_t width, size_t height);
 
 		bool nextFrame();
@@ -62,8 +61,13 @@ namespace mk
 
 	protected:
 		void initResources();
+		void loadImages();
 
 	protected:
+		RenderWindow& m_renderWindow;
+		InputWindow& m_inputWindow;
+		Renderer& m_renderer;
+
 		string m_resourcePath;
 		std::vector<Image> m_images;
 
@@ -71,10 +75,6 @@ namespace mk
 
 		float m_width;
 		float m_height;
-
-		RenderWindow* m_renderWindow;
-		InputWindow* m_inputWindow;
-		Renderer* m_renderer;
 
 		unique_ptr<Styler> m_styler;
 

@@ -16,7 +16,7 @@ namespace mk
 	class MK_UI_EXPORT NanoRenderer : public Renderer
 	{
 	public:
-		NanoRenderer(UiWindow& uiWindow);
+		NanoRenderer(const string& resourcePath);
 		~NanoRenderer();
 
 		// init

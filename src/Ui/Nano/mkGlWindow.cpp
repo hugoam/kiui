@@ -166,7 +166,7 @@ namespace mk
 	}
 
 	GlWindow::GlWindow(size_t width, size_t height, string title, string resourcePath)
-		: RenderWindow(width, height, title, 0)
+		: RenderWindow(title, width, height, 0)
 		, m_resourcePath(resourcePath)
 		, m_uiWindow()
 		, m_glWindow(nullptr)
@@ -175,6 +175,8 @@ namespace mk
 	GlWindow::~GlWindow()
 	{
 		glfwTerminate();
+		m_uiWindow.reset();
+		m_renderer.reset();
 	}
 
 	void GlWindow::initContext()
@@ -206,19 +208,17 @@ namespace mk
 		glfwMakeContextCurrent(m_glWindow);
 		glfwSetInputMode(m_glWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-		m_uiWindow = make_unique<UiWindow>(m_resourcePath);
-		m_renderer = make_unique<GlRenderer>(*m_uiWindow);
+		m_renderer = make_unique<GlRenderer>(m_resourcePath);
+		m_uiWindow = make_unique<UiWindow>(*this, *this, *m_renderer, m_resourcePath);
 
-		m_uiWindow->setup(*this, *this, *m_renderer);
 		this->updateSize();
 
 		glfwSwapInterval(0);
 		glfwSetTime(0);
 	}
 
-	void GlWindow::initInput(Mouse& mouse, Keyboard& keyboard, size_t windowHnd)
+	void GlWindow::initInput(Mouse& mouse, Keyboard& keyboard)
 	{
-		UNUSED(windowHnd);
 		m_mouse = &mouse;
 		m_keyboard = &keyboard;
 	}

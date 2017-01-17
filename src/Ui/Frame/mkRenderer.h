@@ -34,7 +34,7 @@ namespace mk
 	class MK_UI_EXPORT Renderer
 	{
 	public:
-		Renderer(UiWindow& uiWindow);
+		Renderer(const string& resourcePath);
 		virtual ~Renderer() {}
 
 		// init
@@ -95,7 +95,7 @@ namespace mk
 		virtual float textSize(const string& text, Dimension dim, InkStyle& skin) = 0;
 
 	protected:
-		UiWindow& m_uiWindow;
+		string m_resourcePath;
 		int m_debugBatch;
 	};
 }

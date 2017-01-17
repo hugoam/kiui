@@ -60,8 +60,8 @@ namespace mk
 							colour.a());
 	}
 
-	NanoRenderer::NanoRenderer(UiWindow& uiWindow)
-		: Renderer(uiWindow)
+	NanoRenderer::NanoRenderer(const string& resourcePath)
+		: Renderer(resourcePath)
 		, m_ctx(nullptr)
 	{}
 
@@ -81,7 +81,7 @@ namespace mk
 		m_ctx = nvgCreateGLES2(NVG_STENCIL_STROKES);
 #endif
 
-		string fontPath = m_uiWindow.resourcePath() + "interface/fonts/DejaVuSans.ttf";
+		string fontPath = m_resourcePath + "interface/fonts/DejaVuSans.ttf";
 		nvgCreateFont(m_ctx, "dejavu", fontPath.c_str());
 		nvgFontSize(m_ctx, 14.0f);
 		nvgFontFace(m_ctx, "dejavu");

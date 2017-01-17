@@ -22,7 +22,7 @@ namespace mk
 		UiWindow& uiWindow() { return *m_uiWindow; }
 
 		void initContext();
-		void initInput(Mouse& mouse, Keyboard& keyboard, size_t windowHnd);
+		void initInput(Mouse& mouse, Keyboard& keyboard);
 
 		bool renderFrame();
 

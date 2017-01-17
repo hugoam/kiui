@@ -15,10 +15,8 @@ namespace mk
 	class MK_UI_EXPORT GlRenderer : public NanoRenderer
 	{
 	public:
-		GlRenderer(UiWindow& uiWindow);
+		GlRenderer(const string& resourcePath);
 		~GlRenderer();
-
-		UiWindow& uiWindow() { return m_uiWindow; }
 
 		void init();
 

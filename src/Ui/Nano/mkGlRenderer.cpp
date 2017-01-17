@@ -20,8 +20,8 @@
 
 namespace mk
 {
-	GlRenderer::GlRenderer(UiWindow& uiWindow)
-		: NanoRenderer(uiWindow)
+	GlRenderer::GlRenderer(const string& resourcePath)
+		: NanoRenderer(resourcePath)
 		, m_clock()
 	{
 		this->init();
