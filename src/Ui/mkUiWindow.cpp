@@ -65,6 +65,7 @@ namespace mk
 		, m_user(user)
 	{
 		this->initResources();
+		this->init();
 	}
 
 	UiWindow::~UiWindow()
@@ -77,14 +78,14 @@ namespace mk
 
 	void UiWindow::init()
 	{
+		m_renderer.setupContext();
+
 		this->loadImages();
 
 		m_styler->defaultLayout();
 		m_styler->defaultSkins();
 
 		m_styler->prepare();
-
-		m_renderer.setupContext();
 
 		m_rootSheet = make_unique<RootSheet>(*this);
 		m_rootDevice = make_unique<RootDevice>(*this, *m_rootSheet);

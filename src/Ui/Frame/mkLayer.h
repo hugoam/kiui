@@ -59,14 +59,14 @@ namespace mk
 
 		FrameType frameType() { return MASTER_LAYER; }
 
-		RenderTarget& target() { return d_target; }
+		RenderTarget& target() { return *d_target; }
 		const std::vector<Layer*>& layers() { return d_layers; }
 
 		void reorder();
 
 	protected:
 		std::vector<Layer*> d_layers;
-		RenderTarget d_target;
+		unique_ptr<RenderTarget> d_target;
 	};
 
 	class MK_UI_EXPORT Layer3D : public MasterLayer

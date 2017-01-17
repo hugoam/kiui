@@ -23,6 +23,9 @@ namespace mk
 		virtual void setupContext();
 		virtual void releaseContext();
 
+		// targets
+		virtual unique_ptr<RenderTarget> createRenderTarget(MasterLayer& masterLayer);
+
 		// setup
 		virtual void loadImageRGBA(Image& image, const unsigned char* data);
 		virtual void loadImage(Image& image);

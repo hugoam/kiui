@@ -106,6 +106,11 @@ namespace mk
 		m_ctx = nullptr;
 	}
 
+	unique_ptr<RenderTarget> NanoRenderer::createRenderTarget(MasterLayer& masterLayer)
+	{
+		return make_unique<RenderTarget>(*this, masterLayer, false);
+	}
+
 	void NanoRenderer::loadImageRGBA(Image& image, const unsigned char* data)
 	{
 		image.d_index = nvgCreateImageRGBA(m_ctx, image.d_width, image.d_height, 0, data);

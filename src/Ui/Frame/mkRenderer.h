@@ -18,6 +18,7 @@ namespace mk
 	{
 	public:
 		RenderTarget(Renderer& renderer, MasterLayer& masterLayer, bool gammaCorrected);
+		virtual ~RenderTarget() {}
 
 		bool gammaCorrected() { return m_gammaCorrected; }
 		void setGammaCorrected(bool enabled) { m_gammaCorrected = enabled; }
@@ -40,6 +41,9 @@ namespace mk
 		// init
 		virtual void setupContext() = 0;
 		virtual void releaseContext() = 0;
+
+		// targets
+		virtual unique_ptr<RenderTarget> createRenderTarget(MasterLayer& masterLayer) = 0;
 
 		// setup
 		virtual void loadImageRGBA(Image& image, const unsigned char* data) = 0;
