@@ -79,7 +79,7 @@ namespace mk
 
 	protected:
 		void initResources();
-		void loadImages();
+		void loadResources();
 
 	protected:
 		UiContext& m_context;

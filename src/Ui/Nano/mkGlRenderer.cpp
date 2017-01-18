@@ -61,7 +61,7 @@ namespace mk
 		glViewport(0, 0, masterLayer.width(), masterLayer.height());
 
 		glClearColor(0.f, 0.f, 0.f, 1.0f);
-		glClear(GL_STENCIL_BUFFER_BIT); // GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		NanoRenderer::render(masterLayer);
 

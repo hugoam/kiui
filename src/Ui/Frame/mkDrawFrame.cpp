@@ -122,12 +122,12 @@ namespace mk
 		float x = floor(d_frame.dposition(DIM_X));
 		float y = floor(d_frame.dposition(DIM_Y));
 
+		if(d_frame.frameType() > LAYER)
+			renderer.beginTarget();
+
 #ifdef KIUI_DRAW_CACHE
 		void* layerCache = nullptr;
 		renderer.layerCache(d_frame.layer(), layerCache);
-
-		if(d_frame.frameType() > LAYER)
-			renderer.beginTarget();
 
 		if(d_frame.frameType() >= LAYER)
 			renderer.beginLayer(layerCache, x, y, d_frame.scale());

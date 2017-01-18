@@ -25,10 +25,9 @@ void iterate()
 
 int main(int argc, char *argv[])
 {
-	mk::GlWindow glwindow(1200, 800, "kiUi demo", TOYUI_EXAMPLE_RESOURCE_PATH);
-	glwindow.initContext();
+	mk::GlContext glContext(TOYUI_EXAMPLE_RESOURCE_PATH);
+	mk::UiWindow uiwindow(glContext, "kiUi demo", 1200, 800, false);
 
-	mk::UiWindow& uiwindow = glwindow.uiWindow();
 	mk::Sheet& rootSheet = uiwindow.rootSheet();
 	createUiTest(rootSheet);
 
@@ -38,6 +37,6 @@ int main(int argc, char *argv[])
 #else
 	bool pursue = true;
 	while (pursue)
-		pursue = glwindow.renderFrame();
+		pursue = uiwindow.nextFrame();
 #endif
 }

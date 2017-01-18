@@ -85,7 +85,7 @@ namespace mk
 	{
 		m_renderer->setupContext();
 
-		this->loadImages();
+		this->loadResources();
 
 		m_styler->defaultLayout();
 		m_styler->defaultSkins();
@@ -121,8 +121,10 @@ namespace mk
 		closedir(dir);
 	}
 
-	void UiWindow::loadImages()
+	void UiWindow::loadResources()
 	{
+		m_renderer->loadFont();
+
 		m_atlas.generateAtlas(m_images);
 
 		for(Image& image : m_images)

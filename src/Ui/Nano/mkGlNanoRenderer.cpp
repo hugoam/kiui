@@ -2,7 +2,7 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifdef TOYUI_GL
+#ifdef TOY_GL
 
 #include <Ui/mkUiConfig.h>
 #include <Ui/Nano/mkGlNanoRenderer.h>
@@ -64,7 +64,6 @@ namespace mk
 #endif
 
 		m_ctx = nullptr;
-
 	}
 }
 
