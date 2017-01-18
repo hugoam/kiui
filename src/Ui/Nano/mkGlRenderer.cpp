@@ -2,6 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
+#ifdef TOY_GL
+
 #ifdef NANOVG_GLEW
 	#include <Ui/Nano/nanovg/glew.h>
 #elif defined(KIUI_EMSCRIPTEN)
@@ -21,7 +23,7 @@
 namespace mk
 {
 	GlRenderer::GlRenderer(const string& resourcePath)
-		: NanoRenderer(resourcePath)
+		: GlNanoRenderer(resourcePath)
 		, m_clock()
 	{
 		this->init();
@@ -84,3 +86,5 @@ namespace mk
 		++frames;
 	}
 }
+
+#endif

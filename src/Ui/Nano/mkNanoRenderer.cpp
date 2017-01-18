@@ -16,25 +16,7 @@
 #include <Ui/mkImageAtlas.h>
 #include <Ui/mkUiWindow.h>
 
-#ifdef NANOVG_GLEW
-	#include <Ui/Nano/nanovg/glew.h>
-#elif KIUI_EMSCRIPTEN
-	#define GL_GLEXT_PROTOTYPES
-	#include <GL/gl.h>
-	#include <GL/glext.h>
-#endif
-
-#include <Ui/Nano/nanovg/nanovg.h>
-
-#if KIUI_EMSCRIPTEN
-	#define NANOVG_GLES2_IMPLEMENTATION
-	//#define NANOVG_GL_USE_UNIFORMBUFFER 1
-#else
-	#define NANOVG_GL3_IMPLEMENTATION
-	//#define NANOVG_GL_USE_UNIFORMBUFFER 1
-#endif
-
-#include <Ui/Nano/nanovg/nanovg_gl.h>
+#include <nanovg.h>
 
 #include <cmath>
 
@@ -67,48 +49,21 @@ namespace mk
 
 	NanoRenderer::~NanoRenderer()
 	{
-		if(m_ctx)
-			this->releaseContext();
-	}
-
-	void NanoRenderer::setupContext()
-	{
-#if NANOVG_GL2
-		m_ctx = nvgCreateGL2(NVG_ANTIALIAS);
-#elif NANOVG_GL3
-		m_ctx = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
-#elif NANOVG_GLES2
-		m_ctx = nvgCreateGLES2(NVG_STENCIL_STROKES);
-#endif
-
-		string fontPath = m_resourcePath + "interface/fonts/DejaVuSans.ttf";
-		nvgCreateFont(m_ctx, "dejavu", fontPath.c_str());
-		nvgFontSize(m_ctx, 14.0f);
-		nvgFontFace(m_ctx, "dejavu");
-
-		if(m_ctx == nullptr)
-		{
-			printf("Could not init nanovg.\n");
-			return;
-		}
-	}
-
-	void NanoRenderer::releaseContext()
-	{
-#if NANOVG_GL2
-		nvgDeleteGL2(m_ctx);
-#elif NANOVG_GL3
-		nvgDeleteGL3(m_ctx);
-#elif NANOVG_GLES2
-		nvgDeleteGLES2(m_ctx);
-#endif
-
-		m_ctx = nullptr;
+		//if(m_ctx)
+			//this->releaseContext();
 	}
 
 	unique_ptr<RenderTarget> NanoRenderer::createRenderTarget(MasterLayer& masterLayer)
 	{
 		return make_unique<RenderTarget>(*this, masterLayer, false);
+	}
+
+	void NanoRenderer::loadFont()
+	{
+		string fontPath = m_resourcePath + "interface/fonts/DejaVuSans.ttf";
+		nvgCreateFont(m_ctx, "dejavu", fontPath.c_str());
+		nvgFontSize(m_ctx, 14.0f);
+		nvgFontFace(m_ctx, "dejavu");
 	}
 
 	void NanoRenderer::loadImageRGBA(Image& image, const unsigned char* data)
@@ -164,7 +119,8 @@ namespace mk
 
 	void NanoRenderer::clipFrame(const BoxFloat& rect, const BoxFloat& corners)
 	{
-		nvgIntersectRoundedScissor(m_ctx, rect.x(), rect.y(), rect.w(), rect.h(), corners.v0(), corners.v1(), corners.v2(), corners.v3());
+		//nvgIntersectRoundedScissor(m_ctx, rect.x(), rect.y(), rect.w(), rect.h(), corners.v0(), corners.v1(), corners.v2(), corners.v3());
+		nvgIntersectScissor(m_ctx, rect.x(), rect.y(), rect.w(), rect.h());
 	}
 
 	void NanoRenderer::unclipFrame()
@@ -415,6 +371,18 @@ namespace mk
 		nvgText(m_ctx, x, y, start, end);
 	}
 
+	void NanoRenderer::beginTarget()
+	{
+		nvgSave(m_ctx);
+		nvgResetTransform(m_ctx);
+		nvgResetScissor(m_ctx);
+	}
+
+	void NanoRenderer::endTarget()
+	{
+		nvgRestore(m_ctx);
+	}
+
 #ifdef KIUI_DRAW_CACHE
 	void NanoRenderer::layerCache(Layer& layer, void*& cache)
 	{
@@ -431,19 +399,6 @@ namespace mk
 		nvgScale(m_ctx, scale, scale);
 		nvgDrawDisplayList(m_ctx, (NVGdisplayList*)layerCache);
 		nvgRestore(m_ctx);
-	}
-
-	void NanoRenderer::beginTarget()
-	{
-		nvgSave(m_ctx);
-		nvgResetTransform(m_ctx);
-		nvgResetScissor(m_ctx);
-	}
-
-	void NanoRenderer::endTarget()
-	{
-		nvgRestore(m_ctx);
-
 	}
 
 	void NanoRenderer::beginLayer(void* layerCache, float x, float y, float scale)

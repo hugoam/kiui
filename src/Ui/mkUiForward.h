@@ -134,6 +134,8 @@ namespace mk
 	class Styler;
 	class UiWindow;
 
+	class UiContext;
+
 	class WValue;
 
 	class Device;

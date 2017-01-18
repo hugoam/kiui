@@ -30,6 +30,7 @@ namespace mk
 		unsigned int height() { return m_height; }
 
 		size_t handle() { return m_handle; }
+		void* nativeHandle() { return m_nativeHandle; }
 
 		bool resized() { return m_resized; }
 		bool active() { return m_active; }
@@ -40,6 +41,7 @@ namespace mk
 		unsigned int m_width;
 		unsigned int m_height;
 		size_t m_handle;
+		void* m_nativeHandle;
 
 		bool m_resized;
 		bool m_active;

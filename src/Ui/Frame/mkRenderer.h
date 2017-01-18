@@ -10,7 +10,7 @@
 #include <Ui/mkUiForward.h>
 #include <Ui/Frame/mkCaption.h>
 
-#define KIUI_DRAW_CACHE
+//#define KIUI_DRAW_CACHE
 
 namespace mk
 {
@@ -46,6 +46,7 @@ namespace mk
 		virtual unique_ptr<RenderTarget> createRenderTarget(MasterLayer& masterLayer) = 0;
 
 		// setup
+		virtual void loadFont() = 0;
 		virtual void loadImageRGBA(Image& image, const unsigned char* data) = 0;
 		virtual void loadImage(Image& image) = 0;
 		virtual void unloadImage(Image& image) = 0;

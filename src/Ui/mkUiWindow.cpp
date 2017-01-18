@@ -26,6 +26,10 @@
 
 namespace mk
 {
+	UiContext::UiContext(const string& resourcePath)
+		: m_resourcePath(resourcePath)
+	{}
+
 	void spritesInFolder(std::vector<Image>& images, const string& path, const string& subfolder)
 	{
 		DIR* dir = opendir(path.c_str());
@@ -50,15 +54,16 @@ namespace mk
 		closedir(dir);
 	}
 
-	UiWindow::UiWindow(RenderWindow& renderWindow, InputWindow& inputWindow, Renderer& renderer, const string& resourcePath, User* user)
-		: m_renderWindow(renderWindow)
-		, m_inputWindow(inputWindow)
-		, m_renderer(renderer)
-		, m_resourcePath(resourcePath)
+	UiWindow::UiWindow(UiContext& context, const string& name, int width, int height, bool fullScreen, User* user)
+		: m_context(context)
+		, m_resourcePath(context.resourcePath())
+		, m_renderWindow(context.createRenderWindow(name, width, height, fullScreen))
+		, m_inputWindow(context.createInputWindow(*m_renderWindow))
+		, m_renderer(context.createRenderer(m_resourcePath))
 		, m_images()
 		, m_atlas(1024, 1024)
-		, m_width(renderWindow.width())
-		, m_height(renderWindow.height())
+		, m_width(m_renderWindow->width())
+		, m_height(m_renderWindow->height())
 		, m_styler(make_unique<Styler>())
 		, m_shutdownRequested(false)
 		, m_rootSheet(nullptr)
@@ -71,14 +76,14 @@ namespace mk
 	UiWindow::~UiWindow()
 	{
 		for(Image& image : m_images)
-			m_renderer.unloadImage(image);
+			m_renderer->unloadImage(image);
 
 		m_rootSheet->clear();
 	}
 
 	void UiWindow::init()
 	{
-		m_renderer.setupContext();
+		m_renderer->setupContext();
 
 		this->loadImages();
 
@@ -93,7 +98,7 @@ namespace mk
 		m_mouse = make_unique<Mouse>(*m_rootSheet);
 		m_keyboard = make_unique<Keyboard>(*m_rootSheet);
 
-		m_inputWindow.initInput(*m_mouse, *m_keyboard);
+		m_inputWindow->initInput(*m_mouse, *m_keyboard);
 
 		m_rootSheet->frame().setSize(m_width, m_height);
 
@@ -121,16 +126,16 @@ namespace mk
 		m_atlas.generateAtlas(m_images);
 
 		for(Image& image : m_images)
-			m_renderer.loadImage(image);
+			m_renderer->loadImage(image);
 
-		m_renderer.loadImageRGBA(m_atlas.image(), m_atlas.data());
+		m_renderer->loadImageRGBA(m_atlas.image(), m_atlas.data());
 	}
 
 	Image& UiWindow::createImage(const string& name, int width, int height, uint8_t* data)
 	{
 		m_images.emplace_back(name, name, width, height);
 		Image& image = m_images.back();
-		m_renderer.loadImageRGBA(image, data);
+		m_renderer->loadImageRGBA(image, data);
 		return image;
 	}
 
@@ -139,13 +144,24 @@ namespace mk
 		m_width = float(width);
 		m_height = float(height);
 
-		m_inputWindow.resize(width, height);
+		m_inputWindow->resize(width, height);
 
 		m_rootSheet->frame().setSize(float(width), float(height));
 	}
 
 	bool UiWindow::nextFrame()
 	{
+		if(m_renderWindow->width() != size_t(m_width) 
+		|| m_renderWindow->height() != size_t(m_height))
+			this->resize(m_renderWindow->width(), m_renderWindow->height());
+
+		// if(manualRender)
+		m_rootSheet->layer().target().render();
+		// add sub layers
+
+		m_renderWindow->nextFrame();
+		m_inputWindow->nextFrame();
+
 		size_t tick = m_clock.readTick();
 		size_t delta = m_clock.stepTick();
 

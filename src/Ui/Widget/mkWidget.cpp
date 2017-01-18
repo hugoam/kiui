@@ -41,6 +41,21 @@ namespace mk
 		this->cleanup();
 	}
 
+	RootSheet& Widget::rootSheet()
+	{
+		return m_parent->rootSheet();
+	}
+
+	UiWindow& Widget::uiWindow()
+	{
+		return this->rootSheet().uiWindow();
+	}
+
+	UiContext& Widget::uiContext()
+	{
+		return this->uiWindow().context();
+	}
+
 	const string& Widget::label()
 	{
 		return m_frame->text();
@@ -169,22 +184,12 @@ namespace mk
 			return style;
 	}
 
-	RootSheet& Widget::rootSheet()
-	{
-		return m_parent->rootSheet();
-	}
-
 	bool Widget::contains(Widget& widget)
 	{
 		Widget* test = &widget;
 		while(test && test != this)
 			test = test->parent();
 		return test == this;
-	}
-
-	UiWindow&  Widget::uiWindow()
-	{
-		return this->rootSheet().uiWindow();
 	}
 
 	void Widget::markDirty()

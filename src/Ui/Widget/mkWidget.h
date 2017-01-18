@@ -72,6 +72,7 @@ namespace mk
 		virtual RootSheet& rootSheet();
 
 		UiWindow& uiWindow();
+		UiContext& uiContext();
 
 		void show();
 		void hide();

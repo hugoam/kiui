@@ -64,7 +64,12 @@ endif ()
 
 add_library(toyui ${LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
+if (NOT NANOVG_INCLUDE_DIR)
+    set(NANOVG_INCLUDE_DIR ${TOYUI_INCLUDE_DIR}/Ui/Nano/nanovg/)
+endif ()
+
 include_directories(${TOYOBJ_INCLUDE_DIR})
+include_directories(${NANOVG_INCLUDE_DIR})
 include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(${GLFW_INCLUDE_DIR})
 

@@ -9,7 +9,7 @@
 #include <Ui/mkUiForward.h>
 #include <Ui/Frame/mkRenderer.h>
 
-#include <Ui/Nano/nanovg/nanovg.h>
+#include <nanovg.h>
 
 namespace mk
 {
@@ -19,14 +19,11 @@ namespace mk
 		NanoRenderer(const string& resourcePath);
 		~NanoRenderer();
 
-		// init
-		virtual void setupContext();
-		virtual void releaseContext();
-
 		// targets
 		virtual unique_ptr<RenderTarget> createRenderTarget(MasterLayer& masterLayer);
 
 		// setup
+		virtual void loadFont();
 		virtual void loadImageRGBA(Image& image, const unsigned char* data);
 		virtual void loadImage(Image& image);
 		virtual void unloadImage(Image& image);

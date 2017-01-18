@@ -18,11 +18,28 @@
 
 namespace mk
 {
+	class MK_UI_EXPORT UiContext
+	{
+	public:
+		UiContext(const string& resourcePath);
+
+		const string& resourcePath() const { return m_resourcePath; }
+
+		virtual unique_ptr<RenderWindow> createRenderWindow(const string& name, int width, int height, bool fullScreen) = 0;
+		virtual unique_ptr<InputWindow> createInputWindow(RenderWindow& renderWindow) = 0;
+		virtual unique_ptr<Renderer> createRenderer(const string& resourcePath) = 0;
+
+	protected:
+		string m_resourcePath;
+	};
+
 	class MK_UI_EXPORT UiWindow
 	{
 	public:
-		UiWindow(RenderWindow& renderWindow, InputWindow& inputWindow, Renderer& renderer, const string& resourcePath, User* user = nullptr);
+		UiWindow(UiContext& context, const string& name, int width, int height, bool fullScreen, User* user = nullptr);
 		~UiWindow();
+
+		UiContext& context() { return m_context; }
 
 		std::vector<Image>& images() { return m_images; }
 		ImageAtlas& imageAtlas() { return m_atlas; }
@@ -32,8 +49,8 @@ namespace mk
 		float width() const { return m_width; }
 		float height() const { return m_height; }
 
-		RenderWindow& renderWindow() const { return m_renderWindow; }
-		Renderer& renderer() const { return m_renderer; }
+		RenderWindow& renderWindow() const { return *m_renderWindow; }
+		Renderer& renderer() const { return *m_renderer; }
 
 		RootSheet& rootSheet() const { return *m_rootSheet; }
 		RootDevice& rootDevice() const { return *m_rootDevice; }
@@ -41,11 +58,11 @@ namespace mk
 		Mouse& mouse() const { return *m_mouse; }
 		Keyboard& keyboard() const { return *m_keyboard; }
 
-		User& user() const { return *m_user; }
-
 		Styler& styler() const { return *m_styler; }
 
 		bool shutdownRequested() const { return m_shutdownRequested; }
+		
+		User& user() const { return *m_user; }
 
 		void init();
 
@@ -55,6 +72,7 @@ namespace mk
 
 		void shutdown();
 
+		void handleResizeWindow(size_t width, size_t height);
 		void handleDestroyWidget(Widget& widget);
 
 		Image& createImage(const string& image, int width, int height, uint8_t* data);
@@ -64,13 +82,14 @@ namespace mk
 		void loadImages();
 
 	protected:
-		RenderWindow& m_renderWindow;
-		InputWindow& m_inputWindow;
-		Renderer& m_renderer;
-
+		UiContext& m_context;
 		string m_resourcePath;
-		std::vector<Image> m_images;
 
+		unique_ptr<RenderWindow> m_renderWindow;
+		unique_ptr<InputWindow> m_inputWindow;
+		unique_ptr<Renderer> m_renderer;
+
+		std::vector<Image> m_images;
 		ImageAtlas m_atlas;
 
 		float m_width;
