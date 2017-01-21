@@ -8,7 +8,7 @@
 #include <Ui/Gl/mkGlNanoRenderer.h>
 
 #ifdef NANOVG_GLEW
-	#include <glew.h>
+	#include <GL/glew.h>
 #elif KIUI_EMSCRIPTEN
 	#define GL_GLEXT_PROTOTYPES
 	#include <GL/gl.h>
