@@ -25,7 +25,7 @@
 	//#define NANOVG_GL_USE_UNIFORMBUFFER 1
 #endif
 
-#include <Ui/Nano/nanovg/nanovg_gl.h>
+#include <nanovg_gl.h>
 
 namespace mk
 {
