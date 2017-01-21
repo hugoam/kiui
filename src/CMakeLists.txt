@@ -44,19 +44,12 @@ endif ()
 
 add_definitions("-DUI_EXPORT")
 
-add_definitions("-DNANOVG_GLEW")
 add_definitions("-DHAVE_CONFIG_H")
 add_definitions("-DYAML_DECLARE_STATIC")
 
-option(TOYUI_GLEW_IN_SOURCE "Build glew in source" ON)
-if (TOYUI_GLEW_IN_SOURCE)
-    add_definitions("-DGLEW_STATIC")
-else ()
-    if (GLEW_FOUND)
-        include_directories($(GLEW_INCLUDE_DIRS))
-    endif()
-endif ()
-
+if (GLEW_FOUND)
+    add_definitions("-DNANOVG_GLEW")
+endif()
 
 if (MSVC)
 	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
@@ -91,6 +84,13 @@ include_directories(${GLFW_INCLUDE_DIR})
 target_link_libraries(toyui toyobj)
 target_link_libraries(toyui ${GLFW_LIBRARIES})
 target_link_libraries(toyui ${OPENGL_LIBRARIES})
+
+if (GLEW_FOUND)
+    include_directories(${GLEW_INCLUDE_DIRS})
+    target_link_libraries(toyui ${GLEW_LIBRARIES})
+endif()
+
+include_directories($(GLEW_INCLUDE_DIRS))
 
 
 set(${PROJECT_NAME_UPPER}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}
