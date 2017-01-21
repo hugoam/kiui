@@ -16,6 +16,7 @@ file(GLOB HEADER_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Controller/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Widget/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/nanovg/src/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/yaml/include/*.h"
+						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/yaml/include/win32/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/*.h")
 
 file(GLOB SOURCE_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Controller/*.cpp"
