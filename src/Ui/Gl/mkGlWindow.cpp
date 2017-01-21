@@ -21,12 +21,12 @@
 
 #include <iostream>
 
+#if defined TOY_PLATFORM_WINDOWS
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 #undef max
 #undef min
-
-#define TOY_PLATFORM_WINDOWS
+#endif
 
 void errorcb(int error, const char* desc)
 {
