@@ -1,3 +1,21 @@
 [submodule "toyobj"]
 	path = sub/toyobj
 	url = https://github.com/hugoam/toyobj
+[submodule "3rdparty/nanovg"]
+	path = 3rdparty/nanovg
+	url = https://github.com/memononen/nanovg
+[submodule "3rdparty/nanovgvg-layers"]
+	path = 3rdparty/nanovg-layers
+	url = https://github.com/ytsedan/nanovg
+[submodule "3rdparty/yaml"]
+	path = 3rdparty/yaml
+	url = https://github.com/yaml/libyaml
+[submodule "3rdparty/stb"]
+	path = 3rdparty/stb
+	url = https://github.com/nothings/stb
+[submodule "3rdparty/glfw"]
+	path = 3rdparty/glfw
+	url = https://github.com/glfw/glfw
+[submodule "3rdparty/glew"]
+	path = 3rdparty/glew
+	url = https://github.com/nigels-com/glew

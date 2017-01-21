@@ -2,23 +2,22 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
+#include <Ui/mkUiConfig.h>
+#include <Ui/Gl/mkGlWindow.h>
+
+#include <Ui/Gl/mkGlRenderer.h>
+
+#include <Ui/mkUiWindow.h>
+
 #ifdef NANOVG_GLEW
-	#include <Ui/Nano/nanovg/glew.h>
+#include <glew.h>
 #elif defined(KIUI_EMSCRIPTEN)
-	#define GL_GLEXT_PROTOTYPES
-	#include <GL/gl.h>
-	#include <GL/glext.h>
+#define GL_GLEXT_PROTOTYPES
+#include <GL/gl.h>
+#include <GL/glext.h>
 #endif
 
 #include <GLFW/glfw3.h>
-
-#include <Ui/mkUiConfig.h>
-#include <Ui/Nano/mkGlWindow.h>
-
-#include <Ui/Frame/mkRenderer.h>
-#include <Ui/Nano/mkGlRenderer.h>
-
-#include <Ui/mkUiWindow.h>
 
 #include <iostream>
 

@@ -253,15 +253,15 @@ namespace mk
 
 	void NanoRenderer::setupText(InkStyle& skin)
 	{
-		m_alignH = NVG_ALIGN_LEFT;
+		NVGalign alignH = NVG_ALIGN_LEFT;
 		if(skin.align()[DIM_X] == CENTER)
-			m_alignH = NVG_ALIGN_CENTER;
+			alignH = NVG_ALIGN_CENTER;
 		else if(skin.align()[DIM_X] == RIGHT)
-			m_alignH = NVG_ALIGN_RIGHT;
+			alignH = NVG_ALIGN_RIGHT;
 
 		nvgFontSize(m_ctx, skin.textSize());
 		nvgFontFace(m_ctx, skin.textFont().c_str());
-		nvgTextAlign(m_ctx, m_alignH | NVG_ALIGN_TOP);
+		nvgTextAlign(m_ctx, alignH | NVG_ALIGN_TOP);
 
 		m_lineHeight = 0.f;
 		nvgTextMetrics(m_ctx, nullptr, nullptr, &m_lineHeight);

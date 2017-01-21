@@ -9,8 +9,6 @@
 #include <Ui/mkUiForward.h>
 #include <Ui/Frame/mkRenderer.h>
 
-#include <nanovg.h>
-
 namespace mk
 {
 	class MK_UI_EXPORT NanoRenderer : public Renderer
@@ -89,7 +87,6 @@ namespace mk
 	protected:
 		NVGcontext* m_ctx;
 
-		NVGalign m_alignH;
 		float m_lineHeight;
 
 		std::map<Layer*, NVGdisplayList*> m_layers;

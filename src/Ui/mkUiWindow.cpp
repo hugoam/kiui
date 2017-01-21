@@ -19,7 +19,7 @@
 
 #include <Ui/Controller/mkController.h>
 
-#include <Ui/Nano/nanovg/stb_image.h>
+#include <stb_image.h>
 #include <dirent.h>
 
 #include <iostream>

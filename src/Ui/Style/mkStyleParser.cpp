@@ -11,7 +11,7 @@
 #include <Ui/mkUiLayout.h>
 #include <Ui/Widget/mkWidget.h>
 
-#include <Ui/Style/yaml/yaml.h>
+#include <yaml.h>
 
 namespace mk
 {

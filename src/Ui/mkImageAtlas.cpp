@@ -10,7 +10,7 @@
 
 #include <Ui/mkUiWindow.h>
 
-#include <Ui/Nano/nanovg/stb_image.h>
+#include <stb_image.h>
 
 namespace mk
 {
