@@ -17,6 +17,7 @@ file(GLOB HEADER_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Controller/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/nanovg/src/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/yaml/include/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/yaml/win32/*.h"
+						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/yaml/src/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/*.h")
 
 file(GLOB SOURCE_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Controller/*.cpp"
@@ -44,6 +45,7 @@ endif ()
 add_definitions("-DUI_EXPORT")
 
 add_definitions("-DNANOVG_GLEW")
+add_definitions("-DHAVE_CONFIG_H")
 add_definitions("-DYAML_DECLARE_STATIC")
 
 option(TOYUI_GLEW_IN_SOURCE "Build glew in source" ON)
@@ -80,6 +82,7 @@ endif ()
 
 include_directories(${TOYOBJ_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/yaml/include/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/yaml/win32/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/nanovg/src/)
 include_directories(${NANOVG_INCLUDE_DIR})
 include_directories(${OPENGL_INCLUDE_DIR})
