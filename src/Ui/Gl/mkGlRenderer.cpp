@@ -13,7 +13,7 @@
 #endif
 
 #include <Ui/mkUiConfig.h>
-#include <Ui/Nano/mkGlRenderer.h>
+#include <Ui/Gl/mkGlRenderer.h>
 
 #include <Ui/Frame/mkLayer.h>
 #include <Ui/mkUiWindow.h>
