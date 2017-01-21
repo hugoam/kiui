@@ -10,7 +10,7 @@
 /* mk Og */
 #include <Object/Util/mkTimer.h>
 #include <Ui/mkUiForward.h>
-#include <Ui/Nano/mkGlNanoRenderer.h>
+#include <Ui/Gl/mkGlNanoRenderer.h>
 
 namespace mk
 {

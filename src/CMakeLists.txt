@@ -10,9 +10,12 @@ file(GLOB HEADER_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Controller/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Frame/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Input/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Nano/*.h"
+						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Gl/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Scheme/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Style/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Widget/*.h"
+						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/nanovg/src/*.h"
+						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/yaml/include/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/*.h")
 
 file(GLOB SOURCE_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Controller/*.cpp"
@@ -21,13 +24,15 @@ file(GLOB SOURCE_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Controller/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Frame/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Input/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Nano/*.cpp"
+						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Gl/*.cpp"
+						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Nano/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Nano/RectPacking/*.cpp"
-						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Nano/nanovg/*.cpp"
-						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Nano/nanovg/*.c"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Scheme/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Style/*.cpp"
-						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Style/yaml/*.c"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/Widget/*.cpp"
+						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/nanovg/src/*.cpp"
+						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/nanovg/src/*.c"
+						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/yaml/src/*.c"
 						"${CMAKE_CURRENT_SOURCE_DIR}/Ui/*.cpp")
 
 option(TOYUI_PRINT_SOURCES "Print source files list" OFF)
@@ -69,6 +74,8 @@ if (NOT NANOVG_INCLUDE_DIR)
 endif ()
 
 include_directories(${TOYOBJ_INCLUDE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/yaml/include/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/nanovg/src/)
 include_directories(${NANOVG_INCLUDE_DIR})
 include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(${GLFW_INCLUDE_DIR})

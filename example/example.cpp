@@ -5,7 +5,7 @@
 #include <mkUiExampleConfig.h>
 #include <mkUiExample.h>
 
-#include <Ui/Nano/mkGlWindow.h>
+#include <Ui/Gl/mkGlWindow.h>
 #include <Ui/mkUiTypes.h>
 
 #ifdef KIUI_EMSCRIPTEN

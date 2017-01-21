@@ -5,7 +5,7 @@
 #ifdef TOY_GL
 
 #ifdef NANOVG_GLEW
-	#include <Ui/Nano/nanovg/glew.h>
+	#include <glew.h>
 #elif defined(KIUI_EMSCRIPTEN)
 	#define GL_GLEXT_PROTOTYPES
 	#include <GL/gl.h>
