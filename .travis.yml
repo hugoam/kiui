@@ -12,6 +12,7 @@ addons:
       - gcc-5
       - cmake
       - cmake-data
+      - libglew-dev
             
 compiler:
   - gcc
