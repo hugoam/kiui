@@ -48,6 +48,10 @@ add_definitions("-DYAML_DECLARE_STATIC")
 option(TOYUI_GLEW_IN_SOURCE "Build glew in source" ON)
 if (TOYUI_GLEW_IN_SOURCE)
     add_definitions("-DGLEW_STATIC")
+else ()
+    if (GLEW_FOUND)
+        include_directories($(GLEW_INCLUDE_DIRS))
+    endif()
 endif ()
 
 
