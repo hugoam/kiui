@@ -15,8 +15,8 @@ project "toyui"
 	}
 
 	files {
-        path.join(TOYUI_DIR, "src", "Ui", "**.h"),
-        path.join(TOYUI_DIR, "src", "Ui", "**.cpp"),
+        path.join(TOYUI_DIR, "src", "**.h"),
+        path.join(TOYUI_DIR, "src", "**.cpp"),
 		path.join(TOYUI_3RDPARTY_DIR, "nanovg", "src", "nanovg.c"),
 		path.join(TOYUI_3RDPARTY_DIR, "yaml", "src", "*.c"),
 	}
@@ -34,8 +34,8 @@ project "toyui"
     
     configuration { "not toyui-gl" }
         removefiles {
-            path.join(TOYUI_DIR, "src", "Ui", "Gl", "**.h"),
-            path.join(TOYUI_DIR, "src", "Ui", "Gl", "**.cpp"),
+            path.join(TOYUI_DIR, "src", "toyui", "Gl", "**.h"),
+            path.join(TOYUI_DIR, "src", "toyui", "Gl", "**.cpp"),
         }
         
     

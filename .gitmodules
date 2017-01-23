@@ -16,6 +16,3 @@
 [submodule "3rdparty/glfw"]
 	path = 3rdparty/glfw
 	url = https://github.com/glfw/glfw
-[submodule "3rdparty/glew"]
-	path = 3rdparty/glew
-	url = https://github.com/nigels-com/glew
