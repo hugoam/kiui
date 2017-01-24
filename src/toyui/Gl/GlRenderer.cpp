@@ -5,7 +5,7 @@
 #ifdef TOY_GL
 
 #ifdef NANOVG_GLEW
-	#include <toyui/Nano/nanovg/glew.h>
+	#include <GL/glew.h>
 #elif defined(KIUI_EMSCRIPTEN)
 	#define GL_GLEXT_PROTOTYPES
 	#include <GL/gl.h>
@@ -13,7 +13,7 @@
 #endif
 
 #include <toyui/Config.h>
-#include <toyui/Nano/GlRenderer.h>
+#include <toyui/Gl/GlRenderer.h>
 
 #include <toyui/Frame/Layer.h>
 #include <toyui/UiWindow.h>

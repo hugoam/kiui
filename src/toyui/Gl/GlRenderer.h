@@ -10,7 +10,7 @@
 /* toy Og */
 #include <toyobj/Util/Timer.h>
 #include <toyui/Forward.h>
-#include <toyui/Nano/GlNanoRenderer.h>
+#include <toyui/Gl/GlNanoRenderer.h>
 
 namespace toy
 {

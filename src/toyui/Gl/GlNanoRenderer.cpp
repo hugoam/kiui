@@ -5,14 +5,14 @@
 #ifdef TOY_GL
 
 #include <toyui/Config.h>
-#include <toyui/Nano/GlNanoRenderer.h>
+#include <toyui/Gl/GlNanoRenderer.h>
 
 #ifdef NANOVG_GLEW
-	#include <toyui/Nano/nanovg/glew.h>
+#include <GL/glew.h>
 #elif KIUI_EMSCRIPTEN
-	#define GL_GLEXT_PROTOTYPES
-	#include <GL/gl.h>
-	#include <GL/glext.h>
+#define GL_GLEXT_PROTOTYPES
+#include <GL/gl.h>
+#include <GL/glext.h>
 #endif
 
 #include <nanovg.h>
@@ -25,7 +25,7 @@
 	//#define NANOVG_GL_USE_UNIFORMBUFFER 1
 #endif
 
-#include <toyui/Nano/nanovg/nanovg_gl.h>
+#include <nanovg_gl.h>
 
 namespace toy
 {

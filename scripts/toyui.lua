@@ -24,6 +24,7 @@ project "toyui"
     defines { "UI_EXPORT" }
     
     defines {
+        "NANOVG_GLEW",
         "HAVE_CONFIG_H",
         "YAML_DECLARE_STATIC",
     }
@@ -43,6 +44,7 @@ project "toyui"
         links {
             "glfw3",
             "OpenGL32",
+            "glew32",
         }
 
 	configuration { "linux-*" }

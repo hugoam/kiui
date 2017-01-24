@@ -10,7 +10,7 @@
 #include <toyui/UiWindow.h>
 
 #ifdef NANOVG_GLEW
-#include <glew.h>
+#include <GL/glew.h>
 #elif defined(KIUI_EMSCRIPTEN)
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
