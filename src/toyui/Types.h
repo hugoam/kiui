@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_UITYPES_H
-#define TOY_UITYPES_H
+#ifndef TOY_UI_TYPES_H
+#define TOY_UI_TYPES_H
 
 #include <toyobj/Types.h>
 
@@ -64,4 +64,4 @@ namespace toy
 	template <> inline Type& typecls<WidgetState>() { static Type ty; return ty; }
 }
 
-#endif // TOY_UITYPES_H
+#endif // TOY_UI_TYPES_H

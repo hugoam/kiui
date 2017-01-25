@@ -8,7 +8,7 @@
 #include <toyui/Device/Device.h>
 #include <toyui/Device/Stack.h>
 
-/* Standard */
+/* std */
 #include <functional>
 
 namespace toy

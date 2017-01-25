@@ -14,7 +14,7 @@
 #include <toyobj/Util/Stat.h>
 #include <toyobj/Util/Dispatch.h>
 
-/* Standard */
+/* std */
 #include <functional>
 
 namespace toy

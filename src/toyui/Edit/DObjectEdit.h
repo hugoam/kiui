@@ -11,7 +11,7 @@
 #include <toyui/Device/Stack.h>
 #include <toyui/Edit/DValueEdit.h>
 
-/* Standard */
+/* std */
 #include <functional>
 
 namespace toy

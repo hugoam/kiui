@@ -7,7 +7,7 @@
 #include <toyui/Forward.h>
 #include <toyui/Device/Stack.h>
 
-/* Standard */
+/* std */
 #include <functional>
 
 namespace toy

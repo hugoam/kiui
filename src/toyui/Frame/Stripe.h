@@ -8,7 +8,7 @@
 /* toy headers */
 #include <toyui/Frame/Frame.h>
 
-/* Standard */
+/* std */
 #include <list>
 #include <map>
 
