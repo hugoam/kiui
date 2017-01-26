@@ -9,29 +9,10 @@
 
 #include <toyobj/Config.h>
 
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef UI_EXPORT
-    #ifdef __GNUC__
-      #define TOY_UI_EXPORT __attribute__ ((dllexport))
-    #else
-      #define TOY_UI_EXPORT __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
-    #endif
-  #else
-    #ifdef __GNUC__
-      #define TOY_UI_EXPORT __attribute__ ((dllimport))
-    #else
-      #define TOY_UI_EXPORT __declspec(dllimport) // Note: actually gcc seems to also supports this syntax.
-    #endif
-  #endif
-  #define DLL_LOCAL
+#if defined UI_EXPORT
+#define TOY_UI_EXPORT TOY_EXPORT
 #else
-  #if __GNUC__ >= 4
-    #define TOY_UI_EXPORT __attribute__ ((visibility ("default")))
-    #define DLL_LOCAL __attribute__ ((visibility ("hidden")))
-  #else
-    #define TOY_UI_EXPORT
-    #define DLL_LOCAL
-  #endif
+#define TOY_UI_EXPORT TOY_IMPORT
 #endif
 
 #endif // TOY_UICONFIG_H

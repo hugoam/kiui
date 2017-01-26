@@ -45,6 +45,8 @@
 
 #include <toyui/Frame/DimString.h>
 
+#include <toyui/Device/Hook.h>
+
 #include <toyui/UiWindow.h>
 #include <toyui/UiLayout.h>
 
