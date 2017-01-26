@@ -37,8 +37,8 @@ namespace toy
 	public:
 		Controller(ControlMode controlMode);
 
-		void takeControl(Widget& inputWidget);
-		void yieldControl();
+		void take(Widget& inputWidget);
+		void yield();
 
 	protected:
 		ControlMode m_controlMode;

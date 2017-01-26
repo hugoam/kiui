@@ -41,8 +41,6 @@ namespace toy
 				string fullpath = path + ent->d_name;
 				string name = subfolder + replaceAll(ent->d_name, ".png", "");
 
-				if(subfolder != "")
-					int i = 0;
 				int width, height, n;
 				unsigned char* img = stbi_load(fullpath.c_str(), &width, &height, &n, 4);
 				stbi_image_free(img);
@@ -65,8 +63,8 @@ namespace toy
 		, m_width(m_renderWindow->width())
 		, m_height(m_renderWindow->height())
 		, m_styler(make_unique<Styler>())
-		, m_shutdownRequested(false)
 		, m_rootSheet(nullptr)
+		, m_shutdownRequested(false)
 		, m_user(user)
 	{
 		this->initResources();

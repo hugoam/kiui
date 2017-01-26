@@ -40,17 +40,17 @@ namespace toy
 		, m_inputWidget(nullptr)
 	{}
 
-	void Controller::takeControl(Widget& inputWidget)
+	void Controller::take(Widget& inputWidget)
 	{
 		m_inputWidget = &inputWidget;
 		InputFrame::m_controlMode = m_controlMode;
-		InputFrame::takeControl(inputWidget);
+		this->takeControl(inputWidget);
 	}
 
-	void Controller::yieldControl()
+	void Controller::yield()
 	{
 		m_inputWidget = nullptr;
-		InputFrame::yieldControl();
+		this->yieldControl();
 	}
 
 }

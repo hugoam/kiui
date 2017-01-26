@@ -26,7 +26,7 @@ namespace toy
 		this->tooltipOff();
 	}
 
-	void Cursor::nextFrame()
+	void Cursor::nextFrame(size_t tick, size_t delta)
 	{
 		if(m_tooltipClock.read() > 0.5f && m_tooltip.frame().hidden() && !m_hovered->tooltip().empty())
 			this->tooltipOn();

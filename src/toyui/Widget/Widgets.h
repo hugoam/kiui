@@ -10,6 +10,7 @@
 #include <toyobj/Util/Stat.h>
 #include <toyobj/Util/Unique.h>
 #include <toyui/Forward.h>
+#include <toyui/Widget/Sheet.h>
 #include <toyui/Scheme/Window.h>
 #include <toyui/Scheme/List.h>
 #include <toyui/Scheme/Tabber.h>

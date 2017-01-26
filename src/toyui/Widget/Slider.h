@@ -142,9 +142,9 @@ namespace toy
 			: WValue(lref, this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); } : OnUpdate())
 			, m_stat(this->m_value->template ref<AutoStat<T>>())
 			, m_dim(dim)
-			, m_display(this->template makeappend<SliderDisplay>(toString(m_stat.value())))
 			, m_slider(m_dim == DIM_X ? (Slider&) this->template makeappend<SliderX>(std::bind(&StatSlider::updateStat, this))
 									: (Slider&) this->template makeappend<SliderY>(std::bind(&StatSlider::updateStat, this)))
+			, m_display(this->template makeappend<SliderDisplay>(toString(m_stat.value())))
 		{
 			this->updateSlider();
 		}
@@ -153,9 +153,9 @@ namespace toy
 			: WValue(lref(value), this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); } : OnUpdate())
 			, m_stat(this->m_value->template ref<AutoStat<T>>())
 			, m_dim(dim)
-			, m_display(this->template makeappend<SliderDisplay>(toString(m_stat.value())))
 			, m_slider(m_dim == DIM_X ? (Slider&) this->template makeappend<SliderX>(std::bind(&StatSlider::updateStat, this))
 									: (Slider&) this->template makeappend<SliderY>(std::bind(&StatSlider::updateStat, this)))
+			, m_display(this->template makeappend<SliderDisplay>(toString(m_stat.value())))
 		{
 			this->updateSlider();
 		}

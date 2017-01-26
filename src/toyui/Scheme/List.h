@@ -70,15 +70,6 @@ namespace toy
 	public:
 		SortList();
 
-		/*
-		Device* swapdrop(Device* form, Dropper* source) { UNUSED(form); UNUSED(source); return nullptr; }
-		bool candrop(Device* form, Dropper* source) { UNUSED(form); UNUSED(source); return false; }
-		void dropin(Device* form, Dropper* source, size_t index) { UNUSED(form); UNUSED(source); UNUSED(index); }
-		void dropout(Device* form, Dropper* source) { UNUSED(form); UNUSED(source); }
-
-		virtual void moved(size_t from, size_t to) { UNUSED(from); UNUSED(to); }
-		*/
-
 		static StyleType& cls() { static StyleType ty("SortList", List::cls()); return ty; }
 	};
 }

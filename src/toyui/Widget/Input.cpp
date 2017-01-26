@@ -41,7 +41,7 @@ namespace toy
 
 	template <class T_Val, class T_Widget>
 	unique_ptr<WValue> statValueWidget(Lref& parent, Lref& valref, T_Val& val) { UNUSED(parent); UNUSED(valref); return make_unique<T_Widget>(AutoStat<T_Val>(val, StatDef<T_Val>())); }
-
+	
 	template class Dispatch<DispatchInput, bool&, valueWidget<bool&, Input<bool>>>;
 	template class Dispatch<DispatchInput, unsigned int&, statValueWidget<unsigned int, Input<unsigned int>>>;
 	template class Dispatch<DispatchInput, int&, statValueWidget<int, Input<int>>>;

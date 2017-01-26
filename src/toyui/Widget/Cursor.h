@@ -17,7 +17,8 @@ namespace toy
 	public:
 		Cursor(RootSheet& rootSheet);
 
-		void nextFrame();
+		void nextFrame(size_t tick, size_t delta);
+
 		void setPosition(float x, float y);
 
 		void hover(Widget& hovered);

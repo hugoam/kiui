@@ -124,36 +124,22 @@ namespace toy
 	};
 
 	template <class T>
-	class Input
-	{};
-
-	template <>
-	class _I_ TOY_UI_EXPORT Input<unsigned int> : public NumberInput<unsigned int>
+	class Input : public NumberInput<T>
 	{
 	public:
-		using NumberInput<unsigned int>::NumberInput;
+		Input(Lref& lref, std::function<void(T)> callback = nullptr)
+			: NumberInput<T>(lref, callback)
+		{}
+
+		Input(AutoStat<T> value, std::function<void(T)> callback = nullptr)
+			: NumberInput<T>(value, callback)
+		{}
 	};
 
-	template <>
-	class _I_ TOY_UI_EXPORT Input<int> : public NumberInput<int>
-	{
-	public:
-		using NumberInput<int>::NumberInput;
-	};
-
-	template <>
-	class _I_ TOY_UI_EXPORT Input<float> : public NumberInput<float>
-	{
-	public:
-		using NumberInput<float>::NumberInput;
-	};
-
-	template <>
-	class _I_ TOY_UI_EXPORT Input<double> : public NumberInput<double>
-	{
-	public:
-		using NumberInput<double>::NumberInput;
-	};
+	template class _I_ TOY_UI_EXPORT Input<unsigned int>;
+	template class _I_ TOY_UI_EXPORT Input<int>;
+	template class _I_ TOY_UI_EXPORT Input<float>;
+	template class _I_ TOY_UI_EXPORT Input<double>;
 
 	template <>
 	class _I_ TOY_UI_EXPORT Input<bool> : public WValue
