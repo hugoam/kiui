@@ -5,7 +5,7 @@
 #ifndef TOY_INPUT_H
 #define TOY_INPUT_H
 
-/* toy headers */
+/* toy */
 #include <toyobj/Typed.h>
 #include <toyobj/Ref.h>
 #include <toyui/Forward.h>

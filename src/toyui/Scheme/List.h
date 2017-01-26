@@ -5,7 +5,7 @@
 #ifndef TOY_LIST_H
 #define TOY_LIST_H
 
-/* toy headers */
+/* toy */
 #include <toyobj/Typed.h>
 #include <toyui/Forward.h>
 #include <toyui/Widget/Sheet.h>

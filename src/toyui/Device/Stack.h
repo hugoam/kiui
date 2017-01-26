@@ -5,7 +5,7 @@
 #ifndef TOY_DEVICESTACK_H
 #define TOY_DEVICESTACK_H
 
-/* toy headers */
+/* toy */
 #include <toyobj/Iterable/VectorObserver.h>
 #include <toyui/Forward.h>
 #include <toyui/Style/Style.h>

@@ -5,7 +5,7 @@
 #ifndef TOY_LAYER_H
 #define TOY_LAYER_H
 
-/* toy headers */
+/* toy */
 #include <toyui/Frame/Stripe.h>
 
 namespace toy

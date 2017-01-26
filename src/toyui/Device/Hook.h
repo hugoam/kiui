@@ -5,7 +5,7 @@
 #ifndef TOY_HOOK_H
 #define TOY_HOOK_H
 
-/* toy headers */
+/* toy */
 #include <toyobj/Typed.h>
 #include <toyobj/Forward.h>
 #include <toyobj/Reflect/Echo.h>

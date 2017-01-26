@@ -5,7 +5,7 @@
 #ifndef TOY_WIDGETS_H
 #define TOY_WIDGETS_H
 
-/* toy headers */
+/* toy */
 #include <toyobj/Typed.h>
 #include <toyobj/Util/Stat.h>
 #include <toyobj/Util/Unique.h>

@@ -6,7 +6,7 @@
 #ifndef TOY_GRID_H_INCLUDED
 #define TOY_GRID_H_INCLUDED
 
-/* toy headers */
+/* toy */
 #include <toyui/Frame/Stripe.h>
 
 /*

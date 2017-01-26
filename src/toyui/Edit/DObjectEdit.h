@@ -1,7 +1,7 @@
 #ifndef TOY_DOBJECTEDIT_H
 #define TOY_DOBJECTEDIT_H
 
-/* toy headers */
+/* toy */
 #include <toyobj/Typed.h>
 #include <toyobj/Store/Array.h>
 #include <toyobj/Reflect/Echo.h>

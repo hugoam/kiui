@@ -5,7 +5,7 @@
 #ifndef TOY_DEVICE_H
 #define TOY_DEVICE_H
 
-/* toy headers */
+/* toy */
 #include <toyobj/Typed.h>
 #include <toyobj/Ref.h>
 #include <toyobj/Indexer.h>

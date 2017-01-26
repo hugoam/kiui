@@ -5,7 +5,7 @@
 #ifndef TOY_ROOTFORM_H
 #define TOY_ROOTFORM_H
 
-/* toy headers */
+/* toy */
 #include <toyobj/Typed.h>
 #include <toyobj/Util/Updatable.h>
 #include <toyobj/Util/Unique.h>

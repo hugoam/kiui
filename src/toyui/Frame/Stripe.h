@@ -5,7 +5,7 @@
 #ifndef TOY_STRIPE_H
 #define TOY_STRIPE_H
 
-/* toy headers */
+/* toy */
 #include <toyui/Frame/Frame.h>
 
 /* std */

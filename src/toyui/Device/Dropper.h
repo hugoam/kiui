@@ -5,7 +5,7 @@
 #ifndef TOY_DROPPER_H
 #define TOY_DROPPER_H
 
-/* toy headers */
+/* toy */
 #include <toyobj/Typed.h>
 #include <toyui/Forward.h>
 #include <toyui/Device/Device.h>

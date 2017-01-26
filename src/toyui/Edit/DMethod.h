@@ -1,7 +1,7 @@
 #ifndef TOY_DMETHOD_H
 #define TOY_DMETHOD_H
 
-/* toy headers */
+/* toy */
 #include <toyobj/Typed.h>
 #include <toyobj/Procedure.h>
 #include <toyui/Forward.h>
