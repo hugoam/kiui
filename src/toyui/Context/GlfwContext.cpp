@@ -190,6 +190,8 @@ namespace toy
 
 		glfwSetErrorCallback(errorcb);
 
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
@@ -205,6 +207,7 @@ namespace toy
 
 #if defined TOY_PLATFORM_LINUX || defined TOY_PLATFORM_BSD
 		m_nativeHandle = (void*)(uintptr_t)glfwGetX11Window(m_glWindow);
+		m_nativeTarget = glfwGetX11Display();
 #elif defined TOY_PLATFORM_OSX
 		m_nativeHandle = glfwGetCocoaWindow(m_glWindow);
 #elif defined TOY_PLATFORM_WINDOWS

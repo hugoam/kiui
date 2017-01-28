@@ -18,6 +18,7 @@ namespace toy
 			, m_height(height)
 			, m_handle(handle)
 			, m_nativeHandle(nullptr)
+			, m_nativeTarget(nullptr)
 			, m_resized(false)
 			, m_active(true)
 			, m_shutdown(false)
@@ -32,6 +33,7 @@ namespace toy
 
 		size_t handle() { return m_handle; }
 		void* nativeHandle() { return m_nativeHandle; }
+		void* nativeTarget() { return m_nativeTarget; }
 
 		bool resized() { return m_resized; }
 		bool active() { return m_active; }
@@ -43,6 +45,7 @@ namespace toy
 		unsigned int m_height;
 		size_t m_handle;
 		void* m_nativeHandle;
+		void* m_nativeTarget;
 
 		bool m_resized;
 		bool m_active;
