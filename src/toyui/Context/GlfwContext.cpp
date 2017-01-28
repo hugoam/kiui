@@ -7,7 +7,7 @@
 
 #ifdef NANOVG_GLEW
 	#include <GL/glew.h>
-#elif defined(KIUI_EMSCRIPTEN)
+#elif defined KIUI_EMSCRIPTEN
 	#define GL_GLEXT_PROTOTYPES
 	#include <GL/gl.h>
 	#include <GL/glext.h>
@@ -20,6 +20,10 @@
 	#include <GLFW/glfw3native.h>
 	#undef max
 	#undef min
+
+#elif defined TOY_PLATFORM_LINUX
+	#define GLFW_EXPOSE_NATIVE_X11
+	#include <GLFW/glfw3native.h>
 #endif
 
 void errorcb(int error, const char* desc)
@@ -200,9 +204,9 @@ namespace toy
 		glfwSetTime(0);
 
 #if defined TOY_PLATFORM_LINUX || defined TOY_PLATFORM_BSD
-		m_nativeHandle = (void*)(uintptr_t)glfwGetX11Window(_window);
+		m_nativeHandle = (void*)(uintptr_t)glfwGetX11Window(m_glWindow);
 #elif defined TOY_PLATFORM_OSX
-		m_nativeHandle = glfwGetCocoaWindow(_window);
+		m_nativeHandle = glfwGetCocoaWindow(m_glWindow);
 #elif defined TOY_PLATFORM_WINDOWS
 		m_nativeHandle = glfwGetWin32Window(m_glWindow);
 #endif
