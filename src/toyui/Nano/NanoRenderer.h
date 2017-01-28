@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hugo Amiard hugo.amiard@laposte.net
+//  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
@@ -33,7 +33,7 @@ namespace toy
 		virtual void beginTarget();
 		virtual void endTarget();
 
-#ifdef KIUI_DRAW_CACHE
+#ifdef TOYUI_DRAW_CACHE
 		virtual void layerCache(Layer& layer, void*& layerCache);
 		virtual void drawLayer(void* layerCache, float x, float y, float scale);
 

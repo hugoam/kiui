@@ -1,3 +1,6 @@
+//  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
+//  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
+//  This notice and the license may not be removed or altered from any source distribution.
 #ifndef TOY_FNEWOBJECT_H
 #define TOY_FNEWOBJECT_H
 
@@ -23,7 +26,6 @@ namespace toy
 	private:
 		Array<Type> m_rootTypes;
 		Stack& m_types;
-		Type* m_type;
 		Device* m_objectCreate;
 	};
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hugo Amiard hugo.amiard@laposte.net
+//  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
@@ -192,7 +192,7 @@ namespace toy
 
 		glfwSetErrorCallback(errorcb);
 
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
 		m_glWindow = glfwCreateWindow(m_width, m_height, m_title.c_str(), NULL, NULL);

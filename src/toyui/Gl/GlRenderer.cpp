@@ -1,41 +1,62 @@
-//  Copyright (c) 2015 Hugo Amiard hugo.amiard@laposte.net
+//  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifdef TOY_GL
+
+#include <toyui/Config.h>
+#include <toyui/Gl/GlRenderer.h>
 
 #ifdef NANOVG_GLEW
 	#include <GL/glew.h>
-#elif defined(KIUI_EMSCRIPTEN)
+#elif defined NANOVG_EMSCRIPTEN
 	#define GL_GLEXT_PROTOTYPES
 	#include <GL/gl.h>
 	#include <GL/glext.h>
 #endif
 
-#include <toyui/Config.h>
-#include <toyui/Gl/GlRenderer.h>
-
 #include <toyui/Frame/Layer.h>
 #include <toyui/UiWindow.h>
-
-#include <iostream>
 
 namespace toy
 {
 	GlRenderer::GlRenderer(const string& resourcePath)
-		: GlNanoRenderer(resourcePath)
+		: NanoRenderer(resourcePath)
 		, m_clock()
-	{
-		this->init();
-	}
+	{}
 
 	GlRenderer::~GlRenderer()
+	{}
+
+	void GlRenderer::setupContext()
 	{
+		this->initGlew();
+
+#if NANOVG_GL2
+		m_ctx = nvgCreateGL2(NVG_ANTIALIAS);
+#elif NANOVG_GL3
+		m_ctx = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+#elif NANOVG_GLES2
+		m_ctx = nvgCreateGLES2(NVG_STENCIL_STROKES);
+#endif
+
+		if(m_ctx == nullptr)
+		{
+			printf("Could not init nanovg.\n");
+			return;
+		}
 	}
 
-	void GlRenderer::init()
+	void GlRenderer::releaseContext()
 	{
-		initGlew();
+#if NANOVG_GL2
+		nvgDeleteGL2(m_ctx);
+#elif NANOVG_GL3
+		nvgDeleteGL3(m_ctx);
+#elif NANOVG_GLES2
+		nvgDeleteGLES2(m_ctx);
+#endif
+
+		m_ctx = nullptr;
 	}
 
 	void GlRenderer::initGlew()
@@ -86,5 +107,3 @@ namespace toy
 		++frames;
 	}
 }
-
-#endif

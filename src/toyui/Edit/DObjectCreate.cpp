@@ -1,3 +1,6 @@
+//  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
+//  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
+//  This notice and the license may not be removed or altered from any source distribution.
 #include <toyui/Config.h>
 #include <toyui/Edit/DObjectCreate.h>
 
@@ -30,7 +33,6 @@ namespace toy
 		: Device(parent, cls())
 		, m_rootTypes()
 		, m_types(this->emplace<Stack>(Type::cls()).tstore(m_rootTypes).picker([this](Object& object) { this->selectType(object.as<Type>()); }))
-		, m_type(nullptr)
 		, m_objectCreate(nullptr)
 	{
 		for(Object* object : Type::cls().indexer().objects())

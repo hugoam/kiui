@@ -1,3 +1,6 @@
+//  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
+//  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
+//  This notice and the license may not be removed or altered from any source distribution.
 #ifndef TOY_DVALUEEDIT_H
 #define TOY_DVALUEEDIT_H
 
@@ -18,10 +21,16 @@
 namespace toy
 {
 	class TOY_UI_EXPORT DValueEdit : public HashDispatch<DValueEdit, Device&, unique_ptr<DValue>>
-	{};
+	{
+	public:
+		static string name() { return "DValueEdit"; };
+	};
 
 	class TOY_UI_EXPORT DValueDisplay : public HashDispatch<DValueDisplay, Device&, unique_ptr<DValue>>
-	{};
+	{
+	public:
+		static string name() { return "DValueDisplay"; };
+	};
 
 	TOY_UI_EXPORT void declareDValueEdit();
 	TOY_UI_EXPORT void declareDValueDisplay();

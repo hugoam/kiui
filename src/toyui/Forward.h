@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hugo Amiard hugo.amiard@laposte.net
+//  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
@@ -38,7 +38,6 @@ namespace toy
 	struct MouseEvent;
 	struct KeyEvent;
 
-	class InputWindow;
 	class InputReceiver;
 	class InputFrame;
 	class InputWidget;
@@ -126,15 +125,18 @@ namespace toy
 	class Image;
 	class ImageAtlas;
 
-	class RenderWindow;
 	class Renderer;
 	class RenderTarget;
 
 	class Skinner;
 	class Styler;
-	class UiWindow;
 
-	class UiContext;
+	class RenderWindow;
+	class InputWindow;
+	class Context;
+	class RenderSystem;
+
+	class UiWindow;
 
 	class WValue;
 

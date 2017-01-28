@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hugo Amiard hugo.amiard@laposte.net
+//  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
@@ -91,7 +91,7 @@ namespace toy
 
 		masterLayer.render(*this);
 
-#ifdef KIUI_DRAW_CACHE
+#ifdef TOYUI_DRAW_CACHE
 		void* layerCache = nullptr;
 		this->layerCache(masterLayer, layerCache);
 		this->drawLayer(layerCache, 0.f, 0.f, 1.f);
@@ -383,7 +383,7 @@ namespace toy
 		nvgRestore(m_ctx);
 	}
 
-#ifdef KIUI_DRAW_CACHE
+#ifdef TOYUI_DRAW_CACHE
 	void NanoRenderer::layerCache(Layer& layer, void*& cache)
 	{
 		if(m_layers.find(&layer) == m_layers.end())

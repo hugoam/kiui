@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hugo Amiard hugo.amiard@laposte.net
+//  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
@@ -24,9 +24,9 @@ namespace toy
 		: Sheet(type)
 		, m_dim(dim)
 		, m_percentage(0.f)
-		, m_onUpdated(onUpdated)
 		, m_filler(m_dim == DIM_X ? (Widget&) this->makeappend<FillerX>() : (Widget&) this->makeappend<FillerY>())
 		, m_spacer(m_dim == DIM_X ? (Widget&) this->makeappend<SpacerX>() : (Widget&) this->makeappend<SpacerY>())
+		, m_onUpdated(onUpdated)
 	{}
 
 	void ProgressBar::setPercentage(float percentage)

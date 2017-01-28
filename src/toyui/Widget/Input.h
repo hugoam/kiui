@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hugo Amiard hugo.amiard@laposte.net
+//  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
@@ -22,10 +22,16 @@
 namespace toy
 {
 	class TOY_UI_EXPORT DispatchInput : public HashDispatch<DispatchInput, Lref&, unique_ptr<WValue>>
-	{};
+	{
+	public:
+		static string name() { return "DispatchInput"; };
+	};
 	
 	class TOY_UI_EXPORT DispatchDisplay : public HashDispatch<DispatchDisplay, Lref&, unique_ptr<Widget>>
-	{};
+	{
+	public:
+		static string name() { return "DispatchDisplay"; };
+	};
 
 	template <>
 	class _I_ TOY_UI_EXPORT Input<Colour> : public WValue

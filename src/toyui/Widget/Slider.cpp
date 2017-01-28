@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hugo Amiard hugo.amiard@laposte.net
+//  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
@@ -73,9 +73,9 @@ namespace toy
 	Slider::Slider(Dimension dim, const Trigger& onUpdated, StyleType& type)
 		: Sheet(type)
 		, m_dim(dim)
-		, m_onUpdated(onUpdated)
 		, m_filler(dim == DIM_X ? (Widget&) this->makeappend<FillerX>() : (Widget&) this->makeappend<FillerY>())
 		, m_button(dim == DIM_X ? (SliderKnob&) this->makeappend<SliderKnobX>() : (SliderKnob&) this->makeappend<SliderKnobY>())
+		, m_onUpdated(onUpdated)
 	{}
 	
 	SliderX::SliderX(const Trigger& onUpdated)

@@ -3,24 +3,25 @@
 
 project "toyui"
 	kind "SharedLib"
+	--kind "StaticLib"
 
 	includedirs {
 		path.join(TOYOBJ_DIR, "src"),
 		path.join(TOYUI_DIR,  "src"),
 		path.join(TOYUI_3RDPARTY_DIR, "stb"),
-		path.join(TOYUI_3RDPARTY_DIR, "nanovg", "src"),
 		path.join(TOYUI_3RDPARTY_DIR, "glfw", "include"),
 		path.join(TOYUI_3RDPARTY_DIR, "yaml", "include"),
 		path.join(TOYUI_3RDPARTY_DIR, "yaml", "win32"),
+		path.join(TOY_NANOVG_DIR, "src"),
 	}
 
 	files {
         path.join(TOYUI_DIR, "src", "**.h"),
         path.join(TOYUI_DIR, "src", "**.cpp"),
-		path.join(TOYUI_3RDPARTY_DIR, "nanovg", "src", "nanovg.c"),
 		path.join(TOYUI_3RDPARTY_DIR, "yaml", "src", "*.c"),
+        path.join(TOY_NANOVG_DIR, "src", "nanovg.c"),
 	}
-                        
+       
     defines { "UI_EXPORT" }
     
     defines {
@@ -31,22 +32,33 @@ project "toyui"
     
     links {
 		"toyobj",
+        "OpenGL32",
 	}
     
-    configuration { "not toyui-gl" }
+    configuration { "not context-native or not windows" }
         removefiles {
-            path.join(TOYUI_DIR, "src", "toyui", "Gl", "**.h"),
-            path.join(TOYUI_DIR, "src", "toyui", "Gl", "**.cpp"),
+            path.join(TOYUI_DIR, "src/toyui/Context/WindowsContext.h"),
+            path.join(TOYUI_DIR, "src/toyui/Context/WindowsContext.cpp"),
         }
         
-    
-    configuration { "toyui-gl" }
+    configuration { "not context-glfw" }
+        removefiles {
+            path.join(TOYUI_DIR, "src/toyui/Context/GlfwContext.h"),
+            path.join(TOYUI_DIR, "src/toyui/Context/GlfwContext.cpp"),
+        }
+        
+    configuration { "context-glfw" }
         links {
             "glfw3",
-            "OpenGL32",
             "glew32",
         }
-
+        
+    configuration { "not asmjs" }
+        removefiles {
+            path.join(TOYUI_DIR, "src/toyui/Context/EmscriptenContext.h"),
+            path.join(TOYUI_DIR, "src/toyui/Context/EmscriptenContext.cpp"),
+        }
+        
 	configuration { "linux-*" }
 		buildoptions {
 			"-fPIC",

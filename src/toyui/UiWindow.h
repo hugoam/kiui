@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hugo Amiard hugo.amiard@laposte.net
+//  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
@@ -18,28 +18,53 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT UiContext
+	class TOY_UI_EXPORT RenderSystem
 	{
 	public:
-		UiContext(const string& resourcePath);
+		RenderSystem(const string& resourcePath);
 
 		const string& resourcePath() const { return m_resourcePath; }
 
-		virtual unique_ptr<RenderWindow> createRenderWindow(const string& name, int width, int height, bool fullScreen) = 0;
-		virtual unique_ptr<InputWindow> createInputWindow(RenderWindow& renderWindow) = 0;
-		virtual unique_ptr<Renderer> createRenderer(const string& resourcePath) = 0;
+		virtual unique_ptr<Context> createContext(const string& name, int width, int height, bool fullScreen) = 0;
+		virtual unique_ptr<Renderer> createRenderer(Context& context) = 0;
 
 	protected:
+		string m_resourcePath;
+	};
+
+	class TOY_UI_EXPORT Context
+	{
+	public:
+		Context(RenderSystem& renderSystem, unique_ptr<RenderWindow> renderWindow, unique_ptr<InputWindow> inputWindow);
+		Context(RenderSystem& renderSystem);
+		~Context();
+
+		void init(unique_ptr<RenderWindow> renderWindow, unique_ptr<InputWindow> inputWindow);
+
+		RenderWindow& renderWindow() { return *m_renderWindow; }
+		InputWindow& inputWindow() { return *m_inputWindow; }
+
+		RenderSystem& renderSystem() { return m_renderSystem; }
+		const string& resourcePath() const { return m_resourcePath; }
+
+	protected:
+		unique_ptr<RenderWindow> m_renderWindow;
+		unique_ptr<InputWindow> m_inputWindow;
+
+		RenderSystem& m_renderSystem;
 		string m_resourcePath;
 	};
 
 	class TOY_UI_EXPORT UiWindow
 	{
 	public:
-		UiWindow(UiContext& context, const string& name, int width, int height, bool fullScreen, User* user = nullptr);
+		UiWindow(RenderSystem& system, const string& name, int width, int height, bool fullScreen, User* user = nullptr);
 		~UiWindow();
 
-		UiContext& context() { return m_context; }
+		RenderSystem& renderSystem() { return m_system; }
+
+		Context& context() { return *m_context; }
+		Renderer& renderer() const { return *m_renderer; }
 
 		std::vector<Image>& images() { return m_images; }
 		ImageAtlas& imageAtlas() { return m_atlas; }
@@ -48,9 +73,6 @@ namespace toy
 
 		float width() const { return m_width; }
 		float height() const { return m_height; }
-
-		RenderWindow& renderWindow() const { return *m_renderWindow; }
-		Renderer& renderer() const { return *m_renderer; }
 
 		RootSheet& rootSheet() const { return *m_rootSheet; }
 		RootDevice& rootDevice() const { return *m_rootDevice; }
@@ -82,11 +104,10 @@ namespace toy
 		void loadResources();
 
 	protected:
-		UiContext& m_context;
+		RenderSystem& m_system;
 		string m_resourcePath;
 
-		unique_ptr<RenderWindow> m_renderWindow;
-		unique_ptr<InputWindow> m_inputWindow;
+		unique_ptr<Context> m_context;
 		unique_ptr<Renderer> m_renderer;
 
 		std::vector<Image> m_images;

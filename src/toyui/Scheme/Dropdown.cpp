@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hugo Amiard hugo.amiard@laposte.net
+//  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
@@ -23,11 +23,11 @@ namespace toy
 	Dropdown::Dropdown(const Trigger& onSelected, StringVector choices, bool input, StyleType& type)
 		: Sheet(type)
 		, m_onSelected()
-		, m_selected(nullptr)
-		, m_down(false)
 		, m_list(this->makeappend<DropdownList>(*this))
 		, m_header(this->makeappend<DropdownHeader>(*this, input))
 		, m_toggle(this->makeappend<DropdownToggle>(*this))
+		, m_selected(nullptr)
+		, m_down(false)
 	{
 		m_list.hide();
 
