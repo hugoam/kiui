@@ -7,7 +7,6 @@
 
 #include <toyui/Widget/Widgets.h>
 
-#include <iostream>
 #include <locale>
 
 using namespace std::placeholders;
@@ -15,7 +14,12 @@ using namespace std::placeholders;
 namespace toy
 {
 	List::List(StyleType& type, FrameType frameType)
-		: ScrollSheet(type, frameType)
+		: Sheet(type, frameType)
+	{}
+
+	ScrollList::ScrollList(StyleType& type, FrameType frameType)
+		: ScrollSheet(type)
+		, m_list(this->emplace<List>())
 	{}
 
 	SelectList::SelectList(StyleType& type)

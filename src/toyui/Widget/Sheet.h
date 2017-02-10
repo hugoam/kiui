@@ -27,19 +27,24 @@ namespace toy
 
 		inline Widget& at(size_t index) { return *m_contents.at(index); }
 
-		virtual void cleanup();
+		void bindChild(Widget& child, size_t index);
+		void unbindChild(Widget& child);
 
 		virtual void bind(Sheet& parent, size_t index);
-		virtual void rebind(Sheet& parent, size_t index);
+		virtual void unbind();
 
-		virtual Widget& vappend(unique_ptr<Widget> widget) { return append(std::move(widget)); }
-		virtual unique_ptr<Widget> vrelease(Widget& widget) { return widget.unbind(); }
+		virtual void nextFrame(size_t tick, size_t delta);
+		virtual void render(Renderer& renderer);
+
+		virtual Widget& vappend(unique_ptr<Widget> widget) { return this->append(std::move(widget)); }
+		virtual unique_ptr<Widget> vrelease(Widget& widget) { return this->release(widget.index()); }
 
 		Widget& insert(unique_ptr<Widget> widget, size_t index);
 		Widget& append(unique_ptr<Widget> widget);
 		unique_ptr<Widget> release(Widget& widget);
 		unique_ptr<Widget> release(size_t index);
 
+		void reindex(size_t from);
 		void swap(size_t from, size_t to);
 
 		void clear();
@@ -66,6 +71,7 @@ namespace toy
 		}
 
 	protected:
+		unique_ptr<Layout> m_layout;
 		std::vector<unique_ptr<Widget>> m_contents;
 	};
 
@@ -85,30 +91,35 @@ namespace toy
 		static StyleType& cls() { static StyleType ty("Board", Sheet::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT WrapSheet : public Sheet
+	class _I_ TOY_UI_EXPORT ScrollZone : public Sheet
 	{
 	public:
-		WrapSheet(StyleType& type = cls());
+		ScrollZone();
 
-		static StyleType& cls() { static StyleType ty("WrapSheet", Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("ScrollZone", Sheet::cls()); return ty; }
 	};
 
 	class _I_ TOY_UI_EXPORT ScrollSheet : public Sheet
 	{
 	public:
-		ScrollSheet(StyleType& type = cls(), FrameType frameType = STRIPE);
+		ScrollSheet(StyleType& type = cls());
 		~ScrollSheet();
 
-		void clear();
+		virtual void bound();
 
-		void nextFrame(size_t tick, size_t delta);
+		virtual Widget& vappend(unique_ptr<Widget> widget);
+		virtual unique_ptr<Widget> vrelease(Widget& widget);
+
+		virtual void clear();
 
 		void mouseWheel(MouseEvent& mouseEvent);
 
 		static StyleType& cls() { static StyleType ty("ScrollSheet", Sheet::cls()); return ty; }
 
 	protected:
-		ScrollArea& m_scrollArea;
+		ScrollZone& m_scrollzone;
+		Scrollbar& m_scrollbarX;
+		Scrollbar& m_scrollbarY;
 	};
 
 	class _I_ TOY_UI_EXPORT GridSheet : public Sheet
@@ -122,7 +133,7 @@ namespace toy
 		void leftDrag(MouseEvent& mouseEvent);
 		void leftDragEnd(MouseEvent& mouseEvent);
 
-		virtual void gridResized(Widget& first, Widget& second) { UNUSED(first); UNUSED(second); }
+		virtual void gridResized(Frame& first, Frame& second) { UNUSED(first); UNUSED(second); }
 
 		static StyleType& cls() { static StyleType ty("GridSheet", Sheet::cls()); return ty; }
 

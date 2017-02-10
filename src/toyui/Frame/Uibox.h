@@ -22,47 +22,67 @@ namespace toy
 	{
 	public:
 		Uibox();
-		~Uibox();
-
-		LayoutStyle& layout() { return *d_layout; }
 
 		inline DimFloat position() { return d_position; }
 		inline DimFloat size() { return d_size; }
 
 		inline float dposition(Dimension dim) { return d_position[dim]; }
 		inline float dsize(Dimension dim) { return d_size[dim]; }
+		inline float dcontent(Dimension dim) { return d_content[dim]; }
 		inline float dspan(Dimension dim) { return d_span[dim]; }
 
 		inline float dpadding(Dimension dim) { return d_layout->padding()[dim]; }
 		inline float dbackpadding(Dimension dim) { return d_layout->padding()[dim + 2]; }
 		inline float dmargin(Dimension dim) { return d_layout->margin()[dim]; }
 
+		inline float dbounds(Dimension dim) { return dcontent(dim) + dpadding(dim) + dbackpadding(dim) + dmargin(dim) * 2.f; }
+		inline float dmeasure(Dimension dim) { return std::max(dbounds(dim), d_layout->size()[dim]); }
+		inline float dextent(Dimension dim) { return dsize(dim) + dmargin(dim) * 2.f; }
+
+		inline float doffset(Dimension dim) { return dposition(dim) + dextent(dim); }
+
 		inline Align dalign(Dimension dim) { return d_layout->align()[dim]; }
 
-		inline bool dexpand(Dimension dim) { return d_sizing[dim] == EXPAND; }
-		inline bool dshrink(Dimension dim) { return d_sizing[dim] == SHRINK; }
+		inline Sizing dsizing(Dimension dim) { return d_sizing[dim]; }
+		inline bool dexpand(Dimension dim) { return d_sizing[dim] >= WRAP; }
 		inline bool dmanual(Dimension dim) { return d_sizing[dim] == MANUAL; }
-		inline bool dfixed(Dimension dim) { return d_sizing[dim] == FIXED; }
 
+		inline Dimension length() { return d_layout->d_layoutDim; }
+		inline Dimension depth() { return d_layout->d_layoutDim == DIM_X ? DIM_Y : DIM_X; }
+
+		inline bool flow() { return d_layout->d_flow == FLOW; }
 		inline bool unflow() { return d_layout->d_flow == FREE || d_layout->d_flow == FREE_FILL; }
-		inline bool floats() { return d_layout->d_flow == FLOAT_DEPTH || d_layout->d_flow == FLOAT_LENGTH; }
 		inline bool clip() { return d_layout->d_clipping == CLIP; }
 		inline bool opaque() { return d_opacity == OPAQUE; }
 		inline bool hollow() { return d_opacity == HOLLOW; }
 
 		inline float scale() { return d_scale; }
 
+		inline float left() { return dposition(DIM_X); }
+		inline float right() { return dposition(DIM_X) + dsize(DIM_X); }
+
+		inline float top() { return dposition(DIM_Y); }
+		inline float bottom() { return dposition(DIM_Y) + dsize(DIM_Y); }
+
+		inline float width() { return dsize(DIM_X); }
+		inline float height() { return dsize(DIM_Y); }
+
 		inline void setOpacity(Opacity opacity) { d_opacity = opacity; }
 		inline void setScale(float scale) { d_scale = scale; }
+		inline void setSizing(Sizing xsizing, Sizing ysizing) { d_sizing = DimSizing(xsizing, ysizing); }
+		inline void setContentSize(DimFloat content) { d_content = content; }
 
 	protected:
 		DimFloat d_position;
 		DimFloat d_size;
+		DimFloat d_content;
 		DimFloat d_span;
 		Space d_space;
 		DimSizing d_sizing;
 		Opacity d_opacity;
 		float d_scale;
+		Dimension d_depth;
+		Dimension d_length;
 		LayoutStyle* d_layout;
 	};
 }

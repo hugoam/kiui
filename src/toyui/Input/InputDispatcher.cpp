@@ -8,7 +8,6 @@
 #include <toyui/Widget/RootSheet.h>
 #include <toyui/Widget/Sheet.h>
 
-#include <iostream>
 #include <cassert>
 
 namespace toy
@@ -96,7 +95,7 @@ namespace toy
 		m_controlled = &inputFrame;
 		m_controlled->m_controller = this;
 
-		//std::cerr << ">>>>> " << static_cast<Widget&>(*this).style().name() << " TAKE CONTROL OF " << static_cast<Widget&>(*m_controlled).style().name() << std::endl;
+		//printf(">>>>> %s TAKE CONTROL OF %s\n", static_cast<Widget&>(*this).style().name(), static_cast<Widget&>(*m_controlled).style().name());
 	}
 
 	void InputFrame::yieldControl()
@@ -107,7 +106,7 @@ namespace toy
 		if(!m_controlled)
 			return;
 
-		//std::cerr << ">>>>> " << static_cast<Widget&>(*this).style().name() << " YIELD CONTROL OF " << static_cast<Widget&>(*m_controlled).style().name() << std::endl;
+		//printf(">>>>> %s YIELD CONTROL OF %s\n", static_cast<Widget&>(*this).style().name(), static_cast<Widget&>(*m_controlled).style().name());
 
 		this->uncontrol();
 		m_controlled->m_controller = nullptr;

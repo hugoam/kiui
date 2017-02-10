@@ -16,14 +16,13 @@
 namespace toy
 {
 	template <> Flow fromString<Flow>(const string& str) { if(str == "FLOW") return FLOW; else if(str == "OVERLAY") return OVERLAY; return FLOW; }
-	template <> Space fromString<Space>(const string& str) { if(str == "AUTO") return AUTO; if(str == "BLOCK") return BLOCK; else if(str == "FIT") return FIT; else if(str == "DIV") return DIV; else if(str == "SPACE") return SPACE; else if(str == "BOARD") return BOARD; return AUTO; }
+	template <> Space fromString<Space>(const string& str) { if(str == "AUTO") return AUTO; else if(str == "FLEX") return FLEX; else if(str == "BLOCK") return BLOCK; else if(str == "DIV") return DIV; else if(str == "SPACE") return SPACE; else if(str == "BOARD") return BOARD; return AUTO; }
 	template <> Clipping fromString<Clipping>(const string& str) { if(str == "NOCLIP") return NOCLIP; else if(str == "CLIP") return CLIP; return NOCLIP; }
 	template <> Opacity fromString<Opacity>(const string& str) { if(str == "OPAQUE") return OPAQUE; else if(str == "CLEAR") return CLEAR; else if(str == "HOLLOW") return HOLLOW;  return OPAQUE; }
 	template <> Dimension fromString<Dimension>(const string& str) { if(str == "DIM_X") return DIM_X; else if(str == "DIM_Y") return DIM_Y; return DIM_X; }
 	template <> Sizing fromString<Sizing>(const string& str) { if(str == "FIXED") return FIXED; else if(str == "MANUAL") return MANUAL; else if(str == "SHRINK") return SHRINK; else if(str == "EXPAND") return EXPAND; return FIXED; }
 	template <> Align fromString<Align>(const string& str) { if(str == "CENTER") return CENTER; else if(str == "LEFT") return LEFT; else if(str == "RIGHT") return RIGHT; return LEFT; }
 	template <> Pivot fromString<Pivot>(const string& str) { if(str == "FORWARD") return FORWARD; else if(str == "REVERSE") return REVERSE; return FORWARD; }
-	template <> Weight fromString<Weight>(const string& str) { if(str == "LIST") return LIST; else if(str == "TABLE") return TABLE; return LIST; }
 
 	template <> DimSizing fromString<DimSizing>(const string& str) { std::vector<string> dimStr = splitString(str, ","); return DimSizing(fromString<Sizing>(dimStr[0]), fromString<Sizing>(dimStr[1])); }
 	template <> DimPivot fromString<DimPivot>(const string& str) { std::vector<string> dimStr = splitString(str, ","); return DimPivot(fromString<Pivot>(dimStr[0]), fromString<Pivot>(dimStr[1])); }
@@ -209,7 +208,7 @@ namespace toy
 		else if(key == "opacity")
 			m_style->layout().d_opacity = fromString<Opacity>(value); // OPAQUE | CLEAR | HOLLOW
 		else if(key == "space")
-			m_style->layout().d_space = fromString<Space>(value); // AUTO | BLOCK | FIT | DIV | SPACE | BOARD
+			m_style->layout().d_space = fromString<Space>(value); // AUTO | FLEX | BLOCK | DIV | SPACE | BOARD
 		else if(key == "sizing")
 			m_style->layout().d_sizing = fromString<DimSizing>(value); // FIXED | SHRINK | EXPAND
 		else if(key == "layout_dim")
@@ -230,10 +229,6 @@ namespace toy
 			m_style->layout().d_spacing = fromString<DimFloat>(value); // x, y
 		else if(key == "pivot")
 			m_style->layout().d_pivot = fromString<DimPivot>(value);// FORWARD | REVERSE
-		else if(key == "weight")
-			m_style->layout().d_weight = fromString<Weight>(value); // LIST | TABLE
-		else if(key == "weights")
-			m_style->layout().d_weights = fromString<std::vector<float>>(value); // : 0.3, 0.4, 0.3
 
 		else if(key == "empty")
 			m_skin->m_empty = (value == "false" ? false : true);

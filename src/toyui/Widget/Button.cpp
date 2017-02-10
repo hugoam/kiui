@@ -10,9 +10,9 @@
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Stripe.h>
 
-#include <toyui/Frame/Caption.h>
+#include <toyui/Render/Caption.h>
 
-#include <toyui/UiWindow.h>
+#include <toyui/Widget/RootSheet.h>
 
 namespace toy
 {
@@ -44,15 +44,15 @@ namespace toy
 		: Control(type)
 		, WidgetTrigger(trigger)
 	{
-		m_frame->setText(label);
+		this->content().setText(label);
 	}
 
 	void Button::leftClick(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		if(uiWindow().keyboard().ctrlPressed())
+		if(this->rootSheet().keyboard().ctrlPressed())
 			this->triggerCtrl();
-		else if(uiWindow().keyboard().shiftPressed())
+		else if(this->rootSheet().keyboard().shiftPressed())
 			this->triggerShift();
 		else
 			this->trigger();
@@ -94,9 +94,9 @@ namespace toy
 	void WrapButton::leftClick(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		if(uiWindow().keyboard().ctrlPressed())
+		if(this->rootSheet().keyboard().ctrlPressed())
 			this->triggerCtrl();
-		else if(uiWindow().keyboard().shiftPressed())
+		else if(this->rootSheet().keyboard().shiftPressed())
 			this->triggerShift();
 		else
 			this->trigger();

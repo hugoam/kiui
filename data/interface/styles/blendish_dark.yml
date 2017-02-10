@@ -134,6 +134,8 @@ WindowBody :
     
 WindowFooter :
     background_colour : 0.275,0.275,0.275,1.0
+    
+WindowSizer :
     size : 0.0,8.0
     
 CloseButton :
@@ -254,7 +256,18 @@ ScrollDown :
     inherit_skin : Clear
     image : arrow_down_15
     
+ScrollLeft :
+    inherit_skin : Clear
+    image : arrow_left_15
+    
+ScrollRight :
+    inherit_skin : Clear
+    image : arrow_right_15
+    
 ScrollerKnobY :
+    inherit_skin : ScrollerButton
+    
+ScrollerKnobX :
     inherit_skin : ScrollerButton
 
 Input<int> :

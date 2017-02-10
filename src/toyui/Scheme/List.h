@@ -13,12 +13,25 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT List : public ScrollSheet
+	class TOY_UI_EXPORT List : public Sheet
 	{
 	public:
 		List(StyleType& type = cls(), FrameType frameType = STRIPE);
 
-		static StyleType& cls() { static StyleType ty("List", ScrollSheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("List", Sheet::cls()); return ty; }
+	};
+
+	class TOY_UI_EXPORT ScrollList : public ScrollSheet
+	{
+	public:
+		ScrollList(StyleType& type = cls(), FrameType frameType = STRIPE);
+
+		List& list() { return m_list; }
+
+		static StyleType& cls() { static StyleType ty("ScrollList", ScrollSheet::cls()); return ty; }
+
+	protected:
+		List& m_list;
 	};
 
 	class TOY_UI_EXPORT SelectList : public List

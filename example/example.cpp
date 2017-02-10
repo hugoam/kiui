@@ -1,35 +1,42 @@
 
-#include <mkUiExampleConfig.h>
-#include <mkUiExample.h>
+#include <UiExampleConfig.h>
+#include <UiExample.h>
 
-#include <Ui/Gl/mkGlWindow.h>
-#include <Ui/mkUiTypes.h>
+#include <toyui/Types.h>
 
-#ifdef KIUI_EMSCRIPTEN
-#define TOYUI_EXAMPLE_RESOURCE_PATH "/data/"
-#include <emscripten/emscripten.h>
+#ifdef TOY_PLATFORM_EMSCRIPTEN
+	#include <toyui/Context/EmscriptenContext.h>
+	#define TOYUI_RESOURCE_PATH "/data/"
+	#include <emscripten/emscripten.h>
 
-mk::GlWindow* gGlWindow;
-void iterate()
-{
-	gGlWindow->renderFrame();
-}
+	toy::UiWindow* gWindow;
+	void iterate()
+	{
+		gWindow->nextFrame();
+	}
+#else
+	#include <toyui/Context/Glfw/GlfwContext.h>
 #endif
 
-#ifndef TOYUI_EXAMPLE_RESOURCE_PATH
-  #define TOYUI_EXAMPLE_RESOURCE_PATH "../../data/"
+#ifndef TOYUI_RESOURCE_PATH
+	#define TOYUI_RESOURCE_PATH "../../data/"
 #endif
 
 int main(int argc, char *argv[])
 {
-	mk::GlContext glContext(TOYUI_EXAMPLE_RESOURCE_PATH);
-	mk::UiWindow uiwindow(glContext, "kiUi demo", 1200, 800, false);
+#ifdef TOY_PLATFORM_EMSCRIPTEN
+	toy::EmRenderSystem renderSystem(TOYUI_RESOURCE_PATH);
+#else
+	toy::GlfwRenderSystem renderSystem(TOYUI_RESOURCE_PATH);
+#endif
 
-	mk::Sheet& rootSheet = uiwindow.rootSheet();
+	toy::UiWindow uiwindow(renderSystem, "kiUi demo", 1200, 800, false);
+
+	toy::Sheet& rootSheet = uiwindow.rootSheet();
 	createUiTest(rootSheet);
 
-#ifdef KIUI_EMSCRIPTEN
-	gGlWindow = &glwindow;
+#ifdef TOY_PLATFORM_EMSCRIPTEN
+	gWindow = &uiwindow;
 	emscripten_set_main_loop(iterate, 0, 1);
 #else
 	bool pursue = true;

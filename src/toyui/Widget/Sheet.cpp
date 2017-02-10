@@ -7,6 +7,7 @@
 
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Stripe.h>
+#include <toyui/Frame/Grid.h>
 #include <toyui/Frame/Layer.h>
 
 #include <toyui/Widget/Widgets.h>
@@ -18,8 +19,6 @@
 
 #include <toyobj/Iterable/Reverse.h>
 
-#include <iostream>
-
 namespace toy
 {
 	Sheet::Sheet(StyleType& type, FrameType frameType)
@@ -29,12 +28,24 @@ namespace toy
 	Sheet::~Sheet()
 	{}
 
-	void Sheet::cleanup()
+	void Sheet::reindex(size_t from)
 	{
-		for(size_t i = 0; i < m_contents.size(); ++i)
-			m_contents[i]->cleanup();
+		for(size_t i = from; i < m_contents.size(); ++i)
+			m_contents[i]->setIndex(i);
+	}
 
-		Widget::cleanup();
+	void Sheet::bindChild(Widget& child, size_t index)
+	{
+		child.bind(*this, index);
+
+		this->stripe().remap();
+	}
+
+	void Sheet::unbindChild(Widget& child)
+	{
+		child.unbind();
+
+		this->stripe().remap();
 	}
 
 	void Sheet::bind(Sheet& parent, size_t index)
@@ -42,15 +53,35 @@ namespace toy
 		Widget::bind(parent, index);
 
 		for(size_t i = 0; i < m_contents.size(); ++i)
-			m_contents[i]->bind(*this, i);
+			this->bindChild(*m_contents[i], i);
 	}
 
-	void Sheet::rebind(Sheet& parent, size_t index)
+	void Sheet::unbind()
 	{
-		Widget::rebind(parent, index);
+		for(int i = m_contents.size() - 1; i >= 0; --i)
+			this->unbindChild(*m_contents[i]);
 
-		//for(size_t i = 0; i < m_contents.size(); ++i)
-		//	m_contents[i]->rebind(this, i);
+		Widget::unbind();
+	}
+
+	void Sheet::nextFrame(size_t tick, size_t delta)
+	{
+		Widget::nextFrame(tick, delta);
+
+		for(size_t i = 0; i < m_contents.size(); ++i)
+			m_contents[i]->nextFrame(tick, delta);
+	}
+
+	void Sheet::render(Renderer& renderer)
+	{
+		m_frame->content().beginDraw(renderer);
+		m_frame->content().draw(renderer);
+
+		for(size_t i = 0; i < m_contents.size(); ++i)
+			if(!m_contents[i]->frame().hidden())
+				m_contents[i]->render(renderer);
+
+		m_frame->content().endDraw(renderer);
 	}
 
 	Widget& Sheet::append(unique_ptr<Widget> unique)
@@ -62,37 +93,30 @@ namespace toy
 	{
 		Widget& widget = *unique;
 		m_contents.insert(m_contents.begin() + index, std::move(unique));
+		this->reindex(index);
 		if(m_state & BOUND)
-			widget.parent() ? widget.rebind(*this, index) : widget.bind(*this, index);
+			this->bindChild(widget, index);
 		return widget;
 	}
 
 	unique_ptr<Widget> Sheet::release(Widget& widget)
 	{
-		widget.detach();
-
-		size_t pos = 0;
-		while(m_contents[pos].get() != &widget)
-			++pos;
-
-		unique_ptr<Widget> pointer = std::move(m_contents[pos]);
-		m_contents.erase(m_contents.begin() + pos);
-		return pointer;
+		return this->release(widget.index());
 	}
 
 	unique_ptr<Widget> Sheet::release(size_t index)
 	{
-		m_contents.at(index)->detach();
-
+		m_contents[index]->unbind();
 		unique_ptr<Widget> pointer = std::move(m_contents[index]);
 		m_contents.erase(m_contents.begin() + index);
+		this->reindex(index);
 		return pointer;
 	}
 
 	void Sheet::clear()
 	{
 		for(auto& widget : m_contents)
-			widget->detach();
+			widget->unbind();
 
 		m_contents.clear();
 	}
@@ -112,54 +136,51 @@ namespace toy
 		: Sheet(type)
 	{}
 
-	WrapSheet::WrapSheet(StyleType& type)
-		: Sheet(type)
+	ScrollZone::ScrollZone()
+		: Sheet(cls())
 	{}
 
-	ScrollSheet::ScrollSheet(StyleType& type, FrameType frameType)
-		: Sheet(type, frameType)
-		, m_scrollArea(this->makeappend<ScrollArea>(*this))
-	{}
+	ScrollSheet::ScrollSheet(StyleType& type)
+		: Sheet(type, GRID)
+		, m_scrollzone(this->makeappend<ScrollZone>())
+		, m_scrollbarX(this->makeappend<ScrollbarX>(m_scrollzone))
+		, m_scrollbarY(this->makeappend<ScrollbarY>(m_scrollzone))
+	{
+		m_scrollzone.frame().setIndex(0, 0);
+		m_scrollbarY.frame().setIndex(1, 0);
+		m_scrollbarX.frame().setIndex(0, 1);
+	}
 
 	ScrollSheet::~ScrollSheet()
 	{}
 
-	void ScrollSheet::nextFrame(size_t tick, size_t delta)
+	void ScrollSheet::bound()
 	{
-		UNUSED(tick); UNUSED(delta);
+		m_frame->as<Grid>().resize(2);
+		m_frame->as<Grid>().line(0).setSizing(EXPAND, EXPAND);
+		m_frame->as<Grid>().line(1).setSizing(EXPAND, SHRINK);
+	}
 
-		if(this->stripe().cursor() > 0.f && this->stripe().sequenceLength() - this->stripe().cursor() < m_frame->dsize(DIM_Y))
-			this->stripe().setCursor(this->stripe().layoutDim(), std::max(this->stripe().sequenceLength() - m_frame->dsize(DIM_Y), 0.f));
+	Widget& ScrollSheet::vappend(unique_ptr<Widget> widget)
+	{
+		return m_scrollzone.vappend(std::move(widget));
+	}
 
-		if(this->stripe().overflow() && m_scrollArea.scrollbar().frame().hidden())
-			m_scrollArea.scrollbar().show();
-		else if(!this->stripe().overflow() && !m_scrollArea.scrollbar().frame().hidden())
-			m_scrollArea.scrollbar().hide();
+	unique_ptr<Widget> ScrollSheet::vrelease(Widget& widget)
+	{
+		return m_scrollzone.vrelease(widget);
 	}
 
 	void ScrollSheet::clear()
 	{
-		while(m_contents.size() > 1)
-		{
-			m_contents.back()->detach();
-			m_contents.pop_back();
-		}
+		m_scrollzone.clear();
 	}
 
 	void ScrollSheet::mouseWheel(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		if(!this->stripe().overflow())
-			return;
-
-		float amount = mouseEvent.deltaY;
-
-		if(amount > 0)
-			while(amount-- > 0)
-				m_scrollArea.scrollbar().scrollup();
-		else if(amount < 0)
-			while(amount++ < 0)
-				m_scrollArea.scrollbar().scrolldown();
+		m_scrollbarX.scroll(mouseEvent.deltaX);
+		m_scrollbarY.scroll(mouseEvent.deltaY);
 
 		mouseEvent.consumed = true;
 	};
@@ -180,24 +201,24 @@ namespace toy
 		for(Frame* frame : m_frame->as<Stripe>().sequence())
 			if(frame->dabsolute(m_dim) >= pos)
 			{
-				m_resizing = &frame->widget();
+				m_resizing = frame->widget();
 				break;
 			}
 	}
 
 	void GridSheet::leftDrag(MouseEvent& mouseEvent)
 	{
-		if(!m_resizing || m_resizing->frame().first())
+		if(!m_resizing || !this->stripe().before(m_resizing->frame()))
 			return;
 
-		Widget& prev = m_resizing->prev();
-		Widget& next = *m_resizing;
+		Frame& prev = this->stripe().prev(m_resizing->frame());
+		Frame& next = m_resizing->frame();
 
 		float pixspan = 1.f / m_frame->as<Stripe>().dsize(m_dim);
 		float offset = m_dim == DIM_X ? mouseEvent.deltaX * pixspan : mouseEvent.deltaY * pixspan;
 
-		prev.frame().setSpanDim(m_dim, std::max(0.01f, prev.frame().dspan(m_dim) + offset));
-		next.frame().setSpanDim(m_dim, std::max(0.01f, next.frame().dspan(m_dim) - offset));
+		prev.setSpanDim(m_dim, std::max(0.01f, prev.dspan(m_dim) + offset));
+		next.setSpanDim(m_dim, std::max(0.01f, next.dspan(m_dim) - offset));
 
 		this->gridResized(prev, next);
 	}

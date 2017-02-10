@@ -25,13 +25,11 @@ namespace toy
 		//this->clear();
 	}
 
-	void ContextMenu::bind(Sheet& parent, size_t index)
+	void ContextMenu::bound()
 	{
-		Sheet::bind(parent, index);
-
 		this->rootSheet().append(m_parent->release(*this));
 
-		this->frame().setPosition(this->uiWindow().mouse().lastX(), this->uiWindow().mouse().lastY());
+		this->frame().setPosition(this->rootSheet().mouse().lastX(), this->rootSheet().mouse().lastY());
 		this->takeControl(CM_MODAL);
 	}
 

@@ -11,8 +11,11 @@
 #include <toyui/Widget/Widgets.h>
 
 #include <toyui/Frame/Frame.h>
-#include <toyui/Frame/Caption.h>
-#include <toyui/Frame/Stencil.h>
+#include <toyui/Frame/Stripe.h>
+#include <toyui/Frame/Grid.h>
+
+#include <toyui/Render/Caption.h>
+#include <toyui/Render/Stencil.h>
 
 #include <toyui/Style/StyleParser.h>
 
@@ -45,8 +48,6 @@
 
 #include <toyui/Frame/DimString.h>
 
-#include <toyui/Device/Hook.h>
-
 #include <toyui/UiWindow.h>
 #include <toyui/UiLayout.h>
 
@@ -61,7 +62,6 @@ namespace toy
 	template <> inline Type& typecls<Clipping>() { static Type ty; return ty; }
 	template <> inline Type& typecls<BoxLayer>() { static Type ty; return ty; }
 	template <> inline Type& typecls<Opacity>() { static Type ty; return ty; }
-	template <> inline Type& typecls<Weight>() { static Type ty; return ty; }
 	template <> inline Type& typecls<FrameType>() { static Type ty; return ty; }
 	template <> inline Type& typecls<WidgetState>() { static Type ty; return ty; }
 }

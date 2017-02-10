@@ -8,30 +8,35 @@
 #include <toyobj/Iterable/Reverse.h>
 
 #include <toyui/Widget/Widget.h>
+#include <toyui/Widget/Sheet.h>
 
 #include <algorithm>
-#include <iostream>
 
 namespace toy
 {
 	Stripe::Stripe(Widget& widget)
 		: Frame(widget)
-		, d_depth(DIM_X)
-		, d_length(DIM_Y)
-		, d_cursor(0.f, 0.f)
 		, d_contents()
 		, d_sequence(d_contents)
-		, d_sequenceLength(0)
-		, d_freeSpace(0)
-		, d_floatDepth(0)
-		, d_maxDepth(0)
-		, d_forceDirty(CLEAN)
-		, d_weights()
+	{}
+
+	Stripe::Stripe(StyleType& style, Stripe& parent)
+		: Frame(style, parent)
+		, d_contents()
+		, d_sequence(d_contents)
+	{}
+
+	void Stripe::map(Frame& frame)
 	{
-		this->setDirty(DIRTY_FLOW);
+		this->insert(frame, frame.widget()->index());
 	}
 
-	Stripe::~Stripe()
+	void Stripe::unmap(Frame& frame)
+	{
+		this->remove(frame);
+	}
+
+	void Stripe::remap()
 	{}
 
 	void Stripe::append(Frame& frame)
@@ -41,8 +46,6 @@ namespace toy
 
 	void Stripe::insert(Frame& frame, size_t index)
 	{
-		frame.bind(this);
-
 		if(frame.flow())
 			index = std::min(d_sequence.size(), index);
 		else
@@ -53,34 +56,30 @@ namespace toy
 		if(frame.flow())
 			++d_sequence.size();
 
-		if(!frame.hidden())
-			this->childShown(frame);
+		this->markDirty(DIRTY_LAYOUT);
 	}
 
 	void Stripe::remove(Frame& frame)
 	{
-		frame.unbind();
-
-		d_contents.erase(d_contents.begin() + frame.index());
-		this->reindex(frame.index());
+		d_contents.erase(d_contents.begin() + frame.dindex(d_length));
+		this->reindex(frame.dindex(d_length));
 		if(frame.flow())
 			--d_sequence.size();
 
-		if(!frame.hidden())
-			this->childHidden(frame);
+		this->markDirty(DIRTY_LAYOUT);
 	}
 
 	void Stripe::clear()
 	{
 		d_sequence.size() = 0;
 		d_contents.clear();
-		this->setDirty(DIRTY_FLOW);
+		this->markDirty(DIRTY_LAYOUT);
 	}
 
 	void Stripe::reindex(size_t from)
 	{
 		for(size_t i = from; i < d_contents.size(); ++i)
-			d_contents[i]->setIndex(i);
+			d_contents[i]->setIndex(d_length, i);
 	}
 
 	void Stripe::move(size_t from, size_t to)
@@ -89,305 +88,189 @@ namespace toy
 		this->reindex(from < to ? from : to);
 	}
 
-	void Stripe::nextFrame(size_t tick, size_t delta)
+	Frame* Stripe::before(Frame& frame)
 	{
-		Frame::nextFrame(tick, delta);
-
-		// cannot use range-based iteration because updateStyle() causes removing and reinserting in this vector
-		for(size_t i = 0; i < d_contents.size(); ++i)
-			d_contents[i]->nextFrame(tick, delta);
+		int index = frame.dindex(d_length);
+		while(index-- > 0)
+			if(!d_contents[index]->hidden())
+				return d_contents[index];
+		return nullptr;
 	}
 
-
-	void Stripe::render(Renderer& renderer)
+	Frame& Stripe::prev(Frame& frame)
 	{
-		this->beginDraw(renderer);
-
-		for(size_t i = 0; i < d_contents.size(); ++i)
-			if(!d_contents[i]->hidden())
-				d_contents[i]->render(renderer);
-
-		this->endDraw(renderer);
+		return *d_contents.at(frame.dindex(d_length) - 1);
 	}
 
-	void Stripe::recomputeLength()
+	Frame& Stripe::next(Frame& frame)
 	{
-		d_sequenceLength = 0.f;
-
-		for(Frame* frame : d_sequence)
-			if(!frame->dexpand(d_length) && !frame->hidden())
-				d_sequenceLength += this->extentSequence(*frame);
-
-		this->updateLength();
+		return *d_contents.at(frame.dindex(d_length) + 1);
 	}
 
-	void Stripe::recomputeDepth()
+	bool Stripe::first(Frame& frame)
 	{
-		d_maxDepth = 0.f;
-
-		for(Frame* frame : d_sequence)
-			if(!frame->dexpand(d_depth) && !frame->hidden())
-				d_maxDepth = std::max(d_maxDepth, frame->dextent(d_depth));
-
-		this->updateDepth();
+		return frame.dindex(d_length) == 0;
 	}
 
-	void Stripe::updateLength()
+	bool Stripe::last(Frame& frame)
 	{
-		if(dshrink(d_length))// || dwrap(d_length))
-			this->setSizeDim(d_length, d_sequenceLength + d_layout->padding()[d_length] + d_layout->padding()[d_length+2]);
+		return frame.dindex(d_length) == d_sequence.size() - 1;
 	}
-
-	void Stripe::updateDepth()
+	
+	void Stripe::measure()
 	{
-		if(dshrink(d_depth)) // || dwrap(d_depth))
-			this->setSizeDim(d_depth, d_maxDepth + d_layout->padding()[d_depth] + d_layout->padding()[d_depth+2]);
-	}
+		if(d_dirty < DIRTY_CONTENT)
+			return;
 
-	void Stripe::expandDepth()
-	{
-		float space = dspace(d_depth);
+		d_content = DimFloat(0.f, 0.f);
 
-		for(Frame* frame : d_contents)
-			if(frame->dexpand(d_depth))
-				frame->setSizeDim(d_depth, space);
-	}
+		if(d_sequence.size() < 1)
+			Frame::measure();
 
-	void Stripe::expandLength()
-	{
-		float space = dspace(d_length) - d_sequenceLength;
-		d_freeSpace = space;
-
-		for(Frame* frame : d_contents)
-			if(frame->dexpand(d_length))
-			{
-				if(frame->flow())
-					frame->setSizeDim(d_length, space * frame->dspan(d_length));
-				else
-					frame->setSizeDim(d_length, dspace(d_length));
-				d_freeSpace = 0.f;
-			}
-	}
-
-	void Stripe::relayout()
-	{
-		this->normalizeSpan();
-
-		if(d_layout->d_weight == LIST && d_weights && d_weights->size() > 0)
-			this->dispatchWeights();
-		else if(d_layout->d_weight == TABLE)
-			this->dispatchTableWeights();
-
-		this->expandDepth();
-		this->expandLength();
+		for(Frame* pframe : d_contents)
+			this->measure(*pframe, d_content);
 
 #if 0 // DEBUG
-			Stripe* parent = d_parent;
-			while(parent)
-			{
-				printf("  ");
-				parent = parent->parent();
-			}
-
-			printf("Stripe :: relayout %s size %f , %f\n", d_widget.style().name().c_str(), dsize(DIM_X), dsize(DIM_Y));
+		this->debugPrintDepth();
+		printf("%s measured content size %f , %f\n", this->style().name().c_str(), d_content[DIM_X], d_content[DIM_Y]);
 #endif
 	}
 
-	void Stripe::positionLength(Frame& frame)
+	void Stripe::measure(Frame& frame, DimFloat& content)
 	{
-		if(frame.flow())
-			frame.setPositionDim(d_length, this->offsetSequence(frame));
-		else
-			frame.setPositionDim(d_length, this->offset(frame, d_length));
-	}
+		frame.measure();
 
-	void Stripe::positionDepth(Frame& frame)
-	{
-		frame.setPositionDim(d_depth, this->offset(frame, d_depth));
-	}
-
-	void Stripe::initWeights()
-	{
-		d_weights = make_unique<std::vector<float>>();
-		if(d_layout)
-			*d_weights = d_layout->d_weights;
-	}
-
-	void Stripe::dispatchWeights()
-	{
-		if(d_contents.size() < d_weights->size())
+		if(frame.hidden())
 			return;
 
-		for(size_t index = 0; index != d_weights->size(); ++index)
-			if((*d_weights)[index] >= 0.f)
-				d_contents[index]->setSpanDim(d_length, (*d_weights)[index]);
+		if(frame.flow() && frame.dsizing(d_length) <= WRAP)
+			content[d_length] += frame.dmeasure(d_length) + this->spacing(frame);
 
-		d_weights->clear();
+		if(frame.flow() && frame.dsizing(d_depth) <= WRAP)
+			content[d_depth] = std::max(content[d_depth], frame.dmeasure(d_depth));
 	}
 
-	void Stripe::setWeights(std::vector<float> weights)
+	void Stripe::layout()
 	{
-		this->initWeights();
-
-		*d_weights = weights;
-	}
-
-	void Stripe::dispatchTableWeights()
-	{
-		for(size_t index = 0; index != d_weights->size(); ++index)
-			for(Frame* frame : d_sequence)
-				if(frame->as<Stripe>().sequence().size() == d_weights->size())
-					frame->as<Stripe>().contents()[index]->setSpanDim(d_depth, (*d_weights)[index]);
-	}
-
-	void Stripe::updateOnce()
-	{
-		this->clearForceDirty();
-
-		if(d_parent)
-			this->setForceDirty(d_parent->d_forceDirty);
-
-		if(d_dirty >= DIRTY_FLOW)
-			this->relayout();
-		if(d_dirty >= DIRTY_OFFSET)
-			this->setForceDirty(DIRTY_POSITION);
-		if(d_dirty >= DIRTY_ABSOLUTE)
-			this->setForceDirty(DIRTY_ABSOLUTE);
-
-		Frame::updateOnce();
-	}
-
-	void Stripe::updateSpace()
-	{
-		if(!d_parent)
-			d_space = BOARD;
-		else if(!flow())
-			d_space = BLOCK;
-		else if(d_length == d_parent->d_length && d_length == DIM_X) // @idea : make this distinction depend on a space Scarcity property (which by default would be Scarce for Y containers and Ample for X containers)
-			d_space = SPACE;
-		else if(d_length != d_parent->d_length && d_parent->d_length == DIM_X)
-			d_space = DIV;
-		else
-			d_space = DIV;
-	}
-
-	void Stripe::updateStyle()
-	{
-		Frame::updateStyle();
-
-		if(d_layout->weights().size() > 0)
-			this->initWeights();
-	}
-
-	void Stripe::updateSizing()
-	{
-		d_length = d_layout->d_layoutDim;
-		d_depth = d_layout->d_layoutDim == DIM_X ? DIM_Y : DIM_X;
-
-		Frame::updateSizing();
-	}
-
-	void Stripe::migrate(Stripe& stripe)
-	{
-		Frame::migrate(stripe);
-		
-		for(Frame* frame : d_contents)
-			if(frame->frameType() < LAYER)
-				frame->migrate(stripe);
-	}
-
-	void Stripe::childShown(Frame& child)
-	{
-		this->childSizedLength(child, child.dextent(d_length));
-		this->childSizedDepth(child, child.dextent(d_depth));
-
-		if(child.flow())
-			this->setDirty(DIRTY_FLOW);
-
-		if(child.flow() && d_sequence.size() != 1)
-			d_sequenceLength += d_layout->spacing()[d_length];
-	}
-
-	void Stripe::childHidden(Frame& child)
-	{
-		this->childSizedLength(child, -child.dextent(d_length));
-		this->childSizedDepth(child, -child.dextent(d_depth));
-
-		if(child.flow())
-			this->setDirty(DIRTY_FLOW);
-
-		if(child.flow() && d_sequence.size() != 0)
-			d_sequenceLength -= d_layout->spacing()[d_length];
-	}
-
-	void Stripe::childSized(Frame& child, Dimension dim, float delta)
-	{
-		if(child.hidden() || child.dexpand(dim))
+		if(d_dirty < DIRTY_LAYOUT)
 			return;
 
+		this->normalizeSpan();
+
+		DimFloat expanded;
+		for(Frame* pframe : d_contents)
+			this->resize(*pframe, expanded);
+
+		DimFloat space;
+		space[d_length] = std::max(this->dspace(d_length) - d_content[d_length] - expanded[d_length], 0.f);
+		space[d_depth] = std::max(this->dspace(d_depth), 0.f);
+
+		// the offset is our position relative to first parent widget frame (this skips layout frames)
+		DimFloat offset;
+		offset[d_length] = this->drelative(d_length);
+		offset[d_depth] = this->drelative(d_depth);
+
+		for(Frame* pframe : d_contents)
+			this->layout(*pframe, offset, space);
+
+#if 1 // DEBUG
+		this->debugPrintDepth();
+		printf("%s relayout size %f , %f\n", this->style().name().c_str(), dsize(DIM_X), dsize(DIM_Y));
+#endif
+	}
+
+	void Stripe::resize(Frame& frame, DimFloat& expanded)
+	{
+		if(frame.hidden())
+			return;
+
+		if(d_layout->layout()[d_length] >= AUTOSIZE && frame.flow())
+			expanded[d_length] += this->resize(frame, d_length);
+		else if(d_layout->layout()[d_length] >= AUTOSIZE)
+			this->resize(frame, d_length);
+
+		if(d_layout->layout()[d_depth] >= AUTOSIZE)
+			this->resize(frame, d_depth);
+
+		frame.content().updateContentSize();
+	}
+
+	float Stripe::resize(Frame& frame, Dimension dim)
+	{
+		float space = this->dspace(dim);
 		if(dim == d_length)
-			this->childSizedLength(child, delta);
+			space = (space - d_content[dim]) * frame.dspan(d_length);
+
+		float content = frame.dcontent(dim) + frame.dpadding(dim) + frame.dbackpadding(dim);
+		float expand = std::max(0.f, dim == d_length ? space : space - content);
+
+		Sizing sizing = frame.dsizing(dim);
+
+		if(sizing == SHRINK)
+			frame.setSizeDim(dim, content);
+		else if(sizing == WRAP)
+			frame.setSizeDim(dim, content + expand);
+		else if(sizing == EXPAND)
+			frame.setSizeDim(dim, space);
+
+		if(sizing == WRAP)
+			return expand;
+		else if(sizing == EXPAND)
+			return space;
 		else
-			this->childSizedDepth(child, delta);
+			return 0.f;
 	}
 
-	void Stripe::childSizedLength(Frame& child, float delta)
+	void Stripe::layout(Frame& frame, DimFloat& offset, DimFloat& space)
 	{
-		if(!(child.flow() || child.floats()) || child.layout().d_flow == FLOAT_DEPTH || child.dexpand(d_length))
+		this->position(frame, offset, space);
+		frame.layout();
+	}
+
+	void Stripe::position(Frame& frame, DimFloat& offset, DimFloat& space)
+	{
+		if(frame.style().name() == "Dir")
+			int i = 0;
+
+		if(frame.hidden() || frame.unflow())
 			return;
 
-		d_sequenceLength += delta;
-		this->updateLength();
-		this->setDirty(DIRTY_FLOW);
+		if(d_layout->layout()[d_length] >= AUTOLAYOUT && frame.flow())
+			frame.setPositionDim(d_length, this->positionSequence(frame, offset[d_length], space[d_length]));
+		else if(d_layout->layout()[d_length] >= AUTOLAYOUT)
+			frame.setPositionDim(d_length, this->positionFree(frame, d_length, offset[d_length], this->dspace(d_length)));
+
+		if(d_layout->layout()[d_depth] >= AUTOLAYOUT)
+			frame.setPositionDim(d_depth, this->positionFree(frame, d_depth, offset[d_depth], this->dspace(d_depth)));
 	}
 
-	void Stripe::childSizedDepth(Frame& child, float delta)
+	float Stripe::positionFree(Frame& frame, Dimension dim, float offset, float space)
 	{
-		if(child.flow() || child.layout().d_flow == FREE_FILL)
-			this->flowSizedDepth(child, delta);
-		else if(child.layout().d_flow == FLOAT_DEPTH)
-			this->floatSizedDepth(child, delta);
+		Align align = frame.dalign(dim);
+		float alignOffset = space * AlignSpace[align] - frame.dextent(dim) * AlignExtent[align];
+		return offset + (frame.flow() ? dpadding(dim) + frame.dmargin(dim) : 0.f) + alignOffset;
 	}
 
-	void Stripe::flowSizedDepth(Frame& child, float delta)
+	float Stripe::positionSequence(Frame& frame, float offset, float space)
 	{
-		if(delta < 0.f)
-		{
-			this->recomputeDepth();
-		}
-		else if(delta > 0.f)
-		{
-			d_maxDepth = std::max(d_maxDepth, child.dextent(d_depth));
-			this->updateDepth();
-		}
-	}
-
-	void Stripe::floatSizedDepth(Frame& child, float delta)
-	{
-		UNUSED(child);
-		d_floatDepth += delta;
-		this->setDirty(DIRTY_FLOW);
-	}
-
-	void Stripe::resized(Dimension dim)
-	{
-		Frame::resized(dim);
-		if(dim == d_length)
-			this->expandLength();
+		Frame* before = this->before(frame);
+		if(before)
+			return before->doffset(d_length) + this->spacing(frame) - alignSequence(*before, space) + alignSequence(frame, space);
 		else
-			this->expandDepth();
+			return offset + dpadding(d_length) + frame.dmargin(d_length) + alignSequence(frame, space);
 	}
 
 	Frame* Stripe::pinpoint(float x, float y, bool opaque)
 	{
-		//if(this->hollow() || !this->inside(x, y))
-		//	return nullptr;
+		if(this->hollow() || !this->inside(x, y))
+			return nullptr;
 
-		Frame* target;
 		for(Frame* frame : reverse_adapt(d_contents))
 			if(!frame->hidden() && frame->frameType() < MASTER_LAYER)
 			{
-				target = frame->pinpoint(x, y, opaque);
+				Frame* target = frame->widget() ? frame->pinpoint(x - frame->left(), y - frame->top(), opaque)
+											    : frame->pinpoint(x, y, opaque);
+
 				if(target)
 					return target;
 			}
@@ -405,54 +288,38 @@ namespace toy
 
 		for(Frame* frame : d_sequence)
 			if(frame->dexpand(d_length) && !frame->hidden())
-				frame->setSpanDimDirect(d_length, (1.f / span) * frame->dspan(d_length));
+				frame->setSpanDimDirect(d_length, frame->dspan(d_length) / span);
 	}
 
-	bool Stripe::nextOffset(Dimension dim, float& pos, float seuil, bool top)
+	float Stripe::nextOffset(Dimension dim, float pos)
 	{
-		if(d_length != dim)
-			return Frame::nextOffset(dim, pos, seuil);
+		pos -= d_position[dim];
 
-		pos += d_parent->extentSequence(*this);
-
-		if(pos < seuil && !top)
-			return false;
-
-		pos -= d_parent->extentSequence(*this);
 		for(Frame* frame : d_sequence)
-			if(frame->nextOffset(dim, pos, seuil))
-				return true;
+			if(frame->dposition(dim) + frame->dsize(dim) > pos)
+			{
+				if(frame->frameType() >= STRIPE)
+					return d_position[dim] + frame->as<Stripe>().nextOffset(dim, pos);
+				else
+					return d_position[dim] + frame->dposition(dim) + frame->dsize(dim);
+			}
 
-		pos -= d_parent->extentSequence(*this);
-		return Frame::nextOffset(dim, pos, seuil);
+		return d_position[dim] + d_size[dim];
 	}
 
-	bool Stripe::prevOffset(Dimension dim, float& pos, float seuil, bool top)
+	float Stripe::prevOffset(Dimension dim, float pos)
 	{
-		if(d_length != dim)
-			return Frame::prevOffset(dim, pos, seuil);
+		pos -= d_position[dim];
 
-		if(top || pos + d_parent->extentSequence(*this) >= seuil)
-			for(Frame* frame : d_sequence)
-				if(frame->prevOffset(dim, pos, seuil))
-					return true;
+		for(Frame* frame : reverse_adapt(d_sequence))
+			if(frame->dposition(dim) < pos)
+			{
+				if(frame->frameType() >= STRIPE)
+					return d_position[dim] + frame->as<Stripe>().prevOffset(dim, pos);
+				else
+					return d_position[dim] + frame->dposition(dim);
+			}
 
-		return Frame::prevOffset(dim, pos, seuil);
-	}
-
-	void Stripe::cursorUp()
-	{
-		float pos = 0.f;
-		this->prevOffset(d_length, pos, d_cursor[d_length], true);
-		d_cursor[d_length] = std::max(0.f, pos);
-		this->setDirty(DIRTY_OFFSET);
-	}
-
-	void Stripe::cursorDown()
-	{
-		float pos = 0.f;
-		this->nextOffset(d_length, pos, d_cursor[d_length], true);
-		d_cursor[d_length] = std::min(d_sequenceLength - d_size[DIM_Y], pos);
-		this->setDirty(DIRTY_OFFSET);
+		return d_position[dim];
 	}
 }

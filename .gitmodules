@@ -6,7 +6,7 @@
 	url = https://github.com/memononen/nanovg
 [submodule "3rdparty/nanovgvg-layers"]
 	path = 3rdparty/nanovg-layers
-	url = https://github.com/ytsedan/nanovg
+	url = https://github.com/hugoam/nanovg
 [submodule "3rdparty/yaml"]
 	path = 3rdparty/yaml
 	url = https://github.com/yaml/libyaml

@@ -42,6 +42,8 @@ namespace toy
 		void leftDrag(MouseEvent& mouseEvent);
 		void leftDragEnd(MouseEvent& mouseEvent);
 
+		Docksection* docktarget(float x, float y);
+
 		static StyleType& cls() { static StyleType ty("WindowHeader", Band::cls()); return ty; }
 
 	protected:
@@ -97,12 +99,12 @@ namespace toy
 		WindowSizer& m_secondSizer;
 	};
 
-	class _I_ TOY_UI_EXPORT WindowBody : public Sheet
+	class _I_ TOY_UI_EXPORT WindowBody : public ScrollSheet
 	{
 	public:
 		WindowBody();
 
-		static StyleType& cls() { static StyleType ty("WindowBody", Sheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("WindowBody", ScrollSheet::cls()); return ty; }
 	};
 
 	class _I_ TOY_UI_EXPORT CloseButton : public Button
@@ -119,12 +121,13 @@ namespace toy
 	enum WindowState
 	{
 		WINDOW_NOSTATE = 0,
-		WINDOW_DOCKABLE = 1 << 0,
-		WINDOW_CLOSABLE = 1 << 1,
-		WINDOW_MOVABLE = 1 << 2,
-		WINDOW_SIZABLE = 1 << 3,
-		WINDOW_SHRINK = 1 << 4,
-		WINDOW_DEFAULT = WINDOW_MOVABLE | WINDOW_SIZABLE | WINDOW_CLOSABLE
+		WINDOW_CREATED = 1 << 0,
+		WINDOW_DOCKABLE = 1 << 1,
+		WINDOW_CLOSABLE = 1 << 2,
+		WINDOW_MOVABLE = 1 << 3,
+		WINDOW_SIZABLE = 1 << 4,
+		WINDOW_SHRINK = 1 << 5,
+		WINDOW_DEFAULT = WINDOW_CREATED | WINDOW_MOVABLE | WINDOW_SIZABLE | WINDOW_CLOSABLE
 	};
 
 	class _I_ TOY_UI_EXPORT Window : public LayerSheet
@@ -145,7 +148,7 @@ namespace toy
 		bool sizable() { return (m_windowState & WINDOW_SIZABLE) != 0; }
 		bool shrink() { return (m_windowState & WINDOW_SHRINK) != 0; }
 
-		void bind(Sheet& parent, size_t index);
+		virtual void bound();
 
 		void toggleWindowState(WindowState state);
 

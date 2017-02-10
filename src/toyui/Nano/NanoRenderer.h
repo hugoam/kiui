@@ -7,7 +7,7 @@
 
 /* toy */
 #include <toyui/Forward.h>
-#include <toyui/Frame/Renderer.h>
+#include <toyui/Render/Renderer.h>
 
 namespace toy
 {
@@ -35,10 +35,8 @@ namespace toy
 
 #ifdef TOYUI_DRAW_CACHE
 		virtual void layerCache(Layer& layer, void*& layerCache);
+		virtual void clearLayer(void* layerCache);
 		virtual void drawLayer(void* layerCache, float x, float y, float scale);
-
-		virtual void beginLayer(void* layerCache, float x, float y, float scale);
-		virtual void endLayer();
 
 		virtual void beginUpdate(void* layerCache, float x, float y, float scale);
 		virtual void endUpdate();
@@ -47,6 +45,7 @@ namespace toy
 		virtual void endUpdate();
 #endif
 
+		virtual bool clipTest(const BoxFloat& rect);
 		virtual void clipRect(const BoxFloat& rect);
 		virtual void unclipRect();
 

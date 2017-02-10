@@ -11,8 +11,6 @@
 
 #include <toyui/Widget/RootSheet.h>
 
-#include <iostream>
-
 using namespace std::placeholders;
 
 namespace toy
@@ -43,7 +41,7 @@ namespace toy
 		: ScrollSheet(cls())
 		, m_name(title)
 		, m_contextTrigger(contextTrigger)
-		, m_plan(this->makeappend<Plan>())
+		, m_plan(this->emplace<Plan>())
 	{}
 
 	const string& Canvas::name()
@@ -56,11 +54,6 @@ namespace toy
 		m_plan.updateBounds();
 
 		ScrollSheet::nextFrame(tick, delta);
-	}
-
-	Widget& Canvas::vappend(unique_ptr<Widget> widget)
-	{
-		return m_plan.append(std::move(widget));
 	}
 
 	void Canvas::rightClick(MouseEvent& mouseEvent)
@@ -87,9 +80,9 @@ namespace toy
 
 		DimFloat deltaCenter((mousePos[DIM_X] - halfSize[DIM_X]) / halfSize[DIM_X], (mousePos[DIM_Y] - halfSize[DIM_Y]) / halfSize[DIM_Y]);
 
-		std::cerr << "Mouse Pos : " << mousePos[DIM_X] << ", " << mousePos[DIM_Y] << std::endl;
-		std::cerr << "Half Size : " << halfSize[DIM_X] << ", " << halfSize[DIM_Y] << std::endl;
-		std::cerr << "Delta Center: " << deltaCenter[DIM_X] << ", " << deltaCenter[DIM_Y] << std::endl;
+		printf("Mouse Pos : %f, %f\n", mousePos[DIM_X], mousePos[DIM_Y]);
+		printf("Half Size : %f, %f\n", halfSize[DIM_X], halfSize[DIM_Y]);
+		printf("Delta Center:  %f, %f\n", deltaCenter[DIM_X], deltaCenter[DIM_Y]);
 
 		m_plan.frame().setPosition(position[DIM_X] - deltaSize[DIM_X] * 0.5f * deltaCenter[DIM_X], position[DIM_Y] - deltaSize[DIM_Y] * 0.5f * deltaCenter[DIM_Y]);
 	}
@@ -206,7 +199,13 @@ namespace toy
 		, m_plugIn(plugIn)
 	{}
 
-	void NodeCable::customDraw(Renderer& renderer)
+	void NodeCable::nextFrame(size_t tick, size_t delta)
+	{
+		m_frame->setDirty(Frame::DIRTY_POSITION);
+		Widget::nextFrame(tick, delta);
+	}
+
+	bool NodeCable::customDraw(Renderer& renderer)
 	{
 		Sheet& canvas = *this->parent();
 
@@ -214,20 +213,22 @@ namespace toy
 		Frame& frameOut = m_plugOut.frame();
 		Frame& frameIn = m_plugIn.frame();
 
-		float x1 = frameOut.right() - frameCanvas.left();
-		float y1 = frameOut.top() + frameOut.height() / 2 - frameCanvas.top();
+		float x1 = frameOut.dabsolute(DIM_X) + frameOut.width() - frameCanvas.dabsolute(DIM_X);
+		float y1 = frameOut.dabsolute(DIM_Y) + frameOut.height() / 2 - frameCanvas.dabsolute(DIM_Y);
 
 		float c1x = x1 + 100.f;
 		float c1y = y1;
 
-		float x2 = frameIn.left() - frameCanvas.left();
-		float y2 = frameIn.top() + frameIn.height() / 2 - frameCanvas.top();
+		float x2 = frameIn.dabsolute(DIM_X) - frameCanvas.dabsolute(DIM_X);
+		float y2 = frameIn.dabsolute(DIM_Y) + frameIn.height() / 2 - frameCanvas.dabsolute(DIM_Y);
 
 		float c2x = x2 - 100.f;
 		float c2y = y2;
 
 		renderer.pathBezier(x1, y1, c1x, c1y, c2x, c2y, x2, y2);
-		renderer.stroke(m_frame->inkstyle());
+		renderer.stroke(this->content().inkstyle());
+
+		return true;
 	}
 
 	NodeBody::NodeBody(Node& node)

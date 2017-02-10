@@ -57,8 +57,6 @@ namespace toy
 		Tabber(StyleType& type = cls(), bool downtabs = false);
 		~Tabber();
 
-		void select(size_t index);
-
 		Widget& vappend(unique_ptr<Widget> widget);
 		unique_ptr<Widget> vrelease(Widget& widget);
 

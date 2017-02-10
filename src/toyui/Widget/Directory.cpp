@@ -9,12 +9,11 @@
 
 #include <dirent.h>
 
-#include <iostream>
-
 namespace toy
 {
-	Dir::Dir(const string& name)
+	Dir::Dir(Directory& directory, const string& name)
 		: WrapButton(nullptr, Trigger(), cls())
+		, m_directory(directory)
 		, m_name(name)
 	{
 		this->makeappend<Icon>("folder_20");
@@ -26,14 +25,15 @@ namespace toy
 		if(m_name == ".")
 			return;
 		if(m_name == "..")
-			m_parent->as<Directory>().moveOut();
+			m_directory.moveOut();
 		else
-			m_parent->as<Directory>().moveIn(m_name);
+			m_directory.moveIn(m_name);
 			
 	}
 
-	File::File(const string& name)
+	File::File(Directory& directory, const string& name)
 		: WrapButton(nullptr, Trigger(), cls())
+		, m_directory(directory)
 		, m_name(name)
 	{
 		this->makeappend<Icon>("file_20");
@@ -44,7 +44,7 @@ namespace toy
 	{}
 
 	Directory::Directory(const string& path)
-		: ScrollSheet(cls())
+		: Sheet(cls())
 		, m_path(path)
 	{
 		this->update();
@@ -57,13 +57,13 @@ namespace toy
 
 		while((ent = readdir(dir)) != NULL)
 			if(ent->d_type & DT_DIR && string(ent->d_name) != ".")
-				this->emplace<Dir>(ent->d_name);
+				this->emplace<Dir>(*this, ent->d_name);
 
 		rewinddir(dir);
 
 		while((ent = readdir(dir)) != NULL)
 			if(ent->d_type & DT_REG)
-				this->emplace<File>(ent->d_name);
+				this->emplace<File>(*this, ent->d_name);
 
 		closedir(dir);
 	}

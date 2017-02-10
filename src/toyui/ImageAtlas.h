@@ -8,10 +8,10 @@
 /* toy Og */
 #include <toyui/Forward.h>
 #include <toyui/Image.h>
-#include <toyui/Nano/RectPacking/Rect.h>
-#include <toyui/Nano/RectPacking/GuillotineBinPack.h>
 
 #include <memory>
+
+class GuillotineBinPack;
 
 namespace toy
 {
@@ -19,6 +19,7 @@ namespace toy
 	{
 	public:
 		ImageAtlas(size_t width, size_t height);
+		~ImageAtlas();
 
 		size_t width() const { return m_width; }
 		size_t height() const { return m_height; }
@@ -46,7 +47,7 @@ namespace toy
 		unsigned char* m_data;
 		Image m_image;
 
-		GuillotineBinPack m_rectPacker;
+		unique_ptr<GuillotineBinPack> m_rectPacker;
 	};
 }
 

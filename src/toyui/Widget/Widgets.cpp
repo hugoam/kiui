@@ -12,7 +12,7 @@ namespace toy
 	{}
 
 	Page::Page(const string& name, const string& dockid)
-		: ScrollSheet(cls())
+		: Sheet(cls())
 		, m_name(name)
 		, m_dockId(dockid)
 	{}

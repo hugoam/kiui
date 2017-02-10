@@ -10,8 +10,8 @@
 #include <toyobj/Util/Timer.h>
 #include <toyui/Forward.h>
 #include <toyui/Input/InputDevice.h>
-#include <toyui/Device/RootDevice.h>
-#include <toyui/RenderWindow.h>
+//#include <toyui/Device/RootDevice.h>
+#include <toyui/Render/RenderWindow.h>
 #include <toyui/ImageAtlas.h>
 
 #include <vector>
@@ -77,9 +77,6 @@ namespace toy
 		RootSheet& rootSheet() const { return *m_rootSheet; }
 		RootDevice& rootDevice() const { return *m_rootDevice; }
 
-		Mouse& mouse() const { return *m_mouse; }
-		Keyboard& keyboard() const { return *m_keyboard; }
-
 		Styler& styler() const { return *m_styler; }
 
 		bool shutdownRequested() const { return m_shutdownRequested; }
@@ -95,7 +92,6 @@ namespace toy
 		void shutdown();
 
 		void handleResizeWindow(size_t width, size_t height);
-		void handleDestroyWidget(Widget& widget);
 
 		Image& createImage(const string& image, int width, int height, uint8_t* data);
 
@@ -118,11 +114,10 @@ namespace toy
 
 		unique_ptr<Styler> m_styler;
 
-		unique_ptr<RootDevice> m_rootDevice;
+		//unique_ptr<RootDevice> m_rootDevice;
 		unique_ptr<RootSheet> m_rootSheet;
 
-		unique_ptr<Mouse> m_mouse;
-		unique_ptr<Keyboard> m_keyboard;
+		RootDevice* m_rootDevice;
 
 		bool m_shutdownRequested;
 

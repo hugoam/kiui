@@ -26,18 +26,27 @@ namespace toy
 		RootSheet& rootSheet() { return *this; }
 		MasterLayer& layer() { return *m_layer; }
 
+		Mouse& mouse() const { return *m_mouse; }
+		Keyboard& keyboard() const { return *m_keyboard; }
+
 		Cursor& cursor() { return *m_cursor; }
 
 		void nextFrame(size_t tick, size_t delta);
 
 		virtual void transformCoordinates(MouseEvent& mouseEvent) { UNUSED(mouseEvent); }
-
 		InputReceiver* dispatchEvent(InputEvent& inputEvent);
+
+		void handleUnbindWidget(Widget& widget);
+		void handleBindWidget(Widget& widget);
 
 		static StyleType& cls() { static StyleType ty("RootSheet", Sheet::cls()); return ty; }
 
 	protected:
 		UiWindow& m_window;
+
+		unique_ptr<Mouse> m_mouse;
+		unique_ptr<Keyboard> m_keyboard;
+
 		MasterLayer* m_layer;
 		Cursor* m_cursor;
 	};

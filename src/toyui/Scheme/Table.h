@@ -14,17 +14,20 @@ namespace toy
 	class _I_ TOY_UI_EXPORT TableHead : public GridSheet
 	{
 	public:
-		TableHead();
+		TableHead(Table& table);
 		
-		void gridResized(Widget& first, Widget& second);
+		void gridResized(Frame& first, Frame& second);
 
 		static StyleType& cls() { static StyleType ty("TableHead", GridSheet::cls()); return ty; }
+
+	protected:
+		Table& m_table;
 	};
 
 	class _I_ TOY_UI_EXPORT ColumnHeader : public Label
 	{
 	public:
-		ColumnHeader(const string& label);
+		ColumnHeader(const string& label, float span);
 
 		static StyleType& cls() { static StyleType ty("ColumnHeader", Label::cls()); return ty; }
 	};
@@ -33,7 +36,8 @@ namespace toy
 	{
 	public:
 		Table(StringVector columns, std::vector<float> weights);
-		~Table();
+
+		void bound();
 
 		static StyleType& cls() { static StyleType ty("Table", Sheet::cls()); return ty; }
 

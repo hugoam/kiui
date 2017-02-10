@@ -55,9 +55,18 @@ namespace toy
 	{
 		FRAME = 0,
 		STRIPE = 1,
-		LAYER = 2,
-		MASTER_LAYER = 3,
-		SPACE_LAYER = 4
+		GRID = 2,
+		TABLE = 3,
+		LAYER = 4,
+		MASTER_LAYER = 5,
+		SPACE_LAYER = 6
+	};
+
+	enum _I_ Layout : unsigned int
+	{
+		NOLAYOUT = 0,
+		AUTOSIZE = 1,
+		AUTOLAYOUT = 2,
 	};
 
 	enum _I_ Flow : unsigned int
@@ -66,16 +75,14 @@ namespace toy
 		FREE = 1,
 		FREE_FILL = 2,
 		ALIGN = 3,
-		OVERLAY = 4,
-		FLOAT_DEPTH = 5,
-		FLOAT_LENGTH = 6
+		OVERLAY = 4
 	};
 
 	enum _I_ Space : unsigned int
 	{
 		AUTO = 0,
-		BLOCK = 1,
-		FIT = 2,
+		FLEX = 1,
+		BLOCK = 2,
 		DIV = 3,
 		SPACE = 4,
 		BOARD = 5
@@ -84,10 +91,10 @@ namespace toy
 	enum _I_ Sizing : unsigned int
 	{
 		FIXED = 0,
-		SHRINK = 1,
-		WRAP = 2,
-		EXPAND = 3,
-		MANUAL = 4
+		MANUAL = 1,
+		SHRINK = 2,
+		WRAP = 3,
+		EXPAND = 4
 	};
 
 	enum _I_ Clipping : unsigned int
@@ -103,19 +110,19 @@ namespace toy
 		HOLLOW = 2
 	};
 
-	enum _I_ Weight : unsigned int
-	{
-		NOWEIGHT = 0,
-		LIST = 1,
-		TABLE = 2
-	};
-
 	template <class T>
 	class _I_ Dim
 	{
 	public:
 		Dim(T x, T y) : d_values{{ x, y }} {}
+		Dim(T val) : Dim(val, val) {}
 		Dim() : Dim(T(), T()) {}
+
+		T x() const { return d_values[0]; }
+		T y() const { return d_values[1]; }
+
+		void setX(T x) { d_values[0] = x; }
+		void setY(T y) { d_values[1] = y; }
 
 		bool null() const { return d_values[0] == T() && d_values[1] == T(); }
 
@@ -124,21 +131,6 @@ namespace toy
 
 	protected:
 		std::array<T, 2> d_values;
-	};
-
-	class _I_ DimFloat : public Struct, public Dim<float>
-	{
-	public:
-		_C_ DimFloat(float x, float y) : Dim(x, y) {}
-		DimFloat() : Dim() {}
-
-		_A_ _M_ float x() const { return d_values[0]; }
-		_A_ _M_ float y() const { return d_values[1]; }
-
-		void setX(float x) { d_values[0] = x; }
-		void setY(float y) { d_values[1] = y; }
-
-		static Type& cls() { static Type ty; return ty; }
 	};
 
 	class _I_ BoxFloat : public Struct
@@ -189,6 +181,13 @@ namespace toy
 		void setX1(float x1) { d_values[2] = x1; d_null = cnull(); }
 		void setY1(float y1) { d_values[3] = y1; d_null = cnull(); }
 
+		bool intersects(const BoxFloat& other) const
+		{
+			return !(other.x() > x() + w() || other.y() > y() + h() || other.x() + other.w() < x() || other.y() + other.h() < y());
+		}
+
+		float* pointer() { return &d_values[0]; }
+
 		static Type& cls() { static Type ty; return ty; }
 
 	protected:
@@ -197,50 +196,13 @@ namespace toy
 		bool d_null;
 	};
 
-	class _I_ DimSizing : public Struct, public Dim<Sizing>
-	{
-	public:
-		_C_ DimSizing(Sizing x, Sizing y) : Dim(x, y) {}
-		DimSizing() : Dim() {}
-
-		_A_ _M_ Sizing x() { return d_values[0]; }
-		_A_ _M_ Sizing y() { return d_values[1]; }
-
-		void setX(Sizing x) { d_values[0] = x; }
-		void setY(Sizing y) { d_values[0] = y; }
-
-		static Type& cls() { static Type ty; return ty; }
-	};
-
-	class _I_ DimAlign : public Struct, public Dim<Align>
-	{
-	public:
-		_C_ DimAlign(Align x, Align y) : Dim(x, y) {}
-		DimAlign() : Dim() {}
-
-		_A_ _M_ Align x() { return d_values[0]; }
-		_A_ _M_ Align y() { return d_values[1]; }
-
-		void setX(Align x) { d_values[0] = x; }
-		void setY(Align y) { d_values[0] = y; }
-
-		static Type& cls() { static Type ty; return ty; }
-	};
-
-	class _I_ DimPivot : public Struct, public Dim<Pivot>
-	{
-	public:
-		_C_ DimPivot(Pivot x, Pivot y) : Dim(x, y) {}
-		DimPivot() : Dim() {}
-
-		_A_ _M_ Pivot x() { return d_values[0]; }
-		_A_ _M_ Pivot y() { return d_values[1]; }
-
-		void setX(Pivot x) { d_values[0] = x; }
-		void setY(Pivot y) { d_values[0] = y; }
-
-		static Type& cls() { static Type ty; return ty; }
-	};
+	// @todo add template reflection mechanism for these
+	typedef Dim<size_t> Index;
+	typedef Dim<float> DimFloat;
+	typedef Dim<Layout> DimLayout;
+	typedef Dim<Sizing> DimSizing;
+	typedef Dim<Align> DimAlign;
+	typedef Dim<Pivot> DimPivot;
 }
 
 #endif // TOY_DIM_H

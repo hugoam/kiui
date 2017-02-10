@@ -16,7 +16,7 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT TypeIn : public Sheet
+	class _I_ TOY_UI_EXPORT TypeIn : public Widget
 	{
 	public:
 		TypeIn(string& string, StyleType& type = cls());

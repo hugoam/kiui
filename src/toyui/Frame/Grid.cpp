@@ -2,64 +2,83 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-/*
+
 #include <toyui/Config.h>
 #include <toyui/Frame/Grid.h>
 
-#include <toyobj/Store/Reverse.h>
-#include <toyobj/Util/Make.h>
-
-#include <toyui/Frame/Ink.h>
-
-#include <algorithm>
-#include <iostream>
-
-#include <toyui/Widget/Widget.h>
-#include <toyui/Form/Form.h>
-
-#include <toyui/UiWindow.h>
-#include <toyui/UiLayout.h>
-
-#include <toyui/Widget/Layer.h>
+#include <toyui/Widget/Sheet.h>
 
 namespace toy
 {
-	Grid::Grid(Stripe* parent, LayoutStyle* style, Skin* skin, InkLayer* inklayer, Widget* widget)
-		: Stripe(parent, style, skin, inklayer, widget)
-	{
-		this->addStripe();
-	}
-
-	Grid::~Grid()
+	GridOverlay::GridOverlay(Stripe& parent)
+		: Stripe(cls(), parent)
 	{}
 
-	void Grid::addStripe()
-	{
-		UiWindow* window = d_widget->uiWindow();
-		d_stripes.push_back(make<Stripe>(nullptr, window->layout()->style("gridline"), window->skinner()->skin("gridline"), d_widget->layer()->inkLayer(), nullptr));
-		d_stripes.back()->setParent(this);
-		d_sequence.push_back(d_stripes.back().get());
-		d_contents.push_back(d_stripes.back().get());
-	}
-	void Grid::add(Frame* frame)
-	{
-		if(frame->flow())
-			appendFlow(frame);
-		else
-			insertManual(frame);
-	}
-
-	void Grid::appendFlow(Frame* frame)
-	{
-		if(frame->style()->d_div)
-			this->addStripe();
-
-		frame->setParent(this);
-		d_sequence.back()->as<Stripe>()->add(frame);
-		d_relayout = true;
-	}
-
-	void Grid::insertStripe(float x, float y, Frame* frame)
+	GridLine::GridLine(Stripe& parent)
+		: Stripe(cls(), parent)
 	{}
+
+	GridColumn::GridColumn(Stripe& parent)
+		: Stripe(cls(), parent)
+	{}
+
+	TableGrid::TableGrid(Widget& widget)
+		: Stripe(widget)
+		, d_grid(*this)
+	{}
+
+	void TableGrid::remap()
+	{
+		for(Frame* pframe : d_sequence)
+			if(pframe->frameType() >= STRIPE)
+				this->remap(pframe->as<Stripe>());
+	}
+
+	void TableGrid::remap(Stripe& stripe)
+	{
+		if(stripe.length() != d_depth)
+			return;
+
+		this->resize(stripe.sequence().size());
+		if(stripe.sequence().size() >= d_columns.size())
+			for(size_t i = 0; i < d_columns.size(); ++i)
+				d_columns[i]->append(*stripe.contents()[i]);
+	}
+
+	void TableGrid::resize(size_t columns)
+	{
+		while(d_columns.size() < columns)
+			d_columns.emplace_back(make_unique<GridColumn>(d_grid));
+	}
+
+	void TableGrid::layout()
+	{
+		Stripe::layout();
+		d_grid.layout();
+	}
+
+	Grid::Grid(Widget& widget)
+		: Stripe(widget)
+	{}
+
+	void Grid::map(Frame& frame)
+	{
+		size_t line = frame.dindex(d_length);
+		size_t index = frame.dindex(d_depth);
+		this->resize(line + 1);
+		d_lines[line]->insert(frame, index);
+	}
+
+	void Grid::unmap(Frame& frame)
+	{
+		size_t line = frame.dindex(d_length);
+		d_lines[line]->remove(frame);
+	}
+
+	void Grid::resize(size_t lines)
+	{
+		while(d_lines.size() < lines)
+			d_lines.emplace_back(make_unique<GridLine>(*this));
+	}
 }
-*/
+

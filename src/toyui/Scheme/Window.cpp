@@ -16,8 +16,6 @@
 #include <toyui/Widget/RootSheet.h>
 #include <toyui/Widget/Slider.h>
 
-#include <iostream>
-
 using namespace std::placeholders;
 
 namespace toy
@@ -28,8 +26,8 @@ namespace toy
 
 	void Popup::bound()
 	{
-		float x = uiWindow().mouse().lastX() - m_parent->frame().left();
-		float y = uiWindow().mouse().lastY() - m_parent->frame().top();
+		float x = this->rootSheet().mouse().lastX() - m_parent->frame().left();
+		float y = this->rootSheet().mouse().lastY() - m_parent->frame().top();
 		m_frame->setPosition(x, y);
 
 		this->takeControl(CM_MODAL);
@@ -63,7 +61,8 @@ namespace toy
 	{
 		UNUSED(mouseEvent);
 		m_window.activate();
-		m_window.frame().layer().moveToTop();
+		if(!m_window.dock()) // crashes for some reason
+			m_window.frame().layer().moveToTop();
 	}
 
 	void WindowHeader::leftDragStart(MouseEvent& mouseEvent)
@@ -73,33 +72,37 @@ namespace toy
 			m_window.undock();
 
 		m_window.frame().layer().moveToTop();
+		m_window.frame().layer().setOpacity(HOLLOW);
 	}
 
 	void WindowHeader::leftDrag(MouseEvent& mouseEvent)
 	{
-		UNUSED(mouseEvent);
 		if(m_window.movable())
 			m_window.frame().setPosition(m_window.frame().dposition(DIM_X) + mouseEvent.deltaX, m_window.frame().dposition(DIM_Y) + mouseEvent.deltaY);
 	}
 
 	void WindowHeader::leftDragEnd(MouseEvent& mouseEvent)
 	{
-		m_window.frame().layer().setOpacity(HOLLOW);
-
 		if(m_window.dockable())
 		{
-			Widget* widget = this->rootSheet().pinpoint(mouseEvent.posX, mouseEvent.posY);
-			while(widget && &widget->type() != &Docksection::cls())
-				widget = widget->parent();
-
-			if(widget)
-			{
-				Docksection& section = widget->as<Docksection>().docktarget(mouseEvent.posX, mouseEvent.posY);
-				m_window.dock(section);
-			}
+			Docksection* target = this->docktarget(mouseEvent.posX, mouseEvent.posY);
+			if(target)
+				m_window.dock(*target);
 		}
 
 		m_window.frame().layer().setOpacity(OPAQUE);
+	}
+
+	Docksection* WindowHeader::docktarget(float x, float y)
+	{
+		Widget* widget = this->rootSheet().pinpoint(x, y);
+		while(widget && &widget->type() != &Docksection::cls())
+			widget = widget->parent();
+
+		if(widget)
+			return &widget->as<Docksection>().docktarget(x, y);
+		else
+			return nullptr;
 	}
 
 	WindowSizer::WindowSizer(Window& window, StyleType& type, bool left)
@@ -148,7 +151,7 @@ namespace toy
 	{}
 
 	WindowBody::WindowBody()
-		: Sheet(cls())
+		: ScrollSheet(cls())
 	{}
 
 	CloseButton::CloseButton(const Trigger& trigger)
@@ -178,7 +181,6 @@ namespace toy
 		, m_body(this->makeappend<WindowBody>())
 		, m_footer(this->makeappend<WindowFooter>(*this))
 	{
-		//m_style = dock ? &DockWindow::cls() : &Window::cls();
 		if(!this->sizable())
 			m_footer.hide();
 	}
@@ -186,16 +188,17 @@ namespace toy
 	Window::~Window()
 	{}
 
-	void Window::bind(Sheet& parent, size_t index)
+	void Window::bound()
 	{
-		Sheet::bind(parent, index);
-
-		if(!m_dock)
+		if((m_windowState & WINDOW_CREATED) && !m_dock)
 		{
-			float x = this->rootSheet().frame().dsize(DIM_X) / 2 - m_frame->dsize(DIM_X) / 2;
-			float y = this->rootSheet().frame().dsize(DIM_Y) / 2 - m_frame->dsize(DIM_Y) / 2;
+			float x = (m_parent->frame().dsize(DIM_X) - m_frame->dsize(DIM_X)) / 2.f;
+			float y = (m_parent->frame().dsize(DIM_Y) - m_frame->dsize(DIM_Y)) / 2.f;
 			m_frame->setPosition(x, y);
 		}
+
+		if(m_windowState & WINDOW_CREATED)
+			this->toggleWindowState(WINDOW_CREATED);
 	}
 
 	void Window::toggleWindowState(WindowState state)
@@ -236,7 +239,6 @@ namespace toy
 
 	void Window::dock(Docksection& docksection)
 	{
-		std::cerr << ">>>>>>>>>>>  Window :: dock" << std::endl;
 		this->docked();
 		m_dock = &docksection;
 		docksection.dock(*this);
@@ -251,7 +253,6 @@ namespace toy
 
 	void Window::undock()
 	{
-		std::cerr << ">>>>>>>>>>>  Window :: undock" << std::endl;
 		m_dock->undock(*this);
 		m_dock = nullptr;
 		this->undocked();
@@ -278,7 +279,7 @@ namespace toy
 	{
 		m_header.title().setLabel(widget->name());
 		m_content = widget.get();
-		return m_body.append(std::move(widget));
+		return m_body.vappend(std::move(widget));
 	}
 
 	void Window::leftClick(MouseEvent& mouseEvent)

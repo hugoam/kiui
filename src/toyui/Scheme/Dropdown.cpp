@@ -64,13 +64,9 @@ namespace toy
 
 	void Dropdown::dropdown(bool modal)
 	{
-		//if(m_list.count() == 0)
-		//	return;
-
 		m_list.show();
 		m_list.frame().as<Layer>().moveToTop();
-		if(modal)
-			m_list.takeControl(CM_MODAL);
+		m_list.takeControl(CM_MODAL);
 
 		m_down = true;
 	}
@@ -115,7 +111,7 @@ namespace toy
 			m_content->hide();
 			m_input->show();
 			m_input->setString(m_content->contentlabel());
-			MouseClickEvent mouseEvent(InputEvent::DEVICE_MOUSE_LEFT_BUTTON, this->uiWindow().mouse().lastX(), this->uiWindow().mouse().lastY());
+			MouseClickEvent mouseEvent(InputEvent::DEVICE_MOUSE_LEFT_BUTTON, this->rootSheet().mouse().lastX(), this->rootSheet().mouse().lastY());
 			m_input->typeIn().leftClick(mouseEvent);
 		}
 		else
@@ -163,9 +159,7 @@ namespace toy
 
 	DropdownChoice::DropdownChoice(unique_ptr<Widget> content, const Trigger& trigger)
 		: WrapButton(std::move(content), trigger, cls())
-	{
-		//content->setStyle(DropdownLabel::cls());
-	}
+	{}
 
 	DropdownList::DropdownList(Dropdown& dropdown)
 		: List(cls(), LAYER)

@@ -35,8 +35,6 @@ namespace toy
 
 		void nextFrame(size_t tick, size_t delta);
 
-		Widget& vappend(unique_ptr<Widget> widget);
-
 		void rightClick(MouseEvent& mouseEvent);
 		void mouseWheel(MouseEvent& mouseEvent);
 
@@ -115,10 +113,12 @@ namespace toy
 	public:
 		NodeCable(Widget& plugOut, Widget& plugIn);
 
+		void nextFrame(size_t tick, size_t delta);
+
 		Widget& plugOut() { return m_plugOut; }
 		Widget& plugIn() { return m_plugIn; }
 
-		void customDraw(Renderer& renderer);
+		bool customDraw(Renderer& renderer);
 
 		static StyleType& cls() { static StyleType ty("NodeCable", Sheet::cls()); return ty; }
 

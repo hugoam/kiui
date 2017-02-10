@@ -11,50 +11,47 @@
 #include <toyobj/Util/Updatable.h>
 #include <toyui/Forward.h>
 #include <toyui/Frame/Uibox.h>
-#include <toyui/Frame/DrawFrame.h>
+#include <toyui/Render/DrawFrame.h>
 
 #include <cmath>
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Frame : public Object, public Uibox, public DrawFrame, public Updatable
+	class _I_ TOY_UI_EXPORT Frame : public Object, public Uibox
 	{
 	public:
 		Frame(Widget& widget);
-		~Frame();
+		Frame(StyleType& style, Stripe& parent);
 
 		enum Dirty
 		{
 			CLEAN,				// Frame doesn't need update
 			DIRTY_ABSOLUTE,		// The absolute position of the frame has changed
-			DIRTY_CLIP,			// The clipping of the frame has changed
 			DIRTY_POSITION,		// The relative position of the frame has changed
-			DIRTY_OFFSET,		// The offset of the contents has changed
-			DIRTY_FLOW,			// The flow of the contents has changed
-			DIRTY_FRAME,		// The size of the frame has changed
-			DIRTY_SKIN,			// The skin of the frame has changed
-			DIRTY_WIDGET,		// The content of the widget has changed
-			DIRTY_VISIBILITY,	// The visibility of the frame has changed
+			DIRTY_CONTENT,		// The skin of the frame has changed
+			DIRTY_LAYOUT,		// The content of the widget has changed
 		};
 
 		virtual FrameType frameType() { return FRAME; }
 
-		inline Widget& widget() { return d_widget; }
+		inline Widget* widget() { return d_widget; }
+		inline DrawFrame& content() { return d_frame; }
 		inline Stripe* parent() { return d_parent; }
 		inline Dirty dirty() { return d_dirty; }
 		inline bool hidden() { return d_hidden; }
-		inline size_t index() { return d_index; }
-		inline bool flow() { return d_flow; }
+		inline const Index& index() { return d_index; }
+		inline size_t dindex(Dimension dim) { return d_index[dim]; }
 
 		inline Style& style() { return *d_style; }
 
-		void setIndex(size_t index) { d_index = index; }
-		void setDirty(Dirty dirty) { if(dirty > d_dirty) d_dirty = dirty; }
-		void clearDirty() { d_dirty = CLEAN; }
+		void setIndex(Dimension dim, size_t index) { d_index[dim] = index; }
+		void setIndex(size_t xindex, size_t yindex) { d_index[DIM_X] = xindex; d_index[DIM_Y] = yindex; }
+
+		inline float dspace(Dimension dim) { return d_size[dim] - dpadding(dim) - dbackpadding(dim); }
 
 		Layer& layer();
 
-		virtual void bind(Stripe* parent);
+		virtual void bind(Stripe& parent);
 		virtual void unbind();
 
 		void show();
@@ -62,41 +59,23 @@ namespace toy
 
 		bool visible();
 
-		void transfer(Stripe& stripe, size_t index);
-		void remove();
-
-		Frame* before();
-
-		Frame& prev();
-		Frame& next();
-
-		bool first();
-		bool last();
-
-		virtual bool nextOffset(Dimension dim, float& pos, float seuil, bool top = false);
-		virtual bool prevOffset(Dimension dim, float& pos, float seuil, bool top = false);
+		void setDirty(Dirty dirty) { if(dirty > d_dirty) d_dirty = dirty; }
+		void markDirty(Dirty dirty);
 
 		virtual Frame* pinpoint(float x, float y, bool opaque);
-
-		virtual void migrate(Stripe& stripe);
-
-		virtual void nextFrame(size_t tick, size_t delta);
-		virtual void render(Renderer& renderer);
-
-		void resetStyle();
 
 		virtual void updateOnce();
 
 		void updateSizing(Dimension dim);
 		void updateFixed(Dimension dim);
 
-		virtual void updateSpace();
-		virtual void updateSizing();
-		virtual void updateStyle();
+		void updateSpace();
+		void updateSizing();
 
-		void updatePosition();
+		void setStyle(Style& style);
 
-		void updateState(WidgetState state);
+		virtual void measure();
+		virtual void layout();
 
 		void setSizeDim(Dimension dim, float size);
 		void setSpanDim(Dimension dim, float span);
@@ -107,37 +86,24 @@ namespace toy
 		inline void setSize(float width, float height) { setSizeDim(DIM_X, width); setSizeDim(DIM_Y, height); }
 		inline void setSize(DimFloat dim) { setSizeDim(DIM_X, dim[DIM_X]); setSizeDim(DIM_Y, dim[DIM_Y]); }
 
-		inline float left() { return dabsolute(DIM_X); }
-		inline float right() { return dabsolute(DIM_X) + dsize(DIM_X); }
-
-		inline float top() { return dabsolute(DIM_Y); }
-		inline float bottom() { return dabsolute(DIM_Y) + dsize(DIM_Y); }
-
-		inline float width() { return dsize(DIM_X); }
-		inline float height() { return dsize(DIM_Y); }
-
-		inline float dextent(Dimension dim) { return dsize(dim) + dmargin(dim) * 2.f; }
-		inline float doffset(Dimension dim) { return dposition(dim) + dextent(dim); }
-
 		float dabsolute(Dimension dim);
+		float drelative(Dimension dim);
 
 		bool inside(float x, float y);
 
+		void debugPrintDepth();
+
 		static Type& cls() { static Type ty; return ty; }
 
-	public:
-		virtual void resized(Dimension dim);
-
 	protected:
-		Widget& d_widget;
+		Widget* d_widget;
+		DrawFrame d_frame;
 		Stripe* d_parent;
 		Dirty d_dirty;
 		bool d_hidden;
-		bool d_flow;
-		size_t d_index;
+		Index d_index;
 
 		Style* d_style;
-		size_t d_styleStamp;
 	};
 }
 

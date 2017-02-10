@@ -15,8 +15,6 @@
 
 #include <toyui/Widget/ProgressBar.h>
 
-#include <iostream>
-
 namespace toy
 {
 	SliderKnob::SliderKnob(Dimension dim, StyleType& type)
@@ -25,7 +23,7 @@ namespace toy
 		, m_startPos(0.f)
 		, m_startOffset(0.f)
 	{
-		m_frame->setEmpty();
+		this->content().setEmpty();
 	}
 
 	float SliderKnob::offset(float pos)
@@ -88,9 +86,10 @@ namespace toy
 
 	void Slider::nextFrame(size_t tick, size_t delta)
 	{
-		UNUSED(tick); UNUSED(delta);
-		if(m_frame->dirty() >= Frame::DIRTY_FRAME)
+		if(m_frame->dirty() >= Frame::DIRTY_LAYOUT)
 			this->updateKnob();
+
+		Sheet::nextFrame(tick, delta);
 	}
 
 	float Slider::length()
@@ -136,7 +135,7 @@ namespace toy
 
 	void Slider::updateKnob()
 	{
-		if(!(m_state & BOUND) || m_frame->hidden())
+		if(m_frame->hidden())
 			return;
 
 		if(m_button.frame().dmanual(m_dim))
@@ -144,7 +143,6 @@ namespace toy
 
 		float pos = (m_val - m_min) / (m_max - m_min) * this->length();		
 		m_filler.frame().setSizeDim(m_dim, pos);
-		m_button.frame().parent()->positionDepth(m_button.frame());
 
 		if(!m_button.frame().dexpand(m_dim))
 			m_button.frame().setPositionDim(m_dim, pos);

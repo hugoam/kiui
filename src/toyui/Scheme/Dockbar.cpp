@@ -56,7 +56,7 @@ namespace toy
 	{
 		Dockbox& dockbox = widget.parent()->as<Dockbox>();
 
-		unique_ptr<Widget> unique = widget.unbind();
+		unique_ptr<Widget> unique = widget.detach();
 		dockbox.toggle().destroy();
 		dockbox.destroy();
 

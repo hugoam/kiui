@@ -18,30 +18,32 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Dir : public WrapButton
 	{
 	public:
-		Dir(const string& name);
+		Dir(Directory& directory, const string& name);
 
 		void trigger();
 
 		static StyleType& cls() { static StyleType ty("Dir", WrapButton::cls()); return ty; }
 
 	protected:
+		Directory& m_directory;
 		string m_name;
 	};
 
 	class _I_ TOY_UI_EXPORT File : public WrapButton
 	{
 	public:
-		File(const string& name);
+		File(Directory& directory, const string& name);
 
 		void trigger();
 
 		static StyleType& cls() { static StyleType ty("File", WrapButton::cls()); return ty; }
 
 	protected:
+		Directory& m_directory;
 		string m_name;
 	};
 
-	class _I_ TOY_UI_EXPORT Directory : public ScrollSheet
+	class _I_ TOY_UI_EXPORT Directory : public Sheet
 	{
 	public:
 		Directory(const string& path);
@@ -52,7 +54,7 @@ namespace toy
 		void moveIn(const string& name);
 		void moveOut();
 
-		static StyleType& cls() { static StyleType ty("Directory", ScrollSheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Directory", Sheet::cls()); return ty; }
 
 	protected:
 		string m_path;

@@ -22,8 +22,6 @@
 #include <stb_image.h>
 #include <dirent.h>
 
-#include <iostream>
-
 namespace toy
 {
 	RenderSystem::RenderSystem(const string& resourcePath)
@@ -60,6 +58,8 @@ namespace toy
 			{
 				string fullpath = path + ent->d_name;
 				string name = subfolder + replaceAll(ent->d_name, ".png", "");
+
+				printf("Adding Image %s\n", fullpath.c_str());
 
 				int width, height, n;
 				unsigned char* img = stbi_load(fullpath.c_str(), &width, &height, &n, 4);
@@ -100,6 +100,7 @@ namespace toy
 
 	void UiWindow::init()
 	{
+		printf("UiWindow Init\n");
 		m_renderer->setupContext();
 
 		this->loadResources();
@@ -110,16 +111,15 @@ namespace toy
 		m_styler->prepare();
 
 		m_rootSheet = make_unique<RootSheet>(*this);
-		m_rootDevice = make_unique<RootDevice>(*this, *m_rootSheet);
+		//m_rootDevice = make_unique<RootDevice>(*this, *m_rootSheet);
 
-		m_mouse = make_unique<Mouse>(*m_rootSheet);
-		m_keyboard = make_unique<Keyboard>(*m_rootSheet);
-
-		m_context->inputWindow().initInput(*m_mouse, *m_keyboard);
+		m_context->inputWindow().initInput(m_rootSheet->mouse(), m_rootSheet->keyboard());
 
 		m_rootSheet->frame().setSize(m_width, m_height);
 
 		this->resize(size_t(m_width), size_t(m_height));
+
+		printf("UiWindow Init End\n");
 	}
 
 	void UiWindow::initResources()
@@ -184,10 +184,7 @@ namespace toy
 		size_t tick = m_clock.readTick();
 		size_t delta = m_clock.stepTick();
 
-		m_mouse->nextFrame();
-		m_keyboard->nextFrame();
-
-		m_rootSheet->layer().nextFrame(tick, delta);
+		m_rootSheet->nextFrame(tick, delta);
 
 		return !m_shutdownRequested;
 	}
@@ -195,10 +192,5 @@ namespace toy
 	void UiWindow::shutdown()
 	{
 		m_shutdownRequested = true;
-	}
-
-	void UiWindow::handleDestroyWidget(Widget& widget)
-	{
-		m_mouse->handleDestroyWidget(widget);
 	}
 }

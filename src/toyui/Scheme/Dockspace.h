@@ -13,13 +13,24 @@
 
 namespace toy
 {
+	class _I_ TOY_UI_EXPORT Placeholder : public Widget
+	{
+	public:
+		Placeholder(const string& name);
+
+		const string& name() { return m_name; }
+
+		static StyleType& cls() { static StyleType ty("Placeholder", Widget::cls()); return ty; }
+
+	protected:
+		string m_name;
+	};
+
 	class _I_ TOY_UI_EXPORT Docksection : public Tabber
 	{
 	public:
-		Docksection(Dockline& dockline, size_t index);
-		~Docksection();
+		Docksection(Dockline& dockline);
 
-		size_t index() { return m_index; }
 		Dockline* dockline() { return m_dockline; }
 
 		void setDockline(Dockline* dockline) { m_dockline = dockline; }
@@ -37,17 +48,14 @@ namespace toy
 
 	protected:
 		Dockline* m_dockline;
-		size_t m_index;
 	};
 
 	class _I_ TOY_UI_EXPORT Dockline : public GridSheet
 	{
 	public:
-		Dockline(Dockspace& dockspace, Dockline* dockline, Dimension dim, size_t index, StyleType& type);
-		~Dockline();
+		Dockline(Dockspace& dockspace, Dockline* dockline, Dimension dim, StyleType& type);
 
 		Dimension dim() { return m_dim; }
-		size_t index() { return m_index; }
 		Dockline* dockline() { return m_dockline; }
 		Dockspace& dockspace() { return m_dockspace; }
 
@@ -66,13 +74,12 @@ namespace toy
 	protected:
 		Dockspace& m_dockspace;
 		Dockline* m_dockline;
-		size_t m_index;
 	};
 
 	class _I_ TOY_UI_EXPORT DocklineX : public Dockline
 	{
 	public:
-		DocklineX(Dockspace& dockspace, Dockline* dockline, size_t index);
+		DocklineX(Dockspace& dockspace, Dockline* dockline);
 
 		static StyleType& cls() { static StyleType ty("DocklineX", Dockline::cls()); return ty; }
 	};
@@ -80,7 +87,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT DocklineY : public Dockline
 	{
 	public:
-		DocklineY(Dockspace& dockspace, Dockline* dockline, size_t index);
+		DocklineY(Dockspace& dockspace, Dockline* dockline);
 
 		static StyleType& cls() { static StyleType ty("DocklineY", Dockline::cls()); return ty; }
 	};

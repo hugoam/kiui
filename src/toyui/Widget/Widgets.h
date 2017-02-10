@@ -19,7 +19,7 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Page : public ScrollSheet
+	class _I_ TOY_UI_EXPORT Page : public Sheet
 	{
 	public:
 		Page(const string& name, const string& dockid = "");
@@ -27,7 +27,7 @@ namespace toy
 		const string& name() { return m_name; }
 		const string& dockid() { return m_dockId; }
 
-		static StyleType& cls() { static StyleType ty("Page", ScrollSheet::cls()); return ty; }
+		static StyleType& cls() { static StyleType ty("Page", Sheet::cls()); return ty; }
 
 	protected:
 		string m_name;

@@ -10,6 +10,9 @@
 
 #include <toyui/UiWindow.h>
 
+#include <RectPacking/Rect.h>
+#include <RectPacking/GuillotineBinPack.h>
+
 #include <stb_image.h>
 
 namespace toy
@@ -18,9 +21,11 @@ namespace toy
 		: m_width(width)
 		, m_height(height)
 		, m_image("ImageAtlas", "", width, height)
-		, m_rectPacker(width, height)
-	{
-	}
+		, m_rectPacker(make_unique<GuillotineBinPack>(width, height))
+	{}
+
+	ImageAtlas::~ImageAtlas()
+	{}
 
 	void ImageAtlas::createAtlas()
 	{
@@ -65,7 +70,7 @@ namespace toy
 
 	void ImageAtlas::placeSprite(Image& sprite)
 	{
-		BPRect rect = m_rectPacker.Insert(sprite.d_width, sprite.d_height, false,
+		BPRect rect = m_rectPacker->Insert(sprite.d_width, sprite.d_height, false,
 										  GuillotineBinPack::RectBestShortSideFit, GuillotineBinPack::SplitShorterLeftoverAxis);
 
 		sprite.d_left = rect.x;

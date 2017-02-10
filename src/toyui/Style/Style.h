@@ -67,7 +67,7 @@ namespace toy
 	public:
 		LayoutStyle()
 			: IdStruct(cls())
-			, d_flow(FLOW), d_clipping(NOCLIP), d_opacity(CLEAR), d_space(AUTO), d_layoutDim(DIM_Y), d_align(DimAlign(LEFT, LEFT))
+			, d_layout(DimLayout(AUTOLAYOUT, AUTOLAYOUT)), d_flow(FLOW), d_clipping(NOCLIP), d_opacity(CLEAR), d_space(AUTO), d_layoutDim(DIM_Y), d_align(DimAlign(LEFT, LEFT))
 			, d_span(DimFloat(1.f, 1.f)), d_pivot(DimPivot(FORWARD, FORWARD)), d_updated(0)
 		{}
 
@@ -81,6 +81,7 @@ namespace toy
 
 		void copy(const LayoutStyle& other, bool inherit = false)
 		{
+			d_layout.copy(other.d_layout, inherit);
 			d_flow.copy(other.d_flow, inherit);
 			d_clipping.copy(other.d_clipping, inherit);
 			d_opacity.copy(other.d_opacity, inherit);
@@ -94,10 +95,9 @@ namespace toy
 			d_spacing.copy(other.d_spacing, inherit);
 			d_pivot.copy(other.d_pivot, inherit);
 			d_sizing.copy(other.d_sizing, inherit);
-			d_weight.copy(other.d_weight, inherit);
-			d_weights.copy(other.d_weights, inherit);
 		}
 
+		_A_ DimLayout layout() const { return d_layout.val; }
 		_A_ Flow flow() const { return d_flow.val; }
 		_A_ Clipping clipping() const { return d_clipping.val; }
 		_A_ Opacity opacity() const { return d_opacity.val; }
@@ -111,9 +111,8 @@ namespace toy
 		_A_ DimFloat& spacing() { return d_spacing.val; }
 		_A_ DimSizing& sizing() { return d_sizing.val; }
 		_A_ DimPivot& pivot() { return d_pivot.val; }
-		_A_ Weight weight() const { return d_weight.val; }
-		_A_ const std::vector<float>& weights() { return d_weights.val; }
 
+		StyleAttr<DimLayout> d_layout;
 		StyleAttr<Flow> d_flow;
 		StyleAttr<Clipping> d_clipping;
 		StyleAttr<Opacity> d_opacity;
@@ -127,8 +126,6 @@ namespace toy
 		StyleAttr<DimFloat> d_spacing;
 		StyleAttr<DimSizing> d_sizing;
 		StyleAttr<DimPivot> d_pivot;
-		StyleAttr<Weight> d_weight;
-		StyleAttr<std::vector<float>> d_weights;
 
 		_A_ _M_ size_t d_updated;
 

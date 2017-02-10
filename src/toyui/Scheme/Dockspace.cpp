@@ -16,17 +16,16 @@
 
 #include <toyui/Widget/RootSheet.h>
 
-#include <iostream>
-
 namespace toy
 {
-	Docksection::Docksection(Dockline& dockline, size_t index)
-		: Tabber(cls(), true)
-		, m_dockline(&dockline)
-		, m_index(index)
+	Placeholder::Placeholder(const string& name)
+		: Widget(cls())
+		, m_name(name)
 	{}
 
-	Docksection::~Docksection()
+	Docksection::Docksection(Dockline& dockline)
+		: Tabber(cls(), true)
+		, m_dockline(&dockline)
 	{}
 
 	void Docksection::dock(Window& window)
@@ -36,10 +35,8 @@ namespace toy
 
 	void Docksection::undock(Window& window)
 	{
-		this->rootSheet().append(Tabber::vrelease(window));
-
-		if(m_tabs.count() == 0)
-			m_dockline->removeSection(*this);
+		RootSheet& rootSheet = this->rootSheet();
+		rootSheet.append(this->vrelease(window));
 	}
 
 	Widget& Docksection::vappend(unique_ptr<Widget> widget)
@@ -65,11 +62,11 @@ namespace toy
 		if(m_dockline->dim() == dim)
 		{
 			m_frame->setSpanDim(m_dockline->dim(), m_frame->dspan(m_dockline->dim()) - span);
-			return m_dockline->insertSection(m_frame->index() + (after ? 1 : 0), span);
+			return m_dockline->insertSection(this->index() + (after ? 1 : 0), span);
 		}
 		else
 		{
-			return m_dockline->insertLine(m_frame->index(), true, span).insertSection(after ? 1 : 0);
+			return m_dockline->insertLine(this->index(), true, span).insertSection(after ? 1 : 0);
 		}
 	}
 
@@ -90,20 +87,16 @@ namespace toy
 			return *this; // dock on
 	}
 
-	Dockline::Dockline(Dockspace& dockspace, Dockline* dockline, Dimension dim, size_t index, StyleType& type)
+	Dockline::Dockline(Dockspace& dockspace, Dockline* dockline, Dimension dim, StyleType& type)
 		: GridSheet(dim, type)
 		, m_dockspace(dockspace)
 		, m_dockline(dockline)
-		, m_index(index)
-	{}
-
-	Dockline::~Dockline()
 	{}
 
 	Dockline& Dockline::insertLine(size_t index, bool replace, float span)
 	{
-		Dockline& dockline = m_dim == DIM_X ? (Dockline&) this->makeinsert<DocklineY>(index, m_dockspace, this, index)
-											: (Dockline&) this->makeinsert<DocklineX>(index, m_dockspace, this, index);
+		Dockline& dockline = m_dim == DIM_X ? (Dockline&) this->makeinsert<DocklineY>(index, m_dockspace, this)
+											: (Dockline&) this->makeinsert<DocklineX>(index, m_dockspace, this);
 
 		if(replace)
 			dockline.frame().setSpanDim(m_dim, this->stripe().contents()[index + 1]->dspan(m_dim));
@@ -118,14 +111,14 @@ namespace toy
 
 	Docksection& Dockline::insertSection(size_t index, float span)
 	{
-		Docksection& docksection = this->makeinsert<Docksection>(index, *this, index);
+		Docksection& docksection = this->makeinsert<Docksection>(index, *this);
 		docksection.frame().setSpanDim(m_dim, span);
 		return docksection;
 	}
 
 	void Dockline::removeSection(Docksection& section)
 	{
-		Frame& givespan = section.frame().index() > 0 ? section.prev().frame() : section.next().frame();
+		Frame& givespan = this->stripe().first(section.frame()) ? this->stripe().next(section.frame()) : this->stripe().prev(section.frame());
 		givespan.setSpanDim(m_dim, givespan.dspan(m_dim) + section.frame().dspan(m_dim));
 
 		section.destroy();
@@ -136,7 +129,7 @@ namespace toy
 
 	void Dockline::removeLine(Dockline& line)
 	{
-		Widget& section = this->insert(line.release(size_t(0)), line.frame().index());
+		Widget& section = this->insert(line.release(size_t(0)), line.as<Widget>().index());
 		section.as<Docksection>().setDockline(this);
 		section.frame().setSpanDim(m_dim, line.frame().dspan(m_dim));
 
@@ -188,16 +181,16 @@ namespace toy
 			return dockline.insertSection(index);
 	}
 
-	DocklineX::DocklineX(Dockspace& dockspace, Dockline* dockline, size_t index)
-		: Dockline(dockspace, dockline, DIM_X, index, cls())
+	DocklineX::DocklineX(Dockspace& dockspace, Dockline* dockline)
+		: Dockline(dockspace, dockline, DIM_X, cls())
 	{}
 
-	DocklineY::DocklineY(Dockspace& dockspace, Dockline* dockline, size_t index)
-		: Dockline(dockspace, dockline, DIM_Y, index, cls())
+	DocklineY::DocklineY(Dockspace& dockspace, Dockline* dockline)
+		: Dockline(dockspace, dockline, DIM_Y, cls())
 	{}
 
 	MasterDockline::MasterDockline(Dockspace& dockspace)
-		: DocklineX(dockspace, nullptr, 0)
+		: DocklineX(dockspace, nullptr)
 	{}
 
 	Dockspace::Dockspace()

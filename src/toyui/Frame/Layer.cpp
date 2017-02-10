@@ -9,11 +9,10 @@
 #include <toyobj/Iterable/Reverse.h>
 
 #include <toyui/Widget/Widget.h>
-#include <toyui/Frame/Renderer.h>
+#include <toyui/Render/Renderer.h>
 
 #include <toyui/UiWindow.h>
 
-#include <iostream>
 #include <algorithm>
 
 namespace toy
@@ -38,14 +37,9 @@ namespace toy
 		return layer->as<MasterLayer>();
 	}
 
-	void Layer::bind()
+	void Layer::bind(Stripe& parent)
 	{
-		this->updateStyle();
-	}
-
-	void Layer::bind(Stripe* parent)
-	{
-		d_parentLayer = &parent->layer();
+		d_parentLayer = &parent.layer();
 		d_parentLayer->add(*this);
 
 		Frame::bind(parent);
@@ -83,31 +77,17 @@ namespace toy
 		}
 	}
 
-	size_t Layer::reorder(size_t pos, size_t cursor, size_t next, std::vector<Layer*>& layers)
+	size_t Layer::reorder(size_t cursor, std::vector<Layer*>& layers)
 	{
-		/*if(this->frameType() >= MASTER_LAYER)
-		{
-			this->as<MasterLayer>().reorder();
-			return next;
-		}*/
-
-		UNUSED(pos);
-
+		cursor += 1;
 		d_index = cursor;
 		layers.push_back(this);
 
-		//cursor = next;
-		cursor += 1;
-		//next = next + d_numLayers;
-
 		size_t i = 0;
 		for(; i < d_sublayers.size(); ++i)
-		{
-			next = d_sublayers[i]->reorder(i, cursor, next, layers);
-			cursor += 1;
-		}
+			cursor = d_sublayers[i]->reorder(cursor, layers);
 
-		return next;
+		return cursor;
 	}
 
 	void Layer::moveToTop()
@@ -115,27 +95,12 @@ namespace toy
 		if(!d_parentLayer)
 			return;
 
-		/*Stripe* parent = d_parent;
+		Stripe* parent = d_parent;
 		d_parent->remove(*this);
-		parent->append(*this);*/
+		parent->append(*this);
 
 		d_parentLayer->remove(*this);
 		d_parentLayer->add(*this);
-	}
-
-	Frame* Layer::pinpoint(float x, float y, bool opaque)
-	{
-		Frame* result = nullptr;
-		for(Layer* layer : reverse_adapt(d_sublayers))
-			if(layer->visible() && layer->frameType() < MASTER_LAYER)
-			{
-				result = layer->pinpoint(x, y, opaque);
-				if(result)
-					return result;
-			}
-
-		result = Stripe::pinpoint(x, y, opaque);
-		return result;
 	}
 
 	MasterLayer::MasterLayer(Widget& widget)
@@ -146,7 +111,7 @@ namespace toy
 	void MasterLayer::reorder()
 	{
 		d_layers.clear();
-		Layer::reorder(0, d_index, 1, d_layers);
+		Layer::reorder(0, d_layers);
 
 		auto goesBefore = [](Layer* a, Layer* b) { return a->index() < b->index(); };
 		std::sort(d_layers.begin(), d_layers.end(), goesBefore);
@@ -161,7 +126,7 @@ namespace toy
 				parent = parent->parentLayer();
 			}
 
-			printf("Layer :: %s reorder index %u\n", layer->widget().style().name().c_str(), layer->index());
+			printf("Layer :: %s reorder index %u\n", layer->widget()->style().name().c_str(), layer->index());
 		}
 #endif
 	}

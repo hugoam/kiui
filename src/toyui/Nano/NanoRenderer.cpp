@@ -85,11 +85,13 @@ namespace toy
 	void NanoRenderer::render(MasterLayer& masterLayer)
 	{
 		m_debugBatch = 0;
+		Stencil::s_debugBatch = 0;
+		static int prevBatch = 0;
 
 		float pixelRatio = 1.f;
 		nvgBeginFrame(m_ctx, masterLayer.width(), masterLayer.height(), pixelRatio);
 
-		masterLayer.render(*this);
+		masterLayer.widget()->render(*this);
 
 #ifdef TOYUI_DRAW_CACHE
 		void* layerCache = nullptr;
@@ -104,7 +106,24 @@ namespace toy
 			}
 #endif
 
+		if(Stencil::s_debugBatch > 1 && Stencil::s_debugBatch != prevBatch)
+		{
+			prevBatch = Stencil::s_debugBatch;
+			printf("Render Frame : %i frames redrawn\n", Stencil::s_debugBatch);
+		}
+
 		nvgEndFrame(m_ctx);
+	}
+
+	bool NanoRenderer::clipTest(const BoxFloat& rect)
+	{
+		BoxFloat scissor;
+		nvgCurrentScissor(m_ctx, scissor.pointer());
+
+		if(scissor.x1() < 0.f || scissor.y1() < 0.f)
+			return false;
+
+		return !rect.intersects(scissor);
 	}
 
 	void NanoRenderer::clipRect(const BoxFloat& rect)
@@ -178,11 +197,16 @@ namespace toy
 
 	void NanoRenderer::debugRect(const BoxFloat& rect, const Colour& colour)
 	{
+		//nvgSave(m_ctx);
+		//nvgResetScissor(m_ctx);
+
 		static InkStyle debugStyle("debugRectStyle");
 		debugStyle.m_borderWidth = 1.f;
 		debugStyle.m_borderColour = colour;
 
 		this->drawRect(rect, BoxFloat(), debugStyle);
+
+		//nvgRestore(m_ctx);
 	}
 
 	void NanoRenderer::fill(InkStyle& skin, const BoxFloat& rect)
@@ -401,20 +425,10 @@ namespace toy
 		nvgRestore(m_ctx);
 	}
 
-	void NanoRenderer::beginLayer(void* layerCache, float x, float y, float scale)
+	void NanoRenderer::clearLayer(void* layerCache)
 	{
 		nvgResetDisplayList((NVGdisplayList*)layerCache);
-		nvgBindDisplayList(m_ctx, (NVGdisplayList*)layerCache);
-		nvgSave(m_ctx);
-		nvgTranslate(m_ctx, x, y);
-		nvgScale(m_ctx, scale, scale);
-
-		++m_debugBatch;
-	}
-
-	void NanoRenderer::endLayer()
-	{
-
+		nvgResetScissor(m_ctx);
 	}
 
 	void NanoRenderer::beginUpdate(void* layerCache, float x, float y, float scale)

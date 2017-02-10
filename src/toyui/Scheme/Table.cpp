@@ -8,42 +8,49 @@
 #include <toyui/Widget/Widgets.h>
 
 #include <toyui/Frame/Frame.h>
-
-#include <iostream>
+#include <toyui/Frame/Grid.h>
 
 using namespace std::placeholders;
 
 namespace toy
 {
-	TableHead::TableHead()
+	TableHead::TableHead(Table& table)
 		: GridSheet(DIM_X, cls())
+		, m_table(table)
 	{}
 
-	void TableHead::gridResized(Widget& first, Widget& second)
+	void TableHead::gridResized(Frame& first, Frame& second)
 	{
-		m_parent->stripe().weights()[first.frame().index()] = first.frame().dspan(DIM_X);
-		m_parent->stripe().weights()[second.frame().index()] = second.frame().dspan(DIM_X);
-		m_parent->stripe().setDirty(Frame::DIRTY_FLOW);
+		Stripe& firstColumn = m_table.frame().as<TableGrid>().column(first.dindex(DIM_X));
+		Stripe& secondColumn = m_table.frame().as<TableGrid>().column(second.dindex(DIM_X));
+		firstColumn.setSpanDim(DIM_X, first.dspan(DIM_X));
+		secondColumn.setSpanDim(DIM_X, second.dspan(DIM_X));
+
+		printf("Table resize column %i span %f <---> column %i span %f\n", first.dindex(DIM_X), first.dspan(DIM_X), second.dindex(DIM_X), second.dspan(DIM_X));
 	}
 
-	ColumnHeader::ColumnHeader(const string& label)
+	ColumnHeader::ColumnHeader(const string& label, float span)
 		: Label(label, cls())
-	{}
+	{
+		m_frame->setSpanDim(DIM_X, span);
+	}
 
 	Table::Table(StringVector columns, std::vector<float> weights)
-		: Sheet(cls())
+		: Sheet(cls(), TABLE)
 		, m_columns(columns)
 		, m_weights(weights)
-		, m_head(this->makeappend<TableHead>())
+		, m_head(this->makeappend<TableHead>(*this))
 	{
-		for(string& name : m_columns)
-			m_head.emplace<ColumnHeader>(name);
-
-		this->stripe().initWeights();
-		for(float& weight : m_weights)
-			this->stripe().weights().push_back(weight);
+		for(size_t i = 0; i < m_columns.size(); ++i)
+			m_head.emplace<ColumnHeader>(m_columns[i], m_weights[i]);
 	}
 
-	Table::~Table()
-	{}
+	void Table::bound()
+	{
+		TableGrid& grid = this->frame().as<TableGrid>();
+		grid.resize(m_columns.size());
+
+		for(size_t i = 0; i < m_columns.size(); ++i)
+			grid.column(i).setSpanDim(DIM_X, m_weights[i]);
+	}
 }

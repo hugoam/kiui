@@ -76,7 +76,7 @@ namespace toy
 		if(&tab == m_currentTab)
 			m_currentTab = nullptr;
 
-		unique_ptr<Widget> unique = widget.unbind();
+		unique_ptr<Widget> unique = widget.detach();
 		tab.header().destroy();
 		tab.destroy();
 
@@ -90,7 +90,7 @@ namespace toy
 
 	void Tabber::headerClicked(Button& header)
 	{
-		this->showTab(header.frame().index());
+		this->showTab(header.index());
 	}
 
 	void Tabber::showTab(Tab& tab)

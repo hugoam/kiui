@@ -1,14 +1,14 @@
 
-#include <mkUiExampleConfig.h>
-#include <mkUiExample.h>
+#include <UiExampleConfig.h>
+#include <UiExample.h>
 
-#include <Ui/mkUiTypes.h>
+#include <toyui/Types.h>
 
 #include <cfloat>
 
 using namespace std::placeholders;
 
-namespace mk
+namespace toy
 {
 	const char* girl_names[] =
 	{
@@ -136,7 +136,7 @@ namespace mk
 	{
 		parent.clear();
 
-		MasterDockline::cls().layout().d_weights = { 0.2f, 0.6f, 0.2f };
+		//MasterDockline::cls().layout().d_weights = { 0.2f, 0.6f, 0.2f };
 
 		Dockspace& dockspace = parent.emplace<Dockspace>();
 
@@ -204,8 +204,8 @@ namespace mk
 
 	Sheet& createUiTestTable(Sheet& parent, bool window)
 	{
-		Sheet& page = window ? parent.emplace<Window>("Tables").body().emplace<Page>("Tables")
-							 : parent.emplace<Page>("Tables");
+		Sheet& page = window ? parent.emplace<Window>("Table").body().emplace<Page>("Table")
+							 : parent.emplace<Page>("Table");
 
 		Table& table0 = page.emplace<Table>(StringVector({ "ID", "Name", "Path", "Flags" }), std::vector<float>({ 0.25f, 0.25f, 0.25f, 0.25f }));
 
@@ -335,7 +335,7 @@ namespace mk
 
 	Sheet& createUiTestControls(Sheet& parent, bool window)
 	{
-		Sheet& page = window ? parent.emplace<Window>("Tables").body().emplace<Page>("Tables")
+		Sheet& page = window ? parent.emplace<Window>("Table").body().emplace<Page>("Table")
 							 : parent.emplace<Page>("Controls");
 
 		Table& table = page.emplace<Table>(StringVector({ "input", "label" }), std::vector<float>({ 0.7f, 0.3f }));
@@ -457,7 +457,7 @@ namespace mk
 
 		static string help = "This window is being created by the ShowTestWindow() function. Please refer to the code for programming reference.\n\nUser Guide:";
 		Expandbox& box0 = page.emplace<Expandbox>("Help");
-		box0.emplace<Text>(help);
+		//box0.emplace<Text>(help);
 
 		Expandbox& box1 = page.emplace<Expandbox>("Window options");
 
@@ -466,12 +466,12 @@ namespace mk
 		box1.emplace<InputBool>("resizable", true, [&window](bool) { window.toggleResizable(); }, true);
 		box1.emplace<InputBool>("closable", true, [&window](bool) { window.toggleClosable(); }, true);
 
-		box1.emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha){ window.frame().inkstyle().m_backgroundColour.val.setA(alpha); });
+		box1.emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha){ window.content().inkstyle().m_backgroundColour.val.setA(alpha); });
 
 		Expandbox& box2 = page.emplace<Expandbox>("Widgets");
 		createUiTestControls(box2, false);
 
-		Expandbox& box3 = page.emplace<Expandbox>("Tables");
+		Expandbox& box3 = page.emplace<Expandbox>("Table");
 		createUiTestTable(box3, false);
 
 		return window;
@@ -567,7 +567,7 @@ namespace mk
 
 	void switchUiTheme(UiWindow& uiWindow, const string& name)
 	{
-		mk::StyleParser parser(uiWindow.styler());
+		StyleParser parser(uiWindow.styler());
 
 		if(name == "Blendish")
 			parser.loadStyleSheet(uiWindow.resourcePath() + "interface/styles/blendish.yml");
@@ -633,7 +633,7 @@ namespace mk
 		Header& demoheader = rootSheet.emplace<Header>();
 		Board& demobody = rootSheet.emplace<Board>();
 		LayerSheet& samplebody = demobody.emplace<LayerSheet>();
-		//createUiStyleEdit(demobody);
+		createUiStyleEdit(demobody);
 
 		StringVector samples({ "Dockspace", "Nodes", "Window", "Text Editor", "Filtered List", "Custom List", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" });
 		StringVector themes({ "Blendish", "Blendish Dark", "TurboBadger", "MyGui" });

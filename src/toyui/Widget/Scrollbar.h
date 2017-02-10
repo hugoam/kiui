@@ -33,12 +33,16 @@ namespace toy
 	{
 	public:
 		ScrollerX();
+
+		static StyleType& cls() { static StyleType ty("ScrollerX", Scroller::cls()); return ty; }
 	};
 
 	class TOY_UI_EXPORT ScrollerY : public Scroller
 	{
 	public:
 		ScrollerY();
+
+		static StyleType& cls() { static StyleType ty("ScrollerY", Scroller::cls()); return ty; }
 	};
 
 	class TOY_UI_EXPORT ScrollerKnob : public SliderKnob
@@ -81,38 +85,67 @@ namespace toy
 		static StyleType& cls() { static StyleType ty("ScrollDown", Button::cls()); return ty; }
 	};
 
+	class TOY_UI_EXPORT ScrollLeft : public Button
+	{
+	public:
+		ScrollLeft(const Trigger& trigger);
+
+		static StyleType& cls() { static StyleType ty("ScrollLeft", Button::cls()); return ty; }
+	};
+
+	class TOY_UI_EXPORT ScrollRight : public Button
+	{
+	public:
+		ScrollRight(const Trigger& trigger);
+
+		static StyleType& cls() { static StyleType ty("ScrollRight", Button::cls()); return ty; }
+	};
+
 	class _I_ TOY_UI_EXPORT Scrollbar : public Sheet
 	{
 	public:
-		Scrollbar(Sheet& sheet, Dimension dim = DIM_Y);
+		Scrollbar(Sheet& frameSheet, Dimension dim, StyleType& type);
 		~Scrollbar();
+
+		float contentSize();
+		float visibleSize();
+
+		float overflow();
 
 		void scrollup();
 		void scrolldown();
-		void scroll(float offset);
+		void scroll(float amount);
+		void scrollTo(float offset);
+
 		void nextFrame(size_t tick, size_t delta);
 
 		static StyleType& cls() { static StyleType ty("Scrollbar", Sheet::cls()); return ty; }
 
 	protected:
 		Dimension m_dim;
-		Sheet& m_sheet;
+		float d_cursor;
+		Sheet& m_frameSheet;
+
 		Button& m_up;
 		Scroller& m_scroller;
 		Button& m_down;
+
 	};
 
-	class TOY_UI_EXPORT ScrollArea : public Sheet
+	class TOY_UI_EXPORT ScrollbarX : public Scrollbar
 	{
 	public:
-		ScrollArea(Sheet& sheet);
+		ScrollbarX(Sheet& frameSheet);
 
-		Scrollbar& scrollbar() { return m_scrollbar; }
+		static StyleType& cls() { static StyleType ty("ScrollbarX", Scrollbar::cls()); return ty; }
+	};
 
-		static StyleType& cls() { static StyleType ty("ScrollArea", Sheet::cls()); return ty; }
+	class TOY_UI_EXPORT ScrollbarY : public Scrollbar
+	{
+	public:
+		ScrollbarY(Sheet& frameSheet);
 
-	protected:
-		Scrollbar& m_scrollbar;
+		static StyleType& cls() { static StyleType ty("ScrollbarY", Scrollbar::cls()); return ty; }
 	};
 }
 

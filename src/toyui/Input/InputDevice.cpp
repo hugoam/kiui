@@ -11,8 +11,6 @@
 
 #include <cassert>
 
-#include <iostream>
-
 namespace toy
 {
 	InputDevice::InputDevice(RootSheet& rootSheet)
@@ -150,11 +148,18 @@ namespace toy
 		m_rootFrame.dispatchEvent(mouseEvent);
 	}
 
-	void Mouse::handleDestroyWidget(Widget& widget)
+	void Mouse::handleBindWidget(Widget& widget)
 	{
-		m_leftButton.handleDestroyWidget(widget);
-		m_rightButton.handleDestroyWidget(widget);
-		m_middleButton.handleDestroyWidget(widget);
+		m_leftButton.handleBindWidget(widget);
+		m_rightButton.handleBindWidget(widget);
+		m_middleButton.handleBindWidget(widget);
+	}
+
+	void Mouse::handleUnbindWidget(Widget& widget)
+	{
+		m_leftButton.handleUnbindWidget(widget);
+		m_rightButton.handleUnbindWidget(widget);
+		m_middleButton.handleUnbindWidget(widget);
 
 		for(int i = m_focused.size() - 1; i >= 0; --i)
 			if(m_focused.at(i) == &widget)
@@ -168,9 +173,8 @@ namespace toy
 		: InputDevice(mouse.rootSheet())
 		, m_mouse(mouse)
 		, m_deviceType(deviceType)
-		, m_pressed(false)
+		, m_pressed(nullptr)
 		, m_dragging(false)
-		, m_pressedFrame(nullptr)
 		, m_pressedX(0.f)
 		, m_pressedY(0.f)
 	{}
@@ -194,8 +198,8 @@ namespace toy
 		MousePressEvent mouseEvent(m_deviceType, x, y);
 		m_mouse.transformMouseEvent(mouseEvent);
 
-		m_pressed = true;
-		m_pressedFrame = m_rootFrame.dispatchEvent(mouseEvent);
+		m_pressed = m_rootFrame.dispatchEvent(mouseEvent);
+		printf("MousePressed %s\n", static_cast<Widget&>(*m_pressed).style().name().c_str());
 		m_pressedX = mouseEvent.posX;
 		m_pressedY = mouseEvent.posY;
 	}
@@ -206,60 +210,65 @@ namespace toy
 		m_mouse.transformMouseEvent(mouseEvent);
 
 		m_rootFrame.dispatchEvent(mouseEvent);
-		m_pressedFrame->dispatchEvent(mouseEvent);
+		m_pressed->dispatchEvent(mouseEvent);
 
 		if(m_dragging)
 			this->dragEnd(mouseEvent);
 		else
 			this->click(mouseEvent);
 
-		if(!m_pressedFrame)
-			return;
-
-		m_pressed = false;
-		m_pressedFrame = nullptr;
+		m_pressed = nullptr;
 		m_dragging = false;
 	}
 
 	void MouseButton::dragStart(MouseEvent& mouseEvent)
 	{
 		MouseDragStartEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY, m_pressedX, m_pressedY);
-		m_pressedFrame->dispatchEvent(dragEvent); 
-		//m_pressedFrame->receiveEvent(dragEvent);
+		//m_pressed->dispatchEvent(dragEvent); 
+		m_pressed->receiveEvent(dragEvent);
 		// switch to receiveEvent -> composite events maybe don't even need propagation
 	}
 
 	void MouseButton::dragEnd(MouseEvent& mouseEvent)
 	{
 		MouseDragEndEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY);
-		m_pressedFrame->dispatchEvent(dragEvent); 
-		//m_pressedFrame->receiveEvent(dragEvent);
+		//m_pressed->dispatchEvent(dragEvent); 
+		m_pressed->receiveEvent(dragEvent);
 		// switch to receiveEvent ? composite events maybe don't even need propagation
 	}
 
 	void MouseButton::dragMove(MouseEvent& mouseEvent)
 	{
 		MouseDragEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY, mouseEvent.deltaX, mouseEvent.deltaY);
-		m_pressedFrame->dispatchEvent(dragEvent);
-		//m_pressedFrame->receiveEvent(dragEvent);
+		//m_pressed->dispatchEvent(dragEvent);
+		m_pressed->receiveEvent(dragEvent);
 		// switch to receiveEvent ? composite events maybe don't even need propagation
 	}
 
 	void MouseButton::click(MouseEvent& mouseEvent)
 	{
 		MouseClickEvent clickEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY);
-		m_pressedFrame->dispatchEvent(clickEvent);
-		//m_pressedFrame->receiveEvent(clickEvent);
+		//m_pressed->dispatchEvent(clickEvent);
+		m_pressed->receiveEvent(clickEvent);
 		// switch to receiveEvent ? composite events maybe don't even need propagation
 	}
 
-	void MouseButton::handleDestroyWidget(Widget& widget)
+	void MouseButton::handleUnbindWidget(Widget& widget)
 	{
-		if(m_pressedFrame == &widget)
+		if(m_pressed == &widget)
 		{
-			m_pressed = false;
-			m_pressedFrame = nullptr;
-			m_dragging = false;
+			m_prevPressed = m_pressed;
+			m_pressed = nullptr;
+			//m_dragging = false;
+		}
+	}
+	
+	void MouseButton::handleBindWidget(Widget& widget)
+	{
+		if(m_prevPressed == &widget)
+		{
+			m_pressed = &widget;
+			//m_dragging = false;
 		}
 	}
 }

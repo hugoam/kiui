@@ -42,18 +42,21 @@ namespace toy
 		~Widget();
 
 		_A_ inline Sheet* parent() { return m_parent; }
+		_A_ inline size_t index() { return m_index; }
 		_A_ inline Frame& frame() { return *m_frame; }
 		_A_ inline WidgetState state() { return m_state; }
 		_A_ _M_ inline Style& style() { return *m_style; }
 		inline Device* device() { return m_device; }
+
+		void setIndex(size_t index) { m_index = index; }
+
+		DrawFrame& content();
 
 		const string& label();
 		void setLabel(const string& label);
 
 		Image* image();
 		void setImage(Image* image);
-
-		void setStyle(Style& style);
 
 		void setDevice(Device& device) { m_device = &device; }
 		void resetDevice() { m_device = nullptr; }
@@ -77,31 +80,33 @@ namespace toy
 		void show();
 		void hide();
 
-		virtual void cleanup();
-
 		virtual void bind(Sheet& parent, size_t index);
-		virtual void rebind(Sheet& parent, size_t index);
+		virtual void unbind();
 
 		virtual void bound() {}
-		
-		unique_ptr<Widget> unbind();
+		virtual void unbound() {}
+
+		unique_ptr<Widget> detach();
 		unique_ptr<Widget> extract();
 
 		void remove();
 		void destroy();
-		void detach();
 
+		void updateStyle();
+		void resetStyle();
 		void resetStyle(Style& style);
 		void resetSkin(Style& style);
 
-		void nextFrame(size_t tick, size_t delta) { UNUSED(tick); UNUSED(delta); }
+		virtual void nextFrame(size_t tick, size_t delta);
+		virtual void render(Renderer& renderer);
 
 		void toggleState(WidgetState state);
 
-		void markDirty();
+		void enableState(WidgetState state);
+		void disableState(WidgetState state);
+		void updateState();
 
-		void hover();
-		void unhover();
+		void markDirty();
 
 		void control();
 		void uncontrol();
@@ -117,12 +122,7 @@ namespace toy
 
 		virtual Widget* pinpoint(float x, float y);
 
-		Widget& prev();
-		Widget& next();
-
-		bool contains(Widget& widget);
-
-		virtual void customDraw(Renderer& renderer) { UNUSED(renderer); }
+		virtual bool customDraw(Renderer& renderer) { UNUSED(renderer); return false; }
 
 		InputReceiver* controlEvent(InputEvent& inputEvent);
 		InputReceiver* propagateEvent(InputEvent& inputEvent);
@@ -139,7 +139,9 @@ namespace toy
 
 	protected:
 		Sheet* m_parent;
+		size_t m_index;
 		Style* m_style;
+		size_t d_styleStamp;
 		unique_ptr<Frame> m_frame;
 		WidgetState m_state;
 

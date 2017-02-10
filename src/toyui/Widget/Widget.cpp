@@ -10,13 +10,12 @@
 
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Stripe.h>
+#include <toyui/Frame/Grid.h>
 #include <toyui/Frame/Layer.h>
 
 #include <toyui/UiLayout.h>
 
 #include <toyobj/Iterable/Reverse.h>
-
-#include <iostream>
 
 namespace toy
 {
@@ -26,20 +25,23 @@ namespace toy
 		: TypeObject(type)
 		, m_parent(nullptr)
 		, m_style(&type)
-		, m_frame(nullptr)
+		, d_styleStamp(type.updated())
+		, m_frame()
 		, m_state(UNBOUND)
 		, m_device(nullptr)
 	{
-		if(frameType == STRIPE)
+		if(frameType == GRID)
+			m_frame = make_unique<Grid>(*this);
+		else if(frameType == TABLE)
+			m_frame = make_unique<TableGrid>(*this);
+		else if(frameType == STRIPE)
 			m_frame = make_unique<Stripe>(*this);
 		else if(frameType == FRAME)
 			m_frame = make_unique<Frame>(*this);
 	}
 
 	Widget::~Widget()
-	{
-		this->cleanup();
-	}
+	{}
 
 	RootSheet& Widget::rootSheet()
 	{
@@ -56,93 +58,100 @@ namespace toy
 		return this->uiWindow().context();
 	}
 
+	DrawFrame& Widget::content()
+	{
+		return m_frame->content();
+	}
+
 	const string& Widget::label()
 	{
-		return m_frame->text();
+		return this->content().text();
 	}
 
 	void Widget::setLabel(const string& label)
 	{
-		m_frame->setText(label);
+		this->content().setText(label);
 	}
 
 	Image* Widget::image()
 	{
-		return m_frame->image();
+		return this->content().image();
 	}
 
 	void Widget::setImage(Image* image)
 	{
-		m_frame->setImage(image);
+		this->content().setImage(image);
 	}
 
 	const string& Widget::contentlabel()
 	{
-		return m_frame->text();
-	}
-
-	void Widget::cleanup()
-	{
-		if(m_state & PRESSED || m_state & HOVERED)
-			this->uiWindow().handleDestroyWidget(*this);
-
-		m_frame->remove();
-		m_state = UNBOUND;
+		return this->content().text();
 	}
 
 	void Widget::bind(Sheet& parent, size_t index)
 	{
 		m_parent = &parent;
 		m_parentFrame = &parent;
+		m_index = index;
 
-		//if(m_frame->frameType() != SPACE_LAYER)
-			m_parent->stripe().insert(*m_frame, index);
-		//else
-		//	m_frame->as<Layer>().bind();
-
-		this->toggleState(BOUND);
-
+		m_frame->bind(parent.stripe());
+		m_parent->stripe().map(*m_frame);
+		this->updateStyle();
+		this->enableState(BOUND);
 		this->bound();
+
+		this->rootSheet().handleBindWidget(*this);
 	}
 
-	void Widget::rebind(Sheet& parent, size_t index)
+	void Widget::unbind()
 	{
-		m_parent = &parent;
-		m_parentFrame = &parent;
+		this->rootSheet().handleUnbindWidget(*this);
 
-		m_frame->transfer(m_parent->frame().as<Stripe>(), index);
+		this->disableState(BOUND);
+		this->unbound();
+		m_frame->unbind();
+		m_parent->stripe().unmap(*m_frame);
+
+		m_parent = nullptr;
+		m_parentFrame = nullptr;
+		m_index = 0;
 	}
 
-	unique_ptr<Widget> Widget::unbind()
+	unique_ptr<Widget> Widget::detach()
 	{
-		//this->cleanup();
-		this->toggleState(BOUND);
-		return m_parent->as<Sheet>().release(*this);
+		return m_parent->release(*this);
 	}
 
 	unique_ptr<Widget> Widget::extract()
 	{
-		this->cleanup();
-		unique_ptr<Widget> unique = m_parent->as<Sheet>().release(*this);
+		unique_ptr<Widget> unique = m_parent->release(*this);
 		m_parent->destroy();
 		return unique;
 	}
 
 	void Widget::remove()
 	{
-		this->cleanup();
-		m_parent->as<Sheet>().vrelease(*this);
+		m_parent->vrelease(*this);
 	}
 
 	void Widget::destroy()
 	{
-		this->cleanup();
-		m_parent->as<Sheet>().release(*this);
+		m_parent->release(*this);
 	}
 
-	void Widget::detach()
+	void Widget::nextFrame(size_t tick, size_t step)
 	{
-		m_frame->remove();
+		m_frame->updateOnce();
+
+		if(m_style->updated() > d_styleStamp)
+			this->resetStyle();
+	}
+
+	void Widget::render(Renderer& renderer)
+	{
+		m_frame->content().beginDraw(renderer);
+		m_frame->content().draw(renderer);
+		m_frame->content().endDraw(renderer);
 	}
 
 	void Widget::show()
@@ -155,22 +164,36 @@ namespace toy
 		m_frame->hide();
 	}
 
-	void Widget::setStyle(Style& style)
+	void Widget::updateStyle()
 	{
-		m_style = &style;
-		//this->reset(style);
+		m_frame->setStyle(this->fetchOverride(*m_style));
+	}
+
+	void Widget::resetStyle()
+	{
+		if(!m_parent)
+			return;
+
+		size_t index = m_index;
+		Sheet& parent = *m_parent;
+		parent.unbindChild(*this);
+		parent.bindChild(*this, index);
+
+		d_styleStamp = m_style->updated();
+
+		this->updateStyle();
 	}
 
 	void Widget::resetStyle(Style& style)
 	{
 		m_style = &style;
-		m_frame->resetStyle();
+		this->resetStyle();
 	}
 
 	void Widget::resetSkin(Style& style)
 	{
 		m_style = &style;
-		m_frame->updateStyle();
+		this->updateStyle();
 	}
 
 	Style& Widget::fetchOverride(Style& style)
@@ -184,43 +207,40 @@ namespace toy
 			return style;
 	}
 
-	bool Widget::contains(Widget& widget)
-	{
-		Widget* test = &widget;
-		while(test && test != this)
-			test = test->parent();
-		return test == this;
-	}
-
 	void Widget::markDirty()
 	{
-		m_frame->setDirty(Frame::DIRTY_WIDGET);
+		m_frame->setDirty(Frame::DIRTY_CONTENT);
 	}
 
 	void Widget::toggleState(WidgetState state)
 	{
 		m_state = static_cast<WidgetState>(m_state ^ state);
+		this->updateState();
+	}
+
+	void Widget::enableState(WidgetState state)
+	{
+		if(!(m_state & state))
+			this->toggleState(state);
+	}
+
+	void Widget::disableState(WidgetState state)
+	{
+		if(m_state & state)
+			this->toggleState(state);
+	}
+
+	void Widget::updateState()
+	{
+		// @kludge: m_style is our original type and style, but m_frame->style() is the 'transient' override, think about harmonizing that
 		if(m_state & BOUND)
-			m_frame->updateState(m_state);
+			m_frame->content().updateInkstyle(m_frame->style().subskin(m_state));
 	}
 
 	Widget* Widget::pinpoint(float x, float y)
 	{
-		Frame* target = m_frame->pinpoint(x, y, true);
-		if(target)
-			return &target->widget();
-		else
-			return nullptr;
-	}
-
-	Widget& Widget::prev()
-	{
-		return m_frame->parent()->contents()[m_frame->index() - 1]->widget();
-	}
-
-	Widget& Widget::next()
-	{
-		return m_frame->parent()->contents()[m_frame->index() + 1]->widget();
+		Frame* frame = m_frame->pinpoint(x - m_frame->dabsolute(DIM_X), y - m_frame->dabsolute(DIM_Y), true);
+		return frame ? frame->widget() : nullptr;
 	}
 
 	InputReceiver* Widget::controlEvent(InputEvent& inputEvent)
@@ -244,73 +264,61 @@ namespace toy
 		return m_parent;
 	}
 
-	void Widget::hover()
-	{
-		this->toggleState(HOVERED);
-	}
-
-	void Widget::unhover()
-	{
-		this->toggleState(HOVERED);
-	}
-
 	void Widget::activate()
 	{
-		this->toggleState(ACTIVATED);
+		this->enableState(ACTIVATED);
 	}
 
 	void Widget::deactivate()
 	{
-		this->toggleState(ACTIVATED);
+		this->disableState(ACTIVATED);
 	}
 	
 	void Widget::modal()
 	{
-		this->toggleState(MODAL);
+		this->enableState(MODAL);
 	}
 
 	void Widget::unmodal()
 	{
-		this->toggleState(MODAL);
+		this->disableState(MODAL);
 	}
 
 	void Widget::control()
 	{
-		this->toggleState(CONTROL);
-		this->toggleState(FOCUSED);
+		this->enableState(CONTROL);
+		this->enableState(FOCUSED);
 		this->focused();
 	}
 
 	void Widget::uncontrol()
 	{
-		this->toggleState(CONTROL);
-		this->toggleState(FOCUSED);
+		this->disableState(CONTROL);
+		this->disableState(FOCUSED);
 		this->unfocused();
 	}
 
 	void Widget::mouseEntered(MouseEvent& mouseEvent)
 	{
-		//std::cerr << ">>>>> HOVERED " << this->style().name() << std::endl;
 		UNUSED(mouseEvent);
-		this->hover();
+		this->enableState(HOVERED);
 	}
 
 	void Widget::mouseLeaved(MouseEvent& mouseEvent)
 	{
-		//std::cerr << "<<<<< UNHOVERED " << this->style().name() << std::endl;
 		UNUSED(mouseEvent);
-		this->unhover();
+		this->disableState(HOVERED);
 	}
 
 	void Widget::mousePressed(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		this->toggleState(PRESSED);
+		this->enableState(PRESSED);
 	}
 
 	void Widget::mouseReleased(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		this->toggleState(PRESSED);
+		this->disableState(PRESSED);
 	}
 }

@@ -17,7 +17,7 @@ namespace toy
 		ContextMenu(Trigger onClose);
 		~ContextMenu();
 
-		virtual void bind(Sheet& parent, size_t index);
+		virtual void bound();
 
 		void clear();
 

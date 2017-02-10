@@ -10,12 +10,11 @@ namespace toy
 	Uibox::Uibox()
 		: d_position(0.f, 0.f)
 		, d_size(0.f, 0.f)
-		, d_space(FIT)
+		, d_space(AUTO)
 		, d_sizing(SHRINK, SHRINK)
 		, d_scale(1.f)
+		, d_depth(DIM_X)
+		, d_length(DIM_Y)
 		, d_layout(nullptr)
-	{}
-
-	Uibox::~Uibox()
 	{}
 }

@@ -26,21 +26,18 @@ namespace toy
 
 		bool redraw() { return d_redraw; }
 		void setRedraw() { d_redraw = true; }
+		void endRedraw() { d_redraw = false; }
 
 		MasterLayer& rootLayer();
 
-		void bind();
-
-		void bind(Stripe* parent);
+		void bind(Stripe& parent);
 		void unbind();
 
 		void add(Layer& layer);
 		void remove(Layer& layer);
 
-		size_t reorder(size_t pos, size_t index, size_t next, std::vector<Layer*>& layers);
+		size_t reorder(size_t index, std::vector<Layer*>& layers);
 		void moveToTop();
-
-		Frame* pinpoint(float x, float y, bool opaque);
 
 	protected:
 		size_t d_index;

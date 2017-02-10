@@ -16,7 +16,6 @@
 #include <toyui/Style/Style.h>
 
 #include <cmath>
-#include <iostream>
 
 namespace toy
 {
@@ -25,18 +24,32 @@ namespace toy
 
 	Frame::Frame(Widget& widget)
 		: Uibox()
-		, DrawFrame(*this)
-		, d_widget(widget)
+		, d_widget(&widget)
+		, d_frame(*this)
 		, d_parent(nullptr)
-		, d_dirty(DIRTY_VISIBILITY)
+		, d_dirty(DIRTY_LAYOUT)
 		, d_hidden(false)
-		, d_index(0)
+		, d_index(0, 0)
 		, d_style(nullptr)
-		, d_styleStamp(0)
-	{}
+	{
+		this->setStyle(widget.style());
+	}
 
-	Frame::~Frame()
-	{}
+	Frame::Frame(StyleType& style, Stripe& parent)
+		: Uibox()
+		, d_widget(nullptr)
+		, d_frame(*this)
+		, d_parent(nullptr)
+		, d_dirty(DIRTY_LAYOUT)
+		, d_hidden(false)
+		, d_index(0, 0)
+		, d_style(&style)
+	{
+		d_layout = &style.layout();
+		parent.append(*this);
+		this->bind(parent);
+		this->setStyle(style);
+	}
 
 	Layer& Frame::layer()
 	{
@@ -46,25 +59,31 @@ namespace toy
 			return this->as<Layer>();	
 	}
 
-	void Frame::resetStyle()
+	void Frame::markDirty(Dirty dirty)
 	{
-		if(!d_parent)
+		this->setDirty(dirty);
+		Stripe* parent = this->parent();
+		while(parent)
 		{
-			//this->updateStyle();
-			return;
+			parent->setDirty(dirty);
+			parent = parent->parent();
 		}
+	}
 
-		Stripe* parent = d_parent;
-		bool flow = d_flow;
-
-		d_parent->remove(*this);
-		parent->insert(*this, d_index);
-
-		if(flow && !this->flow())
-		{
-			d_position[0] = 0.f;
-			d_position[1] = 0.f;
-		}
+	void Frame::updateSpace()
+	{
+		if(!d_frame.empty())
+			d_space = BLOCK;
+		else if(frameType() == FRAME || !d_parent)
+			d_space = BOARD;
+		else if(!flow())
+			d_space = BLOCK;
+		else if(length() == d_parent->length() && length() == DIM_X) // @idea : make this distinction depend on a space Scarcity property (which by default would be Scarce for Y containers and Ample for X containers)
+			d_space = SPACE;
+		else if(length() != d_parent->length() && d_parent->length() == DIM_X)
+			d_space = DIV;
+		else
+			d_space = DIV;
 	}
 
 	void Frame::updateSizing(Dimension dim)
@@ -73,41 +92,32 @@ namespace toy
 			d_sizing[dim] = d_layout->sizing()[dim];
 		else if(d_space == BLOCK)
 			d_sizing[dim] = SHRINK;
-		else if(d_space == FIT)
-			d_sizing[dim] = d_parent->d_sizing[dim] == FIXED ? EXPAND : d_parent->d_sizing[dim];
 		else if(d_space == BOARD)
 			d_sizing[dim] = EXPAND;
-		else if(d_parent && ((d_space == SPACE && d_parent->layoutDim() == dim) || (d_space == DIV && d_parent->layoutDim() != dim)))
+		else if(d_space == FLEX)
 			d_sizing[dim] = WRAP;
-		else if(d_parent && ((d_space == SPACE && d_parent->layoutDim() != dim) || (d_space == DIV && d_parent->layoutDim() == dim)))
-			d_sizing[dim] = SHRINK;
-
-		if(d_sizing[dim] == WRAP && d_parent->d_sizing[dim] != SHRINK)
-			d_sizing[dim] = EXPAND;
-		if(d_sizing[dim] == WRAP && d_parent->d_sizing[dim] == SHRINK)
+		else if(d_parent && ((d_space == SPACE && d_parent->length() == dim) || (d_space == DIV && d_parent->length() != dim)))
+			d_sizing[dim] = WRAP;
+		else if(d_parent && ((d_space == SPACE && d_parent->length() != dim) || (d_space == DIV && d_parent->length() == dim)))
 			d_sizing[dim] = SHRINK;
 	}
 
-	void Frame::updateSpace()
+	void Frame::setStyle(Style& style)
 	{
-		if(!m_text.empty() || m_image != nullptr || d_inkstyle->image() != nullptr)
-			d_space = BLOCK;
-		else
-			d_space = BOARD;
-	}
-
-	void Frame::updateStyle()
-	{
-		d_style = &d_widget.fetchOverride(d_widget.style());
+		d_style = &style;
 		d_layout = &d_style->layout();
-		d_styleStamp = d_style->updated();
-		
-		d_flow = d_layout->d_flow == FLOW;
+
 		d_opacity = d_layout->d_opacity;
 		if(d_span.null())
 			d_span = d_layout->d_span;
 
-		this->resetInkstyle(d_style->subskin(d_widget.state()));
+		d_length = d_layout->layoutDim();
+		d_depth = d_layout->layoutDim() == DIM_X ? DIM_Y : DIM_X;
+
+		if(d_widget)
+			d_frame.resetInkstyle(d_style->subskin(d_widget->state()));
+		else
+			d_frame.resetInkstyle(d_style->skin());
 
 		this->updateSizing();
 	}
@@ -124,9 +134,6 @@ namespace toy
 
 		this->updateFixed(DIM_X);
 		this->updateFixed(DIM_Y);
-
-		if(d_parent && d_parent->parent() && d_parent->parent()->layout().d_weight == TABLE) // @kludge if this is not done the table layout is fucked up because elements are set back to SHRINK and their size is wrongly substracted from sequencelength
-			d_sizing[DIM_X] = EXPAND;
 	}
 
 	void Frame::updateFixed(Dimension dim)
@@ -135,14 +142,14 @@ namespace toy
 			return;
 
 		d_sizing[dim] = FIXED;
+		d_content[dim] = d_layout->size()[dim];
 		if(d_layout->d_space != BOARD || d_size[dim] == 0.f)
 			this->setSizeDim(dim, d_layout->size()[dim]);
 	}
 
-	void Frame::bind(Stripe* parent)
+	void Frame::bind(Stripe& parent)
 	{
-		d_parent = parent;
-		this->updateStyle();
+		d_parent = &parent;
 	}
 	
 	void Frame::unbind()
@@ -150,121 +157,30 @@ namespace toy
 		d_parent = nullptr;
 	}
 
-	void Frame::remove()
-	{
-		if(d_parent)
-			d_parent->remove(*this);
-	}
-
-	Frame* Frame::before()
-	{
-		int index = d_index;
-		while(index-- > 0)
-			if(!d_parent->contents().at(index)->hidden())
-				return d_parent->contents().at(index);
-		return nullptr;
-	}
-
-	Frame& Frame::prev()
-	{
-		return *d_parent->contents().at(d_index - 1);
-	}
-
-	Frame& Frame::next()
-	{
-		return *d_parent->contents().at(d_index + 1);
-	}
-
-	bool Frame::first()
-	{
-		return d_index == 0;
-	}
-
-	bool Frame::last()
-	{
-		return d_index == d_parent->sequence().size()-1;
-	}
-
-	void Frame::nextFrame(size_t tick, size_t delta)
-	{
-		UNUSED(tick); UNUSED(delta);
-
-		d_widget.nextFrame(tick, delta);
-
-		if(d_style->updated() > d_styleStamp)
-			this->resetStyle();
-
-		this->updateOnce();
-	}
-
-	void Frame::render(Renderer& renderer)
-	{
-		this->beginDraw(renderer);
-		this->endDraw(renderer);
-	}
-
 	void Frame::updateOnce()
 	{
-		if(d_parent)
-			this->setDirty(d_parent->forceDirty());
-
-		if(d_dirty >= DIRTY_POSITION)
-			this->updatePosition();
-		if(d_frame.dirty() >= DIRTY_OFFSET)
+		if(d_dirty)
 			this->layer().setRedraw();
 
 		d_dirty = CLEAN;
 	}
 
-	void Frame::transfer(Stripe& stripe, size_t index)
+	void Frame::measure()
 	{
-		stripe.insert(*this, index);
-		this->migrate(stripe);
+		d_content[DIM_X] = d_frame.extentSize(DIM_X);
+		d_content[DIM_Y] = d_frame.extentSize(DIM_Y);
 	}
-
-	void Frame::migrate(Stripe& stripe)
-	{
-		UNUSED(stripe);
-		if(this->frameType() == LAYER)
-			return;
-
-		this->setDirty(DIRTY_VISIBILITY);
-	}
-
-	void Frame::updatePosition()
-	{
-		if(!d_parent || d_hidden || unflow())
-			return;
-
-		d_parent->positionDepth(*this);
-		d_parent->positionLength(*this);
-	}
-
-	void Frame::updateState(WidgetState state)
-	{
-		this->updateInkstyle(d_style->subskin(state));
-	}
-
-	void Frame::resized(Dimension dim)
-	{
-		UNUSED(dim);
-		this->updateContentSize();
-	}
+	
+	void Frame::layout()
+	{}
 
 	void Frame::setSizeDim(Dimension dim, float size)
 	{
 		if(d_size[dim] == size)
 			return;
 
-		float delta = size - d_size[dim];
 		d_size[dim] = size;
-		this->setDirty(DIRTY_FRAME);
-
-		// @kludge checking state because of double loop bind -> updateStyle -> setSizeDim -> childSized and insert -> childShown adding size twice
-		// one option is reversing the parent part of updateStyle() so that the stripe takes care of it on insert (setting override style, space, sizing, and size)
-		if(d_widget.state() & BOUND && d_parent)
-			d_parent->childSized(*this, dim, delta);
-		this->resized(dim);
+		this->markDirty(DIRTY_LAYOUT);
 	}
 
 	void Frame::setSpanDim(Dimension dim, float span)
@@ -272,11 +188,8 @@ namespace toy
 		if(d_span[dim] == span)
 			return;
 
-		d_sizing[dim] = EXPAND;
 		d_span[dim] = span;
-		this->setDirty(DIRTY_FRAME);
-
-		d_parent->setDirty(DIRTY_FLOW);
+		this->markDirty(DIRTY_LAYOUT);
 	}
 
 	void Frame::setPositionDim(Dimension dim, float position)
@@ -288,17 +201,13 @@ namespace toy
 	void Frame::show()
 	{
 		d_hidden = false;
-		this->setDirty(DIRTY_VISIBILITY);
-		if(d_parent)
-			d_parent->childShown(*this);
+		this->markDirty(DIRTY_LAYOUT);
 	}
 
 	void Frame::hide()
 	{
 		d_hidden = true;
-		this->setDirty(DIRTY_VISIBILITY);
-		if(d_parent)
-			d_parent->childHidden(*this);
+		this->markDirty(DIRTY_LAYOUT);
 	}
 
 	bool Frame::visible()
@@ -317,12 +226,18 @@ namespace toy
 			return dposition(dim);
 	}
 
+	float Frame::drelative(Dimension dim)
+	{
+		if(d_parent && !d_widget)
+			return dposition(dim) + d_parent->drelative(dim);
+		else
+			return 0.f;
+	}
+
 	bool Frame::inside(float x, float y)
 	{
-		float left = dabsolute(DIM_X);
-		float top = dabsolute(DIM_Y);
-		return (x >= left && x <= left + dsize(DIM_X)
-			&& y >= top && y <= top + dsize(DIM_Y));
+		return (x >= 0.f && x <= width()
+			 && y >= 0.f && y <= height());
 	}
 
 	Frame* Frame::pinpoint(float x, float y, bool opaque)
@@ -333,20 +248,13 @@ namespace toy
 			return this;
 	}
 
-	bool Frame::nextOffset(Dimension dim, float& pos, float seuil, bool top)
+	void Frame::debugPrintDepth()
 	{
-		UNUSED(top);
-		pos += d_parent->extent(*this, dim);
-		return pos > seuil;
-	}
-
-	bool Frame::prevOffset(Dimension dim, float& pos, float seuil, bool top)
-	{
-		UNUSED(top);
-		if(pos + d_parent->extent(*this, dim) >= seuil)
-			return true;
-		
-		pos += d_parent->extent(*this, dim);
-		return false;
+		Stripe* parent = this->parent();
+		while(parent)
+		{
+			printf("  ");
+			parent = parent->parent();
+		}
 	}
 }

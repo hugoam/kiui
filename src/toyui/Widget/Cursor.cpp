@@ -28,6 +28,8 @@ namespace toy
 
 	void Cursor::nextFrame(size_t tick, size_t delta)
 	{
+		Sheet::nextFrame(tick, delta);
+
 		if(m_tooltipClock.read() > 0.5f && m_tooltip.frame().hidden() && !m_hovered->tooltip().empty())
 			this->tooltipOn();
 
@@ -82,11 +84,11 @@ namespace toy
 		: Widget(cls(), LAYER)
 	{
 		m_frame = make_unique<Layer>(*this, -2);
-		m_frame->setText(label);
+		this->content().setText(label);
 	}
 
 	void Tooltip::setLabel(const string& label)
 	{
-		m_frame->setText(label);
+		this->content().setText(label);
 	}
 }

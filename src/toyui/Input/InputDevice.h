@@ -173,7 +173,7 @@ namespace toy
 	public:
 		MouseButton(Mouse& mouse, InputEvent::DeviceType deviceType);
 
-		InputReceiver* pressedFrame() { return m_pressedFrame; }
+		InputReceiver* pressed() { return m_pressed; }
 		float pressedX() { return m_pressedX; }
 		float pressedY() { return m_pressedY; }
 
@@ -186,16 +186,17 @@ namespace toy
 		void dragMove(MouseEvent& mouseEvent);
 		void click(MouseEvent& mouseEvent);
 
-		void handleDestroyWidget(Widget& widget);
+		void handleUnbindWidget(Widget& widget);
+		void handleBindWidget(Widget& widget);
 
 	protected:
 		Mouse& m_mouse;
 		InputEvent::DeviceType m_deviceType;
 
-		bool m_pressed;
+		InputReceiver* m_pressed;
+		InputReceiver* m_prevPressed;
 		bool m_dragging;
 
-		InputReceiver* m_pressedFrame;
 		float m_pressedX;
 		float m_pressedY;
 	};
@@ -219,7 +220,8 @@ namespace toy
 
 		void mouseFocus(float x, float y, std::vector<Widget*>& inputFrame);
 
-		void handleDestroyWidget(Widget& widget);
+		void handleUnbindWidget(Widget& widget);
+		void handleBindWidget(Widget& widget);
 
 	protected:
 		MouseButton m_leftButton;

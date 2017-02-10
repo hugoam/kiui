@@ -9,8 +9,6 @@
 
 #include <toyui/Types.h>
 
-#include <iostream>
-
 namespace toy
 {
 	Styler::Styler()
@@ -89,14 +87,14 @@ namespace toy
 	{
 		// Built-in Layouts
 
+		Sheet::cls().layout().d_layoutDim = DIM_Y;
+		Board::cls().layout().d_layoutDim = DIM_X;
+		Page::cls().layout().d_layoutDim = DIM_Y;
+		Canvas::cls().layout().d_layoutDim = DIM_X;
+
 		Cursor::cls().layout().d_flow = FREE;
-		Cursor::cls().layout().d_clipping = NOCLIP;
-
 		Tooltip::cls().layout().d_flow = FREE;
-		Tooltip::cls().layout().d_clipping = NOCLIP;
-
 		ContextMenu::cls().layout().d_flow = FREE;
-		ContextMenu::cls().layout().d_clipping = NOCLIP;
 
 		Control::cls().layout().d_opacity = OPAQUE;
 
@@ -145,8 +143,6 @@ namespace toy
 		WrapButton::cls().layout().d_opacity = OPAQUE;
 		WrapButton::cls().layout().d_layoutDim = DIM_X;
 
-		WrapSheet::cls().layout().d_space = FIT;
-
 		Window::cls().layout().d_space = BOARD;
 
 		DockWindow::cls().layout().d_space = BOARD;
@@ -154,27 +150,41 @@ namespace toy
 		ShrinkWindow::cls().layout().d_space = BLOCK;
 		ShrinkWindow::cls().layout().d_size = DimFloat();
 
-		WindowBody::cls().layout().d_space = FIT;
+		WindowBody::cls().layout().d_space = FLEX;
 
 		Board::cls().layout().d_space = BOARD;
+		Board::cls().layout().d_clipping = CLIP;
+
 		Dockspace::cls().layout().d_space = BOARD;
 		Docksection::cls().layout().d_space = BOARD;
 		ScrollSheet::cls().layout().d_space = BOARD;
 		LayerSheet::cls().layout().d_space = BOARD;
 		Tabber::cls().layout().d_space = BOARD;
-		TabberBody::cls().layout().d_space = BOARD;
+		TabberBody::cls().layout().d_space = FLEX;
 		Tab::cls().layout().d_space = BOARD;
-		Tree::cls().layout().d_space = BOARD;
-		List::cls().layout().d_space = BOARD;
 
+		Expandbox::cls().layout().d_sizing = DimSizing(WRAP, SHRINK);
+		Tree::cls().layout().d_space = FLEX;
+		List::cls().layout().d_space = FLEX;
+		
 		Textbox::cls().layout().d_space = BOARD;
 		Text::cls().layout().d_space = DIV;
 
-		Page::cls().layout().d_space = FIT;
+		Page::cls().layout().d_space = FLEX;
 
-		Dockbar::cls().layout().d_space = SPACE;
-		Dockbar::cls().layout().d_flow = FLOAT_DEPTH;
-		Dockbar::cls().layout().d_align = DimAlign(RIGHT, LEFT);
+		GridLine::cls().layout().d_space = BOARD;
+		GridLine::cls().layout().d_layoutDim = DIM_X;
+
+		GridColumn::cls().layout().d_space = FLEX;
+		GridColumn::cls().layout().d_layout = DimLayout(AUTOLAYOUT, NOLAYOUT);
+		GridColumn::cls().layout().d_layoutDim = DIM_Y;
+
+		GridOverlay::cls().layout().d_space = BOARD;
+		GridOverlay::cls().layout().d_flow = OVERLAY;
+		GridOverlay::cls().layout().d_layoutDim = DIM_X;
+		GridOverlay::cls().layout().d_opacity = HOLLOW;
+
+		Dockbar::cls().layout().d_align = DimAlign(RIGHT, RIGHT);
 
 		Docker::cls().layout().d_flow = ALIGN;
 		Docker::cls().layout().d_clipping = NOCLIP;
@@ -182,27 +192,31 @@ namespace toy
 		Docker::cls().layout().d_align = DimAlign(OUT_LEFT, LEFT);
 
 		Dockbox::cls().layout().d_flow = FLOW;
-		Dockbox::cls().layout().d_space = BLOCK;
+		Dockbox::cls().layout().d_space = FLEX;
 		Dockbox::cls().layout().d_size = DimFloat(300.f, 0.f);
+		Dockbox::cls().rebaseSkins(DockWindow::cls());
 
 		Dockbar::cls().layout().d_padding = BoxFloat(4.f);
 		Dockbar::cls().layout().d_spacing = DimFloat(4.f, 4.f);
 
-		Dockbox::cls().rebaseSkins(DockWindow::cls());
 
 		DockToggle::cls().layout().d_align = DimAlign(CENTER, LEFT);
 
-		ScrollArea::cls().layout().d_space = SPACE;
-		ScrollArea::cls().layout().d_flow = FLOAT_DEPTH;
-		ScrollArea::cls().layout().d_align = DimAlign(RIGHT, LEFT);
-		ScrollArea::cls().layout().d_layoutDim = DIM_X;
-		ScrollArea::cls().layout().d_pivot = DimPivot(REVERSE, REVERSE);
-
 		ScrollSheet::cls().layout().d_opacity = OPAQUE;
 
-		Scrollbar::cls().layout().d_space = DIV;
+		ScrollbarX::cls().layout().d_space = DIV;
+		ScrollbarX::cls().layout().d_align = DimAlign(LEFT, RIGHT);
+
+		ScrollbarY::cls().layout().d_space = SPACE;
 
 		Scroller::cls().layout().d_space = BOARD;
+
+		ScrollZone::cls().layout().d_space = BOARD;
+		ScrollZone::cls().layout().d_layout = DimLayout(AUTOSIZE, AUTOSIZE);
+		ScrollZone::cls().layout().d_clipping = CLIP;
+
+		Placeholder::cls().layout().d_space = BOARD;
+		Placeholder::cls().skin().m_backgroundColour = Colour::Blue;
 
 		DropdownHeader::cls().layout().d_space = SPACE;
 
@@ -232,6 +246,9 @@ namespace toy
 
 		ScrollerX::cls().layout().d_layoutDim = DIM_X;
 		ScrollerY::cls().layout().d_layoutDim = DIM_Y;
+
+		ScrollbarX::cls().layout().d_layoutDim = DIM_X;
+		ScrollbarY::cls().layout().d_layoutDim = DIM_Y;
 
 		//DynamicImage::cls().skin().m_empty = false;
 		Icon::cls().skin().m_empty = false;
@@ -270,17 +287,19 @@ namespace toy
 		SpacerX::cls().layout().d_space = SPACE;
 		SpacerX::cls().layout().d_layoutDim = DIM_X;
 		SpacerY::cls().layout().d_space = SPACE;
-		SpacerY::cls().layout().d_layoutDim = DIM_Y;
+		//SpacerY::cls().layout().d_layoutDim = DIM_Y;
+
+		ProgressBarX::cls();
+		ProgressBarY::cls();
 
 		ProgressBarX::cls().layout().d_layoutDim = DIM_X;
-		ProgressBarY::cls().layout().d_layoutDim = DIM_Y;
+		//ProgressBarY::cls().layout().d_layoutDim = DIM_Y;
 
 		FillerX::cls().layout().d_size = DimFloat(0.f, 20.f);
 		FillerY::cls().layout().d_size = DimFloat(20.f, 0.f);
 
 		SliderDisplay::cls().layout().d_flow = OVERLAY;
 
-		Dockline::cls().layout().d_weight = LIST;
 		Dockline::cls().layout().d_space = BOARD;
 		DocklineY::cls().layout().d_spacing = DimFloat(0.f, 5.f);
 		DocklineY::cls().layout().d_layoutDim = DIM_Y;
@@ -293,7 +312,6 @@ namespace toy
 
 		Table::cls().layout().d_spacing = DimFloat(0.f, 2.f);
 		Table::cls().layout().d_layoutDim = DIM_Y;
-		Table::cls().layout().d_weight = TABLE;
 
 		ColumnHeader::cls().layout().d_space = SPACE;
 
@@ -310,7 +328,9 @@ namespace toy
 		MenuList::cls().layout().d_clipping = NOCLIP;
 
 		ScrollSheet::cls().layout().d_clipping = CLIP;
+		RootSheet::cls().layout().d_clipping = CLIP;
 
+		ScrollSheet::cls().layout().d_layoutDim = DIM_Y;
 		Scrollbar::cls().layout().d_layoutDim = DIM_Y;
 
 		Tab::cls().layout().d_padding = BoxFloat(0.f, 4.f, 0.f, 0.f);
@@ -340,8 +360,6 @@ namespace toy
 		CaretCursor::cls().skin().m_image = &findImage("caret_white");
 		CaretCursor::cls().skin().m_padding = BoxFloat(-4.f, -9.f, +4.f, +9.f);
 
-		//Caret::cls().skin().m_backgroundColour = Colour::White;
-
 		Text::cls().skin().m_textWrap = true;
 		Textbox::cls().skin().m_textWrap = true;
 
@@ -353,161 +371,40 @@ namespace toy
 		WrapButton::cls().layout().d_align = DimAlign(LEFT, CENTER);
 		CloseButton::cls().layout().d_align = DimAlign(RIGHT, CENTER);
 
-		ScrollerKnob::cls().layout().d_sizing = DimSizing(FIXED, MANUAL);
+		ScrollerKnobY::cls().layout().d_sizing = DimSizing(FIXED, MANUAL);
+		ScrollerKnobX::cls().layout().d_sizing = DimSizing(MANUAL, FIXED);
+
 		FillerX::cls().layout().d_sizing = DimSizing(MANUAL, FIXED);
 
-		this->override(Scroller::cls(), FillerX::cls(), SpacerX::cls());
-		this->override(Scroller::cls(), FillerY::cls(), SpacerY::cls());
+		Title::cls();
+		DropdownToggle::cls();
+		ExpandboxToggle::cls();
+		ExpandboxHeader::cls();
+		ExpandboxBody::cls();
+		TreeNodeToggle::cls();
+		TreeNodeHeader::cls();
+		TreeNodeBody::cls();
+		CloseButton::cls();
+		Checkbox::cls();
 
-		this->override(Scroller::cls(), SliderKnobX::cls(), ScrollerKnobX::cls());
-		this->override(Scroller::cls(), SliderKnobY::cls(), ScrollerKnobY::cls());
+		ScrollUp::cls();
+		ScrollDown::cls();
+		ScrollLeft::cls();
+		ScrollRight::cls();
 
-		//Plan::cls().skin().m_borderColour = Colour::Red;
-		//Plan::cls().skin().m_borderWidth = 1.f;
+		Label::cls().skin().m_textColour = Colour::White;
+		Label::cls().skin().m_padding = BoxFloat(2.f);
+
+		this->override(ScrollerX::cls(), FillerX::cls(), SpacerX::cls());
+		this->override(ScrollerY::cls(), FillerY::cls(), SpacerY::cls());
+
+		this->override(ScrollerX::cls(), SliderKnobX::cls(), ScrollerKnobX::cls());
+		this->override(ScrollerY::cls(), SliderKnobY::cls(), ScrollerKnobY::cls());
 	}
 
 	void Styler::defaultSkins()
 	{
 		// Skins
 
-		TableHead::cls().layout().d_spacing = DimFloat(1.f, 0.f);
-
-		WindowBody::cls().layout().d_padding = BoxFloat(4.f);
-
-		Checkbox::cls().layout().d_size = DimFloat(16.f, 16.f);
-
-
-		SliderKnobX::cls().layout().d_size = DimFloat(8.f, 0.f);
-		SliderKnobY::cls().layout().d_size = DimFloat(0.f, 8.f);
-
-		SliderKnob::cls().skin().m_backgroundColour = Colour::LightGrey;
-		SliderKnob::cls().skin().m_cornerRadius = 3.f;
-		SliderKnob::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
-
-		SliderDisplay::cls().layout().d_align = DimAlign(CENTER, CENTER);
-
-		CloseButton::cls().skin().m_image = &findImage("close_15");
-		CloseButton::cls().skin().m_padding = BoxFloat(4.f);
-		CloseButton::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
-
-		DropdownToggle::cls().skin().m_backgroundColour = Colour::MidGrey;
-		DropdownToggle::cls().skin().m_image = &findImage("arrow_down_15");
-		DropdownToggle::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
-
-		ExpandboxToggle::cls().skin().m_image = &findImage("arrow_right_15");
-		ExpandboxToggle::cls().decline(ACTIVATED).m_image = &findImage("arrow_down_15");
-		ExpandboxToggle::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
-		ExpandboxToggle::cls().decline(DISABLED).m_image = &findImage("empty_15");
-		ExpandboxToggle::cls().decline(static_cast<WidgetState>(ACTIVATED | HOVERED)).m_image = &findImage("arrow_down_15");
-		ExpandboxToggle::cls().subskin(static_cast<WidgetState>(ACTIVATED | HOVERED)).m_backgroundColour = Colour::Red;
-
-		TreeNodeToggle::cls().copySkins(ExpandboxToggle::cls());
-
-		Label::cls().skin().m_textColour = Colour::White;
-		Label::cls().skin().m_padding = BoxFloat(2.f);
-		Title::cls();
-		
-		TypeIn::cls().skin().m_textColour = Colour::White;
-		TypeIn::cls().skin().m_padding = BoxFloat(2.f);
-
-		Button::cls().skin().m_backgroundColour = Colour::MidGrey;
-		Button::cls().skin().m_textColour = Colour::White;
-		Button::cls().skin().m_padding = BoxFloat(2.f);
-		Button::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
-		Button::cls().decline(ACTIVATED).m_backgroundColour = Colour::LightGrey;
-		Button::cls().decline(static_cast<WidgetState>(ACTIVATED | HOVERED)).m_backgroundColour = Colour::Red;
-
-		ImgButton::cls().skin().m_backgroundColour = Colour::Transparent;
-
-		CloseButton::cls().skin().m_backgroundColour = Colour::Transparent;
-		DropdownToggle::cls().skin().m_backgroundColour = Colour::Transparent;
-
-		//Toggle::cls().copySkins(Button::cls());
-		WrapButton::cls().copySkins(Button::cls());
-
-		EmptyStyle::cls().skin().m_backgroundColour = Colour::Transparent;
-		DropdownHeader::cls().copySkins(EmptyStyle::cls());
-
-		Dir::cls().copySkins(ImgButton::cls());
-		File::cls().copySkins(ImgButton::cls());
-		TreeNodeHeader::cls().copySkins(ImgButton::cls());
-
-		ProgressBarX::cls().skin().m_backgroundColour = Colour::LightGrey;
-		ProgressBarX::cls().skin().m_borderColour = Colour::White;
-		ProgressBarX::cls().skin().m_borderWidth = 0.5f;
-		ProgressBarX::cls().layout().d_padding = BoxFloat(1.f, 1.f, 1.f, 1.f);
-
-		FillerX::cls().skin().m_backgroundColour = Colour(0.05f, 0.65f, 1.f, 0.6f);
-		FillerY::cls().skin().m_backgroundColour = Colour(0.05f, 0.65f, 1.f, 0.6f);
-
-		ScrollerKnob::cls().skin().m_backgroundColour = Colour::LightGrey;
-		ScrollerKnob::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
-		ScrollerKnob::cls().decline(PRESSED).m_backgroundColour = Colour::Red;
-
-		ScrollerKnobX::cls().skin().m_margin = BoxFloat(0.f, 4.f, 0.f, 4.f);
-		ScrollerKnobY::cls().skin().m_margin = BoxFloat(4.f, 0.f, 4.f, 0.f);
-
-		Scrollbar::cls().skin().m_backgroundColour = Colour::Black;
-
-		Slider::cls().skin().m_backgroundColour = Colour::MidGrey;
-		Slider::cls().skin().m_cornerRadius = 3.f;
-
-		ScrollUp::cls().skin().m_image = &findImage("arrow_up_15");
-		ScrollUp::cls().skin().m_backgroundColour = Colour::Transparent;
-		ScrollUp::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
-
-		ScrollDown::cls().skin().m_image = &findImage("arrow_down_15");
-		ScrollDown::cls().skin().m_backgroundColour = Colour::Transparent;
-		ScrollDown::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
-
-		Scroller::cls().skin().m_backgroundColour = Colour::Transparent;
-
-		NodeCable::cls().skin().m_borderWidth = 2.f;
-		NodeCable::cls().skin().m_borderColour = Colour::White;
-
-		Dialog::cls().skin().m_backgroundColour = Colour::DarkGrey;
-
-		Tooltip::cls().skin().m_padding = BoxFloat(4.f);
-		Tooltip::cls().skin().m_textColour = Colour::White;
-		Tooltip::cls().skin().m_backgroundColour = Colour::MidGrey;
-
-		//Tree::cls().skin().m_backgroundColour = Colour::Black;
-		//List::cls().skin().m_backgroundColour = Colour::Black;
-		SelectList::cls();
-
-		Window::cls().skin().m_backgroundColour = Colour::AlphaGrey;
-		//DockWindow::cls().skin().m_backgroundColour = Colour::DarkGrey;
-		WindowHeader::cls().skin().m_backgroundColour = Colour::LightGrey;
-		WindowFooter::cls().skin().m_backgroundColour = Colour::LightGrey;
-		WindowFooter::cls().layout().d_size = DimFloat(0.f, 7.f);
-
-
-		//Tab::cls().skin().m_backgroundColour = Colour::LightGrey;
-		TabberHead::cls().skin().m_backgroundColour = Colour::Black;
-
-		ExpandboxHeader::cls().skin().m_backgroundColour = Colour::LightGrey;
-		ExpandboxHeader::cls().decline(ACTIVATED).m_backgroundColour = Colour::Red;
-
-		ColumnHeader::cls().skin().m_backgroundColour = Colour::MidGrey;
-
-		Header::cls().skin().m_backgroundColour = Colour::DarkGrey;
-
-		ExpandboxBody::cls().skin().m_backgroundColour = Colour::DarkGrey;
-
-		TreeNodeBody::cls().skin().m_backgroundColour = Colour::Transparent;
-
-		TypeIn::cls().skin().m_backgroundColour = Colour::LightGrey;
-		TypeIn::cls().skin().m_cornerRadius = BoxFloat(3.f, 3.f, 3.f, 3.f);
-		TypeIn::cls().decline(ACTIVATED).m_backgroundColour = Colour::Red;
-
-		Dropdown::cls().copySkins(TypeIn::cls());
-		DropdownList::cls().skin().m_backgroundColour = Colour::LightGrey;
-
-		Checkbox::cls().skin().m_backgroundColour = Colour::MidGrey;
-		Checkbox::cls().decline(HOVERED).m_backgroundColour = Colour::Red;
-		Checkbox::cls().decline(ACTIVATED).m_backgroundColour = Colour::LightGrey;
-
-		Node::cls().rebaseSkins(Window::cls());
-		NodeBody::cls().rebaseSkins(WindowHeader::cls());
 	}
 }

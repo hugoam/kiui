@@ -292,7 +292,7 @@ namespace toy
             typecls<Flow>().imprint().initRefMethods<Flow>();
             
             typecls<Space>().imprint().setup("Space", ENUM);
-            typecls<Space>().imprint().initEnum(StringVector({ "AUTO", "BLOCK", "FIT", "DIV", "SPACE", "BOARD" }));
+            typecls<Space>().imprint().initEnum(StringVector({ "AUTO", "BLOCK", "DIV", "SPACE", "BOARD" }));
             typecls<Space>().imprint().initRefMethods<Space>();
             
             typecls<Sizing>().imprint().setup("Sizing", ENUM);
@@ -647,10 +647,6 @@ namespace toy
             Board::cls().imprint().setup("Board", OBJECT);
             Board::cls().imprint().initObject(false);
             
-            // WrapSheet
-            WrapSheet::cls().imprint().setup("WrapSheet", OBJECT);
-            WrapSheet::cls().imprint().initObject(false);
-            
             // ScrollSheet
             ScrollSheet::cls().imprint().setup("ScrollSheet", OBJECT);
             ScrollSheet::cls().imprint().initObject(false);
@@ -781,7 +777,6 @@ namespace toy
             m_rootTypes.push_back(&Sheet::cls());
             m_rootTypes.push_back(&LayerSheet::cls());
             m_rootTypes.push_back(&Board::cls());
-            m_rootTypes.push_back(&WrapSheet::cls());
             m_rootTypes.push_back(&ScrollSheet::cls());
             m_rootTypes.push_back(&GridSheet::cls());
             m_rootTypes.push_back(&Band::cls());

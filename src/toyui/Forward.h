@@ -19,13 +19,13 @@ namespace toy
 
 	enum Dimension : unsigned int;
 	enum FrameType : unsigned int;
+	enum LayoutType : unsigned int;
 	enum Sizing : unsigned int;
 	enum Flow : unsigned int;
 	enum BoxLayer : unsigned int;
 	enum Opacity : unsigned int;
 
 	class BoxFloat;
-	class DimFloat;
 
 	class User;
 
@@ -57,6 +57,8 @@ namespace toy
 	class Uibox;
 	class Frame;
 	class Stripe;
+	class Grid;
+	class Table;
 	class Layer;
 	class MasterLayer;
 	class LayoutStyle;
@@ -122,6 +124,10 @@ namespace toy
 	class Dockbox;
 	class Dockbar;
 
+	class Directory;
+	class Dir;
+	class File;
+
 	class Image;
 	class ImageAtlas;
 
@@ -153,11 +159,19 @@ namespace toy
 	class PickStack;
 
 	// Renderer
-	class NanoContext;
 	class NanoRenderer;
-
 	class GlRenderer;
-	class GlWindow;
+	
+	// Contexts
+	class GlfwRenderWindow;
+	class GlfwInputWindow;
+	class GlfwContext;
+	class GlfwRenderSystem;
+
+	class OgreRenderWindow;
+	class OISInputWindow;
+	class OgreContext;
+	class OgreRenderSystem;
 
 	// Edit Devices
 	class DProcessInput;
