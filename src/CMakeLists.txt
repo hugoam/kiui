@@ -5,12 +5,11 @@ string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 file(GLOB HEADER_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Controller/*.h"
-						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Device/*.h"
-						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Edit/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Frame/*.h"
+						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Gl/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Input/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Nano/*.h"
-						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Gl/*.h"
+						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Render/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Scheme/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Style/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Widget/*.h"
@@ -21,21 +20,18 @@ file(GLOB HEADER_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Controller/*.h"
 						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/yaml/src/*.h")
 
 file(GLOB SOURCE_FILES 	"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Controller/*.cpp"
-						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Device/*.cpp"
-						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Edit/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Frame/*.cpp"
+						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Gl/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Input/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Nano/*.cpp"
-						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Gl/*.cpp"
-						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Nano/*.cpp"
-						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Nano/RectPacking/*.cpp"
+						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Render/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Scheme/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Style/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/Widget/*.cpp"
 						"${CMAKE_CURRENT_SOURCE_DIR}/toyui/*.cpp"
-						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/nanovg/src/*.cpp"
-						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/nanovg/src/*.c"
-						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/yaml/src/*.c")
+						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/nanovg-layers/src/*.c"
+						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/yaml/src/*.c"
+						"${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/rectpacking/RectPacking/*.cpp")
 
 option(TOYUI_PRINT_SOURCES "Print source files list" OFF)
 if (TOYUI_PRINT_SOURCES)             
@@ -43,12 +39,14 @@ if (TOYUI_PRINT_SOURCES)
 endif ()
 
 add_definitions("-DUI_EXPORT")
-
+add_definitions("-DTOYUI_DRAW_CACHE")
+    
 add_definitions("-DHAVE_CONFIG_H")
 add_definitions("-DYAML_DECLARE_STATIC")
 
 if (GLEW_FOUND)
     add_definitions("-DNANOVG_GLEW")
+    add_definitions("-DGLEW_STATIC")
 endif()
 
 if (MSVC)
@@ -69,28 +67,24 @@ endif ()
 
 add_library(toyui ${LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-if (NOT NANOVG_INCLUDE_DIR)
-    set(NANOVG_INCLUDE_DIR ${TOYUI_INCLUDE_DIR}/Ui/Nano/nanovg/)
-endif ()
 
 include_directories(${TOYOBJ_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/yaml/include/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/yaml/win32/)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/nanovg/src/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/nanovg-layers/src/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/rectpacking/)
 include_directories(${NANOVG_INCLUDE_DIR})
 include_directories(${OPENGL_INCLUDE_DIR})
-include_directories(${GLFW_INCLUDE_DIR})
 
 target_link_libraries(toyui toyobj)
-target_link_libraries(toyui ${GLFW_LIBRARIES})
 target_link_libraries(toyui ${OPENGL_LIBRARIES})
 
 if (GLEW_FOUND)
+    include_directories(${GLEW_INCLUDE_DIR})
     include_directories(${GLEW_INCLUDE_DIRS})
+    target_link_libraries(toyui ${GLEW_LIBRARY})
     target_link_libraries(toyui ${GLEW_LIBRARIES})
 endif()
-
-include_directories($(GLEW_INCLUDE_DIRS))
 
 
 set(${PROJECT_NAME_UPPER}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}

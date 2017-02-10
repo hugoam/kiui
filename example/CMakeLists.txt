@@ -4,10 +4,12 @@ string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-file(GLOB SOURCE_FILES example.cpp 
-                       mkUiExample.cpp)
-file(GLOB HEADER_FILES mkUiExampleConfig.h
-                       mkUiExample.h)
+file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../src/toyui/Context/Glfw/*.cpp"
+                       example.cpp 
+                       UiExample.cpp)
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../src/toyui/Context/Glfw/*.h"
+                       UiExampleConfig.h
+                       UiExample.h)
 
 add_definitions("-DUIEXAMPLE_EXPORT")
     
@@ -27,8 +29,10 @@ endif ()
 
 include_directories(${TOYOBJ_INCLUDE_DIR})
 include_directories(${TOYUI_INCLUDE_DIR})
+include_directories(${GLFW_INCLUDE_DIR})
 
 target_link_libraries(toyui_example toyui)
+target_link_libraries(toyui_example ${GLFW_LIBRARIES})
 
 
 set(${PROJECT_NAME_UPPER}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}

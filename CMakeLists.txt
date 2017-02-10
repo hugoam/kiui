@@ -23,8 +23,6 @@ endif ()
 find_package(OpenGL REQUIRED)
 find_package(GLFW REQUIRED)
 find_package(GLEW)
-
-add_definitions("-DTOY_GL")
     
 add_subdirectory(sub/toyobj/src)
 add_subdirectory(src)
