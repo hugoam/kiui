@@ -27,28 +27,23 @@ namespace toy
 		, d_widget(&widget)
 		, d_frame(*this)
 		, d_parent(nullptr)
-		, d_dirty(DIRTY_LAYOUT)
+		, d_dirty(DIRTY_MAPPING)
 		, d_hidden(false)
 		, d_index(0, 0)
-		, d_style(nullptr)
-	{
-		this->setStyle(widget.style());
-	}
+	{}
 
-	Frame::Frame(StyleType& style, Stripe& parent)
+	Frame::Frame(Style& style, Stripe& parent)
 		: Uibox()
 		, d_widget(nullptr)
 		, d_frame(*this)
 		, d_parent(nullptr)
-		, d_dirty(DIRTY_LAYOUT)
+		, d_dirty(DIRTY_MAPPING)
 		, d_hidden(false)
 		, d_index(0, 0)
-		, d_style(&style)
 	{
-		d_layout = &style.layout();
+		this->setStyle(style);
 		parent.append(*this);
 		this->bind(parent);
-		this->setStyle(style);
 	}
 
 	Layer& Frame::layer()
@@ -56,7 +51,20 @@ namespace toy
 		if(this->frameType() < LAYER)
 			return d_parent->layer();
 		else
-			return this->as<Layer>();	
+			return this->as<Layer>();
+	}
+
+	MasterLayer& Frame::masterlayer()
+	{
+		if(this->frameType() < MASTER_LAYER)
+			return d_parent->masterlayer();
+		else
+			return this->as<MasterLayer>();
+	}
+
+	void Frame::visit(Stripe& root, const Visitor& visitor)
+	{
+		visitor(*this);
 	}
 
 	void Frame::markDirty(Dirty dirty)
@@ -70,86 +78,100 @@ namespace toy
 		}
 	}
 
-	void Frame::updateSpace()
-	{
-		if(!d_frame.empty())
-			d_space = BLOCK;
-		else if(frameType() == FRAME || !d_parent)
-			d_space = BOARD;
-		else if(!flow())
-			d_space = BLOCK;
-		else if(length() == d_parent->length() && length() == DIM_X) // @idea : make this distinction depend on a space Scarcity property (which by default would be Scarce for Y containers and Ample for X containers)
-			d_space = SPACE;
-		else if(length() != d_parent->length() && d_parent->length() == DIM_X)
-			d_space = DIV;
-		else
-			d_space = DIV;
-	}
-
-	void Frame::updateSizing(Dimension dim)
-	{
-		if(d_layout->sizing()[dim])
-			d_sizing[dim] = d_layout->sizing()[dim];
-		else if(d_space == BLOCK)
-			d_sizing[dim] = SHRINK;
-		else if(d_space == BOARD)
-			d_sizing[dim] = EXPAND;
-		else if(d_space == FLEX)
-			d_sizing[dim] = WRAP;
-		else if(d_parent && ((d_space == SPACE && d_parent->length() == dim) || (d_space == DIV && d_parent->length() != dim)))
-			d_sizing[dim] = WRAP;
-		else if(d_parent && ((d_space == SPACE && d_parent->length() != dim) || (d_space == DIV && d_parent->length() == dim)))
-			d_sizing[dim] = SHRINK;
-	}
-
-	void Frame::setStyle(Style& style)
+	void Frame::setStyle(Style& style, bool reset)
 	{
 		d_style = &style;
-		d_layout = &d_style->layout();
+		reset ? this->resetStyle() : this->updateStyle();
+	}
 
-		d_opacity = d_layout->d_opacity;
-		if(d_span.null())
-			d_span = d_layout->d_span;
-
-		d_length = d_layout->layoutDim();
-		d_depth = d_layout->layoutDim() == DIM_X ? DIM_Y : DIM_X;
+	void Frame::updateStyle()
+	{
+		d_styleStamp = d_style->updated();
 
 		if(d_widget)
 			d_frame.resetInkstyle(d_style->subskin(d_widget->state()));
 		else
 			d_frame.resetInkstyle(d_style->skin());
 
-		this->updateSizing();
+		if(d_parent)
+			this->updateLayout();
 	}
 
-	void Frame::updateSizing()
+	void Frame::resetStyle()
 	{
-		if(d_layout->d_space != AUTO)
-			d_space = d_layout->d_space;
-		else
-			this->updateSpace();
+		this->updateStyle();
+		this->markDirty(DIRTY_MAPPING);
+	}
 
-		this->updateSizing(DIM_X);
-		this->updateSizing(DIM_Y);
+	void Frame::updateLayout()
+	{
+		Space space = d_style->layout().space();
+
+		if(space == MANUAL_SPACE)
+			this->applySpace(PARAGRAPH, MANUAL, MANUAL);
+		else if(space == CONTAINER)
+			this->applySpace(PARAGRAPH, WRAP, WRAP);
+		else if(space == ITEM)
+			this->applySpace(READING, SHRINK, SHRINK);
+		else if(space == BLOCK)
+			this->applySpace(PARAGRAPH, SHRINK, SHRINK);
+		else if(space == FIXED_BLOCK)
+			this->applySpace(PARAGRAPH, FIXED, FIXED);
+		else if(space == LINE)
+			this->applySpace(READING, WRAP, SHRINK);
+		else if(space == STACK)
+			this->applySpace(PARAGRAPH, SHRINK, WRAP);
+		else if(space == DIV)
+			this->applySpace(ORTHOGONAL, WRAP, SHRINK);
+		else if(space == SPACE)
+			this->applySpace(PARALLEL, WRAP, SHRINK);
+		else if(space == BOARD)
+			this->applySpace(PARAGRAPH, EXPAND, EXPAND);
+		else if(space == PARALLEL_FLEX)
+			this->applySpace(PARALLEL, WRAP, WRAP);
 
 		this->updateFixed(DIM_X);
 		this->updateFixed(DIM_Y);
 	}
 
+	void Frame::applySpace(Direction direction, Sizing length, Sizing depth)
+	{
+		if(d_style->layout().direction() < DIRECTION_AUTO)
+			direction = d_style->layout().direction();
+
+		if(direction == ORTHOGONAL)
+			d_length = this->orthogonal(d_parent->length());
+		else if(direction == PARALLEL)
+			d_length = this->parallel(d_parent->length());
+		else if(direction == READING)
+			d_length = DIM_X;
+		else if(direction == PARAGRAPH)
+			d_length = DIM_Y;
+
+		d_depth = this->orthogonal(d_length);
+
+		d_sizing[d_length] = length;
+		d_sizing[d_depth] = depth;
+	}
+
 	void Frame::updateFixed(Dimension dim)
 	{
-		if(!d_layout->size()[dim])
-			return;
+		if(d_style->layout().size()[dim])
+			this->setFixedSize(dim, d_style->layout().size()[dim]);
+	}
 
+	void Frame::setFixedSize(Dimension dim, float size)
+	{
 		d_sizing[dim] = FIXED;
-		d_content[dim] = d_layout->size()[dim];
-		if(d_layout->d_space != BOARD || d_size[dim] == 0.f)
-			this->setSizeDim(dim, d_layout->size()[dim]);
+		d_content[dim] = size;
+		if(d_style->layout().d_space != BOARD || d_size[dim] == 0.f)
+			this->setSizeDim(dim, size);
 	}
 
 	void Frame::bind(Stripe& parent)
 	{
 		d_parent = &parent;
+		this->updateLayout();
 	}
 	
 	void Frame::unbind()
@@ -157,21 +179,19 @@ namespace toy
 		d_parent = nullptr;
 	}
 
-	void Frame::updateOnce()
-	{
-		if(d_dirty)
-			this->layer().setRedraw();
+	void Frame::remap()
+	{}
 
-		d_dirty = CLEAN;
-	}
-
-	void Frame::measure()
+	void Frame::measureLayout()
 	{
 		d_content[DIM_X] = d_frame.extentSize(DIM_X);
 		d_content[DIM_Y] = d_frame.extentSize(DIM_Y);
 	}
 	
-	void Frame::layout()
+	void Frame::resizeLayout()
+	{}
+
+	void Frame::positionLayout()
 	{}
 
 	void Frame::setSizeDim(Dimension dim, float size)
@@ -195,6 +215,7 @@ namespace toy
 	void Frame::setPositionDim(Dimension dim, float position)
 	{
 		d_position[dim] = position;
+		//this->markDirty(DIRTY_LAYOUT);
 		this->setDirty(DIRTY_ABSOLUTE);
 	}
 
@@ -218,18 +239,62 @@ namespace toy
 			return d_parent ? d_parent->visible() : !d_hidden;
 	}
 
-	float Frame::dabsolute(Dimension dim)
+	void Frame::integratePosition(Frame& root, DimFloat& global)
 	{
-		if(d_parent && this->frameType() < MASTER_LAYER)
-			return d_parent->dabsolute(dim) + d_parent->dpivotposition(*this, dim);
-		else
-			return dposition(dim);
+		if(this == &root)
+			return;
+		
+		d_parent->integratePosition(root, global);
+		global[DIM_X] = (global[DIM_X] - d_position[DIM_X]) / d_scale;
+		global[DIM_Y] = (global[DIM_Y] - d_position[DIM_Y]) / d_scale;
 	}
 
-	float Frame::drelative(Dimension dim)
+	void Frame::derivePosition(Frame& root, DimFloat& local)
+	{
+		if(this == &root)
+			return;
+
+		local[DIM_X] = d_position[DIM_X] + local[DIM_X] * d_scale;
+		local[DIM_Y] = d_position[DIM_Y] + local[DIM_Y] * d_scale;
+		d_parent->derivePosition(root, local);
+	}
+
+	float Frame::deriveScale(Frame& root)
+	{
+		if(this == &root)
+			return d_scale;
+		else 
+			return d_parent->deriveScale(root) * d_scale;
+	}
+
+	DimFloat Frame::relativePosition(Frame& root)
+	{
+		DimFloat pos;
+		this->derivePosition(root, pos);
+		return pos;
+	}
+
+	DimFloat Frame::absolutePosition()
+	{
+		return this->relativePosition(this->masterlayer());
+	}
+
+	float Frame::absoluteScale()
+	{
+		return this->deriveScale(this->masterlayer());
+	}
+
+	DimFloat Frame::localPosition(float x, float y)
+	{
+		DimFloat local(x, y);
+		this->integratePosition(this->masterlayer(), local);
+		return local;
+	}
+
+	float Frame::doffset(Dimension dim)
 	{
 		if(d_parent && !d_widget)
-			return dposition(dim) + d_parent->drelative(dim);
+			return dposition(dim) + d_parent->doffset(dim);
 		else
 			return 0.f;
 	}

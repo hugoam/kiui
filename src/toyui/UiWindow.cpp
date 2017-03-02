@@ -106,9 +106,6 @@ namespace toy
 		this->loadResources();
 
 		m_styler->defaultLayout();
-		m_styler->defaultSkins();
-
-		m_styler->prepare();
 
 		m_rootSheet = make_unique<RootSheet>(*this);
 		//m_rootDevice = make_unique<RootDevice>(*this, *m_rootSheet);
@@ -175,7 +172,7 @@ namespace toy
 			this->resize(m_context->renderWindow().width(), m_context->renderWindow().height());
 
 		// if(manualRender)
-		m_rootSheet->layer().target().render();
+		//m_rootSheet->layer().target().render();
 		// add sub layers
 
 		m_context->renderWindow().nextFrame();

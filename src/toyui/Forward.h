@@ -66,7 +66,8 @@ namespace toy
 	enum WidgetState : unsigned int;
 
 	class Widget;
-	class Sheet;
+	class Piece;
+	class Container;
 	class RootSheet;
 	class Cursor;
 
@@ -79,6 +80,8 @@ namespace toy
 	class Button;
 	class WrapButton;
 	class Toggle;
+	class TypeIn;
+	class FilterInput;
 
 	class Bar;
 	class Band;
@@ -112,6 +115,8 @@ namespace toy
 	class Canvas;
 
 	class Dropdown;
+	class DropdownInput;
+	class TypedownInput;
 	class DropdownList;
 
 	class Menu;

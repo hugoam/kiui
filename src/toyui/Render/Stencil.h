@@ -26,6 +26,8 @@ namespace toy
 
 		void setHardClip(const BoxFloat& hardClip);
 
+		BoxFloat selectCorners();
+
 		static int s_debugBatch;
 
 	protected:

@@ -9,7 +9,6 @@
 #include <toyobj/Util/Colour.h>
 #include <toyobj/Util/Timer.h>
 #include <toyui/Forward.h>
-#include <toyui/Input/InputDevice.h>
 //#include <toyui/Device/RootDevice.h>
 #include <toyui/Render/RenderWindow.h>
 #include <toyui/ImageAtlas.h>

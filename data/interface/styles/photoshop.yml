@@ -6,4 +6,4 @@ Label :
     padding : 4.0,4.0,4.0,4.0
 
 Window :
-    inherit_skin : Background
+    copy_skin : Background

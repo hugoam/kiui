@@ -9,27 +9,27 @@
 #include <toyobj/Util/Timer.h>
 #include <toyui/Forward.h>
 #include <toyui/Widget/Sheet.h>
-#include <toyui/Input/InputDevice.h>
+#include <toyui/Widget/Cursor.h>
 #include <toyui/Input/InputDispatcher.h>
-#include <toyui/UiWindow.h>
-#include <toyui/Frame/Layer.h>
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT RootSheet : public Sheet
+	class _I_ TOY_UI_EXPORT RootSheet : public Container
 	{
 	public:
-		RootSheet(UiWindow& window, StyleType& type = cls(), bool absolute = true);
+		RootSheet(UiWindow& window, Type& type = cls());
+		RootSheet(Piece& parent, Type& type = cls());
 		~RootSheet();
 
-		UiWindow& uiWindow() { return m_window; }
-		RootSheet& rootSheet() { return *this; }
-		MasterLayer& layer() { return *m_layer; }
+		virtual RootSheet& rootSheet() { return *this; }
+		virtual InputFrame& rootFrame() { return *this; }
+		virtual InputFrame& rootController() { return *this; }
 
+		UiWindow& uiWindow() { return m_window; }
 		Mouse& mouse() const { return *m_mouse; }
 		Keyboard& keyboard() const { return *m_keyboard; }
 
-		Cursor& cursor() { return *m_cursor; }
+		Cursor& cursor() { return m_cursor; }
 
 		void nextFrame(size_t tick, size_t delta);
 
@@ -39,7 +39,7 @@ namespace toy
 		void handleUnbindWidget(Widget& widget);
 		void handleBindWidget(Widget& widget);
 
-		static StyleType& cls() { static StyleType ty("RootSheet", Sheet::cls()); return ty; }
+		static Type& cls() { static Type ty("RootSheet", Piece::cls()); return ty; }
 
 	protected:
 		UiWindow& m_window;
@@ -47,8 +47,9 @@ namespace toy
 		unique_ptr<Mouse> m_mouse;
 		unique_ptr<Keyboard> m_keyboard;
 
-		MasterLayer* m_layer;
-		Cursor* m_cursor;
+		unique_ptr<RenderTarget> m_target;
+
+		Cursor m_cursor;
 	};
 }
 

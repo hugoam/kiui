@@ -12,7 +12,6 @@
 #include <toyui/Forward.h>
 #include <toyui/Frame/Uibox.h>
 #include <toyui/Input/InputDispatcher.h>
-#include <toyui/Input/InputDevice.h>
 #include <toyui/Style/Style.h>
 
 #include <functional>
@@ -22,26 +21,27 @@ namespace toy
 {
 	enum _I_ WidgetState : unsigned int
 	{
-		UNBOUND = 0,
-		BOUND = 1 << 0,
-		HOVERED = 1 << 1,
-		TRIGGERED = 1 << 2,
-		ACTIVATED = 1 << 3,
-		FOCUSED = 1 << 4,
-		DISABLED = 1 << 5,
-		PRESSED = 1 << 6,
-		DRAGGED = 1 << 7,
-		CONTROL = 1 << 8,
-		MODAL = 1 << 9
+		NOSTATE = 0,
+		HOVERED = 1 << 0,
+		TRIGGERED = 1 << 1,
+		ACTIVATED = 1 << 2,
+		FOCUSED = 1 << 3,
+		DISABLED = 1 << 4,
+		PRESSED = 1 << 5,
+		DRAGGED = 1 << 6,
+		CONTROL = 1 << 7,
+		MODAL = 1 << 8
 	};
 
 	class _I_ TOY_UI_EXPORT Widget : public TypeObject, public InputWidget, public Updatable
 	{
 	public:
-		Widget(StyleType& type = cls(), FrameType frameType = FRAME);
+		Widget(Piece& parent, Type& type = cls(), FrameType frameType = FRAME);
+		Widget(Type& type = cls(), FrameType frameType = FRAME, Piece* parent = nullptr);
 		~Widget();
 
-		_A_ inline Sheet* parent() { return m_parent; }
+		_A_ inline Piece* parent() { return m_parent; }
+		_A_ inline Container* container() { return m_container; }
 		_A_ inline size_t index() { return m_index; }
 		_A_ inline Frame& frame() { return *m_frame; }
 		_A_ inline WidgetState state() { return m_state; }
@@ -49,7 +49,7 @@ namespace toy
 		inline Device* device() { return m_device; }
 
 		void setIndex(size_t index) { m_index = index; }
-
+		void setContainer(Container& container) { m_container = &container; }
 		DrawFrame& content();
 
 		const string& label();
@@ -61,14 +61,10 @@ namespace toy
 		void setDevice(Device& device) { m_device = &device; }
 		void resetDevice() { m_device = nullptr; }
 
-		virtual unique_ptr<Widget> clone() { return make_unique<Widget>(); }
-
-		virtual Style& fetchOverride(Style& style);
+		virtual unique_ptr<Widget> clone(Piece& parent) { return make_unique<Widget>(parent); }
 
 		virtual const string& name() { return sNullString; }
 		virtual const string& tooltip() { return sNullString; }
-		virtual const string& dockid() { return sNullString; }
-		virtual Style* hoverCursor() { return nullptr; }
 
 		virtual const string& contentlabel();
 
@@ -80,25 +76,28 @@ namespace toy
 		void show();
 		void hide();
 
-		virtual void bind(Sheet& parent, size_t index);
-		virtual void unbind();
+		void bind(Piece& parent, size_t index, bool deferred = true);
+		void unbind();
 
-		virtual void bound() {}
-		virtual void unbound() {}
-
-		unique_ptr<Widget> detach();
 		unique_ptr<Widget> extract();
 
 		void remove();
 		void destroy();
 
+		typedef std::function<bool(Widget&)> Visitor;
+
+		virtual void visit(const Visitor& visitor);
+
 		void updateStyle();
-		void resetStyle();
-		void resetStyle(Style& style);
-		void resetSkin(Style& style);
+
+		void resetStyle(Type& type, bool hard = true);
+		void resetStyle(Style& style, bool hard = true);
+		//void resetStyle(const string& style, bool hard = true);
+
+		Style& fetchStyle(Type& type);
 
 		virtual void nextFrame(size_t tick, size_t delta);
-		virtual void render(Renderer& renderer);
+		virtual void render(Renderer& renderer, bool force);
 
 		void toggleState(WidgetState state);
 
@@ -135,13 +134,13 @@ namespace toy
 
 		typedef std::function<void(Widget&)> Trigger;
 
-		static StyleType& cls() { static StyleType ty("Widget"); return ty; }
+		static Type& cls() { static Type ty("Widget"); return ty; }
 
 	protected:
-		Sheet* m_parent;
+		Piece* m_parent;
+		Container* m_container;
 		size_t m_index;
 		Style* m_style;
-		size_t d_styleStamp;
 		unique_ptr<Frame> m_frame;
 		WidgetState m_state;
 
@@ -150,12 +149,20 @@ namespace toy
 		static string sNullString;
 	};
 
-	class TOY_UI_EXPORT Control : public Widget
+	class TOY_UI_EXPORT Item : public Widget
 	{
 	public:
-		Control(StyleType& type = cls());
+		Item(Piece& parent, Type& type = cls());
 
-		static StyleType& cls() { static StyleType ty("Control"); return ty; }
+		static Type& cls() { static Type ty("Item", Widget::cls()); return ty; }
+	};
+
+	class TOY_UI_EXPORT Control : public Item
+	{
+	public:
+		Control(Piece& parent, Type& type = cls());
+
+		static Type& cls() { static Type ty("Control", Item::cls()); return ty; }
 	};
 }
 

@@ -16,11 +16,9 @@
 namespace toy
 {
 	Cursor::Cursor(RootSheet& rootSheet)
-		: Sheet(cls(), LAYER)
-		, m_tooltip(rootSheet.emplace<Tooltip>(rootSheet, ""))
+		: Decal(rootSheet, cls())
+		, m_tooltip(rootSheet, "")
 	{
-		m_frame = make_unique<Layer>(*this, -1);
-
 		m_hovered = &rootSheet;
 
 		this->tooltipOff();
@@ -28,16 +26,10 @@ namespace toy
 
 	void Cursor::nextFrame(size_t tick, size_t delta)
 	{
-		Sheet::nextFrame(tick, delta);
+		Piece::nextFrame(tick, delta);
 
 		if(m_tooltipClock.read() > 0.5f && m_tooltip.frame().hidden() && !m_hovered->tooltip().empty())
 			this->tooltipOn();
-
-		if(m_dirty)
-		{
-			//m_frame->stencil().updateFrame();
-			m_dirty = false;
-		}
 	}
 
 	void Cursor::setPosition(float x, float y)
@@ -49,7 +41,6 @@ namespace toy
 			this->tooltipOff();
 		m_tooltipClock.step();
 		m_frame->setPosition(x, y);
-		m_dirty = true;
 	}
 
 	void Cursor::tooltipOn()
@@ -69,21 +60,25 @@ namespace toy
 	{
 		this->unhover();
 		m_hovered = &widget;
-		if(m_hovered->hoverCursor())
-			this->resetSkin(*widget.hoverCursor());
+		if(widget.style().skin().hoverCursor())
+			this->resetStyle(*widget.style().skin().hoverCursor(), false);
+	}
+
+	void Cursor::unhover(Widget& widget)
+	{
+		if(m_hovered = &widget)
+			this->unhover();
 	}
 
 	void Cursor::unhover()
 	{
-		if(m_hovered->hoverCursor())
-			this->resetSkin(cls());
+		this->resetStyle(Cursor::cls(), false);
 		m_hovered = &this->rootSheet();
 	}
 
 	Tooltip::Tooltip(RootSheet& rootSheet, const string& label)
-		: Widget(cls(), LAYER)
+		: Overlay(rootSheet, cls())
 	{
-		m_frame = make_unique<Layer>(*this, -2);
 		this->content().setText(label);
 	}
 

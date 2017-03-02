@@ -1,6 +1,3 @@
-Clear :
-    text_colour : 1.0,1.0,1.0,0.0
-    
 Label :
     text_colour : 1.0,1.0,1.0,1.0
     text_size : 14.0
@@ -43,16 +40,16 @@ WindowBody :
     padding : 10.0,4.0,10.0,10.0
     
 Node :
-    inherit_skin : Window
+    copy_skin : Window
     
 NodeBody :
-    inherit_skin : WindowHeader
+    copy_skin : WindowHeader
     
 NodeIn :
-    inherit_skin : WindowHeader
+    copy_skin : WindowHeader
     
 NodeOut :
-    inherit_skin : WindowHeader
+    copy_skin : WindowHeader
     
 NodePlugKnob :
     image : tbb/plug_knob
@@ -62,16 +59,16 @@ NodeCable :
     border_colour : 1.0,1.0,1.0,1.0
     
 Tab :
-    inherit_skin : Frame
+    copy_skin : Frame
     
 TabHeader :
-    inherit_skin : Label
+    copy_skin : Label
     image_skin : tbb/tab_button_top_inactive, 12, 12, 12, 12, 6
     activated :
         image_skin : tbb/tab_button_top_active, 12, 12, 12, 12, 6
         
 Dockbar :
-    inherit_skin : Frame
+    copy_skin : Frame
     
 Dockbox :
     image_skin : tbb/frame_shadow, 16, 16, 16, 16, 12
@@ -92,7 +89,7 @@ TreeNodeToggle :
     copy_skin : ExpandboxToggle
     
 Checkbox :
-    inherit_skin : Clear
+    reset_skin : true
     image : tbb/checkbox
     pressed :
         overlay : tbb/checkbox_pressed
@@ -100,7 +97,7 @@ Checkbox :
         overlay : tbb/checkbox_activated
     
 CloseButton :
-    inherit_skin : Clear
+    reset_skin : true
     image : tbb/window_close
     decline_image : pressed
     
@@ -117,11 +114,11 @@ DropdownList :
     copy_skin : Frame
     
 DropdownToggle :
-    inherit_skin : Clear
+    reset_skin : true
     image : tbb/arrow_down
     
 TypeIn :
-    inherit_skin : Label
+    copy_skin : Label
     image_skin : tbb/editfield, 12, 12, 12, 12, 4
     
 Typedown :
@@ -134,11 +131,11 @@ SelectList :
     image_skin : tbb/editfield, 12, 12, 12, 12, 4
     
 ScrollUp :
-    inherit_skin : Clear
+    reset_skin : true
     space : BLOCK
     
 ScrollDown :
-    inherit_skin : Clear
+    reset_skin : true
     space : BLOCK
 
 Scrollbar :
@@ -152,16 +149,16 @@ ScrollerKnobY :
     size : 13.0,0.0
     image_skin : tbb/scroll_fg_y, 11, 11, 11, 11, 5
     
-SliderX :
+Slider :
     image_skin : tbb/slider_bg_x, 9, 9, 9, 9, 6, DIM_X
     align : LEFT, CENTER
     
-SliderKnobX :
-    inherit_skin : Clear
+SliderKnob :
+    reset_skin : true
     image : tbb/slider_handle
     
 WrapButton :
-    inherit_skin : Clear
+    reset_skin : true
     hovered :
         image_skin : tbb/item_hover, 7, 7, 7, 7
     pressed :

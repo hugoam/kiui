@@ -9,106 +9,111 @@
 
 #include <toyui/Widget/Widget.h>
 
-#include <toyui/Widget/Input.h>
+#include <toyui/Edit/Input.h>
 
 namespace toy
 {
-	StyleType::StyleType(const string& name)
-		: Type(TYPE, name)
-		, Style(*this, nullptr)
-	{}
+	void InkStyle::prepare()
+	{
+		if(m_base)
+			this->inherit(m_base.val->skin());
 
-	StyleType::StyleType(const string& name, StyleType& base)
-		: Type(*base.styleType(), TYPE, name)
-		, Style(*this, &base)
-	{}
+		if(backgroundColour().a() > 0.f || textColour().a() > 0.f || borderColour().a() > 0.f || image() || !imageSkin().null())
+			m_empty = false;
+	}
 
 	Style::Style(Type& type, Style* base)
 		: IdStruct(cls())
 		, m_styleType(&type)
 		, m_base(base)
-		, m_baseSkin(base)
 		, m_name(type.name())
 		, m_layout()
-		, m_skin(m_name)
+		, m_skin(this)
 		, m_subskins()
 		, m_updated(0)
-	{
-		if(m_base)
-			this->inherit();
-	}
+		, m_ready(false)
+	{}
 
 	Style::Style(const string& name)
 		: IdStruct(cls())
 		, m_styleType(nullptr)
 		, m_base(nullptr)
-		, m_baseSkin(nullptr)
 		, m_name(name)
 		, m_layout()
-		, m_skin(m_name)
+		, m_skin(this)
 		, m_subskins()
 		, m_updated(0)
+		, m_ready(false)
 	{}
 
 	Style::~Style()
 	{}
 
-	void Style::reset()
+	void Style::clear()
 	{
 		m_layout = LayoutStyle();
-		m_skin = InkStyle(m_name);
+		m_skin = InkStyle(this);
 		m_subskins.clear();
+		++m_updated;
+		m_ready = false;
+	}
+
+	void Style::prepare(Style* definition)
+	{
+		if(m_ready)
+			return;
+
+		if(definition)
+			this->define(*definition);
+
 		if(m_base)
-			m_baseSkin = m_base;
+		{
+			this->inheritLayout(*m_base);
+			this->inheritSkin(*m_base);
+		}
+
+		for(auto& subskin : m_subskins)
+			subskin.m_skin.inherit(m_skin);
+
+		m_skin.prepare();
+
+		for(auto& subskin : m_subskins)
+			subskin.m_skin.prepare();
+
+		m_ready = true;
 		++m_updated;
 	}
 
-	void Style::rebase(Style& base)
+	void Style::define(Style& style)
 	{
-		m_base = &base;
-		m_baseSkin = &base;
-		this->inherit();
-	}
-
-	void Style::rebaseSkins(Style& base)
-	{
-		m_baseSkin = &base;
-		this->inherit();
-	}
-
-	void Style::inherit()
-	{
-		if(m_base)
-			this->inheritLayout(*m_base);
-		if(m_baseSkin)
-			this->inheritSkins(*m_baseSkin);
-
-		//for(auto& subskin : m_subskins) //@todo : why doesn't this behave correctly when enabled
-		//	subskin.m_skin.copy(m_skin, true);
+		this->copyLayout(style);
+		this->copySkin(style);
 	}
 
 	void Style::inheritLayout(Style& base)
 	{
-		m_layout.copy(base.layout(), true);
+		m_layout.inherit(base.layout());
 	}
 
-	void Style::inheritSkins(Style& base)
+	void Style::copyLayout(Style& base)
 	{
-		m_skin.copy(base.skin(), true);
-
-		for(auto& subskin : base.m_subskins)
-		{
-			this->copy(subskin.m_state, m_skin, false);
-			this->copy(subskin.m_state, subskin.m_skin, true);
-		}
+		m_layout.copy(base.layout());
 	}
 
-	void Style::copySkins(Style& base)
+	void Style::inheritSkin(Style& base)
 	{
-		m_skin.copy(base.skin(), false);
+		m_skin.inherit(base.skin());
 
 		for(auto& subskin : base.m_subskins)
-			this->copy(subskin.m_state, subskin.m_skin, false);
+			this->fetchSubskin(subskin.m_state).inherit(subskin.m_skin);
+	}
+
+	void Style::copySkin(Style& base)
+	{
+		m_skin.copy(base.skin());
+
+		for(auto& subskin : base.m_subskins)
+			this->fetchSubskin(subskin.m_state).copy(subskin.m_skin);
 	}
 
 	InkStyle& Style::subskin(WidgetState state)
@@ -119,22 +124,19 @@ namespace toy
 		return m_skin;
 	}
 
-	InkStyle& Style::copy(WidgetState state, InkStyle& original, bool inherit)
+	InkStyle& Style::fetchSubskin(WidgetState state)
 	{
 		for(SubSkin& skin : reverse_adapt(m_subskins))
 			if(state == skin.m_state)
-			{
-				skin.m_skin.copy(original, inherit);
 				return skin.m_skin;
-			}
 
-		m_subskins.emplace_back(state, m_name + toString(state));
-		m_subskins.back().m_skin.copy(original, inherit);
+		m_subskins.emplace_back(state, *this, m_name + toString(state));
+		m_subskins.back().m_skin.copy(m_skin);
 		return m_subskins.back().m_skin;
 	}
 
 	InkStyle& Style::decline(WidgetState state)
 	{
-		return this->copy(state, m_skin, false);
+		return this->fetchSubskin(state);
 	}
 }

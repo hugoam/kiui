@@ -33,6 +33,16 @@ namespace toy
 		DIM_NULL = 4
 	};
 
+	enum _I_ Direction : unsigned int
+	{
+		READING = 0,
+		PARAGRAPH = 1,
+		PARALLEL = 2,
+		ORTHOGONAL = 3,
+		DIMENSION = 4,
+		DIRECTION_AUTO = 5
+	};
+
 	enum _I_ Pivot : unsigned int
 	{
 		FORWARD = 0,
@@ -62,30 +72,34 @@ namespace toy
 		SPACE_LAYER = 6
 	};
 
-	enum _I_ Layout : unsigned int
+	enum _I_ AutoLayout : unsigned int
 	{
-		NOLAYOUT = 0,
-		AUTOSIZE = 1,
-		AUTOLAYOUT = 2,
+		NO_LAYOUT = 0,
+		AUTO_SIZE = 1,
+		AUTO_LAYOUT = 2
 	};
 
 	enum _I_ Flow : unsigned int
 	{
-		FLOW = 0,
-		FREE = 1,
-		FREE_FILL = 2,
-		ALIGN = 3,
-		OVERLAY = 4
+		FLOW = 0,			// AUTO_LAYOUT
+		OVERLAY = 1,		// AUTO_SIZE
+		ALIGN = 2,			// AUTO_POSITION
+		FREE = 3			// NO_LAYOUT
 	};
 
 	enum _I_ Space : unsigned int
 	{
-		AUTO = 0,
-		FLEX = 1,
-		BLOCK = 2,
-		DIV = 3,
-		SPACE = 4,
-		BOARD = 5
+		MANUAL_SPACE = 0,        // PARAGRAPH   direction, MANUAL length, MANUAL depth
+		CONTAINER = 1,           // PARAGRAPH   direction, WRAP   length, WRAP   depth
+		ITEM = 2,                // READING     direction, SHRINK length, SHRINK depth
+		BLOCK = 3,               // PARAGRAPH   direction, SHRINK length, SHRINK depth
+		FIXED_BLOCK = 4,         // PARAGRAPH   direction, FIXED  length, FIXED  depth
+		LINE = 5,	             // READING     direction, WRAP   length, SHRINK depth
+		STACK = 6,               // PARAGRAPH   direction, SHRINK length, WRAP   depth 
+		DIV = 7,	             // ORTHOGONAL  direction, WRAP   length, SHRINK depth
+		SPACE = 8,               // PARALLEL    direction, WRAP   length, SHRINK depth
+		BOARD = 9,               // PARAGRAPH   direction, EXPAND length, EXPAND depth
+		PARALLEL_FLEX = 10,       // PARALLEL    direction, WRAP   length, WRAP depth
 	};
 
 	enum _I_ Sizing : unsigned int
@@ -199,7 +213,7 @@ namespace toy
 	// @todo add template reflection mechanism for these
 	typedef Dim<size_t> Index;
 	typedef Dim<float> DimFloat;
-	typedef Dim<Layout> DimLayout;
+	typedef Dim<AutoLayout> DimLayout;
 	typedef Dim<Sizing> DimSizing;
 	typedef Dim<Align> DimAlign;
 	typedef Dim<Pivot> DimPivot;

@@ -9,135 +9,12 @@
 #include <toyobj/Object.h>
 #include <toyui/Input/KeyCode.h>
 #include <toyui/Forward.h>
+#include <toyui/Widget/RootSheet.h>
 
 #include <vector>
 
 namespace toy
 {
-	struct TOY_UI_EXPORT InputEvent
-	{
-		enum DeviceType : unsigned int
-		{
-			DEVICE_KEYBOARD = 1 << 0,
-			DEVICE_MOUSE = 1 << 1,
-			DEVICE_MOUSE_LEFT_BUTTON = 1 << 2,
-			DEVICE_MOUSE_RIGHT_BUTTON = 1 << 3,
-			DEVICE_MOUSE_MIDDLE_BUTTON = 1 << 4,
-			ALL_DEVICES = DEVICE_KEYBOARD | DEVICE_MOUSE | DEVICE_MOUSE_LEFT_BUTTON | DEVICE_MOUSE_RIGHT_BUTTON | DEVICE_MOUSE_MIDDLE_BUTTON
-		};
-
-		enum EventType
-		{
-			EVENT_ENTERED,
-			EVENT_LEAVED,
-			EVENT_PRESSED,
-			EVENT_RELEASED,
-			EVENT_MOVED,
-			EVENT_STROKED,
-			EVENT_DRAGGED,
-			EVENT_DRAGGED_START,
-			EVENT_DRAGGED_END
-		};
-
-		InputFrame* rootFrame;
-		DeviceType deviceType;
-		EventType eventType;
-		bool consumed;
-		bool abort;
-
-		std::vector<Widget*> visited;
-
-		InputEvent(DeviceType deviceType, EventType eventType) : rootFrame(nullptr), deviceType(deviceType), eventType(eventType), consumed(false), abort(false) {}
-	};
-
-	struct TOY_UI_EXPORT KeyEvent : public InputEvent
-	{
-		KeyCode code;
-		char c;
-
-		KeyEvent(DeviceType deviceType, EventType eventType, KeyCode code, char c) : InputEvent(deviceType, eventType), code(code), c(c) {}
-	};
-
-	struct TOY_UI_EXPORT KeyDownEvent : public KeyEvent
-	{
-		KeyDownEvent(KeyCode code, char c) : KeyEvent(DEVICE_KEYBOARD, EVENT_PRESSED, code, c) {}
-	};
-
-	struct TOY_UI_EXPORT KeyUpEvent : public KeyEvent
-	{
-		KeyUpEvent(KeyCode code, char c) : KeyEvent(DEVICE_KEYBOARD, EVENT_RELEASED, code, c) {}
-	};
-
-	struct TOY_UI_EXPORT KeyCharEvent : public KeyEvent
-	{
-		KeyCharEvent(KeyCode code, char c) : KeyEvent(DEVICE_KEYBOARD, EVENT_STROKED, code, c) {}
-	};
-
-	struct TOY_UI_EXPORT MouseEvent : public InputEvent
-	{
-		float posX;
-		float posY;
-		float deltaX;
-		float deltaY;
-		float deltaZ;
-		float lastPressedX;
-		float lastPressedY;
-
-		MouseButtonCode button;
-
-		MouseEvent(DeviceType deviceType, EventType eventType, float x, float y) : InputEvent(deviceType, eventType), posX(x), posY(y), deltaX(0.f), deltaY(0.f), deltaZ(0.f), lastPressedX(0.f), lastPressedY(0.f), button(NO_BUTTON) {}
-	};
-
-	struct TOY_UI_EXPORT MouseMoveEvent : public MouseEvent
-	{
-		MouseMoveEvent(float x, float y) : MouseEvent(DEVICE_MOUSE, EVENT_MOVED, x, y) {}
-	};
-
-	struct TOY_UI_EXPORT MousePressEvent : public MouseEvent
-	{
-		MousePressEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_PRESSED, x, y) {}
-	};
-
-	struct TOY_UI_EXPORT MouseReleaseEvent : public MouseEvent
-	{
-		MouseReleaseEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_RELEASED, x, y) {}
-	};
-
-	struct TOY_UI_EXPORT MouseWheelEvent : public MouseEvent
-	{
-		MouseWheelEvent(float x, float y, float amount) : MouseEvent(DEVICE_MOUSE_MIDDLE_BUTTON, EVENT_MOVED, x, y) { deltaZ = amount; }
-	};
-
-	struct TOY_UI_EXPORT MouseClickEvent : public MouseEvent
-	{
-		MouseClickEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_STROKED, x, y) {}
-	};
-
-	struct TOY_UI_EXPORT MouseDragEvent : public MouseEvent
-	{
-		MouseDragEvent(DeviceType deviceType, float x, float y, float dx, float dy) : MouseEvent(deviceType, EVENT_DRAGGED, x, y) { deltaX = dx; deltaY = dy; }
-	};
-
-	struct TOY_UI_EXPORT MouseDragStartEvent : public MouseEvent
-	{
-		MouseDragStartEvent(DeviceType deviceType, float x, float y, float startX, float startY) : MouseEvent(deviceType, EVENT_DRAGGED_START, x, y) { lastPressedX = startX; lastPressedY = startY; }
-	};
-
-	struct TOY_UI_EXPORT MouseDragEndEvent : public MouseEvent
-	{
-		MouseDragEndEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_DRAGGED_END, x, y) {}
-	};
-
-	struct TOY_UI_EXPORT MouseEnterEvent : public MouseEvent
-	{
-		MouseEnterEvent(float x, float y) : MouseEvent(DEVICE_MOUSE, EVENT_ENTERED, x, y) {}
-	};
-
-	struct TOY_UI_EXPORT MouseLeaveEvent : public MouseEvent
-	{
-		MouseLeaveEvent(float x, float y) : MouseEvent(DEVICE_MOUSE, EVENT_LEAVED, x, y) {}
-	};
-
 	class TOY_UI_EXPORT InputDevice
 	{
 	public:
@@ -178,7 +55,7 @@ namespace toy
 		float pressedY() { return m_pressedY; }
 
 		void mousePressed(float x, float y);
-		void mouseMoved(MouseMoveEvent& mouseEvent);
+		void mouseMoved(MouseEvent& mouseEvent);
 		void mouseReleased(float x, float y);
 
 		void dragStart(MouseEvent& mouseEvent);
@@ -214,7 +91,7 @@ namespace toy
 		void transformMouseEvent(MouseEvent& mouseEvent);
 
 		void dispatchMousePressed(float x, float y, MouseButtonCode button);
-		void dispatchMouseMoved(float x, float y, float xDif, float yDif);
+		void dispatchMouseMoved(float x, float y);
 		void dispatchMouseReleased(float x, float y, MouseButtonCode button);
 		void dispatchMouseWheeled(float x, float y, float amount);
 
@@ -233,6 +110,86 @@ namespace toy
 		
 		std::vector<Widget*> m_focused;
 	};
+
+	struct TOY_UI_EXPORT KeyDownEvent : public KeyEvent
+	{
+		KeyDownEvent(KeyCode code, char c) : KeyEvent(DEVICE_KEYBOARD, EVENT_PRESSED, code, c) {}
+
+		void dispatch(RootSheet& rootSheet) { rootSheet.keyboard().dispatchKeyPressed(code, c); }
+	};
+
+	struct TOY_UI_EXPORT KeyUpEvent : public KeyEvent
+	{
+		KeyUpEvent(KeyCode code, char c) : KeyEvent(DEVICE_KEYBOARD, EVENT_RELEASED, code, c) {}
+
+		void dispatch(RootSheet& rootSheet) { rootSheet.keyboard().dispatchKeyReleased(code, c); }
+	};
+
+	struct TOY_UI_EXPORT KeyCharEvent : public KeyEvent
+	{
+		KeyCharEvent(KeyCode code, char c) : KeyEvent(DEVICE_KEYBOARD, EVENT_STROKED, code, c) {}
+
+		//void dispatch(RootSheet& rootSheet) { rootSheet.keyboard().dispatchKeyReleased(code, c); }
+	};
+
+	struct TOY_UI_EXPORT MouseMoveEvent : public MouseEvent
+	{
+		MouseMoveEvent(float x, float y) : MouseEvent(DEVICE_MOUSE, EVENT_MOVED, x, y) {}
+
+		void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMouseMoved(posX, posY); }
+	};
+
+	struct TOY_UI_EXPORT MousePressEvent : public MouseEvent
+	{
+		MousePressEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_PRESSED, x, y) {}
+
+		void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMousePressed(posX, posY, button); }
+	};
+
+	struct TOY_UI_EXPORT MouseReleaseEvent : public MouseEvent
+	{
+		MouseReleaseEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_RELEASED, x, y) {}
+
+		void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMouseReleased(posX, posY, button); }
+	};
+
+	struct TOY_UI_EXPORT MouseWheelEvent : public MouseEvent
+	{
+		MouseWheelEvent(float x, float y, float amount) : MouseEvent(DEVICE_MOUSE_MIDDLE_BUTTON, EVENT_MOVED, x, y) { deltaZ = amount; }
+
+		void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMouseWheeled(posX, posY, deltaZ); }
+	};
+
+	struct TOY_UI_EXPORT MouseClickEvent : public MouseEvent
+	{
+		MouseClickEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_STROKED, x, y) {}
+	};
+
+	struct TOY_UI_EXPORT MouseDragEvent : public MouseEvent
+	{
+		MouseDragEvent(DeviceType deviceType, float x, float y, float dx, float dy) : MouseEvent(deviceType, EVENT_DRAGGED, x, y) { deltaX = dx; deltaY = dy; }
+	};
+
+	struct TOY_UI_EXPORT MouseDragStartEvent : public MouseEvent
+	{
+		MouseDragStartEvent(DeviceType deviceType, float x, float y, float startX, float startY) : MouseEvent(deviceType, EVENT_DRAGGED_START, x, y) { lastPressedX = startX; lastPressedY = startY; }
+	};
+
+	struct TOY_UI_EXPORT MouseDragEndEvent : public MouseEvent
+	{
+		MouseDragEndEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_DRAGGED_END, x, y) {}
+	};
+
+	struct TOY_UI_EXPORT MouseEnterEvent : public MouseEvent
+	{
+		MouseEnterEvent(float x, float y) : MouseEvent(DEVICE_MOUSE, EVENT_ENTERED, x, y) {}
+	};
+
+	struct TOY_UI_EXPORT MouseLeaveEvent : public MouseEvent
+	{
+		MouseLeaveEvent(float x, float y) : MouseEvent(DEVICE_MOUSE, EVENT_LEAVED, x, y) {}
+	};
+
 }
 
 #endif // TOY_INPUTDEVICE_H

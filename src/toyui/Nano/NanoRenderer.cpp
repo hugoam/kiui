@@ -82,29 +82,32 @@ namespace toy
 		image.d_index = 0;
 	}
 
-	void NanoRenderer::render(MasterLayer& masterLayer)
+	void NanoRenderer::render(RenderTarget& target)
 	{
 		m_debugBatch = 0;
 		Stencil::s_debugBatch = 0;
 		static int prevBatch = 0;
 
 		float pixelRatio = 1.f;
-		nvgBeginFrame(m_ctx, masterLayer.width(), masterLayer.height(), pixelRatio);
+		nvgBeginFrame(m_ctx, target.layer().width(), target.layer().height(), pixelRatio);
 
-		masterLayer.widget()->render(*this);
+		if(target.layer().dirty() < Frame::DIRTY_MAPPING)
+		{
+			target.layer().widget()->render(*this, false);
 
 #ifdef TOYUI_DRAW_CACHE
-		void* layerCache = nullptr;
-		this->layerCache(masterLayer, layerCache);
-		this->drawLayer(layerCache, 0.f, 0.f, 1.f);
+			void* layerCache = nullptr;
+			this->layerCache(target.layer(), layerCache);
+			this->drawLayer(layerCache, 0.f, 0.f, 1.f);
 
-		for(Layer* layer : masterLayer.layers())
-			if(layer->visible())
-			{
-				this->layerCache(*layer, layerCache);
-				this->drawLayer(layerCache, 0.f, 0.f, 1.f);
-			}
+			for(Layer* layer : target.layer().layers())
+				if(layer->visible())
+				{
+					this->layerCache(*layer, layerCache);
+					this->drawLayer(layerCache, 0.f, 0.f, 1.f);
+				}
 #endif
+		}
 
 		if(Stencil::s_debugBatch > 1 && Stencil::s_debugBatch != prevBatch)
 		{
@@ -136,15 +139,11 @@ namespace toy
 		nvgResetScissor(m_ctx);
 	}
 
-	void NanoRenderer::clipFrame(const BoxFloat& rect, const BoxFloat& corners)
+	void NanoRenderer::pathLine(float x1, float y1, float x2, float y2)
 	{
-		//nvgIntersectRoundedScissor(m_ctx, rect.x(), rect.y(), rect.w(), rect.h(), corners.v0(), corners.v1(), corners.v2(), corners.v3());
-		nvgIntersectScissor(m_ctx, rect.x(), rect.y(), rect.w(), rect.h());
-	}
-
-	void NanoRenderer::unclipFrame()
-	{
-		nvgResetScissor(m_ctx);
+		nvgBeginPath(m_ctx);
+		nvgMoveTo(m_ctx, x1, y1);
+		nvgLineTo(m_ctx, x2, y2);
 	}
 
 	void NanoRenderer::pathBezier(float x1, float y1, float c1x, float c1y, float c2x, float c2y, float x2, float y2)
@@ -200,7 +199,7 @@ namespace toy
 		//nvgSave(m_ctx);
 		//nvgResetScissor(m_ctx);
 
-		static InkStyle debugStyle("debugRectStyle");
+		static InkStyle debugStyle;
 		debugStyle.m_borderWidth = 1.f;
 		debugStyle.m_borderColour = colour;
 
@@ -428,7 +427,7 @@ namespace toy
 	void NanoRenderer::clearLayer(void* layerCache)
 	{
 		nvgResetDisplayList((NVGdisplayList*)layerCache);
-		nvgResetScissor(m_ctx);
+		//nvgResetScissor(m_ctx);
 	}
 
 	void NanoRenderer::beginUpdate(void* layerCache, float x, float y, float scale)

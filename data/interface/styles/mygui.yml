@@ -1,6 +1,3 @@
-Clear :
-    text_colour : 1.0,1.0,1.0,0.0
-    
 Window :
     empty : true
 
@@ -9,15 +6,15 @@ Label :
     skin_padding : 4.0,4.0,4.0,4.0
     
 Title :
-    inherit_skin : Label
+    copy_skin : Label
     
 TabHeader :
-    inherit_skin : Label
+    copy_skin : Label
     skin_padding : 8.0,6.0,8.0,4.0
     
 DockTab :
     inherit : Tab
-    inherit_skin : Clear
+    reset_skin : true
     padding : 0.0,0.0,0.0,0.0
     override : Dockspace, Tab
     
@@ -29,19 +26,19 @@ Page :
     padding : 4.0,2.0,6.0,4.0
     
 TabHeader :
-    inherit_skin : Label
+    copy_skin : Label
     image_skin : mygui/tab_button, 6, 6, 9, 4
     decline_image_skin : hovered, activated, activated|hovered
         
 WindowHeader :
-    inherit_skin : Label
+    copy_skin : Label
     image_skin : mygui/windowheader, 7, 10, 9, 17
     image_skin : mygui/windowheader_darker, 7, 10, 32, 17
     size : 0.0, 30.0
     padding : 10.0, 4.0, 10.0, 4.0
     
 WindowBody :
-    inherit_skin : Label
+    copy_skin : Label
     skin_margin : 0.0,-3.0,0.0,0.0
     image_skin : mygui/windowbody_black, 4, 4, 6, 6
     padding : 10.0, 4.0, 10.0, 4.0
@@ -55,7 +52,7 @@ Frame :
     image_skin : mygui/frame_assym, 4, 4, 6, 6
 
 Dockbar :
-    inherit_skin : Frame
+    copy_skin : Frame
     
 TypeIn :
     copy_skin : Label
@@ -63,16 +60,16 @@ TypeIn :
     decline_image_skin : hovered, pressed, focused, activated|hovered
 
 Dropdown :
-    inherit_skin : TypeIn
+    copy_skin : TypeIn
     
 DropdownToggle :
-    inherit_skin : Clear
+    reset_skin : true
     skin_padding : 4.0,4.0,4.0,4.0
     image : mygui/arrow_down
     decline_image : hovered, pressed, activated
     
 ColumnHeader :
-    inherit_skin : Label
+    copy_skin : Label
     image_skin : mygui/tableheader, 6, 6, 8, 8
     
 Button :
@@ -85,12 +82,12 @@ RadioChoice :
     copy_skin : Button
     
 Checkbox :
-    inherit_skin : Icon
+    copy_skin : Icon
     image : mygui/checkbox
     decline_image : hovered, pressed, activated, activated|hovered, activated|pressed
     
 ExpandboxToggle :
-    inherit_skin : Clear
+    reset_skin : true
     image : arrow_right_15
     activated :
         image : arrow_down_15
@@ -98,19 +95,19 @@ ExpandboxToggle :
         image : arrow_down_15
         
 TreeNodeToggle :
-    inherit_skin : ExpandboxToggle
+    copy_skin : ExpandboxToggle
     
 Expandbox :
-    inherit_skin : Frame
+    copy_skin : Frame
     padding : 4.0, 4.0, 4.0, 4.0
     
 ScrollUp :
-    inherit_skin : Clear
+    reset_skin : true
     image : mygui/arrow_up
     decline_image : hovered, pressed, activated
     
 ScrollDown :
-    inherit_skin : Clear
+    reset_skin : true
     image : mygui/arrow_down
     decline_image : hovered, pressed, activated
 
@@ -118,50 +115,42 @@ Scroller :
     padding : 2.0, 2.0, 1.0, 1.0
     
 CloseButton :
-    inherit_skin : Clear
+    reset_skin : true
     image : mygui/closebutton
     decline_image : hovered, pressed, activated
 
-SliderKnobY :
-    inherit_skin : Clear
-    image_skin : mygui/sliderknoby, 1, 1, 3, 3
-    sizing : EXPAND, MANUAL
-    size : 0.0,7.0
-    decline_image_skin : hovered, pressed, activated
-    
-SliderKnobX :
-    inherit_skin : Clear
+SliderKnob :
+    reset_skin : true
     image_skin : mygui/sliderknobx, 1, 1, 3, 3
-    sizing : MANUAL, EXPAND
     size : 7.0,0.0
     decline_image_skin : hovered, pressed, activated
     
-FillerX :
+Filler :
     background_colour : 1.0,1.0,1.0,0.3
     
-ProgressFillerX :
-    inherit : FillerX
+ProgressFiller :
+    inherit : Filler
     image_skin : mygui/button_activated, 6, 6, 8, 8
-    override : ProgressBarX, FillerX
+    override : ProgressBar, Filler
     
-SliderX :
-    inherit_skin : TypeIn
+Slider :
+    copy_skin : TypeIn
     padding : 1.0, 1.0, 0.0, 0.0
     
 SliderDisplay :
     align : CENTER, CENTER
     
-ScrollerKnobY :
-    inherit_skin : Clear
+ScrollerKnob :
+    reset_skin : true
     align : CENTER, LEFT
     image_skin : mygui/scrollerknoby, 5, 2, 7, 4
     decline_image_skin : hovered, pressed, activated
 
 DropdownList :
-    inherit_skin : Frame
+    copy_skin : Frame
     
 DropdownLabel :
-    inherit_skin : Label
+    copy_skin : Label
     
 DropdownChoice :
     hovered :

@@ -26,8 +26,9 @@
 
 namespace toy
 {
-	GlRenderer::GlRenderer(const string& resourcePath)
+	GlRenderer::GlRenderer(const string& resourcePath, bool clear)
 		: NanoRenderer(resourcePath)
+		, m_clear(clear)
 		, m_clock()
 	{}
 
@@ -78,22 +79,25 @@ namespace toy
 #endif
 	}
 
-	void GlRenderer::render(MasterLayer& masterLayer)
+	void GlRenderer::render(RenderTarget& target)
 	{
 		this->logFPS();
 
-		if(masterLayer.target().gammaCorrected())
+		if(target.gammaCorrected())
 			glDisable(GL_FRAMEBUFFER_SRGB);
 
 		// Update and render
-		glViewport(0, 0, masterLayer.width(), masterLayer.height());
+		glViewport(0, 0, target.layer().width(), target.layer().height());
 
-		glClearColor(0.f, 0.f, 0.f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		if(m_clear)
+		{
+			glClearColor(0.f, 0.f, 0.f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		}
 
-		NanoRenderer::render(masterLayer);
+		NanoRenderer::render(target);
 
-		if(masterLayer.target().gammaCorrected())
+		if(target.gammaCorrected())
 			glEnable(GL_FRAMEBUFFER_SRGB);
 	}
 

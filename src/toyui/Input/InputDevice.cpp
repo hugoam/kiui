@@ -99,10 +99,8 @@ namespace toy
 		mouseEvent.deltaY = mouseEvent.posY - m_lastY;
 	}
 
-	void Mouse::dispatchMouseMoved(float x, float y, float xDif, float yDif)
+	void Mouse::dispatchMouseMoved(float x, float y)
 	{
-		UNUSED(xDif); UNUSED(yDif);
-
 		MouseMoveEvent mouseEvent(x, y);
 		this->transformMouseEvent(mouseEvent);
 
@@ -179,7 +177,7 @@ namespace toy
 		, m_pressedY(0.f)
 	{}
 
-	void MouseButton::mouseMoved(MouseMoveEvent& mouseEvent)
+	void MouseButton::mouseMoved(MouseEvent& mouseEvent)
 	{
 		const float threshold = 3.f;
 
@@ -199,7 +197,6 @@ namespace toy
 		m_mouse.transformMouseEvent(mouseEvent);
 
 		m_pressed = m_rootFrame.dispatchEvent(mouseEvent);
-		printf("MousePressed %s\n", static_cast<Widget&>(*m_pressed).style().name().c_str());
 		m_pressedX = mouseEvent.posX;
 		m_pressedY = mouseEvent.posY;
 	}
@@ -209,7 +206,6 @@ namespace toy
 		MouseReleaseEvent mouseEvent(m_deviceType, x, y);
 		m_mouse.transformMouseEvent(mouseEvent);
 
-		m_rootFrame.dispatchEvent(mouseEvent);
 		m_pressed->dispatchEvent(mouseEvent);
 
 		if(m_dragging)
@@ -224,33 +220,25 @@ namespace toy
 	void MouseButton::dragStart(MouseEvent& mouseEvent)
 	{
 		MouseDragStartEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY, m_pressedX, m_pressedY);
-		//m_pressed->dispatchEvent(dragEvent); 
 		m_pressed->receiveEvent(dragEvent);
-		// switch to receiveEvent -> composite events maybe don't even need propagation
 	}
 
 	void MouseButton::dragEnd(MouseEvent& mouseEvent)
 	{
 		MouseDragEndEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY);
-		//m_pressed->dispatchEvent(dragEvent); 
 		m_pressed->receiveEvent(dragEvent);
-		// switch to receiveEvent ? composite events maybe don't even need propagation
 	}
 
 	void MouseButton::dragMove(MouseEvent& mouseEvent)
 	{
 		MouseDragEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY, mouseEvent.deltaX, mouseEvent.deltaY);
-		//m_pressed->dispatchEvent(dragEvent);
 		m_pressed->receiveEvent(dragEvent);
-		// switch to receiveEvent ? composite events maybe don't even need propagation
 	}
 
 	void MouseButton::click(MouseEvent& mouseEvent)
 	{
 		MouseClickEvent clickEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY);
-		//m_pressed->dispatchEvent(clickEvent);
 		m_pressed->receiveEvent(clickEvent);
-		// switch to receiveEvent ? composite events maybe don't even need propagation
 	}
 
 	void MouseButton::handleUnbindWidget(Widget& widget)
@@ -259,7 +247,7 @@ namespace toy
 		{
 			m_prevPressed = m_pressed;
 			m_pressed = nullptr;
-			//m_dragging = false;
+			m_dragging = false;
 		}
 	}
 	
@@ -267,8 +255,9 @@ namespace toy
 	{
 		if(m_prevPressed == &widget)
 		{
+			m_prevPressed = nullptr;
 			m_pressed = &widget;
-			//m_dragging = false;
+			m_dragging = false;
 		}
 	}
 }

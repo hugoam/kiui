@@ -21,15 +21,17 @@ namespace toy
 	{
 	public:
 		Frame(Widget& widget);
-		Frame(StyleType& style, Stripe& parent);
+		Frame(Style& style, Stripe& parent);
 
 		enum Dirty
 		{
 			CLEAN,				// Frame doesn't need update
 			DIRTY_ABSOLUTE,		// The absolute position of the frame has changed
 			DIRTY_POSITION,		// The relative position of the frame has changed
-			DIRTY_CONTENT,		// The skin of the frame has changed
-			DIRTY_LAYOUT,		// The content of the widget has changed
+			DIRTY_CONTENT,		// The content of the widget has changed
+			DIRTY_LAYOUT,		// The skin of the frame has changed
+			DIRTY_STRUCTURE,
+			DIRTY_MAPPING		// The widget needs to be remapped
 		};
 
 		virtual FrameType frameType() { return FRAME; }
@@ -50,32 +52,42 @@ namespace toy
 		inline float dspace(Dimension dim) { return d_size[dim] - dpadding(dim) - dbackpadding(dim); }
 
 		Layer& layer();
+		MasterLayer& masterlayer();
 
-		virtual void bind(Stripe& parent);
-		virtual void unbind();
+		void bind(Stripe& parent);
+		void unbind();
+
+		typedef std::function<bool(Frame&)> Visitor;
+
+		virtual void visit(Stripe& root, const Visitor& visitor);
 
 		void show();
 		void hide();
 
 		bool visible();
 
+		void clearDirty() { d_dirty = CLEAN; }
 		void setDirty(Dirty dirty) { if(dirty > d_dirty) d_dirty = dirty; }
 		void markDirty(Dirty dirty);
 
 		virtual Frame* pinpoint(float x, float y, bool opaque);
 
-		virtual void updateOnce();
-
-		void updateSizing(Dimension dim);
 		void updateFixed(Dimension dim);
+		void setFixedSize(Dimension dim, float size);
 
-		void updateSpace();
-		void updateSizing();
+		void updateLayout();
 
-		void setStyle(Style& style);
+		void applySpace(Direction direction, Sizing length, Sizing depth);
 
-		virtual void measure();
-		virtual void layout();
+		void setStyle(Style& style, bool reset = false);
+		void updateStyle();
+		void resetStyle();
+
+		virtual void remap();
+
+		virtual void measureLayout();
+		virtual void resizeLayout();
+		virtual void positionLayout();
 
 		void setSizeDim(Dimension dim, float size);
 		void setSpanDim(Dimension dim, float span);
@@ -86,8 +98,17 @@ namespace toy
 		inline void setSize(float width, float height) { setSizeDim(DIM_X, width); setSizeDim(DIM_Y, height); }
 		inline void setSize(DimFloat dim) { setSizeDim(DIM_X, dim[DIM_X]); setSizeDim(DIM_Y, dim[DIM_Y]); }
 
-		float dabsolute(Dimension dim);
-		float drelative(Dimension dim);
+		void integratePosition(Frame& root, DimFloat& local);
+		void derivePosition(Frame& root, DimFloat& local);
+		float deriveScale(Frame& root);
+
+		DimFloat absolutePosition();
+		float absoluteScale();
+
+		DimFloat relativePosition(Frame& root);
+		DimFloat localPosition(float x, float y);
+
+		float doffset(Dimension dim);
 
 		bool inside(float x, float y);
 
@@ -102,8 +123,6 @@ namespace toy
 		Dirty d_dirty;
 		bool d_hidden;
 		Index d_index;
-
-		Style* d_style;
 	};
 }
 

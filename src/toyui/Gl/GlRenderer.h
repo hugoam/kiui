@@ -15,14 +15,14 @@ namespace toy
 	class TOY_UI_EXPORT GlRenderer : public NanoRenderer
 	{
 	public:
-		GlRenderer(const string& resourcePath);
+		GlRenderer(const string& resourcePath, bool clear);
 		~GlRenderer();
 
 		// init
 		virtual void setupContext();
 		virtual void releaseContext();
 
-		void render(MasterLayer& layer);
+		void render(RenderTarget& target);
 
 		void logFPS();
 
@@ -30,6 +30,7 @@ namespace toy
 		void initGlew();
 
 	protected:
+		bool m_clear;
 		Clock m_clock;
 	};
 

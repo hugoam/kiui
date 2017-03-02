@@ -38,10 +38,10 @@ namespace toy
 
 	void Caption::redraw(Renderer& target, const BoxFloat& rect, const BoxFloat& paddedRect, const BoxFloat& contentRect)
 	{
-		static InkStyle textSelectionStyle("TextSelection");
+		static InkStyle textSelectionStyle;
 		textSelectionStyle.m_backgroundColour = Colour(0/255.f, 55/255.f, 255/255.f, 124/255.f);
 
-		static InkStyle caretStyle("Caret");
+		static InkStyle caretStyle;
 		caretStyle.m_backgroundColour = Colour::White;
 
 		if(paddedRect.w() <= 0.f || paddedRect.h() <= 0.f)

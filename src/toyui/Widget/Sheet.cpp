@@ -10,9 +10,9 @@
 #include <toyui/Frame/Grid.h>
 #include <toyui/Frame/Layer.h>
 
-#include <toyui/Widget/Widgets.h>
+#include <toyui/Widget/Layout.h>
 
-#include <toyui/Widget/Scrollbar.h>
+#include <toyui/Button/Scrollbar.h>
 #include <toyui/Widget/RootSheet.h>
 
 #include <toyui/UiLayout.h>
@@ -21,50 +21,18 @@
 
 namespace toy
 {
-	Sheet::Sheet(StyleType& type, FrameType frameType)
+	Piece::Piece(Piece& parent, Type& type, FrameType frameType)
+		: Widget(parent, type, frameType)
+	{}
+
+	Piece::Piece(Type& type, FrameType frameType)
 		: Widget(type, frameType)
 	{}
 
-	Sheet::~Sheet()
+	Piece::~Piece()
 	{}
 
-	void Sheet::reindex(size_t from)
-	{
-		for(size_t i = from; i < m_contents.size(); ++i)
-			m_contents[i]->setIndex(i);
-	}
-
-	void Sheet::bindChild(Widget& child, size_t index)
-	{
-		child.bind(*this, index);
-
-		this->stripe().remap();
-	}
-
-	void Sheet::unbindChild(Widget& child)
-	{
-		child.unbind();
-
-		this->stripe().remap();
-	}
-
-	void Sheet::bind(Sheet& parent, size_t index)
-	{
-		Widget::bind(parent, index);
-
-		for(size_t i = 0; i < m_contents.size(); ++i)
-			this->bindChild(*m_contents[i], i);
-	}
-
-	void Sheet::unbind()
-	{
-		for(int i = m_contents.size() - 1; i >= 0; --i)
-			this->unbindChild(*m_contents[i]);
-
-		Widget::unbind();
-	}
-
-	void Sheet::nextFrame(size_t tick, size_t delta)
+	void Piece::nextFrame(size_t tick, size_t delta)
 	{
 		Widget::nextFrame(tick, delta);
 
@@ -72,124 +40,156 @@ namespace toy
 			m_contents[i]->nextFrame(tick, delta);
 	}
 
-	void Sheet::render(Renderer& renderer)
+	void Piece::render(Renderer& renderer, bool force)
 	{
-		m_frame->content().beginDraw(renderer);
-		m_frame->content().draw(renderer);
+		if(m_frame->layer().forceRedraw())
+			force = true;
+
+		m_frame->content().beginDraw(renderer, force);
+		m_frame->content().draw(renderer, force);
 
 		for(size_t i = 0; i < m_contents.size(); ++i)
 			if(!m_contents[i]->frame().hidden())
-				m_contents[i]->render(renderer);
+				m_contents[i]->render(renderer, force);
 
 		m_frame->content().endDraw(renderer);
 	}
 
-	Widget& Sheet::append(unique_ptr<Widget> unique)
+	void Piece::visit(const Visitor& visitor)
 	{
-		return this->insert(std::move(unique), m_contents.size());
+		bool pursue = visitor(*this);
+		if(!pursue)
+			return;
+
+		for(Widget* pwidget : m_contents)
+			pwidget->visit(visitor);
 	}
 
-	Widget& Sheet::insert(unique_ptr<Widget> unique, size_t index)
+	void Piece::reindex(size_t from)
+	{
+		for(size_t i = from; i < m_contents.size(); ++i)
+			m_contents[i]->setIndex(i);
+	}
+
+	void Piece::push(Widget& widget, bool deferred)
+	{
+		m_contents.push_back(&widget);
+		widget.bind(*this, m_contents.size() - 1, deferred);
+	}
+
+	void Piece::remove(Widget& widget)
+	{
+		size_t index = widget.index();
+		m_contents.erase(m_contents.begin() + index);
+		widget.unbind();
+		this->reindex(index);
+	}
+
+	void Piece::swap(size_t from, size_t to)
+	{
+		std::iter_swap(m_contents.begin() + from, m_contents.begin() + to);
+		this->reindex(from < to ? from : to);
+		m_frame->markDirty(Frame::DIRTY_MAPPING);
+	}
+
+	Container::Container(Piece& parent, Type& type, FrameType frameType)
+		: Piece(parent, type, frameType)
+	{}
+
+	Container::Container(Type& type, FrameType frameType)
+		: Piece(type, frameType)
+	{}
+
+	Container::~Container()
+	{}
+
+	Widget& Container::append(unique_ptr<Widget> unique)
+	{
+		return this->insert(std::move(unique), m_containerContents.size());
+	}
+
+	Widget& Container::insert(unique_ptr<Widget> unique, size_t index)
 	{
 		Widget& widget = *unique;
-		m_contents.insert(m_contents.begin() + index, std::move(unique));
-		this->reindex(index);
-		if(m_state & BOUND)
-			this->bindChild(widget, index);
+		if(widget.parent() == nullptr)
+			this->push(widget, false);
+		widget.setContainer(*this);
+		m_containerContents.insert(m_containerContents.begin() + index, std::move(unique));
+		this->handleAdd(widget);
 		return widget;
 	}
 
-	unique_ptr<Widget> Sheet::release(Widget& widget)
+	unique_ptr<Widget> Container::release(Widget& widget)
 	{
-		return this->release(widget.index());
-	}
-
-	unique_ptr<Widget> Sheet::release(size_t index)
-	{
-		m_contents[index]->unbind();
-		unique_ptr<Widget> pointer = std::move(m_contents[index]);
-		m_contents.erase(m_contents.begin() + index);
-		this->reindex(index);
+		widget.parent()->remove(widget);
+		auto pos = std::find_if(m_containerContents.begin(), m_containerContents.end(), [&widget](auto& pt) { return pt.get() == &widget; });
+		unique_ptr<Widget> pointer = std::move(*pos);
+		m_containerContents.erase(pos);
+		this->handleRemove(widget);
 		return pointer;
 	}
 
-	void Sheet::clear()
+	void Container::clear()
 	{
-		for(auto& widget : m_contents)
-			widget->unbind();
+		for(auto& widget : m_containerContents)
+			widget->parent()->remove(*widget);
 
-		m_contents.clear();
+		m_containerContents.clear();
 	}
 
-	void Sheet::swap(size_t from, size_t to)
-	{
-		std::iter_swap(m_contents.begin() + from, m_contents.begin() + to);
-	}
 
-	LayerSheet::LayerSheet(StyleType& type)
-		: Sheet(type, LAYER)
-	{
-		m_frame = make_unique<Layer>(*this, 0);
-	}
-
-	Board::Board(StyleType& type)
-		: Sheet(type)
+	WrapControl::WrapControl(Piece& parent, Type& type)
+		: Container(parent, type)
 	{}
 
-	ScrollZone::ScrollZone()
-		: Sheet(cls())
+	WideControl::WideControl(Piece& parent, Type& type)
+		: WrapControl(parent, type)
 	{}
 
-	ScrollSheet::ScrollSheet(StyleType& type)
-		: Sheet(type, GRID)
-		, m_scrollzone(this->makeappend<ScrollZone>())
-		, m_scrollbarX(this->makeappend<ScrollbarX>(m_scrollzone))
-		, m_scrollbarY(this->makeappend<ScrollbarY>(m_scrollzone))
-	{
-		m_scrollzone.frame().setIndex(0, 0);
-		m_scrollbarY.frame().setIndex(1, 0);
-		m_scrollbarX.frame().setIndex(0, 1);
-	}
-
-	ScrollSheet::~ScrollSheet()
+	Board::Board(Piece& parent, Type& type)
+		: Container(parent, type)
 	{}
 
-	void ScrollSheet::bound()
-	{
-		m_frame->as<Grid>().resize(2);
-		m_frame->as<Grid>().line(0).setSizing(EXPAND, EXPAND);
-		m_frame->as<Grid>().line(1).setSizing(EXPAND, SHRINK);
-	}
+	Line::Line(Piece& parent, Type& type)
+		: Container(parent, type)
+	{}
 
-	Widget& ScrollSheet::vappend(unique_ptr<Widget> widget)
-	{
-		return m_scrollzone.vappend(std::move(widget));
-	}
+	Stack::Stack(Piece& parent, Type& type, FrameType frameType)
+		: Container(parent, type, frameType)
+	{}
 
-	unique_ptr<Widget> ScrollSheet::vrelease(Widget& widget)
-	{
-		return m_scrollzone.vrelease(widget);
-	}
+	Div::Div(Piece& parent, Type& type)
+		: Container(parent, type)
+	{}
 
-	void ScrollSheet::clear()
-	{
-		m_scrollzone.clear();
-	}
+	Spacer::Spacer(Piece& parent, Type& type)
+		: Widget(parent, type)
+	{}
 
-	void ScrollSheet::mouseWheel(MouseEvent& mouseEvent)
-	{
-		UNUSED(mouseEvent);
-		m_scrollbarX.scroll(mouseEvent.deltaX);
-		m_scrollbarY.scroll(mouseEvent.deltaY);
+	Filler::Filler(Piece& parent)
+		: Spacer(parent, cls())
+	{}
 
-		mouseEvent.consumed = true;
-	};
+	Layout::Layout(Piece& parent, Type& type)
+		: Board(parent, type)
+	{}
 
-	GridSheet::GridSheet(Dimension dim, StyleType& type)
-		: Sheet(type)
+	Decal::Decal(Piece& parent, Type& type)
+		: Piece(parent, type, LAYER)
+	{}
+
+	Overlay::Overlay(Piece& parent, Type& type)
+		: Container(parent, type, LAYER)
+	{}
+
+	Sheet::Sheet(Piece& parent, Type& type)
+		: Container(parent, type)
+	{}
+
+	GridSheet::GridSheet(Piece& parent, Dimension dim, Type& type)
+		: Container(parent, type)
 		, m_dim(dim)
 		, m_resizing(nullptr)
-		, m_hoverCursor(m_dim == DIM_X ? ResizeCursorX::cls() : ResizeCursorY::cls())
 	{}
 
 	void GridSheet::leftDragStart(MouseEvent& mouseEvent)
@@ -199,7 +199,7 @@ namespace toy
 		m_resizing = nullptr;
 
 		for(Frame* frame : m_frame->as<Stripe>().sequence())
-			if(frame->dabsolute(m_dim) >= pos)
+			if(frame->absolutePosition()[m_dim] >= pos)
 			{
 				m_resizing = frame->widget();
 				break;

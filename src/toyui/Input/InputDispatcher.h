@@ -8,10 +8,89 @@
 /* toy */
 #include <toyui/Forward.h>
 #include <toyui/Input/KeyCode.h>
-#include <toyui/Input/InputDevice.h>
+
+#include <vector>
+
+#undef CM_NONE
 
 namespace toy
 {
+	struct TOY_UI_EXPORT InputEvent
+	{
+		enum DeviceType : unsigned int
+		{
+			DEVICE_KEYBOARD = 1 << 0,
+			DEVICE_MOUSE = 1 << 1,
+			DEVICE_MOUSE_LEFT_BUTTON = 1 << 2,
+			DEVICE_MOUSE_RIGHT_BUTTON = 1 << 3,
+			DEVICE_MOUSE_MIDDLE_BUTTON = 1 << 4,
+			ALL_DEVICES = DEVICE_KEYBOARD | DEVICE_MOUSE | DEVICE_MOUSE_LEFT_BUTTON | DEVICE_MOUSE_RIGHT_BUTTON | DEVICE_MOUSE_MIDDLE_BUTTON
+		};
+
+		enum EventType
+		{
+			EVENT_ENTERED,
+			EVENT_LEAVED,
+			EVENT_PRESSED,
+			EVENT_RELEASED,
+			EVENT_MOVED,
+			EVENT_STROKED,
+			EVENT_DRAGGED,
+			EVENT_DRAGGED_START,
+			EVENT_DRAGGED_END
+		};
+
+		DeviceType deviceType;
+		EventType eventType;
+		bool consumed;
+		bool abort;
+
+		std::vector<Widget*> visited;
+
+		InputEvent(DeviceType deviceType, EventType eventType) : deviceType(deviceType), eventType(eventType), consumed(false), abort(false) {}
+		virtual ~InputEvent() {}
+
+		virtual void dispatch(RootSheet& rootSheet) {}
+	};
+
+	struct TOY_UI_EXPORT MouseEvent : public InputEvent
+	{
+		float posX;
+		float posY;
+		float relativeX;
+		float relativeY;
+		float deltaX;
+		float deltaY;
+		float deltaZ;
+		float lastPressedX;
+		float lastPressedY;
+
+		MouseButtonCode button;
+
+		MouseEvent(DeviceType deviceType, EventType eventType, float x, float y)
+			: InputEvent(deviceType, eventType)
+			, posX(x), posY(y), deltaX(0.f), deltaY(0.f), deltaZ(0.f)
+			, lastPressedX(0.f), lastPressedY(0.f), button(NO_BUTTON)
+		{
+			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
+				button = LEFT_BUTTON;
+			else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
+				button = RIGHT_BUTTON;
+			else if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
+				button = MIDDLE_BUTTON;
+		}
+	};
+
+	struct TOY_UI_EXPORT KeyEvent : public InputEvent
+	{
+		KeyCode code;
+		char c;
+
+		KeyEvent(DeviceType deviceType, EventType eventType, KeyCode code, char c)
+			: InputEvent(deviceType, eventType), code(code), c(c)
+		{}
+	};
+
 	class TOY_UI_EXPORT InputWindow
 	{
 	public:
@@ -49,8 +128,8 @@ namespace toy
 
 		InputFrame* parentFrame() { return m_parentFrame; }
 
-		InputFrame& rootFrame();
-		InputFrame& rootController();
+		virtual InputFrame& rootFrame();
+		virtual InputFrame& rootController();
 
 		InputReceiver* dispatchEvent(InputEvent& inputEvent);
 		InputReceiver* controlEvent(InputEvent& inputEvent);

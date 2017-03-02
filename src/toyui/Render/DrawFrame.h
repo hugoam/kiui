@@ -17,7 +17,6 @@ namespace toy
 	class TOY_UI_EXPORT DrawFrame
 	{
 	public:
-		DrawFrame();
 		DrawFrame(Frame& frame);
 
 		DrawFrame(const DrawFrame&) = default;
@@ -40,8 +39,8 @@ namespace toy
 
 		inline InkStyle& inkstyle() { return *d_inkstyle; }
 
-		void beginDraw(Renderer& renderer);
-		void draw(Renderer& renderer);
+		void beginDraw(Renderer& renderer, bool force);
+		void draw(Renderer& renderer, bool force);
 		void endDraw(Renderer& renderer);
 
 		void updateInkstyle(InkStyle& inkstyle);
@@ -71,6 +70,7 @@ namespace toy
 	public:
 		static Renderer* sRenderer;
 
+		static string sDebugDrawFilter;
 		static bool sDebugDrawFrameRect;
 		static bool sDebugDrawPaddedRect;
 		static bool sDebugDrawContentRect;

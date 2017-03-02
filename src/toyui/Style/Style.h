@@ -20,6 +20,8 @@
 
 namespace toy
 {
+	typedef std::function<bool (Frame&, Renderer&)> CustomRenderer;
+
 	class _I_ TOY_UI_EXPORT Shadow : public IdStruct
 	{
 	public:
@@ -67,8 +69,8 @@ namespace toy
 	public:
 		LayoutStyle()
 			: IdStruct(cls())
-			, d_layout(DimLayout(AUTOLAYOUT, AUTOLAYOUT)), d_flow(FLOW), d_clipping(NOCLIP), d_opacity(CLEAR), d_space(AUTO), d_layoutDim(DIM_Y), d_align(DimAlign(LEFT, LEFT))
-			, d_span(DimFloat(1.f, 1.f)), d_pivot(DimPivot(FORWARD, FORWARD)), d_updated(0)
+			, d_layout(DimLayout(AUTO_LAYOUT, AUTO_LAYOUT)), d_flow(FLOW), d_clipping(NOCLIP), d_opacity(CLEAR), d_space(CONTAINER), d_direction(DIRECTION_AUTO), d_align(DimAlign(LEFT, LEFT))
+			, d_span(DimFloat(1.f, 1.f)), d_pivot(DimPivot(FORWARD, FORWARD)), d_zorder(0), d_updated(0)
 		{}
 
 		LayoutStyle(const LayoutStyle& other)
@@ -79,14 +81,14 @@ namespace toy
 
 		LayoutStyle& operator=(const LayoutStyle&) = default;
 
-		void copy(const LayoutStyle& other, bool inherit = false)
+		void copy(const LayoutStyle& other, bool inherit)
 		{
 			d_layout.copy(other.d_layout, inherit);
 			d_flow.copy(other.d_flow, inherit);
+			d_space.copy(other.d_space, inherit);
 			d_clipping.copy(other.d_clipping, inherit);
 			d_opacity.copy(other.d_opacity, inherit);
-			d_space.copy(other.d_space, inherit);
-			d_layoutDim.copy(other.d_layoutDim, inherit);
+			d_direction.copy(other.d_direction, inherit);
 			d_align.copy(other.d_align, inherit);
 			d_span.copy(other.d_span, inherit);
 			d_size.copy(other.d_size, inherit);
@@ -94,38 +96,41 @@ namespace toy
 			d_margin.copy(other.d_margin, inherit);
 			d_spacing.copy(other.d_spacing, inherit);
 			d_pivot.copy(other.d_pivot, inherit);
-			d_sizing.copy(other.d_sizing, inherit);
+			d_zorder.copy(other.d_zorder, inherit);
 		}
+
+		void inherit(const LayoutStyle& other) { return this->copy(other, true); }
+		void copy(const LayoutStyle& other) { return this->copy(other, false); }
 
 		_A_ DimLayout layout() const { return d_layout.val; }
 		_A_ Flow flow() const { return d_flow.val; }
+		_A_ Space space() const { return d_space.val; }
 		_A_ Clipping clipping() const { return d_clipping.val; }
 		_A_ Opacity opacity() const { return d_opacity.val; }
-		_A_ Space div() const { return d_space.val; }
-		_A_ Dimension layoutDim() const { return d_layoutDim.val; }
+		_A_ Direction direction() const { return d_direction.val; }
 		_A_ DimAlign& align() { return d_align.val; }
 		_A_ DimFloat& span() { return d_span.val; }
 		_A_ DimFloat& size() { return d_size.val; }
 		_A_ BoxFloat& padding() { return d_padding.val; }
 		_A_ DimFloat& margin() { return d_margin.val; }
 		_A_ DimFloat& spacing() { return d_spacing.val; }
-		_A_ DimSizing& sizing() { return d_sizing.val; }
 		_A_ DimPivot& pivot() { return d_pivot.val; }
+		_A_ int& zorder() { return d_zorder.val; }
 
 		StyleAttr<DimLayout> d_layout;
 		StyleAttr<Flow> d_flow;
+		StyleAttr<Space> d_space;
 		StyleAttr<Clipping> d_clipping;
 		StyleAttr<Opacity> d_opacity;
-		StyleAttr<Space> d_space;
-		StyleAttr<Dimension> d_layoutDim;
+		StyleAttr<Direction> d_direction;
 		StyleAttr<DimAlign> d_align;
 		StyleAttr<DimFloat> d_span;
 		StyleAttr<DimFloat> d_size;
 		StyleAttr<BoxFloat> d_padding;
 		StyleAttr<DimFloat> d_margin;
 		StyleAttr<DimFloat> d_spacing;
-		StyleAttr<DimSizing> d_sizing;
 		StyleAttr<DimPivot> d_pivot;
+		StyleAttr<int> d_zorder;
 
 		_A_ _M_ size_t d_updated;
 
@@ -135,28 +140,34 @@ namespace toy
 	class _I_ TOY_UI_EXPORT InkStyle : public IdStruct
 	{
 	public:
-		_C_ InkStyle(const string& name)
+		_C_ InkStyle(Style* style = nullptr)
 			: IdStruct(cls())
-			, m_name(name)
-			, m_empty(true), m_backgroundColour(Colour::Transparent), m_borderColour(Colour::Transparent), m_imageColour(Colour::Transparent), m_textColour(Colour::Transparent)
+			, m_style(style)
+			, m_empty(true), m_base(nullptr), m_backgroundColour(Colour::Transparent), m_borderColour(Colour::Transparent), m_imageColour(Colour::Transparent), m_textColour(Colour::Transparent)
 			, m_textFont("dejavu"), m_textSize(14.f), m_textBreak(true), m_textWrap(false)
 			, m_borderWidth(0.f), m_cornerRadius(), m_weakCorners(false)
 			, m_padding(0.f), m_margin(0.f)
 			, m_align(DimAlign(LEFT, LEFT)), m_linearGradient(DimFloat(0.f, 0.f)), m_linearGradientDim(DIM_Y)
-			, m_image(nullptr), m_overlay(nullptr), m_tile(nullptr)
+			, m_image(nullptr), m_overlay(nullptr), m_tile(nullptr), m_hoverCursor(nullptr)
 		{}
 
 		InkStyle(const InkStyle& other)
 			: IdStruct(cls())
-			, m_name(other.m_name)
+			, m_style(other.m_style)
 		{
 			this->copy(other);
 		}
 
 		InkStyle& operator=(const InkStyle&) = default;
 
-		void copy(const InkStyle& other, bool inherit = false)
+		void copy(const InkStyle& other, bool inherit)
 		{
+			if(!inherit)
+				m_base.copy(other.m_base, false);
+			if(inherit && m_base.set && other.m_style != m_base.val)
+				return;
+
+			m_empty.copy(other.m_empty, inherit);
 			m_backgroundColour.copy(other.m_backgroundColour, inherit);
 			m_borderColour.copy(other.m_borderColour, inherit);
 			m_imageColour.copy(other.m_imageColour, inherit);
@@ -178,12 +189,17 @@ namespace toy
 			m_tile.copy(other.m_tile, inherit);
 			m_imageSkin.copy(other.m_imageSkin, inherit);
 			m_shadow.copy(other.m_shadow, inherit);
+			m_hoverCursor.copy(other.m_hoverCursor, inherit);
+			m_customRenderer.copy(other.m_customRenderer, inherit);
 		}
+
+		void inherit(const InkStyle& other) { return this->copy(other, true); }
+		void copy(const InkStyle& other) { return this->copy(other, false); }
 
 		void setEmpty(bool empty) { m_empty = empty; }
 
-		_A_ const string& name() const { return m_name; }
-		_A_ bool empty() const { return m_empty; }
+		_A_ bool empty() const { return m_empty.val; }
+		_A_ Style* base() const { return m_base.val; }
 		_A_ Colour& backgroundColour() { return m_backgroundColour.val; }
 		_A_ Colour& borderColour() { return m_borderColour.val; }
 		_A_ Colour& imageColour() { return m_imageColour.val; }
@@ -205,9 +221,14 @@ namespace toy
 		_A_ Image* tile() { return m_tile.val; }
 		_A_ ImageSkin& imageSkin() { return m_imageSkin.val; }
 		_A_ Shadow& shadow() { return m_shadow.val; }
+		_A_ Type* hoverCursor() { return m_hoverCursor.val; }
+		_A_ const CustomRenderer& customRenderer() { return m_customRenderer.val; }
 
-		string m_name;
-		bool m_empty;
+		void prepare();
+
+		Style* m_style;
+		StyleAttr<bool> m_empty;
+		StyleAttr<Style*> m_base;
 		StyleAttr<Colour> m_backgroundColour;
 		StyleAttr<Colour> m_borderColour;
 		StyleAttr<Colour> m_imageColour;
@@ -229,6 +250,8 @@ namespace toy
 		StyleAttr<Image*> m_tile;
 		StyleAttr<ImageSkin> m_imageSkin;
 		StyleAttr<Shadow> m_shadow;
+		StyleAttr<Type*> m_hoverCursor;
+		StyleAttr<CustomRenderer> m_customRenderer;
 
 		static Type& cls() { static Type ty(INDEXED); return ty; }
 	};
@@ -238,7 +261,7 @@ namespace toy
 	class TOY_UI_EXPORT SubSkin
 	{
 	public:
-		SubSkin(WidgetState state, const string& name) : m_state(state), m_skin(name) {}
+		SubSkin(WidgetState state, Style& style, const string& name) : m_state(state), m_skin(&style) {}
 		SubSkin(WidgetState state, const InkStyle& skin) : m_state(state), m_skin(skin) {}
 
 		WidgetState m_state;
@@ -250,7 +273,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Style : public IdStruct, public NonCopy
 	{
 	public:
-		Style(Type& type, Style* base);
+		Style(Type& type, Style* base = nullptr);
 		Style(const string& name);
 		~Style();
 
@@ -263,43 +286,39 @@ namespace toy
 		void markUpdate() { ++m_updated; }
 		void setUpdated(size_t update) { m_updated = update; }
 
+		bool ready() { return m_ready; }
+
 		Type* styleType() { return m_styleType; }
 		const StyleTable& subskins() { return m_subskins; }
 		
-		void reset();
-		InkStyle& copy(WidgetState state, InkStyle& original, bool inherit);
+		void clear();
+		void prepare(Style* definition);
 
 		InkStyle& subskin(WidgetState state);
 		InkStyle& decline(WidgetState state);
 
-		void rebase(Style& base);
-		void rebaseSkins(Style& base);
+		InkStyle& fetchSubskin(WidgetState state);
 
-		void inherit();
 		void inheritLayout(Style& base);
-		void inheritSkins(Style& base);
-		void copySkins(Style& base);
+		void inheritSkin(Style& base);
+
+		void define(Style& style);
+
+		void copyLayout(Style& base);
+		void copySkin(Style& base);
 
 		static Type& cls() { static Type ty(INDEXED); return ty; }
 
 	protected:
 		Type* m_styleType;
 		Style* m_base;
-		Style* m_baseSkin;
 		string m_name;
 		LayoutStyle m_layout;
 		InkStyle m_skin;
 		StyleTable m_subskins;
 		size_t m_updated;
-	};
 
-	class TOY_UI_EXPORT StyleType : public Type, public Style
-	{
-	public:
-		StyleType(const string& name);
-		StyleType(const string& name, StyleType& base);
-
-		using Type::name;
+		bool m_ready;
 	};
 }
 

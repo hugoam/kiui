@@ -23,6 +23,8 @@ namespace toy
 	public:
 		Uibox();
 
+		size_t styleStamp() { return d_styleStamp; }
+
 		inline DimFloat position() { return d_position; }
 		inline DimFloat size() { return d_size; }
 
@@ -31,30 +33,29 @@ namespace toy
 		inline float dcontent(Dimension dim) { return d_content[dim]; }
 		inline float dspan(Dimension dim) { return d_span[dim]; }
 
-		inline float dpadding(Dimension dim) { return d_layout->padding()[dim]; }
-		inline float dbackpadding(Dimension dim) { return d_layout->padding()[dim + 2]; }
-		inline float dmargin(Dimension dim) { return d_layout->margin()[dim]; }
+		inline float dpadding(Dimension dim) { return d_style->layout().padding()[dim]; }
+		inline float dbackpadding(Dimension dim) { return d_style->layout().padding()[dim + 2]; }
+		inline float dmargin(Dimension dim) { return d_style->layout().margin()[dim]; }
 
 		inline float dbounds(Dimension dim) { return dcontent(dim) + dpadding(dim) + dbackpadding(dim) + dmargin(dim) * 2.f; }
-		inline float dmeasure(Dimension dim) { return std::max(dbounds(dim), d_layout->size()[dim]); }
+		inline float dmeasure(Dimension dim) { return std::max(dbounds(dim), d_style->layout().size()[dim]); }
 		inline float dextent(Dimension dim) { return dsize(dim) + dmargin(dim) * 2.f; }
 
-		inline float doffset(Dimension dim) { return dposition(dim) + dextent(dim); }
-
-		inline Align dalign(Dimension dim) { return d_layout->align()[dim]; }
+		inline Align dalign(Dimension dim) { return d_style->layout().align()[dim]; }
 
 		inline Sizing dsizing(Dimension dim) { return d_sizing[dim]; }
 		inline bool dexpand(Dimension dim) { return d_sizing[dim] >= WRAP; }
 		inline bool dmanual(Dimension dim) { return d_sizing[dim] == MANUAL; }
 
-		inline Dimension length() { return d_layout->d_layoutDim; }
-		inline Dimension depth() { return d_layout->d_layoutDim == DIM_X ? DIM_Y : DIM_X; }
+		inline Dimension length() { return d_length; }
+		inline Dimension depth() { return d_depth; }
 
-		inline bool flow() { return d_layout->d_flow == FLOW; }
-		inline bool unflow() { return d_layout->d_flow == FREE || d_layout->d_flow == FREE_FILL; }
-		inline bool clip() { return d_layout->d_clipping == CLIP; }
-		inline bool opaque() { return d_opacity == OPAQUE; }
-		inline bool hollow() { return d_opacity == HOLLOW; }
+		inline bool flow() { return d_style->layout().d_flow == FLOW; }
+		inline bool posflow() { return d_style->layout().d_flow <= ALIGN; }
+		inline bool sizeflow() { return d_style->layout().d_flow <= OVERLAY; }
+		inline bool clip() { return d_style->layout().d_clipping == CLIP; }
+		inline bool opaque() { return d_style->layout().d_opacity == OPAQUE; }
+		inline bool hollow() { return d_style->layout().d_opacity == HOLLOW; }
 
 		inline float scale() { return d_scale; }
 
@@ -67,23 +68,27 @@ namespace toy
 		inline float width() { return dsize(DIM_X); }
 		inline float height() { return dsize(DIM_Y); }
 
-		inline void setOpacity(Opacity opacity) { d_opacity = opacity; }
+		inline Dimension orthogonal(Dimension dim) { return dim == DIM_X ? DIM_Y : DIM_X; }
+		inline Dimension parallel(Dimension dim) { return dim; }
+
+		inline void setLength(Dimension dim) { d_length = dim; }
 		inline void setScale(float scale) { d_scale = scale; }
-		inline void setSizing(Sizing xsizing, Sizing ysizing) { d_sizing = DimSizing(xsizing, ysizing); }
 		inline void setContentSize(DimFloat content) { d_content = content; }
 
 	protected:
 		DimFloat d_position;
 		DimFloat d_size;
 		DimFloat d_content;
+		DimFloat d_spaceContent;
+		bool d_contentExpand;
 		DimFloat d_span;
-		Space d_space;
 		DimSizing d_sizing;
-		Opacity d_opacity;
 		float d_scale;
 		Dimension d_depth;
 		Dimension d_length;
-		LayoutStyle* d_layout;
+
+		Style* d_style;
+		size_t d_styleStamp;
 	};
 }
 

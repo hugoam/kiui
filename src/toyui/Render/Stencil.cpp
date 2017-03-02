@@ -30,6 +30,20 @@ namespace toy
 		//	m_frame.parent()->stencil().setHardClip(hardClip);
 	}
 
+	BoxFloat Stencil::selectCorners()
+	{
+		Frame& frame = m_frame.frame();
+		Stripe& parent = *m_frame.frame().parent();
+
+		BoxFloat& corners = parent.style().skin().cornerRadius();
+		if(parent.first(frame))
+			return parent.length() == DIM_X ? BoxFloat(corners.v0(), 0.f, 0.f, corners.v3()) : BoxFloat(corners.v0(), corners.v1(), 0.f, 0.f);
+		else if(parent.last(frame))
+			return parent.length() == DIM_X ? BoxFloat(0.f, corners.v1(), corners.v2(), 0.f) : BoxFloat(0.f, 0.f, corners.v2(), corners.v3());
+		else 
+			return BoxFloat();
+	}
+
 	void Stencil::redraw(Renderer& target, BoxFloat& rect, BoxFloat& paddedRect, BoxFloat& contentRect)
 	{
 		UNUSED(paddedRect);
@@ -48,15 +62,10 @@ namespace toy
 		}
 
 		// Rect
-		if((skin.borderWidth().x0() || skin.backgroundColour().a() > 0.f) && skin.m_weakCorners)
-		{
-			BoxFloat clipBox(-m_frame.frame().dposition(DIM_X), -m_frame.frame().dposition(DIM_Y), m_frame.frame().parent()->width(), m_frame.frame().parent()->height());
-			target.clipFrame(clipBox, BoxFloat()/*m_frame.parent()->inkstyle().cornerRadius()*/);
-		}
-		
 		if((skin.borderWidth().x0() || skin.backgroundColour().a() > 0.f))
 		{
-			target.drawRect(rect, skin.cornerRadius(), skin);
+			BoxFloat cornerRadius = skin.m_weakCorners ? this->selectCorners() : skin.cornerRadius();
+			target.drawRect(rect, cornerRadius, skin);
 		}
 
 		// ImageSkin

@@ -14,6 +14,7 @@
 #include <toyui/Frame/Layer.h>
 
 #include <toyui/UiLayout.h>
+#include <toyui/UiWindow.h>
 
 #include <toyobj/Iterable/Reverse.h>
 
@@ -21,16 +22,26 @@ namespace toy
 {
 	string Widget::sNullString;
 
-	Widget::Widget(StyleType& type, FrameType frameType)
+	Widget::Widget(Piece& parent, Type& type, FrameType frameType)
+		: Widget(type, frameType, &parent)
+	{
+		parent.push(*this);
+	}
+
+	Widget::Widget(Type& type, FrameType frameType, Piece* parent)
 		: TypeObject(type)
-		, m_parent(nullptr)
-		, m_style(&type)
-		, d_styleStamp(type.updated())
+		, m_parent(parent)
+		, m_container(nullptr)
+		, m_style(nullptr)
 		, m_frame()
-		, m_state(UNBOUND)
+		, m_state(NOSTATE)
 		, m_device(nullptr)
 	{
-		if(frameType == GRID)
+		if(frameType == MASTER_LAYER)
+			m_frame = make_unique<MasterLayer>(*this);
+		else if(frameType == LAYER)
+			m_frame = make_unique<Layer>(*this);
+		else if(frameType == GRID)
 			m_frame = make_unique<Grid>(*this);
 		else if(frameType == TABLE)
 			m_frame = make_unique<TableGrid>(*this);
@@ -38,6 +49,9 @@ namespace toy
 			m_frame = make_unique<Stripe>(*this);
 		else if(frameType == FRAME)
 			m_frame = make_unique<Frame>(*this);
+
+		if(m_parent)
+			this->updateStyle();
 	}
 
 	Widget::~Widget()
@@ -88,28 +102,26 @@ namespace toy
 		return this->content().text();
 	}
 
-	void Widget::bind(Sheet& parent, size_t index)
+	void Widget::bind(Piece& parent, size_t index, bool deferred)
 	{
 		m_parent = &parent;
 		m_parentFrame = &parent;
 		m_index = index;
+		
+		if(deferred)
+			m_parent->frame().markDirty(Frame::DIRTY_MAPPING);
+		else
+			m_parent->stripe().map(*m_frame);
 
-		m_frame->bind(parent.stripe());
-		m_parent->stripe().map(*m_frame);
-		this->updateStyle();
-		this->enableState(BOUND);
-		this->bound();
-
-		this->rootSheet().handleBindWidget(*this);
+		RootSheet& rootSheet = this->rootSheet();
+		this->visit([&rootSheet](Widget& widget) { rootSheet.handleBindWidget(widget); return true; });
 	}
 
 	void Widget::unbind()
 	{
-		this->rootSheet().handleUnbindWidget(*this);
+		RootSheet& rootSheet = this->rootSheet();
+		this->visit([&rootSheet](Widget& widget) { rootSheet.handleUnbindWidget(widget); return true; });
 
-		this->disableState(BOUND);
-		this->unbound();
-		m_frame->unbind();
 		m_parent->stripe().unmap(*m_frame);
 
 		m_parent = nullptr;
@@ -117,40 +129,43 @@ namespace toy
 		m_index = 0;
 	}
 
-	unique_ptr<Widget> Widget::detach()
-	{
-		return m_parent->release(*this);
-	}
-
 	unique_ptr<Widget> Widget::extract()
 	{
-		unique_ptr<Widget> unique = m_parent->release(*this);
+		unique_ptr<Widget> unique = m_container->release(*this);
 		m_parent->destroy();
 		return unique;
 	}
 
 	void Widget::remove()
 	{
-		m_parent->vrelease(*this);
+		m_container->release(*this);
 	}
 
 	void Widget::destroy()
 	{
-		m_parent->release(*this);
+		m_container->release(*this);
+	}
+
+	void Widget::visit(const Visitor& visitor)
+	{
+		visitor(*this);
 	}
 
 	void Widget::nextFrame(size_t tick, size_t step)
 	{
-		m_frame->updateOnce();
+		if(m_frame->dirty())
+			m_frame->layer().setRedraw();
 
-		if(m_style->updated() > d_styleStamp)
-			this->resetStyle();
+		m_frame->clearDirty();
+
+		if(m_style->updated() > m_frame->styleStamp())
+			m_frame->resetStyle();
 	}
 
-	void Widget::render(Renderer& renderer)
+	void Widget::render(Renderer& renderer, bool force)
 	{
-		m_frame->content().beginDraw(renderer);
-		m_frame->content().draw(renderer);
+		m_frame->content().beginDraw(renderer, force);
+		m_frame->content().draw(renderer, force);
 		m_frame->content().endDraw(renderer);
 	}
 
@@ -166,45 +181,24 @@ namespace toy
 
 	void Widget::updateStyle()
 	{
-		m_frame->setStyle(this->fetchOverride(*m_style));
+		m_style = &this->fetchStyle(m_type);
+		m_frame->setStyle(*m_style);
 	}
 
-	void Widget::resetStyle()
-	{
-		if(!m_parent)
-			return;
-
-		size_t index = m_index;
-		Sheet& parent = *m_parent;
-		parent.unbindChild(*this);
-		parent.bindChild(*this, index);
-
-		d_styleStamp = m_style->updated();
-
-		this->updateStyle();
-	}
-
-	void Widget::resetStyle(Style& style)
+	void Widget::resetStyle(Style& style, bool hard)
 	{
 		m_style = &style;
-		this->resetStyle();
+		m_frame->setStyle(*m_style, hard);
 	}
 
-	void Widget::resetSkin(Style& style)
+	void Widget::resetStyle(Type& type, bool hard)
 	{
-		m_style = &style;
-		this->updateStyle();
+		this->resetStyle(this->fetchStyle(type), hard);
 	}
 
-	Style& Widget::fetchOverride(Style& style)
+	Style& Widget::fetchStyle(Type& type)
 	{
-		Style* overrider = this->uiWindow().styler().fetchOverride(style, *m_style);
-		if(overrider)
-			return *overrider;
-		else if(m_parent)
-			return m_parent->fetchOverride(style);
-		else
-			return style;
+		return this->uiWindow().styler().style(type);
 	}
 
 	void Widget::markDirty()
@@ -232,14 +226,14 @@ namespace toy
 
 	void Widget::updateState()
 	{
-		// @kludge: m_style is our original type and style, but m_frame->style() is the 'transient' override, think about harmonizing that
-		if(m_state & BOUND)
-			m_frame->content().updateInkstyle(m_frame->style().subskin(m_state));
+		m_frame->content().updateInkstyle(m_style->subskin(m_state));
+		m_frame->setDirty(Frame::DIRTY_CONTENT);
 	}
 
 	Widget* Widget::pinpoint(float x, float y)
 	{
-		Frame* frame = m_frame->pinpoint(x - m_frame->dabsolute(DIM_X), y - m_frame->dabsolute(DIM_Y), true);
+		DimFloat absolute = m_frame->absolutePosition();
+		Frame* frame = m_frame->pinpoint(x - absolute[DIM_X], y - absolute[DIM_Y], true);
 		return frame ? frame->widget() : nullptr;
 	}
 
@@ -321,4 +315,12 @@ namespace toy
 		UNUSED(mouseEvent);
 		this->disableState(PRESSED);
 	}
+
+	Item::Item(Piece& parent, Type& type)
+		: Widget(parent, type)
+	{}
+
+	Control::Control(Piece& parent, Type& type)
+		: Item(parent, type)
+	{}
 }

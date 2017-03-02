@@ -343,6 +343,6 @@ namespace toy
 
 	unique_ptr<Renderer> GlfwRenderSystem::createRenderer(Context& context)
 	{
-		return make_unique<GlRenderer>(m_resourcePath);
+		return make_unique<GlRenderer>(m_resourcePath, true);
 	}
 }

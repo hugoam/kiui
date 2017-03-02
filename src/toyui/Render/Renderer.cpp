@@ -21,7 +21,7 @@ namespace toy
 
 	void RenderTarget::render()
 	{
-		m_renderer.render(m_masterLayer);
+		m_renderer.render(*this);
 	}
 
 	Renderer::Renderer(const string& resourcePath)

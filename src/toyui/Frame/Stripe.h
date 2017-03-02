@@ -35,22 +35,19 @@ namespace toy
 	{
 	public:
 		Stripe(Widget& widget);
-		Stripe(StyleType& style, Stripe& parent);
+		Stripe(Style& style, Stripe& parent);
 
 		FrameType frameType() { return STRIPE; }
 
 		inline FrameVector& contents() { return d_contents; }
 		inline FlowSequence& sequence() { return d_sequence; }
 
-		inline float spacing(Frame& frame) { return this->before(frame) ? d_layout->spacing()[d_length] : 0.f; }
-		
-		inline float alignSequence(Frame& frame, float space) { return space * AlignSpace[frame.dalign(d_length)]; }
-
-		inline float dpivotposition(Frame& frame, Dimension dim) { return d_layout->pivot()[dim] ? dsize(dim) - frame.dsize(dim) - frame.dposition(dim) : frame.dposition(dim); }
+		inline float spacing(Frame& frame) { return this->before(frame) ? d_style->layout().spacing()[d_length] : 0.f; }
 
 		virtual void map(Frame& frame);
 		virtual void unmap(Frame& frame);
 		virtual void remap();
+		virtual void unmap();
 
 		void append(Frame& frame);
 		void insert(Frame& frame, size_t index);
@@ -66,18 +63,15 @@ namespace toy
 		bool first(Frame& frame);
 		bool last(Frame& frame);
 
-		virtual void measure();
-		void measure(Frame& frame, DimFloat& content);
+		virtual void visit(Stripe& root, const Visitor& visitor);
 
-		virtual void layout();
-		void resize(Frame& frame, DimFloat& expanded);
-		void layout(Frame& frame, DimFloat& offset, DimFloat& space);
+		virtual void measureLayout();
+		virtual void resizeLayout();
+		virtual void positionLayout();
 
-		float resize(Frame& frame, Dimension dim);
-
-		void position(Frame& frame, DimFloat& offset, DimFloat& space);
-		float positionFree(Frame& frame, Dimension dim, float offset, float space);
-		float positionSequence(Frame& frame, float offset, float space);
+		void measure(Frame& frame);
+		void resize(Frame& frame);
+		void position(Frame& frame);
 
 		void normalizeSpan();
 
@@ -85,6 +79,14 @@ namespace toy
 		float prevOffset(Dimension dim, float pos);
 
 		Frame* pinpoint(float x, float y, bool opaque);
+
+	private:
+		void measure(Frame& frame, Dimension dim);
+		void resize(Frame& frame, Dimension dim);
+		void position(Frame& frame, Dimension dim);
+
+		float positionFree(Frame& frame, Dimension dim, float offset, float space);
+		float positionSequence(Frame& frame, float offset, float space);
 
 	protected:
 		FrameVector d_contents;

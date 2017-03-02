@@ -16,20 +16,11 @@ namespace toy
 {
 	Renderer* DrawFrame::sRenderer = nullptr;
 
+	string DrawFrame::sDebugDrawFilter = "";
 	bool DrawFrame::sDebugDrawFrameRect = false;
 	bool DrawFrame::sDebugDrawPaddedRect = false;
 	bool DrawFrame::sDebugDrawContentRect = false;
 	bool DrawFrame::sDebugDrawClipRect = false;
-
-	DrawFrame::DrawFrame()
-		: d_frame(nullptr)
-		, d_stencil(*this)
-		, d_caption(*this)
-		, m_text()
-		, m_textLines(0)
-		, m_image(nullptr)
-		, d_inkstyle(nullptr)
-	{}
 
 	DrawFrame::DrawFrame(Frame& frame)
 		: d_frame(&frame)
@@ -131,7 +122,7 @@ namespace toy
 			pos[dim] = paddedRect[dim] + paddedRect[dim + 2] - size[dim];
 	}
 
-	void DrawFrame::beginDraw(Renderer& renderer)
+	void DrawFrame::beginDraw(Renderer& renderer, bool force)
 	{
 		float x = floor(d_frame->dposition(DIM_X));
 		float y = floor(d_frame->dposition(DIM_Y));
@@ -143,8 +134,12 @@ namespace toy
 		void* layerCache = nullptr;
 		renderer.layerCache(d_frame->layer(), layerCache);
 
-		if(d_frame->frameType() >= LAYER && d_frame->layer().redraw())
+		if(d_frame->frameType() >= LAYER && (d_frame->layer().redraw() || force))
+		{
+			//d_frame->debugPrintDepth();
+			//printf("Clearing Layer %s\n", d_frame->style().name().c_str());
 			renderer.clearLayer(layerCache);
+		}
 
 		renderer.beginUpdate(layerCache, x, y, d_frame->scale());
 #else
@@ -152,15 +147,23 @@ namespace toy
 #endif
 	}
 
-	void DrawFrame::draw(Renderer& renderer)
+	void DrawFrame::draw(Renderer& renderer, bool force)
 	{
 #ifdef TOYUI_DRAW_CACHE
-		if(!d_frame->layer().redraw())
+		if(!(d_frame->layer().redraw() || force))
 			return;
 #endif
 		bool custom = d_frame->widget()->customDraw(renderer);
 		if(custom)
 			return;
+
+		if(d_inkstyle->customRenderer() != nullptr)
+		{
+			CustomRenderer func = d_inkstyle->customRenderer();
+			custom = func(*d_frame, renderer);
+			if(custom)
+				return;
+		}
 
 		float left = floor(d_inkstyle->margin().x0());
 		float top = floor(d_inkstyle->margin().y0());
@@ -168,6 +171,11 @@ namespace toy
 		float height = floor(d_frame->height() - d_inkstyle->margin().y0() - d_inkstyle->margin().y1());
 
 		BoxFloat rect(left, top, width, height);
+
+#if 1 // DEBUG
+		if(d_frame->style().name() == sDebugDrawFilter)
+			renderer.debugRect(rect, Colour::Red);
+#endif
 
 		if(d_frame->clip())
 			renderer.clipRect(rect);
@@ -199,6 +207,8 @@ namespace toy
 		d_caption.redraw(renderer, rect, paddedRect, contentRect);
 
 #if 1 // DEBUG
+		if(d_frame->style().name() == sDebugDrawFilter)
+			renderer.debugRect(rect, Colour::Red);
 		if(sDebugDrawFrameRect)
 			renderer.debugRect(rect, Colour::Red);
 		if(sDebugDrawPaddedRect)

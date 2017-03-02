@@ -449,9 +449,9 @@ namespace toy
             DockWindow::cls().imprint().setup("DockWindow", OBJECT);
             DockWindow::cls().imprint().initObject(false);
             
-            // ShrinkWindow
-            ShrinkWindow::cls().imprint().setup("ShrinkWindow", OBJECT);
-            ShrinkWindow::cls().imprint().initObject(false);
+            // WrapWindow
+            WrapWindow::cls().imprint().setup("WrapWindow", OBJECT);
+            WrapWindow::cls().imprint().initObject(false);
             
             // DimFloat
             DimFloat::cls().imprint().setup("DimFloat", STRUCT);
@@ -635,13 +635,13 @@ namespace toy
             Scrollbar::cls().imprint().setup("Scrollbar", OBJECT);
             Scrollbar::cls().imprint().initObject(false);
             
-            // Sheet
-            Sheet::cls().imprint().setup("Sheet", OBJECT);
-            Sheet::cls().imprint().initObject(false);
+            // Piece
+            Piece::cls().imprint().setup("Piece", OBJECT);
+            Piece::cls().imprint().initObject(false);
             
-            // LayerSheet
-            LayerSheet::cls().imprint().setup("LayerSheet", OBJECT);
-            LayerSheet::cls().imprint().initObject(false);
+            // Overlay
+            Overlay::cls().imprint().setup("Overlay", OBJECT);
+            Overlay::cls().imprint().initObject(false);
             
             // Board
             Board::cls().imprint().setup("Board", OBJECT);
@@ -654,11 +654,7 @@ namespace toy
             // GridSheet
             GridSheet::cls().imprint().setup("GridSheet", OBJECT);
             GridSheet::cls().imprint().initObject(false);
-            
-            // Band
-            Band::cls().imprint().setup("Band", OBJECT);
-            Band::cls().imprint().initObject(false);
-            
+
             // StatSliderfloat
             StatSlider<float>::cls().imprint().setup("StatSlider<float>", OBJECT);
             StatSlider<float>::cls().imprint().initObject(false);
@@ -701,7 +697,7 @@ namespace toy
             
             // Widget
             Widget::cls().imprint().setup("Widget", OBJECT);
-            Widget::cls().imprint().addMember(make_unique<Member>(Sheet::cls(), 0, "parent", &Widget_parent, nullptr, false, false, &Widget_parent_object));
+            Widget::cls().imprint().addMember(make_unique<Member>(Piece::cls(), 0, "parent", &Widget_parent, nullptr, false, false, &Widget_parent_object));
             Widget::cls().imprint().addMember(make_unique<Member>(Frame::cls(), 1, "frame", &Widget_frame, nullptr, true, false, &Widget_frame_object));
             Widget::cls().imprint().addMember(make_unique<Member>(typecls<WidgetState>(), 2, "state", &Widget_state, nullptr, false, false));
             Widget::cls().imprint().addMember(make_unique<Member>(Style::cls(), 3, "style", &Widget_style, &Widget_setStyle, true, true, &Widget_style_object));
@@ -751,7 +747,7 @@ namespace toy
             m_rootTypes.push_back(&CloseButton::cls());
             m_rootTypes.push_back(&Window::cls());
             m_rootTypes.push_back(&DockWindow::cls());
-            m_rootTypes.push_back(&ShrinkWindow::cls());
+            m_rootTypes.push_back(&WrapWindow::cls());
             m_rootTypes.push_back(&DimFloat::cls());
             m_rootTypes.push_back(&BoxFloat::cls());
             m_rootTypes.push_back(&DimSizing::cls());
@@ -774,12 +770,11 @@ namespace toy
             m_rootTypes.push_back(&Input<toy::Colour>::cls());
             m_rootTypes.push_back(&RootSheet::cls());
             m_rootTypes.push_back(&Scrollbar::cls());
-            m_rootTypes.push_back(&Sheet::cls());
-            m_rootTypes.push_back(&LayerSheet::cls());
+            m_rootTypes.push_back(&Piece::cls());
+            m_rootTypes.push_back(&Overlay::cls());
             m_rootTypes.push_back(&Board::cls());
             m_rootTypes.push_back(&ScrollSheet::cls());
             m_rootTypes.push_back(&GridSheet::cls());
-            m_rootTypes.push_back(&Band::cls());
             m_rootTypes.push_back(&StatSlider<float>::cls());
             m_rootTypes.push_back(&StatSlider<int>::cls());
             m_rootTypes.push_back(&Textbox::cls());

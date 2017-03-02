@@ -20,7 +20,7 @@ namespace toy
 		, d_sequence(d_contents)
 	{}
 
-	Stripe::Stripe(StyleType& style, Stripe& parent)
+	Stripe::Stripe(Style& style, Stripe& parent)
 		: Frame(style, parent)
 		, d_contents()
 		, d_sequence(d_contents)
@@ -28,16 +28,34 @@ namespace toy
 
 	void Stripe::map(Frame& frame)
 	{
+		frame.bind(*this);
 		this->insert(frame, frame.widget()->index());
 	}
 
 	void Stripe::unmap(Frame& frame)
 	{
+		frame.unbind();
 		this->remove(frame);
 	}
 
 	void Stripe::remap()
-	{}
+	{
+		if(d_dirty < DIRTY_MAPPING)
+			return;
+
+		this->unmap();
+
+		for(Widget* widget : d_widget->as<Piece>().contents())
+		{
+			this->map(widget->frame());
+			widget->frame().remap();
+		}
+	}
+
+	void Stripe::unmap()
+	{
+		this->clear();
+	}
 
 	void Stripe::append(Frame& frame)
 	{
@@ -56,7 +74,7 @@ namespace toy
 		if(frame.flow())
 			++d_sequence.size();
 
-		this->markDirty(DIRTY_LAYOUT);
+		this->markDirty(DIRTY_STRUCTURE);
 	}
 
 	void Stripe::remove(Frame& frame)
@@ -66,7 +84,7 @@ namespace toy
 		if(frame.flow())
 			--d_sequence.size();
 
-		this->markDirty(DIRTY_LAYOUT);
+		this->markDirty(DIRTY_STRUCTURE);
 	}
 
 	void Stripe::clear()
@@ -116,161 +134,203 @@ namespace toy
 	{
 		return frame.dindex(d_length) == d_sequence.size() - 1;
 	}
-	
-	void Stripe::measure()
+
+	void Stripe::visit(Stripe& root, const Visitor& visitor)
+	{
+		if(this != &root)
+		{
+			bool pursue = visitor(*this);
+			if(!pursue)
+				return;
+		}
+
+		for(Frame* pframe : d_contents)
+			pframe->visit(root, visitor);
+	}
+
+	void Stripe::measureLayout()
 	{
 		if(d_dirty < DIRTY_CONTENT)
 			return;
 
 		d_content = DimFloat(0.f, 0.f);
+		d_spaceContent = DimFloat(0.f, 0.f);
+		d_contentExpand = false;
 
 		if(d_sequence.size() < 1)
-			Frame::measure();
+			Frame::measureLayout();
 
 		for(Frame* pframe : d_contents)
-			this->measure(*pframe, d_content);
-
-#if 0 // DEBUG
-		this->debugPrintDepth();
-		printf("%s measured content size %f , %f\n", this->style().name().c_str(), d_content[DIM_X], d_content[DIM_Y]);
-#endif
+			this->measure(*pframe);
 	}
 
-	void Stripe::measure(Frame& frame, DimFloat& content)
-	{
-		frame.measure();
-
-		if(frame.hidden())
-			return;
-
-		if(frame.flow() && frame.dsizing(d_length) <= WRAP)
-			content[d_length] += frame.dmeasure(d_length) + this->spacing(frame);
-
-		if(frame.flow() && frame.dsizing(d_depth) <= WRAP)
-			content[d_depth] = std::max(content[d_depth], frame.dmeasure(d_depth));
-	}
-
-	void Stripe::layout()
+	void Stripe::resizeLayout()
 	{
 		if(d_dirty < DIRTY_LAYOUT)
 			return;
 
 		this->normalizeSpan();
 
-		DimFloat expanded;
 		for(Frame* pframe : d_contents)
-			this->resize(*pframe, expanded);
+			this->resize(*pframe);
+	}
 
-		DimFloat space;
-		space[d_length] = std::max(this->dspace(d_length) - d_content[d_length] - expanded[d_length], 0.f);
-		space[d_depth] = std::max(this->dspace(d_depth), 0.f);
-
-		// the offset is our position relative to first parent widget frame (this skips layout frames)
-		DimFloat offset;
-		offset[d_length] = this->drelative(d_length);
-		offset[d_depth] = this->drelative(d_depth);
+	void Stripe::positionLayout()
+	{
+		if(d_dirty < DIRTY_LAYOUT)
+			return;
 
 		for(Frame* pframe : d_contents)
-			this->layout(*pframe, offset, space);
+			this->position(*pframe);
+	}
 
-#if 1 // DEBUG
-		this->debugPrintDepth();
-		printf("%s relayout size %f , %f\n", this->style().name().c_str(), dsize(DIM_X), dsize(DIM_Y));
+	void Stripe::measure(Frame& frame)
+	{
+		frame.measureLayout();
+
+		if(frame.hidden() || !frame.sizeflow())
+			return;
+
+		this->measure(frame, d_length);
+		this->measure(frame, d_depth);
+
+		if(frame.dsizing(d_length) > WRAP)
+			d_contentExpand = true;
+
+#if 0 // DEBUG
+		frame.debugPrintDepth();
+		printf("%s measured content size %f , %f\n", frame.style().name().c_str(), frame.dcontent(DIM_X), frame.dcontent(DIM_Y));
 #endif
 	}
 
-	void Stripe::resize(Frame& frame, DimFloat& expanded)
+	void Stripe::measure(Frame& frame, Dimension dim)
+	{
+		if(frame.dsizing(dim) > WRAP)
+			return;
+
+		if(dim == d_length && frame.flow())
+			d_content[dim] += frame.dmeasure(dim) + this->spacing(frame);
+		else
+			d_content[dim] = std::max(d_content[dim], frame.dmeasure(dim));
+
+
+		if(frame.dsizing(dim) > SHRINK || !frame.flow())
+			return;
+
+		if(dim == d_length && frame.flow())
+			d_spaceContent[dim] += frame.dmeasure(dim) + this->spacing(frame);
+		else
+			d_spaceContent[dim] = std::max(d_spaceContent[dim], frame.dmeasure(dim));
+	}
+
+	void Stripe::resize(Frame& frame)
 	{
 		if(frame.hidden())
 			return;
 
-		if(d_layout->layout()[d_length] >= AUTOSIZE && frame.flow())
-			expanded[d_length] += this->resize(frame, d_length);
-		else if(d_layout->layout()[d_length] >= AUTOSIZE)
-			this->resize(frame, d_length);
-
-		if(d_layout->layout()[d_depth] >= AUTOSIZE)
-			this->resize(frame, d_depth);
+		this->resize(frame, d_length);
+		this->resize(frame, d_depth);
 
 		frame.content().updateContentSize();
+
+		frame.resizeLayout();
+
+#if 0 // DEBUG
+		frame.debugPrintDepth();
+		printf("%s resize size %f , %f\n", frame.style().name().c_str(), frame.dsize(DIM_X), frame.dsize(DIM_Y));
+#endif
 	}
 
-	float Stripe::resize(Frame& frame, Dimension dim)
+	void Stripe::resize(Frame& frame, Dimension dim)
 	{
+		if(d_style->layout().layout()[dim] < AUTO_SIZE)
+			return;
+
 		float space = this->dspace(dim);
 		if(dim == d_length)
-			space = (space - d_content[dim]) * frame.dspan(d_length);
+			space = (space - d_spaceContent[dim]) * frame.dspan(d_length);
 
 		float content = frame.dcontent(dim) + frame.dpadding(dim) + frame.dbackpadding(dim);
-		float expand = std::max(0.f, dim == d_length ? space : space - content);
+		float expand = std::max(0.f, space - content);
 
 		Sizing sizing = frame.dsizing(dim);
-
 		if(sizing == SHRINK)
 			frame.setSizeDim(dim, content);
 		else if(sizing == WRAP)
 			frame.setSizeDim(dim, content + expand);
 		else if(sizing == EXPAND)
 			frame.setSizeDim(dim, space);
-
-		if(sizing == WRAP)
-			return expand;
-		else if(sizing == EXPAND)
-			return space;
-		else
-			return 0.f;
 	}
 
-	void Stripe::layout(Frame& frame, DimFloat& offset, DimFloat& space)
+	void Stripe::position(Frame& frame)
 	{
-		this->position(frame, offset, space);
-		frame.layout();
-	}
-
-	void Stripe::position(Frame& frame, DimFloat& offset, DimFloat& space)
-	{
-		if(frame.style().name() == "Dir")
-			int i = 0;
-
-		if(frame.hidden() || frame.unflow())
+		if(frame.hidden())
 			return;
 
-		if(d_layout->layout()[d_length] >= AUTOLAYOUT && frame.flow())
-			frame.setPositionDim(d_length, this->positionSequence(frame, offset[d_length], space[d_length]));
-		else if(d_layout->layout()[d_length] >= AUTOLAYOUT)
-			frame.setPositionDim(d_length, this->positionFree(frame, d_length, offset[d_length], this->dspace(d_length)));
+		if(frame.posflow())
+		{
+			this->position(frame, d_length);
+			this->position(frame, d_depth);
+		}
 
-		if(d_layout->layout()[d_depth] >= AUTOLAYOUT)
-			frame.setPositionDim(d_depth, this->positionFree(frame, d_depth, offset[d_depth], this->dspace(d_depth)));
+		frame.positionLayout();
+
+#if 0 // DEBUG
+		frame.debugPrintDepth();
+		printf("%s layout position %f , %f\n", frame.style().name().c_str(), frame.dposition(DIM_X), frame.dposition(DIM_Y));
+#endif
+	}
+
+	void Stripe::position(Frame& frame, Dimension dim)
+	{
+		if(d_style->layout().layout()[dim] < AUTO_LAYOUT)
+			return;
+
+		float offset = this->doffset(dim);
+		float space = this->dspace(dim);
+
+		if(dim == d_length && frame.flow())
+			frame.setPositionDim(dim, this->positionSequence(frame, offset, d_contentExpand ? 0.f : space - d_content[d_length]));
+		else
+			frame.setPositionDim(dim, this->positionFree(frame, dim, offset, space));
 	}
 
 	float Stripe::positionFree(Frame& frame, Dimension dim, float offset, float space)
 	{
-		Align align = frame.dalign(dim);
+		Align align = frame.dalign(dim == d_length ? DIM_X : DIM_Y);
 		float alignOffset = space * AlignSpace[align] - frame.dextent(dim) * AlignExtent[align];
 		return offset + (frame.flow() ? dpadding(dim) + frame.dmargin(dim) : 0.f) + alignOffset;
+	}
+
+	namespace
+	{
+		inline float alignSequence(Frame& frame, float space) { return space * AlignSpace[frame.dalign(DIM_X)]; }
 	}
 
 	float Stripe::positionSequence(Frame& frame, float offset, float space)
 	{
 		Frame* before = this->before(frame);
 		if(before)
-			return before->doffset(d_length) + this->spacing(frame) - alignSequence(*before, space) + alignSequence(frame, space);
+			return before->dposition(d_length) + before->dextent(d_length) + this->spacing(frame) - alignSequence(*before, space) + alignSequence(frame, space);
 		else
 			return offset + dpadding(d_length) + frame.dmargin(d_length) + alignSequence(frame, space);
 	}
 
 	Frame* Stripe::pinpoint(float x, float y, bool opaque)
 	{
-		if(this->hollow() || !this->inside(x, y))
+		if(this->hollow() || (this->clip() && !this->inside(x, y)))
 			return nullptr;
+
+		if(!this->widget())
+		{
+			x += this->left();
+			y += this->top();
+		}
 
 		for(Frame* frame : reverse_adapt(d_contents))
 			if(!frame->hidden() && frame->frameType() < MASTER_LAYER)
 			{
-				Frame* target = frame->widget() ? frame->pinpoint(x - frame->left(), y - frame->top(), opaque)
-											    : frame->pinpoint(x, y, opaque);
-
+				Frame* target = frame->pinpoint((x - frame->left()) / frame->scale(), (y - frame->top()) / frame->scale(), opaque);
 				if(target)
 					return target;
 			}

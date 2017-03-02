@@ -7,9 +7,6 @@
 
 #include <toyobj/Types.h>
 
-#include <toyui/Widget/Input.h>
-#include <toyui/Widget/Widgets.h>
-
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Stripe.h>
 #include <toyui/Frame/Grid.h>
@@ -23,28 +20,37 @@
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Widget/RootSheet.h>
 #include <toyui/Widget/Cursor.h>
+#include <toyui/Widget/Layout.h>
 
-#include <toyui/Widget/Button.h>
-#include <toyui/Widget/Slider.h>
-#include <toyui/Widget/Scrollbar.h>
-#include <toyui/Widget/ProgressBar.h>
-#include <toyui/Widget/Checkbox.h>
-#include <toyui/Widget/TypeIn.h>
-#include <toyui/Widget/Textbox.h>
-#include <toyui/Widget/Directory.h>
+#include <toyui/Button/Button.h>
+#include <toyui/Button/Slider.h>
+#include <toyui/Button/Scrollbar.h>
+#include <toyui/Button/ProgressBar.h>
+#include <toyui/Button/Checkbox.h>
+#include <toyui/Button/Dropdown.h>
+#include <toyui/Button/Typedown.h>
+#include <toyui/Button/RadioButton.h>
+#include <toyui/Button/Filter.h>
 
-#include <toyui/Widget/ContextMenu.h>
+#include <toyui/Edit/TypeIn.h>
+#include <toyui/Edit/Textbox.h>
+#include <toyui/Edit/Input.h>
 
-#include <toyui/Scheme/Dropdown.h>
-#include <toyui/Scheme/RadioButton.h>
-#include <toyui/Scheme/Expandbox.h>
-#include <toyui/Scheme/Tree.h>
-#include <toyui/Scheme/Table.h>
-#include <toyui/Scheme/Tabber.h>
-#include <toyui/Scheme/Dockspace.h>
-#include <toyui/Scheme/Dockbar.h>
-#include <toyui/Scheme/Window.h>
-#include <toyui/Scheme/Node.h>
+#include <toyui/Window/ContextMenu.h>
+
+#include <toyui/Container/Expandbox.h>
+#include <toyui/Container/Tree.h>
+#include <toyui/Container/Table.h>
+#include <toyui/Container/Tabber.h>
+
+#include <toyui/Container/Directory.h>
+
+#include <toyui/Window/Dockspace.h>
+#include <toyui/Window/Dockbar.h>
+#include <toyui/Window/Window.h>
+#include <toyui/Window/Node.h>
+#include <toyui/Window/Menu.h>
+#include <toyui/Window/Toolbar.h>
 
 #include <toyui/Frame/DimString.h>
 

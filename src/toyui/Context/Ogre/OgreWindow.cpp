@@ -7,6 +7,8 @@
 
 #include <toyui/Context/Ogre/OgreContext.h>
 
+#include <toyui/Input/InputDevice.h>
+
 #include <Ogre.h>
 #include <OgreRoot.h>
 
@@ -161,7 +163,7 @@ namespace toy
 
 	bool OISInputWindow::mouseMoved(const OIS::MouseEvent &arg)
 	{
-		m_uiMouse->dispatchMouseMoved(float(arg.state.X.abs), float(arg.state.Y.abs), float(arg.state.X.rel), float(arg.state.Y.rel));
+		m_uiMouse->dispatchMouseMoved(float(arg.state.X.abs), float(arg.state.Y.abs));
 
 		if(arg.state.Z.rel != 0)
 			m_uiMouse->dispatchMouseWheeled(float(arg.state.X.abs), float(arg.state.Y.abs), float(arg.state.Z.rel));

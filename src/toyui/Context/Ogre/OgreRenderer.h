@@ -12,7 +12,6 @@
 
 /* Ogre */
 #include <Ogre.h>
-#undef CM_NONE
 
 namespace toy
 {
@@ -25,6 +24,13 @@ namespace toy
 		Ogre::SceneManager& m_scene;
 		Ogre::SceneNode& m_node;
 		Ogre::Camera& m_camera;
+	};
+
+	class OgreSpaceTarget : public RenderTarget
+	{
+	public:
+		OgreSpaceTarget(Renderer& renderer, MasterLayer& masterLayer, Ogre::SceneManager& scene, Ogre::Camera& camera);
+		~OgreSpaceTarget();
 	};
 
 	class OgreRenderer : public GlRenderer

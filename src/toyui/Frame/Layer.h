@@ -13,40 +13,51 @@ namespace toy
 	class TOY_UI_EXPORT Layer : public Stripe
 	{
 	public:
-		Layer(Widget& widget, int zorder = 0);
+		Layer(Widget& widget);
 		~Layer();
+
+		enum Redraw
+		{
+			NO_REDRAW = 0,
+			REDRAW = 1,
+			FORCE_REDRAW = 2
+		};
 
 		FrameType frameType() { return LAYER; }
 
-		size_t index() { return d_index; }
-		int z() { return d_z; }
 		Layer* parentLayer() { return d_parentLayer; }
+		size_t index() { return d_index; }
+		size_t z() { return d_style->layout().zorder() ? d_style->layout().zorder() : d_z; }
 
-		std::vector<Layer*>& sublayers() { return d_sublayers; }
+		void setIndex(size_t index) { d_index = index; }
+		void setZ(size_t z) { d_z = z; }
 
-		bool redraw() { return d_redraw; }
-		void setRedraw() { d_redraw = true; }
-		void endRedraw() { d_redraw = false; }
+		bool redraw() { return d_redraw >= REDRAW; }
+		bool forceRedraw() { return d_redraw >= FORCE_REDRAW; }
 
-		MasterLayer& rootLayer();
+		void setRedraw() { if(d_redraw < REDRAW) d_redraw = REDRAW; }
+		void setForceRedraw() { d_redraw = FORCE_REDRAW; }
 
-		void bind(Stripe& parent);
-		void unbind();
+		void endRedraw() { d_redraw = NO_REDRAW; }
 
-		void add(Layer& layer);
-		void remove(Layer& layer);
+		void collectLayers(std::vector<Layer*>& layers, FrameType barrier = LAYER);
 
-		size_t reorder(size_t index, std::vector<Layer*>& layers);
+		void remap();
+		void reindex(size_t from);
+
+		void moveToTop(Layer& sublayer);
 		void moveToTop();
 
-	protected:
-		size_t d_index;
-		int d_z;
-		size_t d_numLayers;
-		Layer* d_parentLayer;
-		std::vector<Layer*> d_sublayers;
+		Frame* pinpoint(float x, float y, bool opaque);
 
-		bool d_redraw;
+	protected:
+		Layer* d_parentLayer;
+		size_t d_index;
+		size_t d_z;
+
+		Redraw d_redraw;
+
+		std::vector<Layer*> d_sublayers;
 	};
 
 	class TOY_UI_EXPORT MasterLayer : public Layer
@@ -56,14 +67,17 @@ namespace toy
 
 		FrameType frameType() { return MASTER_LAYER; }
 
-		RenderTarget& target() { return *d_target; }
 		const std::vector<Layer*>& layers() { return d_layers; }
+		void markReorder() { d_reorder = true; }
 
+		void relayout();
+		
 		void reorder();
+		void addLayer(Layer& layer);
 
 	protected:
 		std::vector<Layer*> d_layers;
-		unique_ptr<RenderTarget> d_target;
+		bool d_reorder;
 	};
 
 	class TOY_UI_EXPORT Layer3D : public MasterLayer

@@ -17,116 +17,120 @@
 
 namespace toy
 {
-	Layer::Layer(Widget& widget, int zorder)
+	Layer::Layer(Widget& widget)
 		: Stripe(widget)
-		, d_index(0)
-		, d_z(zorder)
-		, d_numLayers(0)
 		, d_parentLayer(nullptr)
-		, d_redraw(true)
+		, d_index(-1)
+		, d_z(0)
+		, d_redraw(REDRAW)
 	{}
 
 	Layer::~Layer()
 	{}
 
-	MasterLayer& Layer::rootLayer()
+	void Layer::collectLayers(std::vector<Layer*>& layers, FrameType barrier)
 	{
-		Layer* layer = this;
-		while(layer->frameType() < MASTER_LAYER)
-			layer = layer->d_parentLayer;
-		return layer->as<MasterLayer>();
+		layers.clear();
+
+		this->visit(*this, [&layers, barrier](Frame& frame) {
+			if(frame.frameType() == LAYER)
+				layers.push_back(&frame.as<Layer>());
+			return frame.frameType() < barrier;
+		});
 	}
 
-	void Layer::bind(Stripe& parent)
+	void Layer::remap()
 	{
-		d_parentLayer = &parent.layer();
-		d_parentLayer->add(*this);
+		if(d_parent)
+			d_parentLayer = &d_parent->layer();
 
-		Frame::bind(parent);
+		Stripe::remap();
+
+		this->collectLayers(d_sublayers);
+
+		auto goesBefore = [](Layer* a, Layer* b) { return a->index() < b->index(); };
+		std::sort(d_sublayers.begin(), d_sublayers.end(), goesBefore);
+
+		this->reindex(0);
+
 	}
 
-	void Layer::unbind()
+	void Layer::reindex(size_t from)
 	{
-		Frame::unbind();
-		if(d_parentLayer)
-		{
-			d_parentLayer->remove(*this);
-			d_parentLayer = nullptr;
-		}
+		for(size_t i = from; i < d_sublayers.size(); ++i)
+			d_sublayers[i]->setIndex(i);
 	}
 
-	void Layer::add(Layer& layer)
+	void Layer::moveToTop(Layer& sublayer)
 	{
-		d_sublayers.insert(d_sublayers.begin() + d_numLayers, &layer);
-
-		if(layer.z() == 0)
-		{
-			++d_numLayers;
-			this->rootLayer().reorder();
-		}
-	}
-
-	void Layer::remove(Layer& layer)
-	{
-		d_sublayers.erase(std::remove(d_sublayers.begin(), d_sublayers.end(), &layer), d_sublayers.end());
-
-		if(layer.z() == 0)
-		{
-			--d_numLayers;
-			this->rootLayer().reorder();
-		}
-	}
-
-	size_t Layer::reorder(size_t cursor, std::vector<Layer*>& layers)
-	{
-		cursor += 1;
-		d_index = cursor;
-		layers.push_back(this);
-
-		size_t i = 0;
-		for(; i < d_sublayers.size(); ++i)
-			cursor = d_sublayers[i]->reorder(cursor, layers);
-
-		return cursor;
+		size_t index = sublayer.index();
+		d_sublayers.erase(d_sublayers.begin() + index);
+		d_sublayers.push_back(&sublayer);
+		this->reindex(index);
+		this->masterlayer().markReorder();
 	}
 
 	void Layer::moveToTop()
 	{
-		if(!d_parentLayer)
-			return;
+		d_parent->layer().moveToTop(*this);
+	}
 
-		Stripe* parent = d_parent;
-		d_parent->remove(*this);
-		parent->append(*this);
+	Frame* Layer::pinpoint(float x, float y, bool opaque)
+	{
+		if(this->hollow() || (this->clip() && !this->inside(x, y)))
+			return nullptr;
 
-		d_parentLayer->remove(*this);
-		d_parentLayer->add(*this);
+		for(Layer* frame : reverse_adapt(d_sublayers))
+			if(!frame->hidden() && frame->frameType() < MASTER_LAYER)
+			{
+				DimFloat local = frame->localPosition(x, y); // probably should be local to this
+				Frame* target = frame->pinpoint(local.x(), local.y(), opaque);
+				if(target)
+					return target;
+			}
+
+		return Stripe::pinpoint(x, y, opaque);
 	}
 
 	MasterLayer::MasterLayer(Widget& widget)
-		: Layer(widget, 0)
-		, d_target(widget.uiWindow().renderer().createRenderTarget(*this))
+		: Layer(widget)
 	{}
+
+	void MasterLayer::relayout()
+	{
+		this->remap();
+
+		if(d_dirty >= DIRTY_STRUCTURE || d_reorder)
+			this->reorder();
+
+		this->measureLayout();
+		this->resizeLayout();
+		this->positionLayout();
+	}
+
+	void MasterLayer::addLayer(Layer& layer)
+	{
+		layer.setIndex(d_layers.size());
+		d_layers.push_back(&layer);
+	}
 
 	void MasterLayer::reorder()
 	{
-		d_layers.clear();
-		Layer::reorder(0, d_layers);
+		this->collectLayers(d_layers, MASTER_LAYER);
 
-		auto goesBefore = [](Layer* a, Layer* b) { return a->index() < b->index(); };
+		for(Layer* layer : d_layers)
+			layer->setZ(layer->parentLayer() ? layer->parentLayer()->z() + layer->index() : layer->index());
+
+		auto goesBefore = [](Layer* a, Layer* b) { return a->z() < b->z(); };
 		std::sort(d_layers.begin(), d_layers.end(), goesBefore);
+
+		d_reorder = false;
 
 #if 0 // DEBUG
 		for(Layer* layer: d_layers)
 		{
-			Layer* parent = layer->parentLayer();
-			while(parent)
-			{
-				printf("  ");
-				parent = parent->parentLayer();
-			}
-
-			printf("Layer :: %s reorder index %u\n", layer->widget()->style().name().c_str(), layer->index());
+			layer->debugPrintDepth();
+			printf("Layer :: %s reorder z %u index %u\n", layer->style().name().c_str(), layer->z(), layer->index());
 		}
 #endif
 	}

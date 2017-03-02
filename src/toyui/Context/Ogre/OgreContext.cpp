@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
+ //  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
@@ -130,41 +130,4 @@ namespace toy
 		Ogre::CompositorWorkspaceDef* workDef = compositorManager->addWorkspaceDefinition("Ui Workspace");
 		workDef->connectExternal(0, nodeDef->getName(), 0);
 	}
-
-	/*void OgreSystem::setupSpaceSheet()
-	{
-		m_sceneNode = m_viewport.sceneManager().createSceneNode();
-		m_sceneNode->getUserObjectBindings().setUserAny(Ogre::Any(static_cast<Object*>(this)));
-
-		m_viewport.ogreCamera().setUserAny(Ogre::Any(&m_layer->target()));
-
-		Ogre::Item& item = *m_sceneNode->getCreator()->createItem("SpaceSheet");
-		item.setQueryFlags(SPACESHEET_OGRE_MASK);
-
-		Ogre::HlmsUnlitDatablock* datablock = ogModule.createUnlitDatablock("SpaceSheet", "", m_texture);
-		item.setDatablock(datablock);
-
-		m_sceneNode->attachObject(&item);
-
-		OgreSystem& ogreSystem = static_cast<OgreSystem&>(m_viewport.uiContext());
-
-		Ogre::Root& ogreRoot = ogWindow.ogModule().ogreRoot();
-
-		m_texture = ogreRoot.getTextureManager()->createManual("SpaceSheetTexture",
-			Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-			Ogre::TEX_TYPE_2D,
-			size_t(m_width),
-			size_t(m_height),
-			0,
-			Ogre::PF_R8G8B8,
-			Ogre::TU_RENDERTARGET,
-			0,
-			true
-		);
-
-		Ogre::RenderTarget& renderTexture = *m_texture->getBuffer()->getRenderTarget();
-
-		ogreRoot.getCompositorManager2()->addWorkspace(&m_viewport.sceneManager(), &renderTexture, &m_viewport.ogreCamera(), "Ui Workspace", true, 0);
-		ogreRoot.getCompositorManager2()->addWorkspace(&m_viewport.sceneManager(), &renderTexture, &m_viewport.ogreCamera(), "Clear Workspace", true, 0);
-	}*/
 }

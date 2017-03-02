@@ -27,7 +27,7 @@ namespace toy
 		virtual void unloadImage(Image& image);
 
 		// rendering
-		virtual void render(MasterLayer& layer);
+		virtual void render(RenderTarget& target);
 
 		// drawing
 		virtual void beginTarget();
@@ -49,8 +49,7 @@ namespace toy
 		virtual void clipRect(const BoxFloat& rect);
 		virtual void unclipRect();
 
-		virtual void clipFrame(const BoxFloat& rect, const BoxFloat& corners);
-		virtual void unclipFrame();
+		virtual void pathLine(float x1, float y1, float x2, float y2);
 
 		virtual void pathBezier(float x1, float y1, float c1x, float c1y, float c2x, float c2y, float x2, float y2);
 

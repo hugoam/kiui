@@ -1,6 +1,3 @@
-Clear :
-    text_colour : 1.0,1.0,1.0,0.0
-
 Label :
     text_colour : 0.0,0.0,0.0,1.0
     skin_padding : 4.0,4.0,4.0,4.0
@@ -11,24 +8,24 @@ WhiteLabel :
     skin_padding : 4.0,4.0,4.0,4.0
     
 Title :
-    inherit_skin : Label
+    copy_skin : Label
     
 SliderDisplay :
-    inherit_skin : Label
+    copy_skin : Label
     
 Blendish :
-    inherit_skin : Label
+    copy_skin : Label
     border_colour : 0.146,0.146,0.146,1.0
     border_width : 1.0,1.0,1.0,1.0
     corner_radius : 4.0,4.0,4.0,4.0
     topdown_gradient : 15,-15
     
 Regular :
-    inherit_skin : Blendish
+    copy_skin : Blendish
     background_colour : 0.6,0.6,0.6,1.0
     
 Button :
-    inherit_skin : Regular
+    copy_skin : Regular
     
     hovered :
         background_colour : 0.65,0.65,0.65,1.0
@@ -57,7 +54,7 @@ Toggle :
         background_colour : 0.337,0.502,0.761,1
 
 NumberField :
-    inherit_skin : Blendish
+    copy_skin : Blendish
     background_colour : 0.706,0.706,0.706,1.0
     topdown_gradient : -20,0
     
@@ -66,7 +63,7 @@ NumberField :
         background_colour : 0.6,0.6,0.6,1.0
         
 TabHeader :
-    inherit_skin : Clear
+    reset_skin : true
     copy_skin : Label
     background_colour : 0.407,0.407,0.407,1.0
     border_width : 0.0,0.0,0.0,0.0
@@ -83,8 +80,6 @@ TabHeader :
         
     hovered :
         background_colour : 0.65,0.65,0.65,1.0
-        border_width : 0.0,0.0,0.0,0.0
-        corner_radius : 4.0,4.0,0.0,0.0
         
     activated|hovered :
         background_colour : 0.337,0.502,0.761,1
@@ -98,16 +93,16 @@ Tab :
     
 DockTab :
     inherit : Tab
-    inherit_skin : Clear
+    reset_skin : true
     padding : 0.0,0.0,0.0,0.0
     override : Dockspace, Tab
     
 TableHead :
-    inherit_skin : NumberField
+    copy_skin : NumberField
     corner_radius : 0.0,0.0,0.0,0.0
     
 TypeIn :
-    inherit_skin : Regular
+    copy_skin : Regular
     topdown_gradient : 0.0,25.0
     
     focused :
@@ -135,6 +130,7 @@ WindowHeader :
     topdown_gradient : 15,-15
     text_colour : 1.0,1.0,1.0,1.0
     padding : 4.0,2.0,4.0,2.0
+    weak_corners : true
     
 Dockbar :
     copy_skin : Header
@@ -150,22 +146,23 @@ WindowBody :
     
 WindowFooter :
     background_colour : 0.6,0.6,0.6,1.0
+    weak_corners : true
 
 WindowSizer :
     size : 0.0,8.0
     
 CloseButton :
-    inherit_skin : Clear
+    reset_skin : true
     skin_padding : 2.0,2.0,2.0,2.0
     image : close_15
     hovered :
         background_colour : 1.0,0.0,0.0,1.0
         
 Node :
-    inherit_skin : Window
+    copy_skin : Window
     
 NodeBody :
-    inherit_skin : WindowHeader
+    copy_skin : WindowHeader
     
 NodePlugKnob :
     image : tbb/plug_knob
@@ -182,28 +179,28 @@ Expandbox :
     topdown_gradient : 5,0
     
 ExpandboxHeader :
-    inherit_skin : Label
+    copy_skin : Label
     background_colour : 0.0,0.0,0.0,0.0
     hovered :
         border_colour : 1.0,1.0,1.0,0.3
         border_width : 2.0,2.0,2.0,2.0
         
 TreeNodeHeader :
-    inherit_skin : ExpandboxHeader
+    copy_skin : ExpandboxHeader
     skin_padding : 0.0,0.0,0.0,0.0
     activated :
         background_colour : 1.0,1.0,1.0,0.3
         
 ColumnHeader :
-    inherit_skin : Label
+    copy_skin : Label
     border_colour : 0.098,0.098,0.098,1.0
     border_width : 1.0,1.0,1.0,1.0
     
 Dropdown:
-    inherit_skin : Toggle
+    copy_skin : Toggle
     
 Typedown:
-    inherit_skin : TypeIn
+    copy_skin : TypeIn
     
 Checkbox :
     copy_skin : Toggle
@@ -223,33 +220,33 @@ RadioSwitch :
     corner_radius : 4.0,4.0,4.0,4.0
     
 RadioChoice :
-    inherit_skin : Toggle
-    corner_radius : 0.0,0.0,0.0,0.0
+    copy_skin : Toggle
+    weak_corners : true
     
-FillerX :
-    inherit_skin : Blendish
+Filler :
+    copy_skin : Blendish
     background_colour : 0.447,0.447,0.447,1.0
     topdown_gradient : 15,-5
     
-SliderX :
-    inherit_skin : NumberField
+Slider :
+    copy_skin : NumberField
     corner_radius : 10.0,10.0,10.0,10.0
         
-SliderKnobX :
-    inherit_skin : Clear
+SliderKnob :
+    reset_skin : true
     flow : OVERLAY
     
 SliderDisplay :
     align : CENTER, CENTER
 
 Scroller :
-    inherit_skin : Blendish
+    copy_skin : Blendish
     corner_radius : 6.0,6.0,6.0,6.0
     background_colour : 0.314,0.314,0.314,0.706 
     topdown_gradient : -15,15
     
 ScrollerButton :
-    inherit_skin : Blendish
+    copy_skin : Blendish
     corner_radius : 6.0,6.0,6.0,6.0
     weak_corners : false
     background_colour : 0.502,0.502,0.502,1.0
@@ -262,31 +259,36 @@ ScrollerButton :
         background_colour : 0.542,0.542,0.542,1.0
 
 Scrollbar :
-    inherit_skin : Clear
+    reset_skin : true
     padding : 6.0,6.0,6.0,6.0
     
+ScrollForward :
+    reset_skin : true
+    image : arrow_up_15
+    
+ScrollBackward :
+    reset_skin : true
+    image : arrow_down_15
+    
 ScrollUp :
-    inherit_skin : Clear
+    reset_skin : true
     image : arrow_up_15
     
 ScrollDown :
-    inherit_skin : Clear
+    reset_skin : true
     image : arrow_down_15
     
 ScrollLeft :
-    inherit_skin : Clear
+    reset_skin : true
     image : arrow_left_15
     
 ScrollRight :
-    inherit_skin : Clear
+    reset_skin : true
     image : arrow_right_15
     
-ScrollerKnobY :
-    inherit_skin : ScrollerButton
+ScrollerKnob :
+    copy_skin : ScrollerButton
     
-ScrollerKnobX :
-    inherit_skin : ScrollerButton
-
 Input<int> :
     corner_radius : 4.0,4.0,4.0,4.0
     
@@ -297,7 +299,7 @@ Caret :
     background_colour : 1.0,1.0,1.0,1.0
     
 ExpandboxToggle :
-    inherit_skin : Clear
+    reset_skin : true
     image : arrow_right_15
     activated :
         image : arrow_down_15
@@ -305,7 +307,7 @@ ExpandboxToggle :
         image : arrow_down_15
         
 TreeNodeToggle :
-    inherit_skin : ExpandboxToggle
+    copy_skin : ExpandboxToggle
     
 Tooltip :
     background_colour : 0.098,0.098,0.098,0.902
@@ -317,24 +319,13 @@ Tooltip :
         background_colour : 0.176,0.176,0.176,0.902
 
 DropdownList :
-    inherit_skin : Tooltip
+    copy_skin : Tooltip
     
 MenuList :
     copy_skin : Tooltip
     
-DropLabel :
-    inherit : Label
-    copy_skin : WhiteLabel
-    override : Dropdown, Label
-    override : Typedown, Label
-    override : RadioSwitch, Label
-    override : WindowHeader, Label
-    
-DropdownLabel :
-    inherit : WhiteLabel
-    
 DropdownToggle :
-    inherit_skin : Clear
+    reset_skin : true
     image : blendish_updown
     skin_padding : 1.0,2.0,1.0,2.0
     
@@ -344,10 +335,3 @@ DropdownChoice :
         topdown_gradient : -15,15
         text_colour : 0.0,0.0,0.0,1.0
         
-MenuChoice :
-    inherit : Button
-    inherit_skin : DropdownChoice
-    copy_skin : WhiteLabel
-    space : BLOCK
-    override : MenuList, Button
-    override : MenuList, Menu

@@ -19,6 +19,8 @@ namespace toy
 		RenderTarget(Renderer& renderer, MasterLayer& masterLayer, bool gammaCorrected);
 		virtual ~RenderTarget() {}
 
+		MasterLayer& layer() { return m_masterLayer; }
+
 		bool gammaCorrected() { return m_gammaCorrected; }
 		void setGammaCorrected(bool enabled) { m_gammaCorrected = enabled; }
 
@@ -51,7 +53,7 @@ namespace toy
 		virtual void unloadImage(Image& image) = 0;
 
 		// rendering
-		virtual void render(MasterLayer& layer) = 0;
+		virtual void render(RenderTarget& target) = 0;
 
 		// drawing
 		virtual void beginTarget() = 0;
@@ -73,9 +75,7 @@ namespace toy
 		virtual void clipRect(const BoxFloat& rect) = 0;
 		virtual void unclipRect() = 0;
 
-		virtual void clipFrame(const BoxFloat& rect, const BoxFloat& corners) = 0;
-		virtual void unclipFrame() = 0;
-
+		virtual void pathLine(float x1, float y1, float x2, float y2) = 0;
 		virtual void pathBezier(float x1, float y1, float c1x, float c1y, float c2x, float c2y, float x2, float y2) = 0;
 		virtual void pathRect(const BoxFloat& rect, const BoxFloat& corners, float border) = 0;
 

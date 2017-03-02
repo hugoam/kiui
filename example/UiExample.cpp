@@ -1,4 +1,4 @@
-
+ 
 #include <UiExampleConfig.h>
 #include <UiExample.h>
 
@@ -33,11 +33,11 @@ namespace toy
 		"Ebbe", "Aron", "Julian", "Elvin", "Ivar", 0
 	};
 
-	class CustomElement : public Band
+	class CustomElement : public Line
 	{
 	public:
-		CustomElement(const string& name)
-			: Band(cls())
+		CustomElement(Piece& parent, const string& name)
+			: Line(parent, cls())
 			, m_label(this->build(name))
 		{}
 
@@ -45,22 +45,22 @@ namespace toy
 		{
 			this->emplace<Checkbox>(nullptr, false);
 			this->emplace<Icon>("tbb/icon48");
-			Sheet& sheet = this->emplace<Sheet>();
+			Container& sheet = this->emplace<Container>();
 			Label& label = sheet.emplace<Label>(name);
 			sheet.emplace<Label>("Male");
-			this->emplace<CloseButton>([this](Button&){ this->parent()->parent()->vrelease(*this); });
+			this->emplace<CloseButton>([this](Widget&){ this->parent()->parent()->as<Container>().release(*this); });
 			return label;
 		}
 
 		const string& contentlabel() { return m_label.label(); }
 
-		static StyleType& cls() { static StyleType ty("CustomElement", Band::cls()); return ty; }
+		static Type& cls() { static Type ty("CustomElement", Line::cls()); return ty; }
 
 	protected:
 		Label& m_label;
 	};
 
-	Sheet& createUiTestCustomList(Sheet& parent)
+	Piece& createUiTestCustomList(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("Customized list items");
 		Page& page = window.body().emplace<Page>("List and filter");
@@ -69,13 +69,13 @@ namespace toy
 		for(int i = 0; boy_names[i]; i++)
 			list.emplace<CustomElement>(boy_names[i]);
 
-		page.emplace<FilterInput>(list);
+		page.emplace<FilterInput>(list.container());
 
 		window.frame().setSize(250.f, 300.f);
 		return window;
 	}
 
-	Sheet& createUiTestFilteredList(Sheet& parent)
+	Piece& createUiTestFilteredList(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("List and filter");
 		Page& page = window.body().emplace<Page>("List and filter");
@@ -86,17 +86,17 @@ namespace toy
 		for(int i = 0; girl_names[i]; i++)
 			list.emplace<Label>(boy_names[i]);
 
-		page.emplace<FilterInput>(list);
+		page.emplace<FilterInput>(list.container());
 
 		window.frame().setSize(130.f, 300.f);
 		return window;
 	}
 
-	Sheet& createUiTestScrollList(Sheet& parent)
+	Piece& createUiTestScrollList(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("Scroll List");
 		Page& page = window.body().emplace<Page>("Scroll List");
-		Band& sequence = page.emplace<Band>();
+		Layout& sequence = page.emplace<Layout>();
 
 		List& list0 = sequence.emplace<List>();
 		for(int i = 0; i < 100; i++)
@@ -110,15 +110,15 @@ namespace toy
 		return window;
 	}
 
-	Sheet& createUiTestTextEditor(Sheet& parent)
+	Piece& createUiTestTextEditor(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("Text Editor");
 		Page& page = window.body().emplace<Page>("Text Editor");
-		Band& buttons = page.emplace<Band>();
+		Line& buttons = page.emplace<Line>();
 		Menu& menu = buttons.emplace<Menu>("Menu");
 		menu.emplace<Button>("Redo");
 		menu.emplace<Button>("Undo");
-		Menu& submenu = menu.emplace<Menu>("Set Font", true);
+		Menu& submenu = menu.emplace<Menu>("Change Font", true);
 		submenu.emplace<Button>("Arial");
 		submenu.emplace<Button>("Myriad");
 
@@ -132,7 +132,44 @@ namespace toy
 		return window;
 	}
 
-	Sheet& createUiTestDockspace(Sheet& parent)
+	Piece& createUiTestApplication(Container& parent)
+	{
+		parent.clear();
+
+		Line& menubar = parent.emplace<Line>();
+
+		Menu& menufile = menubar.emplace<Menu>("File");
+		menufile.emplace<Button>("Open");
+		menufile.emplace<Button>("Save");
+		Menu& menusave = menufile.emplace<Menu>("Save As", true);
+		menufile.emplace<Button>("Close");
+
+		menusave.emplace<Button>("Save As JPEG");
+		menusave.emplace<Button>("Save As PNG");
+		menusave.emplace<Button>("Save As PDF");
+
+		Menu& menuedit = menubar.emplace<Menu>("Edit");
+		menuedit.emplace<Button>("Redo");
+		menuedit.emplace<Button>("Undo");
+
+		Menu& menuhelp = menubar.emplace<Menu>("Help");
+		menuhelp.emplace<Button>("About kiUi");
+
+		Tooldock& tooldock = parent.emplace<Tooldock>();
+
+		Toolbar& toolbar0 = tooldock.emplace<Toolbar>();
+		ToolButton& toolUndo = toolbar0.emplace<ToolButton>("arrow_left_15");
+		ToolButton& toolRedo = toolbar0.emplace<ToolButton>("arrow_right_15");
+
+		Toolbar& toolbar1 = tooldock.emplace<Toolbar>();
+		ToolButton& toolOpen =  toolbar1.emplace<ToolButton>("file_15");
+		ToolButton& toolSave =  toolbar1.emplace<ToolButton>("folder_15");
+		ToolButton& toolClose = toolbar1.emplace<ToolButton>("close_15");
+
+		return tooldock;
+	}
+
+	Piece& createUiTestDockspace(Container& parent)
 	{
 		parent.clear();
 
@@ -140,72 +177,78 @@ namespace toy
 
 		Dockspace& dockspace = parent.emplace<Dockspace>();
 
-		Page& dock0 = dockspace.emplace<Page>("Dock 0", "0.0");
+		Page& dock0 = dockspace.addDockWindow("Dock 0").emplace<Page>("Dock 0");
 		createUiTestControls(dock0, false);
 
-		Page& dock1 = dockspace.emplace<Page>("Dock 1", "0.1");
+		Page& dock1 = dockspace.addDockWindow("Dock 1").emplace<Page>("Dock 1");
 		createUiTestInlineControls(dock1);
 
-		Page& dock2 = dockspace.emplace<Page>("Dock 2", "0.2");
+		Page& dock2 = dockspace.addDockWindow("Dock 2").emplace<Page>("Dock 2");
 		createUiTestTable(dock2, false);
 
 		return dockspace;
 	}
 
-	Sheet& createUiTestNodes(Sheet& parent)
+	Piece& createUiTestNodes(Container& parent)
 	{
 		parent.clear();
 
-		Node& node0 = parent.emplace<Node>("A Node");
+		Canvas& canvas = parent.emplace<Canvas>("Node Editor");
+
+		Node& node0 = canvas.emplace<Node>("A Node");
 		node0.addInput("a");
 		node0.addInput("b");
 		node0.addOutput("result");
+		node0.frame().setPosition(150.f, 250.f);
 
-		Node& node1 = parent.emplace<Node>("A Node");
+		Node& node1 = canvas.emplace<Node>("A Node");
 		node1.addInput("a");
 		node1.addInput("b");
 		node1.addOutput("result");
+		node1.frame().setPosition(350.f, 150.f);
 
-		Node& node2 = parent.emplace<Node>("Another Node");
+		Node& node2 = canvas.emplace<Node>("Another Node");
 		node2.addInput("u");
 		node2.addInput("v");
 		node2.addOutput("x");
 		node2.addOutput("y");
 		node2.addOutput("z");
+		node2.frame().setPosition(450.f, 450.f);
 
-		Node& node3 = parent.emplace<Node>("End Node");
+		Node& node3 = canvas.emplace<Node>("End Node");
 		node3.addInput("input 1");
 		node3.addInput("input 2");
+		node3.frame().setPosition(800.f, 200.f);
 
 		return parent;
 	}
 
-	Sheet& createUiTestTabs(Sheet& parent, bool window)
+	Piece& createUiTestTabs(Container& parent, bool window)
 	{
 		if(!window)
 			parent.clear();
 
-		Sheet& page = window ? parent.emplace<Window>("Tabs").body().emplace<Page>("Tabs")
-							 : parent;
+		Container& page = window ? parent.emplace<Window>("Tabs").body().emplace<Page>("Tabs")
+							     : parent;
 
 		Tabber& tabber = page.emplace<Tabber>();
 
-		Page& tab0 = tabber.emplace<Page>("Tab 0");
+		Page& tab0 = tabber.addTab("Tab 0").emplace<Page>("Tab 0");
 		createUiTestTable(tab0, false);
 
-		Page& tab1 = tabber.emplace<Page>("Tab 1");
+		Page& tab1 = tabber.addTab("Tab 1").emplace<Page>("Tab 1");
 		createUiTestInlineControls(tab1);
 
-		Page& tab2 = tabber.emplace<Page>("Tab 2");
+		Page& tab2 = tabber.addTab("Tab 2").emplace<Page>("Tab 2");
 		createUiTestControls(tab2, false);
 
 		return page;
 	}
 
-	Sheet& createUiTestTable(Sheet& parent, bool window)
+	Piece& createUiTestTable(Container& parent, bool window)
 	{
-		Sheet& page = window ? parent.emplace<Window>("Table").body().emplace<Page>("Table")
-							 : parent.emplace<Page>("Table");
+		Container& page = window ? parent.emplace<Window>("Table").body().emplace<Page>("Table")
+							     : parent.emplace<Page>("Table");
 
 		Table& table0 = page.emplace<Table>(StringVector({ "ID", "Name", "Path", "Flags" }), std::vector<float>({ 0.25f, 0.25f, 0.25f, 0.25f }));
 
@@ -219,7 +262,7 @@ namespace toy
 		table1.emplace<ButtonSequence>(StringVector({ "Banana", "Apple", "Corniflower" }));
 		table1.emplace<RadioSwitch>(nullptr, 0, StringVector({ "radio a", "radio b", "radio b" }));
 
-		Band& line0 = table1.emplace<Band>();
+		Line& line0 = table1.emplace<Line>();
 
 		Expandbox& box0 = line0.emplace<Expandbox>("Category A");
 		box0.emplace<Label>("Blah blah blah");
@@ -233,12 +276,12 @@ namespace toy
 
 		Table& table2 = page.emplace<Table>(StringVector({ "Left", "Right" }), std::vector<float>({ 0.5f, 0.5f }));
 
-		Band& line1 = table2.emplace<Band>();
+		Line& line1 = table2.emplace<Line>();
 
 		line1.emplace<InputFloat>("Red", 0.05f);
 		line1.emplace<InputFloat>("Blue", 0.05f);
 
-		Band& line2 = table2.emplace<Band>();
+		Line& line2 = table2.emplace<Line>();
 
 		static string text1 = "The quick brown fox jumps over the lazy dog.";
 		static string text2 = "The quick brown fox jumps over the lazy dog.";
@@ -246,7 +289,7 @@ namespace toy
 		line2.emplace<TypeIn>(text1);
 		line2.emplace<TypeIn>(text2);
 
-		Band& line3 = table2.emplace<Band>();
+		Line& line3 = table2.emplace<Line>();
 
 		line3.emplace<Label>("Hello Left");
 		line3.emplace<Label>("Hello Right");
@@ -254,7 +297,7 @@ namespace toy
 		return page;
 	}
 
-	Sheet& createUiTestTree(Sheet& parent)
+	Piece& createUiTestTree(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("Tree");
 		Page& page = window.body().emplace<Page>("Tree");
@@ -285,7 +328,7 @@ namespace toy
 		return window;
 	}
 
-	Tree& createUiTestTableTree(Sheet& parent)
+	Tree& createUiTestTableTree(Container& parent)
 	{
 		Tree& tree = parent.emplace<Tree>();
 
@@ -310,41 +353,41 @@ namespace toy
 		return tree;
 	}
 
-	Sheet& createUiTestMarkupText(Sheet& parent)
+	Piece& createUiTestMarkupText(Container& parent)
 	{
 		static string multiline = "This is a long paragraph. The text should automatically wrap on the edge of the window. The current implementation follows no word splitting rules, text is just split at the last character.";
 		Page& page = parent.emplace<Page>("Markup Text");
 		page.emplace<Textbox>(multiline);
 		page.emplace<SliderFloat>("Wrap width", AutoStat<float>(200.f, -20.f, 600.f, 0.1f), [](float){ });
 
-		Band& line0 = page.emplace<Band>();
+		Line& line0 = page.emplace<Line>();
 		line0.emplace<Icon>("bullet");
 		line0.emplace<Label>("Bullet point 1");
 
 		static string multiline2 = "Bullet point 2\nOn multiple lines";
-		Band& line1 = page.emplace<Band>();
+		Line& line1 = page.emplace<Line>();
 		line1.emplace<Icon>("bullet");
 		line1.emplace<Textbox>(multiline2);
 
-		Band& line2 = page.emplace<Band>();
+		Line& line2 = page.emplace<Line>();
 		line2.emplace<Icon>("bullet");
 		line2.emplace<Label>("Bullet point 3");
 
 		return page;
 	}
 
-	Sheet& createUiTestControls(Sheet& parent, bool window)
+	Piece& createUiTestControls(Container& parent, bool window)
 	{
-		Sheet& page = window ? parent.emplace<Window>("Table").body().emplace<Page>("Table")
-							 : parent.emplace<Page>("Controls");
+		Container& page = window ? parent.emplace<Window>("Table").body().emplace<Page>("Table")
+								 : parent.emplace<Page>("Controls");
 
 		Table& table = page.emplace<Table>(StringVector({ "input", "label" }), std::vector<float>({ 0.7f, 0.3f }));
 
 		table.emplace<InputBool>("checkbox input", false, nullptr, true);
 		table.emplace<InputRadio>("radio input", StringVector({ "radio a", "radio b", "radio c" }), nullptr, true);
 
-		table.emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {}, false, true);
-		table.emplace<InputDropdown>("typedown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {}, true, true);
+		table.emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {}, true);
+		//table.emplace<InputDropdown>("typedown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {}, true, true);
 
 		table.emplace<InputText>("string input", "Hello, world!", nullptr, true);
 		table.emplace<InputInt>("int input", AutoStat<int>(123, 0, 1000, 1), nullptr, true);
@@ -366,7 +409,7 @@ namespace toy
 		return page;
 	}
 
-	Sheet& createUiTestFocusTabbing(Sheet& parent)
+	Piece& createUiTestFocusTabbing(Container& parent)
 	{
 		Page& page = parent.emplace<Page>("Tabbing");
 		page.emplace<Label>("Use TAB/SHIFT+TAB to cycle through keyboard editable fields.");
@@ -385,14 +428,14 @@ namespace toy
 		return page;
 	}
 
-	Sheet& createUiTestFileBrowser(Sheet& parent)
+	Piece& createUiTestFileBrowser(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("File Browser");
 		window.body().emplace<Directory>("..");
 		return window;
 	}
 
-	Sheet& createUiTestFileTree(Sheet& parent)
+	Piece& createUiTestFileTree(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("File Tree");
 		Tree& filetree = window.body().emplace<Tree>();
@@ -401,35 +444,35 @@ namespace toy
 		return window;
 	}
 
-	Sheet& createUiTestInlineControls(Sheet& parent)
+	Piece& createUiTestInlineControls(Container& parent)
 	{
 		Page& page = parent.emplace<Page>("Inline Controls");
 
-		Band& line0 = page.emplace<Band>();
+		Line& line0 = page.emplace<Line>();
 
 		line0.emplace<Label>("Hello");
 		line0.emplace<Label>("World");
 
-		Band& line1 = page.emplace<Band>();
+		Line& line1 = page.emplace<Line>();
 
 		line1.emplace<Button>("Banana");
 		line1.emplace<Button>("Apple");
 		line1.emplace<Button>("Corniflower");
 
-		Band& line2 = page.emplace<Band>();
+		Line& line2 = page.emplace<Line>();
 
 		line2.emplace<Label>("Small buttons");
 		line2.emplace<Button>("Like this one");
 		line2.emplace<Label>("can fit within a text block.");
 
-		Band& line3 = page.emplace<Band>();
+		Line& line3 = page.emplace<Line>();
 
 		line3.emplace<InputBool>("My", true);
 		line3.emplace<InputBool>("Tailor", true);
 		line3.emplace<InputBool>("Is", true);
 		line3.emplace<InputBool>("Rich", true);
 
-		Band& line4 = page.emplace<Band>();
+		Line& line4 = page.emplace<Line>();
 
 		line4.emplace<InputFloat>("X", 0.f);
 		line4.emplace<InputFloat>("Y", 0.f);
@@ -438,17 +481,17 @@ namespace toy
 		return page;
 	}
 
-	Sheet& createUiTestProgressDialog(Sheet& parent)
+	Piece& createUiTestProgressDialog(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("Progress Dialog");
 		Page& page = window.body().emplace<Page>("Progress Dialog");
-		ProgressBar& bar = page.emplace<ProgressBarX>();
+		ProgressBar& bar = page.emplace<ProgressBar>();
 		bar.setPercentage(0.57f);
 		page.emplace<SliderFloat>("Set progress", AutoStat<float>(0.57f, 0.f, 1.f, 0.01f), [&bar](float val) { bar.setPercentage(val); });
 		return window;
 	}
 
-	Window& createUiTestWindow(Sheet& parent)
+	Window& createUiTestWindow(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("kiUi v0.1");
 		Page& page = window.body().emplace<Page>("kiUi v0.1");
@@ -465,6 +508,7 @@ namespace toy
 		box1.emplace<InputBool>("movable", true, [&window](bool) { window.toggleMovable(); }, true);
 		box1.emplace<InputBool>("resizable", true, [&window](bool) { window.toggleResizable(); }, true);
 		box1.emplace<InputBool>("closable", true, [&window](bool) { window.toggleClosable(); }, true);
+		box1.emplace<InputBool>("wrap content", false, [&window](bool) { window.toggleWrap(); }, true);
 
 		box1.emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha){ window.content().inkstyle().m_backgroundColour.val.setA(alpha); });
 
@@ -480,24 +524,25 @@ namespace toy
 	class StyleEdit : public Page
 	{
 	public:
-		StyleEdit(Styler& styler)
-			: Page("Style Edit")
+		StyleEdit(Piece& parent, Styler& styler)
+			: Page(parent, "Style Edit")
 			, m_styler(styler)
-			, m_stylePicker(this->emplace<Typedown>([this](Widget& choice){ this->pickStyle(choice.contentlabel()); }))
-			, m_empty(this->emplace<InputBool>("Empty", true, [this](bool empty) { this->m_skin->setEmpty(empty); this->m_style->markUpdate(); }))
-			, m_backgroundColour(this->emplace<InputColour>("Background Colour", Colour(), [this](Colour colour) { this->m_skin->backgroundColour() = colour; this->m_style->markUpdate(); }))
-			, m_gradientTop(this->emplace<SliderInt>("Gradient Top", AutoStat<int>(0, -50, +50), [this](int top) { this->m_skin->linearGradient().setX(float(top)); this->m_style->markUpdate(); }))
-			, m_gradientDown(this->emplace<SliderInt>("Gradient Bottom", AutoStat<int>(0, -50, +50), [this](int down) { this->m_skin->linearGradient().setY(float(down)); this->m_style->markUpdate(); }))
-			, m_cornerRadius(this->emplace<SliderInt>("Corner Radius", AutoStat<int>(0, 0, 25), [this](int radius) { this->m_skin->cornerRadius().assign(float(radius)); this->m_style->markUpdate(); }))
-			, m_borderWidth(this->emplace<SliderFloat>("Border Width", AutoStat<float>(0.f, 0.f, 10.f, 0.1f), [this](float width) { this->m_skin->borderWidth().assign(width); this->m_style->markUpdate(); }))
-			, m_borderColour(this->emplace<InputColour>("Border Colour", Colour(), [this](Colour colour) { this->m_skin->borderColour() = colour; this->m_style->markUpdate(); }))
-			, m_textSize(this->emplace<SliderInt>("Text Size", AutoStat<int>(0, 0, 50), [this](int size) { this->m_skin->textSize() = float(size); this->m_style->markUpdate(); }))
-			, m_textColour(this->emplace<InputColour>("Text Colour", Colour(), [this](Colour colour) { this->m_skin->textColour() = colour; this->m_style->markUpdate(); }))
-			, m_padding(this->emplace<SliderInt>("Padding", AutoStat<int>(0, 0, 25), [this](int padding) { this->m_skin->padding().assign(float(padding)); this->m_style->markUpdate(); }))
-			//, m_alignX(this->emplace<InputRadio>("Align Y", StringVector({ "Left", "Center", "Right", "OutLeft", "OutRight" }), [this](const string&) {}))
-			//, m_alignY(this->emplace<InputRadio>("Align Y", StringVector({ "Left", "Center", "Right", "OutLeft", "OutRight" }), [this](const string&) {}))
-			, m_image(this->emplace<InputText>("Image", "", [this](string name) { /*this->m_skin->image().d_name = name;*/ this->m_style->markUpdate(); }))
-			, m_skinImage(this->emplace<InputText>("Skin Image", "", [this](string name) { /*this->m_skin->image().d_name = name;*/ this->m_style->markUpdate(); }))
+			, m_stylePicker(*this, [this](Widget& choice) { this->pickStyle(choice.contentlabel()); })
+			, m_table(*this, { "Field", "Value" }, { 0.3f, 0.7f })
+			, m_empty(m_table, "Empty", true, [this](bool empty) { this->m_skin->setEmpty(empty); this->m_style->markUpdate(); })
+			, m_backgroundColour(m_table, "Background Colour", Colour(), [this](Colour colour) { this->m_skin->backgroundColour() = colour; this->m_style->markUpdate(); })
+			, m_gradientTop(m_table, "Gradient Top", AutoStat<int>(0, -50, +50), [this](int top) { this->m_skin->linearGradient().setX(float(top)); this->m_style->markUpdate(); })
+			, m_gradientDown(m_table, "Gradient Bottom", AutoStat<int>(0, -50, +50), [this](int down) { this->m_skin->linearGradient().setY(float(down)); this->m_style->markUpdate(); })
+			, m_cornerRadius(m_table, "Corner Radius", AutoStat<int>(0, 0, 25), [this](int radius) { this->m_skin->cornerRadius().assign(float(radius)); this->m_style->markUpdate(); })
+			, m_borderWidth(m_table, "Border Width", AutoStat<float>(0.f, 0.f, 10.f, 0.1f), [this](float width) { this->m_skin->borderWidth().assign(width); this->m_style->markUpdate(); })
+			, m_borderColour(m_table, "Border Colour", Colour(), [this](Colour colour) { this->m_skin->borderColour() = colour; this->m_style->markUpdate(); })
+			, m_textSize(m_table, "Text Size", AutoStat<int>(0, 0, 50), [this](int size) { this->m_skin->textSize() = float(size); this->m_style->markUpdate(); })
+			, m_textColour(m_table, "Text Colour", Colour(), [this](Colour colour) { this->m_skin->textColour() = colour; this->m_style->markUpdate(); })
+			, m_padding(m_table, "Padding", AutoStat<int>(0, 0, 25), [this](int padding) { this->m_skin->padding().assign(float(padding)); this->m_style->markUpdate(); })
+			//, m_alignX(m_table, "Align Y", StringVector({ "Left", "Center", "Right", "OutLeft", "OutRight" }), [this](const string&) {})
+			//, m_alignY(m_table, "Align Y", StringVector({ "Left", "Center", "Right", "OutLeft", "OutRight" }), [this](const string&) {})
+			, m_image(m_table, "Image", "", [this](string name) { /*this->m_skin->image().d_name = name;*/ this->m_style->markUpdate(); })
+			, m_skinImage(m_table, "Skin Image", "", [this](string name) { /*this->m_skin->image().d_name = name;*/ this->m_style->markUpdate(); })
 		{
 			for(Object* object : Style::cls().indexer().objects())
 				if(object)
@@ -506,7 +551,7 @@ namespace toy
 
 		void pickStyle(const string& name)
 		{
-			m_style = m_styler.fetchStyle(name);
+			m_style = &m_styler.styledef(name); // @todo fix with style
 			m_skin = &m_style->skin();
 
 			m_empty.input().modifyValue(m_skin->empty());
@@ -529,34 +574,38 @@ namespace toy
 
 	protected:
 		Styler& m_styler;
-		Dropdown& m_stylePicker;
 
-		InputBool& m_empty;
-		InputColour& m_backgroundColour;
-		SliderInt& m_gradientTop;
-		SliderInt& m_gradientDown;
-		SliderInt& m_cornerRadius;
-		SliderFloat& m_borderWidth;
-		InputColour& m_borderColour;
-		SliderInt& m_textSize;
-		InputColour& m_textColour;
-		SliderInt& m_padding;
-		//InputRadio& m_alignX;
-		//InputRadio& m_alignY;
-		InputText& m_image;
-		InputText& m_skinImage;
+		DropdownInput m_stylePicker;
+		Table m_table;
+
+
+		InputBool m_empty;
+		InputColour m_backgroundColour;
+		SliderInt m_gradientTop;
+		SliderInt m_gradientDown;
+		SliderInt m_cornerRadius;
+		SliderFloat m_borderWidth;
+		InputColour m_borderColour;
+		SliderInt m_textSize;
+		InputColour m_textColour;
+		SliderInt m_padding;
+		//InputRadio m_alignX;
+		//InputRadio m_alignY;
+		InputText m_image;
+		InputText m_skinImage;
 
 		Style* m_style;
 		InkStyle* m_skin;
 	};
 
-	Sheet& createUiStyleEdit(Sheet& parent)
+	Piece& createUiStyleEdit(Container& parent)
 	{
 		Dockbar& tooldock = parent.emplace<Dockbar>();
 
-		tooldock.emplace<StyleEdit>(parent.uiWindow().styler());
+		tooldock.addDock("Style Edit").emplace<StyleEdit>(parent.uiWindow().styler());
 
-		Page& options = tooldock.emplace<Page>("Options");
+		Page& options = tooldock.addDock("Options").emplace<Page>("Options");
+		options.emplace<InputText>("Debug draw filter", "", [](string value) { DrawFrame::sDebugDrawFilter = value; });
 		options.emplace<InputBool>("Debug draw Frame", false, [](bool on) { DrawFrame::sDebugDrawFrameRect = on; });
 		options.emplace<InputBool>("Debug draw Padding", false, [](bool on) { DrawFrame::sDebugDrawPaddedRect = on; });
 		options.emplace<InputBool>("Debug draw Content", false, [](bool on) { DrawFrame::sDebugDrawContentRect = on; });
@@ -582,23 +631,25 @@ namespace toy
 		else if(name == "Default")
 			parser.loadDefaultStyle();
 
-		CustomElement::cls().layout().d_align = DimAlign(LEFT, CENTER);
+		uiWindow.styler().style(CustomElement::cls()).layout().d_align = DimAlign(LEFT, CENTER);
 	}
 
-	void selectUiTheme(Sheet& sheet, Widget& selected)
+	void selectUiTheme(Container& sheet, Widget& selected)
 	{
 		const string name = selected.contentlabel();
 		switchUiTheme(sheet.uiWindow(), name);
 	}
 
-	void pickUiSample(Sheet& sheet, Widget& selected)
+	void pickUiSample(Container& sheet, Widget& selected)
 	{
 		const string name = selected.contentlabel();
 
 		if(sheet.stripe().sequence().size() > 0)
 			sheet.clear();
 
-		if(name == "Dockspace")
+		if(name == "Application")
+			createUiTestApplication(sheet);
+		else if(name == "Dockspace")
 			createUiTestDockspace(sheet);
 		else if(name == "Nodes")
 			createUiTestNodes(sheet);
@@ -626,21 +677,21 @@ namespace toy
 			createUiTestProgressDialog(sheet);
 	}
 
-	void createUiTest(Sheet& rootSheet)
+	void createUiTest(Container& rootSheet)
 	{
 		switchUiTheme(rootSheet.uiWindow(), "Blendish Dark");
 
 		Header& demoheader = rootSheet.emplace<Header>();
 		Board& demobody = rootSheet.emplace<Board>();
-		LayerSheet& samplebody = demobody.emplace<LayerSheet>();
+		Layout& samplebody = demobody.emplace<Layout>();
 		createUiStyleEdit(demobody);
 
-		StringVector samples({ "Dockspace", "Nodes", "Window", "Text Editor", "Filtered List", "Custom List", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" });
+		StringVector samples({ "Application", "Dockspace", "Nodes", "Window", "Text Editor", "Filtered List", "Custom List", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" });
 		StringVector themes({ "Blendish", "Blendish Dark", "TurboBadger", "MyGui" });
 
 		demoheader.emplace<Label>("Pick a demo sample : ");
-		demoheader.emplace<Dropdown>(std::bind(&pickUiSample, std::ref(samplebody), std::placeholders::_1), samples);
+		demoheader.emplace<DropdownInput>(std::bind(&pickUiSample, std::ref(samplebody), std::placeholders::_1), samples);
 		demoheader.emplace<Label>("Switch theme : ");
-		demoheader.emplace<Dropdown>(std::bind(&selectUiTheme, std::ref(samplebody), std::placeholders::_1), themes);
+		demoheader.emplace<DropdownInput>(std::bind(&selectUiTheme, std::ref(samplebody), std::placeholders::_1), themes);
 	}
 }

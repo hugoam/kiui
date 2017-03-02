@@ -8,6 +8,8 @@
 #include <toyui/Context/Ogre/OgreWindow.h>
 
 #include <toyui/Widget/RootSheet.h>
+#include <toyui/Frame/Layer.h>
+#include <toyui/UiWindow.h>
 
 #include <Ogre.h>
 #include <Compositor/OgreCompositorManager2.h>
@@ -36,7 +38,7 @@ namespace toy
 	{}
 
 	OgreRenderer::OgreRenderer(const string& resourcePath)
-		: GlRenderer(resourcePath)
+		: GlRenderer(resourcePath, false)
 	{}
 
 	unique_ptr<RenderTarget> OgreRenderer::createRenderTarget(MasterLayer& masterLayer)

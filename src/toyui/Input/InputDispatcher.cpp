@@ -28,14 +28,14 @@ namespace toy
 
 	InputFrame& InputFrame::rootFrame()
 	{
-		return m_parentFrame ? m_parentFrame->rootFrame() : *this;
+		return m_parentFrame->rootFrame();
 	}
 
 	InputFrame& InputFrame::rootController()
 	{
 		if(m_controlled)
 			return *this;
-		return m_parentFrame ? m_parentFrame->rootController() : *this;
+		return m_parentFrame->rootController();
 	}
 
 	InputReceiver* InputFrame::controlEvent(InputEvent& inputEvent)
@@ -53,7 +53,7 @@ namespace toy
 
 	InputReceiver* InputFrame::dispatchEvent(InputEvent& inputEvent)
 	{
-		InputFrame& rootReceiver = inputEvent.rootFrame ? *inputEvent.rootFrame : this->rootFrame();
+		InputFrame& rootReceiver = this->rootFrame();
 		InputReceiver* topReceiver = this->controlEvent(inputEvent);
 		InputReceiver* consumer = topReceiver;
 		InputReceiver* receiver = topReceiver;
@@ -80,7 +80,6 @@ namespace toy
 	{
 		m_controlMode = mode;
 		m_deviceFilter = device;
-		//InputFrame& root = this->rootFrame();
 		InputFrame& root = this->rootController();
 		if(&root != this)
 			this->takeControl(root);
@@ -136,6 +135,15 @@ namespace toy
 			inputEvent.abort = true;
 
 		inputEvent.visited.push_back(static_cast<Widget*>(this));
+
+		if(inputEvent.deviceType >= InputEvent::DEVICE_MOUSE)
+		{
+			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
+			Frame& frame = static_cast<Widget&>(*this).frame();
+			DimFloat absolute = frame.absolutePosition();
+			mouseEvent.relativeX = (mouseEvent.posX - absolute[DIM_X]) / frame.scale();
+			mouseEvent.relativeY = (mouseEvent.posY - absolute[DIM_Y]) / frame.scale();
+		}
 
 		if(inputEvent.deviceType == InputEvent::DEVICE_KEYBOARD && inputEvent.eventType == InputEvent::EVENT_PRESSED)
 			this->keyDown(static_cast<KeyEvent&>(inputEvent));

@@ -9,9 +9,11 @@
 #include <toyui/Frame/Stripe.h>
 #include <toyui/Frame/Layer.h>
 
-#include <toyui/Widget/Scrollbar.h>
+#include <toyui/Button/Scrollbar.h>
 
 #include <toyui/Controller/Controller.h>
+
+#include <toyui/Input/InputDevice.h>
 
 #include <toyui/UiWindow.h>
 #include <toyui/UiLayout.h>
@@ -22,35 +24,36 @@
 
 namespace toy
 {
-	RootSheet::RootSheet(UiWindow& window, StyleType& type, bool absolute)
-		: Sheet(type, LAYER)
+	RootSheet::RootSheet(UiWindow& window, Type& type)
+		: Container(type, MASTER_LAYER)
 		, m_window(window)
 		, m_mouse(make_unique<Mouse>(*this))
 		, m_keyboard(make_unique<Keyboard>(*this))
+		, m_cursor(*this)
 	{
-		if(absolute)
-		{
-			m_frame = make_unique<MasterLayer>(*this);
-			this->updateStyle();
-			m_layer = &m_frame->as<MasterLayer>();
-			m_state = static_cast<WidgetState>(m_state ^ BOUND);
-		}
-
-		m_cursor = &this->makeappend<Cursor>(*this);
+		m_target = window.renderer().createRenderTarget(m_frame->as<MasterLayer>());
+		this->updateStyle();
 	}
+
+	RootSheet::RootSheet(Piece& parent, Type& type)
+		: Container(parent, type, LAYER)
+		, m_window(parent.uiWindow())
+		, m_mouse(make_unique<Mouse>(*this))
+		, m_keyboard(make_unique<Keyboard>(*this))
+		, m_cursor(*this)
+	{}
 
 	RootSheet::~RootSheet()
 	{}
 
 	void RootSheet::nextFrame(size_t tick, size_t delta)
 	{
-		m_frame->measure();
-		m_frame->layout();
+		m_frame->as<MasterLayer>().relayout();
 
 		m_mouse->nextFrame();
 		m_keyboard->nextFrame();
 
-		Sheet::nextFrame(tick, delta);
+		Piece::nextFrame(tick, delta);
 	}
 
 	InputReceiver* RootSheet::dispatchEvent(InputEvent& inputEvent)
@@ -60,6 +63,7 @@ namespace toy
 
 	void RootSheet::handleUnbindWidget(Widget& widget)
 	{
+		m_cursor.unhover(widget);
 		m_mouse->handleUnbindWidget(widget);
 	}
 
