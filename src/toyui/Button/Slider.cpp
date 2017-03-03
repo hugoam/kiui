@@ -17,15 +17,15 @@
 
 namespace toy
 {
-	SliderKnob::SliderKnob(Piece& parent, Dimension dim, Type& type)
+	SliderKnob::SliderKnob(Wedge& parent, Dimension dim, Type& type)
 		: Item(parent, type)
 		, m_dim(dim)
 	{
 		//this->content().setEmpty();
 	}
 
-	Slider::Slider(Piece& parent, Dimension dim, const Trigger& onUpdated, Type& type)
-		: WideControl(parent, type)
+	Slider::Slider(Wedge& parent, Dimension dim, const Trigger& onUpdated, Type& type)
+		: WrapControl(parent, type)
 		, m_dim(dim)
 		, m_filler(*this)
 		, m_button(*this, dim)
@@ -42,7 +42,7 @@ namespace toy
 		if(m_frame->dirty() >= Frame::DIRTY_LAYOUT)
 			this->updateKnob();
 
-		Piece::nextFrame(tick, delta);
+		Wedge::nextFrame(tick, delta);
 	}
 
 	float Slider::offset(float pos)
@@ -132,7 +132,7 @@ namespace toy
 		this->markDirty();
 	}
 
-	SliderDisplay::SliderDisplay(Piece& parent, const string& label)
+	SliderDisplay::SliderDisplay(Wedge& parent, const string& label)
 		: Label(parent, label, cls())
 	{}
 }

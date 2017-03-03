@@ -90,7 +90,7 @@ namespace toy
 		this->styledef(Dockline::cls()).layout().d_space = BOARD;
 
 		// SHEET
-		this->styledef(Sheet::cls()).layout().d_space = CONTAINER;
+		this->styledef(Sheet::cls()).layout().d_space = SHEET;
 
 		// OVERLAYS
 		this->styledef(Decal::cls()).layout().d_flow = FREE;
@@ -109,16 +109,16 @@ namespace toy
 		this->styledef(ScrollerKnob::cls()).layout().d_flow = FLOW;
 
 		// CONTAINERS
-		this->styledef(Container::cls()).layout().d_space = CONTAINER;
+		this->styledef(Container::cls()).layout().d_space = SHEET;
 
 		this->styledef(ScrollSheet::cls()).layout().d_opacity = OPAQUE;
 		this->styledef(ScrollPlan::cls()).layout().d_opacity = OPAQUE;
 
 		this->styledef(Window::cls()).layout().d_space = FIXED_BLOCK;
 
-		this->styledef(Dockbox::cls()).layout().d_space = CONTAINER;
+		this->styledef(Dockbox::cls()).layout().d_space = SHEET;
 		this->styledef(DockWindow::cls()).layout().d_flow = FLOW;
-		this->styledef(DockWindow::cls()).layout().d_space = CONTAINER;
+		this->styledef(DockWindow::cls()).layout().d_space = SHEET;
 
 		// BLOCKS
 		this->styledef(WrapWindow::cls()).layout().d_space = BLOCK;
@@ -128,10 +128,10 @@ namespace toy
 
 		this->styledef(Scroller::cls()).layout().d_space = PARALLEL_FLEX;
 
-		this->styledef(Filler::cls()).layout().d_space = CONTAINER;
-		this->styledef(Slider::cls()).layout().d_space = CONTAINER;
+		this->styledef(Filler::cls()).layout().d_space = SHEET;
+		this->styledef(Slider::cls()).layout().d_space = SHEET;
 
-		this->styledef(SliderKnob::cls()).layout().d_space = CONTAINER;
+		this->styledef(SliderKnob::cls()).layout().d_space = SHEET;
 
 		// LINE
 		this->styledef(Line::cls()).layout().d_space = LINE;
@@ -161,7 +161,7 @@ namespace toy
 		this->styledef(WrapControl::cls()).layout().d_space = LINE;
 		this->styledef(WrapControl::cls()).layout().d_opacity = OPAQUE;
 
-		this->styledef(WideControl::cls()).layout().d_space = LINE;
+		this->styledef(WrapControl::cls()).layout().d_space = LINE;
 		this->styledef(TypeIn::cls()).layout().d_space = LINE;
 		
 		this->styledef(ColumnHeader::cls()).layout().d_space = LINE;
@@ -189,19 +189,19 @@ namespace toy
 		//
 		// 
 
-		this->styledef(WindowSizerLeft::cls()).layout().d_space = CONTAINER;
-		this->styledef(WindowSizerRight::cls()).layout().d_space = CONTAINER;
+		this->styledef(WindowSizerLeft::cls()).layout().d_space = SHEET;
+		this->styledef(WindowSizerRight::cls()).layout().d_space = SHEET;
 
-		this->styledef(NoScrollZone::cls()).layout().d_space = CONTAINER;
+		this->styledef(NoScrollZone::cls()).layout().d_space = SHEET;
 
 		this->styledef(Slider::cls()).layout().d_direction = DIMENSION;
 		this->styledef(Scrollbar::cls()).layout().d_direction = DIMENSION;
 		this->styledef(Dockline::cls()).layout().d_direction = DIMENSION;
 
-		this->styledef(GridLine::cls()).layout().d_space = CONTAINER;
+		this->styledef(GridLine::cls()).layout().d_space = SHEET;
 		this->styledef(GridLine::cls()).layout().d_direction = READING;
 
-		this->styledef(GridColumn::cls()).layout().d_space = CONTAINER;
+		this->styledef(GridColumn::cls()).layout().d_space = SHEET;
 		this->styledef(GridColumn::cls()).layout().d_layout = DimLayout(AUTO_LAYOUT, NO_LAYOUT);
 
 		this->styledef(GridOverlay::cls()).layout().d_space = BOARD;

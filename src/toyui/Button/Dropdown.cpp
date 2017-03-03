@@ -20,20 +20,20 @@ using namespace std::placeholders;
 
 namespace toy
 {
-	DropdownHead::DropdownHead(Piece& parent, const Trigger& trigger)
-		: WrapButton(parent, nullptr, trigger, cls())
+	DropdownHead::DropdownHead(Wedge& parent, const Trigger& trigger)
+		: MultiButton(parent, trigger, {}, cls())
 	{}
 
-	DropdownToggle::DropdownToggle(Piece& parent, const Trigger& trigger)
+	DropdownToggle::DropdownToggle(Wedge& parent, const Trigger& trigger)
 		: Button(parent, "", trigger, cls())
 	{}
 
-	DropdownChoice::DropdownChoice(Piece& parent, const Trigger& trigger)
-		: WrapButton(parent, trigger, cls())
+	DropdownChoice::DropdownChoice(Wedge& parent, const Trigger& trigger, const StringVector& elements)
+		: MultiButton(parent, trigger, elements, cls())
 	{}
 
 	DropdownList::DropdownList(Dropdown& dropdown)
-		: Stack(dropdown, cls(), LAYER)
+		: Container(dropdown, cls(), LAYER)
 		, m_dropdown(dropdown)
 	{}
 
@@ -49,8 +49,8 @@ namespace toy
 		//m_dropdown.dropup();
 	}
 
-	Dropdown::Dropdown(Piece& parent, Type& type)
-		: WrapButton(parent, nullptr, std::bind(&Dropdown::dropdown, this, true), type)
+	Dropdown::Dropdown(Wedge& parent, Type& type)
+		: WrapButton(parent, std::bind(&Dropdown::dropdown, this, true), type)
 		, m_header(*this, std::bind(&Dropdown::dropdown, this, true))
 		, m_toggle(*this, std::bind(&Dropdown::dropdown, this, true))
 		, m_list(*this)
@@ -61,7 +61,7 @@ namespace toy
 
 	DropdownChoice& Dropdown::addChoice()
 	{
-		return m_list.emplace<DropdownChoice>([this](Widget& widget) { this->dropup(); });
+		return m_list.emplace<DropdownChoice>([this](Widget& widget) { this->dropup(); }, StringVector{});
 		// widget.resetStyle(DropdownChoice::cls());
 	}
 
@@ -85,27 +85,28 @@ namespace toy
 		m_down = true;
 	}
 
-	DropdownInput::DropdownInput(Piece& parent, const Trigger& onSelected, StringVector choices, Type& type)
+	DropdownInput::DropdownInput(Wedge& parent, const Trigger& onSelected, StringVector choices, Type& type)
 		: Dropdown(parent, type)
 		, m_onSelected()
 		, m_selected(nullptr)
 	{
 		for(string& choice : choices)
-			this->emplace<Label>(choice);
+			this->addChoice({ choice });
 
 		m_onSelected = onSelected;
 	}
 
-	Container& DropdownInput::emplaceContainer()
+	DropdownChoice& DropdownInput::addChoice(const StringVector& elements)
 	{
-		DropdownChoice& choice = m_list.emplace<DropdownChoice>([this](Widget& button) { this->selected(button.as<DropdownChoice>()); });
+		DropdownChoice& choice = m_list.emplace<DropdownChoice>([this](Widget& button) { this->selected(button.as<DropdownChoice>()); }, elements);
+		if(m_selected == nullptr)
+			this->select(choice);
 		return choice;
 	}
 
-	void DropdownInput::handleAdd(Widget& widget)
+	Container& DropdownInput::emplaceContainer()
 	{
-		if(m_selected == nullptr)
-			this->select(widget.parent()->as<DropdownChoice>());
+		return this->addChoice({ "" });
 	}
 
 	void DropdownInput::select(DropdownChoice& choice)
@@ -116,7 +117,7 @@ namespace toy
 		m_selected = &choice;
 		m_selected->enableState(ACTIVATED);
 
-		this->updateHead(m_selected->content());
+		this->updateHead(*m_selected);
 	}
 
 	void DropdownInput::selected(DropdownChoice& choice)
@@ -127,11 +128,11 @@ namespace toy
 		this->select(choice);
 
 		if(m_onSelected)
-			m_onSelected(m_selected->content());
+			m_onSelected(*m_selected);
 	}
 
-	void DropdownInput::updateHead(Widget& choice)
+	void DropdownInput::updateHead(MultiButton& choice)
 	{
-		m_header.reset(choice.clone(m_header));
+		m_header.reset(choice.elements());
 	}
 }

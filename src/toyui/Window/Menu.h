@@ -28,7 +28,7 @@ namespace toy
 	class TOY_UI_EXPORT Menu : public Dropdown
 	{
 	public:
-		Menu(Piece& parent, const string& label, bool submenu = false);
+		Menu(Wedge& parent, const string& label, bool submenu = false);
 
 		static Type& cls() { static Type ty("Menu", Dropdown::cls()); return ty; }
 

@@ -60,8 +60,8 @@ namespace toy
 	class TOY_UI_EXPORT WValue : public WrapControl, public Value
 	{
 	public:
-		WValue(Piece& parent, Lref& lref, Type& type, const OnUpdate& onUpdate, bool edit = false);
-		WValue(Piece& parent, Lref&& lref, Type& type, const OnUpdate& onUpdate, bool edit = false);
+		WValue(Wedge& parent, Lref& lref, Type& type, const OnUpdate& onUpdate, bool edit = false);
+		WValue(Wedge& parent, Lref&& lref, Type& type, const OnUpdate& onUpdate, bool edit = false);
 
 		string getString();
 

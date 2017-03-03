@@ -18,12 +18,12 @@
 
 namespace toy
 {
-	Placeholder::Placeholder(Piece& parent, const string& name)
-		: Board(parent, cls())
+	Placeholder::Placeholder(Wedge& parent, const string& name)
+		: Container(parent, cls())
 		, m_name(name)
 	{}
 
-	Docksection::Docksection(Piece& parent, Dockline& dockline)
+	Docksection::Docksection(Wedge& parent, Dockline& dockline)
 		: Tabber(parent, cls(), true)
 		, m_dockline(&dockline)
 	{}
@@ -75,7 +75,7 @@ namespace toy
 			return *this; // dock on
 	}
 
-	Dockline::Dockline(Piece& parent, Dockspace& dockspace, Dockline* dockline, Dimension dim)
+	Dockline::Dockline(Wedge& parent, Dockspace& dockspace, Dockline* dockline, Dimension dim)
 		: GridSheet(parent, dim, cls())
 		, m_dockspace(dockspace)
 		, m_dockline(dockline)
@@ -174,8 +174,8 @@ namespace toy
 		: Dockline(dockspace, dockspace, nullptr, DIM_X)
 	{}
 
-	Dockspace::Dockspace(Piece& parent)
-		: Layout(parent, cls())
+	Dockspace::Dockspace(Wedge& parent)
+		: Container(parent, cls())
 		, m_mainLine(*this)
 	{}
 

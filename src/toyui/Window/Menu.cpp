@@ -11,7 +11,7 @@ using namespace std::placeholders;
 
 namespace toy
 {
-	Menu::Menu(Piece& parent, const string& label, bool submenu)
+	Menu::Menu(Wedge& parent, const string& label, bool submenu)
 		: Dropdown(parent, cls())
 		, m_submenu(submenu)
 	{
@@ -19,6 +19,6 @@ namespace toy
 		if(submenu)
 			m_list.resetStyle(SubMenuList::cls());
 
-		m_header.reset(make_unique<Label>(m_header, label));
+		m_header.reset({ label });
 	}
 }

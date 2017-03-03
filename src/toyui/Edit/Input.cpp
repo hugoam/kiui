@@ -19,7 +19,7 @@ using namespace std::placeholders;
 
 namespace toy
 {
-	InputRadio::InputRadio(Piece& parent, const string& label, StringVector choices, std::function<void(const string&)> callback, bool reverse)
+	InputRadio::InputRadio(Wedge& parent, const string& label, StringVector choices, std::function<void(const string&)> callback, bool reverse)
 		: WrapControl(parent, cls())
 		, m_label(*this, label)
 		, m_input(*this, [callback](Widget& widget) { if(callback) callback(widget.label()); }, 0, choices)
@@ -28,7 +28,7 @@ namespace toy
 			this->swap(0, 1);
 	}
 
-	InputDropdown::InputDropdown(Piece& parent, const string& label, StringVector choices, std::function<void(const string&)> callback, bool reverse)
+	InputDropdown::InputDropdown(Wedge& parent, const string& label, StringVector choices, std::function<void(const string&)> callback, bool reverse)
 		: WrapControl(parent, cls())
 		, m_label(*this, label)
 		, m_input(*this, [callback](Widget& widget) { if(callback) callback(widget.label()); }, choices)
@@ -38,10 +38,10 @@ namespace toy
 	}
 
 	template <class T_Val, class T_Widget>
-	unique_ptr<WValue> valueWidget(Lref& parent, Lref& lref, T_Val val) { UNUSED(parent); UNUSED(val); return make_unique<T_Widget>(parent->as<Piece>(), lref); }
+	unique_ptr<WValue> valueWidget(Lref& parent, Lref& lref, T_Val val) { UNUSED(parent); UNUSED(val); return make_unique<T_Widget>(parent->as<Wedge>(), lref); }
 
 	template <class T_Val, class T_Widget>
-	unique_ptr<WValue> statValueWidget(Lref& parent, Lref& valref, T_Val& val) { UNUSED(parent); UNUSED(valref); return make_unique<T_Widget>(parent->as<Piece>(), AutoStat<T_Val>(val, StatDef<T_Val>())); }
+	unique_ptr<WValue> statValueWidget(Lref& parent, Lref& valref, T_Val& val) { UNUSED(parent); UNUSED(valref); return make_unique<T_Widget>(parent->as<Wedge>(), AutoStat<T_Val>(val, StatDef<T_Val>())); }
 	
 	template class Dispatch<DispatchInput, bool&, valueWidget<bool&, Input<bool>>>;
 	template class Dispatch<DispatchInput, unsigned int&, statValueWidget<unsigned int, Input<unsigned int>>>;

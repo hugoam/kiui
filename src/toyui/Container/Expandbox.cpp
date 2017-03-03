@@ -13,20 +13,20 @@
 
 namespace toy
 {
-	ExpandboxHeader::ExpandboxHeader(Piece& parent, const Trigger& trigger)
-		: WrapButton(parent, nullptr, trigger, cls())
+	ExpandboxHeader::ExpandboxHeader(Wedge& parent, const Trigger& trigger)
+		: WrapButton(parent, trigger, cls())
 	{}
 
-	ExpandboxBody::ExpandboxBody(Piece& parent)
+	ExpandboxBody::ExpandboxBody(Wedge& parent)
 		: Container(parent, cls())
 	{}
 
-	ExpandboxToggle::ExpandboxToggle(Piece& parent, const Trigger& triggerOn, const Trigger& triggerOff, bool on)
+	ExpandboxToggle::ExpandboxToggle(Wedge& parent, const Trigger& triggerOn, const Trigger& triggerOff, bool on)
 		: Toggle(parent, triggerOn, triggerOff, on, cls())
 	{}
 
-	Expandbox::Expandbox(Piece& parent, const string& title, bool collapsed, bool build, Type& type)
-		: Stack(parent, type)
+	Expandbox::Expandbox(Wedge& parent, const string& title, bool collapsed, bool build, Type& type)
+		: Container(parent, type)
 		, m_header(*this)
 		, m_toggle(m_header, std::bind(&Expandbox::expand, this), std::bind(&Expandbox::collapse, this), !collapsed)
 		, m_title(m_header, title)

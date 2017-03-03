@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_WCONTEXTMENU_H
-#define TOY_WCONTEXTMENU_H
+#ifndef TOY_CONTEXTMENU_H
+#define TOY_CONTEXTMENU_H
 
 /* toy */
 #include <toyui/Forward.h>
@@ -14,7 +14,7 @@ namespace toy
 	class TOY_UI_EXPORT ContextMenu : public Overlay
 	{
 	public:
-		ContextMenu(Piece& parent, Trigger onClose);
+		ContextMenu(Wedge& parent, Trigger onClose);
 
 		void clear();
 

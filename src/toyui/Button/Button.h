@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_WBUTTON_H
-#define TOY_WBUTTON_H
+#ifndef TOY_BUTTON_H
+#define TOY_BUTTON_H
 
 /* toy */
 #include <toyui/Forward.h>
@@ -13,12 +13,10 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT Label : public Item
+	class TOY_UI_EXPORT Label : public Widget
 	{
 	public:
-		Label(Piece& parent, const string& label, Type& type = cls());
-
-		virtual unique_ptr<Widget> clone(Piece& parent) { return make_unique<Label>(parent, this->label()); }
+		Label(Wedge& parent, const string& label, Type& type = cls());
 
 		static Type& cls() { static Type ty("Label", Item::cls()); return ty; }
 	};
@@ -26,7 +24,7 @@ namespace toy
 	class TOY_UI_EXPORT Text : public Label
 	{
 	public:
-		Text(Piece& parent, const string& label, Type& type = cls());
+		Text(Wedge& parent, const string& label);
 
 		static Type& cls() { static Type ty("Text", Label::cls()); return ty; }
 	};
@@ -34,16 +32,16 @@ namespace toy
 	class TOY_UI_EXPORT Title : public Label
 	{
 	public:
-		Title(Piece& parent, const string& label);
+		Title(Wedge& parent, const string& label);
 
 		static Type& cls() { static Type ty("Title", Label::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT Icon : public Item
+	class TOY_UI_EXPORT Icon : public Widget
 	{
 	public:
-		Icon(Piece& parent, Image& image);
-		Icon(Piece& parent, const string& image);
+		Icon(Wedge& parent, Image& image);
+		Icon(Wedge& parent, const string& image);
 
 		static Type& cls() { static Type ty("Icon", Item::cls()); return ty; }
 	};
@@ -73,30 +71,15 @@ namespace toy
 	class TOY_UI_EXPORT Button : public Control, public ClickTrigger
 	{
 	public:
-		Button(Piece& parent, const string& label, const Trigger& trigger = Trigger(), Type& type = cls());
+		Button(Wedge& parent, const string& label, const Trigger& trigger = Trigger(), Type& type = cls());
+		Button(Wedge& parent, Image& image, const Trigger& trigger = Trigger(), Type& type = cls());
 
 		const string& tooltip() { return m_tooltip; }
 
 		void leftClick(MouseEvent& mouseEvent);
 		void rightClick(MouseEvent& mouseEvent);
 
-		virtual unique_ptr<Widget> clone(Piece& parent) { return make_unique<Button>(parent, this->label(), m_trigger, cls()); }
-
 		static Type& cls() { static Type ty("Button", Control::cls()); return ty; }
-
-	protected:
-		string m_tooltip;
-	};
-
-	class TOY_UI_EXPORT ImgButton : public Button
-	{
-	public:
-		ImgButton(Piece& parent, Image& image, const Trigger& trigger = Trigger(), Type& type = cls());
-		ImgButton(Piece& parent, const string& image, const Trigger& trigger = Trigger(), Type& type = cls());
-
-		const string& tooltip() { return m_tooltip; }
-
-		static Type& cls() { static Type ty("ImgButton", Button::cls()); return ty; }
 
 	protected:
 		string m_tooltip;
@@ -105,25 +88,31 @@ namespace toy
 	class TOY_UI_EXPORT WrapButton : public WrapControl, public ClickTrigger
 	{
 	public:
-		WrapButton(Piece& parent, const Trigger& trigger = Trigger(), Type& type = cls());
-		WrapButton(Piece& parent, Widget* content = nullptr, const Trigger& trigger = Trigger(), Type& type = cls());
-		WrapButton(Piece& parent, unique_ptr<Widget> content, const Trigger& trigger = Trigger(), Type& type = cls());
+		WrapButton(Wedge& parent, const Trigger& trigger = Trigger(), Type& type = cls());
 
 		Widget& content() { return *m_contents[0]; }
-
-		void reset(unique_ptr<Widget> content);
 
 		virtual void leftClick(MouseEvent& mouseEvent);
 		virtual void rightClick(MouseEvent& mouseEvent);
 
-		virtual void handleAdd(Widget& widget);
-
 		const string& contentlabel() { return this->content().contentlabel(); }
 
 		static Type& cls() { static Type ty("WrapButton", WrapControl::cls()); return ty; }
+	};
+
+	class TOY_UI_EXPORT MultiButton : public WrapButton
+	{
+	public:
+		MultiButton(Wedge& parent, const Trigger& trigger = Trigger(), const StringVector& elements = StringVector(), Type& type = cls());
+
+		const std::vector<string>& elements() { return m_elements; }
+
+		void reset(const StringVector& contents);
+
+		static Type& cls() { static Type ty("MultiButton", WrapButton::cls()); return ty; }
 
 	protected:
-		Widget* m_content;
+		std::vector<string> m_elements;
 	};
 
 	class TOY_UI_EXPORT Toggle : public Control
@@ -132,7 +121,7 @@ namespace toy
 		typedef std::function<void(Toggle&)> Trigger;
 
 	public:
-		Toggle(Piece& parent, const Trigger& triggerOn, const Trigger& triggerOff, bool isOn = true, Type& type = cls());
+		Toggle(Wedge& parent, const Trigger& triggerOn, const Trigger& triggerOff, bool isOn = true, Type& type = cls());
 
 		bool on() { return m_on; }
 

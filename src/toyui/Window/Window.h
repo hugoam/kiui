@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_WWINDOW_H
-#define TOY_WWINDOW_H
+#ifndef TOY_WINDOW_H
+#define TOY_WINDOW_H
 
 /* toy */
 #include <toyui/Forward.h>
@@ -17,7 +17,7 @@ namespace toy
 	class TOY_UI_EXPORT Popup : public Overlay
 	{
 	public:
-		Popup(Piece& parent);
+		Popup(Wedge& parent);
 
 		void leftClick(MouseEvent& mouseEvent);
 		void rightClick(MouseEvent& mouseEvent);
@@ -28,7 +28,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT CloseButton : public Button
 	{
 	public:
-		CloseButton(Piece& parent, const Trigger& trigger);
+		CloseButton(Wedge& parent, const Trigger& trigger);
 
 		void leftClick(MouseEvent& mouseEvent);
 		void rightClick(MouseEvent& mouseEvent);
@@ -36,7 +36,7 @@ namespace toy
 		static Type& cls() { static Type ty("CloseButton", Button::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT WindowHeader : public WideControl
+	class _I_ TOY_UI_EXPORT WindowHeader : public WrapControl
 	{
 	public:
 		WindowHeader(Window& window);
@@ -53,7 +53,7 @@ namespace toy
 
 		Docksection* docktarget(float x, float y);
 
-		static Type& cls() { static Type ty("WindowHeader", WideControl::cls()); return ty; }
+		static Type& cls() { static Type ty("WindowHeader", WrapControl::cls()); return ty; }
 
 	protected:
 		Window& m_window;
@@ -65,7 +65,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT WindowSizer : public Control
 	{
 	public:
-		WindowSizer(Piece& parent, Window& window, Type& type, bool left);
+		WindowSizer(Wedge& parent, Window& window, Type& type, bool left);
 
 		void leftDragStart(MouseEvent& mouseEvent);
 		void leftDrag(MouseEvent& mouseEvent);
@@ -81,7 +81,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT WindowSizerLeft : public WindowSizer
 	{
 	public:
-		WindowSizerLeft(Piece& parent, Window& window);
+		WindowSizerLeft(Wedge& parent, Window& window);
 
 		static Type& cls() { static Type ty("WindowSizerLeft", WindowSizer::cls()); return ty; }
 	};
@@ -89,17 +89,17 @@ namespace toy
 	class _I_ TOY_UI_EXPORT WindowSizerRight : public WindowSizer
 	{
 	public:
-		WindowSizerRight(Piece& parent, Window& window);
+		WindowSizerRight(Wedge& parent, Window& window);
 
 		static Type& cls() { static Type ty("WindowSizerRight", WindowSizer::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT WindowFooter : public WideControl
+	class _I_ TOY_UI_EXPORT WindowFooter : public WrapControl
 	{
 	public:
 		WindowFooter(Window& window);
 
-		static Type& cls() { static Type ty("WindowFooter", WideControl::cls()); return ty; }
+		static Type& cls() { static Type ty("WindowFooter", WrapControl::cls()); return ty; }
 
 	protected:
 		WindowSizerLeft m_firstSizer;
@@ -109,7 +109,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT WindowBody : public ScrollContainer
 	{
 	public:
-		WindowBody(Piece& parent);
+		WindowBody(Wedge& parent);
 
 		static Type& cls() { static Type ty("WindowBody", ScrollContainer::cls()); return ty; }
 	};
@@ -128,7 +128,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Window : public Overlay
 	{
 	public:
-		Window(Piece& parent, const string& title, WindowState state = WINDOW_DEFAULT, const Trigger& onClose = nullptr, Docksection* dock = nullptr, Type& type = cls());
+		Window(Wedge& parent, const string& title, WindowState state = WINDOW_DEFAULT, const Trigger& onClose = nullptr, Docksection* dock = nullptr, Type& type = cls());
 
 		const string& name();
 

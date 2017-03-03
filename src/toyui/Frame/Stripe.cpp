@@ -45,7 +45,7 @@ namespace toy
 
 		this->unmap();
 
-		for(Widget* widget : d_widget->as<Piece>().contents())
+		for(Widget* widget : d_widget->as<Wedge>().contents())
 		{
 			this->map(widget->frame());
 			widget->frame().remap();

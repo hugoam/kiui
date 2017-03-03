@@ -22,13 +22,13 @@ namespace toy
 {
 	string Widget::sNullString;
 
-	Widget::Widget(Piece& parent, Type& type, FrameType frameType)
+	Widget::Widget(Wedge& parent, Type& type, FrameType frameType)
 		: Widget(type, frameType, &parent)
 	{
 		parent.push(*this);
 	}
 
-	Widget::Widget(Type& type, FrameType frameType, Piece* parent)
+	Widget::Widget(Type& type, FrameType frameType, Wedge* parent)
 		: TypeObject(type)
 		, m_parent(parent)
 		, m_container(nullptr)
@@ -102,7 +102,7 @@ namespace toy
 		return this->content().text();
 	}
 
-	void Widget::bind(Piece& parent, size_t index, bool deferred)
+	void Widget::bind(Wedge& parent, size_t index, bool deferred)
 	{
 		m_parent = &parent;
 		m_parentFrame = &parent;
@@ -316,11 +316,11 @@ namespace toy
 		this->disableState(PRESSED);
 	}
 
-	Item::Item(Piece& parent, Type& type)
+	Item::Item(Wedge& parent, Type& type)
 		: Widget(parent, type)
 	{}
 
-	Control::Control(Piece& parent, Type& type)
+	Control::Control(Wedge& parent, Type& type)
 		: Item(parent, type)
 	{}
 }

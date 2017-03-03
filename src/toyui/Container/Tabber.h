@@ -15,7 +15,7 @@ namespace toy
 	class TOY_UI_EXPORT TabHeader : public Button
 	{
 	public:
-		TabHeader(Piece& parent, const string& label, const Trigger& trigger);
+		TabHeader(Wedge& parent, const string& label, const Trigger& trigger);
 
 		static Type& cls() { static Type ty("TabHeader", Button::cls()); return ty; }
 	};
@@ -23,7 +23,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Tab : public ScrollSheet
 	{
 	public:
-		Tab(Piece& parent, Tabber& tabber, Button& header, bool active);
+		Tab(Wedge& parent, Tabber& tabber, Button& header, bool active);
 
 		void handleRemove(Widget& widget);
 
@@ -37,18 +37,18 @@ namespace toy
 		bool m_active;
 	};
 
-	class _I_ TOY_UI_EXPORT TabberHead : public Line
+	class _I_ TOY_UI_EXPORT TabberHead : public Container
 	{
 	public:
-		TabberHead(Piece& parent);
+		TabberHead(Wedge& parent);
 
 		static Type& cls() { static Type ty("TabberHead", Line::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT TabberBody : public Sheet
+	class _I_ TOY_UI_EXPORT TabberBody : public Container
 	{
 	public:
-		TabberBody(Piece& parent);
+		TabberBody(Wedge& parent);
 
 		static Type& cls() { static Type ty("TabberBody", Sheet::cls()); return ty; }
 	};
@@ -56,7 +56,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Tabber : public Container
 	{
 	public:
-		Tabber(Piece& parent, Type& type = cls(), bool downtabs = false);
+		Tabber(Wedge& parent, Type& type = cls(), bool downtabs = false);
 		~Tabber();
 
 		Tab& addTab(const string& name);

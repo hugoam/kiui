@@ -29,14 +29,14 @@ namespace toy
 		printf("Table resize column %i span %f <---> column %i span %f\n", first.dindex(DIM_X), first.dspan(DIM_X), second.dindex(DIM_X), second.dspan(DIM_X));
 	}
 
-	ColumnHeader::ColumnHeader(Piece& parent, const string& label, float span)
+	ColumnHeader::ColumnHeader(Wedge& parent, const string& label, float span)
 		: Label(parent, label, cls())
 	{
 		m_frame->setSpanDim(DIM_X, span);
 	}
 
-	Table::Table(Piece& parent, StringVector columns, std::vector<float> weights)
-		: Stack(parent, cls(), TABLE)
+	Table::Table(Wedge& parent, StringVector columns, std::vector<float> weights)
+		: Container(parent, cls(), TABLE)
 		, m_columns(columns)
 		, m_weights(weights)
 		, m_head(*this)

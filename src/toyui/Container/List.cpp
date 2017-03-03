@@ -13,11 +13,11 @@ using namespace std::placeholders;
 
 namespace toy
 {
-	List::List(Piece& parent, Type& type, FrameType frameType)
+	List::List(Wedge& parent, Type& type, FrameType frameType)
 		: ScrollContainer(parent, type)
 	{}
 
-	SelectList::SelectList(Piece& parent, Type& type)
+	SelectList::SelectList(Wedge& parent, Type& type)
 		: List(parent, type)
 	{}
 
@@ -36,21 +36,21 @@ namespace toy
 		selected.toggleState(ACTIVATED);
 	}
 
-	LabelSequence::LabelSequence(Piece& parent, StringVector labels)
-		: Line(parent)
+	LabelSequence::LabelSequence(Wedge& parent, StringVector labels)
+		: Container(parent, cls())
 	{
 		for(string& label : labels)
 			this->emplace<Label>(label);
 	}
 	
-	ButtonSequence::ButtonSequence(Piece& parent, StringVector labels)
-		: Line(parent)
+	ButtonSequence::ButtonSequence(Wedge& parent, StringVector labels)
+		: Container(parent, cls())
 	{
 		for(string& label : labels)
 			this->emplace<Button>(label);
 	}
 
-	SortList::SortList(Piece& parent)
+	SortList::SortList(Wedge& parent)
 		: List(parent, cls())
 	{}
 

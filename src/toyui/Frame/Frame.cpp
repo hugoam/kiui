@@ -109,7 +109,7 @@ namespace toy
 
 		if(space == MANUAL_SPACE)
 			this->applySpace(PARAGRAPH, MANUAL, MANUAL);
-		else if(space == CONTAINER)
+		else if(space == SHEET)
 			this->applySpace(PARAGRAPH, WRAP, WRAP);
 		else if(space == ITEM)
 			this->applySpace(READING, SHRINK, SHRINK);

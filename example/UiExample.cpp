@@ -33,11 +33,11 @@ namespace toy
 		"Ebbe", "Aron", "Julian", "Elvin", "Ivar", 0
 	};
 
-	class CustomElement : public Line
+	class CustomElement : public Container
 	{
 	public:
-		CustomElement(Piece& parent, const string& name)
-			: Line(parent, cls())
+		CustomElement(Wedge& parent, const string& name)
+			: Container(parent, cls())
 			, m_label(this->build(name))
 		{}
 
@@ -60,7 +60,7 @@ namespace toy
 		Label& m_label;
 	};
 
-	Piece& createUiTestCustomList(Container& parent)
+	Wedge& createUiTestCustomList(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("Customized list items");
 		Page& page = window.body().emplace<Page>("List and filter");
@@ -75,7 +75,7 @@ namespace toy
 		return window;
 	}
 
-	Piece& createUiTestFilteredList(Container& parent)
+	Wedge& createUiTestFilteredList(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("List and filter");
 		Page& page = window.body().emplace<Page>("List and filter");
@@ -92,11 +92,11 @@ namespace toy
 		return window;
 	}
 
-	Piece& createUiTestScrollList(Container& parent)
+	Wedge& createUiTestScrollList(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("Scroll List");
 		Page& page = window.body().emplace<Page>("Scroll List");
-		Layout& sequence = page.emplace<Layout>();
+		Container& sequence = page.emplace<Container>(Layout::cls());
 
 		List& list0 = sequence.emplace<List>();
 		for(int i = 0; i < 100; i++)
@@ -110,11 +110,11 @@ namespace toy
 		return window;
 	}
 
-	Piece& createUiTestTextEditor(Container& parent)
+	Wedge& createUiTestTextEditor(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("Text Editor");
 		Page& page = window.body().emplace<Page>("Text Editor");
-		Line& buttons = page.emplace<Line>();
+		Container& buttons = page.emplace<Container>();
 		Menu& menu = buttons.emplace<Menu>("Menu");
 		menu.emplace<Button>("Redo");
 		menu.emplace<Button>("Undo");
@@ -132,11 +132,11 @@ namespace toy
 		return window;
 	}
 
-	Piece& createUiTestApplication(Container& parent)
+	Wedge& createUiTestApplication(Container& parent)
 	{
 		parent.clear();
 
-		Line& menubar = parent.emplace<Line>();
+		Container& menubar = parent.emplace<Container>(Line::cls());
 
 		Menu& menufile = menubar.emplace<Menu>("File");
 		menufile.emplace<Button>("Open");
@@ -169,7 +169,7 @@ namespace toy
 		return tooldock;
 	}
 
-	Piece& createUiTestDockspace(Container& parent)
+	Wedge& createUiTestDockspace(Container& parent)
 	{
 		parent.clear();
 
@@ -189,7 +189,7 @@ namespace toy
 		return dockspace;
 	}
 
-	Piece& createUiTestNodes(Container& parent)
+	Wedge& createUiTestNodes(Container& parent)
 	{
 		parent.clear();
 
@@ -223,7 +223,7 @@ namespace toy
 		return parent;
 	}
 
-	Piece& createUiTestTabs(Container& parent, bool window)
+	Wedge& createUiTestTabs(Container& parent, bool window)
 	{
 		if(!window)
 			parent.clear();
@@ -245,7 +245,7 @@ namespace toy
 		return page;
 	}
 
-	Piece& createUiTestTable(Container& parent, bool window)
+	Wedge& createUiTestTable(Container& parent, bool window)
 	{
 		Container& page = window ? parent.emplace<Window>("Table").body().emplace<Page>("Table")
 							     : parent.emplace<Page>("Table");
@@ -262,7 +262,7 @@ namespace toy
 		table1.emplace<ButtonSequence>(StringVector({ "Banana", "Apple", "Corniflower" }));
 		table1.emplace<RadioSwitch>(nullptr, 0, StringVector({ "radio a", "radio b", "radio b" }));
 
-		Line& line0 = table1.emplace<Line>();
+		Container& line0 = table1.emplace<Container>(Line::cls());
 
 		Expandbox& box0 = line0.emplace<Expandbox>("Category A");
 		box0.emplace<Label>("Blah blah blah");
@@ -276,12 +276,12 @@ namespace toy
 
 		Table& table2 = page.emplace<Table>(StringVector({ "Left", "Right" }), std::vector<float>({ 0.5f, 0.5f }));
 
-		Line& line1 = table2.emplace<Line>();
+		Container& line1 = table2.emplace<Container>(Line::cls());
 
 		line1.emplace<InputFloat>("Red", 0.05f);
 		line1.emplace<InputFloat>("Blue", 0.05f);
 
-		Line& line2 = table2.emplace<Line>();
+		Container& line2 = table2.emplace<Container>(Line::cls());
 
 		static string text1 = "The quick brown fox jumps over the lazy dog.";
 		static string text2 = "The quick brown fox jumps over the lazy dog.";
@@ -289,7 +289,7 @@ namespace toy
 		line2.emplace<TypeIn>(text1);
 		line2.emplace<TypeIn>(text2);
 
-		Line& line3 = table2.emplace<Line>();
+		Container& line3 = table2.emplace<Container>(Line::cls());
 
 		line3.emplace<Label>("Hello Left");
 		line3.emplace<Label>("Hello Right");
@@ -297,7 +297,7 @@ namespace toy
 		return page;
 	}
 
-	Piece& createUiTestTree(Container& parent)
+	Wedge& createUiTestTree(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("Tree");
 		Page& page = window.body().emplace<Page>("Tree");
@@ -353,30 +353,30 @@ namespace toy
 		return tree;
 	}
 
-	Piece& createUiTestMarkupText(Container& parent)
+	Wedge& createUiTestMarkupText(Container& parent)
 	{
 		static string multiline = "This is a long paragraph. The text should automatically wrap on the edge of the window. The current implementation follows no word splitting rules, text is just split at the last character.";
 		Page& page = parent.emplace<Page>("Markup Text");
 		page.emplace<Textbox>(multiline);
 		page.emplace<SliderFloat>("Wrap width", AutoStat<float>(200.f, -20.f, 600.f, 0.1f), [](float){ });
 
-		Line& line0 = page.emplace<Line>();
+		Container& line0 = page.emplace<Container>(Line::cls());
 		line0.emplace<Icon>("bullet");
 		line0.emplace<Label>("Bullet point 1");
 
 		static string multiline2 = "Bullet point 2\nOn multiple lines";
-		Line& line1 = page.emplace<Line>();
+		Container& line1 = page.emplace<Container>(Line::cls());
 		line1.emplace<Icon>("bullet");
 		line1.emplace<Textbox>(multiline2);
 
-		Line& line2 = page.emplace<Line>();
+		Container& line2 = page.emplace<Container>(Line::cls());
 		line2.emplace<Icon>("bullet");
 		line2.emplace<Label>("Bullet point 3");
 
 		return page;
 	}
 
-	Piece& createUiTestControls(Container& parent, bool window)
+	Wedge& createUiTestControls(Container& parent, bool window)
 	{
 		Container& page = window ? parent.emplace<Window>("Table").body().emplace<Page>("Table")
 								 : parent.emplace<Page>("Controls");
@@ -409,7 +409,7 @@ namespace toy
 		return page;
 	}
 
-	Piece& createUiTestFocusTabbing(Container& parent)
+	Wedge& createUiTestFocusTabbing(Container& parent)
 	{
 		Page& page = parent.emplace<Page>("Tabbing");
 		page.emplace<Label>("Use TAB/SHIFT+TAB to cycle through keyboard editable fields.");
@@ -428,14 +428,14 @@ namespace toy
 		return page;
 	}
 
-	Piece& createUiTestFileBrowser(Container& parent)
+	Wedge& createUiTestFileBrowser(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("File Browser");
 		window.body().emplace<Directory>("..");
 		return window;
 	}
 
-	Piece& createUiTestFileTree(Container& parent)
+	Wedge& createUiTestFileTree(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("File Tree");
 		Tree& filetree = window.body().emplace<Tree>();
@@ -444,35 +444,35 @@ namespace toy
 		return window;
 	}
 
-	Piece& createUiTestInlineControls(Container& parent)
+	Wedge& createUiTestInlineControls(Container& parent)
 	{
 		Page& page = parent.emplace<Page>("Inline Controls");
 
-		Line& line0 = page.emplace<Line>();
+		Container& line0 = page.emplace<Container>(Line::cls());
 
 		line0.emplace<Label>("Hello");
 		line0.emplace<Label>("World");
 
-		Line& line1 = page.emplace<Line>();
+		Container& line1 = page.emplace<Container>(Line::cls());
 
 		line1.emplace<Button>("Banana");
 		line1.emplace<Button>("Apple");
 		line1.emplace<Button>("Corniflower");
 
-		Line& line2 = page.emplace<Line>();
+		Container& line2 = page.emplace<Container>(Line::cls());
 
 		line2.emplace<Label>("Small buttons");
 		line2.emplace<Button>("Like this one");
 		line2.emplace<Label>("can fit within a text block.");
 
-		Line& line3 = page.emplace<Line>();
+		Container& line3 = page.emplace<Container>(Line::cls());
 
 		line3.emplace<InputBool>("My", true);
 		line3.emplace<InputBool>("Tailor", true);
 		line3.emplace<InputBool>("Is", true);
 		line3.emplace<InputBool>("Rich", true);
 
-		Line& line4 = page.emplace<Line>();
+		Container& line4 = page.emplace<Container>(Line::cls());
 
 		line4.emplace<InputFloat>("X", 0.f);
 		line4.emplace<InputFloat>("Y", 0.f);
@@ -481,7 +481,7 @@ namespace toy
 		return page;
 	}
 
-	Piece& createUiTestProgressDialog(Container& parent)
+	Wedge& createUiTestProgressDialog(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("Progress Dialog");
 		Page& page = window.body().emplace<Page>("Progress Dialog");
@@ -524,7 +524,7 @@ namespace toy
 	class StyleEdit : public Page
 	{
 	public:
-		StyleEdit(Piece& parent, Styler& styler)
+		StyleEdit(Wedge& parent, Styler& styler)
 			: Page(parent, "Style Edit")
 			, m_styler(styler)
 			, m_stylePicker(*this, [this](Widget& choice) { this->pickStyle(choice.contentlabel()); })
@@ -598,7 +598,7 @@ namespace toy
 		InkStyle* m_skin;
 	};
 
-	Piece& createUiStyleEdit(Container& parent)
+	Wedge& createUiStyleEdit(Container& parent)
 	{
 		Dockbar& tooldock = parent.emplace<Dockbar>();
 
@@ -681,9 +681,9 @@ namespace toy
 	{
 		switchUiTheme(rootSheet.uiWindow(), "Blendish Dark");
 
-		Header& demoheader = rootSheet.emplace<Header>();
-		Board& demobody = rootSheet.emplace<Board>();
-		Layout& samplebody = demobody.emplace<Layout>();
+		Container& demoheader = rootSheet.emplace<Container>(Header::cls());
+		Container& demobody = rootSheet.emplace<Container>(Board::cls());
+		Container& samplebody = demobody.emplace<Container>(Layout::cls());
 		createUiStyleEdit(demobody);
 
 		StringVector samples({ "Application", "Dockspace", "Nodes", "Window", "Text Editor", "Filtered List", "Custom List", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" });

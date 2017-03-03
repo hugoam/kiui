@@ -11,12 +11,10 @@
 
 namespace toy
 {
-	Dir::Dir(Piece& parent, Directory& directory, const string& name)
-		: WrapButton(parent, nullptr, Trigger(), cls())
+	Dir::Dir(Wedge& parent, Directory& directory, const string& name)
+		: MultiButton(parent, Trigger(), { "folder_20" , m_name }, cls())
 		, m_directory(directory)
 		, m_name(name)
-		, m_icon(*this, "folder_20")
-		, m_label(*this, m_name)
 	{}
 
 	void Dir::click()
@@ -30,18 +28,16 @@ namespace toy
 			
 	}
 
-	File::File(Piece& parent, Directory& directory, const string& name)
-		: WrapButton(parent, nullptr, Trigger(), cls())
+	File::File(Wedge& parent, Directory& directory, const string& name)
+		: MultiButton(parent, Trigger(), { "file_20", m_name }, cls())
 		, m_directory(directory)
 		, m_name(name)
-		, m_icon(*this, "file_20")
-		, m_label(*this, m_name)
 	{}
 
 	void File::click()
 	{}
 
-	Directory::Directory(Piece& parent, const string& path)
+	Directory::Directory(Wedge& parent, const string& path)
 		: Container(parent, cls())
 		, m_path(path)
 	{
@@ -84,17 +80,17 @@ namespace toy
 		this->setLocation(m_path.substr(0, pos));
 	}
 
-	FileBrowser::FileBrowser(Piece& parent, const string& path)
-		: Piece(parent, cls())
+	FileBrowser::FileBrowser(Wedge& parent, const string& path)
+		: Wedge(parent, cls())
 		, m_path(path)
 		, m_directory(*this, m_path)
 	{}
 
-	FileNode::FileNode(Piece& parent, const string& name)
+	FileNode::FileNode(Wedge& parent, const string& name)
 		: TreeNode(parent, "file_20", name, true, cls())
 	{}
 
-	DirectoryNode::DirectoryNode(Piece& parent, const string& path, const string& name, bool collapsed)
+	DirectoryNode::DirectoryNode(Wedge& parent, const string& path, const string& name, bool collapsed)
 		: TreeNode(parent, "folder_20", name, collapsed, cls())
 		, m_path(path)
 	{}

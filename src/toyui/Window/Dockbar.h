@@ -13,14 +13,14 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT DockToggle : public ImgButton
+	class TOY_UI_EXPORT DockToggle : public Button
 	{
 	public:
 		DockToggle(Dockbar& dockbar, Dockbox& dockbox, const string& icon);
 
 		void click();
 
-		static Type& cls() { static Type ty("DockToggle", ImgButton::cls()); return ty; }
+		static Type& cls() { static Type ty("DockToggle", Button::cls()); return ty; }
 
 	protected:
 		Dockbox& m_dockbox;
@@ -29,7 +29,7 @@ namespace toy
 	class TOY_UI_EXPORT Dockbox : public Window
 	{
 	public:
-		Dockbox(Piece& parent, Dockbar& dockbar, const string& title, const string& icon);
+		Dockbox(Wedge& parent, Dockbar& dockbar, const string& title, const string& icon);
 
 		Dockbar& dockbar() { return m_dockbar; }
 		DockToggle& toggle() { return m_toggle; }
@@ -41,18 +41,18 @@ namespace toy
 		DockToggle m_toggle;
 	};
 
-	class TOY_UI_EXPORT Docker : public Line
+	class TOY_UI_EXPORT Docker : public Container
 	{
 	public:
-		Docker(Piece& parent);
+		Docker(Wedge& parent);
 
 		static Type& cls() { static Type ty("Docker", Line::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT Dockbar : public Div
+	class TOY_UI_EXPORT Dockbar : public Container
 	{
 	public:
-		Dockbar(Piece& parent);
+		Dockbar(Wedge& parent);
 
 		Dockbox& addDock(const string& name, const string& icon);
 		Dockbox& addDock(const string& name);

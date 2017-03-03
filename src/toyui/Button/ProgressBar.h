@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_WPROGRESSBAR_H
-#define TOY_WPROGRESSBAR_H
+#ifndef TOY_PROGRESSBAR_H
+#define TOY_PROGRESSBAR_H
 
 /* toy */
 #include <toyui/Forward.h>
@@ -13,15 +13,15 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT ProgressBar : public Piece
+	class TOY_UI_EXPORT ProgressBar : public Wedge
 	{
 	public:
-		ProgressBar(Piece& parent, Dimension dim = DIM_X, const Trigger& onUpdated = nullptr);
+		ProgressBar(Wedge& parent, Dimension dim = DIM_X, const Trigger& onUpdated = nullptr);
 
 		float percentage() { return m_percentage; }
 		void setPercentage(float percentage);
 
-		static Type& cls() { static Type ty("ProgressBar", Piece::cls()); return ty; }
+		static Type& cls() { static Type ty("ProgressBar", Wedge::cls()); return ty; }
 
 	protected:
 		Dimension m_dim;

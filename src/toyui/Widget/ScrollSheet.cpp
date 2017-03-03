@@ -21,12 +21,12 @@
 
 namespace toy
 {
-	ScrollZone::ScrollZone(Piece& parent)
-		: Layout(parent, cls())
-		, m_container(*this)
+	ScrollZone::ScrollZone(Wedge& parent)
+		: Container(parent, cls())
+		, m_container(this->as<Wedge>())
 	{}
 
-	ScrollSheet::ScrollSheet(Piece& parent, Type& type)
+	ScrollSheet::ScrollSheet(Wedge& parent, Type& type)
 		: Container(parent, type, GRID)
 		, m_scrollzone(*this)
 		, m_scrollbarX(*this, m_scrollzone, m_scrollzone.container(), DIM_X)
@@ -84,11 +84,11 @@ namespace toy
 		m_scrollzone.resetStyle(ScrollZone::cls());
 	}
 
-	ScrollContainer::ScrollContainer(Piece& parent, Type& type)
+	ScrollContainer::ScrollContainer(Wedge& parent, Type& type)
 		: ScrollSheet(parent, type)
 	{}
 
-	ScrollPlan::ScrollPlan(Piece& parent, Type& type)
+	ScrollPlan::ScrollPlan(Wedge& parent, Type& type)
 		: ScrollSheet(parent, cls())
 		, m_plan(m_scrollzone.container())
 		, m_clamped(true)
@@ -101,7 +101,7 @@ namespace toy
 		if(m_plan.frame().dirty())
 			this->updateBounds();
 
-		Piece::nextFrame(tick, delta);
+		Wedge::nextFrame(tick, delta);
 	}
 
 	void ScrollPlan::updateBounds()

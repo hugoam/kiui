@@ -17,7 +17,7 @@
 
 namespace toy
 {
-	Checkbox::Checkbox(Piece& parent, WValue* input, bool on)
+	Checkbox::Checkbox(Wedge& parent, WValue* input, bool on)
 		: Toggle(parent, std::bind(&Checkbox::toggleOn, this), std::bind(&Checkbox::toggleOff, this), on, cls())
 		, m_input(input)
 	{}

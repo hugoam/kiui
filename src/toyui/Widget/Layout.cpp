@@ -7,16 +7,8 @@
 
 namespace toy
 {
-	Page::Page(Piece& parent, const string& name)
+	Page::Page(Wedge& parent, const string& name)
 		: Container(parent, cls())
 		, m_name(name)
-	{}
-
-	Dialog::Dialog(Piece& parent)
-		: Container(parent, cls())
-	{}
-
-	Header::Header(Piece& parent)
-		: Line(parent, cls())
 	{}
 }

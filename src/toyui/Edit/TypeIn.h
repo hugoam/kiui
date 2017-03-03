@@ -19,7 +19,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT TypeIn : public Control
 	{
 	public:
-		TypeIn(Piece& parent, string& string, Type& type = cls());
+		TypeIn(Wedge& parent, string& string, Type& type = cls());
 		TypeIn(WValue& input, Type& type = cls());
 
 		void nextFrame(size_t tick, size_t delta);
@@ -70,7 +70,7 @@ namespace toy
 	class NumberInput : public WValue
 	{
 	public:
-		NumberInput(Piece& parent, Lref& lref, std::function<void(T)> callback = nullptr)
+		NumberInput(Wedge& parent, Lref& lref, std::function<void(T)> callback = nullptr)
 			: WValue(parent, lref, this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); } : OnUpdate())
 			, m_stat(this->m_value->template ref<AutoStat<T>>())
 			, m_typeIn(*this)
@@ -80,7 +80,7 @@ namespace toy
 			this->build();
 		}
 
-		NumberInput(Piece& parent, AutoStat<T> value, std::function<void(T)> callback = nullptr)
+		NumberInput(Wedge& parent, AutoStat<T> value, std::function<void(T)> callback = nullptr)
 			: WValue(parent, lref(value), this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); } : OnUpdate())
 			, m_stat(this->m_value->template ref<AutoStat<T>>())
 			, m_typeIn(*this)
@@ -127,11 +127,11 @@ namespace toy
 	class Input : public NumberInput<T>
 	{
 	public:
-		Input(Piece& parent, Lref& lref, std::function<void(T)> callback = nullptr)
+		Input(Wedge& parent, Lref& lref, std::function<void(T)> callback = nullptr)
 			: NumberInput<T>(parent, lref, callback)
 		{}
 
-		Input(Piece& parent, AutoStat<T> value, std::function<void(T)> callback = nullptr)
+		Input(Wedge& parent, AutoStat<T> value, std::function<void(T)> callback = nullptr)
 			: NumberInput<T>(parent, value, callback)
 		{}
 	};
@@ -145,12 +145,12 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Input<bool> : public WValue
 	{
 	public:
-		Input(Piece& parent, Lref& value, std::function<void(bool)> callback = nullptr)
+		Input(Wedge& parent, Lref& value, std::function<void(bool)> callback = nullptr)
 			: WValue(parent, value, this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<bool>()); } : OnUpdate())
 			, m_checkbox(*this, this, m_value->get<bool>())
 		{}
 
-		Input(Piece& parent, bool value, std::function<void(bool)> callback = nullptr)
+		Input(Wedge& parent, bool value, std::function<void(bool)> callback = nullptr)
 			: WValue(parent, lref(value), this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<bool>()); } : OnUpdate())
 			, m_checkbox(*this, this, m_value->get<bool>())
 		{}
@@ -167,12 +167,12 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Input<string> : public WValue
 	{
 	public:
-		Input(Piece& parent, Lref& value, std::function<void(string)> callback = nullptr)
+		Input(Wedge& parent, Lref& value, std::function<void(string)> callback = nullptr)
 			: WValue(parent, value, this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<string>()); } : OnUpdate())
 			, m_typeIn(*this)
 		{}
 
-		Input(Piece& parent, const string& value, std::function<void(string)> callback = nullptr)
+		Input(Wedge& parent, const string& value, std::function<void(string)> callback = nullptr)
 			: WValue(parent, lref(value), this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<string>()); } : OnUpdate())
 			, m_typeIn(*this)
 		{}

@@ -60,12 +60,12 @@ namespace toy
 		this->triggerModify();
 	}
 
-	WValue::WValue(Piece& parent, Lref& value, Type& type, const OnUpdate& onUpdate, bool edit)
+	WValue::WValue(Wedge& parent, Lref& value, Type& type, const OnUpdate& onUpdate, bool edit)
 		: WrapControl(parent, type)
 		, Value(value, onUpdate, edit)
 	{}
 
-	WValue::WValue(Piece& parent, Lref&& value, Type& type, const OnUpdate& onUpdate, bool edit)
+	WValue::WValue(Wedge& parent, Lref&& value, Type& type, const OnUpdate& onUpdate, bool edit)
 		: WrapControl(parent, type)
 		, Value(std::move(value), onUpdate, edit)
 	{}

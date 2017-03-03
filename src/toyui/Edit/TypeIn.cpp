@@ -16,7 +16,7 @@
 
 namespace toy
 {
-	TypeIn::TypeIn(Piece& parent, string& string, Type& type)
+	TypeIn::TypeIn(Wedge& parent, string& string, Type& type)
 		: Control(parent, type)
 		, m_input(nullptr)
 		, m_string(string)

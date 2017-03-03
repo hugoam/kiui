@@ -66,7 +66,7 @@ namespace toy
 	enum WidgetState : unsigned int;
 
 	class Widget;
-	class Piece;
+	class Wedge;
 	class Container;
 	class RootSheet;
 	class Cursor;

@@ -16,13 +16,13 @@ namespace toy
 	class TOY_UI_EXPORT ToolButton : public Dropdown
 	{
 	public:
-		ToolButton(Piece& parent, const string& icon);
+		ToolButton(Wedge& parent, const string& icon);
 	};
 
-	class TOY_UI_EXPORT Tooldock : public Div
+	class TOY_UI_EXPORT Tooldock : public Container
 	{
 	public:
-		Tooldock(Piece& parent);
+		Tooldock(Wedge& parent);
 
 		static Type& cls() { static Type ty("Tooldock", Div::cls()); return ty; }
 	};
@@ -30,7 +30,7 @@ namespace toy
 	class TOY_UI_EXPORT Toolbar : public WrapControl
 	{
 	public:
-		Toolbar(Piece& parent);
+		Toolbar(Wedge& parent);
 
 		static Type& cls() { static Type ty("Toolbar", WrapControl::cls()); return ty; }
 	};

@@ -635,9 +635,9 @@ namespace toy
             Scrollbar::cls().imprint().setup("Scrollbar", OBJECT);
             Scrollbar::cls().imprint().initObject(false);
             
-            // Piece
-            Piece::cls().imprint().setup("Piece", OBJECT);
-            Piece::cls().imprint().initObject(false);
+            // Wedge
+            Wedge::cls().imprint().setup("Wedge", OBJECT);
+            Wedge::cls().imprint().initObject(false);
             
             // Overlay
             Overlay::cls().imprint().setup("Overlay", OBJECT);
@@ -697,7 +697,7 @@ namespace toy
             
             // Widget
             Widget::cls().imprint().setup("Widget", OBJECT);
-            Widget::cls().imprint().addMember(make_unique<Member>(Piece::cls(), 0, "parent", &Widget_parent, nullptr, false, false, &Widget_parent_object));
+            Widget::cls().imprint().addMember(make_unique<Member>(Wedge::cls(), 0, "parent", &Widget_parent, nullptr, false, false, &Widget_parent_object));
             Widget::cls().imprint().addMember(make_unique<Member>(Frame::cls(), 1, "frame", &Widget_frame, nullptr, true, false, &Widget_frame_object));
             Widget::cls().imprint().addMember(make_unique<Member>(typecls<WidgetState>(), 2, "state", &Widget_state, nullptr, false, false));
             Widget::cls().imprint().addMember(make_unique<Member>(Style::cls(), 3, "style", &Widget_style, &Widget_setStyle, true, true, &Widget_style_object));
@@ -770,7 +770,7 @@ namespace toy
             m_rootTypes.push_back(&Input<toy::Colour>::cls());
             m_rootTypes.push_back(&RootSheet::cls());
             m_rootTypes.push_back(&Scrollbar::cls());
-            m_rootTypes.push_back(&Piece::cls());
+            m_rootTypes.push_back(&Wedge::cls());
             m_rootTypes.push_back(&Overlay::cls());
             m_rootTypes.push_back(&Board::cls());
             m_rootTypes.push_back(&ScrollSheet::cls());

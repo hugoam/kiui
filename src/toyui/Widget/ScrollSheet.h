@@ -13,31 +13,31 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT ScrollZone : public Layout
+	class _I_ TOY_UI_EXPORT ScrollZone : public Container
 	{
 	public:
-		ScrollZone(Piece& parent);
+		ScrollZone(Wedge& parent);
 
-		Sheet& container() { return m_container; }
+		Container& container() { return m_container; }
 
 		static Type& cls() { static Type ty("ScrollZone", Layout::cls()); return ty; }
 
 	protected:
-		Sheet m_container;
+		Container m_container;
 	};
 
 	class TOY_UI_EXPORT NoScrollZone
 	{
 	public:
-		static Type& cls() { static Type ty("NoScrollZone", Piece::cls()); return ty; }
+		static Type& cls() { static Type ty("NoScrollZone", Wedge::cls()); return ty; }
 	};
 
 	class _I_ TOY_UI_EXPORT ScrollSheet : public Container
 	{
 	public:
-		ScrollSheet(Piece& parent, Type& type = cls());
+		ScrollSheet(Wedge& parent, Type& type = cls());
 
-		Sheet& container() { return m_scrollzone.container(); }
+		Container& container() { return m_scrollzone.container(); }
 
 		virtual Container& emplaceContainer();
 
@@ -62,7 +62,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT ScrollContainer : public ScrollSheet
 	{
 	public:
-		ScrollContainer(Piece& parent, Type& type = cls());
+		ScrollContainer(Wedge& parent, Type& type = cls());
 
 		static Type& cls() { static Type ty("Container", ScrollSheet::cls()); return ty; }
 	};
@@ -76,7 +76,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT ScrollPlan : public ScrollSheet
 	{
 	public:
-		ScrollPlan(Piece& parent, Type& type = cls());
+		ScrollPlan(Wedge& parent, Type& type = cls());
 
 		void nextFrame(size_t tick, size_t delta);
 
@@ -89,7 +89,7 @@ namespace toy
 		static Type& cls() { static Type ty("ScrollPlan", ScrollSheet::cls()); return ty; }
 
 	protected:
-		Sheet& m_plan;
+		Container& m_plan;
 		BoxFloat m_bounds;
 		bool m_clamped;
 	};

@@ -14,7 +14,7 @@ using namespace std::placeholders;
 
 namespace toy
 {
-	TypedownInput::TypedownInput(Piece& parent, const Trigger& onSelected, StringVector choices)
+	TypedownInput::TypedownInput(Wedge& parent, const Trigger& onSelected, StringVector choices)
 		: DropdownInput(parent, onSelected, choices)
 		, m_input(*this, m_list, std::bind(&TypedownInput::onInput, this, _1))
 	{

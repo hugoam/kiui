@@ -11,6 +11,7 @@
 #include <toyobj/Util/Updatable.h>
 #include <toyui/Forward.h>
 #include <toyui/Widget/Widget.h>
+#include <toyui/Widget/Layout.h>
 #include <toyui/Button/Button.h>
 #include <toyui/Button/Slider.h>
 #include <toyui/Frame/Stripe.h>
@@ -22,7 +23,7 @@ namespace toy
 	class TOY_UI_EXPORT Scroller : public Slider
 	{
 	public:
-		Scroller(Piece& parent, Dimension dim);
+		Scroller(Wedge& parent, Dimension dim);
 
 		void sliderStep(float offset, bool ended);
 
@@ -32,7 +33,7 @@ namespace toy
 	class TOY_UI_EXPORT ScrollerKnob : public SliderKnob
 	{
 	public:
-		ScrollerKnob(Piece& parent, Dimension dim);
+		ScrollerKnob(Wedge& parent, Dimension dim);
 
 		static Type& cls() { static Type ty("ScrollerKnob", SliderKnob::cls()); return ty; }
 	};
@@ -40,7 +41,7 @@ namespace toy
 	class TOY_UI_EXPORT ScrollForward : public Button
 	{
 	public:
-		ScrollForward(Piece& parent, const Trigger& trigger);
+		ScrollForward(Wedge& parent, const Trigger& trigger);
 
 		static Type& cls() { static Type ty("ScrollForward", Button::cls()); return ty; }
 	};
@@ -48,7 +49,7 @@ namespace toy
 	class TOY_UI_EXPORT ScrollBackward : public Button
 	{
 	public:
-		ScrollBackward(Piece& parent, const Trigger& trigger);
+		ScrollBackward(Wedge& parent, const Trigger& trigger);
 
 		static Type& cls() { static Type ty("ScrollBackward", Button::cls()); return ty; }
 	};
@@ -77,10 +78,10 @@ namespace toy
 		static Type& cls() { static Type ty("ScrollRight", Button::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Scrollbar : public Line
+	class _I_ TOY_UI_EXPORT Scrollbar : public Container
 	{
 	public:
-		Scrollbar(Piece& parent, Piece& frameSheet, Piece& contentSheet, Dimension dim);
+		Scrollbar(Wedge& parent, Wedge& frameSheet, Wedge& contentSheet, Dimension dim);
 		~Scrollbar();
 
 		float contentSize();
@@ -100,8 +101,8 @@ namespace toy
 	protected:
 		Dimension m_dim;
 		float d_cursor;
-		Piece& m_frameSheet;
-		Piece& m_contentSheet;
+		Wedge& m_frameSheet;
+		Wedge& m_contentSheet;
 
 		ScrollForward m_up;
 		Scroller m_scroller;

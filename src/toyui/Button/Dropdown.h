@@ -14,31 +14,31 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT DropdownHead : public WrapButton
+	class TOY_UI_EXPORT DropdownHead : public MultiButton
 	{
 	public:
-		DropdownHead(Piece& parent, const Trigger& trigger);
+		DropdownHead(Wedge& parent, const Trigger& trigger);
 
-		static Type& cls() { static Type ty("DropdownHead", WrapButton::cls()); return ty; }
+		static Type& cls() { static Type ty("DropdownHead", MultiButton::cls()); return ty; }
 	};
 
 	class TOY_UI_EXPORT DropdownToggle : public Button
 	{
 	public:
-		DropdownToggle(Piece& parent, const Trigger& trigger);
+		DropdownToggle(Wedge& parent, const Trigger& trigger);
 
 		static Type& cls() { static Type ty("DropdownToggle", Button::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT DropdownChoice : public WrapButton
+	class TOY_UI_EXPORT DropdownChoice : public MultiButton
 	{
 	public:
-		DropdownChoice(Piece& parent, const Trigger& trigger);
+		DropdownChoice(Wedge& parent, const Trigger& trigger, const StringVector& elements);
 
-		static Type& cls() { static Type ty("DropdownChoice", WrapButton::cls()); return ty; }
+		static Type& cls() { static Type ty("DropdownChoice", MultiButton::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT DropdownList : public Stack
+	class TOY_UI_EXPORT DropdownList : public Container
 	{
 	public:
 		DropdownList(Dropdown& dropdown);
@@ -46,7 +46,7 @@ namespace toy
 		void leftClick(MouseEvent& mouseEvent);
 		void rightClick(MouseEvent& mouseEvent);
 		
-		static Type& cls() { static Type ty("DropdownList", Stack::cls()); return ty; }
+		static Type& cls() { static Type ty("DropdownList", Container::cls()); return ty; }
 
 	protected:
 		Dropdown& m_dropdown;
@@ -55,7 +55,7 @@ namespace toy
 	class TOY_UI_EXPORT Dropdown : public WrapButton
 	{
 	public:
-		Dropdown(Piece& parent, Type& type = cls());
+		Dropdown(Wedge& parent, Type& type = cls());
 
 		DropdownList& list() { return m_list; }
 		DropdownHead& header() { return m_header; }
@@ -79,22 +79,21 @@ namespace toy
 	class TOY_UI_EXPORT DropdownInput : public Dropdown
 	{
 	public:
-		DropdownInput(Piece& parent, const Trigger& onSelected, StringVector choices = StringVector(), Type& type = cls());
+		DropdownInput(Wedge& parent, const Trigger& onSelected, StringVector choices = StringVector(), Type& type = cls());
 
 		void select(DropdownChoice& selected);
 		void selected(DropdownChoice& selected);
 
+		DropdownChoice& addChoice(const StringVector& elements);
 		virtual Container& emplaceContainer();
 
-		virtual void handleAdd(Widget& widget);
-
-		void updateHead(Widget& choice);
+		void updateHead(MultiButton& choice);
 
 		static Type& cls() { static Type ty("DropdownInput", Dropdown::cls()); return ty; }
 
 	protected:
 		Trigger m_onSelected;
-		WrapButton* m_selected;
+		MultiButton* m_selected;
 	};
 }
 

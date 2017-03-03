@@ -13,7 +13,7 @@ using namespace std::placeholders;
 
 namespace toy
 {
-	FilterInput::FilterInput(Piece& parent, Piece& list, std::function<void(string)> callback)
+	FilterInput::FilterInput(Wedge& parent, Wedge& list, std::function<void(string)> callback)
 		: Input<string>(parent, "", callback)
 		, m_list(list)
 	{}

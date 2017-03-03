@@ -12,12 +12,12 @@
 
 namespace toy
 {
-	RadioChoice::RadioChoice(Piece& parent, const Trigger& trigger)
+	RadioChoice::RadioChoice(Wedge& parent, const Trigger& trigger)
 		: WrapButton(parent, trigger, cls())
 	{}
 
-	RadioSwitch::RadioSwitch(Piece& parent, const Trigger& onSelected, size_t active, StringVector labels)
-		: WideControl(parent, cls())
+	RadioSwitch::RadioSwitch(Wedge& parent, const Trigger& onSelected, size_t active, StringVector labels)
+		: WrapControl(parent, cls())
 		, m_onSelected(onSelected)
 		, m_active(nullptr)
 		, m_activeIndex(active)

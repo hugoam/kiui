@@ -15,7 +15,7 @@
 
 namespace toy
 {
-	ContextMenu::ContextMenu(Piece& parent, Trigger onClose)
+	ContextMenu::ContextMenu(Wedge& parent, Trigger onClose)
 		: Overlay(parent, cls())
 	{
 		this->frame().setPosition(this->rootSheet().mouse().lastX(), this->rootSheet().mouse().lastY());

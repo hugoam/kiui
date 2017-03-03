@@ -13,10 +13,10 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Placeholder : public Board
+	class _I_ TOY_UI_EXPORT Placeholder : public Container
 	{
 	public:
-		Placeholder(Piece& parent, const string& name);
+		Placeholder(Wedge& parent, const string& name);
 
 		const string& name() { return m_name; }
 
@@ -29,7 +29,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Docksection : public Tabber
 	{
 	public:
-		Docksection(Piece& parent, Dockline& dockline);
+		Docksection(Wedge& parent, Dockline& dockline);
 
 		Dockline* dockline() { return m_dockline; }
 
@@ -52,7 +52,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Dockline : public GridSheet
 	{
 	public:
-		Dockline(Piece& parent, Dockspace& dockspace, Dockline* dockline, Dimension dim);
+		Dockline(Wedge& parent, Dockspace& dockspace, Dockline* dockline, Dimension dim);
 
 		Dimension dim() { return m_dim; }
 		Dockline* dockline() { return m_dockline; }
@@ -83,10 +83,10 @@ namespace toy
 		static Type& cls() { static Type ty("MasterDockline", Dockline::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Dockspace : public Layout
+	class _I_ TOY_UI_EXPORT Dockspace : public Container
 	{
 	public:
-		Dockspace(Piece& parent);
+		Dockspace(Wedge& parent);
 
 		Dockline& mainline() { return m_mainLine; }
 

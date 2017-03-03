@@ -2,11 +2,12 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_WTABLE_H
-#define TOY_WTABLE_H
+#ifndef TOY_TABLE_H
+#define TOY_TABLE_H
 
 /* toy */
 #include <toyui/Widget/Sheet.h>
+#include <toyui/Widget/Layout.h>
 #include <toyui/Button/Button.h>
 
 namespace toy
@@ -27,15 +28,15 @@ namespace toy
 	class _I_ TOY_UI_EXPORT ColumnHeader : public Label
 	{
 	public:
-		ColumnHeader(Piece& parent, const string& label, float span);
+		ColumnHeader(Wedge& parent, const string& label, float span);
 
 		static Type& cls() { static Type ty("ColumnHeader", Label::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Table : public Stack
+	class _I_ TOY_UI_EXPORT Table : public Container
 	{
 	public:
-		Table(Piece& parent, StringVector columns, std::vector<float> weights);
+		Table(Wedge& parent, StringVector columns, std::vector<float> weights);
 
 		static Type& cls() { static Type ty("Table", Stack::cls()); return ty; }
 

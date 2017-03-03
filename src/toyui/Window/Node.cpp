@@ -15,7 +15,7 @@ using namespace std::placeholders;
 
 namespace toy
 {
-	Canvas::Canvas(Piece& parent, const string& title, Trigger contextTrigger)
+	Canvas::Canvas(Wedge& parent, const string& title, Trigger contextTrigger)
 		: ScrollPlan(parent, cls())
 		, m_name(title)
 		, m_contextTrigger(contextTrigger)
@@ -31,15 +31,15 @@ namespace toy
 		m_contextTrigger(*this);
 	}
 
-	NodePlugKnob::NodePlugKnob(Piece& parent)
+	NodePlugKnob::NodePlugKnob(Wedge& parent)
 		: Item(parent, cls())
 	{}
 
-	NodeConnectionProxy::NodeConnectionProxy(Piece& parent)
+	NodeConnectionProxy::NodeConnectionProxy(Wedge& parent)
 		: Decal(parent, cls())
 	{}
 
-	NodePlug::NodePlug(Piece& parent, const string& name, bool input, ConnectTrigger onConnect)
+	NodePlug::NodePlug(Wedge& parent, const string& name, bool input, ConnectTrigger onConnect)
 		: WrapControl(parent, cls())
 		, m_name(name)
 		, m_input(input)
@@ -54,7 +54,7 @@ namespace toy
 
 	Canvas& NodePlug::canvas()
 	{
-		Piece& node = *this->parent()->parent();
+		Wedge& node = *this->parent()->parent();
 		Canvas& canvas = node.container()->as<Canvas>();
 		return canvas;
 	}
@@ -119,7 +119,7 @@ namespace toy
 
 	void NodePlug::connectOut(NodePlug& plugIn)
 	{
-		Piece& node = *this->parent()->parent();
+		Wedge& node = *this->parent()->parent();
 		Container& canvas = *node.container();
 		m_cables.push_back(&canvas.emplace<NodeCable>(*this, plugIn));
 
@@ -133,22 +133,22 @@ namespace toy
 			if(&cable->plugIn() == &plugIn)
 			{
 				m_cables.erase(std::find(m_cables.begin(), m_cables.end(), cable));
-				Piece& node = *this->parent()->parent();
+				Wedge& node = *this->parent()->parent();
 				Container& canvas = *node.container();
 				canvas.release(*cable);
 				return;
 			}
 	}
 
-	NodeInPlug::NodeInPlug(Piece& parent, const string& name)
+	NodeInPlug::NodeInPlug(Wedge& parent, const string& name)
 		: NodePlug(parent, name, true)
 	{}
 
-	NodeOutPlug::NodeOutPlug(Piece& parent, const string& name, ConnectTrigger onConnect)
+	NodeOutPlug::NodeOutPlug(Wedge& parent, const string& name, ConnectTrigger onConnect)
 		: NodePlug(parent, name, false, onConnect)
 	{}
 
-	NodeCable::NodeCable(Piece& parent, Widget& plugOut, Widget& plugIn)
+	NodeCable::NodeCable(Wedge& parent, Widget& plugOut, Widget& plugIn)
 		: Decal(parent, cls())
 		, m_plugOut(plugOut)
 		, m_plugIn(plugIn)
@@ -164,7 +164,7 @@ namespace toy
 	{
 		//m_frame->debugPrintDepth();
 		//printf("Drawing cable\n");
-		Piece& canvas = *this->parent();
+		Wedge& canvas = *this->parent();
 
 		Frame& frameCanvas = canvas.frame();
 		Frame& frameOut = m_plugOut.frame();
@@ -191,20 +191,20 @@ namespace toy
 	}
 
 	NodeBody::NodeBody(Node& node)
-		: Sheet(node, cls())
+		: Container(node, cls())
 		, m_node(node)
 		, m_title(*this, m_node.name())
 	{}
 
-	NodeIn::NodeIn(Piece& parent)
-		: Div(parent, cls())
+	NodeIn::NodeIn(Wedge& parent)
+		: Container(parent, cls())
 	{}
 
-	NodeOut::NodeOut(Piece& parent)
-		: Div(parent, cls())
+	NodeOut::NodeOut(Wedge& parent)
+		: Container(parent, cls())
 	{}
 
-	Node::Node(Piece& parent, const string& title)
+	Node::Node(Wedge& parent, const string& title)
 		: Overlay(parent, cls())
 		, m_name(title)
 		, m_inputs(*this)

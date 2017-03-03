@@ -21,18 +21,18 @@
 
 namespace toy
 {
-	Piece::Piece(Piece& parent, Type& type, FrameType frameType)
+	Wedge::Wedge(Wedge& parent, Type& type, FrameType frameType)
 		: Widget(parent, type, frameType)
 	{}
 
-	Piece::Piece(Type& type, FrameType frameType)
+	Wedge::Wedge(Type& type, FrameType frameType)
 		: Widget(type, frameType)
 	{}
 
-	Piece::~Piece()
+	Wedge::~Wedge()
 	{}
 
-	void Piece::nextFrame(size_t tick, size_t delta)
+	void Wedge::nextFrame(size_t tick, size_t delta)
 	{
 		Widget::nextFrame(tick, delta);
 
@@ -40,7 +40,7 @@ namespace toy
 			m_contents[i]->nextFrame(tick, delta);
 	}
 
-	void Piece::render(Renderer& renderer, bool force)
+	void Wedge::render(Renderer& renderer, bool force)
 	{
 		if(m_frame->layer().forceRedraw())
 			force = true;
@@ -55,7 +55,7 @@ namespace toy
 		m_frame->content().endDraw(renderer);
 	}
 
-	void Piece::visit(const Visitor& visitor)
+	void Wedge::visit(const Visitor& visitor)
 	{
 		bool pursue = visitor(*this);
 		if(!pursue)
@@ -65,19 +65,19 @@ namespace toy
 			pwidget->visit(visitor);
 	}
 
-	void Piece::reindex(size_t from)
+	void Wedge::reindex(size_t from)
 	{
 		for(size_t i = from; i < m_contents.size(); ++i)
 			m_contents[i]->setIndex(i);
 	}
 
-	void Piece::push(Widget& widget, bool deferred)
+	void Wedge::push(Widget& widget, bool deferred)
 	{
 		m_contents.push_back(&widget);
 		widget.bind(*this, m_contents.size() - 1, deferred);
 	}
 
-	void Piece::remove(Widget& widget)
+	void Wedge::remove(Widget& widget)
 	{
 		size_t index = widget.index();
 		m_contents.erase(m_contents.begin() + index);
@@ -85,19 +85,19 @@ namespace toy
 		this->reindex(index);
 	}
 
-	void Piece::swap(size_t from, size_t to)
+	void Wedge::swap(size_t from, size_t to)
 	{
 		std::iter_swap(m_contents.begin() + from, m_contents.begin() + to);
 		this->reindex(from < to ? from : to);
 		m_frame->markDirty(Frame::DIRTY_MAPPING);
 	}
 
-	Container::Container(Piece& parent, Type& type, FrameType frameType)
-		: Piece(parent, type, frameType)
+	Container::Container(Wedge& parent, Type& type, FrameType frameType)
+		: Wedge(parent, type, frameType)
 	{}
 
 	Container::Container(Type& type, FrameType frameType)
-		: Piece(type, frameType)
+		: Wedge(type, frameType)
 	{}
 
 	Container::~Container()
@@ -137,56 +137,27 @@ namespace toy
 		m_containerContents.clear();
 	}
 
-
-	WrapControl::WrapControl(Piece& parent, Type& type)
+	WrapControl::WrapControl(Wedge& parent, Type& type)
 		: Container(parent, type)
 	{}
 
-	WideControl::WideControl(Piece& parent, Type& type)
-		: WrapControl(parent, type)
-	{}
-
-	Board::Board(Piece& parent, Type& type)
-		: Container(parent, type)
-	{}
-
-	Line::Line(Piece& parent, Type& type)
-		: Container(parent, type)
-	{}
-
-	Stack::Stack(Piece& parent, Type& type, FrameType frameType)
-		: Container(parent, type, frameType)
-	{}
-
-	Div::Div(Piece& parent, Type& type)
-		: Container(parent, type)
-	{}
-
-	Spacer::Spacer(Piece& parent, Type& type)
+	Spacer::Spacer(Wedge& parent, Type& type)
 		: Widget(parent, type)
 	{}
 
-	Filler::Filler(Piece& parent)
+	Filler::Filler(Wedge& parent)
 		: Spacer(parent, cls())
 	{}
 
-	Layout::Layout(Piece& parent, Type& type)
-		: Board(parent, type)
+	Decal::Decal(Wedge& parent, Type& type)
+		: Wedge(parent, type, LAYER)
 	{}
 
-	Decal::Decal(Piece& parent, Type& type)
-		: Piece(parent, type, LAYER)
-	{}
-
-	Overlay::Overlay(Piece& parent, Type& type)
+	Overlay::Overlay(Wedge& parent, Type& type)
 		: Container(parent, type, LAYER)
 	{}
 
-	Sheet::Sheet(Piece& parent, Type& type)
-		: Container(parent, type)
-	{}
-
-	GridSheet::GridSheet(Piece& parent, Dimension dim, Type& type)
+	GridSheet::GridSheet(Wedge& parent, Dimension dim, Type& type)
 		: Container(parent, type)
 		, m_dim(dim)
 		, m_resizing(nullptr)

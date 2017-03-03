@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_WTEXTBOX_H
-#define TOY_WTEXTBOX_H
+#ifndef TOY_TEXTBOX_H
+#define TOY_TEXTBOX_H
 
 /* toy */
 #include <toyui/Forward.h>
@@ -15,7 +15,7 @@ namespace toy
 	{
 	public:
 		Textbox(WValue& input);
-		Textbox(Piece& parent, string& text);
+		Textbox(Wedge& parent, string& text);
 
 		static Type& cls() { static Type ty("Textbox", TypeIn::cls()); return ty; }
 

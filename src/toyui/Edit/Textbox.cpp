@@ -20,7 +20,7 @@ namespace toy
 		: TypeIn(input, cls())
 	{}
 
-	Textbox::Textbox(Piece& parent, string& text)
+	Textbox::Textbox(Wedge& parent, string& text)
 		: TypeIn(parent, text, cls())
 	{}
 }

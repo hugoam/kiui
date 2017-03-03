@@ -18,7 +18,7 @@ namespace toy
 	{
 	public:
 		RootSheet(UiWindow& window, Type& type = cls());
-		RootSheet(Piece& parent, Type& type = cls());
+		RootSheet(Wedge& parent, Type& type = cls());
 		~RootSheet();
 
 		virtual RootSheet& rootSheet() { return *this; }
@@ -39,7 +39,7 @@ namespace toy
 		void handleUnbindWidget(Widget& widget);
 		void handleBindWidget(Widget& widget);
 
-		static Type& cls() { static Type ty("RootSheet", Piece::cls()); return ty; }
+		static Type& cls() { static Type ty("RootSheet", Wedge::cls()); return ty; }
 
 	protected:
 		UiWindow& m_window;

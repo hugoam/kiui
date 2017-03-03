@@ -16,7 +16,7 @@
 namespace toy
 {
 	template <> Flow fromString<Flow>(const string& str) { if(str == "FLOW") return FLOW; else if(str == "OVERLAY") return OVERLAY; return FLOW; }
-	template <> Space fromString<Space>(const string& str) { if(str == "CONTAINER") return CONTAINER; else if(str == "ITEM") return ITEM; else if(str == "BLOCK") return BLOCK; else if(str == "LINE") return LINE; else if(str == "STACK") return STACK; else if(str == "DIV") return DIV; else if(str == "SPACE") return SPACE; else if(str == "BOARD") return BOARD; return CONTAINER; }
+	template <> Space fromString<Space>(const string& str) { if(str == "SHEET") return SHEET; else if(str == "ITEM") return ITEM; else if(str == "BLOCK") return BLOCK; else if(str == "LINE") return LINE; else if(str == "STACK") return STACK; else if(str == "DIV") return DIV; else if(str == "SPACE") return SPACE; else if(str == "BOARD") return BOARD; return SHEET; }
 	template <> Clipping fromString<Clipping>(const string& str) { if(str == "NOCLIP") return NOCLIP; else if(str == "CLIP") return CLIP; return NOCLIP; }
 	template <> Opacity fromString<Opacity>(const string& str) { if(str == "OPAQUE") return OPAQUE; else if(str == "CLEAR") return CLEAR; else if(str == "HOLLOW") return HOLLOW;  return OPAQUE; }
 	template <> Direction fromString<Direction>(const string& str) { if(str == "READING") return READING; else if(str == "PARAGRAPH") return PARAGRAPH; return READING; }

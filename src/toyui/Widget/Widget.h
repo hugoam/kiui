@@ -36,11 +36,11 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Widget : public TypeObject, public InputWidget, public Updatable
 	{
 	public:
-		Widget(Piece& parent, Type& type = cls(), FrameType frameType = FRAME);
-		Widget(Type& type = cls(), FrameType frameType = FRAME, Piece* parent = nullptr);
+		Widget(Wedge& parent, Type& type = cls(), FrameType frameType = FRAME);
+		Widget(Type& type = cls(), FrameType frameType = FRAME, Wedge* parent = nullptr);
 		~Widget();
 
-		_A_ inline Piece* parent() { return m_parent; }
+		_A_ inline Wedge* parent() { return m_parent; }
 		_A_ inline Container* container() { return m_container; }
 		_A_ inline size_t index() { return m_index; }
 		_A_ inline Frame& frame() { return *m_frame; }
@@ -61,7 +61,7 @@ namespace toy
 		void setDevice(Device& device) { m_device = &device; }
 		void resetDevice() { m_device = nullptr; }
 
-		virtual unique_ptr<Widget> clone(Piece& parent) { return make_unique<Widget>(parent); }
+		virtual unique_ptr<Widget> clone(Wedge& parent) { return make_unique<Widget>(parent); }
 
 		virtual const string& name() { return sNullString; }
 		virtual const string& tooltip() { return sNullString; }
@@ -76,7 +76,7 @@ namespace toy
 		void show();
 		void hide();
 
-		void bind(Piece& parent, size_t index, bool deferred = true);
+		void bind(Wedge& parent, size_t index, bool deferred = true);
 		void unbind();
 
 		unique_ptr<Widget> extract();
@@ -137,7 +137,7 @@ namespace toy
 		static Type& cls() { static Type ty("Widget"); return ty; }
 
 	protected:
-		Piece* m_parent;
+		Wedge* m_parent;
 		Container* m_container;
 		size_t m_index;
 		Style* m_style;
@@ -152,7 +152,7 @@ namespace toy
 	class TOY_UI_EXPORT Item : public Widget
 	{
 	public:
-		Item(Piece& parent, Type& type = cls());
+		Item(Wedge& parent, Type& type = cls());
 
 		static Type& cls() { static Type ty("Item", Widget::cls()); return ty; }
 	};
@@ -160,7 +160,7 @@ namespace toy
 	class TOY_UI_EXPORT Control : public Item
 	{
 	public:
-		Control(Piece& parent, Type& type = cls());
+		Control(Wedge& parent, Type& type = cls());
 
 		static Type& cls() { static Type ty("Control", Item::cls()); return ty; }
 	};

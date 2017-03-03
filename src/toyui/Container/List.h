@@ -17,7 +17,7 @@ namespace toy
 	class TOY_UI_EXPORT List : public ScrollContainer
 	{
 	public:
-		List(Piece& parent, Type& type = cls(), FrameType frameType = STRIPE);
+		List(Wedge& parent, Type& type = cls(), FrameType frameType = STRIPE);
 
 		static Type& cls() { static Type ty("List", Container::cls()); return ty; }
 	};
@@ -25,7 +25,7 @@ namespace toy
 	class TOY_UI_EXPORT SelectList : public List
 	{
 	public:
-		SelectList(Piece& parent, Type& type = cls());
+		SelectList(Wedge& parent, Type& type = cls());
 
 		WrapButton& addChoice();
 		virtual Container& emplaceContainer();
@@ -35,22 +35,26 @@ namespace toy
 		static Type& cls() { static Type ty("SelectList", List::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT LabelSequence : public Line
+	class TOY_UI_EXPORT LabelSequence : public Container
 	{
 	public:
-		LabelSequence(Piece& parent, StringVector labels = StringVector());
+		LabelSequence(Wedge& parent, StringVector labels = StringVector());
+
+		static Type& cls() { static Type ty("LabelSequence", Line::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT ButtonSequence : public Line
+	class TOY_UI_EXPORT ButtonSequence : public Container
 	{
 	public:
-		ButtonSequence(Piece& parent, StringVector labels = StringVector());
+		ButtonSequence(Wedge& parent, StringVector labels = StringVector());
+
+		static Type& cls() { static Type ty("ButtonSequence", Line::cls()); return ty; }
 	};
 
 	class TOY_UI_EXPORT SortList : public List//, public Dropper
 	{
 	public:
-		SortList(Piece& parent);
+		SortList(Wedge& parent);
 
 		static Type& cls() { static Type ty("SortList", List::cls()); return ty; }
 	};

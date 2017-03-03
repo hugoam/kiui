@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_WDIRECTORY_H
-#define TOY_WDIRECTORY_H
+#ifndef TOY_DIRECTORY_H
+#define TOY_DIRECTORY_H
 
 /* toy */
 #include <toyui/Forward.h>
@@ -15,44 +15,38 @@ struct dirent;
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Dir : public WrapButton
+	class _I_ TOY_UI_EXPORT Dir : public MultiButton
 	{
 	public:
-		Dir(Piece& parent, Directory& directory, const string& name);
+		Dir(Wedge& parent, Directory& directory, const string& name);
 
 		void click();
 
-		static Type& cls() { static Type ty("Dir", WrapButton::cls()); return ty; }
+		static Type& cls() { static Type ty("Dir", MultiButton::cls()); return ty; }
 
 	protected:
 		Directory& m_directory;
 		string m_name;
-
-		Icon m_icon;
-		Label m_label;
 	};
 
-	class _I_ TOY_UI_EXPORT File : public WrapButton
+	class _I_ TOY_UI_EXPORT File : public MultiButton
 	{
 	public:
-		File(Piece& parent, Directory& directory, const string& name);
+		File(Wedge& parent, Directory& directory, const string& name);
 
 		void click();
 
-		static Type& cls() { static Type ty("File", WrapButton::cls()); return ty; }
+		static Type& cls() { static Type ty("File", MultiButton::cls()); return ty; }
 
 	protected:
 		Directory& m_directory;
 		string m_name;
-
-		Icon m_icon;
-		Label m_label;
 	};
 
 	class _I_ TOY_UI_EXPORT Directory : public Container
 	{
 	public:
-		Directory(Piece& parent, const string& path);
+		Directory(Wedge& parent, const string& path);
 
 		void update();
 
@@ -66,12 +60,12 @@ namespace toy
 		string m_path;
 	};
 
-	class _I_ TOY_UI_EXPORT FileBrowser : public Piece
+	class _I_ TOY_UI_EXPORT FileBrowser : public Wedge
 	{
 	public:
-		FileBrowser(Piece& parent, const string& path);
+		FileBrowser(Wedge& parent, const string& path);
 
-		static Type& cls() { static Type ty("FileBrowser", Piece::cls()); return ty; }
+		static Type& cls() { static Type ty("FileBrowser", Wedge::cls()); return ty; }
 
 	protected:
 		string m_path;
@@ -81,7 +75,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT FileNode : public TreeNode
 	{
 	public:
-		FileNode(Piece& parent, const string& name);
+		FileNode(Wedge& parent, const string& name);
 
 		static Type& cls() { static Type ty("FileNode", TreeNode::cls()); return ty; }
 	};
@@ -89,7 +83,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT DirectoryNode : public TreeNode
 	{
 	public:
-		DirectoryNode(Piece& parent, const string& path, const string& name, bool collapsed);
+		DirectoryNode(Wedge& parent, const string& path, const string& name, bool collapsed);
 
 		void expand();
 		void update();

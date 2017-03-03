@@ -39,7 +39,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Input<Colour> : public WValue
 	{
 	public:
-		Input(Piece& parent, Colour value, std::function<void(Colour)> callback = nullptr)
+		Input(Wedge& parent, Colour value, std::function<void(Colour)> callback = nullptr)
 			: WValue(parent, lref(value), this->cls(), [callback](Lref& lref) { callback(lref->get<Colour>()); })
 			, m_r(*this, AutoStat<float>(value.r(), 0.f, 1.f, 0.01f), [this](float val) { this->m_value->ref<Colour>().setR(val); this->triggerModify(); })
 			, m_g(*this, AutoStat<float>(value.g(), 0.f, 1.f, 0.01f), [this](float val) { this->m_value->ref<Colour>().setG(val); this->triggerModify(); })
@@ -69,7 +69,7 @@ namespace toy
 	class Field : public WrapControl
 	{
 	public:
-		Field(Piece& parent, const string& label, const T_Val& value, std::function<void(T_Arg)> callback = nullptr, bool reverse = false)
+		Field(Wedge& parent, const string& label, const T_Val& value, std::function<void(T_Arg)> callback = nullptr, bool reverse = false)
 			: WrapControl(parent)
 			, m_label(*this, label)
 			, m_input(*this, value, callback)
@@ -100,7 +100,7 @@ namespace toy
 	class TOY_UI_EXPORT InputRadio : public WrapControl
 	{
 	public:
-		InputRadio(Piece& parent, const string& label, StringVector choices, std::function<void(const string&)> callback = nullptr, bool reverse = false);
+		InputRadio(Wedge& parent, const string& label, StringVector choices, std::function<void(const string&)> callback = nullptr, bool reverse = false);
 
 		static Type& cls() { static Type ty("InputRadio", WrapControl::cls()); return ty; }
 
@@ -112,7 +112,7 @@ namespace toy
 	class TOY_UI_EXPORT InputDropdown : public WrapControl
 	{
 	public:
-		InputDropdown(Piece& parent, const string& label, StringVector choices, std::function<void(const string&)> callback = nullptr, bool reverse = false);
+		InputDropdown(Wedge& parent, const string& label, StringVector choices, std::function<void(const string&)> callback = nullptr, bool reverse = false);
 
 		static Type& cls() { static Type ty("InputDropdown", WrapControl::cls()); return ty; }
 

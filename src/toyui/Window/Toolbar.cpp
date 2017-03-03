@@ -7,20 +7,20 @@
 
 namespace toy
 {
-	ToolButton::ToolButton(Piece& parent, const string& icon)
+	ToolButton::ToolButton(Wedge& parent, const string& icon)
 		: Dropdown(parent)
 	{
 		this->emplace<Icon>(icon);
-		m_header.reset(make_unique<Icon>(m_header, icon));
+		m_header.reset({ icon });
 		m_toggle.hide();
 		//m_header.emplace<Icon>(icon);
 	}
 
-	Tooldock::Tooldock(Piece& parent)
-		: Div(parent, cls())//, GRID)
+	Tooldock::Tooldock(Wedge& parent)
+		: Container(parent, cls())//, GRID)
 	{}
 
-	Toolbar::Toolbar(Piece& parent)
+	Toolbar::Toolbar(Wedge& parent)
 		: WrapControl(parent, cls())
 	{}
 }

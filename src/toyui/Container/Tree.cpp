@@ -15,7 +15,7 @@ using namespace std::placeholders;
 
 namespace toy
 {
-	TreeNode::TreeNode(Piece& parent, const string& image, const string& title, bool collapsed, Type& type)
+	TreeNode::TreeNode(Wedge& parent, const string& image, const string& title, bool collapsed, Type& type)
 		: Expandbox(parent, title, collapsed, false, type)
 		, m_image(image)
 	{
@@ -48,7 +48,7 @@ namespace toy
 
 	Tree& TreeNode::tree()
 	{
-		Piece* parent = m_parent;
+		Wedge* parent = m_parent;
 		while(&parent->type() != &Tree::cls())
 			parent = parent->parent();
 		return parent->as<Tree>();
@@ -59,7 +59,7 @@ namespace toy
 		this->tree().select(*this);
 	}
 
-	Tree::Tree(Piece& parent, const std::function<void(TreeNode&)>& onSelected)
+	Tree::Tree(Wedge& parent, const std::function<void(TreeNode&)>& onSelected)
 		: Container(parent, cls())
 		, m_rootNode(nullptr)
 		, m_selected(nullptr)

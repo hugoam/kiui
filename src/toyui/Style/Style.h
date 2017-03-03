@@ -69,7 +69,7 @@ namespace toy
 	public:
 		LayoutStyle()
 			: IdStruct(cls())
-			, d_layout(DimLayout(AUTO_LAYOUT, AUTO_LAYOUT)), d_flow(FLOW), d_clipping(NOCLIP), d_opacity(CLEAR), d_space(CONTAINER), d_direction(DIRECTION_AUTO), d_align(DimAlign(LEFT, LEFT))
+			, d_layout(DimLayout(AUTO_LAYOUT, AUTO_LAYOUT)), d_flow(FLOW), d_clipping(NOCLIP), d_opacity(CLEAR), d_space(SHEET), d_direction(DIRECTION_AUTO), d_align(DimAlign(LEFT, LEFT))
 			, d_span(DimFloat(1.f, 1.f)), d_pivot(DimPivot(FORWARD, FORWARD)), d_zorder(0), d_updated(0)
 		{}
 

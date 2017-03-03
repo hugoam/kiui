@@ -26,7 +26,7 @@ namespace toy
 
 	void Cursor::nextFrame(size_t tick, size_t delta)
 	{
-		Piece::nextFrame(tick, delta);
+		Wedge::nextFrame(tick, delta);
 
 		if(m_tooltipClock.read() > 0.5f && m_tooltip.frame().hidden() && !m_hovered->tooltip().empty())
 			this->tooltipOn();

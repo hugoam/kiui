@@ -7,6 +7,7 @@
 
 /* toy */
 #include <toyui/Widget/Sheet.h>
+#include <toyui/Widget/Layout.h>
 #include <toyui/Button/Button.h>
 
 namespace toy
@@ -14,7 +15,7 @@ namespace toy
 	class TOY_UI_EXPORT ExpandboxHeader : public WrapButton
 	{
 	public:
-		ExpandboxHeader(Piece& parent, const Trigger& trigger = Trigger());
+		ExpandboxHeader(Wedge& parent, const Trigger& trigger = Trigger());
 
 		static Type& cls() { static Type ty("ExpandboxHeader", WrapButton::cls()); return ty; }
 	};
@@ -22,7 +23,7 @@ namespace toy
 	class TOY_UI_EXPORT ExpandboxBody : public Container
 	{
 	public:
-		ExpandboxBody(Piece& parent);
+		ExpandboxBody(Wedge& parent);
 
 		static Type& cls() { static Type ty("ExpandboxBody", Container::cls()); return ty; }
 	};
@@ -30,18 +31,18 @@ namespace toy
 	class TOY_UI_EXPORT ExpandboxToggle : public Toggle
 	{
 	public:
-		ExpandboxToggle(Piece& parent, const Trigger& triggerOn, const Trigger& triggerOff, bool on);
+		ExpandboxToggle(Wedge& parent, const Trigger& triggerOn, const Trigger& triggerOff, bool on);
 
 		static Type& cls() { static Type ty("ExpandboxToggle", Toggle::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT Expandbox : public Stack
+	class TOY_UI_EXPORT Expandbox : public Container
 	{
 	public:
-		Expandbox(Piece& parent, const string& title, bool collapsed = false, bool build = true, Type& type = cls());
+		Expandbox(Wedge& parent, const string& title, bool collapsed = false, bool build = true, Type& type = cls());
 		~Expandbox();
 
-		Piece& header() { return m_header; }
+		Wedge& header() { return m_header; }
 
 		virtual Container& emplaceContainer();
 

@@ -17,7 +17,7 @@ namespace toy
 	class TOY_UI_EXPORT Canvas : public ScrollPlan
 	{
 	public:
-		Canvas(Piece& parent, const string& title, Trigger contextTrigger = Trigger());
+		Canvas(Wedge& parent, const string& title, Trigger contextTrigger = Trigger());
 
 		const string& name();
 
@@ -33,7 +33,7 @@ namespace toy
 	class TOY_UI_EXPORT NodePlugKnob : public Item
 	{
 	public:
-		NodePlugKnob(Piece& parent);
+		NodePlugKnob(Wedge& parent);
 
 		static Type& cls() { static Type ty("NodePlugKnob", Item::cls()); return ty; }
 	};
@@ -41,7 +41,7 @@ namespace toy
 	class TOY_UI_EXPORT NodeConnectionProxy : public Decal
 	{
 	public:
-		NodeConnectionProxy(Piece& parent);
+		NodeConnectionProxy(Wedge& parent);
 
 		static Type& cls() { static Type ty("NodeConnectionProxy", Decal::cls()); return ty; }
 	};
@@ -52,7 +52,7 @@ namespace toy
 		typedef std::function<void(NodePlug&, NodePlug&)> ConnectTrigger;
 
 	public:
-		NodePlug(Piece& parent, const string& name, bool input, ConnectTrigger onConnect = ConnectTrigger());
+		NodePlug(Wedge& parent, const string& name, bool input, ConnectTrigger onConnect = ConnectTrigger());
 
 		const string& tooltip() { return m_tooltip; }
 
@@ -92,19 +92,19 @@ namespace toy
 	class TOY_UI_EXPORT NodeInPlug : public NodePlug
 	{
 	public:
-		NodeInPlug(Piece& parent, const string& name);
+		NodeInPlug(Wedge& parent, const string& name);
 	};
 
 	class TOY_UI_EXPORT NodeOutPlug : public NodePlug
 	{
 	public:
-		NodeOutPlug(Piece& parent, const string& name, ConnectTrigger onConnect = ConnectTrigger());
+		NodeOutPlug(Wedge& parent, const string& name, ConnectTrigger onConnect = ConnectTrigger());
 	};
 
 	class TOY_UI_EXPORT NodeCable : public Decal
 	{
 	public:
-		NodeCable(Piece& parent, Widget& plugOut, Widget& plugIn);
+		NodeCable(Wedge& parent, Widget& plugOut, Widget& plugIn);
 
 		void nextFrame(size_t tick, size_t delta);
 
@@ -120,7 +120,7 @@ namespace toy
 		Widget& m_plugIn;
 	};
 
-	class TOY_UI_EXPORT NodeBody : public Sheet
+	class TOY_UI_EXPORT NodeBody : public Container
 	{
 	public:
 		NodeBody(Node& parent);
@@ -132,18 +132,18 @@ namespace toy
 		Label m_title;
 	};
 
-	class TOY_UI_EXPORT NodeIn : public Div
+	class TOY_UI_EXPORT NodeIn : public Container
 	{
 	public:
-		NodeIn(Piece& parent);
+		NodeIn(Wedge& parent);
 
 		static Type& cls() { static Type ty("NodeIn", Div::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT NodeOut : public Div
+	class TOY_UI_EXPORT NodeOut : public Container
 	{
 	public:
-		NodeOut(Piece& parent);
+		NodeOut(Wedge& parent);
 
 		static Type& cls() { static Type ty("NodeOut", Div::cls()); return ty; }
 	};
@@ -151,7 +151,7 @@ namespace toy
 	class TOY_UI_EXPORT Node : public Overlay
 	{
 	public:
-		Node(Piece& parent, const string& title);
+		Node(Wedge& parent, const string& title);
 		~Node();
 
 		const string& name() { return m_name; }

@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_WSLIDER_H
-#define TOY_WSLIDER_H
+#ifndef TOY_SLIDER_H
+#define TOY_SLIDER_H
 
 /* toy */
 #include <toyobj/Util/Stat.h>
@@ -20,7 +20,7 @@ namespace toy
 	class TOY_UI_EXPORT SliderKnob : public Item
 	{
 	public:
-		SliderKnob(Piece& parent, Dimension dim = DIM_X, Type& type = cls());
+		SliderKnob(Wedge& parent, Dimension dim = DIM_X, Type& type = cls());
 
 		static Type& cls() { static Type ty("SliderKnob", Item::cls()); return ty; }
 
@@ -28,10 +28,10 @@ namespace toy
 		Dimension m_dim;
 	};
 
-	class TOY_UI_EXPORT Slider : public WideControl
+	class TOY_UI_EXPORT Slider : public WrapControl
 	{
 	public:
-		Slider(Piece& parent, Dimension dim = DIM_X, const Trigger& onUpdated = nullptr, Type& type = cls());
+		Slider(Wedge& parent, Dimension dim = DIM_X, const Trigger& onUpdated = nullptr, Type& type = cls());
 
 		Widget& filler() { return m_filler; }
 		SliderKnob& slider() { return m_button; }
@@ -57,7 +57,7 @@ namespace toy
 		void leftDrag(MouseEvent& mouseEvent);
 		void leftDragEnd(MouseEvent& mouseEvent);
 
-		static Type& cls() { static Type ty("Slider", WideControl::cls()); return ty; }
+		static Type& cls() { static Type ty("Slider", WrapControl::cls()); return ty; }
 
 	protected:
 		Dimension m_dim;
@@ -84,7 +84,7 @@ namespace toy
 	class TOY_UI_EXPORT SliderDisplay : public Label
 	{
 	public:
-		SliderDisplay(Piece& parent, const string& label);
+		SliderDisplay(Wedge& parent, const string& label);
 
 		static Type& cls() { static Type ty("SliderDisplay", Label::cls()); return ty; }
 	};
@@ -93,7 +93,7 @@ namespace toy
 	class StatSlider : public WValue
 	{
 	public:
-		StatSlider(Piece& parent, Lref& lref, std::function<void(T)> callback = nullptr, Dimension dim = DIM_X)
+		StatSlider(Wedge& parent, Lref& lref, std::function<void(T)> callback = nullptr, Dimension dim = DIM_X)
 			: WValue(parent, lref, this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); } : OnUpdate())
 			, m_stat(this->m_value->template ref<AutoStat<T>>())
 			, m_dim(dim)
@@ -103,7 +103,7 @@ namespace toy
 			this->updateSlider();
 		}
 
-		StatSlider(Piece& parent, AutoStat<T> value, std::function<void(T)> callback = nullptr, Dimension dim = DIM_X)
+		StatSlider(Wedge& parent, AutoStat<T> value, std::function<void(T)> callback = nullptr, Dimension dim = DIM_X)
 			: WValue(parent, lref(value), this->cls(), callback ? [callback](Lref& lref) { callback(lref->get<AutoStat<T>>()); } : OnUpdate())
 			, m_stat(this->m_value->template ref<AutoStat<T>>())
 			, m_dim(dim)

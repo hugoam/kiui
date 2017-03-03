@@ -7,14 +7,14 @@
 
 namespace toy
 {
-	Dockbox::Dockbox(Piece& parent, Dockbar& dockbar, const string& title, const string& icon)
+	Dockbox::Dockbox(Wedge& parent, Dockbar& dockbar, const string& title, const string& icon)
 		: Window(parent, title, static_cast<WindowState>(0), nullptr, nullptr, cls())
 		, m_dockbar(dockbar)
 		, m_toggle(dockbar, *this, icon)
 	{}
 
 	DockToggle::DockToggle(Dockbar& dockbar, Dockbox& dockbox, const string& icon)
-		: ImgButton(dockbar, icon, std::bind(&DockToggle::click, this), cls())
+		: Button(dockbar, icon, std::bind(&DockToggle::click, this), cls())
 		, m_dockbox(dockbox)
 	{}
 
@@ -28,12 +28,12 @@ namespace toy
 			m_dockbox.hide();
 	}
 
-	Docker::Docker(Piece& parent)
-		: Line(parent, cls())
+	Docker::Docker(Wedge& parent)
+		: Container(parent, cls())
 	{}
 
-	Dockbar::Dockbar(Piece& parent)
-		: Div(parent, cls())
+	Dockbar::Dockbar(Wedge& parent)
+		: Container(parent, cls())
 		, m_docker(*this)
 	{}
 

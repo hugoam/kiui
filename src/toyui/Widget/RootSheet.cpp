@@ -35,7 +35,7 @@ namespace toy
 		this->updateStyle();
 	}
 
-	RootSheet::RootSheet(Piece& parent, Type& type)
+	RootSheet::RootSheet(Wedge& parent, Type& type)
 		: Container(parent, type, LAYER)
 		, m_window(parent.uiWindow())
 		, m_mouse(make_unique<Mouse>(*this))
@@ -53,7 +53,7 @@ namespace toy
 		m_mouse->nextFrame();
 		m_keyboard->nextFrame();
 
-		Piece::nextFrame(tick, delta);
+		Wedge::nextFrame(tick, delta);
 	}
 
 	InputReceiver* RootSheet::dispatchEvent(InputEvent& inputEvent)

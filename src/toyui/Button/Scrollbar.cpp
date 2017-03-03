@@ -15,7 +15,7 @@
 
 namespace toy
 {
-	Scroller::Scroller(Piece& parent, Dimension dim)
+	Scroller::Scroller(Wedge& parent, Dimension dim)
 		: Slider(parent, dim, nullptr, cls())
 	{
 		m_filler.resetStyle(Spacer::cls());
@@ -28,20 +28,20 @@ namespace toy
 		m_parent->as<Scrollbar>().scrollTo(value);
 	}
 
-	ScrollerKnob::ScrollerKnob(Piece& parent, Dimension dim)
+	ScrollerKnob::ScrollerKnob(Wedge& parent, Dimension dim)
 		: SliderKnob(parent, dim, cls())
 	{}
 
-	ScrollForward::ScrollForward(Piece& parent, const Trigger& trigger)
+	ScrollForward::ScrollForward(Wedge& parent, const Trigger& trigger)
 		: Button(parent, "", trigger, cls())
 	{}
 
-	ScrollBackward::ScrollBackward(Piece& parent, const Trigger& trigger)
+	ScrollBackward::ScrollBackward(Wedge& parent, const Trigger& trigger)
 		: Button(parent, "", trigger, cls())
 	{}
 
-	Scrollbar::Scrollbar(Piece& parent, Piece& frameSheet, Piece& contentSheet, Dimension dim)
-		: Line(parent, cls())
+	Scrollbar::Scrollbar(Wedge& parent, Wedge& frameSheet, Wedge& contentSheet, Dimension dim)
+		: Container(parent, cls())
 		, m_dim(dim)
 		, d_cursor(0.f)
 		, m_frameSheet(frameSheet)
@@ -105,7 +105,7 @@ namespace toy
 
 	void Scrollbar::nextFrame(size_t tick, size_t delta)
 	{
-		Piece::nextFrame(tick, delta);
+		Wedge::nextFrame(tick, delta);
 
 		float visibleSize = this->visibleSize();
 		float contentSize = this->contentSize();

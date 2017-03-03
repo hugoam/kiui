@@ -90,7 +90,7 @@ namespace toy
 	enum _I_ Space : unsigned int
 	{
 		MANUAL_SPACE = 0,        // PARAGRAPH   direction, MANUAL length, MANUAL depth
-		CONTAINER = 1,           // PARAGRAPH   direction, WRAP   length, WRAP   depth
+		SHEET = 1,           // PARAGRAPH   direction, WRAP   length, WRAP   depth
 		ITEM = 2,                // READING     direction, SHRINK length, SHRINK depth
 		BLOCK = 3,               // PARAGRAPH   direction, SHRINK length, SHRINK depth
 		FIXED_BLOCK = 4,         // PARAGRAPH   direction, FIXED  length, FIXED  depth

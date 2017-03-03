@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_WTREE_H
-#define TOY_WTREE_H
+#ifndef TOY_TREE_H
+#define TOY_TREE_H
 
 /* toy */
 #include <toyobj/Typed.h>
@@ -35,7 +35,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT TreeNode : public Expandbox
 	{
 	public:
-		TreeNode(Piece& parent, const string& image, const string& title, bool collapsed = false, Type& type = cls());
+		TreeNode(Wedge& parent, const string& image, const string& title, bool collapsed = false, Type& type = cls());
 		~TreeNode();
 
 		Tree& tree();
@@ -55,7 +55,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Tree : public Container
 	{
 	public:
-		Tree(Piece& parent, const std::function<void (TreeNode&)>& onSelected = nullptr);
+		Tree(Wedge& parent, const std::function<void (TreeNode&)>& onSelected = nullptr);
 		~Tree();
 
 		void select(TreeNode& node);

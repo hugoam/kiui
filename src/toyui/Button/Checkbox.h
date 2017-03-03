@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_WCHECKBOX_H
-#define TOY_WCHECKBOX_H
+#ifndef TOY_CHECKBOX_H
+#define TOY_CHECKBOX_H
 
 /* toy */
 #include <toyui/Forward.h>
@@ -14,7 +14,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Checkbox : public Toggle
 	{
 	public:
-		Checkbox(Piece& parent, WValue* input, bool on);
+		Checkbox(Wedge& parent, WValue* input, bool on);
 
 		void toggleOn();
 		void toggleOff();

@@ -15,7 +15,7 @@ namespace toy
 	class TOY_UI_EXPORT TypedownInput : public DropdownInput
 	{
 	public:
-		TypedownInput(Piece& parent, const Trigger& onSelected, StringVector choices = StringVector());
+		TypedownInput(Wedge& parent, const Trigger& onSelected, StringVector choices = StringVector());
 
 		FilterInput& input() { return m_input; }
 

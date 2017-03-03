@@ -13,11 +13,11 @@ using namespace std::placeholders;
 
 namespace toy
 {
-	TabHeader::TabHeader(Piece& parent, const string& label, const Trigger& trigger)
+	TabHeader::TabHeader(Wedge& parent, const string& label, const Trigger& trigger)
 		: Button(parent, label, trigger, cls())
 	{}
 
-	Tab::Tab(Piece& parent, Tabber& tabber, Button& header, bool active)
+	Tab::Tab(Wedge& parent, Tabber& tabber, Button& header, bool active)
 		: ScrollSheet(parent, cls())
 		, m_tabber(tabber)
 		, m_header(header)
@@ -34,15 +34,15 @@ namespace toy
 		m_tabber.removeTab(*this);
 	}
 
-	TabberHead::TabberHead(Piece& parent)
-		: Line(parent, cls())
+	TabberHead::TabberHead(Wedge& parent)
+		: Container(parent, cls())
 	{}
 
-	TabberBody::TabberBody(Piece& parent)
-		: Sheet(parent, cls())
+	TabberBody::TabberBody(Wedge& parent)
+		: Container(parent, cls())
 	{}
 
-	Tabber::Tabber(Piece& parent, Type& type, bool downtabs)
+	Tabber::Tabber(Wedge& parent, Type& type, bool downtabs)
 		: Container(parent, type)
 		, m_currentTab(nullptr)
 		, m_headers(*this)

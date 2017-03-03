@@ -22,7 +22,7 @@ using namespace std::placeholders;
 
 namespace toy
 {
-	Popup::Popup(Piece& parent)
+	Popup::Popup(Wedge& parent)
 		: Overlay(parent, cls())
 	{
 		float x = this->rootSheet().mouse().lastX() - m_parent->frame().left();
@@ -47,7 +47,7 @@ namespace toy
 	}
 
 	WindowHeader::WindowHeader(Window& window)
-		: WideControl(window, cls())
+		: WrapControl(window, cls())
 		, m_window(window)
 		, m_tooltip("Drag me")
 		, m_title(*this, m_window.name())
@@ -105,7 +105,7 @@ namespace toy
 			return nullptr;
 	}
 
-	WindowSizer::WindowSizer(Piece& parent, Window& window, Type& type, bool left)
+	WindowSizer::WindowSizer(Wedge& parent, Window& window, Type& type, bool left)
 		: Control(parent, type)
 		, m_window(window)
 		, m_resizeLeft(left)
@@ -136,25 +136,25 @@ namespace toy
 		UNUSED(mouseEvent);
 	}
 
-	WindowSizerLeft::WindowSizerLeft(Piece& parent, Window& window)
+	WindowSizerLeft::WindowSizerLeft(Wedge& parent, Window& window)
 		: WindowSizer(parent, window, cls(), true)
 	{}
 
-	WindowSizerRight::WindowSizerRight(Piece& parent, Window& window)
+	WindowSizerRight::WindowSizerRight(Wedge& parent, Window& window)
 		: WindowSizer(parent, window, cls(), false)
 	{}
 
 	WindowFooter::WindowFooter(Window& window)
-		: WideControl(window, cls())
+		: WrapControl(window, cls())
 		, m_firstSizer(*this, window)
 		, m_secondSizer(*this, window)
 	{}
 
-	WindowBody::WindowBody(Piece& parent)
+	WindowBody::WindowBody(Wedge& parent)
 		: ScrollContainer(parent, cls())
 	{}
 
-	CloseButton::CloseButton(Piece& parent, const Trigger& trigger)
+	CloseButton::CloseButton(Wedge& parent, const Trigger& trigger)
 		: Button(parent, "", trigger, cls())
 	{}
 
@@ -170,7 +170,7 @@ namespace toy
 		mouseEvent.abort = true;
 	}
 
-	Window::Window(Piece& parent, const string& title, WindowState state, const Trigger& onClose, Docksection* dock, Type& type)
+	Window::Window(Wedge& parent, const string& title, WindowState state, const Trigger& onClose, Docksection* dock, Type& type)
 		: Overlay(parent, type)
 		, m_name(title)
 		, m_windowState(state)

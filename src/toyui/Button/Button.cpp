@@ -18,38 +18,44 @@
 
 namespace toy
 {
-	Label::Label(Piece& parent, const string& label, Type& type)
-		: Item(parent, type)
+	Label::Label(Wedge& parent, const string& label, Type& type)
+		: Widget(parent, type)
 	{
 		this->setLabel(label);
 	}
 
-	Text::Text(Piece& parent, const string& label, Type& type)
-		: Label(parent, label, type)
-	{}
-
-	Title::Title(Piece& parent, const string& label)
+	Text::Text(Wedge& parent, const string& label)
 		: Label(parent, label, cls())
 	{}
 
-	Icon::Icon(Piece& parent, Image& image)
-		: Item(parent, cls())
+	Title::Title(Wedge& parent, const string& label)
+		: Label(parent, label, cls())
+	{}
+
+	Icon::Icon(Wedge& parent, Image& image)
+		: Widget(parent, cls())
 	{
 		this->setImage(&image);
 	}
 
-	Icon::Icon(Piece& parent, const string& image)
-		: Item(parent, cls())
+	Icon::Icon(Wedge& parent, const string& image)
+		: Widget(parent, cls())
 	{
 		if(image != "")
 			this->setImage(&findImage(image));
 	}
 
-	Button::Button(Piece& parent, const string& label, const Trigger& trigger, Type& type)
+	Button::Button(Wedge& parent, const string& label, const Trigger& trigger, Type& type)
 		: Control(parent, type)
 		, ClickTrigger(*this, trigger)
 	{
-		this->content().setText(label);
+		this->setLabel(label);
+	}
+
+	Button::Button(Wedge& parent, Image& image, const Trigger& trigger, Type& type)
+		: Button(parent, "", trigger, type)
+	{
+		this->setImage(&image);
 	}
 
 	void Button::leftClick(MouseEvent& mouseEvent)
@@ -69,43 +75,10 @@ namespace toy
 		this->clickAlt();
 	}
 
-	ImgButton::ImgButton(Piece& parent, Image& image, const Trigger& trigger, Type& type)
-		: Button(parent, "", trigger, type)
-	{
-		this->setImage(&image);
-	}
-
-	ImgButton::ImgButton(Piece& parent, const string& image, const Trigger& trigger, Type& type)
-		: ImgButton(parent, findImage(image), trigger, type)
-	{}
-
-	WrapButton::WrapButton(Piece& parent, Widget* content, const Trigger& trigger, Type& type)
+	WrapButton::WrapButton(Wedge& parent, const Trigger& trigger, Type& type)
 		: WrapControl(parent, type)
 		, ClickTrigger(*this, trigger)
-		, m_content(content)
 	{}
-
-	WrapButton::WrapButton(Piece& parent, const Trigger& trigger, Type& type)
-		: WrapButton(parent, nullptr, trigger, type)
-	{}
-
-	WrapButton::WrapButton(Piece& parent, unique_ptr<Widget> content, const Trigger& trigger, Type& type)
-		: WrapButton(parent, content.get(), trigger, type)
-	{
-		this->append(std::move(content));
-	}
-
-	void WrapButton::reset(unique_ptr<Widget> content)
-	{
-		if(m_content)
-			this->release(*m_content);
-		m_content = &this->append(std::move(content));
-	}
-
-	void WrapButton::handleAdd(Widget& widget)
-	{
-		m_content = &widget;
-	}
 
 	void WrapButton::leftClick(MouseEvent& mouseEvent)
 	{
@@ -124,7 +97,26 @@ namespace toy
 		this->clickAlt();
 	}
 
-	Toggle::Toggle(Piece& parent, const Trigger& triggerOn, const Trigger& triggerOff, bool on, Type& type)
+	MultiButton::MultiButton(Wedge& parent, const Trigger& trigger, const StringVector& elements, Type& type)
+		: WrapButton(parent, trigger, type)
+	{
+		this->reset(elements);
+	}
+
+	void MultiButton::reset(const StringVector& elements)
+	{
+		this->clear();
+		for(const string& value : elements)
+		{
+			if(findImage(value).null())
+				this->emplace<Label>(value);
+			else
+				this->emplace<Icon>(value);
+		}
+		m_elements = elements;
+	}
+
+	Toggle::Toggle(Wedge& parent, const Trigger& triggerOn, const Trigger& triggerOff, bool on, Type& type)
 		: Control(parent, type)
 		, m_triggerOn(triggerOn)
 		, m_triggerOff(triggerOff)

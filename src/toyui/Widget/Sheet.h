@@ -13,12 +13,12 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Piece : public Widget
+	class _I_ TOY_UI_EXPORT Wedge : public Widget
 	{
 	public:
-		Piece(Piece& parent, Type& type = cls(), FrameType frameType = STRIPE);
-		Piece(Type& type = cls(), FrameType frameType = STRIPE);
-		~Piece();
+		Wedge(Wedge& parent, Type& type = cls(), FrameType frameType = STRIPE);
+		Wedge(Type& type = cls(), FrameType frameType = STRIPE);
+		~Wedge();
 
 		inline Stripe& stripe() { return m_frame->as<Stripe>(); }
 		inline const std::vector<Widget*>& contents() { return m_contents; }
@@ -37,16 +37,16 @@ namespace toy
 		void reindex(size_t from);
 		void swap(size_t from, size_t to);
 
-		static Type& cls() { static Type ty("Piece", Widget::cls()); return ty; }
+		static Type& cls() { static Type ty("Wedge", Widget::cls()); return ty; }
 
 	protected:
 		std::vector<Widget*> m_contents;
 	};
 
-	class _I_ TOY_UI_EXPORT Container : public Piece
+	class _I_ TOY_UI_EXPORT Container : public Wedge
 	{
 	public:
-		Container(Piece& parent, Type& type = cls(), FrameType frameType = STRIPE);
+		Container(Wedge& parent, Type& type = cls(), FrameType frameType = STRIPE);
 		Container(Type& type = cls(), FrameType frameType = STRIPE);
 		~Container();
 
@@ -69,16 +69,16 @@ namespace toy
 		inline T& emplace(Args&&... args)
 		{
 			Container& container = this->emplaceContainer();
-			return this->append(make_unique<T>(container.as<Piece>(), std::forward<Args>(args)...)).template as<T>();
+			return this->append(make_unique<T>(container.as<Wedge>(), std::forward<Args>(args)...)).template as<T>();
 		}
 
 		template <class T, class... Args>
-		inline T& emplaceLocal(Piece& container, Args&&... args)
+		inline T& emplaceLocal(Wedge& container, Args&&... args)
 		{
 			return this->append(make_unique<T>(container, std::forward<Args>(args)...)).template as<T>();
 		}
 
-		static Type& cls() { static Type ty("Container", Piece::cls()); return ty; }
+		static Type& cls() { static Type ty("Container", Wedge::cls()); return ty; }
 
 	protected:
 		std::vector<unique_ptr<Widget>> m_containerContents;
@@ -87,55 +87,15 @@ namespace toy
 	class _I_ TOY_UI_EXPORT WrapControl : public Container
 	{
 	public:
-		WrapControl(Piece& parent, Type& type = cls());
+		WrapControl(Wedge& parent, Type& type = cls());
 
 		static Type& cls() { static Type ty("WrapControl", Container::cls()); return ty; }
-	};
-
-	class _I_ TOY_UI_EXPORT WideControl : public WrapControl
-	{
-	public:
-		WideControl(Piece& parent, Type& type = cls());
-
-		static Type& cls() { static Type ty("WideControl", WrapControl::cls()); return ty; }
-	};
-
-	class _I_ TOY_UI_EXPORT Board : public Container
-	{
-	public:
-		Board(Piece& parent, Type& type = cls());
-
-		static Type& cls() { static Type ty("Board", Container::cls()); return ty; }
-	};
-
-	class _I_ TOY_UI_EXPORT Line : public Container
-	{
-	public:
-		Line(Piece& parent, Type& type = cls());
-
-		static Type& cls() { static Type ty("Line", Container::cls()); return ty; }
-	};
-
-	class _I_ TOY_UI_EXPORT Div : public Container
-	{
-	public:
-		Div(Piece& parent, Type& type = cls());
-
-		static Type& cls() { static Type ty("Div", Container::cls()); return ty; }
-	};
-
-	class _I_ TOY_UI_EXPORT Stack : public Container
-	{
-	public:
-		Stack(Piece& parent, Type& type = cls(), FrameType frameType = STRIPE);
-
-		static Type& cls() { static Type ty("Stack", Container::cls()); return ty; }
 	};
 
 	class TOY_UI_EXPORT Spacer : public Widget
 	{
 	public:
-		Spacer(Piece& parent, Type& type = cls());
+		Spacer(Wedge& parent, Type& type = cls());
 
 		static Type& cls() { static Type ty("Spacer", Widget::cls()); return ty; }
 	};
@@ -143,47 +103,31 @@ namespace toy
 	class TOY_UI_EXPORT Filler : public Spacer
 	{
 	public:
-		Filler(Piece& parent);
+		Filler(Wedge& parent);
 
 		static Type& cls() { static Type ty("Filler", Spacer::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Layout : public Board
-	{
-	public: 
-		Layout(Piece& parent, Type& type = cls());
-
-		static Type& cls() { static Type ty("Layout", Board::cls()); return ty; }
-	};
-
-	class _I_ TOY_UI_EXPORT Decal : public Piece
+	class _I_ TOY_UI_EXPORT Decal : public Wedge
 	{
 	public:
-		Decal(Piece& parent, Type& type = cls());
+		Decal(Wedge& parent, Type& type = cls());
 
-		static Type& cls() { static Type ty("Decal", Piece::cls()); return ty; }
+		static Type& cls() { static Type ty("Decal", Wedge::cls()); return ty; }
 	};
 
 	class _I_ TOY_UI_EXPORT Overlay : public Container
 	{
 	public:
-		Overlay(Piece& parent, Type& type = cls());
+		Overlay(Wedge& parent, Type& type = cls());
 
 		static Type& cls() { static Type ty("Overlay", Container::cls()); return ty; }
-	};
-
-	class _I_ TOY_UI_EXPORT Sheet : public Container
-	{
-	public:
-		Sheet(Piece& parent, Type& type = cls());
-
-		static Type& cls() { static Type ty("Sheet", Container::cls()); return ty; }
 	};
 
 	class _I_ TOY_UI_EXPORT GridSheet : public Container
 	{
 	public:
-		GridSheet(Piece& parent, Dimension dim, Type& type = cls());
+		GridSheet(Wedge& parent, Dimension dim, Type& type = cls());
 
 		void leftDragStart(MouseEvent& mouseEvent);
 		void leftDrag(MouseEvent& mouseEvent);
