@@ -18,8 +18,8 @@ namespace toy
 	Scroller::Scroller(Wedge& parent, Dimension dim)
 		: Slider(parent, dim, nullptr, cls())
 	{
-		m_filler.resetStyle(Spacer::cls());
-		m_button.resetStyle(ScrollerKnob::cls());
+		m_filler.setStyle(Spacer::cls());
+		m_button.setStyle(ScrollerKnob::cls());
 	}
 
 	void Scroller::sliderStep(float value, bool ended)

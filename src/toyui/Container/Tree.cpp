@@ -19,9 +19,9 @@ namespace toy
 		: Expandbox(parent, title, collapsed, false, type)
 		, m_image(image)
 	{
-		m_header.resetStyle(TreeNodeHeader::cls());
-		m_toggle.resetStyle(TreeNodeToggle::cls());
-		m_container.resetStyle(TreeNodeBody::cls());
+		m_header.setStyle(TreeNodeHeader::cls());
+		m_toggle.setStyle(TreeNodeToggle::cls());
+		m_container.setStyle(TreeNodeBody::cls());
 
 		if(!m_image.empty())
 		{

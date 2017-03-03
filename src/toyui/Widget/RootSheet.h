@@ -31,6 +31,8 @@ namespace toy
 
 		Cursor& cursor() { return m_cursor; }
 
+		RenderTarget& target() { return *m_target; }
+
 		void nextFrame(size_t tick, size_t delta);
 
 		virtual void transformCoordinates(MouseEvent& mouseEvent) { UNUSED(mouseEvent); }

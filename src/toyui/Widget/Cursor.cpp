@@ -61,7 +61,7 @@ namespace toy
 		this->unhover();
 		m_hovered = &widget;
 		if(widget.style().skin().hoverCursor())
-			this->resetStyle(*widget.style().skin().hoverCursor(), false);
+			this->setStyle(*widget.style().skin().hoverCursor(), false);
 	}
 
 	void Cursor::unhover(Widget& widget)
@@ -72,7 +72,7 @@ namespace toy
 
 	void Cursor::unhover()
 	{
-		this->resetStyle(Cursor::cls(), false);
+		this->setStyle(Cursor::cls(), false);
 		m_hovered = &this->rootSheet();
 	}
 

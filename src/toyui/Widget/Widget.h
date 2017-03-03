@@ -61,8 +61,6 @@ namespace toy
 		void setDevice(Device& device) { m_device = &device; }
 		void resetDevice() { m_device = nullptr; }
 
-		virtual unique_ptr<Widget> clone(Wedge& parent) { return make_unique<Widget>(parent); }
-
 		virtual const string& name() { return sNullString; }
 		virtual const string& tooltip() { return sNullString; }
 
@@ -90,9 +88,8 @@ namespace toy
 
 		void updateStyle();
 
-		void resetStyle(Type& type, bool hard = true);
-		void resetStyle(Style& style, bool hard = true);
-		//void resetStyle(const string& style, bool hard = true);
+		void setStyle(Type& type, bool hard = true);
+		void setStyle(Style& style, bool hard = true);
 
 		Style& fetchStyle(Type& type);
 

@@ -223,7 +223,7 @@ namespace toy
 	{
 		this->toggleWindowState(WINDOW_SHRINK);
 		this->shrink() ? m_body.enableWrap() : m_body.disableWrap();
-		this->shrink() ? this->resetStyle(WrapWindow::cls()) : this->resetStyle(Window::cls());
+		this->shrink() ? this->setStyle(WrapWindow::cls()) : this->setStyle(Window::cls());
 	}
 
 	void Window::showTitlebar()
@@ -250,7 +250,7 @@ namespace toy
 
 	void Window::docked()
 	{
-		this->resetStyle(DockWindow::cls());
+		this->setStyle(DockWindow::cls());
 		this->toggleMovable();
 		this->toggleResizable();
 	}
@@ -264,7 +264,7 @@ namespace toy
 
 	void Window::undocked()
 	{
-		this->resetStyle(Window::cls());
+		this->setStyle(Window::cls());
 		this->toggleMovable();
 		this->toggleResizable();
 

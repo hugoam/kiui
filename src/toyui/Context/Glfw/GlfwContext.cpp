@@ -5,6 +5,7 @@
 #include <toyui/Config.h>
 #include <toyui/Context/Glfw/GlfwContext.h>
 
+#include <toyui/Input/InputDevice.h>
 #include <toyui/Gl/GlRenderer.h>
 
 #include <GLFW/glfw3.h>
@@ -279,16 +280,13 @@ namespace toy
 
 	void GlfwInputWindow::injectMouseMove(double x, double y)
 	{
-		float xDif = float(x) - m_mouseX;
-		float yDif = float(y) - m_mouseY;
-
 		m_mouseX = float(x);
 		m_mouseY = float(y);
 
 		float clampedX = std::max(0.f, std::min(float(m_renderWindow.width()), m_mouseX));
 		float clampedY = std::max(0.f, std::min(float(m_renderWindow.height()), m_mouseY));
 
-		m_mouse->dispatchMouseMoved(clampedX, clampedY, xDif, yDif);
+		m_mouse->dispatchMouseMoved(clampedX, clampedY);
 	}
 
 	void GlfwInputWindow::injectMouseButton(int button, int action, int mods)

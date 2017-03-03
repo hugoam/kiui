@@ -114,7 +114,7 @@ namespace toy
 	{
 		Window& window = parent.emplace<Window>("Text Editor");
 		Page& page = window.body().emplace<Page>("Text Editor");
-		Container& buttons = page.emplace<Container>();
+		Container& buttons = page.emplace<Container>(Line::cls());
 		Menu& menu = buttons.emplace<Menu>("Menu");
 		menu.emplace<Button>("Redo");
 		menu.emplace<Button>("Undo");

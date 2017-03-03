@@ -62,7 +62,7 @@ namespace toy
 	DropdownChoice& Dropdown::addChoice()
 	{
 		return m_list.emplace<DropdownChoice>([this](Widget& widget) { this->dropup(); }, StringVector{});
-		// widget.resetStyle(DropdownChoice::cls());
+		// widget.setStyle(DropdownChoice::cls());
 	}
 
 	Container& Dropdown::emplaceContainer()

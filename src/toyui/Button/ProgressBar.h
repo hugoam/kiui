@@ -9,7 +9,9 @@
 #include <toyui/Forward.h>
 #include <toyui/Frame/Uibox.h>
 #include <toyui/Widget/Widget.h>
+#include <toyui/Widget/Layout.h>
 #include <toyui/Button/Button.h>
+#include <toyui/Button/Slider.h>
 
 namespace toy
 {
@@ -21,12 +23,13 @@ namespace toy
 		float percentage() { return m_percentage; }
 		void setPercentage(float percentage);
 
-		static Type& cls() { static Type ty("ProgressBar", Wedge::cls()); return ty; }
+		static Type& cls() { static Type ty("ProgressBar", Line::cls()); return ty; }
 
 	protected:
 		Dimension m_dim;
 		Filler m_filler;
 		Spacer m_spacer;
+		SliderDisplay m_display;
 
 		float m_percentage;
 

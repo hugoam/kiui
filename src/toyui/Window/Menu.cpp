@@ -15,9 +15,9 @@ namespace toy
 		: Dropdown(parent, cls())
 		, m_submenu(submenu)
 	{
-		m_list.resetStyle(MenuList::cls());
+		m_list.setStyle(MenuList::cls());
 		if(submenu)
-			m_list.resetStyle(SubMenuList::cls());
+			m_list.setStyle(SubMenuList::cls());
 
 		m_header.reset({ label });
 	}

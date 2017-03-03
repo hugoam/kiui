@@ -74,14 +74,14 @@ namespace toy
 	{
 		m_wrap = true;
 		this->updateWrap();
-		m_scrollzone.resetStyle(NoScrollZone::cls());
+		m_scrollzone.setStyle(NoScrollZone::cls());
 	}
 
 	void ScrollSheet::disableWrap()
 	{
 		m_wrap = false;
 		this->updateWrap();
-		m_scrollzone.resetStyle(ScrollZone::cls());
+		m_scrollzone.setStyle(ScrollZone::cls());
 	}
 
 	ScrollContainer::ScrollContainer(Wedge& parent, Type& type)
@@ -93,7 +93,7 @@ namespace toy
 		, m_plan(m_scrollzone.container())
 		, m_clamped(true)
 	{
-		m_plan.resetStyle(Plan::cls());
+		m_plan.setStyle(Plan::cls());
 	}
 
 	void ScrollPlan::nextFrame(size_t tick, size_t delta)

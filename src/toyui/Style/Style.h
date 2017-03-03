@@ -102,20 +102,20 @@ namespace toy
 		void inherit(const LayoutStyle& other) { return this->copy(other, true); }
 		void copy(const LayoutStyle& other) { return this->copy(other, false); }
 
-		_A_ DimLayout layout() const { return d_layout.val; }
-		_A_ Flow flow() const { return d_flow.val; }
-		_A_ Space space() const { return d_space.val; }
-		_A_ Clipping clipping() const { return d_clipping.val; }
-		_A_ Opacity opacity() const { return d_opacity.val; }
-		_A_ Direction direction() const { return d_direction.val; }
-		_A_ DimAlign& align() { return d_align.val; }
-		_A_ DimFloat& span() { return d_span.val; }
-		_A_ DimFloat& size() { return d_size.val; }
-		_A_ BoxFloat& padding() { return d_padding.val; }
-		_A_ DimFloat& margin() { return d_margin.val; }
-		_A_ DimFloat& spacing() { return d_spacing.val; }
-		_A_ DimPivot& pivot() { return d_pivot.val; }
-		_A_ int& zorder() { return d_zorder.val; }
+		/*_A_*/ DimLayout layout() const { return d_layout.val; }
+		/*_A_*/ Flow flow() const { return d_flow.val; }
+		/*_A_*/ Space space() const { return d_space.val; }
+		/*_A_*/ Clipping clipping() const { return d_clipping.val; }
+		/*_A_*/ Opacity opacity() const { return d_opacity.val; }
+		/*_A_*/ Direction direction() const { return d_direction.val; }
+		/*_A_*/ DimAlign& align() { return d_align.val; }
+		/*_A_*/ DimFloat& span() { return d_span.val; }
+		/*_A_*/ DimFloat& size() { return d_size.val; }
+		/*_A_*/ BoxFloat& padding() { return d_padding.val; }
+		/*_A_*/ DimFloat& margin() { return d_margin.val; }
+		/*_A_*/ DimFloat& spacing() { return d_spacing.val; }
+		/*_A_*/ DimPivot& pivot() { return d_pivot.val; }
+		/*_A_*/ int& zorder() { return d_zorder.val; }
 
 		StyleAttr<DimLayout> d_layout;
 		StyleAttr<Flow> d_flow;
@@ -198,31 +198,31 @@ namespace toy
 
 		void setEmpty(bool empty) { m_empty = empty; }
 
-		_A_ bool empty() const { return m_empty.val; }
-		_A_ Style* base() const { return m_base.val; }
-		_A_ Colour& backgroundColour() { return m_backgroundColour.val; }
-		_A_ Colour& borderColour() { return m_borderColour.val; }
-		_A_ Colour& imageColour() { return m_imageColour.val; }
-		_A_ Colour& textColour() { return m_textColour.val; }
-		_A_ const string& textFont() { return m_textFont.val; }
-		_A_ float& textSize() { return m_textSize.val; }
-		_A_ bool& textBreak() { return m_textBreak.val; }
-		_A_ bool& textWrap() { return m_textWrap.val; }
-		_A_ BoxFloat& borderWidth() { return m_borderWidth.val; }
-		_A_ BoxFloat& cornerRadius() { return m_cornerRadius.val; }
-		_A_ bool& weakCorners() { return m_weakCorners.val; }
-		_A_ BoxFloat& padding() { return m_padding.val; }
-		_A_ BoxFloat& margin() { return m_margin.val; }
-		_A_ DimAlign& align() { return m_align.val; }
-		_A_ DimFloat& linearGradient() { return m_linearGradient.val; }
-		_A_ Dimension& linearGradientDim() { return m_linearGradientDim.val; }
-		_A_ Image* image() { return m_image.val; }
-		_A_ Image* overlay() { return m_overlay.val; }
-		_A_ Image* tile() { return m_tile.val; }
-		_A_ ImageSkin& imageSkin() { return m_imageSkin.val; }
-		_A_ Shadow& shadow() { return m_shadow.val; }
-		_A_ Type* hoverCursor() { return m_hoverCursor.val; }
-		_A_ const CustomRenderer& customRenderer() { return m_customRenderer.val; }
+		/*_A_*/ bool empty() const { return m_empty.val; }
+		/*_A_*/ Style* base() const { return m_base.val; }
+		/*_A_*/ Colour& backgroundColour() { return m_backgroundColour.val; }
+		/*_A_*/ Colour& borderColour() { return m_borderColour.val; }
+		/*_A_*/ Colour& imageColour() { return m_imageColour.val; }
+		/*_A_*/ Colour& textColour() { return m_textColour.val; }
+		/*_A_*/ const string& textFont() { return m_textFont.val; }
+		/*_A_*/ float& textSize() { return m_textSize.val; }
+		/*_A_*/ bool& textBreak() { return m_textBreak.val; }
+		/*_A_*/ bool& textWrap() { return m_textWrap.val; }
+		/*_A_*/ BoxFloat& borderWidth() { return m_borderWidth.val; }
+		/*_A_*/ BoxFloat& cornerRadius() { return m_cornerRadius.val; }
+		/*_A_*/ bool& weakCorners() { return m_weakCorners.val; }
+		/*_A_*/ BoxFloat& padding() { return m_padding.val; }
+		/*_A_*/ BoxFloat& margin() { return m_margin.val; }
+		/*_A_*/ DimAlign& align() { return m_align.val; }
+		/*_A_*/ DimFloat& linearGradient() { return m_linearGradient.val; }
+		/*_A_*/ Dimension& linearGradientDim() { return m_linearGradientDim.val; }
+		/*_A_*/ Image* image() { return m_image.val; }
+		/*_A_*/ Image* overlay() { return m_overlay.val; }
+		/*_A_*/ Image* tile() { return m_tile.val; }
+		/*_A_*/ ImageSkin& imageSkin() { return m_imageSkin.val; }
+		/*_A_*/ Shadow& shadow() { return m_shadow.val; }
+		/*_A_*/ Type* hoverCursor() { return m_hoverCursor.val; }
+		/*_A_*/ const CustomRenderer& customRenderer() { return m_customRenderer.val; }
 
 		void prepare();
 

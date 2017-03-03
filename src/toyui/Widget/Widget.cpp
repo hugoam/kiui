@@ -185,15 +185,15 @@ namespace toy
 		m_frame->setStyle(*m_style);
 	}
 
-	void Widget::resetStyle(Style& style, bool hard)
+	void Widget::setStyle(Style& style, bool hard)
 	{
 		m_style = &style;
 		m_frame->setStyle(*m_style, hard);
 	}
 
-	void Widget::resetStyle(Type& type, bool hard)
+	void Widget::setStyle(Type& type, bool hard)
 	{
-		this->resetStyle(this->fetchStyle(type), hard);
+		this->setStyle(this->fetchStyle(type), hard);
 	}
 
 	Style& Widget::fetchStyle(Type& type)

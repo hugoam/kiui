@@ -18,6 +18,7 @@ namespace toy
 		, m_percentage(0.f)
 		, m_filler(*this)
 		, m_spacer(*this)
+		, m_display(*this, "0%")
 		, m_onUpdated(onUpdated)
 	{}
 
@@ -26,5 +27,6 @@ namespace toy
 		m_percentage = percentage;
 		m_filler.frame().setSpanDim(m_dim, percentage);
 		m_spacer.frame().setSpanDim(m_dim, 1.f - percentage);
+		m_display.setLabel(toString(m_percentage) + "%");
 	}
 }
