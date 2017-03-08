@@ -85,7 +85,7 @@ namespace toy
 		void destroy();
 
 		template <class T>
-		T* findContainer() { Wedge* wedge = this->findContainer(T::cls()); return wedge ? &wedge->as<T>() : nullptr; }
+		T* findContainer() { Wedge* wedge = this->findContainer(T::cls()); return wedge ? &wedge->template as<T>() : nullptr; }
 
 		Wedge* findContainer(Type& type);
 
