@@ -25,8 +25,6 @@ namespace toy
 		Stripe& secondColumn = m_table.frame().as<TableGrid>().column(second.dindex(DIM_X));
 		firstColumn.setSpanDim(DIM_X, first.dspan(DIM_X));
 		secondColumn.setSpanDim(DIM_X, second.dspan(DIM_X));
-
-		printf("Table resize column %i span %f <---> column %i span %f\n", first.dindex(DIM_X), first.dspan(DIM_X), second.dindex(DIM_X), second.dspan(DIM_X));
 	}
 
 	ColumnHeader::ColumnHeader(Wedge& parent, const string& label, float span)

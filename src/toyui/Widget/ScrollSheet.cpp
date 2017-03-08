@@ -89,7 +89,7 @@ namespace toy
 	{}
 
 	ScrollPlan::ScrollPlan(Wedge& parent, Type& type)
-		: ScrollSheet(parent, cls())
+		: ScrollSheet(parent, type)
 		, m_plan(m_scrollzone.container())
 		, m_clamped(true)
 	{
@@ -108,7 +108,7 @@ namespace toy
 	{
 		float margin = 1000.f;
 
-		m_bounds.clear();
+		m_bounds = BoxFloat(-margin, -margin, +margin, +margin);
 
 		for(Frame* frame : m_plan.stripe().contents())
 		{

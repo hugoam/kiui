@@ -80,6 +80,8 @@ namespace toy
 
 		Frame* pinpoint(float x, float y, bool opaque);
 
+		void transferPixelSpan(Frame& prev, Frame& next, float pixelSpan);
+
 	private:
 		void measure(Frame& frame, Dimension dim);
 		void resize(Frame& frame, Dimension dim);

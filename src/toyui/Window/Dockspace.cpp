@@ -24,52 +24,49 @@ namespace toy
 	{}
 
 	Docksection::Docksection(Wedge& parent, Dockline& dockline)
-		: Tabber(parent, cls(), true)
+		: Tabber(parent, cls(), false)
 		, m_dockline(&dockline)
 	{}
 
 	void Docksection::dock(Window& window)
 	{
-		this->emplaceContainer().append(window.container()->release(window));
+		this->addTab(window.name()).append(window.container()->release(window));
 	}
 
 	void Docksection::undock(Window& window)
 	{
 		RootSheet& rootSheet = this->rootSheet();
 		rootSheet.append(window.container()->release(window));
+
+		if(m_tabs.containerContents().size() == 0)
+			m_dockline->removeSection();
 	}
 
-	void Docksection::handleRemove(Widget& widget)
+	Tab& Docksection::addTab(const string& name)
 	{
-		if(m_containerContents.size() == 0)
-			m_dockline->removeSection(*this);
+		Tab& tab = Tabber::addTab(name);
+		tab.setStyle(DockTab::cls());
+		return tab;
 	}
 
 	Docksection& Docksection::docktarget(Dimension dim, bool after)
 	{
-		float span = m_frame->dsize(m_dockline->dim()) / m_dockline->frame().dsize(m_dockline->dim());
-		span = std::min(span, this->frame().dspan(m_dockline->dim()) / 2.f);
-
 		if(m_dockline->dim() == dim)
-		{
-			m_frame->setSpanDim(m_dockline->dim(), m_frame->dspan(m_dockline->dim()) - span);
-			return m_dockline->insertSection(this->index() + (after ? 1 : 0), span);
-		}
+			return m_dockline->divideSection((after ? 1 : 0));
 		else
-		{
-			return m_dockline->insertLine(this->index(), true, span).insertSection(after ? 1 : 0);
-		}
+			return m_dockline->dockline()->insertSection(m_dockline->index() + (after ? 1 : 0));
 	}
 
 	Docksection& Docksection::docktarget(float x, float y)
 	{
-		if(x < m_frame->dsize(DIM_X) * 0.25f)
+		DimFloat pos = m_frame->localPosition(x, y);
+		if(pos.x() < m_frame->dsize(DIM_X) * 0.25f)
 			return this->docktarget(DIM_X, false); // dock left
-		else if(x > m_frame->dsize(DIM_X) * 0.75f)
+		else if(pos.x() > m_frame->dsize(DIM_X) * 0.75f)
 			return this->docktarget(DIM_X, true); // dock right
-		else if(y < m_frame->dsize(DIM_Y) * 0.25f)
+		else if(pos.y() < m_frame->dsize(DIM_Y) * 0.25f)
 			return this->docktarget(DIM_Y, false); // dock under
-		else if(y > m_frame->dsize(DIM_Y) * 0.75f)
+		else if(pos.y() > m_frame->dsize(DIM_Y) * 0.75f)
 			return this->docktarget(DIM_Y, true); // dock above
 		else
 			return *this; // dock on
@@ -79,99 +76,121 @@ namespace toy
 		: GridSheet(parent, dim, cls())
 		, m_dockspace(dockspace)
 		, m_dockline(dockline)
+		, m_docksection(nullptr)
 	{
 		m_frame->setLength(dim);
 	}
 
-	Dockline& Dockline::insertLine(size_t index, bool replace, float span)
+	void Dockline::resetSpans()
 	{
-		Dockline& dockline = this->insert(make_unique<Dockline>(*this, m_dockspace, this, m_dim == DIM_X ? DIM_Y : DIM_X), index).as<Dockline>();
+		for(Widget* widget : m_contents)
+			widget->frame().setSpanDim(m_dim, 1.f);
+	}
 
-		if(replace)
-			dockline.frame().setSpanDim(m_dim, this->stripe().contents()[index + 1]->dspan(m_dim));
-		else
-			dockline.frame().setSpanDim(m_dim, span);
+	Docksection& Dockline::insertSection(size_t index)
+	{
+		Dockline& dockline = this->appendLine();
+		this->move(m_contents.size() - 1, index);
+		this->resetSpans();
+		return dockline.appendSection();
+	}
 
-		if(replace)
-			dockline.append(this->release(*this->contents().at(index + 1)));
+	Docksection& Dockline::divideSection(size_t index)
+	{
+		Dockline& firstline = this->appendLine();
+		Dockline& secondline = this->appendLine();
 
+		Dockline& replace = index == 1 ? firstline : secondline;
+		Dockline& result = index == 0 ? firstline : secondline;
+		replace.moveSection(*m_docksection);
+
+		return result.appendSection();
+	}
+
+	Docksection& Dockline::appendSection()
+	{
+		if(m_docksection == nullptr)
+			m_docksection = &this->emplace<Docksection>(*this);
+		return *m_docksection;
+	}
+
+	void Dockline::moveSection(Docksection& docksection)
+	{
+		this->append(docksection.dockline().release(docksection));
+		docksection.setDockline(*this);
+		m_docksection = &docksection;
+	}
+
+	Dockline& Dockline::appendLine()
+	{
+		Dockline& dockline = this->emplace<Dockline>(m_dockspace, this, m_dim == DIM_X ? DIM_Y : DIM_X);
 		return dockline;
 	}
 
-	Docksection& Dockline::insertSection(size_t index, float span)
+	void Dockline::removeSection()
 	{
-		Docksection& docksection = this->insert(make_unique<Docksection>(*this, *this), index).as<Docksection>();
-		docksection.frame().setSpanDim(m_dim, span);
-		return docksection;
+		m_docksection->destroy();
+		m_dockline->removeLine(*this);
 	}
 
-	void Dockline::removeSection(Docksection& section)
+	void Dockline::collapseSection()
 	{
-		Frame& givespan = this->stripe().first(section.frame()) ? this->stripe().next(section.frame()) : this->stripe().prev(section.frame());
-		givespan.setSpanDim(m_dim, givespan.dspan(m_dim) + section.frame().dspan(m_dim));
+		Dockline& firstline = m_contents.at(0)->as<Dockline>();
+		Dockline* line = &firstline;
 
-		section.destroy();
+		while(line->contents().size() == 1 && !line->docksection())
+			line = &line->contents().at(0)->as<Dockline>();
 
-		if(m_contents.size() == 1 && m_dockline)
-			m_dockline->removeLine(*this);
+		if(line->docksection())
+		{
+			this->moveSection(*line->docksection());
+			this->release(firstline);
+		}
 	}
 
 	void Dockline::removeLine(Dockline& line)
 	{
-		Widget& section = this->insert(line.release(*line.contents().at(0)), line.as<Widget>().index());
-		section.as<Docksection>().setDockline(this);
-		section.frame().setSpanDim(m_dim, line.frame().dspan(m_dim));
-
 		line.destroy();
+		this->resetSpans();
 
-		if(m_contents.size() == 1 && m_dockline)
+		if(m_contents.size() == 1)
+			this->collapseSection();
+
+		if(m_contents.size() == 0 && m_dockline)
 			m_dockline->removeLine(*this);
 	}
 
-	Dockline& Dockline::findLine(std::vector<string>& ids)
+	Dockline& Dockline::findLine(const GridIndex& inputDockid)
 	{
+		GridIndex dockid = inputDockid;
+		std::reverse(dockid.begin(), dockid.end());
+
 		Dockline* dockline = this;
 
-		//ids.pop_back(); // first is us
-		while(ids.size() > 0)
+		while(dockid.size() > 0)
 		{
-			size_t index = fromString<size_t>(ids.back());
-			if(index < dockline->count())
-				dockline = &dockline->at(index).as<Dockline>();
-			else
-				dockline = &dockline->insertLine(index);
-			ids.pop_back();
+			size_t index = dockid.back(); dockid.pop_back();
+			if(index >= dockline->count())
+				dockline->appendLine();
+			dockline = &dockline->at(index).as<Dockline>();
 		}
 
 		return *dockline;
 	}
 
-	Dockline& Dockline::findLine(const string& dockid)
+	Docksection& Dockline::findOrCreateSection(const GridIndex& dockid)
 	{
-		std::vector<string> ids = splitString(dockid, ".");
-		std::reverse(ids.begin(), ids.end());
-
-		return findLine(ids);
+		Dockline& dockline = this->findLine(dockid);
+		return dockline.appendSection();
 	}
 
-	Docksection& Dockline::findOrCreateSection(const string& dockid)
+	void Dockline::mouseEntered(MouseEvent& mouseEvent)
 	{
-		std::vector<string> ids = splitString(dockid, ".");
-		string section = ids.back();
-		ids.pop_back();
-		std::reverse(ids.begin(), ids.end());
-
-		Dockline& dockline = this->findLine(ids);
-
-		size_t index = fromString<size_t>(section);
-		if(index < dockline.count())
-			return dockline.at(index).as<Docksection>();
-		else
-			return dockline.insertSection(index);
+		this->rootSheet().cursor().setStyle(m_dim == DIM_X ? ResizeCursorX::cls() : ResizeCursorY::cls());
 	}
 
 	MasterDockline::MasterDockline(Dockspace& dockspace)
-		: Dockline(dockspace, dockspace, nullptr, DIM_X)
+		: Dockline(dockspace, dockspace, nullptr, DIM_Y)
 	{}
 
 	Dockspace::Dockspace(Wedge& parent)
@@ -179,23 +198,17 @@ namespace toy
 		, m_mainLine(*this)
 	{}
 
-	Docksection& Dockspace::addSection()
+	Docksection& Dockspace::addSection(const GridIndex& dockid)
 	{
-		string dockid = toString(m_mainLine.count());
 		Docksection& section = m_mainLine.findOrCreateSection(dockid);
 		return section;
 	}
 
-	Window& Dockspace::addDockWindow(const string& name)
+	Window& Dockspace::addDockWindow(const string& name, const GridIndex& dockid)
 	{
-		Docksection& section = this->addSection();
-		Window& window = section.emplace<Window>(name, static_cast<WindowState>(WINDOW_DOCKABLE | WINDOW_DEFAULT), nullptr, &section);
+		Docksection& section = this->addSection(dockid);
+		Window& window = section.addTab(name).emplace<Window>(name, static_cast<WindowState>(WINDOW_DOCKABLE | WINDOW_DEFAULT), nullptr, &section);
 		window.docked();
 		return window;
-	}
-
-	Container& Dockspace::emplaceContainer()
-	{
-		return this->addDockWindow("").emplaceContainer();
 	}
 }

@@ -48,6 +48,8 @@ namespace toy
 		_A_ _M_ inline Style& style() { return *m_style; }
 		inline Device* device() { return m_device; }
 
+		inline Lref& frameIndex() { return m_frameIndex; }
+
 		void setIndex(size_t index) { m_index = index; }
 		void setContainer(Container& container) { m_container = &container; }
 		DrawFrame& content();
@@ -82,9 +84,17 @@ namespace toy
 		void remove();
 		void destroy();
 
+		template <class T>
+		T* findContainer() { Wedge* wedge = this->findContainer(T::cls()); return wedge ? &wedge->as<T>() : nullptr; }
+
+		Wedge* findContainer(Type& type);
+
 		typedef std::function<bool(Widget&)> Visitor;
 
 		virtual void visit(const Visitor& visitor);
+
+		virtual void nextFrame(size_t tick, size_t delta);
+		virtual void render(Renderer& renderer, bool force);
 
 		void updateStyle();
 
@@ -92,9 +102,6 @@ namespace toy
 		void setStyle(Style& style, bool hard = true);
 
 		Style& fetchStyle(Type& type);
-
-		virtual void nextFrame(size_t tick, size_t delta);
-		virtual void render(Renderer& renderer, bool force);
 
 		void toggleState(WidgetState state);
 
@@ -140,6 +147,8 @@ namespace toy
 		Style* m_style;
 		unique_ptr<Frame> m_frame;
 		WidgetState m_state;
+
+		Lref m_frameIndex;
 
 		Device* m_device;
 

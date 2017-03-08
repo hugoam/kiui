@@ -58,7 +58,6 @@ namespace toy
 
 	void Cursor::hover(Widget& widget)
 	{
-		this->unhover();
 		m_hovered = &widget;
 		if(widget.style().skin().hoverCursor())
 			this->setStyle(*widget.style().skin().hoverCursor(), false);

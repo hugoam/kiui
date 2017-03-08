@@ -77,17 +77,16 @@ namespace toy
 
 	Frame* Layer::pinpoint(float x, float y, bool opaque)
 	{
-		if(this->hollow() || (this->clip() && !this->inside(x, y)))
+		if(!this->visible() || this->hollow() || (this->clip() && !this->inside(x, y)))
 			return nullptr;
 
 		for(Layer* frame : reverse_adapt(d_sublayers))
-			if(!frame->hidden() && frame->frameType() < MASTER_LAYER)
-			{
-				DimFloat local = frame->localPosition(x, y); // probably should be local to this
-				Frame* target = frame->pinpoint(local.x(), local.y(), opaque);
-				if(target)
-					return target;
-			}
+		{
+			DimFloat local = frame->localPosition(x, y); // probably should be local to this
+			Frame* target = frame->pinpoint(local.x(), local.y(), opaque);
+			if(target)
+				return target;
+		}
 
 		return Stripe::pinpoint(x, y, opaque);
 	}

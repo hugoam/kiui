@@ -1,0 +1,148 @@
+//  Copyright (c) 2016 Hugo Amiard hugo.amiard@laposte.net
+//  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
+//  This notice and the license may not be removed or altered from any source distribution.
+
+#include <toyui/Config.h>
+#include <toyui/Window/Dockspace.h>
+
+#include <toyobj/String/StringConvert.h>
+
+#include <toyui/Widget/Layout.h>
+
+#include <toyui/Frame/Frame.h>
+#include <toyui/Frame/Stripe.h>
+
+#include <toyui/Window/Window.h>
+
+#include <toyui/Widget/RootSheet.h>
+
+namespace toy
+{
+	Placeholder::Placeholder(Wedge& parent, const string& name)
+		: Container(parent, cls())
+		, m_name(name)
+	{}
+
+	Docksection::Docksection(Wedge& parent, Dockspace& dockspace)
+		: Tabber(parent, cls(), false)
+		, m_dockspace(dockspace)
+	{}
+
+	void Docksection::dock(Window& window)
+	{
+		this->addTab(window.name()).append(window.container()->release(window));
+	}
+
+	void Docksection::undock(Window& window)
+	{
+		RootSheet& rootSheet = this->rootSheet();
+		rootSheet.append(window.container()->release(window));
+
+		if(m_tabs.containerContents().size() == 0)
+			m_dockspace.removeSection(*this);
+	}
+
+	Tab& Docksection::addTab(const string& name)
+	{
+		Tab& tab = Tabber::addTab(name);
+		tab.setStyle(DockTab::cls());
+		return tab;
+	}
+
+	void Docksection::handleRemove(Widget& widget)
+	{
+		// not called because widgets are contained in the tabs
+	}
+
+	Docksection& Docksection::docktarget(Dimension dim, bool after)
+	{
+		Stripe& line = *m_frame->parent()->parent();
+		Dimension linedim = line.length();
+
+		MultiGrid& grid = m_dockspace.frame().as<MultiGrid>();
+		GridIndex index = dim == linedim ? grid.insertNextTo(*m_frame, !after) : grid.insertDivide(*m_frame, !after);
+		Docksection& section = m_dockspace.createSection(index);
+
+		return section;
+	}
+
+	Docksection& Docksection::docktarget(float x, float y)
+	{
+		DimFloat pos = m_frame->localPosition(x, y);
+		if(pos.x() < m_frame->dsize(DIM_X) * 0.25f)
+			return this->docktarget(DIM_X, false); // dock left
+		else if(pos.x() > m_frame->dsize(DIM_X) * 0.75f)
+			return this->docktarget(DIM_X, true); // dock right
+		else if(pos.y() < m_frame->dsize(DIM_Y) * 0.25f)
+			return this->docktarget(DIM_Y, false); // dock under
+		else if(pos.y() > m_frame->dsize(DIM_Y) * 0.75f)
+			return this->docktarget(DIM_Y, true); // dock above
+		else
+			return *this; // dock on
+	}
+
+	Dockspace::Dockspace(Wedge& parent)
+		: Container(parent, cls(), MULTIGRID)
+	{}
+
+	Docksection* Dockspace::findSection(const GridIndex& dockid)
+	{
+		for(Docksection* section : m_sections)
+			if(section->frameIndex()->get<GridIndex>() == dockid)
+				return section;
+		return nullptr;
+	}
+
+	Docksection& Dockspace::createSection(const GridIndex& dockid)
+	{
+		Docksection& section = this->emplace<Docksection>(*this);
+		section.frameIndex() = lref(dockid);
+		m_sections.push_back(&section);
+		return section;
+	}
+
+	Docksection& Dockspace::findOrCreateSection(const GridIndex& dockid)
+	{
+		Docksection* section = this->findSection(dockid);
+		return section ? *section : this->createSection(dockid);
+	}
+
+	Docksection& Dockspace::addSection(const GridIndex& dockid)
+	{
+		Docksection& section = this->findOrCreateSection(dockid);
+		return section;
+	}
+
+	void Dockspace::removeSection(Docksection& section)
+	{
+		m_sections.erase(std::find(m_sections.begin(), m_sections.end(), &section));
+		section.destroy();
+	}
+
+	Window& Dockspace::addDockWindow(const string& name, const GridIndex& dockid)
+	{
+		Docksection& section = this->addSection(dockid);
+		Window& window = section.addTab(name).emplace<Window>(name, static_cast<WindowState>(WINDOW_DOCKABLE | WINDOW_DEFAULT), nullptr, &section);
+		window.docked();
+		return window;
+	}
+
+	void Dockspace::leftDragStart(MouseEvent& mouseEvent)
+	{
+		m_dragLine = nullptr;
+
+		DimFloat absolute = m_frame->absolutePosition();
+		float x = mouseEvent.lastPressedX - absolute[DIM_X];
+		float y = mouseEvent.lastPressedY - absolute[DIM_Y];
+		m_frame->as<MultiGrid>().locate(x, y, m_dragLine, m_dragPrev, m_dragNext);
+	}
+
+	void Dockspace::leftDrag(MouseEvent& mouseEvent)
+	{
+		if(!m_dragLine || !m_dragPrev || !m_dragNext)
+			return;
+
+		float amount = m_dragLine->length() == DIM_X ? mouseEvent.deltaX : mouseEvent.deltaY;
+		m_dragLine->transferPixelSpan(*m_dragPrev, *m_dragNext, amount);
+	}
+}

@@ -83,11 +83,12 @@ namespace toy
 		this->styledef(Board::cls()).layout().d_space = BOARD;
 		this->styledef(Board::cls()).layout().d_direction = READING;
 		this->styledef(Board::cls()).layout().d_clipping = CLIP;
+		this->styledef(Tab::cls()).layout().d_clipping = CLIP;
 
 		this->styledef(Layout::cls()).layout().d_direction = PARAGRAPH;
 
 		this->styledef(GridSheet::cls()).layout().d_opacity = OPAQUE;
-		this->styledef(Dockline::cls()).layout().d_space = BOARD;
+		this->styledef(GridSubdiv::cls()).layout().d_space = BOARD;
 
 		// SHEET
 		this->styledef(Sheet::cls()).layout().d_space = SHEET;
@@ -181,6 +182,7 @@ namespace toy
 
 		this->styledef(Toolbar::cls()).layout().d_space = ITEM;
 
+		this->styledef(Dockspace::cls()).layout().d_opacity = OPAQUE;
 
 		// GEOMETRY
 
@@ -197,6 +199,7 @@ namespace toy
 		this->styledef(Slider::cls()).layout().d_direction = DIMENSION;
 		this->styledef(Scrollbar::cls()).layout().d_direction = DIMENSION;
 		this->styledef(Dockline::cls()).layout().d_direction = DIMENSION;
+		this->styledef(GridSubdiv::cls()).layout().d_direction = DIMENSION;
 
 		this->styledef(GridLine::cls()).layout().d_space = SHEET;
 		this->styledef(GridLine::cls()).layout().d_direction = READING;
@@ -254,7 +257,11 @@ namespace toy
 
 		this->styledef(GridSheet::cls()).layout().d_spacing = DimFloat(5.f);
 
-		this->styledef(Tab::cls()).layout().d_padding = BoxFloat(0.f, 4.f, 0.f, 0.f);
+		this->styledef(Tab::cls()).layout().d_padding = BoxFloat(6.f);
+		this->styledef(DockTab::cls()).layout().d_padding = BoxFloat(0.f);
+
+		this->styledef(GridSubdiv::cls()).layout().d_spacing = DimFloat(6.f);
+		this->styledef(Dockspace::cls()).layout().d_spacing = DimFloat(6.f);
 
 		this->styledef(ExpandboxBody::cls()).layout().d_padding = BoxFloat(12.f, 2.f, 0.f, 2.f);
 		this->styledef(ExpandboxBody::cls()).layout().d_spacing = DimFloat(6.f);
@@ -264,6 +271,7 @@ namespace toy
 		this->styledef(Table::cls()).layout().d_spacing = DimFloat(0.f, 2.f);
 
 		this->styledef(WindowHeader::cls()).skin().m_hoverCursor = &MoveCursor::cls();
+		this->styledef(Dockspace::cls()).skin().m_hoverCursor = &ResizeCursorX::cls();
 		this->styledef(WindowSizerLeft::cls()).skin().m_hoverCursor = &ResizeCursorDiagLeft::cls();
 		this->styledef(WindowSizerRight::cls()).skin().m_hoverCursor = &ResizeCursorDiagRight::cls();
 
@@ -281,6 +289,8 @@ namespace toy
 		this->styledef(ResizeCursorDiagRight::cls()).skin().m_padding = BoxFloat(-10.f, -10.f, +10.f, +10.f);
 		this->styledef(CaretCursor::cls()).skin().m_image = &findImage("caret_white");
 		this->styledef(CaretCursor::cls()).skin().m_padding = BoxFloat(-4.f, -9.f, +4.f, +9.f);
+
+		this->styledef(ToolbarMover::cls()).skin().m_image = &findImage("mousepointer");
 
 		this->styledef(Text::cls()).skin().m_textWrap = true;
 		this->styledef(Textbox::cls()).skin().m_textWrap = true;

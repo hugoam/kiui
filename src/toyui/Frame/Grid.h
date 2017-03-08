@@ -34,6 +34,19 @@ namespace toy
 		static Type& cls() { static Type ty("GridColumn"); return ty; }
 	};
 
+	class TOY_UI_EXPORT GridSubdiv : public Stripe
+	{
+	public:
+		GridSubdiv(Widget& widget, Stripe& parent, size_t level, Dimension dim);
+
+		size_t level() { return d_level; }
+
+		static Type& cls() { static Type ty("GridSubdiv"); return ty; }
+
+	protected:
+		size_t d_level;
+	};
+
 	class TOY_UI_EXPORT TableGrid : public Stripe
 	{
 	public:
@@ -70,21 +83,34 @@ namespace toy
 		std::vector<unique_ptr<Stripe>> d_lines;
 	};
 
-	/*class TOY_UI_EXPORT Bigrid : public Stripe
+	typedef std::vector<size_t> GridIndex;
+
+	class TOY_UI_EXPORT MultiGrid : public Stripe
 	{
 	public:
-		Bigrid(Widget& widget);
+		MultiGrid(Widget& widget);
 
-		Stripe& column(size_t index) { return *d_columns[index]; }
+		void printIndex(const GridIndex& index);
+
+		Stripe& appendLine(Stripe& parent, size_t level);
+		Stripe& findLine(GridIndex index);
+
+		void remove(Frame& frame);
+
+		void shift(GridSubdiv& line, size_t from, int amount);
+		GridIndex insertNextTo(Frame& frame, bool before);
+		GridIndex insertDivide(Frame& frame, bool before);
+
+		void locate(float x, float y, GridSubdiv*& line, Frame*& prev, Frame*& next);
 
 		virtual void map(Frame& frame);
 		virtual void unmap(Frame& frame);
-
-		void resize(size_t lines);
+		virtual void unmap();
 
 	protected:
-		std::vector<unique_ptr<Grid>> d_columns;
-	};*/
+		unique_ptr<GridSubdiv> d_maindiv;
+		std::vector<unique_ptr<GridSubdiv>> d_subdivs;
+	};
 }
 
 

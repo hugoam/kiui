@@ -45,6 +45,8 @@ namespace toy
 			m_frame = make_unique<Grid>(*this);
 		else if(frameType == TABLE)
 			m_frame = make_unique<TableGrid>(*this);
+		else if(frameType == MULTIGRID)
+			m_frame = make_unique<MultiGrid>(*this);
 		else if(frameType == STRIPE)
 			m_frame = make_unique<Stripe>(*this);
 		else if(frameType == FRAME)
@@ -146,6 +148,20 @@ namespace toy
 		m_container->release(*this);
 	}
 
+	Wedge* Widget::findContainer(Type& type)
+	{
+		Wedge* widget = this->parent();
+
+		while(widget)
+		{
+			if(&widget->type() == &type)
+				return widget;
+			widget = widget->parent();
+		}
+
+		return nullptr;
+	}
+
 	void Widget::visit(const Visitor& visitor)
 	{
 		visitor(*this);
@@ -232,6 +248,8 @@ namespace toy
 
 	Widget* Widget::pinpoint(float x, float y)
 	{
+		if(m_frame->dirty() >= Frame::DIRTY_MAPPING)
+			return nullptr;
 		DimFloat absolute = m_frame->absolutePosition();
 		Frame* frame = m_frame->pinpoint(x - absolute[DIM_X], y - absolute[DIM_Y], true);
 		return frame ? frame->widget() : nullptr;

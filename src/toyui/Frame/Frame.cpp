@@ -87,6 +87,7 @@ namespace toy
 	void Frame::updateStyle()
 	{
 		d_styleStamp = d_style->updated();
+		d_opacity = d_style->layout().opacity();
 
 		if(d_widget)
 			d_frame.resetInkstyle(d_style->subskin(d_widget->state()));
@@ -245,8 +246,11 @@ namespace toy
 			return;
 		
 		d_parent->integratePosition(root, global);
-		global[DIM_X] = (global[DIM_X] - d_position[DIM_X]) / d_scale;
-		global[DIM_Y] = (global[DIM_Y] - d_position[DIM_Y]) / d_scale;
+		if(d_widget)
+		{
+			global[DIM_X] = (global[DIM_X] - d_position[DIM_X]) / d_scale;
+			global[DIM_Y] = (global[DIM_Y] - d_position[DIM_Y]) / d_scale;
+		}
 	}
 
 	void Frame::derivePosition(Frame& root, DimFloat& local)
@@ -254,8 +258,11 @@ namespace toy
 		if(this == &root)
 			return;
 
-		local[DIM_X] = d_position[DIM_X] + local[DIM_X] * d_scale;
-		local[DIM_Y] = d_position[DIM_Y] + local[DIM_Y] * d_scale;
+		if(d_widget)
+		{
+			local[DIM_X] = d_position[DIM_X] + local[DIM_X] * d_scale;
+			local[DIM_Y] = d_position[DIM_Y] + local[DIM_Y] * d_scale;
+		}
 		d_parent->derivePosition(root, local);
 	}
 
@@ -307,7 +314,7 @@ namespace toy
 
 	Frame* Frame::pinpoint(float x, float y, bool opaque)
 	{
-		if((opaque && !this->opaque()) || !this->inside(x, y))
+		if(this->hidden() || (opaque && !this->opaque()) || !this->inside(x, y))
 			return nullptr;
 		else
 			return this;

@@ -72,35 +72,36 @@ namespace toy
 			m_window.undock();
 
 		m_window.frame().layer().moveToTop();
-		//m_window.frame().layer().setOpacity(HOLLOW);
+		m_window.frame().layer().setOpacity(HOLLOW);
 	}
 
 	void WindowHeader::leftDrag(MouseEvent& mouseEvent)
 	{
-		if(m_window.movable())
-			m_window.frame().setPosition(m_window.frame().dposition(DIM_X) + mouseEvent.deltaX, m_window.frame().dposition(DIM_Y) + mouseEvent.deltaY);
+		if(!m_window.movable())
+			return;
+
+		m_window.frame().setPosition(m_window.frame().dposition(DIM_X) + mouseEvent.deltaX, m_window.frame().dposition(DIM_Y) + mouseEvent.deltaY);
 	}
 
 	void WindowHeader::leftDragEnd(MouseEvent& mouseEvent)
 	{
 		if(m_window.dockable())
 		{
-			Docksection* target = this->docktarget(mouseEvent.relativeX, mouseEvent.relativeY);
+			Docksection* target = this->docktarget(mouseEvent);
 			if(target)
 				m_window.dock(*target);
 		}
 
-		//m_window.frame().layer().setOpacity(OPAQUE);
+		m_window.frame().layer().setOpacity(OPAQUE);
 	}
 
-	Docksection* WindowHeader::docktarget(float x, float y)
+	Docksection* WindowHeader::docktarget(MouseEvent& mouseEvent)
 	{
-		Widget* widget = this->rootSheet().pinpoint(x, y);
-		while(widget && &widget->type() != &Docksection::cls())
-			widget = widget->parent();
+		Widget* widget = this->rootSheet().pinpoint(mouseEvent.posX, mouseEvent.posY);
+		Docksection* docksection = widget->findContainer<Docksection>();
 
-		if(widget)
-			return &widget->as<Docksection>().docktarget(x, y);
+		if(docksection)
+			return &docksection->docktarget(mouseEvent.posX, mouseEvent.posY);
 		else
 			return nullptr;
 	}
@@ -174,7 +175,6 @@ namespace toy
 		: Overlay(parent, type)
 		, m_name(title)
 		, m_windowState(state)
-		, m_content(nullptr)
 		, m_onClose(onClose)
 		, m_dock(dock)
 		, m_header(*this)
@@ -238,7 +238,7 @@ namespace toy
 
 	const string& Window::name()
 	{
-		return m_content ? m_content->name() : m_name;
+		return m_name;
 	}
 
 	void Window::dock(Docksection& docksection)
@@ -275,6 +275,8 @@ namespace toy
 	
 	void Window::close()
 	{
+		if(m_dock)
+			this->undock();
 		if(m_onClose)
 			m_onClose(*this);
 		this->as<Widget>().remove();
@@ -283,12 +285,6 @@ namespace toy
 	Container& Window::emplaceContainer()
 	{
 		return m_body.emplaceContainer();
-	}
-
-	void Window::handleAdd(Widget& content)
-	{
-		m_header.title().setLabel(content.name());
-		m_content = &content;
 	}
 
 	void Window::leftClick(MouseEvent& mouseEvent)

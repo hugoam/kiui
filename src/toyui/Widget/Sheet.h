@@ -32,9 +32,11 @@ namespace toy
 		virtual void visit(const Visitor& visitor);
 
 		void push(Widget& widget, bool deferred = true);
+		void insert(Widget& widget, size_t index, bool deferred = true);
 		void remove(Widget& widget);
 
 		void reindex(size_t from);
+		void move(size_t from, size_t to);
 		void swap(size_t from, size_t to);
 
 		static Type& cls() { static Type ty("Wedge", Widget::cls()); return ty; }
@@ -129,9 +131,10 @@ namespace toy
 	public:
 		GridSheet(Wedge& parent, Dimension dim, Type& type = cls());
 
-		void leftDragStart(MouseEvent& mouseEvent);
-		void leftDrag(MouseEvent& mouseEvent);
-		void leftDragEnd(MouseEvent& mouseEvent);
+		Dimension dim() { return m_dim; }
+
+		virtual void leftDragStart(MouseEvent& mouseEvent);
+		virtual void leftDrag(MouseEvent& mouseEvent);
 
 		virtual void gridResized(Frame& first, Frame& second) { UNUSED(first); UNUSED(second); }
 
@@ -139,7 +142,8 @@ namespace toy
 
 	protected:
 		Dimension m_dim;
-		Widget* m_resizing;
+		Frame* m_dragPrev;
+		Frame* m_dragNext;
 	};
 }
 

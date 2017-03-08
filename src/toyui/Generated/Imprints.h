@@ -473,14 +473,6 @@ namespace toy
             Docksection::cls().imprint().setup("Docksection", OBJECT);
             Docksection::cls().imprint().initObject(false);
             
-            // Dockline
-            Dockline::cls().imprint().setup("Dockline", OBJECT);
-            Dockline::cls().imprint().initObject(false);
-            
-            // MasterDockline
-            MasterDockline::cls().imprint().setup("MasterDockline", OBJECT);
-            MasterDockline::cls().imprint().initObject(false);
-            
             // Dockspace
             Dockspace::cls().imprint().setup("Dockspace", OBJECT);
             Dockspace::cls().imprint().initObject(false);
@@ -579,8 +571,6 @@ namespace toy
             m_rootTypes.push_back(&Widget::cls());
             m_rootTypes.push_back(&Placeholder::cls());
             m_rootTypes.push_back(&Docksection::cls());
-            m_rootTypes.push_back(&Dockline::cls());
-            m_rootTypes.push_back(&MasterDockline::cls());
             m_rootTypes.push_back(&Dockspace::cls());
             m_rootTypes.push_back(&CloseButton::cls());
             m_rootTypes.push_back(&WindowHeader::cls());

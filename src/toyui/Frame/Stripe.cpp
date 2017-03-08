@@ -231,14 +231,14 @@ namespace toy
 		this->resize(frame, d_length);
 		this->resize(frame, d_depth);
 
-		frame.content().updateContentSize();
-
-		frame.resizeLayout();
-
 #if 0 // DEBUG
 		frame.debugPrintDepth();
 		printf("%s resize size %f , %f\n", frame.style().name().c_str(), frame.dsize(DIM_X), frame.dsize(DIM_Y));
 #endif
+
+		frame.content().updateContentSize();
+
+		frame.resizeLayout();
 	}
 
 	void Stripe::resize(Frame& frame, Dimension dim)
@@ -286,7 +286,7 @@ namespace toy
 		if(d_style->layout().layout()[dim] < AUTO_LAYOUT)
 			return;
 
-		float offset = this->doffset(dim);
+		float offset = frame.widget() ? this->doffset(dim) : 0.f;
 		float space = this->dspace(dim);
 
 		if(dim == d_length && frame.flow())
@@ -318,7 +318,7 @@ namespace toy
 
 	Frame* Stripe::pinpoint(float x, float y, bool opaque)
 	{
-		if(this->hollow() || (this->clip() && !this->inside(x, y)))
+		if(this->hidden() || this->hollow() || (this->clip() && !this->inside(x, y)))
 			return nullptr;
 
 		if(!this->widget())
@@ -328,14 +328,28 @@ namespace toy
 		}
 
 		for(Frame* frame : reverse_adapt(d_contents))
-			if(!frame->hidden() && frame->frameType() < MASTER_LAYER)
-			{
-				Frame* target = frame->pinpoint((x - frame->left()) / frame->scale(), (y - frame->top()) / frame->scale(), opaque);
-				if(target)
-					return target;
-			}
+		{
+			Frame* target = frame->pinpoint((x - frame->left()) / frame->scale(), (y - frame->top()) / frame->scale(), opaque);
+			if(target)
+				return target;
+		}
+
+		if(!this->widget())
+		{
+			x -= this->left();
+			y -= this->top();
+		}
 
 		return Frame::pinpoint(x, y, opaque);
+	}
+
+	void Stripe::transferPixelSpan(Frame& prev, Frame& next, float pixelSpan)
+	{
+		float pixspan = 1.f / this->dsize(d_length);
+		float offset = pixelSpan * pixspan;
+
+		prev.setSpanDim(d_length, std::max(0.01f, prev.dspan(d_length) + offset));
+		next.setSpanDim(d_length, std::max(0.01f, next.dspan(d_length) - offset));
 	}
 
 	void Stripe::normalizeSpan()

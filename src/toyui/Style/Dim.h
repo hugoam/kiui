@@ -67,9 +67,10 @@ namespace toy
 		STRIPE = 1,
 		GRID = 2,
 		TABLE = 3,
-		LAYER = 4,
-		MASTER_LAYER = 5,
-		SPACE_LAYER = 6
+		MULTIGRID = 4,
+		LAYER = 5,
+		MASTER_LAYER = 6,
+		SPACE_LAYER = 7
 	};
 
 	enum _I_ AutoLayout : unsigned int

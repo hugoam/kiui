@@ -59,7 +59,9 @@
 
 namespace toy
 {
+	template <> inline Type& typecls<AutoLayout>() { static Type ty; return ty; }
 	template <> inline Type& typecls<Dimension>() { static Type ty; return ty; }
+	template <> inline Type& typecls<Direction>() { static Type ty; return ty; }
 	template <> inline Type& typecls<Sizing>() { static Type ty; return ty; }
 	template <> inline Type& typecls<Pivot>() { static Type ty; return ty; }
 	template <> inline Type& typecls<Align>() { static Type ty; return ty; }

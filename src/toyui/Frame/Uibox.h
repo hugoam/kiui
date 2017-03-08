@@ -54,8 +54,8 @@ namespace toy
 		inline bool posflow() { return d_style->layout().d_flow <= ALIGN; }
 		inline bool sizeflow() { return d_style->layout().d_flow <= OVERLAY; }
 		inline bool clip() { return d_style->layout().d_clipping == CLIP; }
-		inline bool opaque() { return d_style->layout().d_opacity == OPAQUE; }
-		inline bool hollow() { return d_style->layout().d_opacity == HOLLOW; }
+		inline bool opaque() { return d_opacity == OPAQUE; }
+		inline bool hollow() { return d_opacity == HOLLOW; }
 
 		inline float scale() { return d_scale; }
 
@@ -71,7 +71,8 @@ namespace toy
 		inline Dimension orthogonal(Dimension dim) { return dim == DIM_X ? DIM_Y : DIM_X; }
 		inline Dimension parallel(Dimension dim) { return dim; }
 
-		inline void setLength(Dimension dim) { d_length = dim; }
+		inline void setLength(Dimension dim) { d_length = dim; d_depth = dim == DIM_X ? DIM_Y : DIM_X; }
+		inline void setOpacity(Opacity opacity) { d_opacity = opacity; }
 		inline void setScale(float scale) { d_scale = scale; }
 		inline void setContentSize(DimFloat content) { d_content = content; }
 
@@ -86,6 +87,7 @@ namespace toy
 		float d_scale;
 		Dimension d_depth;
 		Dimension d_length;
+		Opacity d_opacity;
 
 		Style* d_style;
 		size_t d_styleStamp;

@@ -26,6 +26,14 @@ namespace toy
 
 		static Type& cls() { static Type ty("Tooldock", Div::cls()); return ty; }
 	};
+	
+	class TOY_UI_EXPORT ToolbarMover : public Control
+	{
+	public:
+		ToolbarMover(Wedge& parent);
+
+		static Type& cls() { static Type ty("ToolbarMover", Control::cls()); return ty; }
+	};
 
 	class TOY_UI_EXPORT Toolbar : public WrapControl
 	{
@@ -33,6 +41,9 @@ namespace toy
 		Toolbar(Wedge& parent);
 
 		static Type& cls() { static Type ty("Toolbar", WrapControl::cls()); return ty; }
+
+	protected:
+		ToolbarMover m_mover;
 	};
 }
 

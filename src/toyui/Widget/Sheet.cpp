@@ -77,12 +77,27 @@ namespace toy
 		widget.bind(*this, m_contents.size() - 1, deferred);
 	}
 
+	void Wedge::insert(Widget& widget, size_t index, bool deferred)
+	{
+		m_contents.insert(m_contents.begin() + index, &widget);
+		widget.bind(*this, index, deferred);
+		this->reindex(index);
+	}
+
 	void Wedge::remove(Widget& widget)
 	{
 		size_t index = widget.index();
 		m_contents.erase(m_contents.begin() + index);
 		widget.unbind();
 		this->reindex(index);
+	}
+
+	void Wedge::move(size_t from, size_t to)
+	{
+		m_contents.insert(m_contents.begin() + to, m_contents[from]);
+		m_contents.erase(m_contents.begin() + from + 1);
+		this->reindex(from < to ? from : to);
+		m_frame->markDirty(Frame::DIRTY_MAPPING);
 	}
 
 	void Wedge::swap(size_t from, size_t to)
@@ -112,7 +127,7 @@ namespace toy
 	{
 		Widget& widget = *unique;
 		if(widget.parent() == nullptr)
-			this->push(widget, false);
+			this->emplaceContainer().as<Wedge>().insert(widget, index, false);
 		widget.setContainer(*this);
 		m_containerContents.insert(m_containerContents.begin() + index, std::move(unique));
 		this->handleAdd(widget);
@@ -160,42 +175,34 @@ namespace toy
 	GridSheet::GridSheet(Wedge& parent, Dimension dim, Type& type)
 		: Container(parent, type)
 		, m_dim(dim)
-		, m_resizing(nullptr)
+		, m_dragPrev(nullptr)
+		, m_dragNext(nullptr)
 	{}
 
 	void GridSheet::leftDragStart(MouseEvent& mouseEvent)
 	{
 		// we take the position BEFORE the mouse moved as a reference
 		float pos = m_dim == DIM_X ? mouseEvent.lastPressedX : mouseEvent.lastPressedY;
-		m_resizing = nullptr;
+		m_dragPrev = nullptr;
+		m_dragNext = nullptr;
 
-		for(Frame* frame : m_frame->as<Stripe>().sequence())
+		for(Frame* frame : this->stripe().sequence())
 			if(frame->absolutePosition()[m_dim] >= pos)
 			{
-				m_resizing = frame->widget();
+				m_dragNext = frame;
+				m_dragPrev = this->stripe().before(*m_dragNext);
 				break;
 			}
 	}
 
 	void GridSheet::leftDrag(MouseEvent& mouseEvent)
 	{
-		if(!m_resizing || !this->stripe().before(m_resizing->frame()))
+		if(!m_dragNext || !m_dragPrev)
 			return;
 
-		Frame& prev = this->stripe().prev(m_resizing->frame());
-		Frame& next = m_resizing->frame();
+		float amount = m_dim == DIM_X ? mouseEvent.deltaX : mouseEvent.deltaY;
+		this->stripe().transferPixelSpan(*m_dragPrev, *m_dragNext, amount);
 
-		float pixspan = 1.f / m_frame->as<Stripe>().dsize(m_dim);
-		float offset = m_dim == DIM_X ? mouseEvent.deltaX * pixspan : mouseEvent.deltaY * pixspan;
-
-		prev.setSpanDim(m_dim, std::max(0.01f, prev.dspan(m_dim) + offset));
-		next.setSpanDim(m_dim, std::max(0.01f, next.dspan(m_dim) - offset));
-
-		this->gridResized(prev, next);
-	}
-
-	void GridSheet::leftDragEnd(MouseEvent& mouseEvent)
-	{
-		UNUSED(mouseEvent);
+		this->gridResized(*m_dragPrev, *m_dragNext);
 	}
 }

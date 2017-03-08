@@ -51,7 +51,7 @@ namespace toy
 		void leftDrag(MouseEvent& mouseEvent);
 		void leftDragEnd(MouseEvent& mouseEvent);
 
-		Docksection* docktarget(float x, float y);
+		Docksection* docktarget(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("WindowHeader", WrapControl::cls()); return ty; }
 
@@ -129,7 +129,7 @@ namespace toy
 	{
 	public:
 		Window(Wedge& parent, const string& title, WindowState state = WINDOW_DEFAULT, const Trigger& onClose = nullptr, Docksection* dock = nullptr, Type& type = cls());
-
+		
 		const string& name();
 
 		WindowState windowState() { return m_windowState; }
@@ -157,8 +157,6 @@ namespace toy
 
 		virtual Container& emplaceContainer();
 
-		virtual void handleAdd(Widget& widget);
-
 		void dock(Docksection& docksection);
 		void undock();
 
@@ -172,7 +170,6 @@ namespace toy
 	protected:
 		string m_name;
 		WindowState m_windowState;
-		Widget* m_content;
 		Trigger m_onClose;
 		WindowHeader m_header;
 		WindowBody m_body;

@@ -36,12 +36,11 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Docksection : public Tabber
 	{
 	public:
-		Docksection(Wedge& parent, Dockline& dockline);
-
-		Dockline& dockline() { return *m_dockline; }
-		void setDockline(Dockline& dockline) { m_dockline = &dockline; }
+		Docksection(Wedge& parent, Dockspace& dockspace);
 
 		Tab& addTab(const string& name);
+
+		void handleRemove(Widget& widget);
 
 		void dock(Window& window);
 		void undock(Window& window);
@@ -52,49 +51,7 @@ namespace toy
 		static Type& cls() { static Type ty("Docksection", Tabber::cls()); return ty; }
 
 	protected:
-		Dockline* m_dockline;
-	};
-
-	class _I_ TOY_UI_EXPORT Dockline : public GridSheet
-	{
-	public:
-		Dockline(Wedge& parent, Dockspace& dockspace, Dockline* dockline, Dimension dim);
-
-		Dockspace& dockspace() { return m_dockspace; }
-		Docksection* docksection() { return m_docksection; }
-		Dockline* dockline() { return m_dockline; }
-
-		Docksection& insertSection(size_t index);
-		Docksection& divideSection(size_t index);
-		Docksection& appendSection();
-		void moveSection(Docksection& docksection);
-		void removeSection();
-		void collapseSection();
-
-		Dockline& appendLine();
-		void removeLine(Dockline& dockline);
-
-		Dockline& findLine(const GridIndex& dockid);
-		Docksection& findOrCreateSection(const GridIndex& dockid);
-
-		void resetSpans();
-
-		virtual void mouseEntered(MouseEvent& mouseEvent);
-
-		static Type& cls() { static Type ty("Dockline", GridSheet::cls()); return ty; }
-
-	protected:
 		Dockspace& m_dockspace;
-		Docksection* m_docksection;
-		Dockline* m_dockline;
-	};
-
-	class _I_ TOY_UI_EXPORT MasterDockline : public Dockline
-	{
-	public:
-		MasterDockline(Dockspace& dockspace);
-
-		static Type& cls() { static Type ty("MasterDockline", Dockline::cls()); return ty; }
 	};
 
 	class _I_ TOY_UI_EXPORT Dockspace : public Container
@@ -102,15 +59,27 @@ namespace toy
 	public:
 		Dockspace(Wedge& parent);
 
-		Dockline& mainline() { return m_mainLine; }
-
 		Docksection& addSection(const GridIndex& dockid);
+		void removeSection(Docksection& section);
+
+		Docksection* findSection(const GridIndex& dockid);
+		Docksection& createSection(const GridIndex& dockid);
+
+		Docksection& findOrCreateSection(const GridIndex& dockid);
+
 		Window& addDockWindow(const string& name, const GridIndex& dockid);
-		
+
+		virtual void leftDragStart(MouseEvent& mouseEvent);
+		virtual void leftDrag(MouseEvent& mouseEvent);
+
 		static Type& cls() { static Type ty("Dockspace", Layout::cls()); return ty; }
 
 	protected:
-		MasterDockline m_mainLine;
+		std::vector<Docksection*> m_sections;
+
+		GridSubdiv* m_dragLine;
+		Frame* m_dragPrev;
+		Frame* m_dragNext;
 	};
 }
 

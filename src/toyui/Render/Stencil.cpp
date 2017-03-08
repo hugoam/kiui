@@ -26,8 +26,8 @@ namespace toy
 	void Stencil::setHardClip(const BoxFloat& hardClip)
 	{
 		m_hardClip = hardClip;
-		//if(m_frame.parent())
-		//	m_frame.parent()->stencil().setHardClip(hardClip);
+		if(m_frame.frame().parent())
+			m_frame.frame().parent()->content().stencil().setHardClip(hardClip);
 	}
 
 	BoxFloat Stencil::selectCorners()

@@ -10,7 +10,7 @@ namespace toy
 	ToolButton::ToolButton(Wedge& parent, const string& icon)
 		: Dropdown(parent)
 	{
-		this->emplace<Icon>(icon);
+		this->emplace<Button>(icon);
 		m_header.reset({ icon });
 		m_toggle.hide();
 		//m_header.emplace<Icon>(icon);
@@ -20,7 +20,12 @@ namespace toy
 		: Container(parent, cls())//, GRID)
 	{}
 
+	ToolbarMover::ToolbarMover(Wedge& parent)
+		: Control(parent, cls())
+	{}
+
 	Toolbar::Toolbar(Wedge& parent)
 		: WrapControl(parent, cls())
+		, m_mover(*this)
 	{}
 }
