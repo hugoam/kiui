@@ -35,6 +35,14 @@ namespace toy
 	protected:
 		bool m_submenu;
 	};
+
+	class TOY_UI_EXPORT Menubar : public Container
+	{
+	public:
+		Menubar(Wedge& parent);
+
+		static Type& cls() { static Type ty("Menubar", Header::cls()); return ty; }
+	};
 }
 
 #endif

@@ -254,6 +254,7 @@ namespace toy
 
 		this->styledef(Toolbar::cls()).layout().d_padding = BoxFloat(6.f);
 		this->styledef(Toolbar::cls()).layout().d_spacing = DimFloat(6.f);
+		this->styledef(Menubar::cls()).layout().d_spacing = DimFloat(6.f);
 
 		this->styledef(GridSheet::cls()).layout().d_spacing = DimFloat(5.f);
 

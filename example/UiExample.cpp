@@ -114,7 +114,7 @@ namespace toy
 	{
 		Window& window = parent.emplace<Window>("Text Editor");
 		Page& page = window.body().emplace<Page>("Text Editor");
-		Container& buttons = page.emplace<Container>(Line::cls());
+		Container& buttons = page.emplace<Menubar>();
 		Menu& menu = buttons.emplace<Menu>("Menu");
 		menu.emplace<Button>("Redo");
 		menu.emplace<Button>("Undo");
@@ -136,7 +136,7 @@ namespace toy
 	{
 		parent.clear();
 
-		Container& menubar = parent.emplace<Container>(Line::cls());
+		Container& menubar = parent.emplace<Menubar>();
 
 		Menu& menufile = menubar.emplace<Menu>("File");
 		menufile.emplace<Button>("Open");
@@ -177,13 +177,13 @@ namespace toy
 
 		Dockspace& dockspace = parent.emplace<Dockspace>();
 
-		Page& dock0 = dockspace.addDockWindow("Dock 0").emplace<Page>("Dock 0");
+		Page& dock0 = dockspace.addDockWindow("Dock 0", { 0, 0 }).emplace<Page>("Dock 0");
 		createUiTestControls(dock0, false);
 
-		Page& dock1 = dockspace.addDockWindow("Dock 1").emplace<Page>("Dock 1");
+		Page& dock1 = dockspace.addDockWindow("Dock 1", { 0, 1 }).emplace<Page>("Dock 1");
 		createUiTestInlineControls(dock1);
 
-		Page& dock2 = dockspace.addDockWindow("Dock 2").emplace<Page>("Dock 2");
+		Page& dock2 = dockspace.addDockWindow("Dock 2", { 0, 2 }).emplace<Page>("Dock 2");
 		createUiTestTable(dock2, false);
 
 		return dockspace;

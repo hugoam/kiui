@@ -306,6 +306,10 @@ Tooltip :
 DropdownList :
     copy_skin : Tooltip
     
+Menubar :
+    copy_skin : WindowHeader
+    padding : 8.0,2.0,8.0,2.0
+    
 MenuList :
     copy_skin : Tooltip
     

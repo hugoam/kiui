@@ -21,4 +21,8 @@ namespace toy
 
 		m_header.reset({ label });
 	}
+
+	Menubar::Menubar(Wedge& parent)
+		: Container(parent, cls())
+	{}
 }
