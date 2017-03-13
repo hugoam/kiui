@@ -20,15 +20,7 @@ namespace toy
 
 	Stencil::Stencil(DrawFrame& frame)
 		: m_frame(frame)
-		, m_hardClip()
 	{}
-
-	void Stencil::setHardClip(const BoxFloat& hardClip)
-	{
-		m_hardClip = hardClip;
-		if(m_frame.frame().parent())
-			m_frame.frame().parent()->content().stencil().setHardClip(hardClip);
-	}
 
 	BoxFloat Stencil::selectCorners()
 	{
@@ -48,7 +40,7 @@ namespace toy
 	{
 		UNUSED(paddedRect);
 
-		if(!m_hardClip.null())
+		if(!m_frame.frame().hardClip().null())
 			return;
 
 		s_debugBatch++;

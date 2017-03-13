@@ -155,6 +155,7 @@ namespace toy
 
 
 
+
     
     
 	class toyui : public Module
@@ -182,7 +183,7 @@ namespace toy
             typecls<Align>().imprint().initRefMethods<Align>();
             
             typecls<FrameType>().imprint().setup("FrameType", ENUM);
-            typecls<FrameType>().imprint().initEnum(StringVector({ "FRAME", "STRIPE", "GRID", "TABLE", "LAYER", "MASTER_LAYER", "SPACE_LAYER" }));
+            typecls<FrameType>().imprint().initEnum(StringVector({ "FRAME", "STRIPE", "GRID", "TABLE", "MULTIGRID", "LAYER", "MASTER_LAYER", "SPACE_LAYER" }));
             typecls<FrameType>().imprint().initRefMethods<FrameType>();
             
             typecls<AutoLayout>().imprint().setup("AutoLayout", ENUM);
@@ -394,8 +395,8 @@ namespace toy
             Style::cls().imprint().setup("Style", OBJECT);
             Style::cls().imprint().addMember(make_unique<Member>(typecls<string>(), 0, "name", &Style_name, nullptr, false, false));
             Style::cls().imprint().addMember(make_unique<Member>(Style::cls(), 1, "base", &Style_base, nullptr, false, false, &Style_base_object));
-            Style::cls().imprint().addMember(make_unique<Member>(LayoutStyle::cls(), 2, "layout", &Style_layout, nullptr, true, false, &Style_layout_object));
-            Style::cls().imprint().addMember(make_unique<Member>(InkStyle::cls(), 3, "skin", &Style_skin, nullptr, true, false, &Style_skin_object));
+            Style::cls().imprint().addMember(make_unique<Member>(LayoutStyle::cls(), 2, "layout", &Style_layout, nullptr, false, false, &Style_layout_object));
+            Style::cls().imprint().addMember(make_unique<Member>(InkStyle::cls(), 3, "skin", &Style_skin, nullptr, false, false, &Style_skin_object));
             Style::cls().imprint().addMember(make_unique<Member>(typecls<size_t>(), 4, "updated", &Style_updated, &Style_setUpdated, false, true));
             Style::cls().imprint().initObject(false);
             
@@ -460,18 +461,30 @@ namespace toy
             Widget::cls().imprint().addMember(make_unique<Member>(Wedge::cls(), 0, "parent", &Widget_parent, nullptr, false, false, &Widget_parent_object));
             Widget::cls().imprint().addMember(make_unique<Member>(Container::cls(), 1, "container", &Widget_container, nullptr, false, false, &Widget_container_object));
             Widget::cls().imprint().addMember(make_unique<Member>(typecls<size_t>(), 2, "index", &Widget_index, nullptr, false, false));
-            Widget::cls().imprint().addMember(make_unique<Member>(Frame::cls(), 3, "frame", &Widget_frame, nullptr, true, false, &Widget_frame_object));
+            Widget::cls().imprint().addMember(make_unique<Member>(Frame::cls(), 3, "frame", &Widget_frame, nullptr, false, false, &Widget_frame_object));
             Widget::cls().imprint().addMember(make_unique<Member>(typecls<WidgetState>(), 4, "state", &Widget_state, nullptr, false, false));
-            Widget::cls().imprint().addMember(make_unique<Member>(Style::cls(), 5, "style", &Widget_style, &Widget_setStyle, true, true, &Widget_style_object));
+            Widget::cls().imprint().addMember(make_unique<Member>(Style::cls(), 5, "style", &Widget_style, &Widget_setStyle, false, true, &Widget_style_object));
             Widget::cls().imprint().initObject(false);
             
             // Placeholder
             Placeholder::cls().imprint().setup("Placeholder", OBJECT);
             Placeholder::cls().imprint().initObject(false);
             
+            // DockTab
+            DockTab::cls().imprint().setup("DockTab", OBJECT);
+            DockTab::cls().imprint().initObject(false);
+            
             // Docksection
             Docksection::cls().imprint().setup("Docksection", OBJECT);
             Docksection::cls().imprint().initObject(false);
+            
+            // Dockline
+            Dockline::cls().imprint().setup("Dockline", OBJECT);
+            Dockline::cls().imprint().initObject(false);
+            
+            // MasterDockline
+            MasterDockline::cls().imprint().setup("MasterDockline", OBJECT);
+            MasterDockline::cls().imprint().initObject(false);
             
             // Dockspace
             Dockspace::cls().imprint().setup("Dockspace", OBJECT);
@@ -570,7 +583,10 @@ namespace toy
             m_rootTypes.push_back(&GridSheet::cls());
             m_rootTypes.push_back(&Widget::cls());
             m_rootTypes.push_back(&Placeholder::cls());
+            m_rootTypes.push_back(&DockTab::cls());
             m_rootTypes.push_back(&Docksection::cls());
+            m_rootTypes.push_back(&Dockline::cls());
+            m_rootTypes.push_back(&MasterDockline::cls());
             m_rootTypes.push_back(&Dockspace::cls());
             m_rootTypes.push_back(&CloseButton::cls());
             m_rootTypes.push_back(&WindowHeader::cls());

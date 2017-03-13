@@ -30,6 +30,7 @@ namespace toy
 		, d_dirty(DIRTY_MAPPING)
 		, d_hidden(false)
 		, d_index(0, 0)
+		, d_hardClip()
 	{}
 
 	Frame::Frame(Style& style, Stripe& parent)
@@ -318,6 +319,13 @@ namespace toy
 			return nullptr;
 		else
 			return this;
+	}
+
+	void Frame::setHardClip(const BoxFloat& hardClip)
+	{
+		d_hardClip = hardClip;
+		if(d_parent)
+			d_parent->setHardClip(hardClip);
 	}
 
 	void Frame::debugPrintDepth()

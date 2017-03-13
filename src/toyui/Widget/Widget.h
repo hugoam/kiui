@@ -85,9 +85,9 @@ namespace toy
 		void destroy();
 
 		template <class T>
-		T* findContainer() { Wedge* wedge = this->findContainer(T::cls()); return wedge ? &wedge->template as<T>() : nullptr; }
+		T* findContainer() { Widget* widget = this->findContainer(T::cls()); return widget ? &widget->template as<T>() : nullptr; }
 
-		Wedge* findContainer(Type& type);
+		Widget* findContainer(Type& type);
 
 		typedef std::function<bool(Widget&)> Visitor;
 
@@ -128,6 +128,7 @@ namespace toy
 		virtual bool customDraw(Renderer& renderer) { UNUSED(renderer); return false; }
 
 		InputReceiver* controlEvent(InputEvent& inputEvent);
+		InputReceiver* receiveEvent(InputEvent& inputEvent);
 		InputReceiver* propagateEvent(InputEvent& inputEvent);
 
 		void mouseEntered(MouseEvent& mouseEvent);

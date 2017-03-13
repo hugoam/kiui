@@ -17,11 +17,15 @@
 
 namespace toy
 {
+	typedef std::function<void(Styler&)> StyleInitializer;
+
 	class TOY_UI_EXPORT Styler : public NonCopy
 	{
 	public:
 		Styler();
 		~Styler();
+
+		void addInitializer(const StyleInitializer& initializer) { m_initializers.push_back(initializer); }
 
 		void clear();
 		void reset();
@@ -40,6 +44,8 @@ namespace toy
 	protected:
 		std::map<string, std::unique_ptr<Style>> m_styledefs;
 		std::map<string, std::unique_ptr<Style>> m_styles;
+
+		std::vector<StyleInitializer> m_initializers;
 	};
 
 	class TOY_UI_EXPORT EmptyStyle : public Object

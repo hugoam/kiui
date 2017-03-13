@@ -127,6 +127,7 @@ namespace toy
 		~InputFrame();
 
 		InputFrame* parentFrame() { return m_parentFrame; }
+		void setParentFrame(InputFrame* parentFrame) { m_parentFrame = parentFrame; }
 
 		virtual InputFrame& rootFrame();
 		virtual InputFrame& rootController();

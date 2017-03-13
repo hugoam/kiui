@@ -148,9 +148,9 @@ namespace toy
 		m_container->release(*this);
 	}
 
-	Wedge* Widget::findContainer(Type& type)
+	Widget* Widget::findContainer(Type& type)
 	{
-		Wedge* widget = this->parent();
+		Widget* widget = this->parent();
 
 		while(widget)
 		{
@@ -332,6 +332,27 @@ namespace toy
 	{
 		UNUSED(mouseEvent);
 		this->disableState(PRESSED);
+	}
+
+	InputReceiver* Widget::receiveEvent(InputEvent& inputEvent)
+	{
+		if(inputEvent.consumed)
+			return this;
+
+		inputEvent.visited.push_back(this);
+
+		if(inputEvent.deviceType >= InputEvent::DEVICE_MOUSE)
+		{
+			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
+			/*DimFloat absolute = m_frame->absolutePosition();
+			mouseEvent.relativeX = (mouseEvent.posX - absolute[DIM_X]) / m_frame->scale();
+			mouseEvent.relativeY = (mouseEvent.posY - absolute[DIM_Y]) / m_frame->scale();*/
+			DimFloat local = m_frame->localPosition(mouseEvent.posX, mouseEvent.posY);
+			mouseEvent.relativeX = local.x();
+			mouseEvent.relativeY = local.y();
+		}
+
+		return InputWidget::receiveEvent(inputEvent);
 	}
 
 	Item::Item(Wedge& parent, Type& type)

@@ -24,8 +24,6 @@ namespace toy
 
 		void drawSkinImage(Renderer& target, ImageSkin::Section section, int left, int top, int width, int height);
 
-		void setHardClip(const BoxFloat& hardClip);
-
 		BoxFloat selectCorners();
 
 		static int s_debugBatch;
@@ -33,8 +31,6 @@ namespace toy
 	protected:
 		DrawFrame& m_frame;
 		//Frame& m_frame;
-
-		BoxFloat m_hardClip;
 	};
 }
 

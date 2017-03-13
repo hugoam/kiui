@@ -44,6 +44,8 @@ namespace toy
 		inline const Index& index() { return d_index; }
 		inline size_t dindex(Dimension dim) { return d_index[dim]; }
 
+		inline const BoxFloat& hardClip() { return d_hardClip; }
+
 		inline Style& style() { return *d_style; }
 
 		void setIndex(Dimension dim, size_t index) { d_index[dim] = index; }
@@ -112,6 +114,8 @@ namespace toy
 
 		bool inside(float x, float y);
 
+		void setHardClip(const BoxFloat& hardClip);
+
 		void debugPrintDepth();
 
 		static Type& cls() { static Type ty; return ty; }
@@ -123,6 +127,8 @@ namespace toy
 		Dirty d_dirty;
 		bool d_hidden;
 		Index d_index;
+
+		BoxFloat d_hardClip;
 	};
 }
 

@@ -25,6 +25,9 @@ namespace toy
 			kv.second->clear();
 
 		this->defaultLayout();
+
+		for(StyleInitializer& initializer : m_initializers)
+			initializer(*this);
 	}
 
 	void Styler::reset()

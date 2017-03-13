@@ -28,20 +28,23 @@ namespace toy
 		typedef std::function<void()> KeyHandler;
 		typedef std::map<KeyCode, KeyHandler> KeyMap;
 
-		KeyMap keyDownHandlers;
-		KeyMap keyUpHandlers;
+		KeyMap m_keyDownHandlers;
+		KeyMap m_keyUpHandlers;
 	};
 
 	class TOY_UI_EXPORT Controller : public KeyInputFrame
 	{
 	public:
-		Controller(ControlMode controlMode);
+		Controller(ControlMode controlMode, InputEvent::DeviceType deviceType = InputEvent::ALL_DEVICES);
 
 		void take(Widget& inputWidget);
 		void yield();
 
+		virtual void leftClick(MouseEvent& mouseEvent);
+
 	protected:
 		ControlMode m_controlMode;
+		InputEvent::DeviceType m_deviceType;
 		Widget* m_inputWidget;
 	};
 }

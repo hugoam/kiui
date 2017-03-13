@@ -134,17 +134,6 @@ namespace toy
 		if(m_controlMode >= CM_MODAL)
 			inputEvent.abort = true;
 
-		inputEvent.visited.push_back(static_cast<Widget*>(this));
-
-		if(inputEvent.deviceType >= InputEvent::DEVICE_MOUSE)
-		{
-			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
-			Frame& frame = static_cast<Widget&>(*this).frame();
-			DimFloat absolute = frame.absolutePosition();
-			mouseEvent.relativeX = (mouseEvent.posX - absolute[DIM_X]) / frame.scale();
-			mouseEvent.relativeY = (mouseEvent.posY - absolute[DIM_Y]) / frame.scale();
-		}
-
 		if(inputEvent.deviceType == InputEvent::DEVICE_KEYBOARD && inputEvent.eventType == InputEvent::EVENT_PRESSED)
 			this->keyDown(static_cast<KeyEvent&>(inputEvent));
 		else if(inputEvent.deviceType == InputEvent::DEVICE_KEYBOARD && inputEvent.eventType == InputEvent::EVENT_RELEASED)
