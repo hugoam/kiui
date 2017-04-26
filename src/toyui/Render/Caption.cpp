@@ -107,7 +107,7 @@ namespace toy
 				int lineSelectStart = std::max(indexStart, m_selectStart);
 				int lineSelectEnd = std::min(indexEnd, m_selectEnd);
 
-				if(row.glyphs.size() == 0)
+				if(row.glyphs.empty())
 				{
 					row.selected.assign(row.rect.x(), row.rect.y(), 5.f, row.rect.h());
 					continue;

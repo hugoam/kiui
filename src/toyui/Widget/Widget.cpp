@@ -45,8 +45,6 @@ namespace toy
 			m_frame = make_unique<Grid>(*this);
 		else if(frameType == TABLE)
 			m_frame = make_unique<TableGrid>(*this);
-		else if(frameType == MULTIGRID)
-			m_frame = make_unique<MultiGrid>(*this);
 		else if(frameType == STRIPE)
 			m_frame = make_unique<Stripe>(*this);
 		else if(frameType == FRAME)
@@ -169,11 +167,6 @@ namespace toy
 
 	void Widget::nextFrame(size_t tick, size_t step)
 	{
-		if(m_frame->dirty())
-			m_frame->layer().setRedraw();
-
-		m_frame->clearDirty();
-
 		if(m_style->updated() > m_frame->styleStamp())
 			m_frame->resetStyle();
 	}
@@ -344,9 +337,6 @@ namespace toy
 		if(inputEvent.deviceType >= InputEvent::DEVICE_MOUSE)
 		{
 			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
-			/*DimFloat absolute = m_frame->absolutePosition();
-			mouseEvent.relativeX = (mouseEvent.posX - absolute[DIM_X]) / m_frame->scale();
-			mouseEvent.relativeY = (mouseEvent.posY - absolute[DIM_Y]) / m_frame->scale();*/
 			DimFloat local = m_frame->localPosition(mouseEvent.posX, mouseEvent.posY);
 			mouseEvent.relativeX = local.x();
 			mouseEvent.relativeY = local.y();

@@ -14,12 +14,12 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT List : public ScrollContainer
+	class TOY_UI_EXPORT List : public ScrollSheet
 	{
 	public:
 		List(Wedge& parent, Type& type = cls(), FrameType frameType = STRIPE);
 
-		static Type& cls() { static Type ty("List", Container::cls()); return ty; }
+		static Type& cls() { static Type ty("List", ScrollSheet::cls()); return ty; }
 	};
 
 	class TOY_UI_EXPORT SelectList : public List

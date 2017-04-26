@@ -63,9 +63,7 @@ namespace toy
 		void setDevice(Device& device) { m_device = &device; }
 		void resetDevice() { m_device = nullptr; }
 
-		virtual const string& name() { return sNullString; }
 		virtual const string& tooltip() { return sNullString; }
-
 		virtual const string& contentlabel();
 
 		virtual RootSheet& rootSheet();

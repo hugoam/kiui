@@ -32,7 +32,7 @@ namespace toy
 	{
 		layers.clear();
 
-		this->visit(*this, [&layers, barrier](Frame& frame) {
+		this->rootvisit([&layers, barrier](Frame& frame) {
 			if(frame.frameType() == LAYER)
 				layers.push_back(&frame.as<Layer>());
 			return frame.frameType() < barrier;
@@ -105,6 +105,16 @@ namespace toy
 		this->measureLayout();
 		this->resizeLayout();
 		this->positionLayout();
+	}
+
+	void MasterLayer::redraw()
+	{
+		this->visit([](Frame& frame) {
+			if(frame.dirty())
+				frame.layer().setRedraw();
+			frame.clearDirty();
+			return true;
+		});
 	}
 
 	void MasterLayer::addLayer(Layer& layer)

@@ -63,7 +63,11 @@ namespace toy
 		bool first(Frame& frame);
 		bool last(Frame& frame);
 
-		virtual void visit(Stripe& root, const Visitor& visitor);
+		virtual void visit(const Visitor& visitor);
+
+		void rootvisit(const Visitor& visitor);
+
+		void relayout();
 
 		virtual void measureLayout();
 		virtual void resizeLayout();

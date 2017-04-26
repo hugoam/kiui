@@ -63,7 +63,7 @@ namespace toy
 			return this->as<MasterLayer>();
 	}
 
-	void Frame::visit(Stripe& root, const Visitor& visitor)
+	void Frame::visit(const Visitor& visitor)
 	{
 		visitor(*this);
 	}

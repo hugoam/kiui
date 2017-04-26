@@ -331,7 +331,7 @@ namespace toy
 	}
 
 	GlfwRenderSystem::GlfwRenderSystem(const string& resourcePath)
-		: RenderSystem(resourcePath)
+		: RenderSystem(resourcePath, true)
 	{}
 
 	unique_ptr<Context> GlfwRenderSystem::createContext(const string& name, int width, int height, bool fullScreen)

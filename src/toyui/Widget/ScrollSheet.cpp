@@ -84,24 +84,33 @@ namespace toy
 		m_scrollzone.setStyle(ScrollZone::cls());
 	}
 
-	ScrollContainer::ScrollContainer(Wedge& parent, Type& type)
-		: ScrollSheet(parent, type)
+	Surface::Surface(Wedge& parent)
+		: Container(parent, cls())
 	{}
 
 	ScrollPlan::ScrollPlan(Wedge& parent, Type& type)
 		: ScrollSheet(parent, type)
 		, m_plan(m_scrollzone.container())
+		, m_surface(m_plan)
 		, m_clamped(true)
 	{
 		m_plan.setStyle(Plan::cls());
+
+		this->updateBounds();
 	}
 
 	void ScrollPlan::nextFrame(size_t tick, size_t delta)
 	{
-		if(m_plan.frame().dirty())
+		bool dirty = m_surface.frame().dirty();
+		if(dirty)
 			this->updateBounds();
 
 		Wedge::nextFrame(tick, delta);
+	}
+
+	Container& ScrollPlan::emplaceContainer()
+	{
+		return m_surface;
 	}
 
 	void ScrollPlan::updateBounds()
@@ -110,7 +119,7 @@ namespace toy
 
 		m_bounds = BoxFloat(-margin, -margin, +margin, +margin);
 
-		for(Frame* frame : m_plan.stripe().contents())
+		for(Frame* frame : m_surface.stripe().contents())
 		{
 			m_bounds[DIM_X] = std::min(frame->dposition(DIM_X) - margin, m_bounds[DIM_X]);
 			m_bounds[DIM_Y] = std::min(frame->dposition(DIM_Y) - margin, m_bounds[DIM_Y]);
@@ -118,12 +127,13 @@ namespace toy
 			m_bounds[DIM_YY] = std::max(frame->dposition(DIM_Y) + frame->dsize(DIM_Y) + margin, m_bounds[DIM_YY]);
 		}
 
-		m_plan.frame().setSize(m_bounds.x1() - m_bounds.x0(), m_bounds.y1() - m_bounds.y0());
+		m_surface.frame().setManualSize(m_bounds.x1() - m_bounds.x0(), m_bounds.y1() - m_bounds.y0());
 	}
 
 	void ScrollPlan::middleDrag(MouseEvent& mouseEvent)
 	{
 		m_plan.frame().setPosition(std::min(0.f, m_plan.frame().dposition(DIM_X) + mouseEvent.deltaX), std::min(0.f, m_plan.frame().dposition(DIM_Y) + mouseEvent.deltaY));
+		m_plan.frame().layer().setForceRedraw();
 	}
 
 	void ScrollPlan::mouseWheel(MouseEvent& mouseEvent)
@@ -139,7 +149,6 @@ namespace toy
 		}
 
 		m_plan.frame().setScale(scale);
-		m_plan.frame().markDirty(Frame::DIRTY_LAYOUT);
 		m_plan.frame().layer().setForceRedraw();
 
 		DimFloat absolute = m_plan.frame().absolutePosition();

@@ -7,8 +7,7 @@
 
 namespace toy
 {
-	Page::Page(Wedge& parent, const string& name)
+	Page::Page(Wedge& parent)
 		: Container(parent, cls())
-		, m_name(name)
 	{}
 }

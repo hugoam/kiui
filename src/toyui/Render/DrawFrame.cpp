@@ -135,11 +135,7 @@ namespace toy
 		renderer.layerCache(d_frame->layer(), layerCache);
 
 		if(d_frame->frameType() >= LAYER && (d_frame->layer().redraw() || force))
-		{
-			//d_frame->debugPrintDepth();
-			//printf("Clearing Layer %s\n", d_frame->style().name().c_str());
 			renderer.clearLayer(layerCache);
-		}
 
 		renderer.beginUpdate(layerCache, x, y, d_frame->scale());
 #else

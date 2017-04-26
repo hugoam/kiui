@@ -71,6 +71,7 @@ namespace toy
 		void markReorder() { d_reorder = true; }
 
 		void relayout();
+		void redraw();
 		
 		void reorder();
 		void addLayer(Layer& layer);

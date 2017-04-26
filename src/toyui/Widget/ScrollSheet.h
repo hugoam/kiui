@@ -59,18 +59,18 @@ namespace toy
 		bool m_wrap;
 	};
 
-	class _I_ TOY_UI_EXPORT ScrollContainer : public ScrollSheet
-	{
-	public:
-		ScrollContainer(Wedge& parent, Type& type = cls());
-
-		static Type& cls() { static Type ty("Container", ScrollSheet::cls()); return ty; }
-	};
-
 	class TOY_UI_EXPORT Plan
 	{
 	public:
 		static Type& cls() { static Type ty("Plan", Sheet::cls()); return ty; }
+	};
+
+	class TOY_UI_EXPORT Surface : public Container
+	{
+	public:
+		Surface(Wedge& parent);
+
+		static Type& cls() { static Type ty("Surface", Sheet::cls()); return ty; }
 	};
 
 	class _I_ TOY_UI_EXPORT ScrollPlan : public ScrollSheet
@@ -78,10 +78,13 @@ namespace toy
 	public:
 		ScrollPlan(Wedge& parent, Type& type = cls());
 
+		Container& plan() { return m_plan; }
+
+		virtual Container& emplaceContainer();
+
 		void nextFrame(size_t tick, size_t delta);
 
 		void middleDrag(MouseEvent& mouseEvent);
-
 		void mouseWheel(MouseEvent& mouseEvent);
 
 		void updateBounds();
@@ -90,6 +93,8 @@ namespace toy
 
 	protected:
 		Container& m_plan;
+		Container& m_surface;
+		//Surface m_surface;
 		BoxFloat m_bounds;
 		bool m_clamped;
 	};

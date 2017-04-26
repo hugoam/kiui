@@ -13,13 +13,12 @@
 #include <toyobj/Reflect/Method.h>
 #include <toyobj/Util/Unique.h>
 #include <toyobj/Module.h>
-#include <toyutil/Memory/Memory.h>
+#include <toyobj/Memory/Memory.h>
 
 namespace toy
 {
-    
 #ifdef IMPRINT_DEF_FILE
-    Object& BoxFloat_create(BoxFloat* at, LrefVector& args) {  new(at) BoxFloat( args[0]->any<float>()->copy(), args[1]->any<float>()->copy(), args[2]->any<float>()->copy(), args[3]->any<float>()->copy() ); return *at; }
+    Object& BoxFloat_create(BoxFloat* at, LrefVector& args) {  new(at) BoxFloat( args[0]->copy<float>(), args[1]->copy<float>(), args[2]->copy<float>(), args[3]->copy<float>() ); return *at; }
     Object& BoxFloat_proto_poolinject(AbstractPool& pool, LrefVector& args) { return BoxFloat_create(pool.as<Pool<BoxFloat>>().alloc(), args); }
     Object& BoxFloat_proto_lrefinject(Lref& lref, LrefVector& args) { return BoxFloat_create(&lref->as<BoxFloat>(), args); }
     AbstractPool* BoxFloat_makePool() { return new Pool<BoxFloat>(); }
@@ -61,13 +60,13 @@ namespace toy
 
 
 	void BoxFloat_x0(Object& object, Lref& ref) { ref->set<float>(object.as<BoxFloat>().x0()); }
-	void BoxFloat_setX0(Object& object, const Lref& ref) { object.as<BoxFloat>().setX0(ref->any<float>()->copy()); }
+	void BoxFloat_setX0(Object& object, const Lref& ref) { object.as<BoxFloat>().setX0(ref->copy<float>()); }
 	void BoxFloat_y0(Object& object, Lref& ref) { ref->set<float>(object.as<BoxFloat>().y0()); }
-	void BoxFloat_setY0(Object& object, const Lref& ref) { object.as<BoxFloat>().setY0(ref->any<float>()->copy()); }
+	void BoxFloat_setY0(Object& object, const Lref& ref) { object.as<BoxFloat>().setY0(ref->copy<float>()); }
 	void BoxFloat_x1(Object& object, Lref& ref) { ref->set<float>(object.as<BoxFloat>().x1()); }
-	void BoxFloat_setX1(Object& object, const Lref& ref) { object.as<BoxFloat>().setX1(ref->any<float>()->copy()); }
+	void BoxFloat_setX1(Object& object, const Lref& ref) { object.as<BoxFloat>().setX1(ref->copy<float>()); }
 	void BoxFloat_y1(Object& object, Lref& ref) { ref->set<float>(object.as<BoxFloat>().y1()); }
-	void BoxFloat_setY1(Object& object, const Lref& ref) { object.as<BoxFloat>().setY1(ref->any<float>()->copy()); }
+	void BoxFloat_setY1(Object& object, const Lref& ref) { object.as<BoxFloat>().setY1(ref->copy<float>()); }
 	void BoxFloat_x(Object& object, Lref& ref) { ref->set<float>(object.as<BoxFloat>().x()); }
 	void BoxFloat_y(Object& object, Lref& ref) { ref->set<float>(object.as<BoxFloat>().y()); }
 	void BoxFloat_w(Object& object, Lref& ref) { ref->set<float>(object.as<BoxFloat>().w()); }
@@ -85,23 +84,23 @@ namespace toy
     Object* ImageSkin_d_image_object(Object& object) { return object.as<ImageSkin>().d_image; }
 	void ImageSkin_setD_image(Object& object, const Lref& ref) { object.as<ImageSkin>().d_image = &ref->as<Image>(); }
 	void ImageSkin_d_filetype(Object& object, Lref& ref) { ref->set<string>(object.as<ImageSkin>().d_filetype); }
-	void ImageSkin_setD_filetype(Object& object, const Lref& ref) { object.as<ImageSkin>().d_filetype = ref->any<string>()->copy(); }
+	void ImageSkin_setD_filetype(Object& object, const Lref& ref) { object.as<ImageSkin>().d_filetype = ref->copy<string>(); }
 	void ImageSkin_d_top(Object& object, Lref& ref) { ref->set<int>(object.as<ImageSkin>().d_top); }
-	void ImageSkin_setD_top(Object& object, const Lref& ref) { object.as<ImageSkin>().d_top = ref->any<int>()->copy(); }
+	void ImageSkin_setD_top(Object& object, const Lref& ref) { object.as<ImageSkin>().d_top = ref->copy<int>(); }
 	void ImageSkin_d_right(Object& object, Lref& ref) { ref->set<int>(object.as<ImageSkin>().d_right); }
-	void ImageSkin_setD_right(Object& object, const Lref& ref) { object.as<ImageSkin>().d_right = ref->any<int>()->copy(); }
+	void ImageSkin_setD_right(Object& object, const Lref& ref) { object.as<ImageSkin>().d_right = ref->copy<int>(); }
 	void ImageSkin_d_bottom(Object& object, Lref& ref) { ref->set<int>(object.as<ImageSkin>().d_bottom); }
-	void ImageSkin_setD_bottom(Object& object, const Lref& ref) { object.as<ImageSkin>().d_bottom = ref->any<int>()->copy(); }
+	void ImageSkin_setD_bottom(Object& object, const Lref& ref) { object.as<ImageSkin>().d_bottom = ref->copy<int>(); }
 	void ImageSkin_d_left(Object& object, Lref& ref) { ref->set<int>(object.as<ImageSkin>().d_left); }
-	void ImageSkin_setD_left(Object& object, const Lref& ref) { object.as<ImageSkin>().d_left = ref->any<int>()->copy(); }
+	void ImageSkin_setD_left(Object& object, const Lref& ref) { object.as<ImageSkin>().d_left = ref->copy<int>(); }
 	void ImageSkin_d_margin(Object& object, Lref& ref) { ref->set<int>(object.as<ImageSkin>().d_margin); }
-	void ImageSkin_setD_margin(Object& object, const Lref& ref) { object.as<ImageSkin>().d_margin = ref->any<int>()->copy(); }
+	void ImageSkin_setD_margin(Object& object, const Lref& ref) { object.as<ImageSkin>().d_margin = ref->copy<int>(); }
 	void ImageSkin_d_stretch(Object& object, Lref& ref) { ref->set<Dimension>(object.as<ImageSkin>().d_stretch); }
-	void ImageSkin_setD_stretch(Object& object, const Lref& ref) { object.as<ImageSkin>().d_stretch = ref->any<Dimension>()->copy(); }
+	void ImageSkin_setD_stretch(Object& object, const Lref& ref) { object.as<ImageSkin>().d_stretch = ref->copy<Dimension>(); }
 
 
 	void LayoutStyle_d_updated(Object& object, Lref& ref) { ref->set<size_t>(object.as<LayoutStyle>().d_updated); }
-	void LayoutStyle_setD_updated(Object& object, const Lref& ref) { object.as<LayoutStyle>().d_updated = ref->any<size_t>()->copy(); }
+	void LayoutStyle_setD_updated(Object& object, const Lref& ref) { object.as<LayoutStyle>().d_updated = ref->copy<size_t>(); }
 
 
 	void Style_name(Object& object, Lref& ref) { ref->set<string>(object.as<Style>().name()); }
@@ -112,8 +111,7 @@ namespace toy
 	void Style_skin(Object& object, Lref& ref) { ref->setobject(object.as<Style>().skin()); }
     Object* Style_skin_object(Object& object) { return &object.as<Style>().skin(); }
 	void Style_updated(Object& object, Lref& ref) { ref->set<size_t>(object.as<Style>().updated()); }
-	void Style_setUpdated(Object& object, const Lref& ref) { object.as<Style>().setUpdated(ref->any<size_t>()->copy()); }
-
+	void Style_setUpdated(Object& object, const Lref& ref) { object.as<Style>().setUpdated(ref->copy<size_t>()); }
 
 
 
@@ -183,7 +181,7 @@ namespace toy
             typecls<Align>().imprint().initRefMethods<Align>();
             
             typecls<FrameType>().imprint().setup("FrameType", ENUM);
-            typecls<FrameType>().imprint().initEnum(StringVector({ "FRAME", "STRIPE", "GRID", "TABLE", "MULTIGRID", "LAYER", "MASTER_LAYER", "SPACE_LAYER" }));
+            typecls<FrameType>().imprint().initEnum(StringVector({ "FRAME", "STRIPE", "GRID", "TABLE", "LAYER", "MASTER_LAYER", "SPACE_LAYER" }));
             typecls<FrameType>().imprint().initRefMethods<FrameType>();
             
             typecls<AutoLayout>().imprint().setup("AutoLayout", ENUM);
@@ -342,37 +340,37 @@ namespace toy
             
             // BoxFloat
             BoxFloat::cls().imprint().setup("BoxFloat", STRUCT);
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 0, "x0", &BoxFloat_x0, &BoxFloat_setX0, false, true));
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 1, "y0", &BoxFloat_y0, &BoxFloat_setY0, false, true));
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 2, "x1", &BoxFloat_x1, &BoxFloat_setX1, false, true));
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 3, "y1", &BoxFloat_y1, &BoxFloat_setY1, false, true));
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 4, "x", &BoxFloat_x, nullptr, false, false));
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 5, "y", &BoxFloat_y, nullptr, false, false));
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 6, "w", &BoxFloat_w, nullptr, false, false));
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 7, "h", &BoxFloat_h, nullptr, false, false));
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 8, "xx", &BoxFloat_xx, nullptr, false, false));
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 9, "xy", &BoxFloat_xy, nullptr, false, false));
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 10, "yx", &BoxFloat_yx, nullptr, false, false));
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 11, "yy", &BoxFloat_yy, nullptr, false, false));
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 12, "v0", &BoxFloat_v0, nullptr, false, false));
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 13, "v1", &BoxFloat_v1, nullptr, false, false));
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 14, "v2", &BoxFloat_v2, nullptr, false, false));
-            BoxFloat::cls().imprint().addMember(make_unique<Member>(typecls<float>(), 15, "v3", &BoxFloat_v3, nullptr, false, false));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::x0), typecls<float>(), 0, "x0", &BoxFloat_x0, &BoxFloat_setX0, false, true));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::y0), typecls<float>(), 1, "y0", &BoxFloat_y0, &BoxFloat_setY0, false, true));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::x1), typecls<float>(), 2, "x1", &BoxFloat_x1, &BoxFloat_setX1, false, true));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::y1), typecls<float>(), 3, "y1", &BoxFloat_y1, &BoxFloat_setY1, false, true));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::x), typecls<float>(), 4, "x", &BoxFloat_x, nullptr, false, false));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::y), typecls<float>(), 5, "y", &BoxFloat_y, nullptr, false, false));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::w), typecls<float>(), 6, "w", &BoxFloat_w, nullptr, false, false));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::h), typecls<float>(), 7, "h", &BoxFloat_h, nullptr, false, false));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::xx), typecls<float>(), 8, "xx", &BoxFloat_xx, nullptr, false, false));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::xy), typecls<float>(), 9, "xy", &BoxFloat_xy, nullptr, false, false));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::yx), typecls<float>(), 10, "yx", &BoxFloat_yx, nullptr, false, false));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::yy), typecls<float>(), 11, "yy", &BoxFloat_yy, nullptr, false, false));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::v0), typecls<float>(), 12, "v0", &BoxFloat_v0, nullptr, false, false));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::v1), typecls<float>(), 13, "v1", &BoxFloat_v1, nullptr, false, false));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::v2), typecls<float>(), 14, "v2", &BoxFloat_v2, nullptr, false, false));
+            BoxFloat::cls().imprint().addMember(make_unique<Member>(BoxFloat::cls(), lref(&BoxFloat::v3), typecls<float>(), 15, "v3", &BoxFloat_v3, nullptr, false, false));
             BoxFloat::cls().imprint().initRefMethods<BoxFloat>();
-            BoxFloat::cls().imprint().setConstructor(make_unique<Method>(BoxFloat::cls(), "BoxFloat", nullptr, ParamVector({ Param("x0", lref(float()), INPUT_PARAM), Param("y0", lref(float()), INPUT_PARAM), Param("x1", lref(float()), INPUT_PARAM), Param("y1", lref(float()), INPUT_PARAM) })));
+            BoxFloat::cls().imprint().setConstructor(make_unique<Method>(BoxFloat::cls(), "BoxFloat", Lref(), nullptr, ParamVector({ Param("x0", lref(float()), INPUT_PARAM), Param("y0", lref(float()), INPUT_PARAM), Param("x1", lref(float()), INPUT_PARAM), Param("y1", lref(float()), INPUT_PARAM) })));
             BoxFloat::cls().imprint().initInjectors(&BoxFloat_proto_poolinject, &BoxFloat_proto_lrefinject, &BoxFloat_makePool);
             BoxFloat::cls().imprint().initObject(false);
             
             // ImageSkin
             ImageSkin::cls().imprint().setup("ImageSkin", STRUCT);
-            ImageSkin::cls().imprint().addMember(make_unique<Member>(Image::cls(), 0, "d_image", &ImageSkin_d_image, &ImageSkin_setD_image, false, true, &ImageSkin_d_image_object));
-            ImageSkin::cls().imprint().addMember(make_unique<Member>(typecls<string>(), 1, "d_filetype", &ImageSkin_d_filetype, &ImageSkin_setD_filetype, false, true));
-            ImageSkin::cls().imprint().addMember(make_unique<Member>(typecls<int>(), 2, "d_top", &ImageSkin_d_top, &ImageSkin_setD_top, false, true));
-            ImageSkin::cls().imprint().addMember(make_unique<Member>(typecls<int>(), 3, "d_right", &ImageSkin_d_right, &ImageSkin_setD_right, false, true));
-            ImageSkin::cls().imprint().addMember(make_unique<Member>(typecls<int>(), 4, "d_bottom", &ImageSkin_d_bottom, &ImageSkin_setD_bottom, false, true));
-            ImageSkin::cls().imprint().addMember(make_unique<Member>(typecls<int>(), 5, "d_left", &ImageSkin_d_left, &ImageSkin_setD_left, false, true));
-            ImageSkin::cls().imprint().addMember(make_unique<Member>(typecls<int>(), 6, "d_margin", &ImageSkin_d_margin, &ImageSkin_setD_margin, false, true));
-            ImageSkin::cls().imprint().addMember(make_unique<Member>(typecls<Dimension>(), 7, "d_stretch", &ImageSkin_d_stretch, &ImageSkin_setD_stretch, false, true));
+            ImageSkin::cls().imprint().addMember(make_unique<Member>(ImageSkin::cls(), Lref(), Image::cls(), 0, "d_image", &ImageSkin_d_image, &ImageSkin_setD_image, false, true, &ImageSkin_d_image_object));
+            ImageSkin::cls().imprint().addMember(make_unique<Member>(ImageSkin::cls(), Lref(), typecls<string>(), 1, "d_filetype", &ImageSkin_d_filetype, &ImageSkin_setD_filetype, false, true));
+            ImageSkin::cls().imprint().addMember(make_unique<Member>(ImageSkin::cls(), Lref(), typecls<int>(), 2, "d_top", &ImageSkin_d_top, &ImageSkin_setD_top, false, true));
+            ImageSkin::cls().imprint().addMember(make_unique<Member>(ImageSkin::cls(), Lref(), typecls<int>(), 3, "d_right", &ImageSkin_d_right, &ImageSkin_setD_right, false, true));
+            ImageSkin::cls().imprint().addMember(make_unique<Member>(ImageSkin::cls(), Lref(), typecls<int>(), 4, "d_bottom", &ImageSkin_d_bottom, &ImageSkin_setD_bottom, false, true));
+            ImageSkin::cls().imprint().addMember(make_unique<Member>(ImageSkin::cls(), Lref(), typecls<int>(), 5, "d_left", &ImageSkin_d_left, &ImageSkin_setD_left, false, true));
+            ImageSkin::cls().imprint().addMember(make_unique<Member>(ImageSkin::cls(), Lref(), typecls<int>(), 6, "d_margin", &ImageSkin_d_margin, &ImageSkin_setD_margin, false, true));
+            ImageSkin::cls().imprint().addMember(make_unique<Member>(ImageSkin::cls(), Lref(), typecls<Dimension>(), 7, "d_stretch", &ImageSkin_d_stretch, &ImageSkin_setD_stretch, false, true));
             ImageSkin::cls().imprint().initRefMethods<ImageSkin>();
             ImageSkin::cls().imprint().initObject(false);
             
@@ -382,22 +380,22 @@ namespace toy
             
             // LayoutStyle
             LayoutStyle::cls().imprint().setup("LayoutStyle", OBJECT);
-            LayoutStyle::cls().imprint().addMember(make_unique<Member>(typecls<size_t>(), 0, "d_updated", &LayoutStyle_d_updated, &LayoutStyle_setD_updated, false, true));
+            LayoutStyle::cls().imprint().addMember(make_unique<Member>(LayoutStyle::cls(), Lref(), typecls<size_t>(), 0, "d_updated", &LayoutStyle_d_updated, &LayoutStyle_setD_updated, false, true));
             LayoutStyle::cls().imprint().initObject(false);
             
             // InkStyle
             InkStyle::cls().imprint().setup("InkStyle", OBJECT);
-            InkStyle::cls().imprint().setConstructor(make_unique<Method>(InkStyle::cls(), "InkStyle", nullptr, ParamVector({ Param("style", Lref(Style::cls()), INPUT_PARAM) })));
+            InkStyle::cls().imprint().setConstructor(make_unique<Method>(InkStyle::cls(), "InkStyle", Lref(), nullptr, ParamVector({ Param("style", Lref(Style::cls()), INPUT_PARAM) })));
             InkStyle::cls().imprint().initInjectors(&InkStyle_proto_poolinject, &InkStyle_proto_lrefinject, &InkStyle_makePool);
             InkStyle::cls().imprint().initObject(false);
             
             // Style
             Style::cls().imprint().setup("Style", OBJECT);
-            Style::cls().imprint().addMember(make_unique<Member>(typecls<string>(), 0, "name", &Style_name, nullptr, false, false));
-            Style::cls().imprint().addMember(make_unique<Member>(Style::cls(), 1, "base", &Style_base, nullptr, false, false, &Style_base_object));
-            Style::cls().imprint().addMember(make_unique<Member>(LayoutStyle::cls(), 2, "layout", &Style_layout, nullptr, false, false, &Style_layout_object));
-            Style::cls().imprint().addMember(make_unique<Member>(InkStyle::cls(), 3, "skin", &Style_skin, nullptr, false, false, &Style_skin_object));
-            Style::cls().imprint().addMember(make_unique<Member>(typecls<size_t>(), 4, "updated", &Style_updated, &Style_setUpdated, false, true));
+            Style::cls().imprint().addMember(make_unique<Member>(Style::cls(), lref(&Style::name), typecls<string>(), 0, "name", &Style_name, nullptr, false, false));
+            Style::cls().imprint().addMember(make_unique<Member>(Style::cls(), lref(&Style::base), Style::cls(), 1, "base", &Style_base, nullptr, false, false, &Style_base_object));
+            Style::cls().imprint().addMember(make_unique<Member>(Style::cls(), lref(&Style::layout), LayoutStyle::cls(), 2, "layout", &Style_layout, nullptr, false, false, &Style_layout_object));
+            Style::cls().imprint().addMember(make_unique<Member>(Style::cls(), lref(&Style::skin), InkStyle::cls(), 3, "skin", &Style_skin, nullptr, false, false, &Style_skin_object));
+            Style::cls().imprint().addMember(make_unique<Member>(Style::cls(), lref(&Style::updated), typecls<size_t>(), 4, "updated", &Style_updated, &Style_setUpdated, false, true));
             Style::cls().imprint().initObject(false);
             
             // Tooltip
@@ -423,10 +421,6 @@ namespace toy
             // ScrollSheet
             ScrollSheet::cls().imprint().setup("ScrollSheet", OBJECT);
             ScrollSheet::cls().imprint().initObject(false);
-            
-            // ScrollContainer
-            ScrollContainer::cls().imprint().setup("ScrollContainer", OBJECT);
-            ScrollContainer::cls().imprint().initObject(false);
             
             // ScrollPlan
             ScrollPlan::cls().imprint().setup("ScrollPlan", OBJECT);
@@ -458,12 +452,12 @@ namespace toy
             
             // Widget
             Widget::cls().imprint().setup("Widget", OBJECT);
-            Widget::cls().imprint().addMember(make_unique<Member>(Wedge::cls(), 0, "parent", &Widget_parent, nullptr, false, false, &Widget_parent_object));
-            Widget::cls().imprint().addMember(make_unique<Member>(Container::cls(), 1, "container", &Widget_container, nullptr, false, false, &Widget_container_object));
-            Widget::cls().imprint().addMember(make_unique<Member>(typecls<size_t>(), 2, "index", &Widget_index, nullptr, false, false));
-            Widget::cls().imprint().addMember(make_unique<Member>(Frame::cls(), 3, "frame", &Widget_frame, nullptr, false, false, &Widget_frame_object));
-            Widget::cls().imprint().addMember(make_unique<Member>(typecls<WidgetState>(), 4, "state", &Widget_state, nullptr, false, false));
-            Widget::cls().imprint().addMember(make_unique<Member>(Style::cls(), 5, "style", &Widget_style, &Widget_setStyle, false, true, &Widget_style_object));
+            Widget::cls().imprint().addMember(make_unique<Member>(Widget::cls(), lref(&Widget::parent), Wedge::cls(), 0, "parent", &Widget_parent, nullptr, false, false, &Widget_parent_object));
+            Widget::cls().imprint().addMember(make_unique<Member>(Widget::cls(), lref(&Widget::container), Container::cls(), 1, "container", &Widget_container, nullptr, false, false, &Widget_container_object));
+            Widget::cls().imprint().addMember(make_unique<Member>(Widget::cls(), lref(&Widget::index), typecls<size_t>(), 2, "index", &Widget_index, nullptr, false, false));
+            Widget::cls().imprint().addMember(make_unique<Member>(Widget::cls(), lref(&Widget::frame), Frame::cls(), 3, "frame", &Widget_frame, nullptr, false, false, &Widget_frame_object));
+            Widget::cls().imprint().addMember(make_unique<Member>(Widget::cls(), lref(&Widget::state), typecls<WidgetState>(), 4, "state", &Widget_state, nullptr, false, false));
+            Widget::cls().imprint().addMember(make_unique<Member>(Widget::cls(), lref(&Widget::style), Style::cls(), 5, "style", &Widget_style, &Widget_setStyle, false, true, &Widget_style_object));
             Widget::cls().imprint().initObject(false);
             
             // Placeholder
@@ -573,7 +567,6 @@ namespace toy
             m_rootTypes.push_back(&RootSheet::cls());
             m_rootTypes.push_back(&ScrollZone::cls());
             m_rootTypes.push_back(&ScrollSheet::cls());
-            m_rootTypes.push_back(&ScrollContainer::cls());
             m_rootTypes.push_back(&ScrollPlan::cls());
             m_rootTypes.push_back(&Wedge::cls());
             m_rootTypes.push_back(&Container::cls());

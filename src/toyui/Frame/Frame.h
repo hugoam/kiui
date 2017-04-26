@@ -61,7 +61,7 @@ namespace toy
 
 		typedef std::function<bool(Frame&)> Visitor;
 
-		virtual void visit(Stripe& root, const Visitor& visitor);
+		virtual void visit(const Visitor& visitor);
 
 		void show();
 		void hide();
@@ -98,6 +98,7 @@ namespace toy
 
 		inline void setPosition(float x, float y) { setPositionDim(DIM_X, x); setPositionDim(DIM_Y, y); }
 		inline void setSize(float width, float height) { setSizeDim(DIM_X, width); setSizeDim(DIM_Y, height); }
+		inline void setManualSize(float width, float height) { setFixedSize(DIM_X, width); setFixedSize(DIM_Y, height); }
 		inline void setSize(DimFloat dim) { setSizeDim(DIM_X, dim[DIM_X]); setSizeDim(DIM_Y, dim[DIM_Y]); }
 
 		void integratePosition(Frame& root, DimFloat& local);

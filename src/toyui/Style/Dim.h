@@ -67,10 +67,9 @@ namespace toy
 		STRIPE = 1,
 		GRID = 2,
 		TABLE = 3,
-		MULTIGRID = 4,
-		LAYER = 5,
-		MASTER_LAYER = 6,
-		SPACE_LAYER = 7
+		LAYER = 4,
+		MASTER_LAYER = 5,
+		SPACE_LAYER = 6
 	};
 
 	enum _I_ AutoLayout : unsigned int
@@ -91,7 +90,7 @@ namespace toy
 	enum _I_ Space : unsigned int
 	{
 		MANUAL_SPACE = 0,        // PARAGRAPH   direction, MANUAL length, MANUAL depth
-		SHEET = 1,           // PARAGRAPH   direction, WRAP   length, WRAP   depth
+		SHEET = 1,               // PARAGRAPH   direction, WRAP   length, WRAP   depth
 		ITEM = 2,                // READING     direction, SHRINK length, SHRINK depth
 		BLOCK = 3,               // PARAGRAPH   direction, SHRINK length, SHRINK depth
 		FIXED_BLOCK = 4,         // PARAGRAPH   direction, FIXED  length, FIXED  depth
@@ -100,7 +99,7 @@ namespace toy
 		DIV = 7,	             // ORTHOGONAL  direction, WRAP   length, SHRINK depth
 		SPACE = 8,               // PARALLEL    direction, WRAP   length, SHRINK depth
 		BOARD = 9,               // PARAGRAPH   direction, EXPAND length, EXPAND depth
-		PARALLEL_FLEX = 10,       // PARALLEL    direction, WRAP   length, WRAP depth
+		PARALLEL_FLEX = 10,      // PARALLEL    direction, WRAP   length, WRAP depth
 	};
 
 	enum _I_ Sizing : unsigned int

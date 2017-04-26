@@ -14,7 +14,7 @@ using namespace std::placeholders;
 namespace toy
 {
 	List::List(Wedge& parent, Type& type, FrameType frameType)
-		: ScrollContainer(parent, type)
+		: ScrollSheet(parent, type)
 	{}
 
 	SelectList::SelectList(Wedge& parent, Type& type)

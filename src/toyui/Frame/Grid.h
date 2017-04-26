@@ -84,33 +84,6 @@ namespace toy
 	};
 
 	typedef std::vector<size_t> GridIndex;
-
-	class TOY_UI_EXPORT MultiGrid : public Stripe
-	{
-	public:
-		MultiGrid(Widget& widget);
-
-		void printIndex(const GridIndex& index);
-
-		Stripe& appendLine(Stripe& parent, size_t level);
-		Stripe& findLine(GridIndex index);
-
-		void remove(Frame& frame);
-
-		void shift(GridSubdiv& line, size_t from, int amount);
-		GridIndex insertNextTo(Frame& frame, bool before);
-		GridIndex insertDivide(Frame& frame, bool before);
-
-		void locate(float x, float y, GridSubdiv*& line, Frame*& prev, Frame*& next);
-
-		virtual void map(Frame& frame);
-		virtual void unmap(Frame& frame);
-		virtual void unmap();
-
-	protected:
-		unique_ptr<GridSubdiv> d_maindiv;
-		std::vector<unique_ptr<GridSubdiv>> d_subdivs;
-	};
 }
 
 

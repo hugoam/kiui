@@ -152,7 +152,7 @@ namespace toy
 	{}
 
 	WindowBody::WindowBody(Wedge& parent)
-		: ScrollContainer(parent, cls())
+		: ScrollSheet(parent, cls())
 	{}
 
 	CloseButton::CloseButton(Wedge& parent, const Trigger& trigger)
@@ -234,11 +234,6 @@ namespace toy
 	void Window::hideTitlebar()
 	{
 		m_header.hide();
-	}
-
-	const string& Window::name()
-	{
-		return m_name;
 	}
 
 	void Window::dock(Docksection& docksection)

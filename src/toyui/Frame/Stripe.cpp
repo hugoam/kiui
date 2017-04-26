@@ -135,17 +135,27 @@ namespace toy
 		return frame.dindex(d_length) == d_sequence.size() - 1;
 	}
 
-	void Stripe::visit(Stripe& root, const Visitor& visitor)
+	void Stripe::visit(const Visitor& visitor)
 	{
-		if(this != &root)
-		{
-			bool pursue = visitor(*this);
-			if(!pursue)
-				return;
-		}
+		bool pursue = visitor(*this);
+		if(!pursue)
+			return;
 
 		for(Frame* pframe : d_contents)
-			pframe->visit(root, visitor);
+			pframe->visit(visitor);
+	}
+
+	void Stripe::rootvisit(const Visitor& visitor)
+	{
+		for(Frame* pframe : d_contents)
+			pframe->visit(visitor);
+	}
+
+	void Stripe::relayout()
+	{
+		this->measureLayout();
+		this->resizeLayout();
+		this->positionLayout();
 	}
 
 	void Stripe::measureLayout()

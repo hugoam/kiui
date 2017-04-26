@@ -49,6 +49,7 @@ namespace toy
 	void RootSheet::nextFrame(size_t tick, size_t delta)
 	{
 		m_frame->as<MasterLayer>().relayout();
+		m_frame->as<MasterLayer>().redraw();
 
 		m_mouse->nextFrame();
 		m_keyboard->nextFrame();

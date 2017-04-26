@@ -18,9 +18,8 @@
 
 namespace toy
 {
-	Placeholder::Placeholder(Wedge& parent, const string& name)
+	Placeholder::Placeholder(Wedge& parent)
 		: Container(parent, cls())
-		, m_name(name)
 	{}
 
 	Docksection::Docksection(Wedge& parent, Dockline& dockline)
@@ -38,7 +37,7 @@ namespace toy
 		RootSheet& rootSheet = this->rootSheet();
 		rootSheet.append(window.container()->release(window));
 
-		if(m_tabs.containerContents().size() == 0)
+		if(m_tabs.containerContents().empty())
 			m_dockline->removeSection();
 	}
 
@@ -156,7 +155,7 @@ namespace toy
 		if(m_contents.size() == 1)
 			this->collapseSection();
 
-		if(m_contents.size() == 0 && m_dockline)
+		if(m_contents.empty() && m_dockline)
 			m_dockline->removeLine(*this);
 	}
 

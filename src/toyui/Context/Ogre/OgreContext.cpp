@@ -83,7 +83,7 @@ namespace toy
 	}
 
 	OgreRenderSystem::OgreRenderSystem(const string& resourcePath)
-		: RenderSystem(resourcePath)
+		: RenderSystem(resourcePath, false)
 		, m_ogreRoot(make_unique<Ogre::Root>())
 	{}
 	

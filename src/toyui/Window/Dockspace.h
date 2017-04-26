@@ -17,14 +17,9 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Placeholder : public Container
 	{
 	public:
-		Placeholder(Wedge& parent, const string& name);
-
-		const string& name() { return m_name; }
+		Placeholder(Wedge& parent);
 
 		static Type& cls() { static Type ty("Placeholder", Board::cls()); return ty; }
-
-	protected:
-		string m_name;
 	};
 
 	class _I_ TOY_UI_EXPORT DockTab

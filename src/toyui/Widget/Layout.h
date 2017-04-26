@@ -15,14 +15,9 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Page : public Container
 	{
 	public:
-		Page(Wedge& parent, const string& name);
-
-		const string& name() { return m_name; }
+		Page(Wedge& parent);
 
 		static Type& cls() { static Type ty("Page", Container::cls()); return ty; }
-
-	protected:
-		string m_name;
 	};
 
 	class TOY_UI_EXPORT Dialog

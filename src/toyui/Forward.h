@@ -83,8 +83,6 @@ namespace toy
 	class TypeIn;
 	class FilterInput;
 
-	class Bar;
-	class Band;
 	class Board;
 
 	class Slider;
@@ -152,16 +150,7 @@ namespace toy
 	class WValue;
 
 	class Device;
-	class DeviceType;
-	class Response;
-	class Hook;
 	class RootDevice;
-	class DeviceMapper;
-	class DeviceMapping;
-
-	class Stack;
-	class SelectStack;
-	class PickStack;
 
 	// Renderer
 	class NanoRenderer;
@@ -177,32 +166,6 @@ namespace toy
 	class OISInputWindow;
 	class OgreContext;
 	class OgreRenderSystem;
-
-	// Edit Devices
-	class DProcessInput;
-	class DProcessOutput;
-	class DProcess;
-	class DScriptCanvas;
-	class DScriptEditor;
-
-	class DMethod;
-	class DMethodBind;
-	class DMethodCall;
-
-	class DValue;
-	class DSequence;
-	class DLink;
-	class DEnum;
-
-	class DStructure;
-
-	class DObjectEdit;
-	class DMemberEdit;
-	class DModularEdit;
-	class DEdit;
-
-	class DRootObjectCreate;
-	class DObjectCreate;
 }
 
 #endif // TOY_UIFORWARD_H

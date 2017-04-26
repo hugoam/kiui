@@ -136,7 +136,7 @@ namespace toy
 		{
 			this->moveCaretRight();
 		}
-		else if(keyEvent.code == KC_RETURN && (m_allowedChars.size() == 0 || m_allowedChars.find('\n') != string::npos))
+		else if(keyEvent.code == KC_RETURN && (m_allowedChars.empty() || m_allowedChars.find('\n') != string::npos))
 		{
 			this->insert('\n');
 		}
@@ -148,7 +148,7 @@ namespace toy
 		{
 			this->erase();
 		}
-		else if(keyEvent.c != 0 && (m_allowedChars.size() == 0 || m_allowedChars.find(keyEvent.c) != string::npos))
+		else if(keyEvent.c != 0 && (m_allowedChars.empty() || m_allowedChars.find(keyEvent.c) != string::npos))
 		{
 			if(keyEvent.c == '.' && m_string.find('.') != string::npos)
 				return;

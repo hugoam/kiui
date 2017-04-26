@@ -106,12 +106,12 @@ namespace toy
 		WindowSizerRight m_secondSizer;
 	};
 
-	class _I_ TOY_UI_EXPORT WindowBody : public ScrollContainer
+	class _I_ TOY_UI_EXPORT WindowBody : public ScrollSheet
 	{
 	public:
 		WindowBody(Wedge& parent);
 
-		static Type& cls() { static Type ty("WindowBody", ScrollContainer::cls()); return ty; }
+		static Type& cls() { static Type ty("WindowBody", ScrollSheet::cls()); return ty; }
 	};
 
 	enum WindowState
@@ -130,7 +130,7 @@ namespace toy
 	public:
 		Window(Wedge& parent, const string& title, WindowState state = WINDOW_DEFAULT, const Trigger& onClose = nullptr, Docksection* dock = nullptr, Type& type = cls());
 		
-		const string& name();
+		const string& name() { return m_name; }
 
 		WindowState windowState() { return m_windowState; }
 		WindowBody& body() { return m_body; }

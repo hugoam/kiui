@@ -15,32 +15,150 @@ using namespace std::placeholders;
 
 namespace toy
 {
+	CanvasLine::CanvasLine(Widget& widget, Stripe& parent)
+		: Stripe(widget.fetchStyle(cls()), parent)
+	{}
+
+	CanvasColumn::CanvasColumn(Widget& widget, Stripe& parent)
+		: Stripe(widget.fetchStyle(cls()), parent)
+	{}
+
+
 	Canvas::Canvas(Wedge& parent, const string& title, Trigger contextTrigger)
 		: ScrollPlan(parent, cls())
 		, m_name(title)
 		, m_contextTrigger(contextTrigger)
 	{}
 
-	const string& Canvas::name()
-	{
-		return m_name;
-	}
-
 	void Canvas::rightClick(MouseEvent& mouseEvent)
 	{
-		m_contextTrigger(*this);
+		this->autoLayout();
+		//m_contextTrigger(*this);
+	}
+
+	void Canvas::autoLayout()
+	{
+		NodeTable nodes;
+		this->orderNodes(nodes);
+		this->layoutNodes(nodes);
+	}
+
+	void Canvas::collectNodes(NodeMap& nodes)
+	{
+		m_plan.visit([&nodes](Widget& widget) {
+			if(&widget.type() == &Node::cls())
+				nodes[&widget.as<Node>()] = NodeInfo(widget.as<Node>());
+			return true;
+		});
+	}
+
+	void Canvas::visit(NodeMap& nodes, NodeInfo& node, int index, int depth, bool output)
+	{
+		node.index = index;
+		node.depth += depth;
+
+		//printf("Canvas layout visited %s set index %i depth %i\n", node.node->name().c_str(), index, depth);
+
+		size_t idepth = 0;
+		std::vector<Node*>& connections = output ? node.outputs : node.inputs;
+		for(Node* pnext : connections)
+		{
+			NodeInfo& next = nodes[pnext];
+			if(next.done)
+				continue;
+			visit(nodes, next, output ? index + 1 : index - 1, idepth++, output);
+			node.visited += 1;
+			next.visited += 1;
+		}
+
+		if(node.visited == node.connections)
+		{
+			//printf("Canvas layout node %s done\n", node.node->name().c_str());
+			node.done = true;
+		}
+	}
+
+	void Canvas::processNode(NodeMap& nodes, NodeInfo& node)
+	{
+		visit(nodes, node, node.index, 0, true);
+		visit(nodes, node, node.index, 0, false);
+		node.done = true;
+	}
+
+	Node* Canvas::nextNode(NodeMap& nodes)
+	{
+		for(auto& kv : nodes)
+			if(!kv.second.done && kv.second.visited > 0)
+				return kv.second.node;
+
+		for(auto& kv : nodes)
+			if(!kv.second.done)
+				return kv.second.node;
+
+		return nullptr;
+	}
+
+	void Canvas::orderNodes(NodeTable& nodeTable)
+	{
+		NodeMap nodes;
+		this->collectNodes(nodes);
+
+		Node* node = nextNode(nodes);
+		while(node)
+		{
+			processNode(nodes, nodes[node]);
+			node = nextNode(nodes);
+		} 
+
+		int minIndex = 0;
+		int maxIndex = 0;
+		for(auto& kv : nodes)
+		{
+			minIndex = std::min(minIndex, kv.second.index);
+			maxIndex = std::max(maxIndex, kv.second.index);
+		}
+
+		int shift = -std::min(0, minIndex);
+		for(auto& kv : nodes)
+			kv.second.index += shift;
+
+		nodeTable.resize(maxIndex + shift + 1);
+
+		for(auto& kv : nodes)
+			nodeTable[kv.second.index].push_back(kv.second.node);
+	}
+
+	void Canvas::layoutNodes(const NodeTable& nodes)
+	{
+		unique_ptr<CanvasLine> line = make_unique<CanvasLine>(*this, m_plan.stripe());
+		std::vector<unique_ptr<CanvasColumn>> columns;
+		for(size_t i = 0; i < nodes.size(); ++i)
+		{
+			columns.emplace_back(make_unique<CanvasColumn>(*this, *line));
+			for(Node* node : nodes[i])
+				columns[i]->append(node->frame());
+		}
+
+		Style& nodeStyle = this->fetchStyle(Node::cls());
+
+		nodeStyle.layout().d_flow = FLOW;
+		line->relayout();
+		nodeStyle.layout().d_flow = FREE;
+
+		m_plan.stripe().remove(*line);
 	}
 
 	NodePlugKnob::NodePlugKnob(Wedge& parent)
 		: Item(parent, cls())
 	{}
-
+	
 	NodeConnectionProxy::NodeConnectionProxy(Wedge& parent)
 		: Decal(parent, cls())
 	{}
 
-	NodePlug::NodePlug(Wedge& parent, const string& name, bool input, ConnectTrigger onConnect)
+	NodePlug::NodePlug(Wedge& parent, Node& node, const string& name, bool input, ConnectTrigger onConnect)
 		: WrapControl(parent, cls())
+		, m_node(node)
 		, m_name(name)
 		, m_input(input)
 		, m_title(*this, m_name)
@@ -52,33 +170,26 @@ namespace toy
 			this->swap(0, 1);
 	}
 
-	Canvas& NodePlug::canvas()
-	{
-		Wedge& node = *this->parent()->parent();
-		Canvas& canvas = node.container()->as<Canvas>();
-		return canvas;
-	}
-
 	void NodePlug::leftDragStart(MouseEvent& mouseEvent)
 	{
 		mouseEvent.abort = true;
 
-		DimFloat local = this->canvas().frame().localPosition(mouseEvent.posX, mouseEvent.posY);
+		DimFloat local = m_node.plan().frame().localPosition(mouseEvent.posX, mouseEvent.posY);
 
-		m_connectionProxy = &this->canvas().emplace<NodeConnectionProxy>();
+		m_connectionProxy = &m_node.plan().emplace<NodeConnectionProxy>();
 		m_connectionProxy->frame().setPosition(local.x(), local.y());
 
 		if(m_input)
-			m_cableProxy = &this->canvas().emplace<NodeCable>(*m_connectionProxy, *this);
+			m_cableProxy = &m_node.plan().emplace<NodeCable>(*m_connectionProxy, *this);
 		else
-			m_cableProxy = &this->canvas().emplace<NodeCable>(*this, *m_connectionProxy);
+			m_cableProxy = &m_node.plan().emplace<NodeCable>(*this, *m_connectionProxy);
 	}
 
 	void NodePlug::leftDrag(MouseEvent& mouseEvent)
 	{
 		mouseEvent.abort = true;
 
-		DimFloat local = this->canvas().container().frame().localPosition(mouseEvent.posX, mouseEvent.posY);
+		DimFloat local = m_node.plan().frame().localPosition(mouseEvent.posX, mouseEvent.posY);
 		m_connectionProxy->frame().setPosition(local.x(), local.y());
 	}
 
@@ -93,59 +204,42 @@ namespace toy
 		if(widget)
 		{
 			NodePlug& plug = widget->as<NodePlug>();
-			this->connect(plug);
+			if(plug.m_input != m_input)
+				m_input ? plug.connect(*this) : this->connect(plug);
 		}
 
-		this->canvas().release(*m_connectionProxy);
-		this->canvas().release(*m_cableProxy);
+		m_node.plan().release(*m_connectionProxy);
+		m_node.plan().release(*m_cableProxy);
 	}
 
-	void NodePlug::connect(NodePlug& plug)
+	NodeCable& NodePlug::connect(NodePlug& plugIn, bool notify)
 	{
-		if(plug.m_input && !m_input)
-			this->connectOut(plug);
-		else if(!plug.m_input && m_input)
-			plug.connectOut(*this);
-	}
+		NodeCable& cable = m_node.plan().emplace<NodeCable>(*this, plugIn);
+		m_cables.push_back(&cable);
 
-
-	void NodePlug::disconnect(NodePlug& plug)
-	{
-		if(plug.m_input && !m_input)
-			this->disconnectOut(plug);
-		else if(!plug.m_input && m_input)
-			plug.disconnectOut(*this);
-	}
-
-	void NodePlug::connectOut(NodePlug& plugIn)
-	{
-		Wedge& node = *this->parent()->parent();
-		Container& canvas = *node.container();
-		m_cables.push_back(&canvas.emplace<NodeCable>(*this, plugIn));
-
-		if(m_onConnect)
+		if(notify && m_onConnect)
 			m_onConnect(*this, plugIn);
+
+		return cable;
 	}
 
-	void NodePlug::disconnectOut(NodePlug& plugIn)
+	void NodePlug::disconnect(NodePlug& plugIn)
 	{
 		for(NodeCable* cable : m_cables)
 			if(&cable->plugIn() == &plugIn)
 			{
 				m_cables.erase(std::find(m_cables.begin(), m_cables.end(), cable));
-				Wedge& node = *this->parent()->parent();
-				Container& canvas = *node.container();
-				canvas.release(*cable);
+				m_node.plan().release(*cable);
 				return;
 			}
 	}
 
-	NodeInPlug::NodeInPlug(Wedge& parent, const string& name)
-		: NodePlug(parent, name, true)
+	NodeInPlug::NodeInPlug(Wedge& parent, Node& node, const string& name)
+		: NodePlug(parent, node, name, true)
 	{}
 
-	NodeOutPlug::NodeOutPlug(Wedge& parent, const string& name, ConnectTrigger onConnect)
-		: NodePlug(parent, name, false, onConnect)
+	NodeOutPlug::NodeOutPlug(Wedge& parent, Node& node, const string& name, ConnectTrigger onConnect)
+		: NodePlug(parent, node, name, false, onConnect)
 	{}
 
 	NodeCable::NodeCable(Wedge& parent, Widget& plugOut, Widget& plugIn)
@@ -156,14 +250,14 @@ namespace toy
 
 	void NodeCable::nextFrame(size_t tick, size_t delta)
 	{
-		m_frame->setDirty(Frame::DIRTY_POSITION);
+		if(m_plugOut.frame().layer().redraw() || m_plugIn.frame().layer().redraw())
+			m_frame->setDirty(Frame::DIRTY_POSITION);
+
 		Widget::nextFrame(tick, delta);
 	}
 
 	bool NodeCable::customDraw(Renderer& renderer)
 	{
-		//m_frame->debugPrintDepth();
-		//printf("Drawing cable\n");
 		Wedge& canvas = *this->parent();
 
 		Frame& frameCanvas = canvas.frame();
@@ -192,8 +286,7 @@ namespace toy
 
 	NodeBody::NodeBody(Node& node)
 		: Container(node, cls())
-		, m_node(node)
-		, m_title(*this, m_node.name())
+		, m_header(*this, node)
 	{}
 
 	NodeIn::NodeIn(Wedge& parent)
@@ -202,6 +295,12 @@ namespace toy
 
 	NodeOut::NodeOut(Wedge& parent)
 		: Container(parent, cls())
+	{}
+
+	NodeHeader::NodeHeader(Wedge& parent, Node& node)
+		: Container(parent, cls())
+		, m_title(*this, node.name())
+		, m_spacer(*this)
 	{}
 
 	Node::Node(Wedge& parent, const string& title)
@@ -218,6 +317,34 @@ namespace toy
 	Container& Node::emplaceContainer()
 	{
 		return m_body;
+	}
+
+	Canvas& Node::canvas()
+	{
+		return *this->findContainer<Canvas>();
+	}
+
+	Container& Node::plan()
+	{
+		return this->canvas().plan();
+	}
+
+	std::vector<Node*> Node::inputNodes()
+	{
+		std::vector<Node*> inputs;
+		for(Widget* widget : m_inputs.contents())
+			for(NodeCable* cable : widget->as<NodePlug>().cables())
+				inputs.push_back(&cable->plugOut().as<NodePlug>().node());
+		return inputs;
+	}
+
+	std::vector<Node*> Node::outputNodes()
+	{
+		std::vector<Node*> outputs;
+		for(Widget* widget : m_outputs.contents())
+			for(NodeCable* cable : widget->as<NodePlug>().cables())
+				outputs.push_back(&cable->plugIn().as<NodePlug>().node());
+		return outputs;
 	}
 
 	void Node::leftClick(MouseEvent& mouseEvent)
@@ -251,11 +378,11 @@ namespace toy
 
 	NodePlug& Node::addInput(const string& name)
 	{
-		return m_inputs.emplace<NodeInPlug>(name);
+		return m_inputs.emplace<NodeInPlug>(*this, name);
 	}
 
 	NodePlug& Node::addOutput(const string& name)
 	{
-		return m_outputs.emplace<NodeOutPlug>(name);
+		return m_outputs.emplace<NodeOutPlug>(*this, name);
 	}
 }

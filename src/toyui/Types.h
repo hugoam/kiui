@@ -23,6 +23,7 @@
 #include <toyui/Widget/Layout.h>
 
 #include <toyui/Button/Button.h>
+#include <toyui/Button/Image.h>
 #include <toyui/Button/Slider.h>
 #include <toyui/Button/Scrollbar.h>
 #include <toyui/Button/ProgressBar.h>

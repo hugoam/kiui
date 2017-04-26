@@ -24,8 +24,9 @@
 
 namespace toy
 {
-	RenderSystem::RenderSystem(const string& resourcePath)
+	RenderSystem::RenderSystem(const string& resourcePath, bool manualRender)
 		: m_resourcePath(resourcePath)
+		, m_manualRender(manualRender)
 	{}
 
 	Context::Context(RenderSystem& renderSystem, unique_ptr<RenderWindow> renderWindow, unique_ptr<InputWindow> inputWindow)
@@ -64,7 +65,6 @@ namespace toy
 				int width, height, n;
 				unsigned char* img = stbi_load(fullpath.c_str(), &width, &height, &n, 4);
 				stbi_image_free(img);
-
 				images.emplace_back(name, fullpath, width, height);
 			}
 				
@@ -147,12 +147,18 @@ namespace toy
 		m_renderer->loadImageRGBA(m_atlas.image(), m_atlas.data());
 	}
 
-	Image& UiWindow::createImage(const string& name, int width, int height, uint8_t* data)
+	Image& UiWindow::createImage(const string& name, int width, int height, uint8_t* data, bool filtering)
 	{
 		m_images.emplace_back(name, name, width, height);
 		Image& image = m_images.back();
+		image.d_filtering = filtering;
 		m_renderer->loadImageRGBA(image, data);
 		return image;
+	}
+
+	void UiWindow::removeImage(Image& image)
+	{
+
 	}
 
 	void UiWindow::resize(size_t width, size_t height)
@@ -171,9 +177,11 @@ namespace toy
 		|| m_context->renderWindow().height() != size_t(m_height))
 			this->resize(m_context->renderWindow().width(), m_context->renderWindow().height());
 
-		// if(manualRender)
-		m_rootSheet->target().render();
-		// add sub layers
+		if(m_context->renderSystem().manualRender())
+		{
+			m_rootSheet->target().render();
+			// add sub layers
+		}
 
 		m_context->renderWindow().nextFrame();
 		m_context->inputWindow().nextFrame();

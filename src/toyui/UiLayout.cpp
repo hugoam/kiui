@@ -180,7 +180,8 @@ namespace toy
 		this->styledef(Canvas::cls()).layout().d_clipping = CLIP;
 
 		this->styledef(Plan::cls()).layout().d_space = MANUAL_SPACE;
-
+		//this->styledef(Plan::cls()).layout().d_space = BLOCK;
+		//this->styledef(Surface::cls()).layout().d_space = MANUAL_SPACE;
 		this->styledef(Plan::cls()).skin().m_customRenderer = &drawGrid;
 
 		this->styledef(Toolbar::cls()).layout().d_space = ITEM;
@@ -209,11 +210,15 @@ namespace toy
 
 		this->styledef(GridColumn::cls()).layout().d_space = SHEET;
 		this->styledef(GridColumn::cls()).layout().d_layout = DimLayout(AUTO_LAYOUT, NO_LAYOUT);
-
+		
 		this->styledef(GridOverlay::cls()).layout().d_space = BOARD;
 		this->styledef(GridOverlay::cls()).layout().d_flow = OVERLAY;
 		this->styledef(GridOverlay::cls()).layout().d_direction = READING;
 		this->styledef(GridOverlay::cls()).layout().d_opacity = HOLLOW;
+
+		this->styledef(CanvasLine::cls()).layout().d_space = ITEM;
+
+		this->styledef(CanvasColumn::cls()).layout().d_space = BLOCK;
 
 		this->styledef(Dockbar::cls()).layout().d_align = DimAlign(RIGHT, RIGHT);
 
@@ -270,6 +275,16 @@ namespace toy
 		this->styledef(ExpandboxBody::cls()).layout().d_padding = BoxFloat(12.f, 2.f, 0.f, 2.f);
 		this->styledef(ExpandboxBody::cls()).layout().d_spacing = DimFloat(6.f);
 
+
+		//this->styledef(Surface::cls()).layout().d_margin = DimFloat(1000.f);
+
+		this->styledef(CanvasLine::cls()).layout().d_padding = BoxFloat(20.f);
+		this->styledef(CanvasLine::cls()).layout().d_spacing = DimFloat(100.f);
+
+		this->styledef(CanvasColumn::cls()).layout().d_padding = BoxFloat(20.f);
+		this->styledef(CanvasColumn::cls()).layout().d_spacing = DimFloat(20.f);
+
+
 		this->styledef(TreeNodeBody::cls()).layout().d_padding = BoxFloat(24.f, 2.f, 0.f, 2.f);
 
 		this->styledef(Table::cls()).layout().d_spacing = DimFloat(0.f, 2.f);
@@ -304,6 +319,8 @@ namespace toy
 
 		this->styledef(Icon::cls()).skin().m_padding = BoxFloat(3.f);
 		this->styledef(Icon::cls()).skin().m_empty = false;
+
+		this->styledef(Figure::cls()).skin().m_empty = false;
 
 		this->styledef(Plan::cls()).skin().m_borderWidth = BoxFloat(2.f);
 		this->styledef(Plan::cls()).skin().m_borderColour = Colour::AlphaGrey;

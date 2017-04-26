@@ -20,15 +20,17 @@ namespace toy
 	class TOY_UI_EXPORT RenderSystem
 	{
 	public:
-		RenderSystem(const string& resourcePath);
+		RenderSystem(const string& resourcePath, bool manualRender);
 
 		const string& resourcePath() const { return m_resourcePath; }
+		bool manualRender() const { return m_manualRender; }
 
 		virtual unique_ptr<Context> createContext(const string& name, int width, int height, bool fullScreen) = 0;
 		virtual unique_ptr<Renderer> createRenderer(Context& context) = 0;
 
 	protected:
 		string m_resourcePath;
+		bool m_manualRender;
 	};
 
 	class TOY_UI_EXPORT Context
@@ -92,7 +94,8 @@ namespace toy
 
 		void handleResizeWindow(size_t width, size_t height);
 
-		Image& createImage(const string& image, int width, int height, uint8_t* data);
+		Image& createImage(const string& image, int width, int height, uint8_t* data, bool filtering = true);
+		void removeImage(Image& image);
 
 	protected:
 		void initResources();

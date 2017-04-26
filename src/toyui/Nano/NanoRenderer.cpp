@@ -68,7 +68,7 @@ namespace toy
 
 	void NanoRenderer::loadImageRGBA(Image& image, const unsigned char* data)
 	{
-		image.d_index = nvgCreateImageRGBA(m_ctx, image.d_width, image.d_height, 0, data);
+		image.d_index = nvgCreateImageRGBA(m_ctx, image.d_width, image.d_height, image.d_filtering ? 0 : NVG_IMAGE_NEAREST, data);
 	}
 
 	void NanoRenderer::loadImage(Image& image)
