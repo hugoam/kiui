@@ -45,17 +45,19 @@ namespace toy
 
 	void Controller::take(Widget& inputWidget)
 	{
+		// @todo : fix difference between key controllers and mouse controllers
+
 		m_parentFrame = &inputWidget;
 		m_inputWidget = &inputWidget;
 		InputFrame::m_controlMode = m_controlMode;
-		inputWidget.takeControl(m_controlMode, m_deviceType);
-		this->takeControl(m_controlMode, m_deviceType);
+		//inputWidget.takeControl(m_controlMode, m_deviceType);
+		this->takeControl(inputWidget, m_controlMode, m_deviceType);
 	}
 
 	void Controller::yield()
 	{
 		this->yieldControl();
-		m_inputWidget->yieldControl();
+		//m_inputWidget->yieldControl();
 		m_parentFrame = nullptr;
 		m_inputWidget = nullptr;
 	}

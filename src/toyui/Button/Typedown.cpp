@@ -10,13 +10,11 @@
 
 #include <toyui/Button/Filter.h>
 
-using namespace std::placeholders;
-
 namespace toy
 {
 	TypedownInput::TypedownInput(Wedge& parent, const Trigger& onSelected, StringVector choices)
 		: DropdownInput(parent, onSelected, choices)
-		, m_input(*this, m_list, std::bind(&TypedownInput::onInput, this, _1))
+		, m_input(*this, m_list, [this](const string& value) { this->onInput(value); })
 	{
 		m_input.hide();
 	}

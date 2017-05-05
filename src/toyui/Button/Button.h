@@ -13,7 +13,7 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT Label : public Widget
+	class _I_ TOY_UI_EXPORT Label : public Item
 	{
 	public:
 		Label(Wedge& parent, const string& label, Type& type = cls());
@@ -21,7 +21,7 @@ namespace toy
 		static Type& cls() { static Type ty("Label", Item::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT Text : public Label
+	class _I_ TOY_UI_EXPORT Text : public Label
 	{
 	public:
 		Text(Wedge& parent, const string& label);
@@ -29,7 +29,7 @@ namespace toy
 		static Type& cls() { static Type ty("Text", Label::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT Title : public Label
+	class _I_ TOY_UI_EXPORT Title : public Label
 	{
 	public:
 		Title(Wedge& parent, const string& label);
@@ -37,7 +37,7 @@ namespace toy
 		static Type& cls() { static Type ty("Title", Label::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT Icon : public Widget
+	class _I_ TOY_UI_EXPORT Icon : public Item
 	{
 	public:
 		Icon(Wedge& parent, Image& image);
@@ -68,7 +68,7 @@ namespace toy
 		TriggerFunc m_triggerCtrl;
 	};
 
-	class TOY_UI_EXPORT Button : public Control, public ClickTrigger
+	class _I_ TOY_UI_EXPORT Button : public Control, public ClickTrigger
 	{
 	public:
 		Button(Wedge& parent, const string& label, const Trigger& trigger = Trigger(), Type& type = cls());
@@ -85,7 +85,7 @@ namespace toy
 		string m_tooltip;
 	};
 
-	class TOY_UI_EXPORT WrapButton : public WrapControl, public ClickTrigger
+	class _I_ TOY_UI_EXPORT WrapButton : public WrapControl, public ClickTrigger
 	{
 	public:
 		WrapButton(Wedge& parent, const Trigger& trigger = Trigger(), Type& type = cls());
@@ -100,14 +100,14 @@ namespace toy
 		static Type& cls() { static Type ty("WrapButton", WrapControl::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT MultiButton : public WrapButton
+	class _I_ TOY_UI_EXPORT MultiButton : public WrapButton
 	{
 	public:
 		MultiButton(Wedge& parent, const Trigger& trigger = Trigger(), const StringVector& elements = StringVector(), Type& type = cls());
 
 		const std::vector<string>& elements() { return m_elements; }
 
-		void reset(const StringVector& contents);
+		void reset(const StringVector& contents, const Trigger& trigger = Trigger());
 
 		static Type& cls() { static Type ty("MultiButton", WrapButton::cls()); return ty; }
 
@@ -115,7 +115,7 @@ namespace toy
 		std::vector<string> m_elements;
 	};
 
-	class TOY_UI_EXPORT Toggle : public Control
+	class _I_ TOY_UI_EXPORT Toggle : public Control
 	{
 	public:
 		typedef std::function<void(Toggle&)> Trigger;

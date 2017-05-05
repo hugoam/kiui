@@ -82,7 +82,7 @@ namespace toy
 		float nextOffset(Dimension dim, float pos);
 		float prevOffset(Dimension dim, float pos);
 
-		Frame* pinpoint(float x, float y, bool opaque);
+		Frame* pinpoint(float x, float y, const Filter& filter);
 
 		void transferPixelSpan(Frame& prev, Frame& next, float pixelSpan);
 

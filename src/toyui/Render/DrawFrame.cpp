@@ -16,6 +16,8 @@ namespace toy
 {
 	Renderer* DrawFrame::sRenderer = nullptr;
 
+	string DrawFrame::sDebugPrintFilter = "";
+	bool DrawFrame::sDebugPrint = true;
 	string DrawFrame::sDebugDrawFilter = "";
 	bool DrawFrame::sDebugDrawFrameRect = false;
 	bool DrawFrame::sDebugDrawPaddedRect = false;

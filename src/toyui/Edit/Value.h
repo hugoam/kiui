@@ -57,7 +57,7 @@ namespace toy
 		OnUpdate m_onUpdate;
 	};
 
-	class TOY_UI_EXPORT WValue : public WrapControl, public Value
+	class _I_ TOY_UI_EXPORT WValue : public WrapControl, public Value
 	{
 	public:
 		WValue(Wedge& parent, Lref& lref, Type& type, const OnUpdate& onUpdate, bool edit = false);

@@ -14,7 +14,7 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT List : public ScrollSheet
+	class _I_ TOY_UI_EXPORT List : public ScrollSheet
 	{
 	public:
 		List(Wedge& parent, Type& type = cls(), FrameType frameType = STRIPE);
@@ -22,7 +22,7 @@ namespace toy
 		static Type& cls() { static Type ty("List", ScrollSheet::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT SelectList : public List
+	class _I_ TOY_UI_EXPORT SelectList : public List
 	{
 	public:
 		SelectList(Wedge& parent, Type& type = cls());
@@ -35,7 +35,7 @@ namespace toy
 		static Type& cls() { static Type ty("SelectList", List::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT LabelSequence : public Container
+	class _I_ TOY_UI_EXPORT LabelSequence : public Line
 	{
 	public:
 		LabelSequence(Wedge& parent, StringVector labels = StringVector());
@@ -43,7 +43,7 @@ namespace toy
 		static Type& cls() { static Type ty("LabelSequence", Line::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT ButtonSequence : public Container
+	class _I_ TOY_UI_EXPORT ButtonSequence : public Line
 	{
 	public:
 		ButtonSequence(Wedge& parent, StringVector labels = StringVector());
@@ -51,7 +51,7 @@ namespace toy
 		static Type& cls() { static Type ty("ButtonSequence", Line::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT SortList : public List//, public Dropper
+	class _I_ TOY_UI_EXPORT SortList : public List//, public Dropper
 	{
 	public:
 		SortList(Wedge& parent);

@@ -75,7 +75,7 @@ namespace toy
 		d_parent->layer().moveToTop(*this);
 	}
 
-	Frame* Layer::pinpoint(float x, float y, bool opaque)
+	Frame* Layer::pinpoint(float x, float y, const Filter& filter)
 	{
 		if(!this->visible() || this->hollow() || (this->clip() && !this->inside(x, y)))
 			return nullptr;
@@ -83,12 +83,12 @@ namespace toy
 		for(Layer* frame : reverse_adapt(d_sublayers))
 		{
 			DimFloat local = frame->localPosition(x, y); // probably should be local to this
-			Frame* target = frame->pinpoint(local.x(), local.y(), opaque);
+			Frame* target = frame->pinpoint(local.x(), local.y(), filter);
 			if(target)
 				return target;
 		}
 
-		return Stripe::pinpoint(x, y, opaque);
+		return Stripe::pinpoint(x, y, filter);
 	}
 
 	MasterLayer::MasterLayer(Widget& widget)

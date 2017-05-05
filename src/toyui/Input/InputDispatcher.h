@@ -138,7 +138,8 @@ namespace toy
 		InputReceiver* propagateEvent(InputEvent& inputEvent);
 
 		void takeControl(ControlMode mode, InputEvent::DeviceType device = InputEvent::ALL_DEVICES);
-		void takeControl(InputFrame& inputFrame);
+
+		void takeControl(InputFrame& inputFrame, ControlMode mode, InputEvent::DeviceType device);
 		void yieldControl();
 
 		bool consumes(InputEvent::DeviceType device);

@@ -12,8 +12,6 @@
 #include <toyui/UiWindow.h>
 #include <toyui/Widget/RootSheet.h>
 
-using namespace std::placeholders;
-
 namespace toy
 {
 	Caption::Caption(DrawFrame& frame)

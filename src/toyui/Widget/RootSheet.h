@@ -41,7 +41,7 @@ namespace toy
 		void handleUnbindWidget(Widget& widget);
 		void handleBindWidget(Widget& widget);
 
-		static Type& cls() { static Type ty("RootSheet", Wedge::cls()); return ty; }
+		static Type& cls() { static Type ty("RootSheet", Container::cls()); return ty; }
 
 	protected:
 		UiWindow& m_window;

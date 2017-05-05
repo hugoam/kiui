@@ -70,6 +70,8 @@ namespace toy
 	public:
 		static Renderer* sRenderer;
 
+		static string sDebugPrintFilter;
+		static bool sDebugPrint;
 		static string sDebugDrawFilter;
 		static bool sDebugDrawFrameRect;
 		static bool sDebugDrawPaddedRect;

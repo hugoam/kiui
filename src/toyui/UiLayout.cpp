@@ -11,7 +11,8 @@
 
 namespace toy
 {
-	Styler::Styler()
+	Styler::Styler(UiWindow& uiWindow)
+		: m_uiWindow(uiWindow)
 	{}
 
 	Styler::~Styler()
@@ -73,6 +74,11 @@ namespace toy
 		style.prepare(m_styledefs[style.name()].get());
 	}
 
+	Image& Styler::findImage(const string& image)
+	{
+		return m_uiWindow.findImage(image);
+	}
+
 	void Styler::defaultLayout()
 	{
 		this->styledef(RootSheet::cls()).layout().d_space = BOARD;
@@ -103,6 +109,8 @@ namespace toy
 		this->styledef(Overlay::cls()).layout().d_flow = FREE;
 		this->styledef(Overlay::cls()).layout().d_space = BLOCK;
 		this->styledef(Overlay::cls()).layout().d_opacity = OPAQUE;
+
+		this->styledef(Rectangle::cls()).layout().d_space = FIXED_BLOCK;
 
 		this->styledef(Node::cls()).layout().d_direction = READING;
 
@@ -324,6 +332,9 @@ namespace toy
 
 		this->styledef(Plan::cls()).skin().m_borderWidth = BoxFloat(2.f);
 		this->styledef(Plan::cls()).skin().m_borderColour = Colour::AlphaGrey;
+
+		this->styledef(Rectangle::cls()).skin().m_borderWidth = BoxFloat(1.f);
+		this->styledef(Rectangle::cls()).skin().m_borderColour = Colour::Cyan;
 
 		this->styledef(Placeholder::cls()).skin().m_backgroundColour = Colour::Blue;
 	}

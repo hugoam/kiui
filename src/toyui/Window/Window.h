@@ -19,8 +19,8 @@ namespace toy
 	public:
 		Popup(Wedge& parent);
 
-		void leftClick(MouseEvent& mouseEvent);
-		void rightClick(MouseEvent& mouseEvent);
+		virtual void leftClick(MouseEvent& mouseEvent);
+		virtual void rightClick(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("Popup", Overlay::cls()); return ty; }
 	};
@@ -30,8 +30,8 @@ namespace toy
 	public:
 		CloseButton(Wedge& parent, const Trigger& trigger);
 
-		void leftClick(MouseEvent& mouseEvent);
-		void rightClick(MouseEvent& mouseEvent);
+		virtual void leftClick(MouseEvent& mouseEvent);
+		virtual void rightClick(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("CloseButton", Button::cls()); return ty; }
 	};
@@ -46,10 +46,10 @@ namespace toy
 		Label& title() { return m_title; }
 		Button& close() { return m_close; }
 
-		void leftClick(MouseEvent& mouseEvent);
-		void leftDragStart(MouseEvent& mouseEvent);
-		void leftDrag(MouseEvent& mouseEvent);
-		void leftDragEnd(MouseEvent& mouseEvent);
+		virtual void leftClick(MouseEvent& mouseEvent);
+		virtual void leftDragStart(MouseEvent& mouseEvent);
+		virtual void leftDrag(MouseEvent& mouseEvent);
+		virtual void leftDragEnd(MouseEvent& mouseEvent);
 
 		Docksection* docktarget(MouseEvent& mouseEvent);
 
@@ -67,9 +67,9 @@ namespace toy
 	public:
 		WindowSizer(Wedge& parent, Window& window, Type& type, bool left);
 
-		void leftDragStart(MouseEvent& mouseEvent);
-		void leftDrag(MouseEvent& mouseEvent);
-		void leftDragEnd(MouseEvent& mouseEvent);
+		virtual void leftDragStart(MouseEvent& mouseEvent);
+		virtual void leftDrag(MouseEvent& mouseEvent);
+		virtual void leftDragEnd(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("WindowSizer", Control::cls()); return ty; }
 
@@ -178,13 +178,13 @@ namespace toy
 		Docksection* m_dock;
 	};
 
-	class _I_ TOY_UI_EXPORT DockWindow : public Object
+	class TOY_UI_EXPORT DockWindow : public Object
 	{
 	public:
 		static Type& cls() { static Type ty("DockWindow", Window::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT WrapWindow : public Object
+	class TOY_UI_EXPORT WrapWindow : public Object
 	{
 	public:
 		static Type& cls() { static Type ty("WrapWindow", Window::cls()); return ty; }

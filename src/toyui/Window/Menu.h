@@ -25,7 +25,7 @@ namespace toy
 		static Type& cls() { static Type ty("SubMenuList", MenuList::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT Menu : public Dropdown
+	class _I_ TOY_UI_EXPORT Menu : public Dropdown
 	{
 	public:
 		Menu(Wedge& parent, const string& label, bool submenu = false);
@@ -36,7 +36,7 @@ namespace toy
 		bool m_submenu;
 	};
 
-	class TOY_UI_EXPORT Menubar : public Container
+	class _I_ TOY_UI_EXPORT Menubar : public Header
 	{
 	public:
 		Menubar(Wedge& parent);

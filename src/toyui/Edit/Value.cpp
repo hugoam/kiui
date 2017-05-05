@@ -14,8 +14,6 @@
 #include <toyui/Edit/TypeIn.h>
 #include <toyui/Button/Slider.h>
 
-using namespace std::placeholders;
-
 namespace toy
 {
 	Value::Value(Lref& value, const OnUpdate& onUpdate, bool edit)

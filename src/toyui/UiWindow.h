@@ -63,14 +63,13 @@ namespace toy
 		~UiWindow();
 
 		RenderSystem& renderSystem() { return m_system; }
+		const string& resourcePath() const { return m_resourcePath; }
 
 		Context& context() { return *m_context; }
 		Renderer& renderer() const { return *m_renderer; }
 
 		std::vector<Image>& images() { return m_images; }
 		ImageAtlas& imageAtlas() { return m_atlas; }
-
-		const string& resourcePath() const { return m_resourcePath; }
 
 		float width() const { return m_width; }
 		float height() const { return m_height; }
@@ -96,6 +95,7 @@ namespace toy
 
 		Image& createImage(const string& image, int width, int height, uint8_t* data, bool filtering = true);
 		void removeImage(Image& image);
+		Image& findImage(const string& name);
 
 	protected:
 		void initResources();

@@ -16,8 +16,6 @@
 #include <toyui/Widget/RootSheet.h>
 #include <toyui/Container/List.h>
 
-using namespace std::placeholders;
-
 namespace toy
 {
 	DropdownHead::DropdownHead(Wedge& parent, const Trigger& trigger)

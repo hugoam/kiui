@@ -12,32 +12,20 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Image : public IdStruct
+	class _I_ TOY_UI_EXPORT Image : public Struct
 	{
 	public:
 		Image(const string& name, const string& path, int width = 0, int height = 0)
-			: IdStruct(cls())
-			, d_name(name), d_path(path), d_left(0), d_top(0), d_width(width), d_height(height), d_index(0), d_atlas(nullptr), d_tile(false), d_stretch(true), d_filtering(true)
+			: Struct()
+			, d_name(name), d_path(path), d_left(0), d_top(0), d_width(width), d_height(height)
+			, d_index(0), d_atlas(nullptr), d_tile(false), d_stretch(true), d_filtering(true)
 		{}
 
 		Image()
-			: IdStruct(cls())
-			, d_name(), d_path(), d_left(0), d_top(0), d_width(0), d_height(0), d_index(0), d_atlas(nullptr), d_tile(false), d_stretch(true), d_filtering(true)
+			: Struct()
+			, d_name(), d_path(), d_left(0), d_top(0), d_width(0), d_height(0)
+			, d_index(0), d_atlas(nullptr), d_tile(false), d_stretch(true), d_filtering(true)
 		{}
-
-		Image(const Image& other)
-			: IdStruct(other)
-		{
-			*this = other;
-		}
-
-		Image(Image&& other)
-			: IdStruct(cls())
-		{
-			*this = other;
-		}
-
-		Image& operator=(const Image&) = default;
 
 		bool null() const { return d_name.empty(); }
 

@@ -29,11 +29,11 @@ namespace toy
 	}
 
 	Docker::Docker(Wedge& parent)
-		: Container(parent, cls())
+		: Line(parent, cls())
 	{}
 
 	Dockbar::Dockbar(Wedge& parent)
-		: Container(parent, cls())
+		: Div(parent, cls())
 		, m_docker(*this)
 	{}
 

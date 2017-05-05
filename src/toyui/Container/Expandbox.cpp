@@ -26,7 +26,7 @@ namespace toy
 	{}
 
 	Expandbox::Expandbox(Wedge& parent, const string& title, bool collapsed, bool build, Type& type)
-		: Container(parent, type)
+		: Stack(parent, type)
 		, m_header(*this)
 		, m_toggle(m_header, std::bind(&Expandbox::expand, this), std::bind(&Expandbox::collapse, this), !collapsed)
 		, m_title(m_header, title)

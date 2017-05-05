@@ -40,7 +40,7 @@ namespace toy
 
 	InputReceiver* InputFrame::controlEvent(InputEvent& inputEvent)
 	{
-		if(m_controller)
+		if(m_controller && m_controller->consumes(inputEvent.deviceType))
 			return m_controller->controlEvent(inputEvent);
 
 		return this;
@@ -55,6 +55,7 @@ namespace toy
 	{
 		InputFrame& rootReceiver = this->rootFrame();
 		InputReceiver* topReceiver = this->controlEvent(inputEvent);
+
 		InputReceiver* consumer = topReceiver;
 		InputReceiver* receiver = topReceiver;
 
@@ -78,23 +79,22 @@ namespace toy
 
 	void InputFrame::takeControl(ControlMode mode, InputEvent::DeviceType device)
 	{
-		m_controlMode = mode;
-		m_deviceFilter = device;
 		InputFrame& root = this->rootController();
 		if(&root != this)
-			this->takeControl(root);
+			this->takeControl(root, mode, device);
 	}
 
-	void InputFrame::takeControl(InputFrame& inputFrame)
+	void InputFrame::takeControl(InputFrame& inputFrame, ControlMode mode, InputEvent::DeviceType device)
 	{
+		m_controlMode = mode;
+		m_deviceFilter = device;
+
 		if(inputFrame.m_controller)
 			inputFrame.m_controller->yieldControl();
 
 		this->control();
 		m_controlled = &inputFrame;
 		m_controlled->m_controller = this;
-
-		//printf(">>>>> %s TAKE CONTROL OF %s\n", static_cast<Widget&>(*this).style().name(), static_cast<Widget&>(*m_controlled).style().name());
 	}
 
 	void InputFrame::yieldControl()
@@ -104,8 +104,6 @@ namespace toy
 
 		if(!m_controlled)
 			return;
-
-		//printf(">>>>> %s YIELD CONTROL OF %s\n", static_cast<Widget&>(*this).style().name(), static_cast<Widget&>(*m_controlled).style().name());
 
 		this->uncontrol();
 		m_controlled->m_controller = nullptr;

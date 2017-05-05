@@ -12,8 +12,6 @@
 #include <toyui/UiWindow.h>
 #include <toyui/Widget/RootSheet.h>
 
-using namespace std::placeholders;
-
 namespace toy
 {
 	int Stencil::s_debugBatch = 0;
@@ -74,7 +72,8 @@ namespace toy
 			else
 				skinRect.assign(rect.x(), rect.y(), rect.w() + margin, rect.h() + margin);
 
-			imageSkin.stretchCoords(skinRect.x(), skinRect.y(), skinRect.w(), skinRect.h(), std::bind(&Stencil::drawSkinImage, this, std::ref(target), _1, _2, _3, _4, _5));
+			auto func = [this, &target](ImageSkin::Section section, const BoxFloat& rect) { this->drawSkinImage(target, section, rect); };
+			imageSkin.stretchCoords(skinRect.x(), skinRect.y(), skinRect.w(), skinRect.h(), func);
 		}
 
 		// Image
@@ -86,21 +85,20 @@ namespace toy
 			target.drawImage(*skin.tile(), rect);
 	}
 
-	void Stencil::drawSkinImage(Renderer& target, ImageSkin::Section section, int left, int top, int width, int height)
+	void Stencil::drawSkinImage(Renderer& target, ImageSkin::Section section, BoxFloat rect)
 	{
 		ImageSkin& imageSkin = m_frame.inkstyle().imageSkin();
-		left -= imageSkin.d_margin;
-		top -= imageSkin.d_margin;
+		rect.setX(rect.x() - imageSkin.d_margin);
+		rect.setY(rect.y() - imageSkin.d_margin);
 
 		float xratio = 1.f;
 		float yratio = 1.f;
 
 		if(section == ImageSkin::TOP || section == ImageSkin::BOTTOM || section == ImageSkin::FILL)
-			xratio = float(width) / imageSkin.d_fillWidth;
+			xratio = rect.w() / imageSkin.d_fillWidth;
 		if(section == ImageSkin::LEFT || section == ImageSkin::RIGHT || section == ImageSkin::FILL)
-			yratio = float(height) / imageSkin.d_fillHeight;
+			yratio = rect.h() / imageSkin.d_fillHeight;
 
-		BoxFloat rect(left, top, width, height);
 		target.drawImageStretch(imageSkin.d_images[section], rect, xratio, yratio);
 	}
 }

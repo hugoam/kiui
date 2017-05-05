@@ -7,10 +7,6 @@
 
 #include <toyui/Widget/Layout.h>
 
-#include <locale>
-
-using namespace std::placeholders;
-
 namespace toy
 {
 	List::List(Wedge& parent, Type& type, FrameType frameType)
@@ -37,14 +33,14 @@ namespace toy
 	}
 
 	LabelSequence::LabelSequence(Wedge& parent, StringVector labels)
-		: Container(parent, cls())
+		: Line(parent, cls())
 	{
 		for(string& label : labels)
 			this->emplace<Label>(label);
 	}
 	
 	ButtonSequence::ButtonSequence(Wedge& parent, StringVector labels)
-		: Container(parent, cls())
+		: Line(parent, cls())
 	{
 		for(string& label : labels)
 			this->emplace<Button>(label);

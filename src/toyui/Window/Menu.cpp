@@ -7,8 +7,6 @@
 
 #include <toyui/Frame/Layer.h>
 
-using namespace std::placeholders;
-
 namespace toy
 {
 	Menu::Menu(Wedge& parent, const string& label, bool submenu)
@@ -23,6 +21,6 @@ namespace toy
 	}
 
 	Menubar::Menubar(Wedge& parent)
-		: Container(parent, cls())
+		: Header(parent, cls())
 	{}
 }

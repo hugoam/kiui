@@ -20,7 +20,7 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT Scroller : public Slider
+	class _I_ TOY_UI_EXPORT Scroller : public Slider
 	{
 	public:
 		Scroller(Wedge& parent, Dimension dim);
@@ -30,7 +30,7 @@ namespace toy
 		static Type& cls() { static Type ty("Scroller", Slider::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT ScrollerKnob : public SliderKnob
+	class _I_ TOY_UI_EXPORT ScrollerKnob : public SliderKnob
 	{
 	public:
 		ScrollerKnob(Wedge& parent, Dimension dim);
@@ -78,7 +78,7 @@ namespace toy
 		static Type& cls() { static Type ty("ScrollRight", Button::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Scrollbar : public Container
+	class _I_ TOY_UI_EXPORT Scrollbar : public Line
 	{
 	public:
 		Scrollbar(Wedge& parent, Wedge& frameSheet, Wedge& contentSheet, Dimension dim);

@@ -11,8 +11,6 @@
 
 #include <toyui/Widget/RootSheet.h>
 
-using namespace std::placeholders;
-
 namespace toy
 {
 	CanvasLine::CanvasLine(Widget& widget, Stripe& parent)
@@ -285,20 +283,20 @@ namespace toy
 	}
 
 	NodeBody::NodeBody(Node& node)
-		: Container(node, cls())
+		: Sheet(node, cls())
 		, m_header(*this, node)
 	{}
 
 	NodeIn::NodeIn(Wedge& parent)
-		: Container(parent, cls())
+		: Div(parent, cls())
 	{}
 
 	NodeOut::NodeOut(Wedge& parent)
-		: Container(parent, cls())
+		: Div(parent, cls())
 	{}
 
 	NodeHeader::NodeHeader(Wedge& parent, Node& node)
-		: Container(parent, cls())
+		: Line(parent, cls())
 		, m_title(*this, node.name())
 		, m_spacer(*this)
 	{}

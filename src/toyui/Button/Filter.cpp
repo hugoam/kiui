@@ -9,11 +9,9 @@
 
 #include <locale>
 
-using namespace std::placeholders;
-
 namespace toy
 {
-	FilterInput::FilterInput(Wedge& parent, Wedge& list, std::function<void(string)> callback)
+	FilterInput::FilterInput(Wedge& parent, Wedge& list, std::function<void(const string&)> callback)
 		: Input<string>(parent, "", callback)
 		, m_list(list)
 	{}

@@ -85,4 +85,8 @@ namespace toy
 	{
 		this->content().setText(label);
 	}
+
+	Rectangle::Rectangle(Wedge& parent, Type& type)
+		: Decal(parent, type)
+	{}
 }

@@ -9,8 +9,6 @@
 
 #include <toyui/Frame/Frame.h>
 
-using namespace std::placeholders;
-
 namespace toy
 {
 	TabHeader::TabHeader(Wedge& parent, const string& label, const Trigger& trigger)
@@ -35,11 +33,11 @@ namespace toy
 	}
 
 	TabberHead::TabberHead(Wedge& parent)
-		: Container(parent, cls())
+		: Line(parent, cls())
 	{}
 
 	TabberBody::TabberBody(Wedge& parent)
-		: Container(parent, cls())
+		: Sheet(parent, cls())
 	{}
 
 	Tabber::Tabber(Wedge& parent, Type& type, bool downtabs)

@@ -20,8 +20,9 @@ namespace toy
 		Wedge(Type& type = cls(), FrameType frameType = STRIPE);
 		~Wedge();
 
+		_A_ _G_ inline std::vector<Widget*>& contents() { return m_contents; }
+
 		inline Stripe& stripe() { return m_frame->as<Stripe>(); }
-		inline const std::vector<Widget*>& contents() { return m_contents; }
 		inline size_t count() { return m_contents.size(); }
 
 		inline Widget& at(size_t index) { return *m_contents.at(index); }

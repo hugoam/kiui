@@ -166,15 +166,10 @@ namespace toy
 		_A_ _M_ float x1() const { return d_values[2]; }
 		_A_ _M_ float y1() const { return d_values[3]; }
 
-		_A_ float x() const { return d_values[0]; }
-		_A_ float y() const { return d_values[1]; }
-		_A_ float w() const { return d_values[2]; }
-		_A_ float h() const { return d_values[3]; }
-
-		_A_ float xx() const { return d_values[0]; }
-		_A_ float xy() const { return d_values[1]; }
-		_A_ float yx() const { return d_values[2]; }
-		_A_ float yy() const { return d_values[3]; }
+		_A_ float x() const { return x0(); }
+		_A_ float y() const { return y0(); }
+		_A_ float w() const { return x1(); }
+		_A_ float h() const { return y1(); }
 
 		_A_ float v0() const { return d_values[0]; }
 		_A_ float v1() const { return d_values[1]; }
@@ -194,6 +189,11 @@ namespace toy
 		void setY0(float y0) { d_values[1] = y0; d_null = cnull(); }
 		void setX1(float x1) { d_values[2] = x1; d_null = cnull(); }
 		void setY1(float y1) { d_values[3] = y1; d_null = cnull(); }
+
+		void setX(float x) { setX0(x); }
+		void setY(float y) { setY0(y); }
+		void setW(float w) { setX1(w); }
+		void setH(float h) { setY1(h); }
 
 		bool intersects(const BoxFloat& other) const
 		{

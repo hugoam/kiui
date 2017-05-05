@@ -22,16 +22,16 @@ namespace toy
 {
 	typedef std::function<bool (Frame&, Renderer&)> CustomRenderer;
 
-	class _I_ TOY_UI_EXPORT Shadow : public IdStruct
+	class _I_ TOY_UI_EXPORT Shadow : public Struct
 	{
 	public:
 		Shadow(float xpos, float ypos, float blur, float spread, Colour colour = Colour::Black)
-			: IdStruct(cls())
+			: Struct()
 			, d_xpos(xpos), d_ypos(ypos), d_blur(blur), d_spread(spread), d_radius(spread + blur), d_colour(colour), d_null(false)
 		{}
 
 		Shadow()
-			: IdStruct(cls())
+			: Struct()
 			, d_null(true)
 		{}
 
@@ -64,17 +64,18 @@ namespace toy
 		bool set;
 	};
 
-	class _I_ TOY_UI_EXPORT LayoutStyle : public IdStruct
+	class _I_ TOY_UI_EXPORT LayoutStyle : public Struct
 	{
 	public:
 		LayoutStyle()
-			: IdStruct(cls())
-			, d_layout(DimLayout(AUTO_LAYOUT, AUTO_LAYOUT)), d_flow(FLOW), d_clipping(NOCLIP), d_opacity(CLEAR), d_space(SHEET), d_direction(DIRECTION_AUTO), d_align(DimAlign(LEFT, LEFT))
+			: Struct()
+			, d_layout(DimLayout(AUTO_LAYOUT, AUTO_LAYOUT)), d_flow(FLOW), d_clipping(NOCLIP), d_opacity(CLEAR), d_space(SHEET)
+			, d_direction(DIRECTION_AUTO), d_align(DimAlign(LEFT, LEFT))
 			, d_span(DimFloat(1.f, 1.f)), d_pivot(DimPivot(FORWARD, FORWARD)), d_zorder(0), d_updated(0)
 		{}
 
 		LayoutStyle(const LayoutStyle& other)
-			: IdStruct(cls())
+			: Struct()
 		{
 			this->copy(other);
 		}
@@ -137,11 +138,11 @@ namespace toy
 		static Type& cls() { static Type ty(INDEXED); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT InkStyle : public IdStruct
+	class _I_ TOY_UI_EXPORT InkStyle : public Struct
 	{
 	public:
 		_C_ InkStyle(Style* style = nullptr)
-			: IdStruct(cls())
+			: Struct()
 			, m_style(style)
 			, m_empty(true), m_base(nullptr), m_backgroundColour(Colour::Transparent), m_borderColour(Colour::Transparent), m_imageColour(Colour::Transparent), m_textColour(Colour::Transparent)
 			, m_textFont("dejavu"), m_textSize(14.f), m_textBreak(true), m_textWrap(false)
@@ -152,7 +153,7 @@ namespace toy
 		{}
 
 		InkStyle(const InkStyle& other)
-			: IdStruct(cls())
+			: Struct()
 			, m_style(other.m_style)
 		{
 			this->copy(other);
@@ -270,7 +271,7 @@ namespace toy
 
 	typedef std::vector<SubSkin> StyleTable;
 
-	class _I_ TOY_UI_EXPORT Style : public IdStruct, public NonCopy
+	class _I_ TOY_UI_EXPORT Style : public Struct, public NonCopy
 	{
 	public:
 		Style(Type& type, Style* base = nullptr);

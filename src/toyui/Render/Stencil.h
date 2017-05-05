@@ -22,7 +22,7 @@ namespace toy
 
 		void redraw(Renderer& target, BoxFloat& rect, BoxFloat& paddedRect, BoxFloat& contentRect);
 
-		void drawSkinImage(Renderer& target, ImageSkin::Section section, int left, int top, int width, int height);
+		void drawSkinImage(Renderer& target, ImageSkin::Section section, BoxFloat rect);
 
 		BoxFloat selectCorners();
 

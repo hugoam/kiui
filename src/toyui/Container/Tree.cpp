@@ -11,8 +11,6 @@
 
 #include <toyui/Frame/Frame.h>
 
-using namespace std::placeholders;
-
 namespace toy
 {
 	TreeNode::TreeNode(Wedge& parent, const string& image, const string& title, bool collapsed, Type& type)

@@ -85,6 +85,7 @@ namespace toy
 	void NanoRenderer::render(RenderTarget& target)
 	{
 		m_debugBatch = 0;
+		m_debugDepth = 0;
 		Stencil::s_debugBatch = 0;
 		static int prevBatch = 0;
 
@@ -161,18 +162,18 @@ namespace toy
 		if(corners.null())
 			nvgRect(m_ctx, rect.x() + halfborder, rect.y() + halfborder, rect.w() - border, rect.h() - border);
 		else
-			nvgRoundedRectVarying(m_ctx, rect.x() + halfborder, rect.y() + halfborder, rect.w() - border, rect.h() - border, corners.xx(), corners.xy(), corners.yx(), corners.yy());
+			nvgRoundedRectVarying(m_ctx, rect.x() + halfborder, rect.y() + halfborder, rect.w() - border, rect.h() - border, corners.v0(), corners.v1(), corners.v2(), corners.v3());
 	}
 
 	void NanoRenderer::drawShadow(const BoxFloat& rect, const BoxFloat& corners, const Shadow& shadow)
 	{
-		NVGpaint shadowPaint = nvgBoxGradient(m_ctx, rect.x() + shadow.d_xpos - shadow.d_spread, rect.y() + shadow.d_ypos - shadow.d_spread, rect.w() + shadow.d_spread * 2.f, rect.h() + shadow.d_spread * 2.f, corners.xy() + shadow.d_spread, shadow.d_blur, nvgRGBA(0, 0, 0, 128), nvgRGBA(0, 0, 0, 0));
+		NVGpaint shadowPaint = nvgBoxGradient(m_ctx, rect.x() + shadow.d_xpos - shadow.d_spread, rect.y() + shadow.d_ypos - shadow.d_spread, rect.w() + shadow.d_spread * 2.f, rect.h() + shadow.d_spread * 2.f, corners.v0() + shadow.d_spread, shadow.d_blur, nvgRGBA(0, 0, 0, 128), nvgRGBA(0, 0, 0, 0));
 		nvgBeginPath(m_ctx);
 		nvgRect(m_ctx, rect.x() + shadow.d_xpos - shadow.d_radius, rect.y() + shadow.d_ypos - shadow.d_radius, rect.w() + shadow.d_radius * 2.f, rect.h() + shadow.d_radius * 2.f);
 		if(corners.null())
 			nvgRect(m_ctx, rect.x(), rect.y(), rect.w(), rect.h());
 		else
-			nvgRoundedRectVarying(m_ctx, rect.x(), rect.y(), rect.w(), rect.h(), corners.xx(), corners.xy(), corners.yx(), corners.yy());
+			nvgRoundedRectVarying(m_ctx, rect.x(), rect.y(), rect.w(), rect.h(), corners.v0(), corners.v1(), corners.v2(), corners.v3());
 		nvgPathWinding(m_ctx, NVG_HOLE);
 		nvgFillPaint(m_ctx, shadowPaint);
 		nvgFill(m_ctx);
@@ -396,6 +397,8 @@ namespace toy
 
 	void NanoRenderer::beginTarget()
 	{
+		m_debugDepth++;
+
 		nvgSave(m_ctx);
 		nvgResetTransform(m_ctx);
 		nvgResetScissor(m_ctx);
@@ -403,6 +406,8 @@ namespace toy
 
 	void NanoRenderer::endTarget()
 	{
+		m_debugDepth--;
+
 		nvgRestore(m_ctx);
 	}
 
@@ -432,6 +437,8 @@ namespace toy
 
 	void NanoRenderer::beginUpdate(void* layerCache, float x, float y, float scale)
 	{
+		m_debugDepth++;
+
 		nvgBindDisplayList(m_ctx, (NVGdisplayList*)layerCache);
 		nvgSave(m_ctx);
 		nvgTranslate(m_ctx, x, y);
@@ -442,6 +449,8 @@ namespace toy
 
 	void NanoRenderer::endUpdate()
 	{
+		m_debugDepth--;
+
 		nvgRestore(m_ctx);
 		nvgBindDisplayList(m_ctx, nullptr);
 	}

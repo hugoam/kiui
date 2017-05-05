@@ -22,7 +22,7 @@
 namespace toy
 {
 	ScrollZone::ScrollZone(Wedge& parent)
-		: Container(parent, cls())
+		: Layout(parent, cls())
 		, m_container(this->as<Wedge>())
 	{}
 
@@ -85,7 +85,7 @@ namespace toy
 	}
 
 	Surface::Surface(Wedge& parent)
-		: Container(parent, cls())
+		: Sheet(parent, cls())
 	{}
 
 	ScrollPlan::ScrollPlan(Wedge& parent, Type& type)

@@ -33,7 +33,7 @@ namespace toy
 		static Type& cls() { static Type ty("ColumnHeader", Label::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Table : public Container
+	class _I_ TOY_UI_EXPORT Table : public Stack
 	{
 	public:
 		Table(Wedge& parent, StringVector columns, std::vector<float> weights);

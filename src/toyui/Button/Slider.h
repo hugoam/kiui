@@ -17,7 +17,7 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT SliderKnob : public Item
+	class _I_ TOY_UI_EXPORT SliderKnob : public Item
 	{
 	public:
 		SliderKnob(Wedge& parent, Dimension dim = DIM_X, Type& type = cls());
@@ -28,7 +28,7 @@ namespace toy
 		Dimension m_dim;
 	};
 
-	class TOY_UI_EXPORT Slider : public WrapControl
+	class _I_ TOY_UI_EXPORT Slider : public WrapControl
 	{
 	public:
 		Slider(Wedge& parent, Dimension dim = DIM_X, const Trigger& onUpdated = nullptr, Type& type = cls());
@@ -81,7 +81,7 @@ namespace toy
 		Trigger m_onUpdated;
 	};
 
-	class TOY_UI_EXPORT SliderDisplay : public Label
+	class _I_ TOY_UI_EXPORT SliderDisplay : public Label
 	{
 	public:
 		SliderDisplay(Wedge& parent, const string& label);

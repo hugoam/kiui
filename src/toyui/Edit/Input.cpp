@@ -16,8 +16,6 @@
 
 #include <toyui/Edit/TypeIn.h>
 
-using namespace std::placeholders;
-
 namespace toy
 {
 	InputRadio::InputRadio(Wedge& parent, const string& label, StringVector choices, std::function<void(const string&)> callback, bool reverse)

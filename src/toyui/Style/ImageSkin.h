@@ -21,15 +21,6 @@
 
 namespace toy
 {
-	inline Image& findImage(const string& name)
-	{
-		Indexer& indexer = Image::cls().indexer();
-		for(Object* object : indexer.objects())
-			if(object && object->as<Image>().d_name == name)
-				return object->as<Image>();
-		static Image null; return null;
-	}
-
 	class _I_ ImageSkin : public Struct
 	{
 	public:
@@ -47,8 +38,8 @@ namespace toy
 		};
 
 	public:
-		ImageSkin(const string& image, int left, int top, int right, int bottom, int margin = 0, Dimension stretch = DIM_NULL)
-			: d_image(&findImage(image))
+		ImageSkin(Image& image, int left, int top, int right, int bottom, int margin = 0, Dimension stretch = DIM_NULL)
+			: d_image(&image)
 			, d_top(top), d_right(right), d_bottom(bottom), d_left(left)
 			, d_margin(margin)
 			, d_stretch(stretch)
@@ -98,30 +89,30 @@ namespace toy
 			d_solidWidth = width - d_margin - d_margin;
 			d_solidHeight = height - d_margin - d_margin;
 
-			this->stretchCoords(0, 0, width, height, [this](Section s, int x, int y, int w, int h) {
-				this->d_images[s].d_left = this->d_image->d_left + x;
-				this->d_images[s].d_top = this->d_image->d_top + y;
-				this->d_images[s].d_width = w;
-				this->d_images[s].d_height = h;
+			this->stretchCoords(0, 0, width, height, [this](Section s, const BoxFloat& rect) {
+				this->d_images[s].d_left = this->d_image->d_left + int(rect.x());
+				this->d_images[s].d_top = this->d_image->d_top + int(rect.y());
+				this->d_images[s].d_width = int(rect.w());
+				this->d_images[s].d_height = int(rect.h());
 			 });
 		}
 
-		void stretchCoords(int x, int y, int width, int height, std::function<void(Section, int, int, int, int)> filler) const
+		void stretchCoords(int x, int y, int width, int height, std::function<void(Section, const BoxFloat&)> filler) const
 		{
 			int fillWidth = width - d_left - d_right;
 			int fillHeight = height - d_top - d_bottom;
 
-			filler(TOP_LEFT, x, y, d_left, d_top);
-			filler(TOP_RIGHT, x + fillWidth + d_left, y, d_right, d_top);
-			filler(BOTTOM_RIGHT, x + fillWidth + d_left, y + fillHeight + d_top, d_right, d_bottom);
-			filler(BOTTOM_LEFT, x, y + fillHeight + d_top, d_left, d_bottom);
+			filler(TOP_LEFT, BoxFloat(x, y, d_left, d_top));
+			filler(TOP_RIGHT, BoxFloat(x + fillWidth + d_left, y, d_right, d_top));
+			filler(BOTTOM_RIGHT, BoxFloat(x + fillWidth + d_left, y + fillHeight + d_top, d_right, d_bottom));
+			filler(BOTTOM_LEFT, BoxFloat(x, y + fillHeight + d_top, d_left, d_bottom));
 
-			filler(TOP, x + d_left, y, fillWidth, d_top); // width, 0.f
-			filler(RIGHT, x + fillWidth + d_left, y + d_top, d_right, fillHeight); // 0.f, height
-			filler(BOTTOM, x + d_left, y + fillHeight + d_top, fillWidth, d_bottom); // width, 0.f
-			filler(LEFT, x, y + d_top, d_left, fillHeight); // 0.f, height
+			filler(TOP, BoxFloat(x + d_left, y, fillWidth, d_top));
+			filler(RIGHT, BoxFloat(x + fillWidth + d_left, y + d_top, d_right, fillHeight));
+			filler(BOTTOM, BoxFloat(x + d_left, y + fillHeight + d_top, fillWidth, d_bottom));
+			filler(LEFT, BoxFloat(x, y + d_top, d_left, fillHeight));
 
-			filler(FILL, x + d_left, y + d_top, fillWidth, fillHeight); // width, height
+			filler(FILL, BoxFloat(x + d_left, y + d_top, fillWidth, fillHeight));
 		}
 
 		_A_ _M_ Image* d_image;

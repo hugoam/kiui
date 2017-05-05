@@ -19,7 +19,7 @@
 namespace toy
 {
 	Label::Label(Wedge& parent, const string& label, Type& type)
-		: Widget(parent, type)
+		: Item(parent, type)
 	{
 		this->setLabel(label);
 	}
@@ -33,16 +33,16 @@ namespace toy
 	{}
 
 	Icon::Icon(Wedge& parent, Image& image)
-		: Widget(parent, cls())
+		: Item(parent, cls())
 	{
 		this->setImage(&image);
 	}
 
 	Icon::Icon(Wedge& parent, const string& image)
-		: Widget(parent, cls())
+		: Item(parent, cls())
 	{
 		if(image != "")
-			this->setImage(&findImage(image));
+			this->setImage(&findImage(toLower(image)));
 	}
 
 	Button::Button(Wedge& parent, const string& label, const Trigger& trigger, Type& type)
@@ -103,15 +103,18 @@ namespace toy
 		this->reset(elements);
 	}
 
-	void MultiButton::reset(const StringVector& elements)
+	void MultiButton::reset(const StringVector& elements , const Trigger& trigger)
 	{
+		if(trigger)
+			m_trigger = trigger;
+
 		this->clear();
 		for(const string& value : elements)
 		{
-			if(findImage(value).null())
-				this->emplace<Label>(value);
-			else
+			if(!findImage(toLower(value)).null())
 				this->emplace<Icon>(value);
+			else
+				this->emplace<Label>(value);
 		}
 		m_elements = elements;
 	}

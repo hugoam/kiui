@@ -97,6 +97,11 @@ namespace toy
 		this->content().setImage(image);
 	}
 
+	Image& Widget::findImage(const string& name)
+	{
+		return this->uiWindow().findImage(name);
+	}
+
 	const string& Widget::contentlabel()
 	{
 		return this->content().text();
@@ -209,7 +214,7 @@ namespace toy
 	{
 		return this->uiWindow().styler().style(type);
 	}
-
+	
 	void Widget::markDirty()
 	{
 		m_frame->setDirty(Frame::DIRTY_CONTENT);
@@ -238,13 +243,18 @@ namespace toy
 		m_frame->content().updateInkstyle(m_style->subskin(m_state));
 		m_frame->setDirty(Frame::DIRTY_CONTENT);
 	}
-
+	
 	Widget* Widget::pinpoint(float x, float y)
+	{
+		return this->pinpoint(x, y, [](Frame& frame) { return frame.opaque(); });
+	}
+
+	Widget* Widget::pinpoint(float x, float y, const Frame::Filter& filter)
 	{
 		if(m_frame->dirty() >= Frame::DIRTY_MAPPING)
 			return nullptr;
 		DimFloat absolute = m_frame->absolutePosition();
-		Frame* frame = m_frame->pinpoint(x - absolute[DIM_X], y - absolute[DIM_Y], true);
+		Frame* frame = m_frame->pinpoint(x - absolute[DIM_X], y - absolute[DIM_Y], filter);
 		return frame ? frame->widget() : nullptr;
 	}
 
@@ -257,7 +267,7 @@ namespace toy
 		{
 			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
 			Widget* pinned = this->pinpoint(mouseEvent.posX, mouseEvent.posY);
-			return pinned ? pinned : this;
+			return (pinned && pinned != this) ? pinned->controlEvent(inputEvent) : this;
 		}
 
 		return this;

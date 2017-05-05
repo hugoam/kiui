@@ -48,7 +48,7 @@ namespace toy
 		void moveToTop(Layer& sublayer);
 		void moveToTop();
 
-		Frame* pinpoint(float x, float y, bool opaque);
+		Frame* pinpoint(float x, float y, const Filter& filter);
 
 	protected:
 		Layer* d_parentLayer;

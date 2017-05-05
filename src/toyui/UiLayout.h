@@ -22,8 +22,10 @@ namespace toy
 	class TOY_UI_EXPORT Styler : public NonCopy
 	{
 	public:
-		Styler();
+		Styler(UiWindow& uiWindow);
 		~Styler();
+
+		UiWindow& uiWindow() { return m_uiWindow; }
 
 		void addInitializer(const StyleInitializer& initializer) { m_initializers.push_back(initializer); }
 
@@ -41,7 +43,11 @@ namespace toy
 		void initStyle(Type& type);
 		void prepareStyle(Style& style);
 
+		Image& findImage(const string& image);
+
 	protected:
+		UiWindow& m_uiWindow;
+
 		std::map<string, std::unique_ptr<Style>> m_styledefs;
 		std::map<string, std::unique_ptr<Style>> m_styles;
 

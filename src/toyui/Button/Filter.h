@@ -16,7 +16,7 @@ namespace toy
 	class TOY_UI_EXPORT FilterInput : public Input<string>
 	{
 	public:
-		FilterInput(Wedge& parent, Wedge& list, std::function<void(string)> callback = nullptr);
+		FilterInput(Wedge& parent, Wedge& list, std::function<void(const string&)> callback = nullptr);
 
 		void filterOn();
 		void filterOff();

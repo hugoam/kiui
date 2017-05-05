@@ -106,7 +106,7 @@ namespace toy
 		Widget& m_plugIn;
 	};
 
-	class TOY_UI_EXPORT NodeHeader : public Container
+	class TOY_UI_EXPORT NodeHeader : public Line
 	{
 	public:
 		NodeHeader(Wedge& parent, Node& node);
@@ -118,7 +118,7 @@ namespace toy
 		Spacer m_spacer;
 	};
 
-	class TOY_UI_EXPORT NodeBody : public Container
+	class TOY_UI_EXPORT NodeBody : public Sheet
 	{
 	public:
 		NodeBody(Node& parent);
@@ -131,7 +131,7 @@ namespace toy
 		NodeHeader m_header;
 	};
 
-	class TOY_UI_EXPORT NodeIn : public Container
+	class TOY_UI_EXPORT NodeIn : public Div
 	{
 	public:
 		NodeIn(Wedge& parent);
@@ -139,7 +139,7 @@ namespace toy
 		static Type& cls() { static Type ty("NodeIn", Div::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT NodeOut : public Container
+	class TOY_UI_EXPORT NodeOut : public Div
 	{
 	public:
 		NodeOut(Wedge& parent);

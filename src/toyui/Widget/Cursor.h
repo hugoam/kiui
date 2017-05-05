@@ -22,6 +22,14 @@ namespace toy
 		static Type& cls() { static Type ty("Tooltip", Overlay::cls()); return ty; }
 	};
 
+	class _I_ TOY_UI_EXPORT Rectangle : public Decal
+	{
+	public:
+		Rectangle(Wedge& parent, Type& type = cls());
+
+		static Type& cls() { static Type ty("Rectangle", Decal::cls()); return ty; }
+	};
+
 	class _I_ TOY_UI_EXPORT Cursor : public Decal
 	{
 	public:
@@ -47,7 +55,7 @@ namespace toy
 		Clock m_tooltipClock;
 	};
 
-	class TOY_UI_EXPORT ResizeCursorX : public Object
+	class TOY_UI_EXPORT ResizeCursorX
 	{
 	public:
 		static Type& cls() { static Type ty("ResizeCursorX", Cursor::cls()); return ty; }
@@ -59,25 +67,25 @@ namespace toy
 		static Type& cls() { static Type ty("ResizeCursorY", Cursor::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT MoveCursor : public Object
+	class TOY_UI_EXPORT MoveCursor
 	{
 	public:
 		static Type& cls() { static Type ty("MoveCursor", Cursor::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT ResizeCursorDiagLeft : public Object
+	class TOY_UI_EXPORT ResizeCursorDiagLeft
 	{
 	public:
 		static Type& cls() { static Type ty("ResizeCursorDiagLeft", Cursor::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT ResizeCursorDiagRight : public Object
+	class TOY_UI_EXPORT ResizeCursorDiagRight
 	{
 	public:
 		static Type& cls() { static Type ty("ResizeCursorDiagRight", Cursor::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT CaretCursor : public Object
+	class TOY_UI_EXPORT CaretCursor
 	{
 	public:
 		static Type& cls() { static Type ty("CaretCursor", Cursor::cls()); return ty; }

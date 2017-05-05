@@ -99,7 +99,8 @@ namespace toy
 
 	protected:
 		string m_resourcePath;
-		int m_debugBatch;
+		size_t m_debugBatch;
+		size_t m_debugDepth;
 	};
 }
 

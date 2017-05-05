@@ -7,17 +7,18 @@
 
 namespace toy
 {
-	ToolButton::ToolButton(Wedge& parent, const string& icon)
+	ToolButton::ToolButton(Wedge& parent, const string& icon, Trigger trigger)
 		: Dropdown(parent)
 	{
-		this->emplace<Button>(icon);
+		DropdownChoice& choice = this->addChoice();
+		choice.reset({ icon }, trigger);
 		m_header.reset({ icon });
 		m_toggle.hide();
 		//m_header.emplace<Icon>(icon);
 	}
 
 	Tooldock::Tooldock(Wedge& parent)
-		: Container(parent, cls())//, GRID)
+		: Div(parent, cls())//, GRID)
 	{}
 
 	ToolbarMover::ToolbarMover(Wedge& parent)

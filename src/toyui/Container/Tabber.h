@@ -12,7 +12,7 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT TabHeader : public Button
+	class _I_ TOY_UI_EXPORT TabHeader : public Button
 	{
 	public:
 		TabHeader(Wedge& parent, const string& label, const Trigger& trigger);
@@ -37,7 +37,7 @@ namespace toy
 		bool m_active;
 	};
 
-	class _I_ TOY_UI_EXPORT TabberHead : public Container
+	class _I_ TOY_UI_EXPORT TabberHead : public Line
 	{
 	public:
 		TabberHead(Wedge& parent);
@@ -45,7 +45,7 @@ namespace toy
 		static Type& cls() { static Type ty("TabberHead", Line::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT TabberBody : public Container
+	class _I_ TOY_UI_EXPORT TabberBody : public Sheet
 	{
 	public:
 		TabberBody(Wedge& parent);

@@ -26,6 +26,8 @@ namespace toy
 
 	Renderer::Renderer(const string& resourcePath)
 		: m_resourcePath(resourcePath)
+		, m_debugBatch(0)
+		, m_debugDepth(0)
 	{
 		DrawFrame::sRenderer = this;
 	}

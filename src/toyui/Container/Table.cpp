@@ -10,8 +10,6 @@
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Grid.h>
 
-using namespace std::placeholders;
-
 namespace toy
 {
 	TableHead::TableHead(Table& table)
@@ -34,7 +32,7 @@ namespace toy
 	}
 
 	Table::Table(Wedge& parent, StringVector columns, std::vector<float> weights)
-		: Container(parent, cls(), TABLE)
+		: Stack(parent, cls(), TABLE)
 		, m_columns(columns)
 		, m_weights(weights)
 		, m_head(*this)

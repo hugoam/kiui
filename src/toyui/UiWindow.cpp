@@ -81,7 +81,7 @@ namespace toy
 		, m_atlas(1024, 1024)
 		, m_width(m_context->renderWindow().width())
 		, m_height(m_context->renderWindow().height())
-		, m_styler(make_unique<Styler>())
+		, m_styler(make_unique<Styler>(*this))
 		, m_rootSheet(nullptr)
 		, m_shutdownRequested(false)
 		, m_user(user)
@@ -159,6 +159,14 @@ namespace toy
 	void UiWindow::removeImage(Image& image)
 	{
 
+	}
+
+	Image& UiWindow::findImage(const string& name)
+	{
+		for(Image& image : m_images)
+			if(image.d_name == name)
+				return image;
+		static Image null; return null;
 	}
 
 	void UiWindow::resize(size_t width, size_t height)

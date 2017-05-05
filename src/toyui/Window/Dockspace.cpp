@@ -19,7 +19,7 @@
 namespace toy
 {
 	Placeholder::Placeholder(Wedge& parent)
-		: Container(parent, cls())
+		: Board(parent, cls())
 	{}
 
 	Docksection::Docksection(Wedge& parent, Dockline& dockline)
@@ -193,7 +193,7 @@ namespace toy
 	{}
 
 	Dockspace::Dockspace(Wedge& parent)
-		: Container(parent, cls())
+		: Layout(parent, cls())
 		, m_mainLine(*this)
 	{}
 

@@ -14,7 +14,7 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Placeholder : public Container
+	class _I_ TOY_UI_EXPORT Placeholder : public Board
 	{
 	public:
 		Placeholder(Wedge& parent);
@@ -92,7 +92,7 @@ namespace toy
 		static Type& cls() { static Type ty("MasterDockline", Dockline::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Dockspace : public Container
+	class _I_ TOY_UI_EXPORT Dockspace : public Layout
 	{
 	public:
 		Dockspace(Wedge& parent);

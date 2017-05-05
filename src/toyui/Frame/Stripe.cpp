@@ -326,7 +326,7 @@ namespace toy
 			return offset + dpadding(d_length) + frame.dmargin(d_length) + alignSequence(frame, space);
 	}
 
-	Frame* Stripe::pinpoint(float x, float y, bool opaque)
+	Frame* Stripe::pinpoint(float x, float y, const Filter& filter)
 	{
 		if(this->hidden() || this->hollow() || (this->clip() && !this->inside(x, y)))
 			return nullptr;
@@ -339,7 +339,7 @@ namespace toy
 
 		for(Frame* frame : reverse_adapt(d_contents))
 		{
-			Frame* target = frame->pinpoint((x - frame->left()) / frame->scale(), (y - frame->top()) / frame->scale(), opaque);
+			Frame* target = frame->pinpoint((x - frame->left()) / frame->scale(), (y - frame->top()) / frame->scale(), filter);
 			if(target)
 				return target;
 		}
@@ -350,7 +350,7 @@ namespace toy
 			y -= this->top();
 		}
 
-		return Frame::pinpoint(x, y, opaque);
+		return Frame::pinpoint(x, y, filter);
 	}
 
 	void Stripe::transferPixelSpan(Frame& prev, Frame& next, float pixelSpan)

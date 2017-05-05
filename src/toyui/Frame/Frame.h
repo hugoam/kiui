@@ -60,6 +60,7 @@ namespace toy
 		void unbind();
 
 		typedef std::function<bool(Frame&)> Visitor;
+		typedef std::function<bool(Frame&)> Filter;
 
 		virtual void visit(const Visitor& visitor);
 
@@ -72,7 +73,7 @@ namespace toy
 		void setDirty(Dirty dirty) { if(dirty > d_dirty) d_dirty = dirty; }
 		void markDirty(Dirty dirty);
 
-		virtual Frame* pinpoint(float x, float y, bool opaque);
+		virtual Frame* pinpoint(float x, float y, const Filter& filter = nullptr);
 
 		void updateFixed(Dimension dim);
 		void setFixedSize(Dimension dim, float size);

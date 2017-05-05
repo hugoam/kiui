@@ -18,8 +18,6 @@
 
 #include <toyui/Input/InputDevice.h>
 
-using namespace std::placeholders;
-
 namespace toy
 {
 	Popup::Popup(Wedge& parent)

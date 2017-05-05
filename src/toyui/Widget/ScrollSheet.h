@@ -13,7 +13,7 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT ScrollZone : public Container
+	class _I_ TOY_UI_EXPORT ScrollZone : public Layout
 	{
 	public:
 		ScrollZone(Wedge& parent);
@@ -65,7 +65,7 @@ namespace toy
 		static Type& cls() { static Type ty("Plan", Sheet::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT Surface : public Container
+	class TOY_UI_EXPORT Surface : public Sheet
 	{
 	public:
 		Surface(Wedge& parent);

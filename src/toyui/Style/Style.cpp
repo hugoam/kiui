@@ -23,7 +23,7 @@ namespace toy
 	}
 
 	Style::Style(Type& type, Style* base)
-		: IdStruct(cls())
+		: Struct()
 		, m_styleType(&type)
 		, m_base(base)
 		, m_name(type.name())
@@ -35,7 +35,7 @@ namespace toy
 	{}
 
 	Style::Style(const string& name)
-		: IdStruct(cls())
+		: Struct()
 		, m_styleType(nullptr)
 		, m_base(nullptr)
 		, m_name(name)

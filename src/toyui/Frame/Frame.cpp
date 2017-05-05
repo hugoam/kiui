@@ -313,9 +313,9 @@ namespace toy
 			 && y >= 0.f && y <= height());
 	}
 
-	Frame* Frame::pinpoint(float x, float y, bool opaque)
+	Frame* Frame::pinpoint(float x, float y, const Filter& filter)
 	{
-		if(this->hidden() || (opaque && !this->opaque()) || !this->inside(x, y))
+		if(!filter(*this) || this->hidden() || !this->inside(x, y))
 			return nullptr;
 		else
 			return this;

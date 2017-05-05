@@ -14,7 +14,7 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT DropdownHead : public MultiButton
+	class _I_ TOY_UI_EXPORT DropdownHead : public MultiButton
 	{
 	public:
 		DropdownHead(Wedge& parent, const Trigger& trigger);
@@ -22,7 +22,7 @@ namespace toy
 		static Type& cls() { static Type ty("DropdownHead", MultiButton::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT DropdownToggle : public Button
+	class _I_ TOY_UI_EXPORT DropdownToggle : public Button
 	{
 	public:
 		DropdownToggle(Wedge& parent, const Trigger& trigger);
@@ -30,7 +30,7 @@ namespace toy
 		static Type& cls() { static Type ty("DropdownToggle", Button::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT DropdownChoice : public MultiButton
+	class _I_ TOY_UI_EXPORT DropdownChoice : public MultiButton
 	{
 	public:
 		DropdownChoice(Wedge& parent, const Trigger& trigger, const StringVector& elements);
@@ -38,7 +38,7 @@ namespace toy
 		static Type& cls() { static Type ty("DropdownChoice", MultiButton::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT DropdownList : public Container
+	class _I_ TOY_UI_EXPORT DropdownList : public Container
 	{
 	public:
 		DropdownList(Dropdown& dropdown);
@@ -52,7 +52,7 @@ namespace toy
 		Dropdown& m_dropdown;
 	};
 
-	class TOY_UI_EXPORT Dropdown : public WrapButton
+	class _I_ TOY_UI_EXPORT Dropdown : public WrapButton
 	{
 	public:
 		Dropdown(Wedge& parent, Type& type = cls());
@@ -76,7 +76,7 @@ namespace toy
 		bool m_down;
 	};
 
-	class TOY_UI_EXPORT DropdownInput : public Dropdown
+	class _I_ TOY_UI_EXPORT DropdownInput : public Dropdown
 	{
 	public:
 		DropdownInput(Wedge& parent, const Trigger& onSelected, StringVector choices = StringVector(), Type& type = cls());

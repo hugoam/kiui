@@ -7,7 +7,39 @@
 
 namespace toy
 {
-	Page::Page(Wedge& parent)
-		: Container(parent, cls())
+	Page::Page(Wedge& parent, Type& type)
+		: Container(parent, type)
+	{}
+
+	Dialog::Dialog(Wedge& parent, Type& type)
+		: Container(parent, type)
+	{}
+
+	Board::Board(Wedge& parent, Type& type)
+		: Container(parent, type)
+	{}
+
+	Layout::Layout(Wedge& parent, Type& type)
+		: Board(parent, type)
+	{}
+
+	Line::Line(Wedge& parent, Type& type)
+		: Container(parent, type)
+	{}
+
+	Div::Div(Wedge& parent, Type& type)
+		: Container(parent, type)
+	{}
+
+	Stack::Stack(Wedge& parent, Type& type, FrameType frameType)
+		: Container(parent, type, frameType)
+	{}
+
+	Sheet::Sheet(Wedge& parent, Type& type)
+		: Container(parent, type)
+	{}
+
+	Header::Header(Wedge& parent, Type& type)
+		: Line(parent, type)
 	{}
 }

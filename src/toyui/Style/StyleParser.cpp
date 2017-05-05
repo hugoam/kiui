@@ -8,8 +8,8 @@
 #include <toyobj/String/StringConvert.h>
 #include <toyobj/Util/Timer.h>
 
-#include <toyui/UiLayout.h>
 #include <toyui/Widget/Widget.h>
+#include <toyui/UiLayout.h>
 
 #include <yaml.h>
 
@@ -165,7 +165,7 @@ namespace toy
 		{
 			WidgetState state = fromString<WidgetState>(strState);
 			string suffix = "_" + replaceAll(strState, "|", "_");
-			m_style->decline(state).m_image = &findImage(m_skin->image()->d_name + suffix);
+			m_style->decline(state).m_image = &m_styler.findImage(m_skin->image()->d_name + suffix);
 		}
 	}
 	
@@ -178,7 +178,7 @@ namespace toy
 			string suffix = "_" + replaceAll(strState, "|", "_");
 			InkStyle& inkstyle = m_style->decline(state);
 			inkstyle.m_imageSkin = m_skin->m_imageSkin;
-			inkstyle.m_imageSkin.val.setupImage(findImage(m_skin->m_imageSkin.val.d_image->d_name + suffix));
+			inkstyle.m_imageSkin.val.setupImage(m_styler.findImage(m_skin->m_imageSkin.val.d_image->d_name + suffix));
 		}
 	}
 
@@ -248,19 +248,20 @@ namespace toy
 		else if(key == "topdown_gradient")
 			m_skin->m_linearGradient = fromString<DimFloat>(value); // top, down
 		else if(key == "image")
-			m_skin->m_image = value == "null" ? nullptr : &findImage(value); // image.png
+			m_skin->m_image = value == "null" ? nullptr : &m_styler.findImage(value); // image.png
 		else if(key == "overlay")
-			m_skin->m_overlay = value == "null" ? nullptr : &findImage(value); // image.png
+			m_skin->m_overlay = value == "null" ? nullptr : &m_styler.findImage(value); // image.png
 		else if(key == "tile")
-			m_skin->m_tile = value == "null" ? nullptr : &findImage(value); // image.png
+			m_skin->m_tile = value == "null" ? nullptr : &m_styler.findImage(value); // image.png
 		else if(key == "image_skin")
-			m_skin->m_imageSkin = ImageSkin(values[0],	fromString<int>(values[1]), fromString<int>(values[2]),
-														fromString<int>(values[3]), fromString<int>(values[4]),
-														values.size() > 5 ? fromString<int>(values[5]) : 0,
-														values.size() > 6 ? fromString<Dimension>(values[6]) : DIM_NULL); // : image.png
+			m_skin->m_imageSkin = ImageSkin(m_styler.findImage(values[0]),
+											fromString<int>(values[1]), fromString<int>(values[2]),
+											fromString<int>(values[3]), fromString<int>(values[4]),
+											values.size() > 5 ? fromString<int>(values[5]) : 0,
+											values.size() > 6 ? fromString<Dimension>(values[6]) : DIM_NULL); // : image.png
 		else if(key == "shadow")
-			m_skin->m_shadow = Shadow(	fromString<float>(values[0]), fromString<float>(values[1]),
-										fromString<float>(values[2]), fromString<float>(values[3])); // : xoffset, yoffset, blur, spread
+			m_skin->m_shadow = Shadow(fromString<float>(values[0]), fromString<float>(values[1]),
+									  fromString<float>(values[2]), fromString<float>(values[3])); // : xoffset, yoffset, blur, spread
 		else if(key == "no_shadow")
 			m_skin->m_shadow = Shadow();
 		else if(key == "shadow_colour")

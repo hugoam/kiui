@@ -10,7 +10,7 @@
 #include <toyobj/String/String.h>
 #include <toyobj/Util/Updatable.h>
 #include <toyui/Forward.h>
-#include <toyui/Frame/Uibox.h>
+#include <toyui/Frame/Frame.h>
 #include <toyui/Input/InputDispatcher.h>
 #include <toyui/Style/Style.h>
 
@@ -46,19 +46,20 @@ namespace toy
 		_A_ inline Frame& frame() { return *m_frame; }
 		_A_ inline WidgetState state() { return m_state; }
 		_A_ _M_ inline Style& style() { return *m_style; }
-		inline Device* device() { return m_device; }
 
-		inline Lref& frameIndex() { return m_frameIndex; }
+		inline Device* device() { return m_device; }
 
 		void setIndex(size_t index) { m_index = index; }
 		void setContainer(Container& container) { m_container = &container; }
 		DrawFrame& content();
 
-		const string& label();
+		_A_ _M_ const string& label();
 		void setLabel(const string& label);
 
-		Image* image();
+		_A_ _M_ Image* image();
 		void setImage(Image* image);
+
+		Image& findImage(const string& name);
 
 		void setDevice(Device& device) { m_device = &device; }
 		void resetDevice() { m_device = nullptr; }
@@ -121,7 +122,8 @@ namespace toy
 		virtual void focused() {}
 		virtual void unfocused() {}
 
-		virtual Widget* pinpoint(float x, float y);
+		Widget* pinpoint(float x, float y);
+		Widget* pinpoint(float x, float y, const Frame::Filter& filter);
 
 		virtual bool customDraw(Renderer& renderer) { UNUSED(renderer); return false; }
 
@@ -147,14 +149,12 @@ namespace toy
 		unique_ptr<Frame> m_frame;
 		WidgetState m_state;
 
-		Lref m_frameIndex;
-
 		Device* m_device;
 
 		static string sNullString;
 	};
 
-	class TOY_UI_EXPORT Item : public Widget
+	class _I_ TOY_UI_EXPORT Item : public Widget
 	{
 	public:
 		Item(Wedge& parent, Type& type = cls());
@@ -162,7 +162,7 @@ namespace toy
 		static Type& cls() { static Type ty("Item", Widget::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT Control : public Item
+	class _I_ TOY_UI_EXPORT Control : public Item
 	{
 	public:
 		Control(Wedge& parent, Type& type = cls());
