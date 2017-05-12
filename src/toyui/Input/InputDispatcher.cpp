@@ -5,61 +5,73 @@
 #include <toyui/Config.h>
 #include <toyui/Input/InputDispatcher.h>
 
+#include <toyobj/Iterable/Reverse.h>
+
 #include <toyui/Widget/RootSheet.h>
 #include <toyui/Widget/Sheet.h>
 
-#include <cassert>
-
 namespace toy
 {
-	InputFrame::InputFrame()
-		: m_controller(nullptr)
-		, m_controlled(nullptr)
-		, m_parentFrame(nullptr)
-		, m_controlMode(CM_CONTROL)
-		, m_deviceFilter(InputEvent::ALL_DEVICES)
+	InputReceiver::InputReceiver()
+		: m_controlGraph()
 	{}
 
-	InputFrame::~InputFrame()
+	InputReceiver::~InputReceiver()
+	{}
+
+	InputReceiver* InputReceiver::controlEvent(InputEvent& inputEvent)
 	{
-		if(m_controlled)
-			this->yieldControl();
+		return this;
 	}
 
-	InputFrame& InputFrame::rootFrame()
+	InputReceiver* InputReceiver::receiveEvent(InputEvent& inputEvent)
 	{
-		return m_parentFrame->rootFrame();
-	}
+		if(inputEvent.consumed)
+			return this;
 
-	InputFrame& InputFrame::rootController()
-	{
-		if(m_controlled)
-			return *this;
-		return m_parentFrame->rootController();
-	}
+		inputEvent.consumed = true;
+		inputEvent.receive(*this);
 
-	InputReceiver* InputFrame::controlEvent(InputEvent& inputEvent)
-	{
-		if(m_controller && m_controller->consumes(inputEvent.deviceType))
-			return m_controller->controlEvent(inputEvent);
+		// if not key down, mouse move, click, entered, leaved
+		//	inputEvent.abort = true;
 
 		return this;
 	}
 
-	InputReceiver* InputFrame::propagateEvent(InputEvent& inputEvent)
+	InputReceiver* InputReceiver::propagateEvent(InputEvent& inputEvent)
 	{
-		return m_parentFrame->controlEvent(inputEvent);
+		return nullptr;
 	}
 
-	InputReceiver* InputFrame::dispatchEvent(InputEvent& inputEvent)
+	ControlNode::ControlNode(InputReceiver& receiver, ControlNode* parent, ControlMode mode, DeviceType device)
+		: m_receiver(&receiver)
+		, m_parent(parent)
+		, m_controlMode(mode)
+		, m_device(device)
+		, m_controller()
 	{
-		InputFrame& rootReceiver = this->rootFrame();
-		InputReceiver* topReceiver = this->controlEvent(inputEvent);
+		if(parent)
+			m_receiver->control();
+	}
 
+	ControlNode::~ControlNode()
+	{
+		m_receiver->uncontrol();
+	}
+
+	bool ControlNode::controls(DeviceType device)
+	{
+		bool filter = m_device & device;
+		return filter && m_controlMode >= CM_CONTROL;
+	}
+
+	InputReceiver* ControlNode::dispatchEvent(InputEvent& inputEvent)
+	{
+		InputReceiver* topReceiver = this->controlEvent(inputEvent);
 		InputReceiver* consumer = topReceiver;
 		InputReceiver* receiver = topReceiver;
 
-		while(receiver != &rootReceiver)
+		while(receiver && receiver != m_receiver)
 		{
 			if(!inputEvent.consumed)
 				consumer = receiver->receiveEvent(inputEvent);
@@ -72,124 +84,93 @@ namespace toy
 		return consumer;
 	}
 
-	InputReceiver* InputFrame::receiveEvent(InputEvent& inputEvent)
+	InputReceiver* ControlNode::controlEvent(InputEvent& inputEvent)
+	{
+		if(m_controller && m_controller->controls(inputEvent.deviceType))
+			return m_controller->controlEvent(inputEvent);
+
+		return m_receiver->controlEvent(inputEvent);
+	}
+
+	InputReceiver* ControlNode::receiveEvent(InputEvent& inputEvent)
 	{
 		return this->dispatchEvent(inputEvent);
 	}
 
-	void InputFrame::takeControl(ControlMode mode, InputEvent::DeviceType device)
+	InputReceiver* ControlNode::propagateEvent(InputEvent& inputEvent)
 	{
-		InputFrame& root = this->rootController();
-		if(&root != this)
-			this->takeControl(root, mode, device);
+		return m_parent ? m_parent->m_receiver : nullptr;
 	}
 
-	void InputFrame::takeControl(InputFrame& inputFrame, ControlMode mode, InputEvent::DeviceType device)
+	ControlNode* ControlNode::findReceiver(InputReceiver& receiver)
 	{
-		m_controlMode = mode;
-		m_deviceFilter = device;
-
-		if(inputFrame.m_controller)
-			inputFrame.m_controller->yieldControl();
-
-		this->control();
-		m_controlled = &inputFrame;
-		m_controlled->m_controller = this;
-	}
-
-	void InputFrame::yieldControl()
-	{
-		m_controlMode = CM_NONE;
-		m_deviceFilter = InputEvent::ALL_DEVICES;
-
-		if(!m_controlled)
-			return;
-
-		this->uncontrol();
-		m_controlled->m_controller = nullptr;
-		m_controlled = nullptr;
-
-	}
-
-	bool InputFrame::consumes(InputEvent::DeviceType device)
-	{
-		return m_deviceFilter & device;
-	}
-
-	void InputWidget::mouseMoved(MouseEvent& mouseEvent)
-	{
-		if(m_controlMode >= CM_MODAL)
-			mouseEvent.abort = true;
-	}
-
-	InputReceiver* InputWidget::receiveEvent(InputEvent& inputEvent)
-	{
-		if(inputEvent.consumed /*&& inputEvent.eventType != InputEvent::EVENT_MOVED*/)
+		if(m_receiver == &receiver)
 			return this;
-
-		inputEvent.consumed = true;
-
-		if(m_controlMode >= CM_MODAL)
-			inputEvent.abort = true;
-
-		if(inputEvent.deviceType == InputEvent::DEVICE_KEYBOARD && inputEvent.eventType == InputEvent::EVENT_PRESSED)
-			this->keyDown(static_cast<KeyEvent&>(inputEvent));
-		else if(inputEvent.deviceType == InputEvent::DEVICE_KEYBOARD && inputEvent.eventType == InputEvent::EVENT_RELEASED)
-			this->keyUp(static_cast<KeyEvent&>(inputEvent));
-
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE && inputEvent.eventType == InputEvent::EVENT_MOVED)
-			this->mouseMoved(static_cast<MouseEvent&>(inputEvent));
-
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE && inputEvent.eventType == InputEvent::EVENT_ENTERED)
-			this->mouseEntered(static_cast<MouseEvent&>(inputEvent));
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE && inputEvent.eventType == InputEvent::EVENT_LEAVED)
-			this->mouseLeaved(static_cast<MouseEvent&>(inputEvent));
-
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_LEFT_BUTTON && inputEvent.eventType == InputEvent::EVENT_STROKED)
-			this->leftClick(static_cast<MouseEvent&>(inputEvent));
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_RIGHT_BUTTON && inputEvent.eventType == InputEvent::EVENT_STROKED)
-			this->rightClick(static_cast<MouseEvent&>(inputEvent));
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_MIDDLE_BUTTON && inputEvent.eventType == InputEvent::EVENT_STROKED)
-			this->middleClick(static_cast<MouseEvent&>(inputEvent));
-
+		else if(m_controller)
+			return m_controller->findReceiver(receiver);
 		else
-			inputEvent.abort = true;
+			return nullptr;
+	}
 
+	void ControlNode::takeControl(InputReceiver& receiver, ControlMode mode, DeviceType device)
+	{
+		if(m_controller && (mode >= CM_MODAL || m_controller->m_controlMode < CM_MODAL))
+			m_controller->takeControl(receiver, mode, device);
+		else
+			m_controller = make_unique<ControlNode>(receiver, this, mode, static_cast<DeviceType>(m_device & device));
+	}
 
+	void ControlNode::yieldControl(InputReceiver& receiver)
+	{
+		if(m_controller)
+			m_controller->yieldControl(receiver);
 
-		if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_LEFT_BUTTON && inputEvent.eventType == InputEvent::EVENT_PRESSED)
-			this->mousePressed(static_cast<MouseEvent&>(inputEvent));
-		if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_LEFT_BUTTON && inputEvent.eventType == InputEvent::EVENT_RELEASED)
-			this->mouseReleased(static_cast<MouseEvent&>(inputEvent));
+		if(m_receiver == &receiver)
+			m_parent->m_controller = m_controller ? std::move(m_controller) : nullptr;
+	}
 
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_MIDDLE_BUTTON && inputEvent.eventType == InputEvent::EVENT_MOVED)
-			this->mouseWheel(static_cast<MouseEvent&>(inputEvent));
+	ControlSwitch::ControlSwitch(InputReceiver& receiver)
+		: ControlNode(receiver, nullptr, CM_CONTROL, DEVICE_ALL)
+		, m_channels{ DEVICE_MOUSE_ALL, DEVICE_KEYBOARD }
+	{
+		for(DeviceType channel : m_channels)
+			m_controllers.emplace_back(make_unique<ControlNode>(receiver, nullptr, CM_CONTROL, channel));
+	}
 
+	ControlNode& ControlSwitch::channel(DeviceType device)
+	{
+		for(auto& channel : m_controllers)
+			if(channel->deviceFilter() & device)
+				return *channel;
+	}
 
+	InputReceiver* ControlSwitch::controlEvent(InputEvent& inputEvent)
+	{
+		for(auto& channel : m_controllers)
+			if(channel->controls(inputEvent.deviceType))
+				return channel->controlEvent(inputEvent);
 
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_LEFT_BUTTON && inputEvent.eventType == InputEvent::EVENT_DRAGGED_START)
-			this->leftDragStart(static_cast<MouseEvent&>(inputEvent));
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_LEFT_BUTTON && inputEvent.eventType == InputEvent::EVENT_DRAGGED)
-			this->leftDrag(static_cast<MouseEvent&>(inputEvent));
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_LEFT_BUTTON && inputEvent.eventType == InputEvent::EVENT_DRAGGED_END)
-			this->leftDragEnd(static_cast<MouseEvent&>(inputEvent));
+		return m_receiver->controlEvent(inputEvent);
+	}
 
+	bool ControlSwitch::takeControl(InputReceiver& receiver, InputReceiver& controller, ControlMode mode, DeviceType device)
+	{
+		ControlNode* controlNode = this->channel(device).findReceiver(controller);
+		if(controlNode)
+			controlNode->takeControl(receiver, mode, device);
+		return controlNode != nullptr;
+	}
 
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_RIGHT_BUTTON && inputEvent.eventType == InputEvent::EVENT_DRAGGED_START)
-			this->rightDragStart(static_cast<MouseEvent&>(inputEvent));
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_RIGHT_BUTTON && inputEvent.eventType == InputEvent::EVENT_DRAGGED)
-			this->rightDrag(static_cast<MouseEvent&>(inputEvent));
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_RIGHT_BUTTON && inputEvent.eventType == InputEvent::EVENT_DRAGGED_END)
-			this->rightDragEnd(static_cast<MouseEvent&>(inputEvent));
+	void ControlSwitch::takeControl(InputReceiver& receiver, ControlMode mode, DeviceType device)
+	{
+		for(auto& channel : m_controllers)
+			if(channel->deviceFilter() & device)
+				channel->takeControl(receiver, mode, device);
+	}
 
-
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_MIDDLE_BUTTON && inputEvent.eventType == InputEvent::EVENT_DRAGGED_START)
-			this->middleDragStart(static_cast<MouseEvent&>(inputEvent));
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_MIDDLE_BUTTON && inputEvent.eventType == InputEvent::EVENT_DRAGGED)
-			this->middleDrag(static_cast<MouseEvent&>(inputEvent));
-		else if(inputEvent.deviceType == InputEvent::DEVICE_MOUSE_MIDDLE_BUTTON && inputEvent.eventType == InputEvent::EVENT_DRAGGED_END)
-			this->middleDragEnd(static_cast<MouseEvent&>(inputEvent));
-
-		return this;
+	void ControlSwitch::yieldControl(InputReceiver& receiver)
+	{
+		for(auto& channel : m_controllers)
+			channel->yieldControl(receiver);
 	}
 }

@@ -16,7 +16,7 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT KeyInputFrame : public InputWidget
+	class TOY_UI_EXPORT KeyInputFrame : public InputReceiver
 	{
 	public:
 		KeyInputFrame();
@@ -35,7 +35,9 @@ namespace toy
 	class TOY_UI_EXPORT Controller : public KeyInputFrame
 	{
 	public:
-		Controller(ControlMode controlMode, InputEvent::DeviceType deviceType = InputEvent::ALL_DEVICES);
+		Controller(ControlMode controlMode, DeviceType deviceType = DEVICE_ALL);
+
+		ControlMode controlMode() { return m_controlMode; }
 
 		void take(Widget& inputWidget);
 		void yield();
@@ -44,7 +46,7 @@ namespace toy
 
 	protected:
 		ControlMode m_controlMode;
-		InputEvent::DeviceType m_deviceType;
+		DeviceType m_deviceType;
 		Widget* m_inputWidget;
 	};
 }

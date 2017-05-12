@@ -72,6 +72,11 @@ namespace toy
 		return this->uiWindow().context();
 	}
 
+	ControlSwitch& Widget::rootController()
+	{
+		return this->rootSheet().controller();
+	}
+
 	DrawFrame& Widget::content()
 	{
 		return m_frame->content();
@@ -110,7 +115,6 @@ namespace toy
 	void Widget::bind(Wedge& parent, size_t index, bool deferred)
 	{
 		m_parent = &parent;
-		m_parentFrame = &parent;
 		m_index = index;
 		
 		if(deferred)
@@ -130,7 +134,6 @@ namespace toy
 		m_parent->stripe().unmap(*m_frame);
 
 		m_parent = nullptr;
-		m_parentFrame = nullptr;
 		m_index = 0;
 	}
 
@@ -260,10 +263,10 @@ namespace toy
 
 	InputReceiver* Widget::controlEvent(InputEvent& inputEvent)
 	{
-		if(m_controller && m_controller->consumes(inputEvent.deviceType))
-			return m_controller->controlEvent(inputEvent);
+		if(m_controlGraph)
+			return m_controlGraph->controlEvent(inputEvent);
 
-		if(inputEvent.deviceType >= InputEvent::DEVICE_MOUSE && m_controlMode < CM_ABSOLUTE)
+		if(inputEvent.deviceType >= DEVICE_MOUSE)
 		{
 			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
 			Widget* pinned = this->pinpoint(mouseEvent.posX, mouseEvent.posY);
@@ -277,6 +280,44 @@ namespace toy
 	{
 		UNUSED(inputEvent);
 		return m_parent;
+	}
+
+	InputReceiver* Widget::receiveEvent(InputEvent& inputEvent)
+	{
+		if(inputEvent.consumed)
+			return this;
+
+		inputEvent.visited.push_back(this);
+
+		if(inputEvent.deviceType >= DEVICE_MOUSE)
+		{
+			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
+			DimFloat local = m_frame->localPosition(mouseEvent.posX, mouseEvent.posY);
+			mouseEvent.relativeX = local.x();
+			mouseEvent.relativeY = local.y();
+		}
+
+		return InputReceiver::receiveEvent(inputEvent);
+	}
+
+	void Widget::giveControl(InputReceiver& receiver, ControlMode mode, DeviceType device)
+	{
+		bool control = this->rootController().takeControl(*this, receiver, mode, device);
+		if(!control)
+			m_controlGraph = make_unique<ControlNode>(receiver, nullptr, mode, device);
+	}
+
+	void Widget::takeControl(ControlMode mode, DeviceType device)
+	{
+		this->rootController().takeControl(*this, mode, device);
+	}
+
+	void Widget::yieldControl()
+	{
+		this->rootController().yieldControl(*this);
+
+		if(m_controlGraph)
+			m_controlGraph = nullptr;
 	}
 
 	void Widget::activate()
@@ -337,22 +378,14 @@ namespace toy
 		this->disableState(PRESSED);
 	}
 
-	InputReceiver* Widget::receiveEvent(InputEvent& inputEvent)
+	void Widget::debugPrintDepth()
 	{
-		if(inputEvent.consumed)
-			return this;
-
-		inputEvent.visited.push_back(this);
-
-		if(inputEvent.deviceType >= InputEvent::DEVICE_MOUSE)
+		Widget* parent = this->parent();
+		while(parent)
 		{
-			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
-			DimFloat local = m_frame->localPosition(mouseEvent.posX, mouseEvent.posY);
-			mouseEvent.relativeX = local.x();
-			mouseEvent.relativeY = local.y();
+			printf("  ");
+			parent = parent->parent();
 		}
-
-		return InputWidget::receiveEvent(inputEvent);
 	}
 
 	Item::Item(Wedge& parent, Type& type)

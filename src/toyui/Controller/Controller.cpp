@@ -11,7 +11,7 @@
 namespace toy
 {
 	KeyInputFrame::KeyInputFrame()
-		: InputWidget()
+		: InputReceiver()
 	{}
 
 	void KeyInputFrame::keyUp(KeyEvent& keyEvent)
@@ -34,7 +34,7 @@ namespace toy
 		}
 	}
 
-	Controller::Controller(ControlMode controlMode, InputEvent::DeviceType deviceType)
+	Controller::Controller(ControlMode controlMode, DeviceType deviceType)
 		: KeyInputFrame()
 		, m_controlMode(controlMode)
 		, m_deviceType(deviceType)
@@ -45,25 +45,22 @@ namespace toy
 
 	void Controller::take(Widget& inputWidget)
 	{
-		// @todo : fix difference between key controllers and mouse controllers
-
-		m_parentFrame = &inputWidget;
 		m_inputWidget = &inputWidget;
-		InputFrame::m_controlMode = m_controlMode;
-		//inputWidget.takeControl(m_controlMode, m_deviceType);
-		this->takeControl(inputWidget, m_controlMode, m_deviceType);
+		inputWidget.giveControl(*this, m_controlMode, DEVICE_MOUSE_ALL);
+		inputWidget.rootController().takeControl(*this, m_controlMode, DEVICE_KEYBOARD);
 	}
 
 	void Controller::yield()
 	{
-		this->yieldControl();
-		//m_inputWidget->yieldControl();
-		m_parentFrame = nullptr;
+		m_inputWidget->rootController().yieldControl(*this);
 		m_inputWidget = nullptr;
 	}
 
 	void Controller::leftClick(MouseEvent& mouseEvent)
 	{
+		if(m_controlMode < CM_MODAL)
+			return;
+
 		DimFloat local = m_inputWidget->frame().localPosition(mouseEvent.posX, mouseEvent.posY);
 		if(!m_inputWidget->frame().inside(local.x(), local.y()))
 			this->yield();

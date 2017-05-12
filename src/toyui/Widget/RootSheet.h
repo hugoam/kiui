@@ -22,10 +22,9 @@ namespace toy
 		~RootSheet();
 
 		virtual RootSheet& rootSheet() { return *this; }
-		virtual InputFrame& rootFrame() { return *this; }
-		virtual InputFrame& rootController() { return *this; }
 
 		UiWindow& uiWindow() { return m_window; }
+		ControlSwitch& controller() { return *m_rootController; }
 		Mouse& mouse() const { return *m_mouse; }
 		Keyboard& keyboard() const { return *m_keyboard; }
 
@@ -36,15 +35,18 @@ namespace toy
 		void nextFrame(size_t tick, size_t delta);
 
 		virtual void transformCoordinates(MouseEvent& mouseEvent) { UNUSED(mouseEvent); }
-		InputReceiver* dispatchEvent(InputEvent& inputEvent);
 
-		void handleUnbindWidget(Widget& widget);
-		void handleBindWidget(Widget& widget);
+		virtual InputReceiver* propagateEvent(InputEvent& inputEvent) { return nullptr; }
+
+		virtual void handleUnbindWidget(Widget& widget);
+		virtual void handleBindWidget(Widget& widget);
 
 		static Type& cls() { static Type ty("RootSheet", Container::cls()); return ty; }
 
 	protected:
 		UiWindow& m_window;
+
+		unique_ptr<ControlSwitch> m_rootController;
 
 		unique_ptr<Mouse> m_mouse;
 		unique_ptr<Keyboard> m_keyboard;

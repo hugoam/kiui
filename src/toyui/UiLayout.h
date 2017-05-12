@@ -48,8 +48,8 @@ namespace toy
 	protected:
 		UiWindow& m_uiWindow;
 
-		std::map<string, std::unique_ptr<Style>> m_styledefs;
-		std::map<string, std::unique_ptr<Style>> m_styles;
+		std::map<string, unique_ptr<Style>> m_styledefs;
+		std::map<string, unique_ptr<Style>> m_styles;
 
 		std::vector<StyleInitializer> m_initializers;
 	};

@@ -27,21 +27,27 @@ namespace toy
 	RootSheet::RootSheet(UiWindow& window, Type& type)
 		: Container(type, MASTER_LAYER)
 		, m_window(window)
+		, m_rootController(make_unique<ControlSwitch>(*this))
 		, m_mouse(make_unique<Mouse>(*this))
 		, m_keyboard(make_unique<Keyboard>(*this))
 		, m_cursor(*this)
 	{
 		m_target = window.renderer().createRenderTarget(m_frame->as<MasterLayer>());
 		this->updateStyle();
+
+		m_rootController->takeControl(*this, CM_MODAL, DEVICE_MOUSE_ALL);
 	}
 
 	RootSheet::RootSheet(Wedge& parent, Type& type)
 		: Container(parent, type, LAYER)
 		, m_window(parent.uiWindow())
+		, m_rootController(make_unique<ControlSwitch>(*this))
 		, m_mouse(make_unique<Mouse>(*this))
 		, m_keyboard(make_unique<Keyboard>(*this))
 		, m_cursor(*this)
-	{}
+	{
+		m_rootController->takeControl(*this, CM_MODAL, DEVICE_MOUSE_ALL);
+	}
 
 	RootSheet::~RootSheet()
 	{}
@@ -57,13 +63,10 @@ namespace toy
 		Wedge::nextFrame(tick, delta);
 	}
 
-	InputReceiver* RootSheet::dispatchEvent(InputEvent& inputEvent)
-	{
-		return InputFrame::dispatchEvent(inputEvent);
-	}
-
 	void RootSheet::handleUnbindWidget(Widget& widget)
 	{
+		m_rootController->yieldControl(widget);
+
 		m_cursor.unhover(widget);
 		m_mouse->handleUnbindWidget(widget);
 	}

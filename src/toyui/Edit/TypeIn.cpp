@@ -102,7 +102,7 @@ namespace toy
 		size_t index = this->content().caption().caretIndex(mouseEvent.relativeX, mouseEvent.relativeY);
 		this->moveCaretTo(index);
 		if(!(m_state & CONTROL))
-			this->takeControl(CM_CONTROL, InputEvent::DEVICE_KEYBOARD);
+			this->takeControl(CM_CONTROL, DEVICE_KEYBOARD);
 	}
 
 	void TypeIn::leftDragStart(MouseEvent& mouseEvent)
@@ -110,7 +110,7 @@ namespace toy
 		size_t index = this->content().caption().caretIndex(mouseEvent.relativeX, mouseEvent.relativeY);
 		this->selectFirst(index);
 		if(!(m_state & CONTROL))
-			this->takeControl(CM_CONTROL, InputEvent::DEVICE_KEYBOARD);
+			this->takeControl(CM_CONTROL, DEVICE_KEYBOARD);
 	}
 
 	void TypeIn::leftDrag(MouseEvent& mouseEvent)

@@ -38,9 +38,8 @@ namespace toy
 	struct MouseEvent;
 	struct KeyEvent;
 
+	class ControlNode;
 	class InputReceiver;
-	class InputFrame;
-	class InputWidget;
 
 	class Controller;
 

@@ -22,7 +22,7 @@ namespace toy
 	void TypedownInput::click()
 	{
 		this->showFilter();
-		MouseClickEvent mouseEvent(InputEvent::DEVICE_MOUSE_LEFT_BUTTON, this->rootSheet().mouse().lastX(), this->rootSheet().mouse().lastY());
+		MouseClickEvent mouseEvent(DEVICE_MOUSE_LEFT_BUTTON, this->rootSheet().mouse().lastX(), this->rootSheet().mouse().lastY());
 		m_input.typeIn().leftClick(mouseEvent);
 	}
 

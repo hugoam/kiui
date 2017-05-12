@@ -33,7 +33,7 @@ namespace toy
 		MODAL = 1 << 8
 	};
 
-	class _I_ TOY_UI_EXPORT Widget : public TypeObject, public InputWidget, public Updatable
+	class _I_ TOY_UI_EXPORT Widget : public TypeObject, public InputReceiver, public Updatable
 	{
 	public:
 		Widget(Wedge& parent, Type& type = cls(), FrameType frameType = FRAME);
@@ -71,6 +71,7 @@ namespace toy
 
 		UiWindow& uiWindow();
 		Context& context();
+		ControlSwitch& rootController();
 
 		void show();
 		void hide();
@@ -127,9 +128,13 @@ namespace toy
 
 		virtual bool customDraw(Renderer& renderer) { UNUSED(renderer); return false; }
 
-		InputReceiver* controlEvent(InputEvent& inputEvent);
-		InputReceiver* receiveEvent(InputEvent& inputEvent);
-		InputReceiver* propagateEvent(InputEvent& inputEvent);
+		virtual InputReceiver* controlEvent(InputEvent& inputEvent);
+		virtual InputReceiver* receiveEvent(InputEvent& inputEvent);
+		virtual InputReceiver* propagateEvent(InputEvent& inputEvent);
+
+		void giveControl(InputReceiver& receiver, ControlMode mode, DeviceType device = DEVICE_ALL);
+		void takeControl(ControlMode mode, DeviceType device = DEVICE_ALL);
+		void yieldControl();
 
 		void mouseEntered(MouseEvent& mouseEvent);
 		void mouseLeaved(MouseEvent& mouseEvent);
@@ -138,6 +143,8 @@ namespace toy
 		void mouseReleased(MouseEvent& mouseEvent);
 
 		typedef std::function<void(Widget&)> Trigger;
+
+		void debugPrintDepth();
 
 		static Type& cls() { static Type ty("Widget"); return ty; }
 

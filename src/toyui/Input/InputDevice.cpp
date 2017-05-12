@@ -15,7 +15,7 @@ namespace toy
 {
 	InputDevice::InputDevice(RootSheet& rootSheet)
 		: m_rootSheet(rootSheet)
-		, m_rootFrame(rootSheet)
+		, m_rootFrame(rootSheet.controller())
 	{}
 
 	Keyboard::Keyboard(RootSheet& rootSheet)
@@ -53,9 +53,9 @@ namespace toy
 
 	Mouse::Mouse(RootSheet& rootSheet)
 		: InputDevice(rootSheet)
-		, m_leftButton(*this, InputEvent::DEVICE_MOUSE_LEFT_BUTTON)
-		, m_rightButton(*this, InputEvent::DEVICE_MOUSE_RIGHT_BUTTON)
-		, m_middleButton(*this, InputEvent::DEVICE_MOUSE_MIDDLE_BUTTON)
+		, m_leftButton(*this, DEVICE_MOUSE_LEFT_BUTTON)
+		, m_rightButton(*this, DEVICE_MOUSE_RIGHT_BUTTON)
+		, m_middleButton(*this, DEVICE_MOUSE_MIDDLE_BUTTON)
 		, m_lastX(0.f)
 		, m_lastY(0.f)
 	{}
@@ -167,7 +167,7 @@ namespace toy
 			}
 	}
 
-	MouseButton::MouseButton(Mouse& mouse, InputEvent::DeviceType deviceType)
+	MouseButton::MouseButton(Mouse& mouse, DeviceType deviceType)
 		: InputDevice(mouse.rootSheet())
 		, m_mouse(mouse)
 		, m_deviceType(deviceType)
@@ -206,7 +206,7 @@ namespace toy
 		MouseReleaseEvent mouseEvent(m_deviceType, x, y);
 		m_mouse.transformMouseEvent(mouseEvent);
 
-		m_pressed->dispatchEvent(mouseEvent);
+		m_pressed->receiveEvent(mouseEvent);
 
 		if(m_dragging)
 			this->dragEnd(mouseEvent);

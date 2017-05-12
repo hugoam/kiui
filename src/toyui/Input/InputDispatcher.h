@@ -6,40 +6,43 @@
 #define TOY_INPUTDISPATCHER_H
 
 /* toy */
+#include <toyobj/Util/Unique.h>
 #include <toyui/Forward.h>
 #include <toyui/Input/KeyCode.h>
 
 #include <vector>
-
-#undef CM_NONE
+#include <memory>
 
 namespace toy
 {
+	enum DeviceType : unsigned int
+	{
+		DEVICE_NONE = 0,
+		DEVICE_KEYBOARD = 1 << 0,
+		DEVICE_MOUSE = 1 << 1,
+		DEVICE_MOUSE_LEFT_BUTTON = 1 << 2,
+		DEVICE_MOUSE_RIGHT_BUTTON = 1 << 3,
+		DEVICE_MOUSE_MIDDLE_BUTTON = 1 << 4,
+		DEVICE_MOUSE_ALL = DEVICE_MOUSE | DEVICE_MOUSE_LEFT_BUTTON | DEVICE_MOUSE_RIGHT_BUTTON | DEVICE_MOUSE_MIDDLE_BUTTON,
+		DEVICE_ALL = DEVICE_KEYBOARD | DEVICE_MOUSE_ALL
+	};
+
+	enum EventType
+	{
+		EVENT_NONE,
+		EVENT_ENTERED,
+		EVENT_LEAVED,
+		EVENT_PRESSED,
+		EVENT_RELEASED,
+		EVENT_MOVED,
+		EVENT_STROKED,
+		EVENT_DRAGGED,
+		EVENT_DRAGGED_START,
+		EVENT_DRAGGED_END
+	};
+
 	struct TOY_UI_EXPORT InputEvent
 	{
-		enum DeviceType : unsigned int
-		{
-			DEVICE_KEYBOARD = 1 << 0,
-			DEVICE_MOUSE = 1 << 1,
-			DEVICE_MOUSE_LEFT_BUTTON = 1 << 2,
-			DEVICE_MOUSE_RIGHT_BUTTON = 1 << 3,
-			DEVICE_MOUSE_MIDDLE_BUTTON = 1 << 4,
-			ALL_DEVICES = DEVICE_KEYBOARD | DEVICE_MOUSE | DEVICE_MOUSE_LEFT_BUTTON | DEVICE_MOUSE_RIGHT_BUTTON | DEVICE_MOUSE_MIDDLE_BUTTON
-		};
-
-		enum EventType
-		{
-			EVENT_ENTERED,
-			EVENT_LEAVED,
-			EVENT_PRESSED,
-			EVENT_RELEASED,
-			EVENT_MOVED,
-			EVENT_STROKED,
-			EVENT_DRAGGED,
-			EVENT_DRAGGED_START,
-			EVENT_DRAGGED_END
-		};
-
 		DeviceType deviceType;
 		EventType eventType;
 		bool consumed;
@@ -51,6 +54,7 @@ namespace toy
 		virtual ~InputEvent() {}
 
 		virtual void dispatch(RootSheet& rootSheet) {}
+		virtual void receive(InputReceiver& receiver) {}
 	};
 
 	struct TOY_UI_EXPORT MouseEvent : public InputEvent
@@ -100,74 +104,29 @@ namespace toy
 		virtual void resize(size_t width, size_t height) = 0;
 	};
 
+	enum ControlMode
+	{
+		CM_WEAK,
+		CM_CONTROL,
+		CM_MODAL,
+		CM_ABSOLUTE
+	};
+
 	class TOY_UI_EXPORT InputReceiver
 	{
 	public:
-		enum ControlMode
-		{
-			CM_NONE,
-			CM_CONTROL,
-			CM_MODAL,
-			CM_ABSOLUTE
-		};
+		InputReceiver();
+		~InputReceiver();
 
-		virtual InputReceiver* dispatchEvent(InputEvent& inputEvent) { UNUSED(inputEvent); return this; }
-		virtual InputReceiver* controlEvent(InputEvent& inputEvent) { UNUSED(inputEvent); return this; }
-		virtual InputReceiver* receiveEvent(InputEvent& inputEvent) { UNUSED(inputEvent); return this; }
-		virtual InputReceiver* propagateEvent(InputEvent& inputEvent) { UNUSED(inputEvent); return this; }
-
-		virtual void takeControl(ControlMode mode, InputEvent::DeviceType device = InputEvent::ALL_DEVICES) = 0;
-		virtual void yieldControl() = 0;
-	};
-
-	class TOY_UI_EXPORT InputFrame : public InputReceiver
-	{
-	public:
-		InputFrame();
-		~InputFrame();
-
-		InputFrame* parentFrame() { return m_parentFrame; }
-		void setParentFrame(InputFrame* parentFrame) { m_parentFrame = parentFrame; }
-
-		virtual InputFrame& rootFrame();
-		virtual InputFrame& rootController();
-
-		InputReceiver* dispatchEvent(InputEvent& inputEvent);
-		InputReceiver* controlEvent(InputEvent& inputEvent);
-		InputReceiver* receiveEvent(InputEvent& inputEvent);
-		InputReceiver* propagateEvent(InputEvent& inputEvent);
-
-		void takeControl(ControlMode mode, InputEvent::DeviceType device = InputEvent::ALL_DEVICES);
-
-		void takeControl(InputFrame& inputFrame, ControlMode mode, InputEvent::DeviceType device);
-		void yieldControl();
-
-		bool consumes(InputEvent::DeviceType device);
-
-		virtual void control() {};
-		virtual void uncontrol() {};
-
-		virtual void modal() {};
-		virtual void unmodal() {};
-
-	protected:
-		InputFrame* m_controller;
-		InputFrame* m_controlled;
-		InputFrame* m_parentFrame;
-		ControlMode m_controlMode;
-		InputEvent::DeviceType m_deviceFilter;
-	};
-
-
-	class TOY_UI_EXPORT InputWidget : public InputFrame
-	{
-	public:
-		InputReceiver* receiveEvent(InputEvent& inputEvent);
+		virtual InputReceiver* controlEvent(InputEvent& inputEvent);
+		virtual InputReceiver* receiveEvent(InputEvent& inputEvent);
+		virtual InputReceiver* propagateEvent(InputEvent& inputEvent);
 
 		virtual void keyUp(KeyEvent& keyEvent) { UNUSED(keyEvent); };
+		virtual void keyStroke(KeyEvent& keyEvent) { UNUSED(keyEvent); };
 		virtual void keyDown(KeyEvent& keyEvent) { UNUSED(keyEvent); };
 
-		virtual void mouseMoved(MouseEvent& mouseEvent);
+		virtual void mouseMoved(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
 
 		virtual void mouseEntered(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
 		virtual void mouseLeaved(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
@@ -192,6 +151,63 @@ namespace toy
 		virtual void middleDragStart(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
 		virtual void middleDrag(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
 		virtual void middleDragEnd(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+	
+		virtual void control() {};
+		virtual void uncontrol() {};
+
+		virtual void modal() {};
+		virtual void unmodal() {};
+
+	protected:
+		unique_ptr<ControlNode> m_controlGraph;
+	};
+
+	class TOY_UI_EXPORT ControlNode
+	{
+	public:
+		ControlNode(InputReceiver& receiver, ControlNode* parent, ControlMode mode, DeviceType device);
+		~ControlNode();
+
+		ControlMode controlMode() { return m_controlMode; }
+		DeviceType deviceFilter() { return m_device; }
+
+		virtual InputReceiver* dispatchEvent(InputEvent& inputEvent);
+		virtual InputReceiver* controlEvent(InputEvent& inputEvent);
+		virtual InputReceiver* receiveEvent(InputEvent& inputEvent);
+		virtual InputReceiver* propagateEvent(InputEvent& inputEvent);
+
+		ControlNode* findReceiver(InputReceiver& receiver);
+
+		void takeControl(InputReceiver& receiver, ControlMode mode, DeviceType device);
+		void yieldControl(InputReceiver& receiver);
+
+		bool controls(DeviceType device);
+
+	protected:
+		InputReceiver* m_receiver;
+		ControlNode* m_parent;
+		ControlMode m_controlMode;
+		DeviceType m_device;
+
+		unique_ptr<ControlNode> m_controller;
+	};
+
+	class TOY_UI_EXPORT ControlSwitch : public ControlNode
+	{
+	public:
+		ControlSwitch(InputReceiver& receiver);
+
+		ControlNode& channel(DeviceType device);
+
+		virtual InputReceiver* controlEvent(InputEvent& inputEvent);
+
+		bool takeControl(InputReceiver& receiver, InputReceiver& controller, ControlMode mode, DeviceType channel);
+		void takeControl(InputReceiver& receiver, ControlMode mode, DeviceType channels);
+		void yieldControl(InputReceiver& receiver);
+
+	protected:
+		std::vector<DeviceType> m_channels;
+		std::vector<unique_ptr<ControlNode>> m_controllers;
 	};
 }
 

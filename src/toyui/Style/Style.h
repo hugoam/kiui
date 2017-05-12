@@ -271,7 +271,7 @@ namespace toy
 
 	typedef std::vector<SubSkin> StyleTable;
 
-	class _I_ TOY_UI_EXPORT Style : public Struct, public NonCopy
+	class _I_ TOY_UI_EXPORT Style : public Object
 	{
 	public:
 		Style(Type& type, Style* base = nullptr);

@@ -54,7 +54,7 @@ namespace toy
 	void BoxFloat_v2(Object& object, Lref& ref) { ref->set<float>(object.as<BoxFloat>().v2()); }
 	void BoxFloat_v3(Object& object, Lref& ref) { ref->set<float>(object.as<BoxFloat>().v3()); }
 
-	void ImageSkin_d_image(Object& object, Lref& ref) { ref->setobject(*object.as<ImageSkin>().d_image); }
+	void ImageSkin_d_image(Object& object, Lref& ref) { ref->set<Image>(*object.as<ImageSkin>().d_image); }
 	void ImageSkin_setD_image(Object& object, const Lref& ref) { object.as<ImageSkin>().d_image = &ref->as<Image>(); }
 	void ImageSkin_d_filetype(Object& object, Lref& ref) { ref->set<string>(object.as<ImageSkin>().d_filetype); }
 	void ImageSkin_setD_filetype(Object& object, const Lref& ref) { object.as<ImageSkin>().d_filetype = ref->copy<string>(); }
@@ -78,8 +78,8 @@ namespace toy
 
 	void Style_name(Object& object, Lref& ref) { ref->set<string>(object.as<Style>().name()); }
 	void Style_base(Object& object, Lref& ref) { ref->setobject(*object.as<Style>().base()); }
-	void Style_layout(Object& object, Lref& ref) { ref->setobject(object.as<Style>().layout()); }
-	void Style_skin(Object& object, Lref& ref) { ref->setobject(object.as<Style>().skin()); }
+	void Style_layout(Object& object, Lref& ref) { ref->set<LayoutStyle>(object.as<Style>().layout()); }
+	void Style_skin(Object& object, Lref& ref) { ref->set<InkStyle>(object.as<Style>().skin()); }
 	void Style_updated(Object& object, Lref& ref) { ref->set<size_t>(object.as<Style>().updated()); }
 	void Style_setUpdated(Object& object, const Lref& ref) { object.as<Style>().setUpdated(ref->copy<size_t>()); }
 
@@ -92,11 +92,11 @@ namespace toy
 	void Widget_setStyle(Object& object, const Lref& ref) { object.as<Widget>().setStyle(ref->as<Style>()); }
 	void Widget_label(Object& object, Lref& ref) { ref->set<string>(object.as<Widget>().label()); }
 	void Widget_setLabel(Object& object, const Lref& ref) { object.as<Widget>().setLabel(ref->copy<string>()); }
-	void Widget_image(Object& object, Lref& ref) { ref->setobject(*object.as<Widget>().image()); }
+	void Widget_image(Object& object, Lref& ref) { ref->set<Image>(*object.as<Widget>().image()); }
 	void Widget_setImage(Object& object, const Lref& ref) { object.as<Widget>().setImage(&ref->as<Image>()); }
 
 
-	void Wedge_contents(Object& object, Lref& ref) { ref->any<std::vector<Widget*>*>().m_content = &object.as<Wedge>().contents(); }
+	void Wedge_contents(Object& object, Lref& ref) { ref->set<std::vector<Widget*>>(object.as<Wedge>().contents()); }
 
 
 
@@ -261,7 +261,8 @@ namespace toy
         
         
             // Image
-            Image::cls().imprint().setup("Image", OBJECT);
+            Image::cls().imprint().setup("Image", STRUCT);
+            Image::cls().imprint().initRefMethods<Image>();
             Image::cls().imprint().initObject(false, false);
             
             // StatSliderfloat
@@ -325,16 +326,19 @@ namespace toy
             ImageSkin::cls().imprint().initObject(false, false);
             
             // Shadow
-            Shadow::cls().imprint().setup("Shadow", OBJECT);
+            Shadow::cls().imprint().setup("Shadow", STRUCT);
+            Shadow::cls().imprint().initRefMethods<Shadow>();
             Shadow::cls().imprint().initObject(false, false);
             
             // LayoutStyle
-            LayoutStyle::cls().imprint().setup("LayoutStyle", OBJECT);
+            LayoutStyle::cls().imprint().setup("LayoutStyle", STRUCT);
             LayoutStyle::cls().imprint().addMember(make_unique<Member>(LayoutStyle::cls(), Lref(), typecls<size_t>(), 0, "d_updated", &LayoutStyle_d_updated, &LayoutStyle_setD_updated, true, false, false, false));
+            LayoutStyle::cls().imprint().initRefMethods<LayoutStyle>();
             LayoutStyle::cls().imprint().initObject(false, false);
             
             // InkStyle
-            InkStyle::cls().imprint().setup("InkStyle", OBJECT);
+            InkStyle::cls().imprint().setup("InkStyle", STRUCT);
+            InkStyle::cls().imprint().initRefMethods<InkStyle>();
             InkStyle::cls().imprint().setConstructor(make_unique<Method>(InkStyle::cls(), "InkStyle", Lref(), nullptr, ParamVector({ Param("style", Lref(Style::cls()), true, INPUT_PARAM) })));
             InkStyle::cls().imprint().initInjectors(&InkStyle_proto_poolinject, &InkStyle_proto_lrefinject, &InkStyle_makePool);
             InkStyle::cls().imprint().initObject(false, false);
