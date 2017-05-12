@@ -65,7 +65,7 @@ namespace toy
 
 	void Cursor::unhover(Widget& widget)
 	{
-		if(m_hovered = &widget)
+		if(m_hovered == &widget)
 			this->unhover();
 	}
 
