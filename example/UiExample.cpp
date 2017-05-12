@@ -63,7 +63,7 @@ namespace toy
 	Wedge& createUiTestCustomList(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("Customized list items");
-		Page& page = window.body().emplace<Page>("List and filter");
+		Page& page = window.emplace<Page>();
 		SelectList& list = page.emplace<SelectList>();
 
 		for(int i = 0; boy_names[i]; i++)
@@ -78,7 +78,7 @@ namespace toy
 	Wedge& createUiTestFilteredList(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("List and filter");
-		Page& page = window.body().emplace<Page>("List and filter");
+		Page& page = window.emplace<Page>();
 		SelectList& list = page.emplace<SelectList>();
 
 		for(int i = 0; boy_names[i]; i++)
@@ -95,7 +95,7 @@ namespace toy
 	Wedge& createUiTestScrollList(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("Scroll List");
-		Page& page = window.body().emplace<Page>("Scroll List");
+		Page& page = window.emplace<Page>();
 		Container& sequence = page.emplace<Container>(Layout::cls());
 
 		List& list0 = sequence.emplace<List>();
@@ -113,7 +113,7 @@ namespace toy
 	Wedge& createUiTestTextEditor(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("Text Editor");
-		Page& page = window.body().emplace<Page>("Text Editor");
+		Page& page = window.emplace<Page>();
 		Container& buttons = page.emplace<Menubar>();
 		Menu& menu = buttons.emplace<Menu>("Menu");
 		menu.emplace<Button>("Redo");
@@ -177,13 +177,13 @@ namespace toy
 
 		Dockspace& dockspace = parent.emplace<Dockspace>();
 
-		Page& dock0 = dockspace.addDockWindow("Dock 0", { 0, 0 }).emplace<Page>("Dock 0");
+		Page& dock0 = dockspace.addDockWindow("Dock 0", { 0, 0 }).emplace<Page>();
 		createUiTestControls(dock0, false);
 
-		Page& dock1 = dockspace.addDockWindow("Dock 1", { 0, 1 }).emplace<Page>("Dock 1");
+		Page& dock1 = dockspace.addDockWindow("Dock 1", { 0, 1 }).emplace<Page>();
 		createUiTestInlineControls(dock1);
 
-		Page& dock2 = dockspace.addDockWindow("Dock 2", { 0, 2 }).emplace<Page>("Dock 2");
+		Page& dock2 = dockspace.addDockWindow("Dock 2", { 0, 2 }).emplace<Page>();
 		createUiTestTable(dock2, false);
 
 		return dockspace;
@@ -228,18 +228,18 @@ namespace toy
 		if(!window)
 			parent.clear();
 
-		Container& page = window ? parent.emplace<Window>("Tabs").body().emplace<Page>("Tabs")
+		Container& page = window ? parent.emplace<Window>("Tabs").emplace<Page>()
 							     : parent;
 
 		Tabber& tabber = page.emplace<Tabber>();
 
-		Page& tab0 = tabber.addTab("Tab 0").emplace<Page>("Tab 0");
+		Page& tab0 = tabber.addTab("Tab 0").emplace<Page>();
 		createUiTestTable(tab0, false);
 
-		Page& tab1 = tabber.addTab("Tab 1").emplace<Page>("Tab 1");
+		Page& tab1 = tabber.addTab("Tab 1").emplace<Page>();
 		createUiTestInlineControls(tab1);
 
-		Page& tab2 = tabber.addTab("Tab 2").emplace<Page>("Tab 2");
+		Page& tab2 = tabber.addTab("Tab 2").emplace<Page>();
 		createUiTestControls(tab2, false);
 
 		return page;
@@ -247,8 +247,8 @@ namespace toy
 
 	Wedge& createUiTestTable(Container& parent, bool window)
 	{
-		Container& page = window ? parent.emplace<Window>("Table").body().emplace<Page>("Table")
-							     : parent.emplace<Page>("Table");
+		Container& page = window ? parent.emplace<Window>("Table").emplace<Page>()
+							     : parent.emplace<Page>();
 
 		Table& table0 = page.emplace<Table>(StringVector({ "ID", "Name", "Path", "Flags" }), std::vector<float>({ 0.25f, 0.25f, 0.25f, 0.25f }));
 
@@ -300,7 +300,7 @@ namespace toy
 	Wedge& createUiTestTree(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("Tree");
-		Page& page = window.body().emplace<Page>("Tree");
+		Page& page = window.emplace<Page>(); // "Tree"
 
 		Tree& tree = page.emplace<Tree>();
 
@@ -356,7 +356,7 @@ namespace toy
 	Wedge& createUiTestMarkupText(Container& parent)
 	{
 		static string multiline = "This is a long paragraph. The text should automatically wrap on the edge of the window. The current implementation follows no word splitting rules, text is just split at the last character.";
-		Page& page = parent.emplace<Page>("Markup Text");
+		Page& page = parent.emplace<Page>(); // "Markup Text"
 		page.emplace<Textbox>(multiline);
 		page.emplace<SliderFloat>("Wrap width", AutoStat<float>(200.f, -20.f, 600.f, 0.1f), [](float){ });
 
@@ -378,8 +378,8 @@ namespace toy
 
 	Wedge& createUiTestControls(Container& parent, bool window)
 	{
-		Container& page = window ? parent.emplace<Window>("Table").body().emplace<Page>("Table")
-								 : parent.emplace<Page>("Controls");
+		Container& page = window ? parent.emplace<Window>("Table").emplace<Page>()
+								 : parent.emplace<Page>(); // "Controls"
 
 		Table& table = page.emplace<Table>(StringVector({ "input", "label" }), std::vector<float>({ 0.7f, 0.3f }));
 
@@ -411,7 +411,7 @@ namespace toy
 
 	Wedge& createUiTestFocusTabbing(Container& parent)
 	{
-		Page& page = parent.emplace<Page>("Tabbing");
+		Page& page = parent.emplace<Page>(); // "Tabbing"
 		page.emplace<Label>("Use TAB/SHIFT+TAB to cycle through keyboard editable fields.");
 
 		static string first = "1";
@@ -431,14 +431,14 @@ namespace toy
 	Wedge& createUiTestFileBrowser(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("File Browser");
-		window.body().emplace<Directory>("..");
+		window.emplace<Directory>("..");
 		return window;
 	}
 
 	Wedge& createUiTestFileTree(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("File Tree");
-		Tree& filetree = window.body().emplace<Tree>();
+		Tree& filetree = window.emplace<Tree>();
 		DirectoryNode& node = filetree.emplace<DirectoryNode>("..", "..", false);
 		node.update();
 		return window;
@@ -446,7 +446,7 @@ namespace toy
 
 	Wedge& createUiTestInlineControls(Container& parent)
 	{
-		Page& page = parent.emplace<Page>("Inline Controls");
+		Page& page = parent.emplace<Page>(); // "Inline Controls"
 
 		Container& line0 = page.emplace<Container>(Line::cls());
 
@@ -484,7 +484,7 @@ namespace toy
 	Wedge& createUiTestProgressDialog(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("Progress Dialog");
-		Page& page = window.body().emplace<Page>("Progress Dialog");
+		Page& page = window.emplace<Page>();
 		ProgressBar& bar = page.emplace<ProgressBar>();
 		bar.setPercentage(0.57f);
 		page.emplace<SliderFloat>("Set progress", AutoStat<float>(0.57f, 0.f, 1.f, 0.01f), [&bar](float val) { bar.setPercentage(val); });
@@ -494,7 +494,7 @@ namespace toy
 	Window& createUiTestWindow(Container& parent)
 	{
 		Window& window = parent.emplace<Window>("kiUi v0.1");
-		Page& page = window.body().emplace<Page>("kiUi v0.1");
+		Page& page = window.emplace<Page>();
 
 		page.emplace<Label>("kiui says hello.");
 
@@ -525,7 +525,7 @@ namespace toy
 	{
 	public:
 		StyleEdit(Wedge& parent, Styler& styler)
-			: Page(parent, "Style Edit")
+			: Page(parent)
 			, m_styler(styler)
 			, m_stylePicker(*this, [this](Widget& choice) { this->pickStyle(choice.contentlabel()); })
 			, m_table(*this, { "Field", "Value" }, { 0.3f, 0.7f })
@@ -604,7 +604,7 @@ namespace toy
 
 		tooldock.addDock("Style Edit").emplace<StyleEdit>(parent.uiWindow().styler());
 
-		Page& options = tooldock.addDock("Options").emplace<Page>("Options");
+		Page& options = tooldock.addDock("Options").emplace<Page>();
 		options.emplace<InputText>("Debug draw filter", "", [](string value) { DrawFrame::sDebugDrawFilter = value; });
 		options.emplace<InputBool>("Debug draw Frame", false, [](bool on) { DrawFrame::sDebugDrawFrameRect = on; });
 		options.emplace<InputBool>("Debug draw Padding", false, [](bool on) { DrawFrame::sDebugDrawPaddedRect = on; });
