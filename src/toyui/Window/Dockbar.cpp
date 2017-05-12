@@ -14,7 +14,7 @@ namespace toy
 	{}
 
 	DockToggle::DockToggle(Dockbar& dockbar, Dockbox& dockbox, const string& icon)
-		: Button(dockbar, dockbar.findImage(icon), std::bind(&DockToggle::click, this), cls())
+		: Button(dockbar, dockbar.findImage(icon), [this](Widget&) { this->click(); }, cls())
 		, m_dockbox(dockbox)
 	{}
 
