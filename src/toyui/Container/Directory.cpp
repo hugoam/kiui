@@ -12,7 +12,7 @@
 namespace toy
 {
 	Dir::Dir(Wedge& parent, Directory& directory, const string& name)
-		: MultiButton(parent, Trigger(), { "folder_20" , m_name }, cls())
+		: MultiButton(parent, Trigger(), { "folder_20" , name }, cls())
 		, m_directory(directory)
 		, m_name(name)
 	{}
@@ -29,7 +29,7 @@ namespace toy
 	}
 
 	File::File(Wedge& parent, Directory& directory, const string& name)
-		: MultiButton(parent, Trigger(), { "file_20", m_name }, cls())
+		: MultiButton(parent, Trigger(), { "file_20", name }, cls())
 		, m_directory(directory)
 		, m_name(name)
 	{}
