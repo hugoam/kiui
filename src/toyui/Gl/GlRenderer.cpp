@@ -49,7 +49,7 @@ namespace toy
 
 		if(m_ctx == nullptr)
 		{
-			printf("Could not init nanovg.\n");
+			printf("ERROR: Could not init nanovg.\n");
 			return;
 		}
 	}
@@ -73,7 +73,7 @@ namespace toy
 		glewExperimental = true;
 
 		if(glewInit() != GLEW_OK) {
-			printf("Could not init glew.\n");
+			printf("ERROR: Could not init glew.\n");
 			return;
 		}
 #endif
@@ -110,7 +110,7 @@ namespace toy
 		double delta = time - prevtime;
 		if(time - prevtime >= 4.f)
 		{
-			printf("fps %f\n", (frames / (time - prevtime)));
+			printf("INFO: fps %f\n", (frames / (time - prevtime)));
 			prevtime = time;
 			frames = 0;
 		}

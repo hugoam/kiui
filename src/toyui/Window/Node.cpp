@@ -55,7 +55,7 @@ namespace toy
 		node.index = index;
 		node.depth += depth;
 
-		//printf("Canvas layout visited %s set index %i depth %i\n", node.node->name().c_str(), index, depth);
+		//printf("DEBUG: Canvas layout visited %s set index %i depth %i\n", node.node->name().c_str(), index, depth);
 
 		size_t idepth = 0;
 		std::vector<Node*>& connections = output ? node.outputs : node.inputs;
@@ -71,7 +71,7 @@ namespace toy
 
 		if(node.visited == node.connections)
 		{
-			//printf("Canvas layout node %s done\n", node.node->name().c_str());
+			//printf("DEBUG: Canvas layout node %s done\n", node.node->name().c_str());
 			node.done = true;
 		}
 	}

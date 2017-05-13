@@ -145,7 +145,6 @@ namespace toy
 
 	void EmRenderWindow::initContext()
 	{
-		printf("Setting Emscripten Canvas size\n");
 		emscripten_set_canvas_size(m_width, m_height);
 
 		EmscriptenWebGLContextAttributes attrs;
@@ -158,9 +157,7 @@ namespace toy
 
 		assert(emscripten_webgl_get_current_context() == 0);
 
-		printf("Creating Emscripten WebGL context\n");
 		m_window = emscripten_webgl_create_context("canvas", &attrs);
-		printf("Created Emscripten WebGL context %i\n", m_window);
 
 		emscripten_webgl_make_context_current(m_window);
 

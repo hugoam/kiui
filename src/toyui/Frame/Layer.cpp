@@ -139,7 +139,7 @@ namespace toy
 		for(Layer* layer: d_layers)
 		{
 			layer->debugPrintDepth();
-			printf("Layer :: %s reorder z %u index %u\n", layer->style().name().c_str(), layer->z(), layer->index());
+			printf("LAYOUT: Layer %s reorder z %u index %u\n", layer->style().name().c_str(), layer->z(), layer->index());
 		}
 #endif
 	}

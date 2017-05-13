@@ -209,7 +209,7 @@ namespace toy
 
 #if 0 // DEBUG
 		frame.debugPrintDepth();
-		printf("%s measured content size %f , %f\n", frame.style().name().c_str(), frame.dcontent(DIM_X), frame.dcontent(DIM_Y));
+		printf("LAYOUT: %s measured content size %f , %f\n", frame.style().name().c_str(), frame.dcontent(DIM_X), frame.dcontent(DIM_Y));
 #endif
 	}
 
@@ -243,7 +243,7 @@ namespace toy
 
 #if 0 // DEBUG
 		frame.debugPrintDepth();
-		printf("%s resize size %f , %f\n", frame.style().name().c_str(), frame.dsize(DIM_X), frame.dsize(DIM_Y));
+		printf("LAYOUT: %s resize size %f , %f\n", frame.style().name().c_str(), frame.dsize(DIM_X), frame.dsize(DIM_Y));
 #endif
 
 		frame.content().updateContentSize();
@@ -287,7 +287,7 @@ namespace toy
 
 #if 0 // DEBUG
 		frame.debugPrintDepth();
-		printf("%s layout position %f , %f\n", frame.style().name().c_str(), frame.dposition(DIM_X), frame.dposition(DIM_Y));
+		printf("LAYOUT: %s layout position %f , %f\n", frame.style().name().c_str(), frame.dposition(DIM_X), frame.dposition(DIM_Y));
 #endif
 	}
 

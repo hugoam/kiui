@@ -113,7 +113,7 @@ namespace toy
 		if(Stencil::s_debugBatch > 1 && Stencil::s_debugBatch != prevBatch)
 		{
 			prevBatch = Stencil::s_debugBatch;
-			//printf("Render Frame : %i frames redrawn\n", Stencil::s_debugBatch);
+			//printf("DEBUG: Render Frame : %i frames redrawn\n", Stencil::s_debugBatch);
 		}
 
 		nvgEndFrame(m_ctx);

@@ -92,7 +92,14 @@ namespace toy
 
 		int done = 0;
 
-		FILE *input = fopen(path.c_str(), "rb");
+		FILE* input = fopen(path.c_str(), "rb");
+
+		if(!input)
+		{
+			printf("ERROR: Could not open style sheet %s", path.c_str());
+			return;
+		}
+
 		yaml_parser_set_input_file(&m_pimpl->m_parser, input);
 
 		while(!done)

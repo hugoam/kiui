@@ -60,7 +60,7 @@ namespace toy
 				string fullpath = path + ent->d_name;
 				string name = subfolder + replaceAll(ent->d_name, ".png", "");
 
-				printf("Adding Image %s\n", fullpath.c_str());
+				printf("INFO: Adding Image %s\n", fullpath.c_str());
 
 				int width, height, n;
 				unsigned char* img = stbi_load(fullpath.c_str(), &width, &height, &n, 4);
@@ -100,7 +100,7 @@ namespace toy
 
 	void UiWindow::init()
 	{
-		printf("UiWindow Init\n");
+		printf("INFO: Initializing UiWindow: resource path %s\n", m_resourcePath.c_str());
 		m_renderer->setupContext();
 
 		this->loadResources();
@@ -115,8 +115,6 @@ namespace toy
 		m_rootSheet->frame().setSize(m_width, m_height);
 
 		this->resize(size_t(m_width), size_t(m_height));
-
-		printf("UiWindow Init End\n");
 	}
 
 	void UiWindow::initResources()

@@ -23,7 +23,7 @@
 
 void errorcb(int error, const char* desc)
 {
-	printf("GLFW error %d: %s\n", error, desc);
+	printf("ERROR: GLFW %d: %s\n", error, desc);
 }
 
 namespace toy
@@ -179,7 +179,7 @@ namespace toy
 	void GlfwRenderWindow::initContext()
 	{
 		if(!glfwInit()) {
-			printf("Failed to init GLFW.");
+			printf("ERROR: Failed to init GLFW.");
 			return;
 		}
 

@@ -58,8 +58,6 @@ namespace toy
 
 	void Styler::initStyle(Type& type)
 	{
-		//printf("Init style %s\n", type.name().c_str());
-
 		unique_ptr<Style> style = make_unique<Style>(type, type.base() ? &this->style(*type.base()) : nullptr);
 		this->prepareStyle(*style);
 
