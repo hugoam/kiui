@@ -86,7 +86,6 @@ namespace toy
 		, m_shutdownRequested(false)
 		, m_user(user)
 	{
-		this->initResources();
 		this->init();
 	}
 
@@ -103,6 +102,7 @@ namespace toy
 		printf("INFO: Initializing UiWindow: resource path %s\n", m_resourcePath.c_str());
 		m_renderer->setupContext();
 
+		this->initResources();
 		this->loadResources();
 
 		m_styler->defaultLayout();
@@ -120,6 +120,8 @@ namespace toy
 	void UiWindow::initResources()
 	{
 		string spritePath = m_resourcePath + "interface/uisprites/";
+
+		printf("INFO: Loading Images in path %s\n", spritePath.c_str());
 
 		DIR* dir = opendir(spritePath.c_str());
 		dirent* ent;
