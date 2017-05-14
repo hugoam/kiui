@@ -7,14 +7,18 @@
 
 namespace toy
 {
-	ToolButton::ToolButton(Wedge& parent, const string& icon, Trigger trigger)
-		: Dropdown(parent)
+	ToolButton::ToolButton(Wedge& parent, const string& icon, const Callback& trigger)
+		: DropdownInput(parent, nullptr, {}, cls())
 	{
-		DropdownChoice& choice = this->addChoice();
-		choice.reset({ icon }, trigger);
-		m_header.reset({ icon });
+		// header is a button
+		m_activeHeader = true;
+
+		// don't drop on left click, but on right click
+		m_trigger = nullptr;
+		m_triggerAlt = [this](Widget&) { this->dropdown(true); };
+
+		DropdownChoice& choice = this->addChoice({ icon }, trigger);
 		m_toggle.hide();
-		//m_header.emplace<Icon>(icon);
 	}
 
 	Tooldock::Tooldock(Wedge& parent)

@@ -15,7 +15,7 @@
 
 namespace toy
 {
-	ContextMenu::ContextMenu(Wedge& parent, Trigger onClose)
+	ContextMenu::ContextMenu(Wedge& parent, const Callback& onClose)
 		: Overlay(parent, cls())
 	{
 		this->frame().setPosition(this->rootSheet().mouse().lastX(), this->rootSheet().mouse().lastY());
@@ -25,7 +25,7 @@ namespace toy
 	void ContextMenu::clear()
 	{
 		this->yieldControl();
-		this->as<Widget>().remove();
+		this->destroy();
 	}
 
 	void ContextMenu::leftClick(MouseEvent& mouseEvent)

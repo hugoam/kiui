@@ -17,15 +17,18 @@ namespace toy
 	class _I_ TOY_UI_EXPORT DropdownHead : public MultiButton
 	{
 	public:
-		DropdownHead(Wedge& parent, const Trigger& trigger);
+		DropdownHead(Dropdown& dropdown, const Callback& trigger);
 
 		static Type& cls() { static Type ty("DropdownHead", MultiButton::cls()); return ty; }
+
+	protected:
+		Dropdown& m_dropdown;
 	};
 
 	class _I_ TOY_UI_EXPORT DropdownToggle : public Button
 	{
 	public:
-		DropdownToggle(Wedge& parent, const Trigger& trigger);
+		DropdownToggle(Wedge& parent, const Callback& trigger);
 
 		static Type& cls() { static Type ty("DropdownToggle", Button::cls()); return ty; }
 	};
@@ -33,9 +36,14 @@ namespace toy
 	class _I_ TOY_UI_EXPORT DropdownChoice : public MultiButton
 	{
 	public:
-		DropdownChoice(Wedge& parent, const Trigger& trigger, const StringVector& elements);
+		DropdownChoice(Wedge& parent, Dropdown& dropdown, const Callback& trigger, const StringVector& elements);
+
+		virtual void leftClick(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("DropdownChoice", MultiButton::cls()); return ty; }
+
+	protected:
+		Dropdown& m_dropdown;
 	};
 
 	class _I_ TOY_UI_EXPORT DropdownList : public Container
@@ -43,8 +51,8 @@ namespace toy
 	public:
 		DropdownList(Dropdown& dropdown);
 
-		void leftClick(MouseEvent& mouseEvent);
-		void rightClick(MouseEvent& mouseEvent);
+		virtual void leftClick(MouseEvent& mouseEvent);
+		virtual void rightClick(MouseEvent& mouseEvent);
 		
 		static Type& cls() { static Type ty("DropdownList", Container::cls()); return ty; }
 
@@ -61,11 +69,14 @@ namespace toy
 		DropdownHead& header() { return m_header; }
 		bool down() { return m_down; }
 
+		virtual Widget& insert(unique_ptr<Widget> widget);
+
 		void dropdown(bool modal = true);
 		void dropup();
 
-		DropdownChoice& addChoice();
-		virtual Container& emplaceContainer();
+		virtual void selected(DropdownChoice& selected);
+
+		DropdownChoice& addChoice(const StringVector& elements, const Callback& trigger = nullptr);
 
 		static Type& cls() { static Type ty("Dropdown", WrapButton::cls()); return ty; }
 
@@ -79,21 +90,19 @@ namespace toy
 	class _I_ TOY_UI_EXPORT DropdownInput : public Dropdown
 	{
 	public:
-		DropdownInput(Wedge& parent, const Trigger& onSelected, StringVector choices = StringVector(), Type& type = cls());
+		DropdownInput(Wedge& parent, const Callback& onSelected = nullptr, StringVector choices = StringVector(), Type& type = cls());
 
+		virtual void selected(DropdownChoice& selected);
 		void select(DropdownChoice& selected);
-		void selected(DropdownChoice& selected);
 
-		DropdownChoice& addChoice(const StringVector& elements);
-		virtual Container& emplaceContainer();
-
-		void updateHead(MultiButton& choice);
+		DropdownChoice& addChoice(const StringVector& elements, const Callback& trigger = nullptr);
 
 		static Type& cls() { static Type ty("DropdownInput", Dropdown::cls()); return ty; }
 
 	protected:
-		Trigger m_onSelected;
+		Callback m_onSelected;
 		MultiButton* m_selected;
+		bool m_activeHeader;
 	};
 }
 

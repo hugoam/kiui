@@ -12,11 +12,11 @@
 
 namespace toy
 {
-	RadioChoice::RadioChoice(Wedge& parent, const Trigger& trigger)
+	RadioChoice::RadioChoice(Wedge& parent, const Callback& trigger)
 		: WrapButton(parent, trigger, cls())
 	{}
 
-	RadioSwitch::RadioSwitch(Wedge& parent, const Trigger& onSelected, size_t active, StringVector labels)
+	RadioSwitch::RadioSwitch(Wedge& parent, const Callback& onSelected, size_t active, StringVector labels)
 		: WrapControl(parent, cls())
 		, m_onSelected(onSelected)
 		, m_active(nullptr)
@@ -37,11 +37,6 @@ namespace toy
 		}
 
 		return choice;
-	}
-
-	Container& RadioSwitch::emplaceContainer()
-	{
-		return this->addChoice();
 	}
 
 	void RadioSwitch::activated(RadioChoice& button)

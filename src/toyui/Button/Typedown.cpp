@@ -12,7 +12,7 @@
 
 namespace toy
 {
-	TypedownInput::TypedownInput(Wedge& parent, const Trigger& onSelected, StringVector choices)
+	TypedownInput::TypedownInput(Wedge& parent, const Callback& onSelected, StringVector choices)
 		: DropdownInput(parent, onSelected, choices)
 		, m_input(*this, m_list, [this](const string& value) { this->onInput(value); })
 	{

@@ -32,11 +32,11 @@ namespace toy
 		: SliderKnob(parent, dim, cls())
 	{}
 
-	ScrollForward::ScrollForward(Wedge& parent, const Trigger& trigger)
+	ScrollForward::ScrollForward(Wedge& parent, const Callback& trigger)
 		: Button(parent, "", trigger, cls())
 	{}
 
-	ScrollBackward::ScrollBackward(Wedge& parent, const Trigger& trigger)
+	ScrollBackward::ScrollBackward(Wedge& parent, const Callback& trigger)
 		: Button(parent, "", trigger, cls())
 	{}
 

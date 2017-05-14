@@ -37,6 +37,8 @@ namespace toy
 		m_scrollbarY.frame().setIndex(1, 0);
 		m_scrollbarX.frame().setIndex(0, 1);
 
+		m_containerTarget = &m_scrollzone.container();
+
 		this->updateWrap();
 	}
 
@@ -49,11 +51,6 @@ namespace toy
 			m_frame->as<Grid>().line(0).setStyle(this->fetchStyle(Sheet::cls()));
 
 		m_frame->as<Grid>().line(1).setStyle(this->fetchStyle(Line::cls()));
-	}
-
-	Container& ScrollSheet::emplaceContainer()
-	{
-		return m_scrollzone.container();
 	}
 
 	void ScrollSheet::clear()
@@ -95,7 +92,7 @@ namespace toy
 		, m_clamped(true)
 	{
 		m_plan.setStyle(Plan::cls());
-
+		m_containerTarget = &m_surface;
 		this->updateBounds();
 	}
 
@@ -106,11 +103,6 @@ namespace toy
 			this->updateBounds();
 
 		Wedge::nextFrame(tick, delta);
-	}
-
-	Container& ScrollPlan::emplaceContainer()
-	{
-		return m_surface;
 	}
 
 	void ScrollPlan::updateBounds()

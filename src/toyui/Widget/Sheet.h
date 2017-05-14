@@ -18,7 +18,6 @@ namespace toy
 	public:
 		Wedge(Wedge& parent, Type& type = cls(), FrameType frameType = STRIPE);
 		Wedge(Type& type = cls(), FrameType frameType = STRIPE);
-		~Wedge();
 
 		_A_ _G_ inline std::vector<Widget*>& contents() { return m_contents; }
 
@@ -51,13 +50,12 @@ namespace toy
 	public:
 		Container(Wedge& parent, Type& type = cls(), FrameType frameType = STRIPE);
 		Container(Type& type = cls(), FrameType frameType = STRIPE);
-		~Container();
 
 		Container(const Container& other) = delete;
 
 		inline const std::vector<unique_ptr<Widget>>& containerContents() { return m_containerContents; }
 
-		virtual Container& emplaceContainer() { return *this; }
+		Container& target() { return m_containerTarget == this ? *this : m_containerTarget->target(); }
 
 		virtual void handleAdd(Widget& widget) {}
 		virtual void handleRemove(Widget& widget) {}
@@ -66,13 +64,14 @@ namespace toy
 		Widget& append(unique_ptr<Widget> widget);
 		unique_ptr<Widget> release(Widget& widget);
 
+		virtual Widget& insert(unique_ptr<Widget> widget) { return this->append(std::move(widget)); }
+
 		void clear();
 
 		template <class T, class... Args>
 		inline T& emplace(Args&&... args)
 		{
-			Container& container = this->emplaceContainer();
-			return this->append(make_unique<T>(container.as<Wedge>(), std::forward<Args>(args)...)).template as<T>();
+			return this->insert(make_unique<T>(m_containerTarget->as<Wedge>(), std::forward<Args>(args)...)).template as<T>();
 		}
 
 		template <class T, class... Args>
@@ -84,6 +83,7 @@ namespace toy
 		static Type& cls() { static Type ty("Container", Wedge::cls()); return ty; }
 
 	protected:
+		Container* m_containerTarget;
 		std::vector<unique_ptr<Widget>> m_containerContents;
 	};
 

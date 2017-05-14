@@ -34,14 +34,14 @@ namespace toy
 	{
 		mouseEvent.abort = true;
 		this->yieldControl();
-		this->as<Widget>().remove();
+		this->destroy();
 	}
 
 	void Popup::rightClick(MouseEvent& mouseEvent)
 	{
 		mouseEvent.abort = true;
 		this->yieldControl();
-		this->as<Widget>().remove();
+		this->destroy();
 	}
 
 	WindowHeader::WindowHeader(Window& window)
@@ -153,7 +153,7 @@ namespace toy
 		: ScrollSheet(parent, cls())
 	{}
 
-	CloseButton::CloseButton(Wedge& parent, const Trigger& trigger)
+	CloseButton::CloseButton(Wedge& parent, const Callback& trigger)
 		: Button(parent, "", trigger, cls())
 	{}
 
@@ -169,7 +169,7 @@ namespace toy
 		mouseEvent.abort = true;
 	}
 
-	Window::Window(Wedge& parent, const string& title, WindowState state, const Trigger& onClose, Docksection* dock, Type& type)
+	Window::Window(Wedge& parent, const string& title, WindowState state, const Callback& onClose, Docksection* dock, Type& type)
 		: Overlay(parent, type)
 		, m_name(title)
 		, m_windowState(state)
@@ -179,6 +179,8 @@ namespace toy
 		, m_body(*this)
 		, m_footer(*this)
 	{
+		m_containerTarget = &m_body.target();
+		
 		if(!this->sizable())
 			m_footer.hide();
 
@@ -272,12 +274,7 @@ namespace toy
 			this->undock();
 		if(m_onClose)
 			m_onClose(*this);
-		this->as<Widget>().remove();
-	}
-
-	Container& Window::emplaceContainer()
-	{
-		return m_body.emplaceContainer();
+		this->destroy();
 	}
 
 	void Window::leftClick(MouseEvent& mouseEvent)

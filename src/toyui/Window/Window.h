@@ -28,7 +28,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT CloseButton : public Button
 	{
 	public:
-		CloseButton(Wedge& parent, const Trigger& trigger);
+		CloseButton(Wedge& parent, const Callback& trigger);
 
 		virtual void leftClick(MouseEvent& mouseEvent);
 		virtual void rightClick(MouseEvent& mouseEvent);
@@ -128,7 +128,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Window : public Overlay
 	{
 	public:
-		Window(Wedge& parent, const string& title, WindowState state = WINDOW_DEFAULT, const Trigger& onClose = nullptr, Docksection* dock = nullptr, Type& type = cls());
+		Window(Wedge& parent, const string& title, WindowState state = WINDOW_DEFAULT, const Callback& onClose = nullptr, Docksection* dock = nullptr, Type& type = cls());
 		
 		const string& name() { return m_name; }
 
@@ -155,8 +155,6 @@ namespace toy
 		virtual void leftClick(MouseEvent& mouseEvent);
 		virtual void rightClick(MouseEvent& mouseEvent);
 
-		virtual Container& emplaceContainer();
-
 		void dock(Docksection& docksection);
 		void undock();
 
@@ -170,7 +168,7 @@ namespace toy
 	protected:
 		string m_name;
 		WindowState m_windowState;
-		Trigger m_onClose;
+		Callback m_onClose;
 		WindowHeader m_header;
 		WindowBody m_body;
 		WindowFooter m_footer;

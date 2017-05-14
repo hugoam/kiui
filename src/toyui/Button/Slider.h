@@ -31,7 +31,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Slider : public WrapControl
 	{
 	public:
-		Slider(Wedge& parent, Dimension dim = DIM_X, const Trigger& onUpdated = nullptr, Type& type = cls());
+		Slider(Wedge& parent, Dimension dim = DIM_X, const Callback& onUpdated = nullptr, Type& type = cls());
 
 		Widget& filler() { return m_filler; }
 		SliderKnob& slider() { return m_button; }
@@ -53,9 +53,9 @@ namespace toy
 
 		float offset(float pos);
 
-		void leftDragStart(MouseEvent& mouseEvent);
-		void leftDrag(MouseEvent& mouseEvent);
-		void leftDragEnd(MouseEvent& mouseEvent);
+		virtual void leftDragStart(MouseEvent& mouseEvent);
+		virtual void leftDrag(MouseEvent& mouseEvent);
+		virtual void leftDragEnd(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("Slider", WrapControl::cls()); return ty; }
 
@@ -78,7 +78,7 @@ namespace toy
 		float m_startPos;
 		float m_startOffset;
 
-		Trigger m_onUpdated;
+		Callback m_onUpdated;
 	};
 
 	class _I_ TOY_UI_EXPORT SliderDisplay : public Label

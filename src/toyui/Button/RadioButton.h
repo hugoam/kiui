@@ -16,7 +16,7 @@ namespace toy
 	class TOY_UI_EXPORT RadioChoice : public WrapButton
 	{
 	public:
-		RadioChoice(Wedge& parent, const Trigger& trigger);
+		RadioChoice(Wedge& parent, const Callback& trigger);
 
 		static Type& cls() { static Type ty("RadioChoice", WrapButton::cls()); return ty; }
 	};
@@ -24,19 +24,18 @@ namespace toy
 	class TOY_UI_EXPORT RadioSwitch : public WrapControl
 	{
 	public:
-		RadioSwitch(Wedge& parent, const Trigger& onSelected, size_t active, StringVector labels = StringVector());
+		RadioSwitch(Wedge& parent, const Callback& onSelected, size_t active, StringVector labels = {});
 
 		RadioChoice* active() { return m_active; }
 
 		RadioChoice& addChoice();
-		virtual Container& emplaceContainer();
 
 		void activated(RadioChoice& choice);
 
 		static Type& cls() { static Type ty("RadioSwitch", WrapControl::cls()); return ty; }
 
 	protected:
-		Trigger m_onSelected;
+		Callback m_onSelected;
 		RadioChoice* m_active;
 		size_t m_activeIndex;
 	};

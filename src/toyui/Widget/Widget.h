@@ -80,8 +80,6 @@ namespace toy
 		void unbind();
 
 		unique_ptr<Widget> extract();
-
-		void remove();
 		void destroy();
 
 		template <class T>
@@ -142,7 +140,7 @@ namespace toy
 		void mousePressed(MouseEvent& mouseEvent);
 		void mouseReleased(MouseEvent& mouseEvent);
 
-		typedef std::function<void(Widget&)> Trigger;
+		typedef std::function<void(Widget&)> Callback;
 
 		void debugPrintDepth();
 

@@ -149,7 +149,7 @@ namespace toy
 		MousePressEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_PRESSED, x, y) {}
 
 		void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMousePressed(posX, posY, button); }
-		void receive(InputReceiver& receiver) { receiver.mousePressed(*this); }
+		void receive(InputReceiver& receiver) { receiver.mousePressed(*this); consumed = true; }
 	};
 
 	struct TOY_UI_EXPORT MouseReleaseEvent : public MouseEvent

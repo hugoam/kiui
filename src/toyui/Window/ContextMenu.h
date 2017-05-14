@@ -14,7 +14,7 @@ namespace toy
 	class TOY_UI_EXPORT ContextMenu : public Overlay
 	{
 	public:
-		ContextMenu(Wedge& parent, Trigger onClose);
+		ContextMenu(Wedge& parent, const Callback& onClose);
 
 		void clear();
 
@@ -25,7 +25,7 @@ namespace toy
 		static Type& cls() { static Type ty("ContextMenu", Overlay::cls()); return ty; }
 
 	protected:
-		Trigger m_onClose;
+		Callback m_onClose;
 	};
 }
 

@@ -131,7 +131,8 @@ namespace toy
 		RootSheet& rootSheet = this->rootSheet();
 		this->visit([&rootSheet](Widget& widget) { rootSheet.handleUnbindWidget(widget); return true; });
 
-		m_parent->stripe().unmap(*m_frame);
+		if(m_frame->mapped())
+			m_parent->stripe().unmap(*m_frame);
 
 		m_parent = nullptr;
 		m_index = 0;
@@ -142,11 +143,6 @@ namespace toy
 		unique_ptr<Widget> unique = m_container->release(*this);
 		m_parent->destroy();
 		return unique;
-	}
-
-	void Widget::remove()
-	{
-		m_container->release(*this);
 	}
 
 	void Widget::destroy()

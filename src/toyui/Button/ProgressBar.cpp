@@ -12,7 +12,7 @@
 
 namespace toy
 {
-	ProgressBar::ProgressBar(Wedge& parent, Dimension dim, const Trigger& onUpdated)
+	ProgressBar::ProgressBar(Wedge& parent, Dimension dim, const Callback& onUpdated)
 		: Wedge(parent, cls())
 		, m_dim(dim)
 		, m_percentage(0.f)

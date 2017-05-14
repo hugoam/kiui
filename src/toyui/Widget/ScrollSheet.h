@@ -39,8 +39,6 @@ namespace toy
 
 		Container& container() { return m_scrollzone.container(); }
 
-		virtual Container& emplaceContainer();
-
 		virtual void clear();
 
 		void mouseWheel(MouseEvent& mouseEvent);
@@ -79,8 +77,6 @@ namespace toy
 		ScrollPlan(Wedge& parent, Type& type = cls());
 
 		Container& plan() { return m_plan; }
-
-		virtual Container& emplaceContainer();
 
 		void nextFrame(size_t tick, size_t delta);
 

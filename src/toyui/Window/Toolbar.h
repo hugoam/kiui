@@ -13,10 +13,12 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT ToolButton : public Dropdown
+	class _I_ TOY_UI_EXPORT ToolButton : public DropdownInput
 	{
 	public:
-		ToolButton(Wedge& parent, const string& icon, Trigger trigger = nullptr);
+		ToolButton(Wedge& parent, const string& icon, const Callback& trigger = nullptr);
+
+		static Type& cls() { static Type ty("ToolButton", DropdownInput::cls()); return ty; }
 	};
 
 	class _I_ TOY_UI_EXPORT Tooldock : public Div

@@ -9,6 +9,7 @@
 #include <toyui/Forward.h>
 #include <toyui/Widget/Widget.h>
 #include <toyui/Widget/Sheet.h>
+#include <toyui/Input/InputDispatcher.h>
 #include <toyui/Edit/Value.h>
 
 namespace toy
@@ -54,11 +55,11 @@ namespace toy
 	public:
 		ClickTrigger(Widget& widget, const TriggerFunc& trigger) : m_widget(widget), m_trigger(trigger) {}
 
-		virtual void click() { if(m_trigger) m_trigger(m_widget); }
+		virtual void click(MouseEvent& mouseEvent) { if(m_trigger) { m_trigger(m_widget); mouseEvent.consumed = true; } }
 
-		virtual void clickAlt() { if(m_triggerAlt) m_triggerAlt(m_widget); }
-		virtual void clickShift() { if(m_triggerShift) m_triggerShift(m_widget); }
-		virtual void clickCtrl() { if(m_triggerCtrl) m_triggerCtrl(m_widget); }
+		virtual void clickAlt(MouseEvent& mouseEvent) { if(m_triggerAlt) { m_triggerAlt(m_widget); mouseEvent.consumed = true; } }
+		virtual void clickShift(MouseEvent& mouseEvent) { if(m_triggerShift) { m_triggerShift(m_widget); mouseEvent.consumed = true; } }
+		virtual void clickCtrl(MouseEvent& mouseEvent) { if(m_triggerCtrl) { m_triggerCtrl(m_widget); mouseEvent.consumed = true; } }
 
 	protected:
 		Widget& m_widget;
@@ -71,13 +72,13 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Button : public Control, public ClickTrigger
 	{
 	public:
-		Button(Wedge& parent, const string& label, const Trigger& trigger = Trigger(), Type& type = cls());
-		Button(Wedge& parent, Image& image, const Trigger& trigger = Trigger(), Type& type = cls());
+		Button(Wedge& parent, const string& label, const Callback& trigger = nullptr, Type& type = cls());
+		Button(Wedge& parent, Image& image, const Callback& trigger = nullptr, Type& type = cls());
 
 		const string& tooltip() { return m_tooltip; }
 
-		void leftClick(MouseEvent& mouseEvent);
-		void rightClick(MouseEvent& mouseEvent);
+		virtual void leftClick(MouseEvent& mouseEvent);
+		virtual void rightClick(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("Button", Control::cls()); return ty; }
 
@@ -88,7 +89,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT WrapButton : public WrapControl, public ClickTrigger
 	{
 	public:
-		WrapButton(Wedge& parent, const Trigger& trigger = Trigger(), Type& type = cls());
+		WrapButton(Wedge& parent, const Callback& trigger = nullptr, Type& type = cls());
 
 		Widget& content() { return *m_contents[0]; }
 
@@ -103,11 +104,12 @@ namespace toy
 	class _I_ TOY_UI_EXPORT MultiButton : public WrapButton
 	{
 	public:
-		MultiButton(Wedge& parent, const Trigger& trigger = Trigger(), const StringVector& elements = StringVector(), Type& type = cls());
+		MultiButton(Wedge& parent, const Callback& trigger = nullptr, const StringVector& elements = {}, Type& type = cls());
 
 		const std::vector<string>& elements() { return m_elements; }
 
-		void reset(const StringVector& contents, const Trigger& trigger = Trigger());
+		void reset(MultiButton& button);
+		void reset(const StringVector& contents, const Callback& trigger = nullptr);
 
 		static Type& cls() { static Type ty("MultiButton", WrapButton::cls()); return ty; }
 
@@ -118,23 +120,23 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Toggle : public Control
 	{
 	public:
-		typedef std::function<void(Toggle&)> Trigger;
+		typedef std::function<void(Toggle&)> Callback;
 
 	public:
-		Toggle(Wedge& parent, const Trigger& triggerOn, const Trigger& triggerOff, bool isOn = true, Type& type = cls());
+		Toggle(Wedge& parent, const Callback& triggerOn, const Callback& triggerOff, bool isOn = true, Type& type = cls());
 
 		bool on() { return m_on; }
 
 		void update(bool on);
 		void toggle();
 
-		void leftClick(MouseEvent& mouseEvent);
+		virtual void leftClick(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("Toggle", Control::cls()); return ty; }
 
 	protected:
-		Trigger m_triggerOn;
-		Trigger m_triggerOff;
+		Callback m_triggerOn;
+		Callback m_triggerOff;
 
 		bool m_on;
 	};

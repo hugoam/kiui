@@ -29,9 +29,6 @@ namespace toy
 		: Widget(type, frameType)
 	{}
 
-	Wedge::~Wedge()
-	{}
-
 	void Wedge::nextFrame(size_t tick, size_t delta)
 	{
 		Widget::nextFrame(tick, delta);
@@ -109,13 +106,12 @@ namespace toy
 
 	Container::Container(Wedge& parent, Type& type, FrameType frameType)
 		: Wedge(parent, type, frameType)
+		, m_containerTarget(this)
 	{}
 
 	Container::Container(Type& type, FrameType frameType)
 		: Wedge(type, frameType)
-	{}
-
-	Container::~Container()
+		, m_containerTarget(this)
 	{}
 
 	Widget& Container::append(unique_ptr<Widget> unique)
@@ -127,7 +123,7 @@ namespace toy
 	{
 		Widget& widget = *unique;
 		if(widget.parent() == nullptr)
-			this->emplaceContainer().as<Wedge>().insert(widget, index, false);
+			m_containerTarget->as<Wedge>().insert(widget, index, false);
 		widget.setContainer(*this);
 		m_containerContents.insert(m_containerContents.begin() + index, std::move(unique));
 		this->handleAdd(widget);

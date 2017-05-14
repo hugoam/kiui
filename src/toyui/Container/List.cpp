@@ -22,11 +22,6 @@ namespace toy
 		return this->emplaceLocal<WrapButton>(m_scrollzone.container(), [this](Widget& button) { return this->selected(button); });
 	}
 
-	Container& SelectList::emplaceContainer()
-	{
-		return this->addChoice();
-	}
-
 	void SelectList::selected(Widget& selected)
 	{
 		selected.toggleState(ACTIVATED);

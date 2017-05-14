@@ -22,7 +22,7 @@ namespace toy
 	{}
 
 
-	Canvas::Canvas(Wedge& parent, const string& title, Trigger contextTrigger)
+	Canvas::Canvas(Wedge& parent, const string& title, const Callback& contextTrigger)
 		: ScrollPlan(parent, cls())
 		, m_name(title)
 		, m_contextTrigger(contextTrigger)
@@ -36,104 +36,43 @@ namespace toy
 
 	void Canvas::autoLayout()
 	{
-		NodeTable nodes;
-		this->orderNodes(nodes);
-		this->layoutNodes(nodes);
+		NodeTable nodeTable;
+		this->collectNodes(nodeTable);
+		this->layoutNodes(nodeTable);
 	}
-
-	void Canvas::collectNodes(NodeMap& nodes)
+	void Canvas::collectNodes(NodeTable& nodeTable)
 	{
-		m_plan.visit([&nodes](Widget& widget) {
+		std::vector<Node*> nodeVector;
+
+		m_plan.visit([&nodeVector](Widget& widget) {
 			if(&widget.type() == &Node::cls())
-				nodes[&widget.as<Node>()] = NodeInfo(widget.as<Node>());
+				nodeVector.push_back(&widget.as<Node>());
 			return true;
 		});
-	}
-
-	void Canvas::visit(NodeMap& nodes, NodeInfo& node, int index, int depth, bool output)
-	{
-		node.index = index;
-		node.depth += depth;
-
-		//printf("DEBUG: Canvas layout visited %s set index %i depth %i\n", node.node->name().c_str(), index, depth);
-
-		size_t idepth = 0;
-		std::vector<Node*>& connections = output ? node.outputs : node.inputs;
-		for(Node* pnext : connections)
-		{
-			NodeInfo& next = nodes[pnext];
-			if(next.done)
-				continue;
-			visit(nodes, next, output ? index + 1 : index - 1, idepth++, output);
-			node.visited += 1;
-			next.visited += 1;
-		}
-
-		if(node.visited == node.connections)
-		{
-			//printf("DEBUG: Canvas layout node %s done\n", node.node->name().c_str());
-			node.done = true;
-		}
-	}
-
-	void Canvas::processNode(NodeMap& nodes, NodeInfo& node)
-	{
-		visit(nodes, node, node.index, 0, true);
-		visit(nodes, node, node.index, 0, false);
-		node.done = true;
-	}
-
-	Node* Canvas::nextNode(NodeMap& nodes)
-	{
-		for(auto& kv : nodes)
-			if(!kv.second.done && kv.second.visited > 0)
-				return kv.second.node;
-
-		for(auto& kv : nodes)
-			if(!kv.second.done)
-				return kv.second.node;
-
-		return nullptr;
-	}
-
-	void Canvas::orderNodes(NodeTable& nodeTable)
-	{
-		NodeMap nodes;
-		this->collectNodes(nodes);
-
-		Node* node = nextNode(nodes);
-		while(node)
-		{
-			processNode(nodes, nodes[node]);
-			node = nextNode(nodes);
-		} 
 
 		int minIndex = 0;
 		int maxIndex = 0;
-		for(auto& kv : nodes)
+		for(Node* node : nodeVector)
 		{
-			minIndex = std::min(minIndex, kv.second.index);
-			maxIndex = std::max(maxIndex, kv.second.index);
+			minIndex = std::min(minIndex, node->order());
+			maxIndex = std::max(maxIndex, node->order());
 		}
 
 		int shift = -std::min(0, minIndex);
-		for(auto& kv : nodes)
-			kv.second.index += shift;
 
 		nodeTable.resize(maxIndex + shift + 1);
-
-		for(auto& kv : nodes)
-			nodeTable[kv.second.index].push_back(kv.second.node);
+		for(Node* node : nodeVector)
+			nodeTable[node->order() + shift].push_back(node);
 	}
 
-	void Canvas::layoutNodes(const NodeTable& nodes)
+	void Canvas::layoutNodes(const NodeTable& nodeTable)
 	{
 		unique_ptr<CanvasLine> line = make_unique<CanvasLine>(*this, m_plan.stripe());
 		std::vector<unique_ptr<CanvasColumn>> columns;
-		for(size_t i = 0; i < nodes.size(); ++i)
+		for(size_t i = 0; i < nodeTable.size(); ++i)
 		{
 			columns.emplace_back(make_unique<CanvasColumn>(*this, *line));
-			for(Node* node : nodes[i])
+			for(Node* node : nodeTable[i])
 				columns[i]->append(node->frame());
 		}
 
@@ -170,8 +109,6 @@ namespace toy
 
 	void NodePlug::leftDragStart(MouseEvent& mouseEvent)
 	{
-		mouseEvent.abort = true;
-
 		DimFloat local = m_node.plan().frame().localPosition(mouseEvent.posX, mouseEvent.posY);
 
 		m_connectionProxy = &m_node.plan().emplace<NodeConnectionProxy>();
@@ -185,16 +122,12 @@ namespace toy
 
 	void NodePlug::leftDrag(MouseEvent& mouseEvent)
 	{
-		mouseEvent.abort = true;
-
 		DimFloat local = m_node.plan().frame().localPosition(mouseEvent.posX, mouseEvent.posY);
 		m_connectionProxy->frame().setPosition(local.x(), local.y());
 	}
 
 	void NodePlug::leftDragEnd(MouseEvent& mouseEvent)
 	{
-		mouseEvent.abort = true;
-
 		Widget* widget = this->rootSheet().pinpoint(mouseEvent.posX, mouseEvent.posY);
 		while(widget && &widget->type() != &NodePlug::cls())
 			widget = widget->parent();
@@ -301,21 +234,19 @@ namespace toy
 		, m_spacer(*this)
 	{}
 
-	Node::Node(Wedge& parent, const string& title)
+	Node::Node(Wedge& parent, const string& title, int order)
 		: Overlay(parent, cls())
 		, m_name(title)
+		, m_order(order)
 		, m_inputs(*this)
 		, m_body(*this)
 		, m_outputs(*this)
-	{}
+	{
+		m_containerTarget = &m_body;
+	}
 
 	Node::~Node()
 	{}
-
-	Container& Node::emplaceContainer()
-	{
-		return m_body;
-	}
 
 	Canvas& Node::canvas()
 	{

@@ -45,14 +45,14 @@ namespace toy
 			this->setImage(&findImage(toLower(image)));
 	}
 
-	Button::Button(Wedge& parent, const string& label, const Trigger& trigger, Type& type)
+	Button::Button(Wedge& parent, const string& label, const Callback& trigger, Type& type)
 		: Control(parent, type)
 		, ClickTrigger(*this, trigger)
 	{
 		this->setLabel(label);
 	}
 
-	Button::Button(Wedge& parent, Image& image, const Trigger& trigger, Type& type)
+	Button::Button(Wedge& parent, Image& image, const Callback& trigger, Type& type)
 		: Button(parent, "", trigger, type)
 	{
 		this->setImage(&image);
@@ -60,50 +60,51 @@ namespace toy
 
 	void Button::leftClick(MouseEvent& mouseEvent)
 	{
-		UNUSED(mouseEvent);
 		if(this->rootSheet().keyboard().ctrlPressed())
-			this->clickCtrl();
+			this->clickCtrl(mouseEvent);
 		else if(this->rootSheet().keyboard().shiftPressed())
-			this->clickShift();
+			this->clickShift(mouseEvent);
 		else
-			this->click();
+			this->click(mouseEvent);
 	}
 
 	void Button::rightClick(MouseEvent& mouseEvent)
 	{
-		UNUSED(mouseEvent);
-		this->clickAlt();
+		this->clickAlt(mouseEvent);
 	}
 
-	WrapButton::WrapButton(Wedge& parent, const Trigger& trigger, Type& type)
+	WrapButton::WrapButton(Wedge& parent, const Callback& trigger, Type& type)
 		: WrapControl(parent, type)
 		, ClickTrigger(*this, trigger)
 	{}
 
 	void WrapButton::leftClick(MouseEvent& mouseEvent)
 	{
-		UNUSED(mouseEvent);
 		if(this->rootSheet().keyboard().ctrlPressed())
-			this->clickCtrl();
+			this->clickCtrl(mouseEvent);
 		else if(this->rootSheet().keyboard().shiftPressed())
-			this->clickShift();
+			this->clickShift(mouseEvent);
 		else
-			this->click();
+			this->click(mouseEvent);
 	}
 
 	void WrapButton::rightClick(MouseEvent& mouseEvent)
 	{
-		UNUSED(mouseEvent);
-		this->clickAlt();
+		this->clickAlt(mouseEvent);
 	}
 
-	MultiButton::MultiButton(Wedge& parent, const Trigger& trigger, const StringVector& elements, Type& type)
+	MultiButton::MultiButton(Wedge& parent, const Callback& trigger, const StringVector& elements, Type& type)
 		: WrapButton(parent, trigger, type)
 	{
 		this->reset(elements);
 	}
 
-	void MultiButton::reset(const StringVector& elements , const Trigger& trigger)
+	void MultiButton::reset(MultiButton& button)
+	{
+		this->reset(button.m_elements, button.m_trigger);
+	}
+
+	void MultiButton::reset(const StringVector& elements , const Callback& trigger)
 	{
 		if(trigger)
 			m_trigger = trigger;
@@ -119,7 +120,7 @@ namespace toy
 		m_elements = elements;
 	}
 
-	Toggle::Toggle(Wedge& parent, const Trigger& triggerOn, const Trigger& triggerOff, bool on, Type& type)
+	Toggle::Toggle(Wedge& parent, const Callback& triggerOn, const Callback& triggerOff, bool on, Type& type)
 		: Control(parent, type)
 		, m_triggerOn(triggerOn)
 		, m_triggerOff(triggerOff)

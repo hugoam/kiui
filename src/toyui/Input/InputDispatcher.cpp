@@ -29,12 +29,7 @@ namespace toy
 		if(inputEvent.consumed)
 			return this;
 
-		inputEvent.consumed = true;
 		inputEvent.receive(*this);
-
-		// if not key down, mouse move, click, entered, leaved
-		//	inputEvent.abort = true;
-
 		return this;
 	}
 
@@ -65,9 +60,11 @@ namespace toy
 		return filter && m_controlMode >= CM_CONTROL;
 	}
 
-	InputReceiver* ControlNode::dispatchEvent(InputEvent& inputEvent)
+	InputReceiver* ControlNode::dispatchEvent(InputEvent& inputEvent, InputReceiver* topReceiver)
 	{
-		InputReceiver* topReceiver = this->controlEvent(inputEvent);
+		if(!topReceiver)
+			topReceiver = this->controlEvent(inputEvent);
+
 		InputReceiver* consumer = topReceiver;
 		InputReceiver* receiver = topReceiver;
 

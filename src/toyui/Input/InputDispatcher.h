@@ -171,7 +171,7 @@ namespace toy
 		ControlMode controlMode() { return m_controlMode; }
 		DeviceType deviceFilter() { return m_device; }
 
-		virtual InputReceiver* dispatchEvent(InputEvent& inputEvent);
+		virtual InputReceiver* dispatchEvent(InputEvent& inputEvent, InputReceiver* topReceiver = nullptr);
 		virtual InputReceiver* controlEvent(InputEvent& inputEvent);
 		virtual InputReceiver* receiveEvent(InputEvent& inputEvent);
 		virtual InputReceiver* propagateEvent(InputEvent& inputEvent);

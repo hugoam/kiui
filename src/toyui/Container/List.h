@@ -28,7 +28,6 @@ namespace toy
 		SelectList(Wedge& parent, Type& type = cls());
 
 		WrapButton& addChoice();
-		virtual Container& emplaceContainer();
 
 		void selected(Widget& selected);
 

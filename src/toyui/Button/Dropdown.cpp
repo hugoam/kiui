@@ -18,17 +18,25 @@
 
 namespace toy
 {
-	DropdownHead::DropdownHead(Wedge& parent, const Trigger& trigger)
+	DropdownHead::DropdownHead(Dropdown& parent, const Callback& trigger)
 		: MultiButton(parent, trigger, {}, cls())
+		, m_dropdown(parent)
 	{}
 
-	DropdownToggle::DropdownToggle(Wedge& parent, const Trigger& trigger)
+	DropdownToggle::DropdownToggle(Wedge& parent, const Callback& trigger)
 		: Button(parent, "", trigger, cls())
 	{}
 
-	DropdownChoice::DropdownChoice(Wedge& parent, const Trigger& trigger, const StringVector& elements)
+	DropdownChoice::DropdownChoice(Wedge& parent, Dropdown& dropdown, const Callback& trigger, const StringVector& elements)
 		: MultiButton(parent, trigger, elements, cls())
+		, m_dropdown(dropdown)
 	{}
+
+	void DropdownChoice::leftClick(MouseEvent& mouseEvent)
+	{
+		MultiButton::leftClick(mouseEvent);
+		m_dropdown.selected(*this);
+	}
 
 	DropdownList::DropdownList(Dropdown& dropdown)
 		: Container(dropdown, cls(), LAYER)
@@ -37,35 +45,41 @@ namespace toy
 
 	void DropdownList::leftClick(MouseEvent& mouseEvent)
 	{
-		UNUSED(mouseEvent);
+		mouseEvent.consumed = true;
 		m_dropdown.dropup();
 	}
 
 	void DropdownList::rightClick(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		//m_dropdown.dropup();
+		m_dropdown.dropup();
 	}
 
 	Dropdown::Dropdown(Wedge& parent, Type& type)
-		: WrapButton(parent, std::bind(&Dropdown::dropdown, this, true), type)
-		, m_header(*this, std::bind(&Dropdown::dropdown, this, true))
-		, m_toggle(*this, std::bind(&Dropdown::dropdown, this, true))
+		: WrapButton(parent, [this](Widget&) { this->dropdown(true); }, type)
+		, m_header(*this, [this](Widget&) { this->dropdown(true); })
+		, m_toggle(*this, [this](Widget&) { this->dropdown(true); })
 		, m_list(*this)
 		, m_down(false)
 	{
 		m_list.hide();
 	}
 
-	DropdownChoice& Dropdown::addChoice()
+	DropdownChoice& Dropdown::addChoice(const StringVector& elements, const Callback& trigger)
 	{
-		return m_list.emplace<DropdownChoice>([this](Widget& widget) { this->dropup(); }, StringVector{});
-		// widget.setStyle(DropdownChoice::cls());
+		return m_list.emplace<DropdownChoice>(*this, trigger, elements);
 	}
 
-	Container& Dropdown::emplaceContainer()
+	Widget& Dropdown::insert(unique_ptr<Widget> widget)
 	{
-		return this->addChoice();
+		widget->parent()->remove(*widget);
+
+		DropdownChoice& choice = this->addChoice({});
+		if(widget->type().upcast(MultiButton::cls()))
+			choice.reset(widget->as<MultiButton>());
+		else if(widget->type().upcast(Button::cls()))
+			choice.reset({ widget->as<Button>().label() });
+		return choice;
 	}
 
 	void Dropdown::dropup()
@@ -83,10 +97,16 @@ namespace toy
 		m_down = true;
 	}
 
-	DropdownInput::DropdownInput(Wedge& parent, const Trigger& onSelected, StringVector choices, Type& type)
+	void Dropdown::selected(DropdownChoice& selected)
+	{
+		this->dropup();
+	}
+
+	DropdownInput::DropdownInput(Wedge& parent, const Callback& onSelected, StringVector choices, Type& type)
 		: Dropdown(parent, type)
 		, m_onSelected()
 		, m_selected(nullptr)
+		, m_activeHeader(false)
 	{
 		for(string& choice : choices)
 			this->addChoice({ choice });
@@ -94,17 +114,12 @@ namespace toy
 		m_onSelected = onSelected;
 	}
 
-	DropdownChoice& DropdownInput::addChoice(const StringVector& elements)
+	DropdownChoice& DropdownInput::addChoice(const StringVector& elements, const Callback& trigger)
 	{
-		DropdownChoice& choice = m_list.emplace<DropdownChoice>([this](Widget& button) { this->selected(button.as<DropdownChoice>()); }, elements);
+		DropdownChoice& choice = m_list.emplace<DropdownChoice>(*this, trigger, elements);
 		if(m_selected == nullptr)
 			this->select(choice);
 		return choice;
-	}
-
-	Container& DropdownInput::emplaceContainer()
-	{
-		return this->addChoice({ "" });
 	}
 
 	void DropdownInput::select(DropdownChoice& choice)
@@ -115,22 +130,16 @@ namespace toy
 		m_selected = &choice;
 		m_selected->enableState(ACTIVATED);
 
-		this->updateHead(*m_selected);
+		m_activeHeader ? m_header.reset(*m_selected) : m_header.reset(m_selected->elements());
 	}
 
 	void DropdownInput::selected(DropdownChoice& choice)
 	{
-		if(m_down)
-			this->dropup();
+		this->dropup();
 
 		this->select(choice);
 
 		if(m_onSelected)
 			m_onSelected(*m_selected);
-	}
-
-	void DropdownInput::updateHead(MultiButton& choice)
-	{
-		m_header.reset(choice.elements());
 	}
 }

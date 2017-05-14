@@ -11,7 +11,7 @@
 
 namespace toy
 {
-	TabHeader::TabHeader(Wedge& parent, const string& label, const Trigger& trigger)
+	TabHeader::TabHeader(Wedge& parent, const string& label, const Callback& trigger)
 		: Button(parent, label, trigger, cls())
 	{}
 
@@ -80,11 +80,6 @@ namespace toy
 			this->showTab(size_t(0));
 		if(m_tabs.containerContents().size() == 1)
 			m_headers.hide();
-	}
-
-	Container& Tabber::emplaceContainer()
-	{
-		return this->addTab("").emplaceContainer();
 	}
 
 	void Tabber::headerClicked(Widget& header)

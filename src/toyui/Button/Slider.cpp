@@ -24,7 +24,7 @@ namespace toy
 		//this->content().setEmpty();
 	}
 
-	Slider::Slider(Wedge& parent, Dimension dim, const Trigger& onUpdated, Type& type)
+	Slider::Slider(Wedge& parent, Dimension dim, const Callback& onUpdated, Type& type)
 		: WrapControl(parent, type)
 		, m_dim(dim)
 		, m_filler(*this)

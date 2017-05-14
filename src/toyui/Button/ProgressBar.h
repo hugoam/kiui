@@ -18,7 +18,7 @@ namespace toy
 	class TOY_UI_EXPORT ProgressBar : public Wedge
 	{
 	public:
-		ProgressBar(Wedge& parent, Dimension dim = DIM_X, const Trigger& onUpdated = nullptr);
+		ProgressBar(Wedge& parent, Dimension dim = DIM_X, const Callback& onUpdated = nullptr);
 
 		float percentage() { return m_percentage; }
 		void setPercentage(float percentage);
@@ -33,7 +33,7 @@ namespace toy
 
 		float m_percentage;
 
-		Trigger m_onUpdated;
+		Callback m_onUpdated;
 	};
 }
 

@@ -41,7 +41,7 @@ namespace toy
 	class TOY_UI_EXPORT ScrollForward : public Button
 	{
 	public:
-		ScrollForward(Wedge& parent, const Trigger& trigger);
+		ScrollForward(Wedge& parent, const Callback& trigger);
 
 		static Type& cls() { static Type ty("ScrollForward", Button::cls()); return ty; }
 	};
@@ -49,7 +49,7 @@ namespace toy
 	class TOY_UI_EXPORT ScrollBackward : public Button
 	{
 	public:
-		ScrollBackward(Wedge& parent, const Trigger& trigger);
+		ScrollBackward(Wedge& parent, const Callback& trigger);
 
 		static Type& cls() { static Type ty("ScrollBackward", Button::cls()); return ty; }
 	};

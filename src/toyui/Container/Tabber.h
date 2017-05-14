@@ -15,7 +15,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT TabHeader : public Button
 	{
 	public:
-		TabHeader(Wedge& parent, const string& label, const Trigger& trigger);
+		TabHeader(Wedge& parent, const string& label, const Callback& trigger);
 
 		static Type& cls() { static Type ty("TabHeader", Button::cls()); return ty; }
 	};
@@ -61,8 +61,6 @@ namespace toy
 
 		Tab& addTab(const string& name);
 		void removeTab(Tab& tab);
-
-		virtual Container& emplaceContainer();
 
 		void headerClicked(Widget& button);
 

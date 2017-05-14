@@ -34,12 +34,12 @@ namespace toy
 		void updateString();
 		void updateText();
 
-		void leftClick(MouseEvent& mouseEvent);
-		void keyDown(KeyEvent& keyEvent);
+		virtual void leftClick(MouseEvent& mouseEvent);
+		virtual void keyDown(KeyEvent& keyEvent);
 
-		void leftDragStart(MouseEvent& mouseEvent);
-		void leftDrag(MouseEvent& mouseEvent);
-		void leftDragEnd(MouseEvent& mouseEvent);
+		virtual void leftDragStart(MouseEvent& mouseEvent);
+		virtual void leftDrag(MouseEvent& mouseEvent);
+		virtual void leftDragEnd(MouseEvent& mouseEvent);
 
 		void selectCaret(int index);
 		void selectFirst(size_t start);

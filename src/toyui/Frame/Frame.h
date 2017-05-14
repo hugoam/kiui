@@ -43,6 +43,7 @@ namespace toy
 		inline bool hidden() { return d_hidden; }
 		inline const Index& index() { return d_index; }
 		inline size_t dindex(Dimension dim) { return d_index[dim]; }
+		inline bool mapped() { return d_parent != nullptr; }
 
 		inline const BoxFloat& hardClip() { return d_hardClip; }
 

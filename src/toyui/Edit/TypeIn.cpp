@@ -126,8 +126,6 @@ namespace toy
 
 	void TypeIn::keyDown(KeyEvent& keyEvent)
 	{
-		keyEvent.abort = true;
-
 		if(keyEvent.code == KC_LEFT)
 		{
 			this->moveCaretLeft();

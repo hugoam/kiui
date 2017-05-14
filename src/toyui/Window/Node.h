@@ -50,9 +50,9 @@ namespace toy
 
 		void setTooltip(const string& tooltip) { m_tooltip = tooltip; }
 
-		void leftDragStart(MouseEvent& mouseEvent);
-		void leftDrag(MouseEvent& mouseEvent);
-		void leftDragEnd(MouseEvent& mouseEvent);
+		virtual void leftDragStart(MouseEvent& mouseEvent);
+		virtual void leftDrag(MouseEvent& mouseEvent);
+		virtual void leftDragEnd(MouseEvent& mouseEvent);
 
 		NodeCable& connect(NodePlug& plugOut, bool notify = true);
 		void disconnect(NodePlug& plugOut);
@@ -150,13 +150,14 @@ namespace toy
 	class TOY_UI_EXPORT Node : public Overlay
 	{
 	public:
-		Node(Wedge& parent, const string& title);
+		Node(Wedge& parent, const string& title, int order = 0);
 		~Node();
 
 		Canvas& canvas();
 		Container& plan();
 
 		const string& name() { return m_name; }
+		int order() { return m_order; }
 
 		NodeIn& inputs() { return m_inputs; }
 		NodeOut& outputs() { return m_outputs; }
@@ -165,22 +166,22 @@ namespace toy
 		std::vector<Node*> inputNodes();
 		std::vector<Node*> outputNodes();
 
-		void leftClick(MouseEvent& mouseEvent);
-		void rightClick(MouseEvent& mouseEvent);
+		virtual void leftClick(MouseEvent& mouseEvent);
+		virtual void rightClick(MouseEvent& mouseEvent);
 
-		void leftDragStart(MouseEvent& mouseEvent);
-		void leftDrag(MouseEvent& mouseEvent);
-		void leftDragEnd(MouseEvent& mouseEvent);
+		virtual void leftDragStart(MouseEvent& mouseEvent);
+		virtual void leftDrag(MouseEvent& mouseEvent);
+		virtual void leftDragEnd(MouseEvent& mouseEvent);
 
 		NodePlug& addInput(const string& name);
 		NodePlug& addOutput(const string& name);
-
-		virtual Container& emplaceContainer();
 
 		static Type& cls() { static Type ty("Node", Overlay::cls()); return ty; }
 
 	protected:
 		string m_name;
+		int m_order;
+
 		NodeIn m_inputs;
 		NodeBody m_body;
 		NodeOut m_outputs;
@@ -204,48 +205,22 @@ namespace toy
 	class TOY_UI_EXPORT Canvas : public ScrollPlan
 	{
 	public:
-		Canvas(Wedge& parent, const string& title, Trigger contextTrigger = Trigger());
+		Canvas(Wedge& parent, const string& title, const Callback& contextTrigger = nullptr);
 
 		void rightClick(MouseEvent& mouseEvent);
 
 		void autoLayout();
 
-		struct NodeInfo
-		{
-			NodeInfo() {}
-			NodeInfo(Node& node)
-				: node(&node), index(0), depth(0), done(false), inputs(node.inputNodes())
-				, outputs(node.outputNodes()), connections(inputs.size() + outputs.size()), visited(0)
-			{}
-
-			Node* node;
-			int index;
-			int depth;
-			bool done;
-
-			std::vector<Node*> outputs;
-			std::vector<Node*> inputs;
-			size_t connections;
-
-			size_t visited;
-		};
-
 		typedef std::vector<std::vector<Node*>> NodeTable;
-		typedef std::map<Node*, NodeInfo> NodeMap;
 
-		void collectNodes(NodeMap& nodes);
-		void orderNodes(NodeTable& nodeTable);
+		void collectNodes(NodeTable& nodes);
 		void layoutNodes(const NodeTable& nodes);
-
-		void visit(NodeMap& nodes, NodeInfo& node, int index, int depth, bool output);
-		void processNode(NodeMap& nodes, NodeInfo& node);
-		Node* nextNode(NodeMap& nodes);
 
 		static Type& cls() { static Type ty("Canvas", ScrollSheet::cls()); return ty; }
 
 	protected:
 		string m_name;
-		Trigger m_contextTrigger;
+		Callback m_contextTrigger;
 	};
 }
 

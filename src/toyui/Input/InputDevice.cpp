@@ -206,7 +206,7 @@ namespace toy
 		MouseReleaseEvent mouseEvent(m_deviceType, x, y);
 		m_mouse.transformMouseEvent(mouseEvent);
 
-		m_pressed->receiveEvent(mouseEvent);
+		m_rootFrame.dispatchEvent(mouseEvent, m_pressed);
 
 		if(m_dragging)
 			this->dragEnd(mouseEvent);
@@ -238,7 +238,7 @@ namespace toy
 	void MouseButton::click(MouseEvent& mouseEvent)
 	{
 		MouseClickEvent clickEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY);
-		m_pressed->receiveEvent(clickEvent);
+		m_rootFrame.dispatchEvent(clickEvent, m_pressed);
 	}
 
 	void MouseButton::handleUnbindWidget(Widget& widget)

@@ -13,7 +13,7 @@
 
 namespace toy
 {
-	ExpandboxHeader::ExpandboxHeader(Wedge& parent, const Trigger& trigger)
+	ExpandboxHeader::ExpandboxHeader(Wedge& parent, const Callback& trigger)
 		: WrapButton(parent, trigger, cls())
 	{}
 
@@ -21,7 +21,7 @@ namespace toy
 		: Container(parent, cls())
 	{}
 
-	ExpandboxToggle::ExpandboxToggle(Wedge& parent, const Trigger& triggerOn, const Trigger& triggerOff, bool on)
+	ExpandboxToggle::ExpandboxToggle(Wedge& parent, const Callback& triggerOn, const Callback& triggerOff, bool on)
 		: Toggle(parent, triggerOn, triggerOff, on, cls())
 	{}
 
@@ -34,17 +34,15 @@ namespace toy
 		, m_collapsed(collapsed)
 	{
 		m_container.hide();
+		m_containerTarget = &m_container;
 	}
 
-	Expandbox::~Expandbox()
-	{}
-
-	Container& Expandbox::emplaceContainer()
+	Widget& Expandbox::insert(unique_ptr<Widget> widget)
 	{
 		if(!m_collapsed && m_container.frame().hidden())
 			m_container.show();
 
-		return m_container;
+		return this->append(std::move(widget));
 	}
 
 	void Expandbox::expand()
