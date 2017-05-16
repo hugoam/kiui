@@ -23,7 +23,7 @@ namespace toy
 		: Board(parent, type)
 	{}
 
-	Line::Line(Wedge& parent, Type& type)
+	Row::Row(Wedge& parent, Type& type)
 		: Container(parent, type)
 	{}
 
@@ -40,6 +40,6 @@ namespace toy
 	{}
 
 	Header::Header(Wedge& parent, Type& type)
-		: Line(parent, type)
+		: Row(parent, type)
 	{}
 }

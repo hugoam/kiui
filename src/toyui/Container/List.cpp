@@ -28,14 +28,14 @@ namespace toy
 	}
 
 	LabelSequence::LabelSequence(Wedge& parent, StringVector labels)
-		: Line(parent, cls())
+		: Row(parent, cls())
 	{
 		for(string& label : labels)
 			this->emplace<Label>(label);
 	}
 	
 	ButtonSequence::ButtonSequence(Wedge& parent, StringVector labels)
-		: Line(parent, cls())
+		: Row(parent, cls())
 	{
 		for(string& label : labels)
 			this->emplace<Button>(label);

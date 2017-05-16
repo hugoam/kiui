@@ -192,6 +192,10 @@ namespace toy
 
 
 
+
+
+
+
     
     
 	class toyui : public Module
@@ -350,7 +354,7 @@ namespace toy
             Style::cls().imprint().addMember(make_unique<Member>(Style::cls(), lref(&Style::layout), LayoutStyle::cls(), 2, "layout", &Style_layout, nullptr, false, false, false, false));
             Style::cls().imprint().addMember(make_unique<Member>(Style::cls(), lref(&Style::skin), InkStyle::cls(), 3, "skin", &Style_skin, nullptr, false, false, false, false));
             Style::cls().imprint().addMember(make_unique<Member>(Style::cls(), lref(&Style::updated), typecls<size_t>(), 4, "updated", &Style_updated, &Style_setUpdated, true, false, false, false));
-            Style::cls().imprint().initObject(false, false);
+            Style::cls().imprint().initObject(false, true);
             
             // Widget
             Widget::cls().imprint().setup("Widget", OBJECT);
@@ -372,6 +376,10 @@ namespace toy
             Wedge::cls().imprint().setup("Wedge", OBJECT);
             Wedge::cls().imprint().addMember(make_unique<Member>(Wedge::cls(), lref(&Wedge::contents), typecls<std::vector<Widget*>>(), 0, "contents", &Wedge_contents, nullptr, false, true, false, false));
             Wedge::cls().imprint().initObject(false, false);
+            
+            // Spacer
+            Spacer::cls().imprint().setup("Spacer", OBJECT);
+            Spacer::cls().imprint().initObject(false, false);
             
             // Item
             Item::cls().imprint().setup("Item", OBJECT);
@@ -396,6 +404,10 @@ namespace toy
             // Container
             Container::cls().imprint().setup("Container", OBJECT);
             Container::cls().imprint().initObject(false, false);
+            
+            // Filler
+            Filler::cls().imprint().setup("Filler", OBJECT);
+            Filler::cls().imprint().initObject(false, false);
             
             // Decal
             Decal::cls().imprint().setup("Decal", OBJECT);
@@ -477,9 +489,9 @@ namespace toy
             Board::cls().imprint().setup("Board", OBJECT);
             Board::cls().imprint().initObject(false, false);
             
-            // Line
-            Line::cls().imprint().setup("Line", OBJECT);
-            Line::cls().imprint().initObject(false, false);
+            // Row
+            Row::cls().imprint().setup("Row", OBJECT);
+            Row::cls().imprint().initObject(false, false);
             
             // Div
             Div::cls().imprint().setup("Div", OBJECT);
@@ -532,6 +544,14 @@ namespace toy
             // DropdownToggle
             DropdownToggle::cls().imprint().setup("DropdownToggle", OBJECT);
             DropdownToggle::cls().imprint().initObject(false, false);
+            
+            // ScrollForward
+            ScrollForward::cls().imprint().setup("ScrollForward", OBJECT);
+            ScrollForward::cls().imprint().initObject(false, false);
+            
+            // ScrollBackward
+            ScrollBackward::cls().imprint().setup("ScrollBackward", OBJECT);
+            ScrollBackward::cls().imprint().initObject(false, false);
             
             // Scrollbar
             Scrollbar::cls().imprint().setup("Scrollbar", OBJECT);
@@ -767,12 +787,14 @@ namespace toy
             m_rootTypes.push_back(&Widget::cls());
             m_rootTypes.push_back(&DockTab::cls());
             m_rootTypes.push_back(&Wedge::cls());
+            m_rootTypes.push_back(&Spacer::cls());
             m_rootTypes.push_back(&Item::cls());
             m_rootTypes.push_back(&Label::cls());
             m_rootTypes.push_back(&Icon::cls());
             m_rootTypes.push_back(&SliderKnob::cls());
             m_rootTypes.push_back(&FileBrowser::cls());
             m_rootTypes.push_back(&Container::cls());
+            m_rootTypes.push_back(&Filler::cls());
             m_rootTypes.push_back(&Decal::cls());
             m_rootTypes.push_back(&Control::cls());
             m_rootTypes.push_back(&Text::cls());
@@ -793,7 +815,7 @@ namespace toy
             m_rootTypes.push_back(&Page::cls());
             m_rootTypes.push_back(&Dialog::cls());
             m_rootTypes.push_back(&Board::cls());
-            m_rootTypes.push_back(&Line::cls());
+            m_rootTypes.push_back(&Row::cls());
             m_rootTypes.push_back(&Div::cls());
             m_rootTypes.push_back(&Stack::cls());
             m_rootTypes.push_back(&Sheet::cls());
@@ -807,6 +829,8 @@ namespace toy
             m_rootTypes.push_back(&WrapButton::cls());
             m_rootTypes.push_back(&Checkbox::cls());
             m_rootTypes.push_back(&DropdownToggle::cls());
+            m_rootTypes.push_back(&ScrollForward::cls());
+            m_rootTypes.push_back(&ScrollBackward::cls());
             m_rootTypes.push_back(&Scrollbar::cls());
             m_rootTypes.push_back(&Slider::cls());
             m_rootTypes.push_back(&ExpandboxToggle::cls());

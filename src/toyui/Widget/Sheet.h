@@ -95,7 +95,7 @@ namespace toy
 		static Type& cls() { static Type ty("WrapControl", Container::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT Spacer : public Widget
+	class _I_ TOY_UI_EXPORT Spacer : public Widget
 	{
 	public:
 		Spacer(Wedge& parent, Type& type = cls());
@@ -103,7 +103,7 @@ namespace toy
 		static Type& cls() { static Type ty("Spacer", Widget::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT Filler : public Spacer
+	class _I_ TOY_UI_EXPORT Filler : public Spacer
 	{
 	public:
 		Filler(Wedge& parent);

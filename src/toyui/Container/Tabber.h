@@ -37,12 +37,12 @@ namespace toy
 		bool m_active;
 	};
 
-	class _I_ TOY_UI_EXPORT TabberHead : public Line
+	class _I_ TOY_UI_EXPORT TabberHead : public Row
 	{
 	public:
 		TabberHead(Wedge& parent);
 
-		static Type& cls() { static Type ty("TabberHead", Line::cls()); return ty; }
+		static Type& cls() { static Type ty("TabberHead", Row::cls()); return ty; }
 	};
 
 	class _I_ TOY_UI_EXPORT TabberBody : public Sheet

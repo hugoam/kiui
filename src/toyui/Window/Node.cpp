@@ -40,6 +40,7 @@ namespace toy
 		this->collectNodes(nodeTable);
 		this->layoutNodes(nodeTable);
 	}
+
 	void Canvas::collectNodes(NodeTable& nodeTable)
 	{
 		std::vector<Node*> nodeVector;
@@ -229,7 +230,7 @@ namespace toy
 	{}
 
 	NodeHeader::NodeHeader(Wedge& parent, Node& node)
-		: Line(parent, cls())
+		: Row(parent, cls())
 		, m_title(*this, node.name())
 		, m_spacer(*this)
 	{}

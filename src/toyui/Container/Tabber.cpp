@@ -33,7 +33,7 @@ namespace toy
 	}
 
 	TabberHead::TabberHead(Wedge& parent)
-		: Line(parent, cls())
+		: Row(parent, cls())
 	{}
 
 	TabberBody::TabberBody(Wedge& parent)

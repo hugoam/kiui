@@ -34,20 +34,20 @@ namespace toy
 		static Type& cls() { static Type ty("SelectList", List::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT LabelSequence : public Line
+	class _I_ TOY_UI_EXPORT LabelSequence : public Row
 	{
 	public:
 		LabelSequence(Wedge& parent, StringVector labels = StringVector());
 
-		static Type& cls() { static Type ty("LabelSequence", Line::cls()); return ty; }
+		static Type& cls() { static Type ty("LabelSequence", Row::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT ButtonSequence : public Line
+	class _I_ TOY_UI_EXPORT ButtonSequence : public Row
 	{
 	public:
 		ButtonSequence(Wedge& parent, StringVector labels = StringVector());
 
-		static Type& cls() { static Type ty("ButtonSequence", Line::cls()); return ty; }
+		static Type& cls() { static Type ty("ButtonSequence", Row::cls()); return ty; }
 	};
 
 	class _I_ TOY_UI_EXPORT SortList : public List//, public Dropper

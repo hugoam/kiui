@@ -106,12 +106,12 @@ namespace toy
 		Widget& m_plugIn;
 	};
 
-	class TOY_UI_EXPORT NodeHeader : public Line
+	class TOY_UI_EXPORT NodeHeader : public Row
 	{
 	public:
 		NodeHeader(Wedge& parent, Node& node);
 
-		static Type& cls() { static Type ty("NodeHeader", Line::cls()); return ty; }
+		static Type& cls() { static Type ty("NodeHeader", Row::cls()); return ty; }
 
 	protected:
 		Label m_title;

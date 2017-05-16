@@ -23,7 +23,7 @@ namespace toy
 		float percentage() { return m_percentage; }
 		void setPercentage(float percentage);
 
-		static Type& cls() { static Type ty("ProgressBar", Line::cls()); return ty; }
+		static Type& cls() { static Type ty("ProgressBar", Row::cls()); return ty; }
 
 	protected:
 		Dimension m_dim;

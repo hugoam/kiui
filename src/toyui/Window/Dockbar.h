@@ -41,12 +41,12 @@ namespace toy
 		DockToggle m_toggle;
 	};
 
-	class TOY_UI_EXPORT Docker : public Line
+	class TOY_UI_EXPORT Docker : public Row
 	{
 	public:
 		Docker(Wedge& parent);
 
-		static Type& cls() { static Type ty("Docker", Line::cls()); return ty; }
+		static Type& cls() { static Type ty("Docker", Row::cls()); return ty; }
 	};
 
 	class TOY_UI_EXPORT Dockbar : public Div

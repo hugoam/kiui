@@ -23,17 +23,11 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT DispatchInput : public HashDispatch<DispatchInput, Lref&, unique_ptr<WValue>>
-	{
-	public:
-		static string name() { return "DispatchInput"; };
-	};
+	class TOY_UI_EXPORT DispatchInput : public Dispatcher<DispatchInput, unique_ptr<WValue>, Lref&>
+	{};
 	
-	class TOY_UI_EXPORT DispatchDisplay : public HashDispatch<DispatchDisplay, Lref&, unique_ptr<Widget>>
-	{
-	public:
-		static string name() { return "DispatchDisplay"; };
-	};
+	class TOY_UI_EXPORT DispatchDisplay : public Dispatcher<DispatchDisplay, unique_ptr<Widget>, Lref&>
+	{};
 
 	template <>
 	class _I_ TOY_UI_EXPORT Input<Colour> : public WValue

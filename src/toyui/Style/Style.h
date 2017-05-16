@@ -144,7 +144,7 @@ namespace toy
 		_C_ InkStyle(Style* style = nullptr)
 			: Struct()
 			, m_style(style)
-			, m_empty(true), m_base(nullptr), m_backgroundColour(Colour::Transparent), m_borderColour(Colour::Transparent), m_imageColour(Colour::Transparent), m_textColour(Colour::Transparent)
+			, m_empty(true), m_base(nullptr), m_backgroundColour(Colour::None), m_borderColour(Colour::None), m_imageColour(Colour::None), m_textColour(Colour::None)
 			, m_textFont("dejavu"), m_textSize(14.f), m_textBreak(true), m_textWrap(false)
 			, m_borderWidth(0.f), m_cornerRadius(), m_weakCorners(false)
 			, m_padding(0.f), m_margin(0.f)
@@ -271,7 +271,7 @@ namespace toy
 
 	typedef std::vector<SubSkin> StyleTable;
 
-	class _I_ TOY_UI_EXPORT Style : public Object
+	class _I_ TOY_UI_EXPORT Style : public IdObject
 	{
 	public:
 		Style(Type& type, Style* base = nullptr);

@@ -38,7 +38,7 @@ namespace toy
 		static Type& cls() { static Type ty("ScrollerKnob", SliderKnob::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT ScrollForward : public Button
+	class _I_ TOY_UI_EXPORT ScrollForward : public Button
 	{
 	public:
 		ScrollForward(Wedge& parent, const Callback& trigger);
@@ -46,7 +46,7 @@ namespace toy
 		static Type& cls() { static Type ty("ScrollForward", Button::cls()); return ty; }
 	};
 
-	class TOY_UI_EXPORT ScrollBackward : public Button
+	class _I_ TOY_UI_EXPORT ScrollBackward : public Button
 	{
 	public:
 		ScrollBackward(Wedge& parent, const Callback& trigger);
@@ -78,7 +78,7 @@ namespace toy
 		static Type& cls() { static Type ty("ScrollRight", Button::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Scrollbar : public Line
+	class _I_ TOY_UI_EXPORT Scrollbar : public Row
 	{
 	public:
 		Scrollbar(Wedge& parent, Wedge& frameSheet, Wedge& contentSheet, Dimension dim);
@@ -96,7 +96,7 @@ namespace toy
 
 		void nextFrame(size_t tick, size_t delta);
 
-		static Type& cls() { static Type ty("Scrollbar", Line::cls()); return ty; }
+		static Type& cls() { static Type ty("Scrollbar", Row::cls()); return ty; }
 
 	protected:
 		Dimension m_dim;

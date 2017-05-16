@@ -16,11 +16,24 @@
 #include <toyui/Style/Style.h>
 
 #include <cmath>
+#include <cassert>
 
 namespace toy
 {
 	float AlignSpace[5] = { 0.f, 0.5f, 1.f, 0.f, 1.f };
 	float AlignExtent[5] = { 0.f, 0.5f, 1.f, 1.f, 0.f };
+
+	SpaceParams SpaceTable[11] = { { MANUAL_SPACE,  PARAGRAPH,  MANUAL, MANUAL },
+								   { SHEET,         PARAGRAPH,  WRAP,   WRAP   },
+								   { ITEM,          READING,    SHRINK, SHRINK },
+								   { BLOCK,         PARAGRAPH,  SHRINK, SHRINK },
+								   { FIXED_BLOCK,   PARAGRAPH,  FIXED,  FIXED  },
+								   { LINE,          READING,    WRAP,   SHRINK },
+								   { STACK,         PARAGRAPH,  SHRINK, WRAP   },
+								   { DIV,           ORTHOGONAL, WRAP,   SHRINK },
+								   { SPACE,         PARALLEL,   WRAP,   SHRINK },
+								   { BOARD,         PARAGRAPH,  EXPAND, EXPAND },
+								   { PARALLEL_FLEX, PARALLEL,   WRAP,   WRAP   } };
 
 	Frame::Frame(Widget& widget)
 		: Uibox()
@@ -70,6 +83,12 @@ namespace toy
 
 	void Frame::markDirty(Dirty dirty)
 	{
+		/*if(d_widget)
+		{
+			this->debugPrintDepth();
+			printf("Frame :: markDirty %s\n", d_widget->type().name().c_str());
+		}*/
+
 		this->setDirty(dirty);
 		Stripe* parent = this->parent();
 		while(parent)
@@ -108,29 +127,10 @@ namespace toy
 	void Frame::updateLayout()
 	{
 		Space space = d_style->layout().space();
+		SpaceParams params = SpaceTable[space];
 
-		if(space == MANUAL_SPACE)
-			this->applySpace(PARAGRAPH, MANUAL, MANUAL);
-		else if(space == SHEET)
-			this->applySpace(PARAGRAPH, WRAP, WRAP);
-		else if(space == ITEM)
-			this->applySpace(READING, SHRINK, SHRINK);
-		else if(space == BLOCK)
-			this->applySpace(PARAGRAPH, SHRINK, SHRINK);
-		else if(space == FIXED_BLOCK)
-			this->applySpace(PARAGRAPH, FIXED, FIXED);
-		else if(space == LINE)
-			this->applySpace(READING, WRAP, SHRINK);
-		else if(space == STACK)
-			this->applySpace(PARAGRAPH, SHRINK, WRAP);
-		else if(space == DIV)
-			this->applySpace(ORTHOGONAL, WRAP, SHRINK);
-		else if(space == SPACE)
-			this->applySpace(PARALLEL, WRAP, SHRINK);
-		else if(space == BOARD)
-			this->applySpace(PARAGRAPH, EXPAND, EXPAND);
-		else if(space == PARALLEL_FLEX)
-			this->applySpace(PARALLEL, WRAP, WRAP);
+		assert(params.space == space);
+		this->applySpace(params.direction, params.length, params.depth);
 
 		this->updateFixed(DIM_X);
 		this->updateFixed(DIM_Y);

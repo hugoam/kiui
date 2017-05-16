@@ -29,7 +29,7 @@ namespace toy
 	}
 
 	Docker::Docker(Wedge& parent)
-		: Line(parent, cls())
+		: Row(parent, cls())
 	{}
 
 	Dockbar::Dockbar(Wedge& parent)

@@ -14,15 +14,17 @@
 
 namespace toy
 {
-	Renderer* DrawFrame::sRenderer = nullptr;
+	Renderer* DrawFrame::s_renderer = nullptr;
 
-	string DrawFrame::sDebugPrintFilter = "";
-	bool DrawFrame::sDebugPrint = true;
-	string DrawFrame::sDebugDrawFilter = "";
-	bool DrawFrame::sDebugDrawFrameRect = false;
-	bool DrawFrame::sDebugDrawPaddedRect = false;
-	bool DrawFrame::sDebugDrawContentRect = false;
-	bool DrawFrame::sDebugDrawClipRect = false;
+	size_t DrawFrame::s_debugBatch = 0;
+
+	string DrawFrame::s_debugPrintFilter = "";
+	bool DrawFrame::s_debugPrint = true;
+	string DrawFrame::s_debugDrawFilter = "";
+	bool DrawFrame::s_debugDrawFrameRect = false;
+	bool DrawFrame::s_debugDrawPaddedRect = false;
+	bool DrawFrame::s_debugDrawContentRect = false;
+	bool DrawFrame::s_debugDrawClipRect = false;
 
 	DrawFrame::DrawFrame(Frame& frame)
 		: d_frame(&frame)
@@ -81,7 +83,7 @@ namespace toy
 
 		DimFloat paddedSize(paddedWidth, paddedHeight);
 
-		d_caption.updateTextRows(*sRenderer, paddedSize);
+		d_caption.updateTextRows(*s_renderer, paddedSize);
 	}
 
 	float DrawFrame::extentSize(Dimension dim)
@@ -99,7 +101,7 @@ namespace toy
 		else if(m_image)
 			return dim == DIM_X ? float(m_image->d_width) : float(m_image->d_height);
 		else if(m_textLines && dim == DIM_Y)
-			return sRenderer->textLineHeight(*d_inkstyle) * m_textLines;
+			return s_renderer->textLineHeight(*d_inkstyle) * m_textLines;
 		else if(d_inkstyle->image())
 			return dim == DIM_X ? float(d_inkstyle->image()->d_width) : float(d_inkstyle->image()->d_height);
 		else if(!d_inkstyle->imageSkin().null())
@@ -171,7 +173,7 @@ namespace toy
 		BoxFloat rect(left, top, width, height);
 
 #if 1 // DEBUG
-		if(d_frame->style().name() == sDebugDrawFilter)
+		if(d_frame->style().name() == s_debugDrawFilter)
 			renderer.debugRect(rect, Colour::Red);
 #endif
 
@@ -201,19 +203,21 @@ namespace toy
 
 		BoxFloat contentRect(contentPos.x(), contentPos.y(), contentSize.x(), contentSize.y());
 
+		s_debugBatch++;
+
 		d_stencil.redraw(renderer, rect, paddedRect, contentRect);
 		d_caption.redraw(renderer, rect, paddedRect, contentRect);
 
 #if 1 // DEBUG
-		if(d_frame->style().name() == sDebugDrawFilter)
+		if(d_frame->style().name() == s_debugDrawFilter)
 			renderer.debugRect(rect, Colour::Red);
-		if(sDebugDrawFrameRect)
+		if(s_debugDrawFrameRect)
 			renderer.debugRect(rect, Colour::Red);
-		if(sDebugDrawPaddedRect)
+		if(s_debugDrawPaddedRect)
 			renderer.debugRect(paddedRect, Colour::Green);
-		if(sDebugDrawContentRect)
+		if(s_debugDrawContentRect)
 			renderer.debugRect(contentRect, Colour::Blue);
-		if(sDebugDrawClipRect && d_frame->clip())
+		if(s_debugDrawClipRect && d_frame->clip())
 			renderer.debugRect(rect, Colour::Red);
 #endif
 	}

@@ -50,7 +50,7 @@ namespace toy
 		else
 			m_frame->as<Grid>().line(0).setStyle(this->fetchStyle(Sheet::cls()));
 
-		m_frame->as<Grid>().line(1).setStyle(this->fetchStyle(Line::cls()));
+		m_frame->as<Grid>().line(1).setStyle(this->fetchStyle(Row::cls()));
 	}
 
 	void ScrollSheet::clear()

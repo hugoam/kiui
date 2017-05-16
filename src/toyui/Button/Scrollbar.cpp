@@ -41,7 +41,7 @@ namespace toy
 	{}
 
 	Scrollbar::Scrollbar(Wedge& parent, Wedge& frameSheet, Wedge& contentSheet, Dimension dim)
-		: Line(parent, cls())
+		: Row(parent, cls())
 		, m_dim(dim)
 		, d_cursor(0.f)
 		, m_frameSheet(frameSheet)

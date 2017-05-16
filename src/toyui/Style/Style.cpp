@@ -23,7 +23,7 @@ namespace toy
 	}
 
 	Style::Style(Type& type, Style* base)
-		: Object()
+		: IdObject(cls())
 		, m_styleType(&type)
 		, m_base(base)
 		, m_name(type.name())
@@ -32,10 +32,12 @@ namespace toy
 		, m_subskins()
 		, m_updated(0)
 		, m_ready(false)
-	{}
+	{
+		this->index();
+	}
 
 	Style::Style(const string& name)
-		: Object()
+		: IdObject(cls())
 		, m_styleType(nullptr)
 		, m_base(nullptr)
 		, m_name(name)
@@ -44,7 +46,9 @@ namespace toy
 		, m_subskins()
 		, m_updated(0)
 		, m_ready(false)
-	{}
+	{
+		this->index();
+	}
 
 	Style::~Style()
 	{}

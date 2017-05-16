@@ -68,15 +68,17 @@ namespace toy
 		InkStyle* d_inkstyle;
 
 	public:
-		static Renderer* sRenderer;
+		static Renderer* s_renderer;
 
-		static string sDebugPrintFilter;
-		static bool sDebugPrint;
-		static string sDebugDrawFilter;
-		static bool sDebugDrawFrameRect;
-		static bool sDebugDrawPaddedRect;
-		static bool sDebugDrawContentRect;
-		static bool sDebugDrawClipRect;
+		static size_t s_debugBatch;
+
+		static string s_debugPrintFilter;
+		static bool s_debugPrint;
+		static string s_debugDrawFilter;
+		static bool s_debugDrawFrameRect;
+		static bool s_debugDrawPaddedRect;
+		static bool s_debugDrawContentRect;
+		static bool s_debugDrawClipRect;
 	};
 }
 

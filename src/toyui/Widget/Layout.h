@@ -44,12 +44,12 @@ namespace toy
 		static Type& cls() { static Type ty("Layout", Board::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Line : public Container
+	class _I_ TOY_UI_EXPORT Row : public Container
 	{
 	public:
-		Line(Wedge& parent, Type& type = cls());
+		Row(Wedge& parent, Type& type = cls());
 
-		static Type& cls() { static Type ty("Line", Container::cls()); return ty; }
+		static Type& cls() { static Type ty("Row", Container::cls()); return ty; }
 	};
 
 	class _I_ TOY_UI_EXPORT Div : public Container
@@ -76,12 +76,12 @@ namespace toy
 		static Type& cls() { static Type ty("Sheet", Container::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Header : public Line
+	class _I_ TOY_UI_EXPORT Header : public Row
 	{
 	public:
 		Header(Wedge& parent, Type& type = cls());
 
-		static Type& cls() { static Type ty("Header", Line::cls()); return ty; }
+		static Type& cls() { static Type ty("Header", Row::cls()); return ty; }
 	};
 }
 

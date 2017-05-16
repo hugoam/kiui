@@ -144,7 +144,7 @@ namespace toy
 		this->styledef(SliderKnob::cls()).layout().d_space = SHEET;
 
 		// LINE
-		this->styledef(Line::cls()).layout().d_space = LINE;
+		this->styledef(Row::cls()).layout().d_space = LINE;
 
 		// ALIGNED
 		this->styledef(DropdownList::cls()).layout().d_flow = ALIGN;

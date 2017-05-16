@@ -29,6 +29,6 @@ namespace toy
 		, m_debugBatch(0)
 		, m_debugDepth(0)
 	{
-		DrawFrame::sRenderer = this;
+		DrawFrame::s_renderer = this;
 	}
 }

@@ -87,6 +87,15 @@ namespace toy
 		FREE = 3			// NO_LAYOUT
 	};
 
+	enum _I_ Sizing : unsigned int
+	{
+		FIXED = 0,
+		MANUAL = 1,
+		SHRINK = 2,
+		WRAP = 3,
+		EXPAND = 4
+	};
+
 	enum _I_ Space : unsigned int
 	{
 		MANUAL_SPACE = 0,        // PARAGRAPH   direction, MANUAL length, MANUAL depth
@@ -102,14 +111,15 @@ namespace toy
 		PARALLEL_FLEX = 10,      // PARALLEL    direction, WRAP   length, WRAP depth
 	};
 
-	enum _I_ Sizing : unsigned int
+	struct SpaceParams
 	{
-		FIXED = 0,
-		MANUAL = 1,
-		SHRINK = 2,
-		WRAP = 3,
-		EXPAND = 4
+		Space space;
+		Direction direction;
+		Sizing length;
+		Sizing depth;
 	};
+
+	extern SpaceParams SpaceTable[11];
 
 	enum _I_ Clipping : unsigned int
 	{

@@ -87,28 +87,27 @@ namespace toy
 		m_debugBatch = 0;
 		m_debugDepth = 0;
 		Stencil::s_debugBatch = 0;
+		DrawFrame::s_debugBatch = 0;
 		static int prevBatch = 0;
 
 		float pixelRatio = 1.f;
 		nvgBeginFrame(m_ctx, target.layer().width(), target.layer().height(), pixelRatio);
 
 		if(target.layer().dirty() < Frame::DIRTY_MAPPING)
-		{
 			target.layer().widget()->render(*this, false);
 
 #ifdef TOYUI_DRAW_CACHE
-			void* layerCache = nullptr;
-			this->layerCache(target.layer(), layerCache);
-			this->drawLayer(layerCache, 0.f, 0.f, 1.f);
+		void* layerCache = nullptr;
+		this->layerCache(target.layer(), layerCache);
+		this->drawLayer(layerCache, 0.f, 0.f, 1.f);
 
-			for(Layer* layer : target.layer().layers())
-				if(layer->visible())
-				{
-					this->layerCache(*layer, layerCache);
-					this->drawLayer(layerCache, 0.f, 0.f, 1.f);
-				}
+		for(Layer* layer : target.layer().layers())
+			if(layer->visible())
+			{
+				this->layerCache(*layer, layerCache);
+				this->drawLayer(layerCache, 0.f, 0.f, 1.f);
+			}
 #endif
-		}
 
 		if(Stencil::s_debugBatch > 1 && Stencil::s_debugBatch != prevBatch)
 		{
