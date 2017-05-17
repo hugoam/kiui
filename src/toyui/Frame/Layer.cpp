@@ -110,9 +110,14 @@ namespace toy
 	void MasterLayer::redraw()
 	{
 		this->visit([](Frame& frame) {
-			if(frame.dirty())
-				frame.layer().setRedraw();
+			bool dirty = frame.dirty();
 			frame.clearDirty();
+
+			if(dirty)
+				frame.layer().setForceRedraw();
+			if(dirty && frame.widget())
+				frame.widget()->dirtyLayout();
+
 			return true;
 		});
 	}

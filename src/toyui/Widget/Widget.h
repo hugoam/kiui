@@ -33,7 +33,7 @@ namespace toy
 		MODAL = 1 << 8
 	};
 
-	class _I_ TOY_UI_EXPORT Widget : public TypeObject, public InputReceiver, public Updatable
+	class _I_ TOY_UI_EXPORT Widget : public TypeObject, public InputAdapter, public Updatable
 	{
 	public:
 		Widget(Wedge& parent, Type& type = cls(), FrameType frameType = FRAME);
@@ -124,11 +124,12 @@ namespace toy
 		Widget* pinpoint(float x, float y);
 		Widget* pinpoint(float x, float y, const Frame::Filter& filter);
 
+		virtual void dirtyLayout();
+
 		virtual bool customDraw(Renderer& renderer) { UNUSED(renderer); return false; }
 
 		virtual InputReceiver* controlEvent(InputEvent& inputEvent);
 		virtual InputReceiver* receiveEvent(InputEvent& inputEvent);
-		virtual InputReceiver* propagateEvent(InputEvent& inputEvent);
 
 		void giveControl(InputReceiver& receiver, ControlMode mode, DeviceType device = DEVICE_ALL);
 		void takeControl(ControlMode mode, DeviceType device = DEVICE_ALL);

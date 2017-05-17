@@ -10,7 +10,6 @@
 #include <toyui/Forward.h>
 #include <toyui/Render/Caption.h>
 
-
 namespace toy
 {
 	class TOY_UI_EXPORT RenderTarget

@@ -11,7 +11,7 @@
 namespace toy
 {
 	KeyInputFrame::KeyInputFrame()
-		: InputReceiver()
+		: InputAdapter()
 	{}
 
 	void KeyInputFrame::keyUp(KeyEvent& keyEvent)

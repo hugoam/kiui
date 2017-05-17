@@ -36,8 +36,6 @@ namespace toy
 
 		virtual void transformCoordinates(MouseEvent& mouseEvent) { UNUSED(mouseEvent); }
 
-		virtual InputReceiver* propagateEvent(InputEvent& inputEvent) { return nullptr; }
-
 		virtual void handleUnbindWidget(Widget& widget);
 		virtual void handleBindWidget(Widget& widget);
 

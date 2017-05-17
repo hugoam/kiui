@@ -16,7 +16,7 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT KeyInputFrame : public InputReceiver
+	class TOY_UI_EXPORT KeyInputFrame : public InputAdapter
 	{
 	public:
 		KeyInputFrame();

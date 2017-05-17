@@ -91,10 +91,11 @@ namespace toy
 
 		void scrollup();
 		void scrolldown();
+
 		void scroll(float amount);
 		void scrollTo(float offset);
 
-		void nextFrame(size_t tick, size_t delta);
+		virtual void nextFrame(size_t tick, size_t delta);
 
 		static Type& cls() { static Type ty("Scrollbar", Row::cls()); return ty; }
 

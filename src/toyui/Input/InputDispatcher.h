@@ -54,7 +54,7 @@ namespace toy
 		virtual ~InputEvent() {}
 
 		virtual void dispatch(RootSheet& rootSheet) {}
-		virtual void receive(InputReceiver& receiver) {}
+		virtual void receive(InputAdapter& receiver) {}
 	};
 
 	struct TOY_UI_EXPORT MouseEvent : public InputEvent
@@ -115,12 +115,31 @@ namespace toy
 	class TOY_UI_EXPORT InputReceiver
 	{
 	public:
-		InputReceiver();
-		~InputReceiver();
+		InputReceiver() : m_propagate(nullptr) {}
 
-		virtual InputReceiver* controlEvent(InputEvent& inputEvent);
+		virtual InputReceiver* controlEvent(InputEvent& inputEvent) { return this; }
+		virtual InputReceiver* receiveEvent(InputEvent& inputEvent) = 0;
+		virtual InputReceiver* propagateEvent(InputEvent& inputEvent) { return m_propagate; }
+
+		void propagateTo(InputReceiver* propagate) { m_propagate = propagate; }
+
+		virtual void control() {};
+		virtual void uncontrol() {};
+
+		virtual void modal() {};
+		virtual void unmodal() {};
+
+	protected:
+		InputReceiver* m_propagate;
+	};
+
+	class TOY_UI_EXPORT InputAdapter : public InputReceiver
+	{
+	public:
+		InputAdapter();
+		~InputAdapter();
+
 		virtual InputReceiver* receiveEvent(InputEvent& inputEvent);
-		virtual InputReceiver* propagateEvent(InputEvent& inputEvent);
 
 		virtual void keyUp(KeyEvent& keyEvent) { UNUSED(keyEvent); };
 		virtual void keyStroke(KeyEvent& keyEvent) { UNUSED(keyEvent); };
@@ -151,18 +170,12 @@ namespace toy
 		virtual void middleDragStart(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
 		virtual void middleDrag(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
 		virtual void middleDragEnd(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
-	
-		virtual void control() {};
-		virtual void uncontrol() {};
-
-		virtual void modal() {};
-		virtual void unmodal() {};
 
 	protected:
 		unique_ptr<ControlNode> m_controlGraph;
 	};
 
-	class TOY_UI_EXPORT ControlNode
+	class TOY_UI_EXPORT ControlNode //: public InputReceiver
 	{
 	public:
 		ControlNode(InputReceiver& receiver, ControlNode* parent, ControlMode mode, DeviceType device);
@@ -171,10 +184,9 @@ namespace toy
 		ControlMode controlMode() { return m_controlMode; }
 		DeviceType deviceFilter() { return m_device; }
 
-		virtual InputReceiver* dispatchEvent(InputEvent& inputEvent, InputReceiver* topReceiver = nullptr);
+		InputReceiver* dispatchEvent(InputEvent& inputEvent, InputReceiver* topReceiver = nullptr);
+
 		virtual InputReceiver* controlEvent(InputEvent& inputEvent);
-		virtual InputReceiver* receiveEvent(InputEvent& inputEvent);
-		virtual InputReceiver* propagateEvent(InputEvent& inputEvent);
 
 		ControlNode* findReceiver(InputReceiver& receiver);
 

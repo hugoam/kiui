@@ -117,7 +117,7 @@ namespace toy
 		KeyDownEvent(KeyCode code, char c) : KeyEvent(DEVICE_KEYBOARD, EVENT_PRESSED, code, c) {}
 
 		void dispatch(RootSheet& rootSheet) { rootSheet.keyboard().dispatchKeyPressed(code, c); }
-		void receive(InputReceiver& receiver) { receiver.keyDown(*this); }
+		void receive(InputAdapter& receiver) { receiver.keyDown(*this); }
 	};
 
 	struct TOY_UI_EXPORT KeyUpEvent : public KeyEvent
@@ -125,7 +125,7 @@ namespace toy
 		KeyUpEvent(KeyCode code, char c) : KeyEvent(DEVICE_KEYBOARD, EVENT_RELEASED, code, c) {}
 
 		void dispatch(RootSheet& rootSheet) { rootSheet.keyboard().dispatchKeyReleased(code, c); }
-		void receive(InputReceiver& receiver) { receiver.keyUp(*this); }
+		void receive(InputAdapter& receiver) { receiver.keyUp(*this); }
 	};
 
 	struct TOY_UI_EXPORT KeyCharEvent : public KeyEvent
@@ -133,7 +133,7 @@ namespace toy
 		KeyCharEvent(KeyCode code, char c) : KeyEvent(DEVICE_KEYBOARD, EVENT_STROKED, code, c) {}
 
 		//void dispatch(RootSheet& rootSheet) { rootSheet.keyboard().dispatchKeyReleased(code, c); }
-		void receive(InputReceiver& receiver) { receiver.keyStroke(*this); }
+		void receive(InputAdapter& receiver) { receiver.keyStroke(*this); }
 	};
 
 	struct TOY_UI_EXPORT MouseMoveEvent : public MouseEvent
@@ -141,7 +141,7 @@ namespace toy
 		MouseMoveEvent(float x, float y) : MouseEvent(DEVICE_MOUSE, EVENT_MOVED, x, y) {}
 
 		void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMouseMoved(posX, posY); }
-		void receive(InputReceiver& receiver) { receiver.mouseMoved(*this); }
+		void receive(InputAdapter& receiver) { receiver.mouseMoved(*this); }
 	};
 
 	struct TOY_UI_EXPORT MousePressEvent : public MouseEvent
@@ -149,7 +149,7 @@ namespace toy
 		MousePressEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_PRESSED, x, y) {}
 
 		void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMousePressed(posX, posY, button); }
-		void receive(InputReceiver& receiver) { receiver.mousePressed(*this); consumed = true; }
+		void receive(InputAdapter& receiver) { receiver.mousePressed(*this); consumed = true; }
 	};
 
 	struct TOY_UI_EXPORT MouseReleaseEvent : public MouseEvent
@@ -157,7 +157,7 @@ namespace toy
 		MouseReleaseEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_RELEASED, x, y) {}
 
 		void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMouseReleased(posX, posY, button); }
-		void receive(InputReceiver& receiver) { receiver.mouseReleased(*this); }
+		void receive(InputAdapter& receiver) { receiver.mouseReleased(*this); }
 	};
 
 	struct TOY_UI_EXPORT MouseWheelEvent : public MouseEvent
@@ -165,13 +165,13 @@ namespace toy
 		MouseWheelEvent(float x, float y, float amount) : MouseEvent(DEVICE_MOUSE_MIDDLE_BUTTON, EVENT_MOVED, x, y) { deltaZ = amount; }
 
 		void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMouseWheeled(posX, posY, deltaZ); }
-		void receive(InputReceiver& receiver) { receiver.mouseWheel(*this); }
+		void receive(InputAdapter& receiver) { receiver.mouseWheel(*this); }
 	};
 
 	struct TOY_UI_EXPORT MouseClickEvent : public MouseEvent
 	{
 		MouseClickEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_STROKED, x, y) {}
-		void receive(InputReceiver& receiver) {	if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
+		void receive(InputAdapter& receiver) {	if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
 													receiver.leftClick(*this);
 												else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
 													receiver.rightClick(*this);
@@ -183,7 +183,7 @@ namespace toy
 	{
 		MouseDragEvent(DeviceType deviceType, float x, float y, float dx, float dy) : MouseEvent(deviceType, EVENT_DRAGGED, x, y) { deltaX = dx; deltaY = dy; }
 
-		void receive(InputReceiver& receiver) {
+		void receive(InputAdapter& receiver) {
 			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
 				receiver.leftDrag(*this);
 			else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
@@ -197,7 +197,7 @@ namespace toy
 	{
 		MouseDragStartEvent(DeviceType deviceType, float x, float y, float startX, float startY) : MouseEvent(deviceType, EVENT_DRAGGED_START, x, y) { lastPressedX = startX; lastPressedY = startY; }
 	
-		void receive(InputReceiver& receiver) {
+		void receive(InputAdapter& receiver) {
 			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
 				receiver.leftDragStart(*this);
 			else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
@@ -211,7 +211,7 @@ namespace toy
 	{
 		MouseDragEndEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_DRAGGED_END, x, y) {}
 
-		void receive(InputReceiver& receiver) {
+		void receive(InputAdapter& receiver) {
 			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
 				receiver.leftDragEnd(*this);
 			else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
@@ -225,14 +225,14 @@ namespace toy
 	{
 		MouseEnterEvent(float x, float y) : MouseEvent(DEVICE_MOUSE, EVENT_ENTERED, x, y) {}
 
-		void receive(InputReceiver& receiver) { receiver.mouseEntered(*this); }
+		void receive(InputAdapter& receiver) { receiver.mouseEntered(*this); }
 	};
 
 	struct TOY_UI_EXPORT MouseLeaveEvent : public MouseEvent
 	{
 		MouseLeaveEvent(float x, float y) : MouseEvent(DEVICE_MOUSE, EVENT_LEAVED, x, y) {}
 
-		void receive(InputReceiver& receiver) { receiver.mouseLeaved(*this); }
+		void receive(InputAdapter& receiver) { receiver.mouseLeaved(*this); }
 	};
 
 }

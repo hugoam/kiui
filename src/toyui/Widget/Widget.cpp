@@ -116,6 +116,8 @@ namespace toy
 	{
 		m_parent = &parent;
 		m_index = index;
+
+		this->propagateTo(&parent);
 		
 		if(deferred)
 			m_parent->frame().markDirty(Frame::DIRTY_MAPPING);
@@ -272,12 +274,6 @@ namespace toy
 		return this;
 	}
 
-	InputReceiver* Widget::propagateEvent(InputEvent& inputEvent)
-	{
-		UNUSED(inputEvent);
-		return m_parent;
-	}
-
 	InputReceiver* Widget::receiveEvent(InputEvent& inputEvent)
 	{
 		if(inputEvent.consumed)
@@ -293,7 +289,7 @@ namespace toy
 			mouseEvent.relativeY = local.y();
 		}
 
-		return InputReceiver::receiveEvent(inputEvent);
+		return InputAdapter::receiveEvent(inputEvent);
 	}
 
 	void Widget::giveControl(InputReceiver& receiver, ControlMode mode, DeviceType device)
@@ -310,6 +306,7 @@ namespace toy
 
 	void Widget::yieldControl()
 	{
+		this->propagateTo(m_parent);
 		this->rootController().yieldControl(*this);
 
 		if(m_controlGraph)
@@ -373,6 +370,9 @@ namespace toy
 		UNUSED(mouseEvent);
 		this->disableState(PRESSED);
 	}
+
+	void Widget::dirtyLayout()
+	{}
 
 	void Widget::debugPrintDepth()
 	{

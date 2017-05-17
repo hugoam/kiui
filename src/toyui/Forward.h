@@ -39,7 +39,9 @@ namespace toy
 	struct KeyEvent;
 
 	class ControlNode;
+
 	class InputReceiver;
+	class InputAdapter;
 
 	class Controller;
 
@@ -88,7 +90,10 @@ namespace toy
 	class SliderKnob;
 	class Scroller;
 	class Scrollbar;
-	class ScrollArea;
+
+	class ScrollZone;
+	class ScrollSheet;
+	class ScrollPlan;
 
 	template <class T>
 	class StatSlider;

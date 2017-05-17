@@ -16,13 +16,14 @@ namespace toy
 	class _I_ TOY_UI_EXPORT ScrollZone : public Layout
 	{
 	public:
-		ScrollZone(Wedge& parent);
+		ScrollZone(ScrollSheet& parent);
 
 		Container& container() { return m_container; }
 
 		static Type& cls() { static Type ty("ScrollZone", Layout::cls()); return ty; }
 
 	protected:
+		ScrollSheet& m_scrollSheet;
 		Container m_container;
 	};
 
@@ -78,10 +79,12 @@ namespace toy
 
 		Container& plan() { return m_plan; }
 
-		void nextFrame(size_t tick, size_t delta);
+		virtual void nextFrame(size_t tick, size_t delta);
 
-		void middleDrag(MouseEvent& mouseEvent);
-		void mouseWheel(MouseEvent& mouseEvent);
+		virtual void middleDrag(MouseEvent& mouseEvent);
+		virtual void mouseWheel(MouseEvent& mouseEvent);
+
+		virtual void dirtyLayout();
 
 		void updateBounds();
 

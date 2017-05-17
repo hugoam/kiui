@@ -21,8 +21,9 @@
 
 namespace toy
 {
-	ScrollZone::ScrollZone(Wedge& parent)
+	ScrollZone::ScrollZone(ScrollSheet& parent)
 		: Layout(parent, cls())
+		, m_scrollSheet(parent)
 		, m_container(this->as<Wedge>())
 	{}
 
@@ -98,11 +99,16 @@ namespace toy
 
 	void ScrollPlan::nextFrame(size_t tick, size_t delta)
 	{
-		bool dirty = m_surface.frame().dirty();
+		/*bool dirty = m_surface.frame().dirty();
 		if(dirty)
-			this->updateBounds();
+			this->updateBounds();*/
 
 		Wedge::nextFrame(tick, delta);
+	}
+
+	void ScrollPlan::dirtyLayout()
+	{
+		this->updateBounds();
 	}
 
 	void ScrollPlan::updateBounds()

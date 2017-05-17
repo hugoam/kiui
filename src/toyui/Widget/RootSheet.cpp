@@ -34,8 +34,6 @@ namespace toy
 	{
 		m_target = window.renderer().createRenderTarget(m_frame->as<MasterLayer>());
 		this->updateStyle();
-
-		m_rootController->takeControl(*this, CM_MODAL, DEVICE_MOUSE_ALL);
 	}
 
 	RootSheet::RootSheet(Wedge& parent, Type& type)
@@ -45,9 +43,7 @@ namespace toy
 		, m_mouse(make_unique<Mouse>(*this))
 		, m_keyboard(make_unique<Keyboard>(*this))
 		, m_cursor(*this)
-	{
-		m_rootController->takeControl(*this, CM_MODAL, DEVICE_MOUSE_ALL);
-	}
+	{}
 
 	RootSheet::~RootSheet()
 	{}

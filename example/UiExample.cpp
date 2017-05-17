@@ -33,11 +33,11 @@ namespace toy
 		"Ebbe", "Aron", "Julian", "Elvin", "Ivar", 0
 	};
 
-	class CustomElement : public Container
+	class CustomElement : public Row
 	{
 	public:
 		CustomElement(Wedge& parent, const string& name)
-			: Container(parent, cls())
+			: Row(parent, cls())
 			, m_label(this->build(name))
 		{}
 
@@ -54,7 +54,7 @@ namespace toy
 
 		const string& contentlabel() { return m_label.label(); }
 
-		static Type& cls() { static Type ty("CustomElement", Line::cls()); return ty; }
+		static Type& cls() { static Type ty("CustomElement", Row::cls()); return ty; }
 
 	protected:
 		Label& m_label;
@@ -262,7 +262,7 @@ namespace toy
 		table1.emplace<ButtonSequence>(StringVector({ "Banana", "Apple", "Corniflower" }));
 		table1.emplace<RadioSwitch>(nullptr, 0, StringVector({ "radio a", "radio b", "radio b" }));
 
-		Container& line0 = table1.emplace<Container>(Line::cls());
+		Container& line0 = table1.emplace<Row>();
 
 		Expandbox& box0 = line0.emplace<Expandbox>("Category A");
 		box0.emplace<Label>("Blah blah blah");
@@ -276,12 +276,12 @@ namespace toy
 
 		Table& table2 = page.emplace<Table>(StringVector({ "Left", "Right" }), std::vector<float>({ 0.5f, 0.5f }));
 
-		Container& line1 = table2.emplace<Container>(Line::cls());
+		Container& line1 = table2.emplace<Row>();
 
 		line1.emplace<InputFloat>("Red", 0.05f);
 		line1.emplace<InputFloat>("Blue", 0.05f);
 
-		Container& line2 = table2.emplace<Container>(Line::cls());
+		Container& line2 = table2.emplace<Row>();
 
 		static string text1 = "The quick brown fox jumps over the lazy dog.";
 		static string text2 = "The quick brown fox jumps over the lazy dog.";
@@ -289,7 +289,7 @@ namespace toy
 		line2.emplace<TypeIn>(text1);
 		line2.emplace<TypeIn>(text2);
 
-		Container& line3 = table2.emplace<Container>(Line::cls());
+		Container& line3 = table2.emplace<Row>();
 
 		line3.emplace<Label>("Hello Left");
 		line3.emplace<Label>("Hello Right");
@@ -360,16 +360,16 @@ namespace toy
 		page.emplace<Textbox>(multiline);
 		page.emplace<SliderFloat>("Wrap width", AutoStat<float>(200.f, -20.f, 600.f, 0.1f), [](float){ });
 
-		Container& line0 = page.emplace<Container>(Line::cls());
+		Container& line0 = page.emplace<Row>();
 		line0.emplace<Icon>("bullet");
 		line0.emplace<Label>("Bullet point 1");
 
 		static string multiline2 = "Bullet point 2\nOn multiple lines";
-		Container& line1 = page.emplace<Container>(Line::cls());
+		Container& line1 = page.emplace<Row>();
 		line1.emplace<Icon>("bullet");
 		line1.emplace<Textbox>(multiline2);
 
-		Container& line2 = page.emplace<Container>(Line::cls());
+		Container& line2 = page.emplace<Row>();
 		line2.emplace<Icon>("bullet");
 		line2.emplace<Label>("Bullet point 3");
 
@@ -448,31 +448,31 @@ namespace toy
 	{
 		Page& page = parent.emplace<Page>(); // "Inline Controls"
 
-		Container& line0 = page.emplace<Container>(Line::cls());
+		Container& line0 = page.emplace<Row>();
 
 		line0.emplace<Label>("Hello");
 		line0.emplace<Label>("World");
 
-		Container& line1 = page.emplace<Container>(Line::cls());
+		Container& line1 = page.emplace<Row>();
 
 		line1.emplace<Button>("Banana");
 		line1.emplace<Button>("Apple");
 		line1.emplace<Button>("Corniflower");
 
-		Container& line2 = page.emplace<Container>(Line::cls());
+		Container& line2 = page.emplace<Row>();
 
 		line2.emplace<Label>("Small buttons");
 		line2.emplace<Button>("Like this one");
 		line2.emplace<Label>("can fit within a text block.");
 
-		Container& line3 = page.emplace<Container>(Line::cls());
+		Container& line3 = page.emplace<Row>();
 
 		line3.emplace<InputBool>("My", true);
 		line3.emplace<InputBool>("Tailor", true);
 		line3.emplace<InputBool>("Is", true);
 		line3.emplace<InputBool>("Rich", true);
 
-		Container& line4 = page.emplace<Container>(Line::cls());
+		Container& line4 = page.emplace<Row>();
 
 		line4.emplace<InputFloat>("X", 0.f);
 		line4.emplace<InputFloat>("Y", 0.f);
@@ -605,11 +605,11 @@ namespace toy
 		tooldock.addDock("Style Edit").emplace<StyleEdit>(parent.uiWindow().styler());
 
 		Page& options = tooldock.addDock("Options").emplace<Page>();
-		options.emplace<InputText>("Debug draw filter", "", [](string value) { DrawFrame::sDebugDrawFilter = value; });
-		options.emplace<InputBool>("Debug draw Frame", false, [](bool on) { DrawFrame::sDebugDrawFrameRect = on; });
-		options.emplace<InputBool>("Debug draw Padding", false, [](bool on) { DrawFrame::sDebugDrawPaddedRect = on; });
-		options.emplace<InputBool>("Debug draw Content", false, [](bool on) { DrawFrame::sDebugDrawContentRect = on; });
-		options.emplace<InputBool>("Debug draw Clip", false, [](bool on) { DrawFrame::sDebugDrawClipRect = on; });
+		options.emplace<InputText>("Debug draw filter", "", [](string value) { DrawFrame::s_debugDrawFilter = value; });
+		options.emplace<InputBool>("Debug draw Frame", false, [](bool on) { DrawFrame::s_debugDrawFrameRect = on; });
+		options.emplace<InputBool>("Debug draw Padding", false, [](bool on) { DrawFrame::s_debugDrawPaddedRect = on; });
+		options.emplace<InputBool>("Debug draw Content", false, [](bool on) { DrawFrame::s_debugDrawContentRect = on; });
+		options.emplace<InputBool>("Debug draw Clip", false, [](bool on) { DrawFrame::s_debugDrawClipRect = on; });
 
 		return tooldock;
 	}

@@ -7,35 +7,25 @@
 
 #include <toyobj/Iterable/Reverse.h>
 
-#include <toyui/Widget/RootSheet.h>
+#include <toyui/Widget/RootSheet.h> 
 #include <toyui/Widget/Sheet.h>
 
 namespace toy
 {
-	InputReceiver::InputReceiver()
+	InputAdapter::InputAdapter()
 		: m_controlGraph()
 	{}
 
-	InputReceiver::~InputReceiver()
+	InputAdapter::~InputAdapter()
 	{}
 
-	InputReceiver* InputReceiver::controlEvent(InputEvent& inputEvent)
-	{
-		return this;
-	}
-
-	InputReceiver* InputReceiver::receiveEvent(InputEvent& inputEvent)
+	InputReceiver* InputAdapter::receiveEvent(InputEvent& inputEvent)
 	{
 		if(inputEvent.consumed)
 			return this;
 
 		inputEvent.receive(*this);
 		return this;
-	}
-
-	InputReceiver* InputReceiver::propagateEvent(InputEvent& inputEvent)
-	{
-		return nullptr;
 	}
 
 	ControlNode::ControlNode(InputReceiver& receiver, ControlNode* parent, ControlMode mode, DeviceType device)
@@ -46,7 +36,10 @@ namespace toy
 		, m_controller()
 	{
 		if(parent)
+		{
+			receiver.propagateTo(parent->m_receiver);
 			m_receiver->control();
+		}
 	}
 
 	ControlNode::~ControlNode()
@@ -89,16 +82,6 @@ namespace toy
 		return m_receiver->controlEvent(inputEvent);
 	}
 
-	InputReceiver* ControlNode::receiveEvent(InputEvent& inputEvent)
-	{
-		return this->dispatchEvent(inputEvent);
-	}
-
-	InputReceiver* ControlNode::propagateEvent(InputEvent& inputEvent)
-	{
-		return m_parent ? m_parent->m_receiver : nullptr;
-	}
-
 	ControlNode* ControlNode::findReceiver(InputReceiver& receiver)
 	{
 		if(m_receiver == &receiver)
@@ -113,8 +96,10 @@ namespace toy
 	{
 		if(m_controller && (mode >= CM_MODAL || m_controller->m_controlMode < CM_MODAL))
 			m_controller->takeControl(receiver, mode, device);
-		else
+		else if(!m_controller)
 			m_controller = make_unique<ControlNode>(receiver, this, mode, static_cast<DeviceType>(m_device & device));
+		else
+			printf("ERROR: case not handled when not taking top control");
 	}
 
 	void ControlNode::yieldControl(InputReceiver& receiver)
