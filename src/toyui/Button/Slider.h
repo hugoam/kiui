@@ -40,7 +40,7 @@ namespace toy
 
 		float length();
 
-		void nextFrame(size_t tick, size_t delta);
+		virtual void dirtyLayout();
 
 		void updateMetrics(float min, float max, float val, float stepLength, float knobLength = 0.f);
 		void resetMetrics(float min, float max, float val, float stepLength, float knobLength = 0.f);

@@ -42,11 +42,16 @@ namespace toy
 
 		void collectLayers(std::vector<Layer*>& layers, FrameType barrier = LAYER);
 
-		void remap();
-		void reindex(size_t from);
+		virtual void bind(Stripe& parent);
+		virtual void unbind();
+
+		void addLayer(Layer& layer);
+		void removeLayer(Layer& layer);
 
 		void moveToTop(Layer& sublayer);
 		void moveToTop();
+
+		void reindex(size_t from);
 
 		Frame* pinpoint(float x, float y, const Filter& filter);
 
@@ -74,7 +79,6 @@ namespace toy
 		void redraw();
 		
 		void reorder();
-		void addLayer(Layer& layer);
 
 	protected:
 		std::vector<Layer*> d_layers;

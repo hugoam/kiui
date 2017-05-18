@@ -54,10 +54,8 @@ namespace toy
 
 		Stripe& column(size_t index) { return *d_columns[index]; }
 
-		virtual void remap();
-		virtual void unmap();
-
-		void remap(Stripe& stripe);
+		virtual void deepMap(Frame& frame);
+		virtual void deepUnmap(Frame& frame);
 
 		void resize(size_t lines);
 
@@ -75,7 +73,8 @@ namespace toy
 
 		virtual void map(Frame& frame);
 		virtual void unmap(Frame& frame);
-		virtual void unmap();
+
+		void move(Frame& frame, size_t xindex, size_t yindex);
 
 		void resize(size_t lines);
 

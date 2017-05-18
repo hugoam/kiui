@@ -30,8 +30,7 @@ namespace toy
 			DIRTY_POSITION,		// The relative position of the frame has changed
 			DIRTY_CONTENT,		// The content of the widget has changed
 			DIRTY_LAYOUT,		// The skin of the frame has changed
-			DIRTY_STRUCTURE,
-			DIRTY_MAPPING		// The widget needs to be remapped
+			DIRTY_STRUCTURE
 		};
 
 		virtual FrameType frameType() { return FRAME; }
@@ -57,8 +56,10 @@ namespace toy
 		Layer& layer();
 		MasterLayer& masterlayer();
 
-		void bind(Stripe& parent);
-		void unbind();
+		bool hasParent(Frame& frame);
+
+		virtual void bind(Stripe& parent);
+		virtual void unbind();
 
 		typedef std::function<bool(Frame&)> Visitor;
 		typedef std::function<bool(Frame&)> Filter;
@@ -86,8 +87,6 @@ namespace toy
 		void setStyle(Style& style, bool reset = false);
 		void updateStyle();
 		void resetStyle();
-
-		virtual void remap();
 
 		virtual void measureLayout();
 		virtual void resizeLayout();

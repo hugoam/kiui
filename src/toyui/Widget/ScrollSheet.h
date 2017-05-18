@@ -79,8 +79,6 @@ namespace toy
 
 		Container& plan() { return m_plan; }
 
-		virtual void nextFrame(size_t tick, size_t delta);
-
 		virtual void middleDrag(MouseEvent& mouseEvent);
 		virtual void mouseWheel(MouseEvent& mouseEvent);
 

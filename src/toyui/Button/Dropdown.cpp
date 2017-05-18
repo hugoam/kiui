@@ -93,7 +93,8 @@ namespace toy
 	{
 		m_list.show();
 		m_list.frame().as<Layer>().moveToTop();
-		m_list.takeControl(CM_MODAL);
+		if(modal)
+			m_list.takeControl(CM_MODAL);
 		m_down = true;
 	}
 

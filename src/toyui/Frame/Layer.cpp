@@ -26,7 +26,10 @@ namespace toy
 	{}
 
 	Layer::~Layer()
-	{}
+	{
+		if(d_parentLayer)
+			d_parentLayer->removeLayer(*this);
+	}
 
 	void Layer::collectLayers(std::vector<Layer*>& layers, FrameType barrier)
 	{
@@ -39,26 +42,37 @@ namespace toy
 		});
 	}
 
-	void Layer::remap()
-	{
-		if(d_parent)
-			d_parentLayer = &d_parent->layer();
-
-		Stripe::remap();
-
-		this->collectLayers(d_sublayers);
-
-		auto goesBefore = [](Layer* a, Layer* b) { return a->index() < b->index(); };
-		std::sort(d_sublayers.begin(), d_sublayers.end(), goesBefore);
-
-		this->reindex(0);
-
-	}
-
 	void Layer::reindex(size_t from)
 	{
 		for(size_t i = from; i < d_sublayers.size(); ++i)
 			d_sublayers[i]->setIndex(i);
+	}
+
+	void Layer::bind(Stripe& parent)
+	{
+		Frame::bind(parent);
+		d_parentLayer = &parent.layer();
+		d_parentLayer->addLayer(*this);
+	}
+	
+	void Layer::unbind()
+	{
+		d_parentLayer->removeLayer(*this);
+		d_parentLayer = nullptr;
+		Frame::unbind();
+	}
+
+	void Layer::addLayer(Layer& layer)
+	{
+		layer.setIndex(d_sublayers.size());
+		d_sublayers.push_back(&layer);
+	}
+
+	void Layer::removeLayer(Layer& layer)
+	{
+		size_t index = layer.index();
+		d_sublayers.erase(std::remove(d_sublayers.begin(), d_sublayers.end(), &layer), d_sublayers.end());
+		this->reindex(index);
 	}
 
 	void Layer::moveToTop(Layer& sublayer)
@@ -97,8 +111,6 @@ namespace toy
 
 	void MasterLayer::relayout()
 	{
-		this->remap();
-
 		if(d_dirty >= DIRTY_STRUCTURE || d_reorder)
 			this->reorder();
 
@@ -111,21 +123,16 @@ namespace toy
 	{
 		this->visit([](Frame& frame) {
 			bool dirty = frame.dirty();
-			frame.clearDirty();
 
 			if(dirty)
 				frame.layer().setForceRedraw();
 			if(dirty && frame.widget())
 				frame.widget()->dirtyLayout();
 
+			frame.clearDirty();
+
 			return true;
 		});
-	}
-
-	void MasterLayer::addLayer(Layer& layer)
-	{
-		layer.setIndex(d_layers.size());
-		d_layers.push_back(&layer);
 	}
 
 	void MasterLayer::reorder()

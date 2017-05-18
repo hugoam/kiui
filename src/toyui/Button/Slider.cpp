@@ -20,9 +20,7 @@ namespace toy
 	SliderKnob::SliderKnob(Wedge& parent, Dimension dim, Type& type)
 		: Item(parent, type)
 		, m_dim(dim)
-	{
-		//this->content().setEmpty();
-	}
+	{}
 
 	Slider::Slider(Wedge& parent, Dimension dim, const Callback& onUpdated, Type& type)
 		: WrapControl(parent, type)
@@ -34,15 +32,14 @@ namespace toy
 		, m_startOffset(0.f)
 		, m_onUpdated(onUpdated)
 	{
+		this->unmap();
 		m_frame->setLength(dim);
+		this->map();
 	}
 
-	void Slider::nextFrame(size_t tick, size_t delta)
+	void Slider::dirtyLayout()
 	{
-		if(m_frame->dirty() >= Frame::DIRTY_LAYOUT)
-			this->updateKnob();
-
-		Wedge::nextFrame(tick, delta);
+		this->updateKnob();
 	}
 
 	float Slider::offset(float pos)

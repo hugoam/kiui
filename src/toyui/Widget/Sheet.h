@@ -31,8 +31,11 @@ namespace toy
 
 		virtual void visit(const Visitor& visitor);
 
-		void push(Widget& widget, bool deferred = true);
-		void insert(Widget& widget, size_t index, bool deferred = true);
+		void unmap();
+		void map();
+
+		void push(Widget& widget);
+		void insert(Widget& widget, size_t index);
 		void remove(Widget& widget);
 
 		void reindex(size_t from);

@@ -18,6 +18,8 @@
 
 #include <toyobj/Iterable/Reverse.h>
 
+#define TOYUI_INSTANT_MAPPING
+
 namespace toy
 {
 	string Widget::sNullString;
@@ -112,17 +114,14 @@ namespace toy
 		return this->content().text();
 	}
 
-	void Widget::bind(Wedge& parent, size_t index, bool deferred)
+	void Widget::bind(Wedge& parent, size_t index)
 	{
 		m_parent = &parent;
 		m_index = index;
 
 		this->propagateTo(&parent);
 		
-		if(deferred)
-			m_parent->frame().markDirty(Frame::DIRTY_MAPPING);
-		else
-			m_parent->stripe().map(*m_frame);
+		m_parent->stripe().map(*m_frame);
 
 		RootSheet& rootSheet = this->rootSheet();
 		this->visit([&rootSheet](Widget& widget) { rootSheet.handleBindWidget(widget); return true; });
@@ -252,8 +251,6 @@ namespace toy
 
 	Widget* Widget::pinpoint(float x, float y, const Frame::Filter& filter)
 	{
-		if(m_frame->dirty() >= Frame::DIRTY_MAPPING)
-			return nullptr;
 		DimFloat absolute = m_frame->absolutePosition();
 		Frame* frame = m_frame->pinpoint(x - absolute[DIM_X], y - absolute[DIM_Y], filter);
 		return frame ? frame->widget() : nullptr;

@@ -34,13 +34,13 @@ namespace toy
 		, m_scrollbarY(*this, m_scrollzone, m_scrollzone.container(), DIM_Y)
 		, m_wrap(false)
 	{
-		m_scrollzone.frame().setIndex(0, 0);
-		m_scrollbarY.frame().setIndex(1, 0);
-		m_scrollbarX.frame().setIndex(0, 1);
-
 		m_containerTarget = &m_scrollzone.container();
 
 		this->updateWrap();
+
+		m_frame->as<Grid>().move(m_scrollzone.frame(), 0, 0);
+		m_frame->as<Grid>().move(m_scrollbarY.frame(), 1, 0);
+		m_frame->as<Grid>().move(m_scrollbarX.frame(), 0, 1);
 	}
 
 	void ScrollSheet::updateWrap()
@@ -95,15 +95,6 @@ namespace toy
 		m_plan.setStyle(Plan::cls());
 		m_containerTarget = &m_surface;
 		this->updateBounds();
-	}
-
-	void ScrollPlan::nextFrame(size_t tick, size_t delta)
-	{
-		/*bool dirty = m_surface.frame().dirty();
-		if(dirty)
-			this->updateBounds();*/
-
-		Wedge::nextFrame(tick, delta);
 	}
 
 	void ScrollPlan::dirtyLayout()

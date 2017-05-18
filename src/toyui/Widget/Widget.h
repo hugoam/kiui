@@ -76,7 +76,7 @@ namespace toy
 		void show();
 		void hide();
 
-		void bind(Wedge& parent, size_t index, bool deferred = true);
+		void bind(Wedge& parent, size_t index);
 		void unbind();
 
 		unique_ptr<Widget> extract();

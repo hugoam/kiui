@@ -18,8 +18,10 @@ namespace toy
 	Scroller::Scroller(Wedge& parent, Dimension dim)
 		: Slider(parent, dim, nullptr, cls())
 	{
+		this->unmap();
 		m_filler.setStyle(Spacer::cls());
 		m_button.setStyle(ScrollerKnob::cls());
+		this->map();
 	}
 
 	void Scroller::sliderStep(float value, bool ended)
@@ -46,11 +48,13 @@ namespace toy
 		, d_cursor(0.f)
 		, m_frameSheet(frameSheet)
 		, m_contentSheet(contentSheet)
-		, m_up(*this, std::bind(&Scrollbar::scrollup, this))
+		, m_up(*this, [this](Widget&) { this->scrollup(); })
 		, m_scroller(*this, dim)
-		, m_down(*this, std::bind(&Scrollbar::scrolldown, this))
+		, m_down(*this, [this](Widget&) { this->scrolldown(); })
 	{
+		this->unmap();
 		m_frame->setLength(dim);
+		this->map();
 	}
 
 	Scrollbar::~Scrollbar()

@@ -40,7 +40,7 @@ namespace toy
 		, d_widget(&widget)
 		, d_frame(*this)
 		, d_parent(nullptr)
-		, d_dirty(DIRTY_MAPPING)
+		, d_dirty(DIRTY_LAYOUT)
 		, d_hidden(false)
 		, d_index(0, 0)
 		, d_hardClip()
@@ -51,7 +51,7 @@ namespace toy
 		, d_widget(nullptr)
 		, d_frame(*this)
 		, d_parent(nullptr)
-		, d_dirty(DIRTY_MAPPING)
+		, d_dirty(DIRTY_LAYOUT)
 		, d_hidden(false)
 		, d_index(0, 0)
 	{
@@ -76,6 +76,16 @@ namespace toy
 			return this->as<MasterLayer>();
 	}
 
+	bool Frame::hasParent(Frame& frame)
+	{
+		if(d_parent == &frame)
+			return true;
+		else if(d_parent)
+			d_parent->hasParent(frame);
+		else
+			return false;
+	}
+
 	void Frame::visit(const Visitor& visitor)
 	{
 		visitor(*this);
@@ -83,12 +93,6 @@ namespace toy
 
 	void Frame::markDirty(Dirty dirty)
 	{
-		/*if(d_widget)
-		{
-			this->debugPrintDepth();
-			printf("Frame :: markDirty %s\n", d_widget->type().name().c_str());
-		}*/
-
 		this->setDirty(dirty);
 		Stripe* parent = this->parent();
 		while(parent)
@@ -121,7 +125,7 @@ namespace toy
 	void Frame::resetStyle()
 	{
 		this->updateStyle();
-		this->markDirty(DIRTY_MAPPING);
+		this->markDirty(DIRTY_STRUCTURE);
 	}
 
 	void Frame::updateLayout()
@@ -180,9 +184,6 @@ namespace toy
 	{
 		d_parent = nullptr;
 	}
-
-	void Frame::remap()
-	{}
 
 	void Frame::measureLayout()
 	{

@@ -30,8 +30,7 @@ namespace toy
 
 	void Canvas::rightClick(MouseEvent& mouseEvent)
 	{
-		this->autoLayout();
-		//m_contextTrigger(*this);
+		m_contextTrigger(*this);
 	}
 
 	void Canvas::autoLayout()

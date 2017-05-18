@@ -93,8 +93,7 @@ namespace toy
 		float pixelRatio = 1.f;
 		nvgBeginFrame(m_ctx, target.layer().width(), target.layer().height(), pixelRatio);
 
-		if(target.layer().dirty() < Frame::DIRTY_MAPPING)
-			target.layer().widget()->render(*this, false);
+		target.layer().widget()->render(*this, false);
 
 #ifdef TOYUI_DRAW_CACHE
 		void* layerCache = nullptr;

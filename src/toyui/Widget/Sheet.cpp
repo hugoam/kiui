@@ -29,6 +29,18 @@ namespace toy
 		: Widget(type, frameType)
 	{}
 
+	void Wedge::unmap()
+	{
+		for(size_t i = 0; i < m_contents.size(); ++i)
+			this->stripe().unmap(m_contents[i]->frame());
+	}
+
+	void Wedge::map()
+	{
+		for(size_t i = 0; i < m_contents.size(); ++i)
+			this->stripe().map(m_contents[i]->frame());
+	}
+
 	void Wedge::nextFrame(size_t tick, size_t delta)
 	{
 		Widget::nextFrame(tick, delta);
@@ -68,16 +80,16 @@ namespace toy
 			m_contents[i]->setIndex(i);
 	}
 
-	void Wedge::push(Widget& widget, bool deferred)
+	void Wedge::push(Widget& widget)
 	{
 		m_contents.push_back(&widget);
-		widget.bind(*this, m_contents.size() - 1, deferred);
+		widget.bind(*this, m_contents.size() - 1);
 	}
 
-	void Wedge::insert(Widget& widget, size_t index, bool deferred)
+	void Wedge::insert(Widget& widget, size_t index)
 	{
 		m_contents.insert(m_contents.begin() + index, &widget);
-		widget.bind(*this, index, deferred);
+		widget.bind(*this, index);
 		this->reindex(index);
 	}
 
@@ -91,17 +103,19 @@ namespace toy
 
 	void Wedge::move(size_t from, size_t to)
 	{
+		this->unmap();
 		m_contents.insert(m_contents.begin() + to, m_contents[from]);
 		m_contents.erase(m_contents.begin() + from + 1);
 		this->reindex(from < to ? from : to);
-		m_frame->markDirty(Frame::DIRTY_MAPPING);
+		this->map();
 	}
 
 	void Wedge::swap(size_t from, size_t to)
 	{
+		this->unmap();
 		std::iter_swap(m_contents.begin() + from, m_contents.begin() + to);
 		this->reindex(from < to ? from : to);
-		m_frame->markDirty(Frame::DIRTY_MAPPING);
+		this->map();
 	}
 
 	Container::Container(Wedge& parent, Type& type, FrameType frameType)
@@ -123,7 +137,7 @@ namespace toy
 	{
 		Widget& widget = *unique;
 		if(widget.parent() == nullptr)
-			m_containerTarget->as<Wedge>().insert(widget, index, false);
+			m_containerTarget->as<Wedge>().insert(widget, index);
 		widget.setContainer(*this);
 		m_containerContents.insert(m_containerContents.begin() + index, std::move(unique));
 		this->handleAdd(widget);

@@ -10,6 +10,10 @@
 #include <toyui/Widget/Widget.h>
 #include <toyui/Widget/Sheet.h>
 
+#include <toyui/Frame/Layer.h>
+
+#include <toyui/Container/Table.h>
+
 #include <algorithm>
 
 namespace toy
@@ -30,38 +34,33 @@ namespace toy
 	{
 		frame.bind(*this);
 		this->insert(frame, frame.widget()->index());
+		this->deepMap(frame);
 	}
 
 	void Stripe::unmap(Frame& frame)
 	{
 		frame.unbind();
 		this->remove(frame);
+		this->deepUnmap(frame);
 	}
 
-	void Stripe::remap()
+	void Stripe::deepMap(Frame& frame)
 	{
-		if(d_dirty < DIRTY_MAPPING)
-			return;
-
-		this->unmap();
-
-		for(Widget* widget : d_widget->as<Wedge>().contents())
-		{
-			this->map(widget->frame());
-			widget->frame().remap();
-		}
+		if(d_parent)
+			d_parent->deepMap(frame);
 	}
 
-	void Stripe::unmap()
+	void Stripe::deepUnmap(Frame& frame)
 	{
-		this->clear();
+		if(d_parent)
+			d_parent->deepUnmap(frame);
 	}
 
 	void Stripe::append(Frame& frame)
 	{
 		this->insert(frame, frame.flow() ? d_sequence.size() : d_contents.size());
 	}
-
+	
 	void Stripe::insert(Frame& frame, size_t index)
 	{
 		if(frame.flow())
@@ -176,6 +175,9 @@ namespace toy
 
 	void Stripe::resizeLayout()
 	{
+		if(!d_widget)
+			this->setDirty(d_parent->dirty());
+
 		if(d_dirty < DIRTY_LAYOUT)
 			return;
 
@@ -189,6 +191,9 @@ namespace toy
 	{
 		if(d_dirty < DIRTY_LAYOUT)
 			return;
+
+		if(d_style->name() == "GridColumn")
+			int i = 0;
 
 		for(Frame* pframe : d_contents)
 			this->position(*pframe);

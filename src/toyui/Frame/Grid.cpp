@@ -34,33 +34,24 @@ namespace toy
 		, d_grid(make_unique<GridOverlay>(widget, *this))
 	{}
 
-	void TableGrid::remap()
+	void TableGrid::deepMap(Frame& frame)
 	{
-		if(d_dirty < DIRTY_MAPPING)
-			return;
+		Stripe& stripe = *frame.parent();
 
-		Stripe::remap();
-
-		for(Frame* pframe : d_sequence)
-			if(pframe->frameType() >= STRIPE)
-				this->remap(pframe->as<Stripe>());
-	}
-
-	void TableGrid::unmap()
-	{
-		Stripe::unmap();
-		this->append(*d_grid);
-	}
-
-	void TableGrid::remap(Stripe& stripe)
-	{
-		if(stripe.length() != d_depth)
+		if(stripe.length() != d_depth || stripe.parent() != this) //|| stripe.dindex(d_length) > d_sequence.size())
 			return;
 
 		this->resize(stripe.sequence().size());
 		if(stripe.sequence().size() >= d_columns.size())
 			for(size_t i = 0; i < d_columns.size(); ++i)
 				d_columns[i]->append(*stripe.contents()[i]);
+	}
+
+	void TableGrid::deepUnmap(Frame& frame)
+	{
+		for(auto& column : d_columns)
+			if(std::find(column->contents().begin(), column->contents().end(), &frame) != column->contents().end())
+				column->remove(frame);
 	}
 
 	void TableGrid::resize(size_t columns)
@@ -87,17 +78,18 @@ namespace toy
 		size_t line = frame.dindex(d_length);
 		d_lines[line]->remove(frame);
 	}
-	
-	void Grid::unmap()
-	{
-		for(auto& line : d_lines)
-			line->clear();
-	}
 
 	void Grid::resize(size_t lines)
 	{
 		while(d_lines.size() < lines)
 			d_lines.emplace_back(make_unique<GridLine>(*d_widget, *this));
+	}
+
+	void Grid::move(Frame& frame, size_t xindex, size_t yindex)
+	{
+		this->unmap(frame);
+		frame.setIndex(xindex, yindex);
+		this->map(frame);
 	}
 }
 

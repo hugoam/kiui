@@ -46,8 +46,9 @@ namespace toy
 
 		virtual void map(Frame& frame);
 		virtual void unmap(Frame& frame);
-		virtual void remap();
-		virtual void unmap();
+
+		virtual void deepMap(Frame& frame);
+		virtual void deepUnmap(Frame& frame);
 
 		void append(Frame& frame);
 		void insert(Frame& frame, size_t index);
