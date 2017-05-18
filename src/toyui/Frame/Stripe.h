@@ -56,7 +56,6 @@ namespace toy
 		void clear();
 
 		void reindex(size_t from);
-		void move(size_t from, size_t to);
 
 		Frame* before(Frame& frame);
 		Frame& prev(Frame& frame);

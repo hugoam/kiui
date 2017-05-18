@@ -99,12 +99,6 @@ namespace toy
 			d_contents[i]->setIndex(d_length, i);
 	}
 
-	void Stripe::move(size_t from, size_t to)
-	{
-		std::swap(d_contents[from], d_contents[to]);
-		this->reindex(from < to ? from : to);
-	}
-
 	Frame* Stripe::before(Frame& frame)
 	{
 		int index = frame.dindex(d_length);
