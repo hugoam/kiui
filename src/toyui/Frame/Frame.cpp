@@ -76,16 +76,6 @@ namespace toy
 			return this->as<MasterLayer>();
 	}
 
-	bool Frame::hasParent(Frame& frame)
-	{
-		if(d_parent == &frame)
-			return true;
-		else if(d_parent)
-			d_parent->hasParent(frame);
-		else
-			return false;
-	}
-
 	void Frame::visit(const Visitor& visitor)
 	{
 		visitor(*this);

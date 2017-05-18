@@ -56,8 +56,6 @@ namespace toy
 		Layer& layer();
 		MasterLayer& masterlayer();
 
-		bool hasParent(Frame& frame);
-
 		virtual void bind(Stripe& parent);
 		virtual void unbind();
 
