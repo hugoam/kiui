@@ -23,9 +23,8 @@ namespace toy
 	Popup::Popup(Wedge& parent)
 		: Overlay(parent, cls())
 	{
-		float x = this->rootSheet().mouse().lastX() - m_parent->frame().left();
-		float y = this->rootSheet().mouse().lastY() - m_parent->frame().top();
-		m_frame->setPosition(x, y);
+		DimFloat local = m_parent->frame().localPosition(this->rootSheet().mouse().lastX(), this->rootSheet().mouse().lastY());
+		m_frame->setPosition(local.x(), local.y());
 
 		this->takeControl(CM_MODAL);
 	}

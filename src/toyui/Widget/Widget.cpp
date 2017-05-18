@@ -251,8 +251,7 @@ namespace toy
 
 	Widget* Widget::pinpoint(float x, float y, const Frame::Filter& filter)
 	{
-		DimFloat absolute = m_frame->absolutePosition();
-		Frame* frame = m_frame->pinpoint(x - absolute[DIM_X], y - absolute[DIM_Y], filter);
+		Frame* frame = m_frame->pinpoint(x, y , filter);
 		return frame ? frame->widget() : nullptr;
 	}
 
@@ -264,7 +263,8 @@ namespace toy
 		if(inputEvent.deviceType >= DEVICE_MOUSE)
 		{
 			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
-			Widget* pinned = this->pinpoint(mouseEvent.posX, mouseEvent.posY);
+			DimFloat local = m_frame->localPosition(mouseEvent.posX, mouseEvent.posY);
+			Widget* pinned = this->pinpoint(local.x(), local.y());
 			return (pinned && pinned != this) ? pinned->controlEvent(inputEvent) : this;
 		}
 

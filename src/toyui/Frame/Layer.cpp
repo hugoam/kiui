@@ -96,7 +96,8 @@ namespace toy
 
 		for(Layer* frame : reverse_adapt(d_sublayers))
 		{
-			DimFloat local = frame->localPosition(x, y); // probably should be local to this
+			DimFloat local(x, y);
+			frame->integratePosition(*this, local);
 			Frame* target = frame->pinpoint(local.x(), local.y(), filter);
 			if(target)
 				return target;

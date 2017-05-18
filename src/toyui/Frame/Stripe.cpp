@@ -12,7 +12,7 @@
 
 #include <toyui/Frame/Layer.h>
 
-#include <toyui/Container/Table.h>
+#include <toyui/Window/Window.h>
 
 #include <algorithm>
 
@@ -330,23 +330,13 @@ namespace toy
 		if(this->hidden() || this->hollow() || (this->clip() && !this->inside(x, y)))
 			return nullptr;
 
-		if(!this->widget())
-		{
-			x += this->left();
-			y += this->top();
-		}
-
 		for(Frame* frame : reverse_adapt(d_contents))
 		{
-			Frame* target = frame->pinpoint((x - frame->left()) / frame->scale(), (y - frame->top()) / frame->scale(), filter);
+			DimFloat local(x, y);
+			frame->integratePosition(*this, local);
+			Frame* target = frame->pinpoint(local.x(), local.y(), filter);
 			if(target)
 				return target;
-		}
-
-		if(!this->widget())
-		{
-			x -= this->left();
-			y -= this->top();
 		}
 
 		return Frame::pinpoint(x, y, filter);
