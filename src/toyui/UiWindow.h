@@ -97,6 +97,8 @@ namespace toy
 		void removeImage(Image& image);
 		Image& findImage(const string& name);
 
+		void makeActive(Widget& widget);
+
 	protected:
 		void initResources();
 		void loadResources();
@@ -116,8 +118,9 @@ namespace toy
 
 		unique_ptr<Styler> m_styler;
 
-		//unique_ptr<RootDevice> m_rootDevice;
 		unique_ptr<RootSheet> m_rootSheet;
+
+		Widget* m_active;
 
 		RootDevice* m_rootDevice;
 

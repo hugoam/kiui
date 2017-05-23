@@ -7,7 +7,7 @@
 
 #include <toyobj/String/StringConvert.h>
 
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Stripe.h>
@@ -29,13 +29,13 @@ namespace toy
 
 	void Docksection::dock(Window& window)
 	{
-		this->addTab(window.name()).append(window.container()->release(window));
+		this->addTab(window.name()).append(window.container()->release(window, false));
 	}
 
 	void Docksection::undock(Window& window)
 	{
 		RootSheet& rootSheet = this->rootSheet();
-		rootSheet.append(window.container()->release(window));
+		rootSheet.append(window.container()->release(window, false));
 
 		if(m_tabs.containerContents().empty())
 			m_dockline->removeSection();
@@ -115,7 +115,7 @@ namespace toy
 
 	void Dockline::moveSection(Docksection& docksection)
 	{
-		this->append(docksection.dockline().release(docksection));
+		this->append(docksection.dockline().release(docksection, false));
 		docksection.setDockline(*this);
 		m_docksection = &docksection;
 	}
@@ -143,7 +143,7 @@ namespace toy
 		if(line->docksection())
 		{
 			this->moveSection(*line->docksection());
-			this->release(firstline);
+			this->release(firstline, true);
 		}
 	}
 
@@ -183,9 +183,10 @@ namespace toy
 		return dockline.appendSection();
 	}
 
-	void Dockline::mouseEntered(MouseEvent& mouseEvent)
+	bool Dockline::mouseEntered(MouseEvent& mouseEvent)
 	{
 		this->rootSheet().cursor().setStyle(m_dim == DIM_X ? ResizeCursorX::cls() : ResizeCursorY::cls());
+		return true;
 	}
 
 	MasterDockline::MasterDockline(Dockspace& dockspace)

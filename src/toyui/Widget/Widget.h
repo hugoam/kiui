@@ -21,16 +21,16 @@ namespace toy
 {
 	enum _I_ WidgetState : unsigned int
 	{
-		NOSTATE = 0,
-		HOVERED = 1 << 0,
-		TRIGGERED = 1 << 1,
-		ACTIVATED = 1 << 2,
-		FOCUSED = 1 << 3,
-		DISABLED = 1 << 4,
-		PRESSED = 1 << 5,
-		DRAGGED = 1 << 6,
-		CONTROL = 1 << 7,
-		MODAL = 1 << 8
+		NOSTATE = 0,			// default state
+		FOCUSED = 1 << 1,		// under input device focus
+		TRIGGERED = 1 << 2,		// triggered by input device (e.g. pressed)
+		ACTIVATED = 1 << 3,		// activated state
+		SELECTED = 1 << 4,		// selected state
+		DRAGGED = 1 << 5,		// dragged by input device
+		DISABLED = 1 << 6,		// disabled state
+		ACTIVE = 1 << 7,		// for the unique currently active widget
+		CONTROL = 1 << 8,		// widget is in the control stack
+		MODAL = 1 << 9			// widget is modal in the control stack
 	};
 
 	class _I_ TOY_UI_EXPORT Widget : public TypeObject, public InputAdapter, public Updatable
@@ -77,7 +77,7 @@ namespace toy
 		void hide();
 
 		void bind(Wedge& parent, size_t index);
-		void unbind();
+		void unbind(bool destroy);
 
 		unique_ptr<Widget> extract();
 		void destroy();
@@ -109,17 +109,11 @@ namespace toy
 
 		void markDirty();
 
-		void control();
-		void uncontrol();
+		void control(bool modal);
+		void uncontrol(bool modal);
 
-		void modal();
-		void unmodal();
-
-		void activate();
-		void deactivate();
-
-		virtual void focused() {}
-		virtual void unfocused() {}
+		virtual void active() {}
+		virtual void inactive() {}
 
 		Widget* pinpoint(float x, float y);
 		Widget* pinpoint(float x, float y, const Frame::Filter& filter);
@@ -131,15 +125,17 @@ namespace toy
 		virtual InputReceiver* controlEvent(InputEvent& inputEvent);
 		virtual InputReceiver* receiveEvent(InputEvent& inputEvent);
 
+		void makeActive();
+
 		void giveControl(InputReceiver& receiver, ControlMode mode, DeviceType device = DEVICE_ALL);
 		void takeControl(ControlMode mode, DeviceType device = DEVICE_ALL);
 		void yieldControl();
 
-		void mouseEntered(MouseEvent& mouseEvent);
-		void mouseLeaved(MouseEvent& mouseEvent);
+		virtual bool mouseEntered(MouseEvent& mouseEvent);
+		virtual bool mouseLeaved(MouseEvent& mouseEvent);
 
-		void mousePressed(MouseEvent& mouseEvent);
-		void mouseReleased(MouseEvent& mouseEvent);
+		virtual bool mousePressed(MouseEvent& mouseEvent);
+		virtual bool mouseReleased(MouseEvent& mouseEvent);
 
 		typedef std::function<void(Widget&)> Callback;
 

@@ -53,6 +53,7 @@ namespace toy
 
 	class Shadow;
 	class ImageSkin;
+	class Paint;
 	class InkStyle;
 
 	class Uibox;

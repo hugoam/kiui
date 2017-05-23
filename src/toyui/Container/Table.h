@@ -7,7 +7,7 @@
 
 /* toy */
 #include <toyui/Widget/Sheet.h>
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 #include <toyui/Button/Button.h>
 
 namespace toy

@@ -18,9 +18,9 @@ namespace toy
 
 		void clear();
 
-		virtual void leftClick(MouseEvent& mouseEvent);
-		virtual void rightClick(MouseEvent& mouseEvent);
-		virtual void middleClick(MouseEvent& mouseEvent);
+		virtual bool leftClick(MouseEvent& mouseEvent);
+		virtual bool rightClick(MouseEvent& mouseEvent);
+		virtual bool middleClick(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("ContextMenu", Overlay::cls()); return ty; }
 

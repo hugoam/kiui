@@ -153,11 +153,11 @@ namespace toy
 		m_middleButton.handleBindWidget(widget);
 	}
 
-	void Mouse::handleUnbindWidget(Widget& widget)
+	void Mouse::handleUnbindWidget(Widget& widget, bool destroy)
 	{
-		m_leftButton.handleUnbindWidget(widget);
-		m_rightButton.handleUnbindWidget(widget);
-		m_middleButton.handleUnbindWidget(widget);
+		m_leftButton.handleUnbindWidget(widget, destroy);
+		m_rightButton.handleUnbindWidget(widget, destroy);
+		m_middleButton.handleUnbindWidget(widget, destroy);
 
 		for(int i = m_focused.size() - 1; i >= 0; --i)
 			if(m_focused.at(i) == &widget)
@@ -220,19 +220,22 @@ namespace toy
 	void MouseButton::dragStart(MouseEvent& mouseEvent)
 	{
 		MouseDragStartEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY, m_pressedX, m_pressedY);
-		m_pressed->receiveEvent(dragEvent);
+		m_rootFrame.dispatchEvent(dragEvent, m_pressed);
+		//m_pressed->receiveEvent(dragEvent);
 	}
 
 	void MouseButton::dragEnd(MouseEvent& mouseEvent)
 	{
 		MouseDragEndEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY);
-		m_pressed->receiveEvent(dragEvent);
+		m_rootFrame.dispatchEvent(dragEvent, m_pressed);
+		//m_pressed->receiveEvent(dragEvent);
 	}
 
 	void MouseButton::dragMove(MouseEvent& mouseEvent)
 	{
 		MouseDragEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY, mouseEvent.deltaX, mouseEvent.deltaY);
-		m_pressed->receiveEvent(dragEvent);
+		m_rootFrame.dispatchEvent(dragEvent, m_pressed);
+		//m_pressed->receiveEvent(dragEvent);
 	}
 
 	void MouseButton::click(MouseEvent& mouseEvent)
@@ -241,11 +244,12 @@ namespace toy
 		m_rootFrame.dispatchEvent(clickEvent, m_pressed);
 	}
 
-	void MouseButton::handleUnbindWidget(Widget& widget)
+	void MouseButton::handleUnbindWidget(Widget& widget, bool destroy)
 	{
+		// @todo remove destroy parameter once we refactor container ownership
 		if(m_pressed == &widget)
 		{
-			m_prevPressed = m_pressed;
+			m_prevPressed = destroy ? nullptr : &widget;
 			m_pressed = nullptr;
 			m_dragging = false;
 		}

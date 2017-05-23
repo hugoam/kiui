@@ -10,6 +10,7 @@
 #include <toyui/Frame/Layer.h>
 
 #include <toyui/Widget/RootSheet.h>
+#include <toyui/Input/InputDevice.h>
 
 namespace toy
 {
@@ -26,33 +27,54 @@ namespace toy
 		: ScrollPlan(parent, cls())
 		, m_name(title)
 		, m_contextTrigger(contextTrigger)
-	{}
-
-	void Canvas::rightClick(MouseEvent& mouseEvent)
 	{
-		m_contextTrigger(*this);
+		m_selection.observe(*this);
+	}
+
+	void Canvas::handleAdd(Node& node)
+	{
+		node.select();
+	}
+
+	void Canvas::handleRemove(Node& node)
+	{
+		node.unselect();
+	}
+
+	bool Canvas::leftClick(MouseEvent& mouseEvent)
+	{
+		m_selection.clear();
+		return true;
+	}
+
+	bool Canvas::rightClick(MouseEvent& mouseEvent)
+	{
+		if(m_contextTrigger)
+			m_contextTrigger(*this);
+		return true;
 	}
 
 	void Canvas::autoLayout()
 	{
-		NodeTable nodeTable;
-		this->collectNodes(nodeTable);
-		this->layoutNodes(nodeTable);
+		std::vector<Node*> nodes;
+		this->collectNodes(nodes);
+		this->layoutNodes(nodes);
 	}
 
-	void Canvas::collectNodes(NodeTable& nodeTable)
+	void Canvas::collectNodes(std::vector<Node*>& nodes)
 	{
-		std::vector<Node*> nodeVector;
-
-		m_plan.visit([&nodeVector](Widget& widget) {
+		m_plan.visit([&nodes](Widget& widget) {
 			if(&widget.type() == &Node::cls())
-				nodeVector.push_back(&widget.as<Node>());
+				nodes.push_back(&widget.as<Node>());
 			return true;
 		});
+	}
 
+	void Canvas::layoutNodes(const std::vector<Node*>& nodes)
+	{
 		int minIndex = 0;
 		int maxIndex = 0;
-		for(Node* node : nodeVector)
+		for(Node* node : nodes)
 		{
 			minIndex = std::min(minIndex, node->order());
 			maxIndex = std::max(maxIndex, node->order());
@@ -60,21 +82,14 @@ namespace toy
 
 		int shift = -std::min(0, minIndex);
 
-		nodeTable.resize(maxIndex + shift + 1);
-		for(Node* node : nodeVector)
-			nodeTable[node->order() + shift].push_back(node);
-	}
-
-	void Canvas::layoutNodes(const NodeTable& nodeTable)
-	{
 		unique_ptr<CanvasLine> line = make_unique<CanvasLine>(*this, m_plan.stripe());
 		std::vector<unique_ptr<CanvasColumn>> columns;
-		for(size_t i = 0; i < nodeTable.size(); ++i)
-		{
+
+		for(int i = 0; i < maxIndex+shift+1; ++i)
 			columns.emplace_back(make_unique<CanvasColumn>(*this, *line));
-			for(Node* node : nodeTable[i])
-				columns[i]->append(node->frame());
-		}
+
+		for(Node* node : nodes)
+			columns[node->order() + shift]->append(node->frame());
 
 		Style& nodeStyle = this->fetchStyle(Node::cls());
 
@@ -82,32 +97,67 @@ namespace toy
 		line->relayout();
 		nodeStyle.layout().d_flow = FREE;
 
+		for(Node* node : nodes)
+			node->updateCables();
+
 		m_plan.stripe().remove(*line);
 	}
 
-	NodePlugKnob::NodePlugKnob(Wedge& parent)
+	bool Canvas::leftDragStart(MouseEvent& mouseEvent)
+	{
+		UNUSED(mouseEvent);
+		return true;
+	}
+
+	bool Canvas::leftDrag(MouseEvent& mouseEvent)
+	{
+		for(Node* node : m_selection.store())
+			node->moveNode(DimFloat(mouseEvent.deltaX, mouseEvent.deltaY));
+		return true;
+	}
+
+	bool Canvas::leftDragEnd(MouseEvent& mouseEvent)
+	{
+		UNUSED(mouseEvent);
+		return true;
+	}
+
+	NodeKnob::NodeKnob(Wedge& parent, const Colour& colour)
 		: Item(parent, cls())
+		, m_colour(0.f,1.f,0.2f)
 	{}
-	
+
+	bool NodeKnob::customDraw(Renderer& renderer)
+	{
+		InkStyle inkstyle;
+		inkstyle.m_backgroundColour = m_colour;
+
+		float radius = 5.f;
+		renderer.pathCircle(m_frame->size().x() / 2.f, m_frame->size().y() / 2.f, radius);
+		renderer.fill(inkstyle, BoxFloat());
+
+		return true;
+	}
+
 	NodeConnectionProxy::NodeConnectionProxy(Wedge& parent)
 		: Decal(parent, cls())
 	{}
 
-	NodePlug::NodePlug(Wedge& parent, Node& node, const string& name, bool input, ConnectTrigger onConnect)
+	NodePlug::NodePlug(Wedge& parent, Node& node, const string& name, const string& icon, bool input, ConnectTrigger onConnect)
 		: WrapControl(parent, cls())
 		, m_node(node)
-		, m_name(name)
 		, m_input(input)
-		, m_title(*this, m_name)
+		, m_title(*this, name)
+		, m_icon(*this, icon)
 		, m_knob(*this)
 		, m_onConnect(onConnect)
 		, m_cableProxy(nullptr)
 	{
 		if(input)
-			this->swap(0, 1);
+			this->swap(0, 2);
 	}
 
-	void NodePlug::leftDragStart(MouseEvent& mouseEvent)
+	bool NodePlug::leftDragStart(MouseEvent& mouseEvent)
 	{
 		DimFloat local = m_node.plan().frame().localPosition(mouseEvent.posX, mouseEvent.posY);
 
@@ -118,15 +168,19 @@ namespace toy
 			m_cableProxy = &m_node.plan().emplace<NodeCable>(*m_connectionProxy, *this);
 		else
 			m_cableProxy = &m_node.plan().emplace<NodeCable>(*this, *m_connectionProxy);
+
+		return true;
 	}
 
-	void NodePlug::leftDrag(MouseEvent& mouseEvent)
+	bool NodePlug::leftDrag(MouseEvent& mouseEvent)
 	{
 		DimFloat local = m_node.plan().frame().localPosition(mouseEvent.posX, mouseEvent.posY);
 		m_connectionProxy->frame().setPosition(local.x(), local.y());
+		m_cableProxy->updateCable();
+		return true;
 	}
 
-	void NodePlug::leftDragEnd(MouseEvent& mouseEvent)
+	bool NodePlug::leftDragEnd(MouseEvent& mouseEvent)
 	{
 		Widget* widget = this->rootSheet().pinpoint(mouseEvent.posX, mouseEvent.posY);
 		while(widget && &widget->type() != &NodePlug::cls())
@@ -139,14 +193,17 @@ namespace toy
 				m_input ? plug.connect(*this) : this->connect(plug);
 		}
 
-		m_node.plan().release(*m_connectionProxy);
-		m_node.plan().release(*m_cableProxy);
+		m_connectionProxy->destroy();
+		m_cableProxy->destroy();
+
+		return true;
 	}
 
 	NodeCable& NodePlug::connect(NodePlug& plugIn, bool notify)
 	{
 		NodeCable& cable = m_node.plan().emplace<NodeCable>(*this, plugIn);
 		m_cables.push_back(&cable);
+		plugIn.m_cables.push_back(&cable);
 
 		if(notify && m_onConnect)
 			m_onConnect(*this, plugIn);
@@ -160,57 +217,49 @@ namespace toy
 			if(&cable->plugIn() == &plugIn)
 			{
 				m_cables.erase(std::find(m_cables.begin(), m_cables.end(), cable));
-				m_node.plan().release(*cable);
+				cable->destroy();
 				return;
 			}
 	}
-
-	NodeInPlug::NodeInPlug(Wedge& parent, Node& node, const string& name)
-		: NodePlug(parent, node, name, true)
-	{}
-
-	NodeOutPlug::NodeOutPlug(Wedge& parent, Node& node, const string& name, ConnectTrigger onConnect)
-		: NodePlug(parent, node, name, false, onConnect)
-	{}
 
 	NodeCable::NodeCable(Wedge& parent, Widget& plugOut, Widget& plugIn)
 		: Decal(parent, cls())
 		, m_plugOut(plugOut)
 		, m_plugIn(plugIn)
-	{}
-
-	void NodeCable::nextFrame(size_t tick, size_t delta)
 	{
-		if(m_plugOut.frame().layer().redraw() || m_plugIn.frame().layer().redraw())
-			m_frame->setDirty(Frame::DIRTY_POSITION);
+		this->updateCable();
+	}
 
-		Widget::nextFrame(tick, delta);
+	void NodeCable::updateCable()
+	{
+		Frame& frameCanvas = this->parent()->frame();
+
+		DimFloat relativeOut = m_plugOut.frame().relativePosition(frameCanvas);
+		DimFloat relativeIn = m_plugIn.frame().relativePosition(frameCanvas);
+
+		float x0 = relativeOut.x() + m_plugOut.frame().width();
+		float y0 = relativeOut.y() + m_plugOut.frame().height() / 2;
+		float x1 = relativeIn.x();
+		float y1 = relativeIn.y() + m_plugIn.frame().height() / 2;
+
+		m_flipX = x1 > x0;
+		m_flipY = y1 > y0;
+
+		m_frame->setPosition(m_flipX ? x0 : x1, m_flipY ? y0 : y1);
+		m_frame->setSize(m_flipX ? x1 - x0 : x0 - x1, m_flipY ? y1 - y0 : y0 - y1);
 	}
 
 	bool NodeCable::customDraw(Renderer& renderer)
 	{
-		Wedge& canvas = *this->parent();
+		float x0 = m_flipX ? 0.f : m_frame->size().x();
+		float y0 = m_flipY ? 0.f : m_frame->size().y();
+		float x1 = m_flipX ? m_frame->size().x() : 0.f;
+		float y1 = m_flipY ? m_frame->size().y() : 0.f;
 
-		Frame& frameCanvas = canvas.frame();
-		Frame& frameOut = m_plugOut.frame();
-		Frame& frameIn = m_plugIn.frame();
-
-		DimFloat relativeOut = frameOut.relativePosition(frameCanvas);
-		float x1 = relativeOut[DIM_X] + frameOut.width();
-		float y1 = relativeOut[DIM_Y] + frameOut.height() / 2;
-
-		float c1x = x1 + 100.f;
-		float c1y = y1;
-
-		DimFloat relativeIn = frameIn.relativePosition(frameCanvas);
-		float x2 = relativeIn[DIM_X];
-		float y2 = relativeIn[DIM_Y] + frameIn.height() / 2;
-
-		float c2x = x2 - 100.f;
-		float c2y = y2;
-
-		renderer.pathBezier(x1, y1, c1x, c1y, c2x, c2y, x2, y2);
-		renderer.stroke(this->content().inkstyle());
+		Paint paint(m_plugOut.as<NodePlug>().knob().colour(), m_plugIn.as<NodePlug>().knob().colour());
+		paint.m_width = 1.f;
+		renderer.pathBezier(x0, y0, x0 + 100.f, y0, x1 - 100.f, y1, x1, y1);
+		renderer.strokeGradient(paint, DimFloat(m_flipX ? x0 : x1, m_flipY ? y0 : y1), DimFloat(m_flipX ? x1 : x0,  m_flipY ? y1 : y0));
 
 		return true;
 	}
@@ -245,9 +294,6 @@ namespace toy
 		m_containerTarget = &m_body;
 	}
 
-	Node::~Node()
-	{}
-
 	Canvas& Node::canvas()
 	{
 		return *this->findContainer<Canvas>();
@@ -258,60 +304,68 @@ namespace toy
 		return this->canvas().plan();
 	}
 
-	std::vector<Node*> Node::inputNodes()
-	{
-		std::vector<Node*> inputs;
-		for(Widget* widget : m_inputs.contents())
-			for(NodeCable* cable : widget->as<NodePlug>().cables())
-				inputs.push_back(&cable->plugOut().as<NodePlug>().node());
-		return inputs;
-	}
-
-	std::vector<Node*> Node::outputNodes()
-	{
-		std::vector<Node*> outputs;
-		for(Widget* widget : m_outputs.contents())
-			for(NodeCable* cable : widget->as<NodePlug>().cables())
-				outputs.push_back(&cable->plugIn().as<NodePlug>().node());
-		return outputs;
-	}
-
-	void Node::leftClick(MouseEvent& mouseEvent)
-	{
-		UNUSED(mouseEvent);
-		m_frame->as<Layer>().moveToTop();
-	}
-
-	void Node::rightClick(MouseEvent& mouseEvent)
-	{
-		UNUSED(mouseEvent);
-		m_frame->as<Layer>().moveToTop();
-	}
-
-	void Node::leftDragStart(MouseEvent& mouseEvent)
-	{
-		UNUSED(mouseEvent);
-		m_frame->layer().moveToTop();
-	}
-
-	void Node::leftDrag(MouseEvent& mouseEvent)
+	void Node::moveNode(const DimFloat& delta)
 	{
 		float scale = m_frame->absoluteScale();
-		m_frame->setPosition(m_frame->dposition(DIM_X) + mouseEvent.deltaX / scale, m_frame->dposition(DIM_Y) + mouseEvent.deltaY / scale);
+		m_frame->setPosition(m_frame->position().x() + delta.x() / scale, m_frame->position().y() + delta.y() / scale);
+
+		this->updateCables();
 	}
 
-	void Node::leftDragEnd(MouseEvent& mouseEvent)
+	void Node::updateCables()
+	{
+		for(Widget* widget : m_inputs.contents())
+			for(NodeCable* cable : widget->as<NodePlug>().cables())
+				cable->updateCable();
+
+		for(Widget* widget : m_outputs.contents())
+			for(NodeCable* cable : widget->as<NodePlug>().cables())
+				cable->updateCable();
+	}
+
+	void Node::select()
+	{
+		m_frame->as<Layer>().moveToTop();
+		this->enableState(SELECTED);
+	}
+
+	void Node::unselect()
+	{
+		this->disableState(SELECTED);
+	}
+
+	bool Node::leftClick(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
+		if(this->rootSheet().keyboard().shiftPressed())
+			this->canvas().selection().swap(*this);
+		else
+			this->canvas().selection().select(*this);
+		return true;
+	}
+
+	bool Node::rightClick(MouseEvent& mouseEvent)
+	{
+		UNUSED(mouseEvent);
+		this->canvas().selection().select(*this);
+		return true;
+	}
+
+	bool Node::leftDragStart(MouseEvent& mouseEvent)
+	{
+		UNUSED(mouseEvent);
+		if(!this->canvas().selection().has(*this))
+			this->canvas().selection().select(*this);
+		return true;
 	}
 
 	NodePlug& Node::addInput(const string& name)
 	{
-		return m_inputs.emplace<NodeInPlug>(*this, name);
+		return m_inputs.emplace<NodePlug>(*this, name, "", true);
 	}
 
 	NodePlug& Node::addOutput(const string& name)
 	{
-		return m_outputs.emplace<NodeOutPlug>(*this, name);
+		return m_outputs.emplace<NodePlug>(*this, name, "", false);
 	}
 }

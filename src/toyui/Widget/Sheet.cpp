@@ -10,7 +10,7 @@
 #include <toyui/Frame/Grid.h>
 #include <toyui/Frame/Layer.h>
 
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 #include <toyui/Button/Scrollbar.h>
 #include <toyui/Widget/RootSheet.h>
@@ -93,11 +93,11 @@ namespace toy
 		this->reindex(index);
 	}
 
-	void Wedge::remove(Widget& widget)
+	void Wedge::remove(Widget& widget, bool destroy)
 	{
 		size_t index = widget.index();
 		m_contents.erase(m_contents.begin() + index);
-		widget.unbind();
+		widget.unbind(destroy);
 		this->reindex(index);
 	}
 
@@ -144,9 +144,9 @@ namespace toy
 		return widget;
 	}
 
-	unique_ptr<Widget> Container::release(Widget& widget)
+	unique_ptr<Widget> Container::release(Widget& widget, bool destroy)
 	{
-		widget.parent()->remove(widget);
+		widget.parent()->remove(widget, destroy);
 		auto pos = std::find_if(m_containerContents.begin(), m_containerContents.end(), [&widget](auto& pt) { return pt.get() == &widget; });
 		unique_ptr<Widget> pointer = std::move(*pos);
 		m_containerContents.erase(pos);
@@ -157,7 +157,7 @@ namespace toy
 	void Container::clear()
 	{
 		for(auto& widget : m_containerContents)
-			widget->parent()->remove(*widget);
+			widget->parent()->remove(*widget, true);
 
 		m_containerContents.clear();
 	}
@@ -189,7 +189,7 @@ namespace toy
 		, m_dragNext(nullptr)
 	{}
 
-	void GridSheet::leftDragStart(MouseEvent& mouseEvent)
+	bool GridSheet::leftDragStart(MouseEvent& mouseEvent)
 	{
 		// we take the position BEFORE the mouse moved as a reference
 		float pos = m_dim == DIM_X ? mouseEvent.lastPressedX : mouseEvent.lastPressedY;
@@ -203,16 +203,20 @@ namespace toy
 				m_dragPrev = this->stripe().before(*m_dragNext);
 				break;
 			}
+
+		return true;
 	}
 
-	void GridSheet::leftDrag(MouseEvent& mouseEvent)
+	bool GridSheet::leftDrag(MouseEvent& mouseEvent)
 	{
 		if(!m_dragNext || !m_dragPrev)
-			return;
+			return true;
 
 		float amount = m_dim == DIM_X ? mouseEvent.deltaX : mouseEvent.deltaY;
 		this->stripe().transferPixelSpan(*m_dragPrev, *m_dragNext, amount);
 
 		this->gridResized(*m_dragPrev, *m_dragNext);
+
+		return true;
 	}
 }

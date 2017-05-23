@@ -24,7 +24,7 @@ namespace toy
 		if(inputEvent.consumed)
 			return this;
 
-		inputEvent.receive(*this);
+		inputEvent.consumed = inputEvent.receive(*this);
 		return this;
 	}
 
@@ -38,13 +38,13 @@ namespace toy
 		if(parent)
 		{
 			receiver.propagateTo(parent->m_receiver);
-			m_receiver->control();
+			m_receiver->control(mode > CM_CONTROL);
 		}
 	}
 
 	ControlNode::~ControlNode()
 	{
-		m_receiver->uncontrol();
+		m_receiver->uncontrol(m_controlMode > CM_CONTROL);
 	}
 
 	bool ControlNode::controls(DeviceType device)
@@ -65,7 +65,7 @@ namespace toy
 		{
 			if(!inputEvent.consumed)
 				consumer = receiver->receiveEvent(inputEvent);
-			else 
+			else
 				receiver->receiveEvent(inputEvent);
 			if(inputEvent.abort) break;
 			receiver = receiver->propagateEvent(inputEvent);

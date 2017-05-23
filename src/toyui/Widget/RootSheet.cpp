@@ -59,12 +59,12 @@ namespace toy
 		Wedge::nextFrame(tick, delta);
 	}
 
-	void RootSheet::handleUnbindWidget(Widget& widget)
+	void RootSheet::handleUnbindWidget(Widget& widget, bool destroy)
 	{
 		m_rootController->yieldControl(widget);
 
 		m_cursor.unhover(widget);
-		m_mouse->handleUnbindWidget(widget);
+		m_mouse->handleUnbindWidget(widget, destroy);
 	}
 
 	void RootSheet::handleBindWidget(Widget& widget)

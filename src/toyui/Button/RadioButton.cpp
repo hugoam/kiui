@@ -5,7 +5,7 @@
 #include <toyui/Config.h>
 #include <toyui/Button/RadioButton.h>
 
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Stripe.h>
@@ -33,7 +33,7 @@ namespace toy
 		if(m_contents.size() - 1 == m_activeIndex)
 		{
 			m_active = &choice;
-			m_active->activate();
+			m_active->enableState(ACTIVATED);
 		}
 
 		return choice;
@@ -42,9 +42,9 @@ namespace toy
 	void RadioSwitch::activated(RadioChoice& button)
 	{
 		if(m_active)
-			m_active->deactivate();
-		m_active = &button.as<RadioChoice>();
-		m_active->activate();
+			m_active->disableState(ACTIVATED);
+		m_active = &button;
+		m_active->enableState(ACTIVATED);
 		if(m_onSelected)
 			m_onSelected(m_active->content());
 	}

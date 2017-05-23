@@ -7,7 +7,7 @@
 
 /* toy */
 #include <toyui/Widget/Sheet.h>
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 #include <toyui/Button/Button.h>
 
 namespace toy
@@ -39,7 +39,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Expandbox : public Stack
 	{
 	public:
-		Expandbox(Wedge& parent, const string& title, bool collapsed = false, bool build = true, Type& type = cls());
+		Expandbox(Wedge& parent, const string& title, bool collapsed = false, Type& type = cls());
 
 		Wedge& header() { return m_header; }
 

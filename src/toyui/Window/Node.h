@@ -6,11 +6,12 @@
 #define TOY_NODE_H
 
 /* toy */
+#include <toyobj/Store/Array.h>
 #include <toyui/Forward.h>
 #include <toyui/Widget/Sheet.h>
-#include <toyui/Widget/ScrollSheet.h>
+#include <toyui/Container/ScrollSheet.h>
 #include <toyui/Widget/Cursor.h>
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 #include <toyui/Button/Button.h>
 
 /* std */
@@ -18,12 +19,20 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT NodePlugKnob : public Item
+	class TOY_UI_EXPORT NodeKnob : public Item
 	{
 	public:
-		NodePlugKnob(Wedge& parent);
+		NodeKnob(Wedge& parent, const Colour& colour = Colour::White);
 
-		static Type& cls() { static Type ty("NodePlugKnob", Item::cls()); return ty; }
+		const Colour& colour() { return m_colour; }
+		void setColour(const Colour& colour) { m_colour = colour; }
+
+		bool customDraw(Renderer& renderer);
+
+		static Type& cls() { static Type ty("NodeKnob", Item::cls()); return ty; }
+
+	protected:
+		Colour m_colour;
 	};
 
 	class TOY_UI_EXPORT NodeConnectionProxy : public Decal
@@ -40,19 +49,20 @@ namespace toy
 		typedef std::function<void(NodePlug&, NodePlug&)> ConnectTrigger;
 
 	public:
-		NodePlug(Wedge& parent, Node& node, const string& name, bool input, ConnectTrigger onConnect = ConnectTrigger());
+		NodePlug(Wedge& parent, Node& node, const string& name, const string& icon, bool input, ConnectTrigger onConnect = ConnectTrigger());
 	
 		Node& node() { return m_node; }
 		const string& tooltip() { return m_tooltip; }
 		bool input() { return m_input; }
+		NodeKnob& knob() { return m_knob; }
 
 		std::vector<NodeCable*>& cables() { return m_cables; }
 
 		void setTooltip(const string& tooltip) { m_tooltip = tooltip; }
 
-		virtual void leftDragStart(MouseEvent& mouseEvent);
-		virtual void leftDrag(MouseEvent& mouseEvent);
-		virtual void leftDragEnd(MouseEvent& mouseEvent);
+		virtual bool leftDragStart(MouseEvent& mouseEvent);
+		virtual bool leftDrag(MouseEvent& mouseEvent);
+		virtual bool leftDragEnd(MouseEvent& mouseEvent);
 
 		NodeCable& connect(NodePlug& plugOut, bool notify = true);
 		void disconnect(NodePlug& plugOut);
@@ -61,11 +71,11 @@ namespace toy
 
 	protected:
 		Node& m_node;
-		string m_name;
 		string m_tooltip;
 		bool m_input;
 		Label m_title;
-		NodePlugKnob m_knob;
+		Icon m_icon;
+		NodeKnob m_knob;
 
 		ConnectTrigger m_onConnect;
 
@@ -75,27 +85,15 @@ namespace toy
 		std::vector<NodeCable*> m_cables;
 	};
 
-	class TOY_UI_EXPORT NodeInPlug : public NodePlug
-	{
-	public:
-		NodeInPlug(Wedge& parent, Node& node, const string& name);
-	};
-
-	class TOY_UI_EXPORT NodeOutPlug : public NodePlug
-	{
-	public:
-		NodeOutPlug(Wedge& parent, Node& node, const string& name, ConnectTrigger onConnect = ConnectTrigger());
-	};
-
 	class TOY_UI_EXPORT NodeCable : public Decal
 	{
 	public:
 		NodeCable(Wedge& parent, Widget& plugOut, Widget& plugIn);
 
-		void nextFrame(size_t tick, size_t delta);
-
 		Widget& plugOut() { return m_plugOut; }
 		Widget& plugIn() { return m_plugIn; }
+
+		void updateCable();
 
 		bool customDraw(Renderer& renderer);
 
@@ -104,6 +102,8 @@ namespace toy
 	protected:
 		Widget& m_plugOut;
 		Widget& m_plugIn;
+		bool m_flipX;
+		bool m_flipY;
 	};
 
 	class TOY_UI_EXPORT NodeHeader : public Row
@@ -151,7 +151,6 @@ namespace toy
 	{
 	public:
 		Node(Wedge& parent, const string& title, int order = 0);
-		~Node();
 
 		Canvas& canvas();
 		Container& plan();
@@ -163,15 +162,16 @@ namespace toy
 		NodeOut& outputs() { return m_outputs; }
 		NodeBody& body() { return m_body; }
 
-		std::vector<Node*> inputNodes();
-		std::vector<Node*> outputNodes();
+		void moveNode(const DimFloat& delta);
+		void updateCables();
 
-		virtual void leftClick(MouseEvent& mouseEvent);
-		virtual void rightClick(MouseEvent& mouseEvent);
+		void select();
+		void unselect();
 
-		virtual void leftDragStart(MouseEvent& mouseEvent);
-		virtual void leftDrag(MouseEvent& mouseEvent);
-		virtual void leftDragEnd(MouseEvent& mouseEvent);
+		virtual bool leftClick(MouseEvent& mouseEvent);
+		virtual bool rightClick(MouseEvent& mouseEvent);
+
+		virtual bool leftDragStart(MouseEvent& mouseEvent);
 
 		NodePlug& addInput(const string& name);
 		NodePlug& addOutput(const string& name);
@@ -202,25 +202,35 @@ namespace toy
 		static Type& cls() { static Type ty("CanvasColumn"); return ty; }
 	};
 
-	class TOY_UI_EXPORT Canvas : public ScrollPlan
+	class TOY_UI_EXPORT Canvas : public ScrollPlan, public StoreObserver<Node>
 	{
 	public:
 		Canvas(Wedge& parent, const string& title, const Callback& contextTrigger = nullptr);
 
-		void rightClick(MouseEvent& mouseEvent);
+		Array<Node>& selection() { return m_selection; }
+
+		virtual bool leftClick(MouseEvent& mouseEvent);
+		virtual bool rightClick(MouseEvent& mouseEvent);
+
+		virtual bool leftDragStart(MouseEvent& mouseEvent);
+		virtual bool leftDrag(MouseEvent& mouseEvent);
+		virtual bool leftDragEnd(MouseEvent& mouseEvent);
 
 		void autoLayout();
 
-		typedef std::vector<std::vector<Node*>> NodeTable;
+		void collectNodes(std::vector<Node*>& nodes);
+		void layoutNodes(const std::vector<Node*>& nodes);
 
-		void collectNodes(NodeTable& nodes);
-		void layoutNodes(const NodeTable& nodes);
+		void handleAdd(Node& node);
+		void handleRemove(Node& node);
 
 		static Type& cls() { static Type ty("Canvas", ScrollSheet::cls()); return ty; }
 
 	protected:
 		string m_name;
 		Callback m_contextTrigger;
+
+		Array<Node> m_selection;
 	};
 }
 

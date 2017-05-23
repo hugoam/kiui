@@ -5,7 +5,7 @@
 #include <toyui/Config.h>
 #include <toyui/Window/ContextMenu.h>
 
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Stripe.h>
@@ -28,21 +28,24 @@ namespace toy
 		this->destroy();
 	}
 
-	void ContextMenu::leftClick(MouseEvent& mouseEvent)
+	bool ContextMenu::leftClick(MouseEvent& mouseEvent)
 	{
 		mouseEvent.abort = true;
 		this->clear();
+		return true;
 	}
 
-	void ContextMenu::rightClick(MouseEvent& mouseEvent)
+	bool ContextMenu::rightClick(MouseEvent& mouseEvent)
 	{
 		mouseEvent.abort = true;
 		this->clear();
+		return true;
 	}
 
-	void ContextMenu::middleClick(MouseEvent& mouseEvent)
+	bool ContextMenu::middleClick(MouseEvent& mouseEvent)
 	{
 		mouseEvent.abort = true;
 		this->clear();
+		return true;
 	}
 }

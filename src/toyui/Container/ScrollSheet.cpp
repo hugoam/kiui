@@ -3,14 +3,14 @@
 //  This notice and the license may not be removed or altered from any source distribution.
 
 #include <toyui/Config.h>
-#include <toyui/Widget/ScrollSheet.h>
+#include <toyui/Container/ScrollSheet.h>
 
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Stripe.h>
 #include <toyui/Frame/Grid.h>
 #include <toyui/Frame/Layer.h>
 
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 #include <toyui/Button/Scrollbar.h>
 #include <toyui/Widget/RootSheet.h>
@@ -59,13 +59,12 @@ namespace toy
 		m_scrollzone.clear();
 	}
 
-	void ScrollSheet::mouseWheel(MouseEvent& mouseEvent)
+	bool ScrollSheet::mouseWheel(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
 		m_scrollbarX.scroll(mouseEvent.deltaX);
 		m_scrollbarY.scroll(mouseEvent.deltaY);
-
-		mouseEvent.consumed = true;
+		return true;
 	}
 
 	void ScrollSheet::enableWrap()
@@ -104,8 +103,9 @@ namespace toy
 
 	void ScrollPlan::updateBounds()
 	{
-		float margin = 1000.f;
+		// @warning: if the plan contains an expand container, the size will keep increasing endlessly
 
+		float margin = 1000.f;
 		m_bounds = BoxFloat(-margin, -margin, +margin, +margin);
 
 		for(Frame* frame : m_surface.stripe().contents())
@@ -119,13 +119,14 @@ namespace toy
 		m_surface.frame().setManualSize(m_bounds.x1() - m_bounds.x0(), m_bounds.y1() - m_bounds.y0());
 	}
 
-	void ScrollPlan::middleDrag(MouseEvent& mouseEvent)
+	bool ScrollPlan::middleDrag(MouseEvent& mouseEvent)
 	{
 		m_plan.frame().setPosition(std::min(0.f, m_plan.frame().dposition(DIM_X) + mouseEvent.deltaX), std::min(0.f, m_plan.frame().dposition(DIM_Y) + mouseEvent.deltaY));
 		m_plan.frame().layer().setForceRedraw();
+		return true;
 	}
 
-	void ScrollPlan::mouseWheel(MouseEvent& mouseEvent)
+	bool ScrollPlan::mouseWheel(MouseEvent& mouseEvent)
 	{
 		float deltaScale = mouseEvent.deltaZ > 0.f ? 1.2f : 0.8333f;
 		float scale = m_plan.frame().scale() * deltaScale;
@@ -151,6 +152,8 @@ namespace toy
 			m_plan.frame().setPosition(std::min(0.f, m_plan.frame().dposition(DIM_X) + offsetX), std::min(0.f, m_plan.frame().dposition(DIM_Y) + offsetY));
 		else
 			m_plan.frame().setPosition(m_plan.frame().dposition(DIM_X) + offsetX, m_plan.frame().dposition(DIM_Y) + offsetY);
+
+		return true;
 	}
 
 	bool drawGrid(Frame& frame, Renderer& renderer)

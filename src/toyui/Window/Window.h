@@ -8,7 +8,7 @@
 /* toy */
 #include <toyui/Forward.h>
 #include <toyui/Widget/Sheet.h>
-#include <toyui/Widget/ScrollSheet.h>
+#include <toyui/Container/ScrollSheet.h>
 #include <toyui/Widget/Cursor.h>
 #include <toyui/Button/Button.h>
 
@@ -19,8 +19,8 @@ namespace toy
 	public:
 		Popup(Wedge& parent);
 
-		virtual void leftClick(MouseEvent& mouseEvent);
-		virtual void rightClick(MouseEvent& mouseEvent);
+		virtual bool leftClick(MouseEvent& mouseEvent);
+		virtual bool rightClick(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("Popup", Overlay::cls()); return ty; }
 	};
@@ -29,9 +29,6 @@ namespace toy
 	{
 	public:
 		CloseButton(Wedge& parent, const Callback& trigger);
-
-		virtual void leftClick(MouseEvent& mouseEvent);
-		virtual void rightClick(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("CloseButton", Button::cls()); return ty; }
 	};
@@ -46,10 +43,10 @@ namespace toy
 		Label& title() { return m_title; }
 		Button& close() { return m_close; }
 
-		virtual void leftClick(MouseEvent& mouseEvent);
-		virtual void leftDragStart(MouseEvent& mouseEvent);
-		virtual void leftDrag(MouseEvent& mouseEvent);
-		virtual void leftDragEnd(MouseEvent& mouseEvent);
+		virtual bool leftClick(MouseEvent& mouseEvent);
+		virtual bool leftDragStart(MouseEvent& mouseEvent);
+		virtual bool leftDrag(MouseEvent& mouseEvent);
+		virtual bool leftDragEnd(MouseEvent& mouseEvent);
 
 		Docksection* docktarget(MouseEvent& mouseEvent);
 
@@ -67,9 +64,9 @@ namespace toy
 	public:
 		WindowSizer(Wedge& parent, Window& window, Type& type, bool left);
 
-		virtual void leftDragStart(MouseEvent& mouseEvent);
-		virtual void leftDrag(MouseEvent& mouseEvent);
-		virtual void leftDragEnd(MouseEvent& mouseEvent);
+		virtual bool leftDragStart(MouseEvent& mouseEvent);
+		virtual bool leftDrag(MouseEvent& mouseEvent);
+		virtual bool leftDragEnd(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("WindowSizer", Control::cls()); return ty; }
 
@@ -152,8 +149,8 @@ namespace toy
 		void showTitlebar();
 		void hideTitlebar();
 
-		virtual void leftClick(MouseEvent& mouseEvent);
-		virtual void rightClick(MouseEvent& mouseEvent);
+		virtual bool leftClick(MouseEvent& mouseEvent);
+		virtual bool rightClick(MouseEvent& mouseEvent);
 
 		void dock(Docksection& docksection);
 		void undock();

@@ -8,7 +8,7 @@
 /* toy */
 #include <toyobj/Typed.h>
 #include <toyui/Widget/Sheet.h>
-#include <toyui/Widget/ScrollSheet.h>
+#include <toyui/Container/ScrollSheet.h>
 
 #include <toyui/Container/Expandbox.h>
 
@@ -36,7 +36,6 @@ namespace toy
 	{
 	public:
 		TreeNode(Wedge& parent, const string& image, const string& title, bool collapsed = false, Type& type = cls());
-		~TreeNode();
 
 		Tree& tree();
 
@@ -56,9 +55,10 @@ namespace toy
 	{
 	public:
 		Tree(Wedge& parent, const std::function<void (TreeNode&)>& onSelected = nullptr);
-		~Tree();
 
 		void select(TreeNode& node);
+		void expand(TreeNode& node, bool exclusive = false);
+		void collapse();
 
 		static Type& cls() { static Type ty("Tree", Container::cls()); return ty; }
 

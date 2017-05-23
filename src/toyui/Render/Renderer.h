@@ -77,9 +77,12 @@ namespace toy
 		virtual void pathLine(float x1, float y1, float x2, float y2) = 0;
 		virtual void pathBezier(float x1, float y1, float c1x, float c1y, float c2x, float c2y, float x2, float y2) = 0;
 		virtual void pathRect(const BoxFloat& rect, const BoxFloat& corners, float border) = 0;
+		virtual void pathCircle(float x, float y, float r) = 0;
 
 		virtual void fill(InkStyle& skin, const BoxFloat& rect) = 0;
 		virtual void stroke(InkStyle& skin) = 0;
+
+		virtual void strokeGradient(const Paint& paint, const DimFloat& start, const DimFloat& end) = 0;
 
 		virtual void drawShadow(const BoxFloat& rect, const BoxFloat& corner, const Shadow& shadows) = 0;
 		virtual void drawRect(const BoxFloat& rect, const BoxFloat& corners, InkStyle& skin) = 0;

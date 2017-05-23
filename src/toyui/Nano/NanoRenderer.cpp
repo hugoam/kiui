@@ -154,18 +154,26 @@ namespace toy
 
 	void NanoRenderer::pathRect(const BoxFloat& rect, const BoxFloat& corners, float border)
 	{
-		float halfborder = border * 0.5f;
+		nvgBeginPath(m_ctx);
 
-		// Path
+		float halfborder = border * 0.5f;
 		if(corners.null())
 			nvgRect(m_ctx, rect.x() + halfborder, rect.y() + halfborder, rect.w() - border, rect.h() - border);
 		else
 			nvgRoundedRectVarying(m_ctx, rect.x() + halfborder, rect.y() + halfborder, rect.w() - border, rect.h() - border, corners.v0(), corners.v1(), corners.v2(), corners.v3());
 	}
 
+	void NanoRenderer::pathCircle(float x, float y, float r)
+	{
+		nvgBeginPath(m_ctx);
+		nvgCircle(m_ctx, x, y, r);
+	}
+
 	void NanoRenderer::drawShadow(const BoxFloat& rect, const BoxFloat& corners, const Shadow& shadow)
 	{
-		NVGpaint shadowPaint = nvgBoxGradient(m_ctx, rect.x() + shadow.d_xpos - shadow.d_spread, rect.y() + shadow.d_ypos - shadow.d_spread, rect.w() + shadow.d_spread * 2.f, rect.h() + shadow.d_spread * 2.f, corners.v0() + shadow.d_spread, shadow.d_blur, nvgRGBA(0, 0, 0, 128), nvgRGBA(0, 0, 0, 0));
+		//nvgRGBA(0, 0, 0, 128)
+		NVGcolor shadowColour = nvgColour(shadow.d_colour);
+		NVGpaint shadowPaint = nvgBoxGradient(m_ctx, rect.x() + shadow.d_xpos - shadow.d_spread, rect.y() + shadow.d_ypos - shadow.d_spread, rect.w() + shadow.d_spread * 2.f, rect.h() + shadow.d_spread * 2.f, corners.v0() + shadow.d_spread, shadow.d_blur, shadowColour, nvgRGBA(0, 0, 0, 0));
 		nvgBeginPath(m_ctx);
 		nvgRect(m_ctx, rect.x() + shadow.d_xpos - shadow.d_radius, rect.y() + shadow.d_ypos - shadow.d_radius, rect.w() + shadow.d_radius * 2.f, rect.h() + shadow.d_radius * 2.f);
 		if(corners.null())
@@ -181,7 +189,6 @@ namespace toy
 	{
 		float border = skin.borderWidth().x0();
 
-		nvgBeginPath(m_ctx);
 		this->pathRect(rect, corners, border);
 
 		// Fill
@@ -231,6 +238,16 @@ namespace toy
 
 		nvgStrokeWidth(m_ctx, border);
 		nvgStrokeColor(m_ctx, nvgColour(skin.borderColour()));
+		nvgStroke(m_ctx);
+	}
+
+	void NanoRenderer::strokeGradient(const Paint& paint, const DimFloat& start, const DimFloat& end)
+	{
+		NVGcolor first = nvgColour(paint.m_gradient[0]);
+		NVGcolor second = nvgColour(paint.m_gradient[1]);
+
+		nvgStrokeWidth(m_ctx, paint.m_width);
+		nvgStrokePaint(m_ctx, nvgLinearGradient(m_ctx, start.x(), start.y(), end.x(), end.y(), first, second));
 		nvgStroke(m_ctx);
 	}
 

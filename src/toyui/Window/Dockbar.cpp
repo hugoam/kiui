@@ -20,12 +20,9 @@ namespace toy
 
 	void DockToggle::click()
 	{
-		this->toggleState(ACTIVATED);
-
-		if(m_dockbox.frame().hidden())
-			m_dockbox.show();
-		else
-			m_dockbox.hide();
+		bool open = !m_dockbox.frame().hidden();
+		open ? m_dockbox.hide() : m_dockbox.show();
+		open ? this->disableState(ACTIVATED) : this->enableState(ACTIVATED);
 	}
 
 	Docker::Docker(Wedge& parent)

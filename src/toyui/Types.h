@@ -20,7 +20,7 @@
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Widget/RootSheet.h>
 #include <toyui/Widget/Cursor.h>
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 #include <toyui/Button/Button.h>
 #include <toyui/Button/Image.h>
@@ -37,8 +37,6 @@
 #include <toyui/Edit/Textbox.h>
 #include <toyui/Edit/Input.h>
 
-#include <toyui/Window/ContextMenu.h>
-
 #include <toyui/Container/Expandbox.h>
 #include <toyui/Container/Tree.h>
 #include <toyui/Container/Table.h>
@@ -52,8 +50,11 @@
 #include <toyui/Window/Node.h>
 #include <toyui/Window/Menu.h>
 #include <toyui/Window/Toolbar.h>
+#include <toyui/Window/ContextMenu.h>
 
 #include <toyui/Frame/DimString.h>
+
+#include <toyui/Input/InputDevice.h>
 
 #include <toyui/UiWindow.h>
 #include <toyui/UiLayout.h>

@@ -53,9 +53,9 @@ namespace toy
 
 		float offset(float pos);
 
-		virtual void leftDragStart(MouseEvent& mouseEvent);
-		virtual void leftDrag(MouseEvent& mouseEvent);
-		virtual void leftDragEnd(MouseEvent& mouseEvent);
+		virtual bool leftDragStart(MouseEvent& mouseEvent);
+		virtual bool leftDrag(MouseEvent& mouseEvent);
+		virtual bool leftDragEnd(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("Slider", WrapControl::cls()); return ty; }
 

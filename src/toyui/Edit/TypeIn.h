@@ -22,24 +22,22 @@ namespace toy
 		TypeIn(Wedge& parent, string& string, Type& type = cls());
 		TypeIn(WValue& input, Type& type = cls());
 
-		void nextFrame(size_t tick, size_t delta);
+		virtual void active();
+		virtual void inactive();
 
 		void setAllowedChars(const string& chars);
-
-		void focused();
-		void unfocused();
 
 		void erase();
 		void insert(char c);
 		void updateString();
 		void updateText();
 
-		virtual void leftClick(MouseEvent& mouseEvent);
-		virtual void keyDown(KeyEvent& keyEvent);
+		virtual bool leftClick(MouseEvent& mouseEvent);
+		virtual bool keyDown(KeyEvent& keyEvent);
 
-		virtual void leftDragStart(MouseEvent& mouseEvent);
-		virtual void leftDrag(MouseEvent& mouseEvent);
-		virtual void leftDragEnd(MouseEvent& mouseEvent);
+		virtual bool leftDragStart(MouseEvent& mouseEvent);
+		virtual bool leftDrag(MouseEvent& mouseEvent);
+		virtual bool leftDragEnd(MouseEvent& mouseEvent);
 
 		void selectCaret(int index);
 		void selectFirst(size_t start);

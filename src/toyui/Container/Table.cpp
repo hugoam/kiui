@@ -5,7 +5,7 @@
 #include <toyui/Config.h>
 #include <toyui/Container/Table.h>
 
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Grid.h>

@@ -26,8 +26,6 @@ namespace toy
 	public:
 		RadioSwitch(Wedge& parent, const Callback& onSelected, size_t active, StringVector labels = {});
 
-		RadioChoice* active() { return m_active; }
-
 		RadioChoice& addChoice();
 
 		void activated(RadioChoice& choice);

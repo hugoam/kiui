@@ -54,7 +54,7 @@ namespace toy
 		virtual ~InputEvent() {}
 
 		virtual void dispatch(RootSheet& rootSheet) {}
-		virtual void receive(InputAdapter& receiver) {}
+		virtual bool receive(InputAdapter& receiver) { return false; }
 	};
 
 	struct TOY_UI_EXPORT MouseEvent : public InputEvent
@@ -123,11 +123,8 @@ namespace toy
 
 		void propagateTo(InputReceiver* propagate) { m_propagate = propagate; }
 
-		virtual void control() {};
-		virtual void uncontrol() {};
-
-		virtual void modal() {};
-		virtual void unmodal() {};
+		virtual void control(bool modal) {};
+		virtual void uncontrol(bool modal) {};
 
 	protected:
 		InputReceiver* m_propagate;
@@ -141,35 +138,35 @@ namespace toy
 
 		virtual InputReceiver* receiveEvent(InputEvent& inputEvent);
 
-		virtual void keyUp(KeyEvent& keyEvent) { UNUSED(keyEvent); };
-		virtual void keyStroke(KeyEvent& keyEvent) { UNUSED(keyEvent); };
-		virtual void keyDown(KeyEvent& keyEvent) { UNUSED(keyEvent); };
+		virtual bool keyUp(KeyEvent& keyEvent) { UNUSED(keyEvent); return false; };
+		virtual bool keyStroke(KeyEvent& keyEvent) { UNUSED(keyEvent); return false; };
+		virtual bool keyDown(KeyEvent& keyEvent) { UNUSED(keyEvent); return false; };
 
-		virtual void mouseMoved(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual bool mouseMoved(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
 
-		virtual void mouseEntered(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
-		virtual void mouseLeaved(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual bool mouseEntered(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
+		virtual bool mouseLeaved(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
 
-		virtual void mousePressed(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
-		virtual void mouseReleased(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual bool mousePressed(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return true; };
+		virtual bool mouseReleased(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return true; };
 
-		virtual void mouseWheel(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual bool mouseWheel(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
 
-		virtual void leftClick(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
-		virtual void rightClick(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
-		virtual void middleClick(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual bool leftClick(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
+		virtual bool rightClick(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
+		virtual bool middleClick(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
 
-		virtual void rightDragStart(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
-		virtual void rightDrag(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
-		virtual void rightDragEnd(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual bool rightDragStart(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
+		virtual bool rightDrag(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
+		virtual bool rightDragEnd(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
 
-		virtual void leftDragStart(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
-		virtual void leftDrag(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
-		virtual void leftDragEnd(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual bool leftDragStart(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
+		virtual bool leftDrag(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
+		virtual bool leftDragEnd(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
 
-		virtual void middleDragStart(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
-		virtual void middleDrag(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
-		virtual void middleDragEnd(MouseEvent& mouseEvent) { UNUSED(mouseEvent); };
+		virtual bool middleDragStart(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
+		virtual bool middleDrag(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
+		virtual bool middleDragEnd(MouseEvent& mouseEvent) { UNUSED(mouseEvent); return false; };
 
 	protected:
 		unique_ptr<ControlNode> m_controlGraph;

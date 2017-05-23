@@ -8,7 +8,7 @@
 #include <toyobj/String/StringConvert.h>
 #include <toyobj/Util/StatString.h>
 
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Stripe.h>
@@ -49,25 +49,28 @@ namespace toy
 		return offset;
 	}
 
-	void Slider::leftDragStart(MouseEvent& mouseEvent)
+	bool Slider::leftDragStart(MouseEvent& mouseEvent)
 	{
 		DimFloat absolute = m_frame->absolutePosition();
 		m_startPos = m_dim == DIM_X ? mouseEvent.posX : mouseEvent.posY;
 		m_startOffset = m_button.frame().flow() ? m_button.frame().dposition(m_dim) : (m_startPos - absolute[m_dim]);
-		this->activate();
-		m_button.activate();
+		this->enableState(TRIGGERED);
+		m_button.enableState(TRIGGERED);
+		return true;
 	}
 
-	void Slider::leftDrag(MouseEvent& mouseEvent)
+	bool Slider::leftDrag(MouseEvent& mouseEvent)
 	{
 		this->offsetChange(this->offset(m_dim == DIM_X ? mouseEvent.posX : mouseEvent.posY), false);
+		return true;
 	}
 
-	void Slider::leftDragEnd(MouseEvent& mouseEvent)
+	bool Slider::leftDragEnd(MouseEvent& mouseEvent)
 	{
 		this->offsetChange(this->offset(m_dim == DIM_X ? mouseEvent.posX : mouseEvent.posY), true);
-		this->deactivate();
-		m_button.deactivate();
+		this->disableState(TRIGGERED);
+		m_button.disableState(TRIGGERED);
+		return true;
 	}
 
 	float Slider::length()

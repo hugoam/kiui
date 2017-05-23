@@ -110,6 +110,8 @@ namespace toy
 
 		this->styledef(Rectangle::cls()).layout().d_space = FIXED_BLOCK;
 
+		this->styledef(NodeCable::cls()).layout().d_space = FIXED_BLOCK;
+
 		this->styledef(Node::cls()).layout().d_direction = READING;
 
 		// LAYERS

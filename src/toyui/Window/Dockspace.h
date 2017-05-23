@@ -74,7 +74,7 @@ namespace toy
 
 		void resetSpans();
 
-		virtual void mouseEntered(MouseEvent& mouseEvent);
+		virtual bool mouseEntered(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("Dockline", GridSheet::cls()); return ty; }
 

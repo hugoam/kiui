@@ -5,7 +5,7 @@
 #include <toyui/Config.h>
 #include <toyui/Button/Dropdown.h>
 
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Stripe.h>
@@ -32,10 +32,10 @@ namespace toy
 		, m_dropdown(dropdown)
 	{}
 
-	void DropdownChoice::leftClick(MouseEvent& mouseEvent)
+	bool DropdownChoice::leftClick(MouseEvent& mouseEvent)
 	{
-		MultiButton::leftClick(mouseEvent);
 		m_dropdown.selected(*this);
+		return MultiButton::leftClick(mouseEvent);
 	}
 
 	DropdownList::DropdownList(Dropdown& dropdown)
@@ -43,16 +43,18 @@ namespace toy
 		, m_dropdown(dropdown)
 	{}
 
-	void DropdownList::leftClick(MouseEvent& mouseEvent)
-	{
-		mouseEvent.consumed = true;
-		m_dropdown.dropup();
-	}
-
-	void DropdownList::rightClick(MouseEvent& mouseEvent)
+	bool DropdownList::leftClick(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
 		m_dropdown.dropup();
+		return true;
+	}
+
+	bool DropdownList::rightClick(MouseEvent& mouseEvent)
+	{
+		UNUSED(mouseEvent);
+		m_dropdown.dropup();
+		return true;
 	}
 
 	Dropdown::Dropdown(Wedge& parent, Type& type)
@@ -72,7 +74,7 @@ namespace toy
 
 	Widget& Dropdown::insert(unique_ptr<Widget> widget)
 	{
-		widget->parent()->remove(*widget);
+		widget->parent()->remove(*widget, false);
 
 		DropdownChoice& choice = this->addChoice({});
 		if(widget->type().upcast(MultiButton::cls()))
@@ -126,10 +128,10 @@ namespace toy
 	void DropdownInput::select(DropdownChoice& choice)
 	{
 		if(m_selected)
-			m_selected->disableState(ACTIVATED);
+			m_selected->disableState(SELECTED);
 
 		m_selected = &choice;
-		m_selected->enableState(ACTIVATED);
+		m_selected->enableState(SELECTED);
 
 		m_activeHeader ? m_header.reset(*m_selected) : m_header.reset(m_selected->elements());
 	}

@@ -36,7 +36,7 @@ namespace toy
 
 		void push(Widget& widget);
 		void insert(Widget& widget, size_t index);
-		void remove(Widget& widget);
+		void remove(Widget& widget, bool destroy);
 
 		void reindex(size_t from);
 		void move(size_t from, size_t to);
@@ -65,7 +65,7 @@ namespace toy
 
 		Widget& insert(unique_ptr<Widget> widget, size_t index);
 		Widget& append(unique_ptr<Widget> widget);
-		unique_ptr<Widget> release(Widget& widget);
+		unique_ptr<Widget> release(Widget& widget, bool destroy);
 
 		virtual Widget& insert(unique_ptr<Widget> widget) { return this->append(std::move(widget)); }
 
@@ -137,8 +137,8 @@ namespace toy
 
 		Dimension dim() { return m_dim; }
 
-		virtual void leftDragStart(MouseEvent& mouseEvent);
-		virtual void leftDrag(MouseEvent& mouseEvent);
+		virtual bool leftDragStart(MouseEvent& mouseEvent);
+		virtual bool leftDrag(MouseEvent& mouseEvent);
 
 		virtual void gridResized(Frame& first, Frame& second) { UNUSED(first); UNUSED(second); }
 

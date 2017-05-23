@@ -9,7 +9,7 @@
 
 #include <toyobj/String/StringConvert.h>
 
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Stripe.h>
@@ -34,17 +34,16 @@ namespace toy
 		this->updateString();
 	}
 
-	void TypeIn::nextFrame(size_t tick, size_t delta)
+	void TypeIn::active()
 	{
-		Widget::nextFrame(tick, delta);
+		this->enableState(ACTIVE);
+		this->takeControl(CM_MODAL, DEVICE_KEYBOARD);
 	}
 
-	void TypeIn::focused()
+	void TypeIn::inactive()
 	{
-	}
-
-	void TypeIn::unfocused()
-	{
+		this->disableState(ACTIVE);
+		this->yieldControl();
 		this->selectCaret(-1);
 	}
 
@@ -97,62 +96,58 @@ namespace toy
 		this->markDirty();
 	}
 
-	void TypeIn::leftClick(MouseEvent& mouseEvent)
+	bool TypeIn::leftClick(MouseEvent& mouseEvent)
 	{
 		size_t index = this->content().caption().caretIndex(mouseEvent.relativeX, mouseEvent.relativeY);
 		this->moveCaretTo(index);
 		if(!(m_state & CONTROL))
-			this->takeControl(CM_CONTROL, DEVICE_KEYBOARD);
+			this->makeActive();
+		return true;
 	}
 
-	void TypeIn::leftDragStart(MouseEvent& mouseEvent)
+	bool TypeIn::leftDragStart(MouseEvent& mouseEvent)
 	{
 		size_t index = this->content().caption().caretIndex(mouseEvent.relativeX, mouseEvent.relativeY);
 		this->selectFirst(index);
 		if(!(m_state & CONTROL))
-			this->takeControl(CM_CONTROL, DEVICE_KEYBOARD);
+			this->makeActive();
+		return true;
 	}
 
-	void TypeIn::leftDrag(MouseEvent& mouseEvent)
+	bool TypeIn::leftDrag(MouseEvent& mouseEvent)
 	{
 		size_t index = this->content().caption().caretIndex(mouseEvent.relativeX, mouseEvent.relativeY);
 		this->selectSecond(index);
+		return true;
 	}
 
-	void TypeIn::leftDragEnd(MouseEvent& mouseEvent)
+	bool TypeIn::leftDragEnd(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
+		return true;
 	}
 
-	void TypeIn::keyDown(KeyEvent& keyEvent)
+	bool TypeIn::keyDown(KeyEvent& keyEvent)
 	{
 		if(keyEvent.code == KC_LEFT)
-		{
 			this->moveCaretLeft();
-		}
 		else if(keyEvent.code == KC_RIGHT)
-		{
 			this->moveCaretRight();
-		}
 		else if(keyEvent.code == KC_RETURN && (m_allowedChars.empty() || m_allowedChars.find('\n') != string::npos))
-		{
 			this->insert('\n');
-		}
 		else if(keyEvent.code == KC_ESCAPE)
-		{
 			this->yieldControl();
-		}
 		else if(keyEvent.code == KC_BACK)
-		{
 			this->erase();
-		}
 		else if(keyEvent.c != 0 && (m_allowedChars.empty() || m_allowedChars.find(keyEvent.c) != string::npos))
 		{
 			if(keyEvent.c == '.' && m_string.find('.') != string::npos)
-				return;
+				return true;
 
 			this->insert(keyEvent.c);
 		}
+
+		return true;
 	}
 
 	void TypeIn::selectCaret(int index)

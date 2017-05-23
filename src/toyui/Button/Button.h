@@ -50,23 +50,30 @@ namespace toy
 	class TOY_UI_EXPORT ClickTrigger
 	{
 	public:
-		typedef std::function<void(Widget&)> TriggerFunc;
+		ClickTrigger(Widget& widget, const Widget::Callback& trigger) : m_widget(widget), m_trigger(trigger) {}
 
-	public:
-		ClickTrigger(Widget& widget, const TriggerFunc& trigger) : m_widget(widget), m_trigger(trigger) {}
+		void setTrigger(const Widget::Callback& trigger) { m_trigger = trigger; }
 
-		virtual void click(MouseEvent& mouseEvent) { if(m_trigger) { m_trigger(m_widget); mouseEvent.consumed = true; } }
+		virtual bool click(MouseEvent& mouseEvent)
+		{
+			if(!m_trigger)
+				return false;
 
-		virtual void clickAlt(MouseEvent& mouseEvent) { if(m_triggerAlt) { m_triggerAlt(m_widget); mouseEvent.consumed = true; } }
-		virtual void clickShift(MouseEvent& mouseEvent) { if(m_triggerShift) { m_triggerShift(m_widget); mouseEvent.consumed = true; } }
-		virtual void clickCtrl(MouseEvent& mouseEvent) { if(m_triggerCtrl) { m_triggerCtrl(m_widget); mouseEvent.consumed = true; } }
+			m_trigger(m_widget);
+			mouseEvent.abort = true; // @kludge for buttons that cause destroying a widget
+			return true; 
+		}
+
+		virtual bool clickAlt(MouseEvent& mouseEvent) { if(!m_triggerAlt) return false; m_triggerAlt(m_widget); return true; }
+		virtual bool clickShift(MouseEvent& mouseEvent) { if(!m_triggerShift) return false; m_triggerShift(m_widget); return true; }
+		virtual bool clickCtrl(MouseEvent& mouseEvent) { if(!m_triggerCtrl) return false; m_triggerCtrl(m_widget); return true; }
 
 	protected:
 		Widget& m_widget;
-		TriggerFunc m_trigger;
-		TriggerFunc m_triggerAlt;
-		TriggerFunc m_triggerShift;
-		TriggerFunc m_triggerCtrl;
+		Widget::Callback m_trigger;
+		Widget::Callback m_triggerAlt;
+		Widget::Callback m_triggerShift;
+		Widget::Callback m_triggerCtrl;
 	};
 
 	class _I_ TOY_UI_EXPORT Button : public Control, public ClickTrigger
@@ -77,8 +84,8 @@ namespace toy
 
 		const string& tooltip() { return m_tooltip; }
 
-		virtual void leftClick(MouseEvent& mouseEvent);
-		virtual void rightClick(MouseEvent& mouseEvent);
+		virtual bool leftClick(MouseEvent& mouseEvent);
+		virtual bool rightClick(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("Button", Control::cls()); return ty; }
 
@@ -93,8 +100,8 @@ namespace toy
 
 		Widget& content() { return *m_contents[0]; }
 
-		virtual void leftClick(MouseEvent& mouseEvent);
-		virtual void rightClick(MouseEvent& mouseEvent);
+		virtual bool leftClick(MouseEvent& mouseEvent);
+		virtual bool rightClick(MouseEvent& mouseEvent);
 
 		const string& contentlabel() { return this->content().contentlabel(); }
 
@@ -130,7 +137,7 @@ namespace toy
 		void update(bool on);
 		void toggle();
 
-		virtual void leftClick(MouseEvent& mouseEvent);
+		virtual bool leftClick(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("Toggle", Control::cls()); return ty; }
 

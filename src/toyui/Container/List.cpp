@@ -5,7 +5,7 @@
 #include <toyui/Config.h>
 #include <toyui/Container/List.h>
 
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 namespace toy
 {
@@ -24,7 +24,7 @@ namespace toy
 
 	void SelectList::selected(Widget& selected)
 	{
-		selected.toggleState(ACTIVATED);
+		selected.toggleState(SELECTED);
 	}
 
 	LabelSequence::LabelSequence(Wedge& parent, StringVector labels)

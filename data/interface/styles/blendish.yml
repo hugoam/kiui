@@ -27,7 +27,7 @@ Regular :
 Button :
     copy_skin : Regular
     
-    hovered :
+    focused :
         background_colour : 0.65,0.65,0.65,1.0
         
     pressed :
@@ -39,7 +39,7 @@ Toggle :
     background_colour : 0.275,0.275,0.275,1.0
     text_colour : 1.0,1.0,1.0,1.0
 
-    hovered :
+    focused :
         background_colour : 0.335,0.335,0.335,1.0
         
     pressed :
@@ -50,7 +50,7 @@ Toggle :
         topdown_gradient : -15,15
         text_colour : 0.0,0.0,0.0,1.0
                 
-    activated|hovered :
+    activated|focused :
         background_colour : 0.337,0.502,0.761,1
 
 NumberField :
@@ -58,7 +58,7 @@ NumberField :
     background_colour : 0.706,0.706,0.706,1.0
     topdown_gradient : -20,0
     
-    activated :
+    active :
         text_colour : 1.0,1.0,1.0,1.0
         background_colour : 0.6,0.6,0.6,1.0
         
@@ -78,10 +78,10 @@ TabHeader :
         background_colour : 0.392,0.392,0.392,1
         topdown_gradient : -15,15
         
-    hovered :
+    focused :
         background_colour : 0.65,0.65,0.65,1.0
         
-    activated|hovered :
+    activated|focused :
         background_colour : 0.337,0.502,0.761,1
         
 Tab :
@@ -105,7 +105,7 @@ TypeIn :
     copy_skin : Regular
     topdown_gradient : 0.0,25.0
     
-    focused :
+    active :
         text_colour : 1.0,1.0,1.0,1.0
 
 Header : 
@@ -155,7 +155,7 @@ CloseButton :
     reset_skin : true
     skin_padding : 2.0,2.0,2.0,2.0
     image : close_15
-    hovered :
+    focused :
         background_colour : 1.0,0.0,0.0,1.0
         
 Node :
@@ -181,14 +181,14 @@ Expandbox :
 ExpandboxHeader :
     copy_skin : Label
     background_colour : 0.0,0.0,0.0,0.0
-    hovered :
+    focused :
         border_colour : 1.0,1.0,1.0,0.3
         border_width : 2.0,2.0,2.0,2.0
         
 TreeNodeHeader :
     copy_skin : ExpandboxHeader
     skin_padding : 0.0,0.0,0.0,0.0
-    activated :
+    selected :
         background_colour : 1.0,1.0,1.0,0.3
         
 ColumnHeader :
@@ -212,7 +212,7 @@ Checkbox :
         background_colour : 0.275,0.275,0.275,1.0
         topdown_gradient : -15,15
                 
-    activated|hovered :
+    activated|focused :
         image : blendish_check
         background_colour : 0.275,0.275,0.275,1.0
     
@@ -255,7 +255,7 @@ ScrollerButton :
     activated :
         background_colour : 0.542,0.542,0.542,1.0
         
-    hovered :
+    focused :
         background_colour : 0.542,0.542,0.542,1.0
 
 Scrollbar :
@@ -303,7 +303,7 @@ ExpandboxToggle :
     image : arrow_right_15
     activated :
         image : arrow_down_15
-    activated|hovered :
+    activated|focused :
         image : arrow_down_15
         
 TreeNodeToggle :
@@ -330,7 +330,7 @@ DropdownToggle :
     skin_padding : 1.0,2.0,1.0,2.0
     
 DropdownChoice :
-    hovered :
+    focused :
         background_colour : 0.337,0.502,0.761,1
         topdown_gradient : -15,15
         text_colour : 0.0,0.0,0.0,1.0

@@ -25,8 +25,8 @@ namespace toy
 
 		size_t styleStamp() { return d_styleStamp; }
 
-		inline DimFloat position() { return d_position; }
-		inline DimFloat size() { return d_size; }
+		inline const DimFloat& position() { return d_position; }
+		inline const DimFloat& size() { return d_size; }
 
 		inline float dposition(Dimension dim) { return d_position[dim]; }
 		inline float dsize(Dimension dim) { return d_size[dim]; }

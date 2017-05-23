@@ -5,7 +5,7 @@
 #include <toyui/Config.h>
 #include <toyui/Container/Tabber.h>
 
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 #include <toyui/Frame/Frame.h>
 
@@ -24,7 +24,7 @@ namespace toy
 		if(!m_active)
 			this->hide();
 		else
-			m_header.activate();
+			m_header.enableState(ACTIVATED);
 	}
 
 	void Tab::handleRemove(Widget& widget)
@@ -92,10 +92,10 @@ namespace toy
 		if(m_currentTab)
 		{
 			m_currentTab->hide();
-			m_currentTab->header().deactivate();
+			m_currentTab->header().disableState(ACTIVATED);
 		}
 		tab.show();
-		tab.header().activate();
+		tab.header().enableState(ACTIVATED);
 		m_currentTab = &tab;
 	}
 

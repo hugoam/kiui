@@ -22,7 +22,7 @@ Regular :
 Button :
     copy_skin : Regular
     
-    hovered :
+    focused :
         background_colour : 0.65,0.65,0.65,1.0
         
     pressed :
@@ -34,7 +34,7 @@ Toggle :
     background_colour : 0.275,0.275,0.275,1.0
     text_colour : 1.0,1.0,1.0,1.0
 
-    hovered :
+    focused :
         background_colour : 0.335,0.335,0.335,1.0
         
     pressed :
@@ -45,7 +45,7 @@ Toggle :
         topdown_gradient : -15,15
         text_colour : 0.0,0.0,0.0,1.0
                 
-    activated|hovered :
+    activated|focused :
         background_colour : 0.337,0.502,0.761,1
 
 NumberField :
@@ -53,10 +53,14 @@ NumberField :
     background_colour : 0.706,0.706,0.706,1.0
     topdown_gradient : -20,0
     
-    activated :
+    active :
         text_colour : 1.0,1.0,1.0,1.0
         background_colour : 0.6,0.6,0.6,1.0
-        
+
+List :
+    border_colour : 0.275,0.275,0.275,1.0
+    border_width : 1.0,1.0,1.0,1.0
+    
 TabHeader :
     copy_skin : Label
     background_colour : 0.275,0.275,0.275,1.0
@@ -69,14 +73,14 @@ TabHeader :
         topdown_gradient : -15,15
         text_colour : 0.0,0.0,0.0,1.0
         
-    hovered :
+    focused :
         background_colour : 0.65,0.65,0.65,1.0
         
-    activated|hovered :
+    activated|focused :
         background_colour : 0.337,0.502,0.761,1
         
 Tab :
-    background_colour : 0.09,0.09,0.09,1.0
+    background_colour : 0.09,0.09,0.09,0.0
     border_colour : 0.275,0.275,0.275,1.0
     border_width : 1.0,1.0,1.0,1.0
     corner_radius : 0.0,4.0,4.0,4.0
@@ -89,7 +93,7 @@ TypeIn :
     copy_skin : Regular
     topdown_gradient : 0.0,25.0
     
-    focused :
+    active :
         text_colour : 1.0,1.0,1.0,1.0
         
 DockWindow :
@@ -103,6 +107,11 @@ Window :
     border_width : 1.0,1.0,1.0,1.0
     corner_radius : 10.0,10.0,10.0,10.0
     shadow : 2.0,2.0,7.0,2.0
+    
+    selected :
+        shadow : 0.0,0.0,7.0,2.0
+        shadow_colour : 1.0,1.0,1.0,1.0
+    
     
 WindowHeader :
     background_colour : 0.275,0.275,0.275,1.0
@@ -134,17 +143,18 @@ CloseButton :
     reset_skin : true
     skin_padding : 2.0,2.0,2.0,2.0
     image : close_15
-    hovered :
+    focused :
         background_colour : 1.0,0.0,0.0,1.0
         
 Node :
+    padding : -5.0,0.0,-5.0,0.0
     copy_skin : Window
     
 NodeBody :
     copy_skin : WindowHeader
     
-NodePlugKnob :
-    image : tbb/plug_knob
+NodeKnob :
+    size : 10.0,22.0
         
 NodeCable :
     border_width : 2.0,2.0,2.0,2.0
@@ -159,14 +169,14 @@ Expandbox :
 ExpandboxHeader :
     copy_skin : Label
     background_colour : 0.0,0.0,0.0,0.0
-    hovered :
+    focused :
         border_colour : 1.0,1.0,1.0,0.3
         border_width : 2.0,2.0,2.0,2.0
         
 TreeNodeHeader :
     copy_skin : ExpandboxHeader
     skin_padding : 0.0,0.0,0.0,0.0
-    activated :
+    selected :
         background_colour : 1.0,1.0,1.0,0.3
         
 ColumnHeader :
@@ -190,7 +200,7 @@ Checkbox :
         background_colour : 0.275,0.275,0.275,1.0
         topdown_gradient : -15,15
                 
-    activated|hovered :
+    activated|focused :
         image : blendish_check
         background_colour : 0.275,0.275,0.275,1.0
     
@@ -210,10 +220,7 @@ Filler :
 Slider :
     copy_skin : NumberField
     corner_radius : 10.0,10.0,10.0,10.0
-    
-    activated :
-        corner_radius : 10.0,10.0,10.0,10.0
-        
+     
 SliderKnob :
     reset_skin : true
     flow : OVERLAY
@@ -234,10 +241,10 @@ ScrollerButton :
     background_colour : 0.502,0.502,0.502,1.0
     topdown_gradient : 5,-5
     
-    activated :
+    triggered :
         background_colour : 0.542,0.542,0.542,1.0
         
-    hovered :
+    focused :
         background_colour : 0.542,0.542,0.542,1.0
         
 Scrollbar :
@@ -285,9 +292,9 @@ ExpandboxToggle :
     image : arrow_right_15
     activated :
         image : arrow_down_15
-    hovered :
+    focused :
         image : arrow_right_15
-    activated|hovered :
+    activated|focused :
         image : arrow_down_15
     disabled :
         image : 
@@ -321,7 +328,7 @@ DropdownToggle :
 DropdownChoice :
     text_colour : 1.0,1.0,1.0,1.0
     
-    hovered :
+    focused :
         background_colour : 0.337,0.502,0.761,1
         topdown_gradient : -15,15
         text_colour : 0.0,0.0,0.0,1.0

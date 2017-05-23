@@ -7,7 +7,7 @@
 
 #include <toyui/Widget/Sheet.h>
 
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 #include <toyui/Frame/Frame.h>
 
@@ -25,10 +25,10 @@ namespace toy
 		: Toggle(parent, triggerOn, triggerOff, on, cls())
 	{}
 
-	Expandbox::Expandbox(Wedge& parent, const string& title, bool collapsed, bool build, Type& type)
+	Expandbox::Expandbox(Wedge& parent, const string& title, bool collapsed, Type& type)
 		: Stack(parent, type)
 		, m_header(*this)
-		, m_toggle(m_header, std::bind(&Expandbox::expand, this), std::bind(&Expandbox::collapse, this), !collapsed)
+		, m_toggle(m_header, [this](Widget&) { this->expand(); }, [this](Widget&) { this->collapse(); }, !collapsed)
 		, m_title(m_header, title)
 		, m_container(*this)
 		, m_collapsed(collapsed)

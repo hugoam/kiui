@@ -50,10 +50,9 @@ namespace toy
 		virtual void unclipRect();
 
 		virtual void pathLine(float x1, float y1, float x2, float y2);
-
 		virtual void pathBezier(float x1, float y1, float c1x, float c1y, float c2x, float c2y, float x2, float y2);
-
 		virtual void pathRect(const BoxFloat& rect, const BoxFloat& corners, float border);
+		virtual void pathCircle(float x, float y, float r);
 
 		virtual void drawShadow(const BoxFloat& rect, const BoxFloat& corner, const Shadow& shadows);
 		virtual void drawRect(const BoxFloat& rect, const BoxFloat& corners, InkStyle& skin);
@@ -65,6 +64,8 @@ namespace toy
 
 		virtual void fill(InkStyle& skin, const BoxFloat& rect);
 		virtual void stroke(InkStyle& skin);
+
+		virtual void strokeGradient(const Paint& paint, const DimFloat& start, const DimFloat& end);
 
 		virtual void fillText(const string& text, const BoxFloat& rect, InkStyle& skin, TextRow& row);
 

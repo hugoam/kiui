@@ -42,7 +42,7 @@ namespace toy
 
 		virtual void clear();
 
-		void mouseWheel(MouseEvent& mouseEvent);
+		virtual bool mouseWheel(MouseEvent& mouseEvent);
 
 		void enableWrap();
 		void disableWrap();
@@ -79,8 +79,8 @@ namespace toy
 
 		Container& plan() { return m_plan; }
 
-		virtual void middleDrag(MouseEvent& mouseEvent);
-		virtual void mouseWheel(MouseEvent& mouseEvent);
+		virtual bool middleDrag(MouseEvent& mouseEvent);
+		virtual bool mouseWheel(MouseEvent& mouseEvent);
 
 		virtual void dirtyLayout();
 

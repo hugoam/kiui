@@ -64,7 +64,7 @@ namespace toy
 		void dragMove(MouseEvent& mouseEvent);
 		void click(MouseEvent& mouseEvent);
 
-		void handleUnbindWidget(Widget& widget);
+		void handleUnbindWidget(Widget& widget, bool destroy);
 		void handleBindWidget(Widget& widget);
 
 	protected:
@@ -98,7 +98,7 @@ namespace toy
 
 		void mouseFocus(float x, float y, std::vector<Widget*>& inputFrame);
 
-		void handleUnbindWidget(Widget& widget);
+		void handleUnbindWidget(Widget& widget, bool destroy);
 		void handleBindWidget(Widget& widget);
 
 	protected:
@@ -116,123 +116,117 @@ namespace toy
 	{
 		KeyDownEvent(KeyCode code, char c) : KeyEvent(DEVICE_KEYBOARD, EVENT_PRESSED, code, c) {}
 
-		void dispatch(RootSheet& rootSheet) { rootSheet.keyboard().dispatchKeyPressed(code, c); }
-		void receive(InputAdapter& receiver) { receiver.keyDown(*this); }
+		virtual void dispatch(RootSheet& rootSheet) { rootSheet.keyboard().dispatchKeyPressed(code, c); }
+		virtual bool receive(InputAdapter& receiver) { return receiver.keyDown(*this); }
 	};
 
 	struct TOY_UI_EXPORT KeyUpEvent : public KeyEvent
 	{
 		KeyUpEvent(KeyCode code, char c) : KeyEvent(DEVICE_KEYBOARD, EVENT_RELEASED, code, c) {}
 
-		void dispatch(RootSheet& rootSheet) { rootSheet.keyboard().dispatchKeyReleased(code, c); }
-		void receive(InputAdapter& receiver) { receiver.keyUp(*this); }
+		virtual void dispatch(RootSheet& rootSheet) { rootSheet.keyboard().dispatchKeyReleased(code, c); }
+		virtual bool receive(InputAdapter& receiver) { return receiver.keyUp(*this); }
 	};
 
 	struct TOY_UI_EXPORT KeyCharEvent : public KeyEvent
 	{
 		KeyCharEvent(KeyCode code, char c) : KeyEvent(DEVICE_KEYBOARD, EVENT_STROKED, code, c) {}
 
-		//void dispatch(RootSheet& rootSheet) { rootSheet.keyboard().dispatchKeyReleased(code, c); }
-		void receive(InputAdapter& receiver) { receiver.keyStroke(*this); }
+		//virtual void dispatch(RootSheet& rootSheet) { rootSheet.keyboard().dispatchKeyReleased(code, c); }
+		virtual bool receive(InputAdapter& receiver) { return receiver.keyStroke(*this); }
 	};
 
 	struct TOY_UI_EXPORT MouseMoveEvent : public MouseEvent
 	{
 		MouseMoveEvent(float x, float y) : MouseEvent(DEVICE_MOUSE, EVENT_MOVED, x, y) {}
 
-		void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMouseMoved(posX, posY); }
-		void receive(InputAdapter& receiver) { receiver.mouseMoved(*this); }
+		virtual void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMouseMoved(posX, posY); }
+		virtual bool receive(InputAdapter& receiver) { return receiver.mouseMoved(*this); }
 	};
 
 	struct TOY_UI_EXPORT MousePressEvent : public MouseEvent
 	{
 		MousePressEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_PRESSED, x, y) {}
 
-		void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMousePressed(posX, posY, button); }
-		void receive(InputAdapter& receiver) { receiver.mousePressed(*this); consumed = true; }
+		virtual void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMousePressed(posX, posY, button); }
+		virtual bool receive(InputAdapter& receiver) { return receiver.mousePressed(*this); consumed = true; }
 	};
 
 	struct TOY_UI_EXPORT MouseReleaseEvent : public MouseEvent
 	{
 		MouseReleaseEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_RELEASED, x, y) {}
 
-		void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMouseReleased(posX, posY, button); }
-		void receive(InputAdapter& receiver) { receiver.mouseReleased(*this); }
+		virtual void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMouseReleased(posX, posY, button); }
+		virtual bool receive(InputAdapter& receiver) { return receiver.mouseReleased(*this); }
 	};
 
 	struct TOY_UI_EXPORT MouseWheelEvent : public MouseEvent
 	{
 		MouseWheelEvent(float x, float y, float amount) : MouseEvent(DEVICE_MOUSE_MIDDLE_BUTTON, EVENT_MOVED, x, y) { deltaZ = amount; }
 
-		void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMouseWheeled(posX, posY, deltaZ); }
-		void receive(InputAdapter& receiver) { receiver.mouseWheel(*this); }
+		virtual void dispatch(RootSheet& rootSheet) { rootSheet.mouse().dispatchMouseWheeled(posX, posY, deltaZ); }
+		virtual bool receive(InputAdapter& receiver) { return receiver.mouseWheel(*this); }
 	};
 
 	struct TOY_UI_EXPORT MouseClickEvent : public MouseEvent
 	{
 		MouseClickEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_STROKED, x, y) {}
-		void receive(InputAdapter& receiver) {	if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
-													receiver.leftClick(*this);
-												else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
-													receiver.rightClick(*this);
-												else if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
-													receiver.middleClick(*this); }
+		virtual bool receive(InputAdapter& receiver) {	if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
+															return receiver.leftClick(*this);
+														else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
+															return receiver.rightClick(*this);
+														else if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
+															return receiver.middleClick(*this); }
 	};
 
 	struct TOY_UI_EXPORT MouseDragEvent : public MouseEvent
 	{
 		MouseDragEvent(DeviceType deviceType, float x, float y, float dx, float dy) : MouseEvent(deviceType, EVENT_DRAGGED, x, y) { deltaX = dx; deltaY = dy; }
 
-		void receive(InputAdapter& receiver) {
-			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
-				receiver.leftDrag(*this);
-			else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
-				receiver.rightDrag(*this);
-			else if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
-				receiver.middleDrag(*this);
-		}
+		virtual bool receive(InputAdapter& receiver) {	if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
+															return receiver.leftDrag(*this);
+														else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
+															return receiver.rightDrag(*this);
+														else if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
+															return receiver.middleDrag(*this); }
 	};
 
 	struct TOY_UI_EXPORT MouseDragStartEvent : public MouseEvent
 	{
 		MouseDragStartEvent(DeviceType deviceType, float x, float y, float startX, float startY) : MouseEvent(deviceType, EVENT_DRAGGED_START, x, y) { lastPressedX = startX; lastPressedY = startY; }
 	
-		void receive(InputAdapter& receiver) {
-			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
-				receiver.leftDragStart(*this);
-			else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
-				receiver.rightDragStart(*this);
-			else if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
-				receiver.middleDragStart(*this);
-		}
+		virtual bool receive(InputAdapter& receiver) {	if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
+															return receiver.leftDragStart(*this);
+														else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
+															return receiver.rightDragStart(*this);
+														else if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
+															return receiver.middleDragStart(*this); }
 	};
 
 	struct TOY_UI_EXPORT MouseDragEndEvent : public MouseEvent
 	{
 		MouseDragEndEvent(DeviceType deviceType, float x, float y) : MouseEvent(deviceType, EVENT_DRAGGED_END, x, y) {}
 
-		void receive(InputAdapter& receiver) {
-			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
-				receiver.leftDragEnd(*this);
-			else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
-				receiver.rightDragEnd(*this);
-			else if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
-				receiver.middleDragEnd(*this);
-		}
+		virtual bool receive(InputAdapter& receiver) {	if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
+															return receiver.leftDragEnd(*this);
+														else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
+															return receiver.rightDragEnd(*this);
+														else if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
+															return receiver.middleDragEnd(*this); }
 	};
 
 	struct TOY_UI_EXPORT MouseEnterEvent : public MouseEvent
 	{
 		MouseEnterEvent(float x, float y) : MouseEvent(DEVICE_MOUSE, EVENT_ENTERED, x, y) {}
 
-		void receive(InputAdapter& receiver) { receiver.mouseEntered(*this); }
+		virtual bool receive(InputAdapter& receiver) { return receiver.mouseEntered(*this); }
 	};
 
 	struct TOY_UI_EXPORT MouseLeaveEvent : public MouseEvent
 	{
 		MouseLeaveEvent(float x, float y) : MouseEvent(DEVICE_MOUSE, EVENT_LEAVED, x, y) {}
 
-		void receive(InputAdapter& receiver) { receiver.mouseLeaved(*this); }
+		virtual bool receive(InputAdapter& receiver) { return receiver.mouseLeaved(*this); }
 	};
 
 }

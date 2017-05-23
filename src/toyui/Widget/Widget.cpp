@@ -127,10 +127,10 @@ namespace toy
 		this->visit([&rootSheet](Widget& widget) { rootSheet.handleBindWidget(widget); return true; });
 	}
 
-	void Widget::unbind()
+	void Widget::unbind(bool destroy)
 	{
 		RootSheet& rootSheet = this->rootSheet();
-		this->visit([&rootSheet](Widget& widget) { rootSheet.handleUnbindWidget(widget); return true; });
+		this->visit([&rootSheet, destroy](Widget& widget) { rootSheet.handleUnbindWidget(widget, destroy); return true; });
 
 		if(m_frame->mapped())
 			m_parent->stripe().unmap(*m_frame);
@@ -141,14 +141,14 @@ namespace toy
 
 	unique_ptr<Widget> Widget::extract()
 	{
-		unique_ptr<Widget> unique = m_container->release(*this);
+		unique_ptr<Widget> unique = m_container->release(*this, false);
 		m_parent->destroy();
 		return unique;
 	}
 
 	void Widget::destroy()
 	{
-		m_container->release(*this);
+		m_container->release(*this, true);
 	}
 
 	Widget* Widget::findContainer(Type& type)
@@ -289,6 +289,11 @@ namespace toy
 		return InputAdapter::receiveEvent(inputEvent);
 	}
 
+	void Widget::makeActive()
+	{
+		this->uiWindow().makeActive(*this);
+	}
+
 	void Widget::giveControl(InputReceiver& receiver, ControlMode mode, DeviceType device)
 	{
 		bool control = this->rootController().takeControl(*this, receiver, mode, device);
@@ -310,62 +315,46 @@ namespace toy
 			m_controlGraph = nullptr;
 	}
 
-	void Widget::activate()
-	{
-		this->enableState(ACTIVATED);
-	}
-
-	void Widget::deactivate()
-	{
-		this->disableState(ACTIVATED);
-	}
-	
-	void Widget::modal()
-	{
-		this->enableState(MODAL);
-	}
-
-	void Widget::unmodal()
-	{
-		this->disableState(MODAL);
-	}
-
-	void Widget::control()
+	void Widget::control(bool modal)
 	{
 		this->enableState(CONTROL);
-		this->enableState(FOCUSED);
-		this->focused();
+		if(modal)
+			this->enableState(MODAL);
 	}
 
-	void Widget::uncontrol()
+	void Widget::uncontrol(bool modal)
 	{
 		this->disableState(CONTROL);
+		if(modal)
+			this->disableState(MODAL);
+	}
+
+	bool Widget::mouseEntered(MouseEvent& mouseEvent)
+	{
+		UNUSED(mouseEvent);
+		this->enableState(FOCUSED);
+		return false;
+	}
+
+	bool Widget::mouseLeaved(MouseEvent& mouseEvent)
+	{
+		UNUSED(mouseEvent);
 		this->disableState(FOCUSED);
-		this->unfocused();
+		return false;
 	}
 
-	void Widget::mouseEntered(MouseEvent& mouseEvent)
+	bool Widget::mousePressed(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		this->enableState(HOVERED);
+		this->enableState(TRIGGERED);
+		return true;
 	}
 
-	void Widget::mouseLeaved(MouseEvent& mouseEvent)
+	bool Widget::mouseReleased(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		this->disableState(HOVERED);
-	}
-
-	void Widget::mousePressed(MouseEvent& mouseEvent)
-	{
-		UNUSED(mouseEvent);
-		this->enableState(PRESSED);
-	}
-
-	void Widget::mouseReleased(MouseEvent& mouseEvent)
-	{
-		UNUSED(mouseEvent);
-		this->disableState(PRESSED);
+		this->disableState(TRIGGERED);
+		return true;
 	}
 
 	void Widget::dirtyLayout()

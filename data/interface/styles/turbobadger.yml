@@ -12,9 +12,7 @@ Container :
     
 Window :
     image_skin : tbb/window, 16, 16, 16, 16, 12
-    activated :
-        image_skin : tbb/window_active, 16, 16, 16, 16, 12
-        
+    decline_image_skin : active, selected
 
 DockWindow :
     image_skin : tbb/window, 16, 16, 16, 16, 12
@@ -63,9 +61,8 @@ Tab :
     
 TabHeader :
     copy_skin : Label
-    image_skin : tbb/tab_button_top_inactive, 12, 12, 12, 12, 6
-    activated :
-        image_skin : tbb/tab_button_top_active, 12, 12, 12, 12, 6
+    image_skin : tbb/tab_button_top, 12, 12, 12, 12, 6
+    decline_image_skin : activated
         
 Dockbar :
     copy_skin : Frame
@@ -80,10 +77,9 @@ ExpandboxHeader :
     copy_skin : WindowHeader
     
 ExpandboxToggle :
-    image : tbb/toggle_section_icon_up
+    image : tbb/toggle_section_icon
     skin_padding : 6.0,0.0,6.0,0.0
-    activated :
-        image : tbb/toggle_section_icon_down
+    decline_image : activated
         
 TreeNodeToggle :
     copy_skin : ExpandboxToggle
@@ -91,10 +87,7 @@ TreeNodeToggle :
 Checkbox :
     reset_skin : true
     image : tbb/checkbox
-    pressed :
-        overlay : tbb/checkbox_pressed
-    activated :
-        overlay : tbb/checkbox_activated
+    decline_image_skin : pressed, activated
     
 CloseButton :
     reset_skin : true
@@ -159,9 +152,6 @@ SliderKnob :
     
 WrapButton :
     reset_skin : true
-    hovered :
-        image_skin : tbb/item_hover, 7, 7, 7, 7
-    pressed :
-        image_skin : tbb/item_selected, 7, 7, 7, 7
-    activated :
-        image_skin : tbb/item_selected, 7, 7, 7, 7
+    image_skin : tbb/item, 7, 7, 7, 7
+    decline_image_skin : focused, pressed, selected
+    

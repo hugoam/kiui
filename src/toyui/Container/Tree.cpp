@@ -5,7 +5,7 @@
 #include <toyui/Config.h>
 #include <toyui/Container/Tree.h>
 
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 #include <toyui/Container/Expandbox.h>
 
@@ -14,12 +14,14 @@
 namespace toy
 {
 	TreeNode::TreeNode(Wedge& parent, const string& image, const string& title, bool collapsed, Type& type)
-		: Expandbox(parent, title, collapsed, false, type)
+		: Expandbox(parent, title, collapsed, type)
 		, m_image(image)
 	{
 		m_header.setStyle(TreeNodeHeader::cls());
 		m_toggle.setStyle(TreeNodeToggle::cls());
 		m_container.setStyle(TreeNodeBody::cls());
+		
+		m_header.setTrigger([this](Widget&) { this->selected(); });
 
 		if(!m_image.empty())
 		{
@@ -29,9 +31,6 @@ namespace toy
 
 		m_toggle.enableState(DISABLED);
 	}
-
-	TreeNode::~TreeNode()
-	{}
 
 	void TreeNode::handleAdd(Widget& widget)
 	{
@@ -64,31 +63,37 @@ namespace toy
 		, m_onSelected(onSelected)
 	{}
 
-	Tree::~Tree()
-	{}
-
 	void Tree::select(TreeNode& selected)
 	{
 		if(m_selected)
-			m_selected->header().toggleState(ACTIVATED);
+			m_selected->header().disableState(SELECTED);
 
-		selected.header().toggleState(ACTIVATED);
+		selected.header().enableState(SELECTED);
 		m_selected = &selected;
-
-		/*Widget* node = selected;
-		while(node != this)
-		{
-			if(node->type() == TreeNode::cls())
-			{
-				node->as<TreeNode>()->expand();
-				for(auto& widget : node->parent()->contents())
-					if(widget.get() != node)
-						widget->as<TreeNode>()->collapse();
-			}
-			node = node->parent();
-		}*/
 
 		if(m_onSelected)
 			m_onSelected(selected);
+	}
+
+	void Tree::expand(TreeNode& target, bool exclusive)
+	{
+		if(exclusive)
+			this->collapse();
+
+		TreeNode* node = &target;
+		while(node)
+		{
+			node->expand();
+			node = node->findContainer<TreeNode>();
+		}
+	}
+
+	void Tree::collapse()
+	{
+		m_rootNode->visit([](Widget& widget) {
+			if(&widget.type() == &TreeNode::cls())
+				widget.as<TreeNode>().collapse();
+			return true;
+		});
 	}
 }

@@ -14,9 +14,8 @@
 #include <toyui/Style/Dim.h>
 #include <toyui/Style/ImageSkin.h>
 
-/* Standards */
-#include <array>
-#include <map>
+/* std */
+#include <vector>
 
 namespace toy
 {
@@ -25,7 +24,7 @@ namespace toy
 	class _I_ TOY_UI_EXPORT Shadow : public Struct
 	{
 	public:
-		Shadow(float xpos, float ypos, float blur, float spread, Colour colour = Colour::Black)
+		Shadow(float xpos, float ypos, float blur, float spread, Colour colour = Colour::AlphaBlack)
 			: Struct()
 			, d_xpos(xpos), d_ypos(ypos), d_blur(blur), d_spread(spread), d_radius(spread + blur), d_colour(colour), d_null(false)
 		{}
@@ -42,6 +41,22 @@ namespace toy
 		float d_radius;
 		Colour d_colour;
 		bool d_null;
+
+		static Type& cls() { static Type ty(INDEXED); return ty; }
+	};
+
+	class _I_ TOY_UI_EXPORT Paint : public Struct
+	{
+	public:
+		Paint() : Struct() {}
+		Paint(const Colour& colour) : Struct(), m_colour(colour) {}
+		Paint(const Colour& first, const Colour& second) : Struct(), m_colour(), m_gradient{ first, second } {}
+
+		bool m_empty;
+		float m_width;
+		Colour m_colour;
+		std::vector<Colour> m_gradient;
+		Image* m_image;
 
 		static Type& cls() { static Type ty(INDEXED); return ty; }
 	};

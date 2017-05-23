@@ -38,7 +38,7 @@ namespace toy
 	public:
 		DropdownChoice(Wedge& parent, Dropdown& dropdown, const Callback& trigger, const StringVector& elements);
 
-		virtual void leftClick(MouseEvent& mouseEvent);
+		virtual bool leftClick(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("DropdownChoice", MultiButton::cls()); return ty; }
 
@@ -51,8 +51,8 @@ namespace toy
 	public:
 		DropdownList(Dropdown& dropdown);
 
-		virtual void leftClick(MouseEvent& mouseEvent);
-		virtual void rightClick(MouseEvent& mouseEvent);
+		virtual bool leftClick(MouseEvent& mouseEvent);
+		virtual bool rightClick(MouseEvent& mouseEvent);
 		
 		static Type& cls() { static Type ty("DropdownList", Container::cls()); return ty; }
 

@@ -21,8 +21,8 @@ namespace toy
 	public:
 		KeyInputFrame();
 
-		void keyUp(KeyEvent& keyEvent);
-		void keyDown(KeyEvent& keyEvent);
+		virtual bool keyUp(KeyEvent& keyEvent);
+		virtual bool keyDown(KeyEvent& keyEvent);
 
 	protected:
 		typedef std::function<void()> KeyHandler;
@@ -42,7 +42,7 @@ namespace toy
 		void take(Widget& inputWidget);
 		void yield();
 
-		virtual void leftClick(MouseEvent& mouseEvent);
+		virtual bool leftClick(MouseEvent& mouseEvent);
 
 	protected:
 		ControlMode m_controlMode;

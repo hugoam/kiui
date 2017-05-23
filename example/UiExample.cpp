@@ -48,7 +48,7 @@ namespace toy
 			Container& sheet = this->emplace<Container>();
 			Label& label = sheet.emplace<Label>(name);
 			sheet.emplace<Label>("Male");
-			this->emplace<CloseButton>([this](Widget&){ this->parent()->parent()->as<Container>().release(*this); });
+			this->emplace<CloseButton>([this](Widget&){ this->destroy(); });
 			return label;
 		}
 

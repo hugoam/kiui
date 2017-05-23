@@ -14,24 +14,26 @@ namespace toy
 		: InputAdapter()
 	{}
 
-	void KeyInputFrame::keyUp(KeyEvent& keyEvent)
+	bool KeyInputFrame::keyUp(KeyEvent& keyEvent)
 	{
 		auto it = m_keyUpHandlers.find(keyEvent.code);
 		if(it != m_keyUpHandlers.end())
 		{
 			(*it).second();
-			keyEvent.consumed = true;
+			return true;
 		}
+		return false;
 	}
 
-	void KeyInputFrame::keyDown(KeyEvent& keyEvent)
+	bool KeyInputFrame::keyDown(KeyEvent& keyEvent)
 	{
 		auto it = m_keyDownHandlers.find(keyEvent.code);
 		if(it != m_keyDownHandlers.end())
 		{
 			(*it).second();
-			keyEvent.consumed = true;
+			return true;
 		}
+		return false;
 	}
 
 	Controller::Controller(ControlMode controlMode, DeviceType deviceType)
@@ -56,13 +58,15 @@ namespace toy
 		m_inputWidget = nullptr;
 	}
 
-	void Controller::leftClick(MouseEvent& mouseEvent)
+	bool Controller::leftClick(MouseEvent& mouseEvent)
 	{
 		if(m_controlMode < CM_MODAL)
-			return;
+			return false;
 
 		DimFloat local = m_inputWidget->frame().localPosition(mouseEvent.posX, mouseEvent.posY);
 		if(!m_inputWidget->frame().inside(local.x(), local.y()))
 			this->yield();
+
+		return true;
 	}
 }

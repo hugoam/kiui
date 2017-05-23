@@ -5,7 +5,7 @@
 #include <toyui/Config.h>
 #include <toyui/Button/Button.h>
 
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Stripe.h>
@@ -58,19 +58,19 @@ namespace toy
 		this->setImage(&image);
 	}
 
-	void Button::leftClick(MouseEvent& mouseEvent)
+	bool Button::leftClick(MouseEvent& mouseEvent)
 	{
 		if(this->rootSheet().keyboard().ctrlPressed())
-			this->clickCtrl(mouseEvent);
+			return this->clickCtrl(mouseEvent);
 		else if(this->rootSheet().keyboard().shiftPressed())
-			this->clickShift(mouseEvent);
+			return this->clickShift(mouseEvent);
 		else
-			this->click(mouseEvent);
+			return this->click(mouseEvent);
 	}
 
-	void Button::rightClick(MouseEvent& mouseEvent)
+	bool Button::rightClick(MouseEvent& mouseEvent)
 	{
-		this->clickAlt(mouseEvent);
+		return this->clickAlt(mouseEvent);
 	}
 
 	WrapButton::WrapButton(Wedge& parent, const Callback& trigger, Type& type)
@@ -78,19 +78,19 @@ namespace toy
 		, ClickTrigger(*this, trigger)
 	{}
 
-	void WrapButton::leftClick(MouseEvent& mouseEvent)
+	bool WrapButton::leftClick(MouseEvent& mouseEvent)
 	{
 		if(this->rootSheet().keyboard().ctrlPressed())
-			this->clickCtrl(mouseEvent);
+			return this->clickCtrl(mouseEvent);
 		else if(this->rootSheet().keyboard().shiftPressed())
-			this->clickShift(mouseEvent);
+			return this->clickShift(mouseEvent);
 		else
-			this->click(mouseEvent);
+			return this->click(mouseEvent);
 	}
 
-	void WrapButton::rightClick(MouseEvent& mouseEvent)
+	bool WrapButton::rightClick(MouseEvent& mouseEvent)
 	{
-		this->clickAlt(mouseEvent);
+		return this->clickAlt(mouseEvent);
 	}
 
 	MultiButton::MultiButton(Wedge& parent, const Callback& trigger, const StringVector& elements, Type& type)
@@ -132,25 +132,21 @@ namespace toy
 	
 	void Toggle::update(bool on)
 	{
-		if(on != m_on)
-			this->toggleState(ACTIVATED);
 		m_on = on;
+		m_on ? this->enableState(ACTIVATED) : this->disableState(ACTIVATED);
 	}
 
 	void Toggle::toggle()
 	{
 		m_on = !m_on;
-		this->toggleState(ACTIVATED);
-
-		if(m_on)
-			m_triggerOn(*this);
-		else
-			m_triggerOff(*this);
+		m_on ? this->enableState(ACTIVATED) : this->disableState(ACTIVATED);
+		m_on ? m_triggerOn(*this) : m_triggerOff(*this);
 	}
 
-	void Toggle::leftClick(MouseEvent& mouseEvent)
+	bool Toggle::leftClick(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
 		this->toggle();
+		return true;
 	}
 }

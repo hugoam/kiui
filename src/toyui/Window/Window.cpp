@@ -7,7 +7,7 @@
 
 #include <toyui/Window/Dockspace.h>
 
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Stripe.h>
@@ -29,18 +29,20 @@ namespace toy
 		this->takeControl(CM_MODAL);
 	}
 
-	void Popup::leftClick(MouseEvent& mouseEvent)
+	bool Popup::leftClick(MouseEvent& mouseEvent)
 	{
 		mouseEvent.abort = true;
 		this->yieldControl();
 		this->destroy();
+		return true;
 	}
 
-	void Popup::rightClick(MouseEvent& mouseEvent)
+	bool Popup::rightClick(MouseEvent& mouseEvent)
 	{
 		mouseEvent.abort = true;
 		this->yieldControl();
 		this->destroy();
+		return true;
 	}
 
 	WindowHeader::WindowHeader(Window& window)
@@ -54,15 +56,16 @@ namespace toy
 			m_close.hide();
 	}
 
-	void WindowHeader::leftClick(MouseEvent& mouseEvent)
+	bool WindowHeader::leftClick(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		m_window.activate();
+		m_window.enableState(ACTIVATED);
 		if(!m_window.dock()) // crashes for some reason
 			m_window.frame().layer().moveToTop();
+		return true;
 	}
 
-	void WindowHeader::leftDragStart(MouseEvent& mouseEvent)
+	bool WindowHeader::leftDragStart(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
 		if(m_window.dock())
@@ -70,17 +73,19 @@ namespace toy
 
 		m_window.frame().layer().moveToTop();
 		m_window.frame().layer().setOpacity(HOLLOW);
+		return true;
 	}
 
-	void WindowHeader::leftDrag(MouseEvent& mouseEvent)
+	bool WindowHeader::leftDrag(MouseEvent& mouseEvent)
 	{
 		if(!m_window.movable())
-			return;
+			return true;
 
 		m_window.frame().setPosition(m_window.frame().dposition(DIM_X) + mouseEvent.deltaX, m_window.frame().dposition(DIM_Y) + mouseEvent.deltaY);
+		return true;
 	}
 
-	void WindowHeader::leftDragEnd(MouseEvent& mouseEvent)
+	bool WindowHeader::leftDragEnd(MouseEvent& mouseEvent)
 	{
 		if(m_window.dockable())
 		{
@@ -90,6 +95,7 @@ namespace toy
 		}
 
 		m_window.frame().layer().setOpacity(OPAQUE);
+		return true;
 	}
 
 	Docksection* WindowHeader::docktarget(MouseEvent& mouseEvent)
@@ -109,13 +115,14 @@ namespace toy
 		, m_resizeLeft(left)
 	{}
 
-	void WindowSizer::leftDragStart(MouseEvent& mouseEvent)
+	bool WindowSizer::leftDragStart(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
 		m_window.frame().as<Layer>().moveToTop();
+		return true;
 	}
 
-	void WindowSizer::leftDrag(MouseEvent& mouseEvent)
+	bool WindowSizer::leftDrag(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
 		if(m_resizeLeft)
@@ -127,11 +134,13 @@ namespace toy
 		{
 			m_window.frame().setSize(std::max(10.f, m_window.frame().dsize(DIM_X) + mouseEvent.deltaX), std::max(25.f, m_window.frame().dsize(DIM_Y) + mouseEvent.deltaY));
 		}
+		return true;
 	}
 
-	void WindowSizer::leftDragEnd(MouseEvent& mouseEvent)
+	bool WindowSizer::leftDragEnd(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
+		return true;
 	}
 
 	WindowSizerLeft::WindowSizerLeft(Wedge& parent, Window& window)
@@ -155,18 +164,6 @@ namespace toy
 	CloseButton::CloseButton(Wedge& parent, const Callback& trigger)
 		: Button(parent, "", trigger, cls())
 	{}
-
-	void CloseButton::leftClick(MouseEvent& mouseEvent)
-	{
-		Button::leftClick(mouseEvent);
-		mouseEvent.abort = true;
-	}
-
-	void CloseButton::rightClick(MouseEvent& mouseEvent)
-	{
-		Button::rightClick(mouseEvent);
-		mouseEvent.abort = true;
-	}
 
 	Window::Window(Wedge& parent, const string& title, WindowState state, const Callback& onClose, Docksection* dock, Type& type)
 		: Overlay(parent, type)
@@ -276,17 +273,19 @@ namespace toy
 		this->destroy();
 	}
 
-	void Window::leftClick(MouseEvent& mouseEvent)
+	bool Window::leftClick(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
 		if(!m_dock)
 			m_frame->as<Layer>().moveToTop();
+		return true;
 	}
 
-	void Window::rightClick(MouseEvent& mouseEvent)
+	bool Window::rightClick(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
 		if(!m_dock)
 			m_frame->as<Layer>().moveToTop();
+		return true;
 	}
 }

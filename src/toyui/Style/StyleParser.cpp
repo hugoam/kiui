@@ -39,13 +39,14 @@ namespace toy
 		std::vector<WidgetState> states;
 		for(const string& name : names)
 		{
-			if(name == "hovered") state |= HOVERED;
+			if(name == "focused") state |= FOCUSED;
 			else if(name == "triggered") state |= TRIGGERED;
+			else if(name == "pressed") state |= TRIGGERED;
 			else if(name == "activated") state |= ACTIVATED;
-			else if(name == "focused") state |= FOCUSED;
-			else if(name == "disabled") state |= DISABLED;
-			else if(name == "pressed") state |= PRESSED;
+			else if(name == "selected") state |= SELECTED;
 			else if(name == "dragged") state |= DRAGGED;
+			else if(name == "disabled") state |= DISABLED;
+			else if(name == "active") state |= ACTIVE;
 			else if(name == "modal") state |= MODAL;
 			else if(name == "control") state |= CONTROL;
 		}

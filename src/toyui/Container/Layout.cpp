@@ -3,7 +3,7 @@
 //  This notice and the license may not be removed or altered from any source distribution.
 
 #include <toyui/Config.h>
-#include <toyui/Widget/Layout.h>
+#include <toyui/Container/Layout.h>
 
 namespace toy
 {

@@ -149,10 +149,24 @@ namespace toy
 
 	void DrawFrame::draw(Renderer& renderer, bool force)
 	{
+		float left = floor(d_inkstyle->margin().x0());
+		float top = floor(d_inkstyle->margin().y0());
+		float width = floor(d_frame->width() - d_inkstyle->margin().x0() - d_inkstyle->margin().x1());
+		float height = floor(d_frame->height() - d_inkstyle->margin().y0() - d_inkstyle->margin().y1());
+
+		BoxFloat rect(left, top, width, height);
+
+		if(d_frame->clip())
+			renderer.clipRect(rect);
+
 #ifdef TOYUI_DRAW_CACHE
 		if(!(d_frame->layer().redraw() || force))
 			return;
 #endif
+
+		if(d_inkstyle->m_empty || renderer.clipTest(rect))
+			return;
+
 		bool custom = d_frame->widget()->customDraw(renderer);
 		if(custom)
 			return;
@@ -165,26 +179,10 @@ namespace toy
 				return;
 		}
 
-		float left = floor(d_inkstyle->margin().x0());
-		float top = floor(d_inkstyle->margin().y0());
-		float width = floor(d_frame->width() - d_inkstyle->margin().x0() - d_inkstyle->margin().x1());
-		float height = floor(d_frame->height() - d_inkstyle->margin().y0() - d_inkstyle->margin().y1());
-
-		BoxFloat rect(left, top, width, height);
-
 #if 1 // DEBUG
 		if(d_frame->style().name() == s_debugDrawFilter)
 			renderer.debugRect(rect, Colour::Red);
 #endif
-
-		if(d_frame->clip())
-			renderer.clipRect(rect);
-
-		if(renderer.clipTest(rect))
-			return;
-
-		if(d_inkstyle->m_empty)
-			return;
 
 		float paddedLeft = floor(d_inkstyle->padding().x0());
 		float paddedTop = floor(d_inkstyle->padding().y0());

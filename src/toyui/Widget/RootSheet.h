@@ -36,7 +36,7 @@ namespace toy
 
 		virtual void transformCoordinates(MouseEvent& mouseEvent) { UNUSED(mouseEvent); }
 
-		virtual void handleUnbindWidget(Widget& widget);
+		virtual void handleUnbindWidget(Widget& widget, bool destroy);
 		virtual void handleBindWidget(Widget& widget);
 
 		static Type& cls() { static Type ty("RootSheet", Container::cls()); return ty; }
