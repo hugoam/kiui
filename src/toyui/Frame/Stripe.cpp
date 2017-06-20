@@ -181,7 +181,7 @@ namespace toy
 		this->normalizeSpan();
 
 		//for(Widget* widget : d_widget->as<Wedge>().contents())
-			this->resize(widget->frame());
+		//	this->resize(widget->frame());
 
 		for(Frame* pframe : d_contents)
 			this->resize(*pframe);
