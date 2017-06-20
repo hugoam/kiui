@@ -6,15 +6,14 @@
 #define TOY_LIST_H
 
 /* toy */
-#include <toyobj/Typed.h>
+#include <toyobj/Type.h>
 #include <toyui/Forward.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Container/ScrollSheet.h>
-#include <toyui/Edit/TypeIn.h>
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT List : public ScrollSheet
+	class _refl_ TOY_UI_EXPORT List : public ScrollSheet
 	{
 	public:
 		List(Wedge& parent, Type& type = cls(), FrameType frameType = STRIPE);
@@ -22,7 +21,7 @@ namespace toy
 		static Type& cls() { static Type ty("List", ScrollSheet::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT SelectList : public List
+	class _refl_ TOY_UI_EXPORT SelectList : public List
 	{
 	public:
 		SelectList(Wedge& parent, Type& type = cls());
@@ -34,7 +33,7 @@ namespace toy
 		static Type& cls() { static Type ty("SelectList", List::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT LabelSequence : public Row
+	class _refl_ TOY_UI_EXPORT LabelSequence : public Row
 	{
 	public:
 		LabelSequence(Wedge& parent, StringVector labels = StringVector());
@@ -42,7 +41,7 @@ namespace toy
 		static Type& cls() { static Type ty("LabelSequence", Row::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT ButtonSequence : public Row
+	class _refl_ TOY_UI_EXPORT ButtonSequence : public Row
 	{
 	public:
 		ButtonSequence(Wedge& parent, StringVector labels = StringVector());
@@ -50,7 +49,7 @@ namespace toy
 		static Type& cls() { static Type ty("ButtonSequence", Row::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT SortList : public List//, public Dropper
+	class _refl_ TOY_UI_EXPORT SortList : public List//, public Dropper
 	{
 	public:
 		SortList(Wedge& parent);

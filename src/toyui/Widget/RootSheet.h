@@ -14,7 +14,7 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT RootSheet : public Container
+	class _refl_ TOY_UI_EXPORT RootSheet : public Container
 	{
 	public:
 		RootSheet(UiWindow& window, Type& type = cls());
@@ -46,10 +46,10 @@ namespace toy
 
 		unique_ptr<ControlSwitch> m_rootController;
 
-		unique_ptr<Mouse> m_mouse;
-		unique_ptr<Keyboard> m_keyboard;
+		object_ptr<Mouse> m_mouse;
+		object_ptr<Keyboard> m_keyboard;
 
-		unique_ptr<RenderTarget> m_target;
+		object_ptr<RenderTarget> m_target;
 
 		Cursor m_cursor;
 	};

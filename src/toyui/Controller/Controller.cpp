@@ -41,8 +41,14 @@ namespace toy
 		, m_controlMode(controlMode)
 		, m_deviceType(deviceType)
 		, m_inputWidget(nullptr)
+		, m_rootSheet(nullptr)
 	{
 		m_keyUpHandlers[KC_ESCAPE] = [this]() { this->yield(); };
+	}
+
+	Controller::~Controller()
+	{
+		this->yield();
 	}
 
 	void Controller::take(Widget& inputWidget)
@@ -50,11 +56,13 @@ namespace toy
 		m_inputWidget = &inputWidget;
 		inputWidget.giveControl(*this, m_controlMode, DEVICE_MOUSE_ALL);
 		inputWidget.rootController().takeControl(*this, m_controlMode, DEVICE_KEYBOARD);
+		m_rootSheet = &inputWidget.rootSheet();
 	}
 
 	void Controller::yield()
 	{
-		m_inputWidget->rootController().yieldControl(*this);
+		m_rootSheet->controller().yieldControl(*this);
+		//m_inputWidget->rootController().yieldControl(*this);
 		m_inputWidget = nullptr;
 	}
 

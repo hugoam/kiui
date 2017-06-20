@@ -2,7 +2,7 @@
 #include <UiExampleConfig.h>
 #include <UiExample.h>
 
-#include <toyui/Types.h>
+#include <toyui/Bundle.h>
 
 #include <cfloat>
 
@@ -547,6 +547,8 @@ namespace toy
 			for(Object* object : Style::cls().indexer().objects())
 				if(object)
 					m_stylePicker.emplace<Label>(object->as<Style>().name());
+
+			this->pickStyle("Widget");
 		}
 
 		void pickStyle(const string& name)
@@ -604,12 +606,14 @@ namespace toy
 
 		tooldock.addDock("Style Edit").emplace<StyleEdit>(parent.uiWindow().styler());
 
+		Renderer& renderer = *DrawFrame::s_renderer;
+
 		Page& options = tooldock.addDock("Options").emplace<Page>();
-		options.emplace<InputText>("Debug draw filter", "", [](string value) { DrawFrame::s_debugDrawFilter = value; });
-		options.emplace<InputBool>("Debug draw Frame", false, [](bool on) { DrawFrame::s_debugDrawFrameRect = on; });
-		options.emplace<InputBool>("Debug draw Padding", false, [](bool on) { DrawFrame::s_debugDrawPaddedRect = on; });
-		options.emplace<InputBool>("Debug draw Content", false, [](bool on) { DrawFrame::s_debugDrawContentRect = on; });
-		options.emplace<InputBool>("Debug draw Clip", false, [](bool on) { DrawFrame::s_debugDrawClipRect = on; });
+		options.emplace<InputText>("Debug draw filter", "", [&renderer](string value) { renderer.m_debugDrawFilter = value; });
+		options.emplace<InputBool>("Debug draw Frame", false, [&renderer](bool on) { renderer.m_debugDrawFrameRect = on; });
+		options.emplace<InputBool>("Debug draw Padding", false, [&renderer](bool on) { renderer.m_debugDrawPaddedRect = on; });
+		options.emplace<InputBool>("Debug draw Content", false, [&renderer](bool on) { renderer.m_debugDrawContentRect = on; });
+		options.emplace<InputBool>("Debug draw Clip", false, [&renderer](bool on) { renderer.m_debugDrawClipRect = on; });
 
 		return tooldock;
 	}

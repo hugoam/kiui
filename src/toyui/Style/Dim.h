@@ -8,9 +8,9 @@
 /* toy */
 #include <toyobj/Id.h>
 #include <toyobj/String/String.h>
-#include <toyobj/Typed.h>
+#include <toyobj/Type.h>
 #include <toyobj/Indexer.h>
-#include <toyobj/Util/GlobalType.h>
+#include <toyobj/Util/Global.h>
 #include <toyobj/Util/Colour.h>
 #include <toyui/Forward.h>
 
@@ -24,7 +24,7 @@
 
 namespace toy
 {
-	enum _I_ Dimension : unsigned int
+	enum _refl_ Dimension : unsigned int
 	{
 		DIM_X = 0,
 		DIM_Y = 1,
@@ -33,7 +33,7 @@ namespace toy
 		DIM_NULL = 4
 	};
 
-	enum _I_ Direction : unsigned int
+	enum _refl_ Direction : unsigned int
 	{
 		READING = 0,
 		PARAGRAPH = 1,
@@ -43,13 +43,13 @@ namespace toy
 		DIRECTION_AUTO = 5
 	};
 
-	enum _I_ Pivot : unsigned int
+	enum _refl_ Pivot : unsigned int
 	{
 		FORWARD = 0,
 		REVERSE = 1
 	};
 
-	enum _I_ Align : unsigned int
+	enum _refl_ Align : unsigned int
 	{
 		LEFT = 0,
 		CENTER = 1,
@@ -61,7 +61,7 @@ namespace toy
 	extern float AlignExtent[5];
 	extern float AlignSpace[5];
 
-	enum _I_ FrameType : unsigned int
+	enum _refl_ FrameType : unsigned int
 	{
 		FRAME = 0,
 		STRIPE = 1,
@@ -72,14 +72,14 @@ namespace toy
 		SPACE_LAYER = 6
 	};
 
-	enum _I_ AutoLayout : unsigned int
+	enum _refl_ AutoLayout : unsigned int
 	{
 		NO_LAYOUT = 0,
 		AUTO_SIZE = 1,
 		AUTO_LAYOUT = 2
 	};
 
-	enum _I_ Flow : unsigned int
+	enum _refl_ Flow : unsigned int
 	{
 		FLOW = 0,			// AUTO_LAYOUT
 		OVERLAY = 1,		// AUTO_SIZE
@@ -87,7 +87,7 @@ namespace toy
 		FREE = 3			// NO_LAYOUT
 	};
 
-	enum _I_ Sizing : unsigned int
+	enum _refl_ Sizing : unsigned int
 	{
 		FIXED = 0,
 		MANUAL = 1,
@@ -96,7 +96,7 @@ namespace toy
 		EXPAND = 4
 	};
 
-	enum _I_ Space : unsigned int
+	enum _refl_ Space : unsigned int
 	{
 		MANUAL_SPACE = 0,        // PARAGRAPH   direction, MANUAL length, MANUAL depth
 		SHEET = 1,               // PARAGRAPH   direction, WRAP   length, WRAP   depth
@@ -121,13 +121,13 @@ namespace toy
 
 	extern SpaceParams SpaceTable[11];
 
-	enum _I_ Clipping : unsigned int
+	enum _refl_ Clipping : unsigned int
 	{
 		NOCLIP = 0,
 		CLIP = 1
 	};
 
-	enum _I_ Opacity : unsigned int
+	enum _refl_ Opacity : unsigned int
 	{
 		OPAQUE = 0,
 		CLEAR = 1,
@@ -135,7 +135,7 @@ namespace toy
 	};
 
 	template <class T>
-	class _I_ Dim
+	class _refl_ Dim
 	{
 	public:
 		Dim(T x, T y) : d_values{{ x, y }} {}
@@ -157,10 +157,10 @@ namespace toy
 		std::array<T, 2> d_values;
 	};
 
-	class _I_ BoxFloat : public Struct
+	class _refl_ BoxFloat : public Struct
 	{
 	public:
-		_C_ BoxFloat(float x0, float y0, float x1, float y1) : d_values{{ x0, y0, x1, y1 }}, d_uniform(false), d_null(cnull()) {}
+		_constr_ BoxFloat(float x0, float y0, float x1, float y1) : d_values{{ x0, y0, x1, y1 }}, d_uniform(false), d_null(cnull()) {}
 
 		BoxFloat(int x0, int y0, int x1, int y1) : BoxFloat(float(x0), float(y0), float(x1), float(y1)) {}
 		BoxFloat(float uniform) : BoxFloat(uniform, uniform, uniform, uniform) {}
@@ -171,20 +171,20 @@ namespace toy
 		float operator [](size_t i) const { return d_values[i]; }
 		float& operator [](size_t i) { d_null = false; return d_values[i]; }
 
-		_A_ _M_ float x0() const { return d_values[0]; }
-		_A_ _M_ float y0() const { return d_values[1]; }
-		_A_ _M_ float x1() const { return d_values[2]; }
-		_A_ _M_ float y1() const { return d_values[3]; }
+		_attr_ _mut_ float x0() const { return d_values[0]; }
+		_attr_ _mut_ float y0() const { return d_values[1]; }
+		_attr_ _mut_ float x1() const { return d_values[2]; }
+		_attr_ _mut_ float y1() const { return d_values[3]; }
 
-		_A_ float x() const { return x0(); }
-		_A_ float y() const { return y0(); }
-		_A_ float w() const { return x1(); }
-		_A_ float h() const { return y1(); }
+		_attr_ float x() const { return x0(); }
+		_attr_ float y() const { return y0(); }
+		_attr_ float w() const { return x1(); }
+		_attr_ float h() const { return y1(); }
 
-		_A_ float v0() const { return d_values[0]; }
-		_A_ float v1() const { return d_values[1]; }
-		_A_ float v2() const { return d_values[2]; }
-		_A_ float v3() const { return d_values[3]; }
+		_attr_ float v0() const { return d_values[0]; }
+		_attr_ float v1() const { return d_values[1]; }
+		_attr_ float v2() const { return d_values[2]; }
+		_attr_ float v3() const { return d_values[3]; }
 
 		void clear() { this->assign(0.f); d_null = true; }
 

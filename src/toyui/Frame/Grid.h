@@ -60,8 +60,8 @@ namespace toy
 		void resize(size_t lines);
 
 	protected:
-		unique_ptr<GridOverlay> d_grid;
-		std::vector<unique_ptr<Stripe>> d_columns;
+		object_ptr<GridOverlay> d_grid;
+		std::vector<object_ptr<Stripe>> d_columns;
 	};
 
 	class TOY_UI_EXPORT Grid : public Stripe
@@ -79,7 +79,7 @@ namespace toy
 		void resize(size_t lines);
 
 	protected:
-		std::vector<unique_ptr<Stripe>> d_lines;
+		std::vector<object_ptr<Stripe>> d_lines;
 	};
 
 	typedef std::vector<size_t> GridIndex;

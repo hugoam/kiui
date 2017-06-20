@@ -9,7 +9,7 @@
 #include <toyobj/Object.h>
 #include <toyobj/Indexer.h>
 #include <toyobj/String/String.h>
-#include <toyobj/Util/GlobalType.h>
+#include <toyobj/Util/Global.h>
 #include <toyobj/Util/Colour.h>
 #include <toyui/Forward.h>
 #include <toyui/Style/Dim.h>
@@ -21,7 +21,7 @@
 
 namespace toy
 {
-	class _I_ ImageSkin : public Struct
+	class _refl_ ImageSkin : public Struct
 	{
 	public:
 		enum Section
@@ -115,15 +115,15 @@ namespace toy
 			filler(FILL, BoxFloat(x + d_left, y + d_top, fillWidth, fillHeight));
 		}
 
-		_A_ _M_ Image* d_image;
-		_A_ _M_ string d_filetype;
+		_attr_ _mut_ Image* d_image;
+		_attr_ _mut_ string d_filetype;
 
-		_A_ _M_ int d_top;
-		_A_ _M_ int d_right;
-		_A_ _M_ int d_bottom;
-		_A_ _M_ int d_left;
-		_A_ _M_ int d_margin;
-		_A_ _M_ Dimension d_stretch;
+		_attr_ _mut_ int d_top;
+		_attr_ _mut_ int d_right;
+		_attr_ _mut_ int d_bottom;
+		_attr_ _mut_ int d_left;
+		_attr_ _mut_ int d_margin;
+		_attr_ _mut_ Dimension d_stretch;
 
 		int d_width;
 		int d_height;

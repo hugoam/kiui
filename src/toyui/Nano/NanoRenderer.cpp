@@ -53,9 +53,9 @@ namespace toy
 			//this->releaseContext();
 	}
 
-	unique_ptr<RenderTarget> NanoRenderer::createRenderTarget(MasterLayer& masterLayer)
+	object_ptr<RenderTarget> NanoRenderer::createRenderTarget(MasterLayer& masterLayer)
 	{
-		return make_unique<RenderTarget>(*this, masterLayer, false);
+		return make_object<RenderTarget>(*this, masterLayer, false);
 	}
 
 	void NanoRenderer::loadFont()
@@ -82,38 +82,14 @@ namespace toy
 		image.d_index = 0;
 	}
 
-	void NanoRenderer::render(RenderTarget& target)
+	void NanoRenderer::beginFrame(RenderTarget& target)
 	{
-		m_debugBatch = 0;
-		m_debugDepth = 0;
-		Stencil::s_debugBatch = 0;
-		DrawFrame::s_debugBatch = 0;
-		static int prevBatch = 0;
-
 		float pixelRatio = 1.f;
 		nvgBeginFrame(m_ctx, target.layer().width(), target.layer().height(), pixelRatio);
+	}
 
-		target.layer().widget()->render(*this, false);
-
-#ifdef TOYUI_DRAW_CACHE
-		void* layerCache = nullptr;
-		this->layerCache(target.layer(), layerCache);
-		this->drawLayer(layerCache, 0.f, 0.f, 1.f);
-
-		for(Layer* layer : target.layer().layers())
-			if(layer->visible())
-			{
-				this->layerCache(*layer, layerCache);
-				this->drawLayer(layerCache, 0.f, 0.f, 1.f);
-			}
-#endif
-
-		if(Stencil::s_debugBatch > 1 && Stencil::s_debugBatch != prevBatch)
-		{
-			prevBatch = Stencil::s_debugBatch;
-			//printf("DEBUG: Render Frame : %i frames redrawn\n", Stencil::s_debugBatch);
-		}
-
+	void NanoRenderer::endFrame()
+	{
 		nvgEndFrame(m_ctx);
 	}
 
@@ -202,16 +178,11 @@ namespace toy
 
 	void NanoRenderer::debugRect(const BoxFloat& rect, const Colour& colour)
 	{
-		//nvgSave(m_ctx);
-		//nvgResetScissor(m_ctx);
-
 		static InkStyle debugStyle;
 		debugStyle.m_borderWidth = 1.f;
 		debugStyle.m_borderColour = colour;
 
 		this->drawRect(rect, BoxFloat(), debugStyle);
-
-		//nvgRestore(m_ctx);
 	}
 
 	void NanoRenderer::fill(InkStyle& skin, const BoxFloat& rect)
@@ -352,9 +323,6 @@ namespace toy
 	{
 		this->setupText(skin);
 
-		const char* first = text.c_str();
-		const char* end = first + text.size();
-
 		textRows.clear();
 	
 		if(!skin.textBreak())
@@ -365,6 +333,9 @@ namespace toy
 			this->fillText(text, rect, skin, textRows[0]);
 			return;
 		}
+
+		const char* first = text.c_str();
+		const char* end = first + text.size();
 
 		while(first < end)
 		{

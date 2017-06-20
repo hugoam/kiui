@@ -8,7 +8,7 @@
 /* toy */
 #include <toyobj/Id.h>
 #include <toyobj/String/String.h>
-#include <toyobj/Typed.h>
+#include <toyobj/Type.h>
 #include <toyobj/Indexer.h>
 #include <toyui/Forward.h>
 #include <toyui/Style/Style.h>
@@ -79,14 +79,14 @@ namespace toy
 	protected:
 		DimFloat d_position;
 		DimFloat d_size;
-		DimFloat d_content;
-		DimFloat d_spaceContent;
-		bool d_contentExpand;
+		DimFloat d_content; // computed
+		DimFloat d_spaceContent; // computed
+		bool d_contentExpand; // computed
 		DimFloat d_span;
-		DimSizing d_sizing;
+		DimSizing d_sizing; // computed
 		float d_scale;
-		Dimension d_depth;
-		Dimension d_length;
+		Dimension d_depth; // computed
+		Dimension d_length; 
 		Opacity d_opacity;
 
 		Style* d_style;

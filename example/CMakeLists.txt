@@ -12,6 +12,7 @@ file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../src/toyui/Context/Glfw/*.
                        UiExample.h)
 
 add_definitions("-DUIEXAMPLE_EXPORT")
+add_definitions("-DTOYUI_DRAW_CACHE")
     
 if (WIN32)
     add_definitions(-DTOYUI_EXAMPLE_RESOURCE_PATH="${CMAKE_INSTALL_PREFIX}/data/")

@@ -12,7 +12,7 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Image : public Struct
+	class _refl_ TOY_UI_EXPORT Image : public Struct
 	{
 	public:
 		Image(const string& name, const string& path, int width = 0, int height = 0)

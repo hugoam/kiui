@@ -277,8 +277,8 @@ namespace toy
 	EmContext::EmContext(RenderSystem& renderSystem, const string& name, int width, int height, bool fullScreen)
 		: Context(renderSystem)
 	{
-		unique_ptr<EmRenderWindow> renderWindow = make_unique<EmRenderWindow>(name, width, height);
-		unique_ptr<EmInputWindow> inputWindow = make_unique<EmInputWindow>(*renderWindow);
+		object_ptr<EmRenderWindow> renderWindow = make_object<EmRenderWindow>(name, width, height);
+		object_ptr<EmInputWindow> inputWindow = make_object<EmInputWindow>(*renderWindow);
 
 		this->init(std::move(renderWindow), std::move(inputWindow));
 	}

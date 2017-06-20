@@ -43,8 +43,9 @@
         }
         
         links {
-            "ogre",
+            "OgreMain",
             "ois",
+            "OpenGL32",
         }
         
     configuration { "context-ogre", "windows" }

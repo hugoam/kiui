@@ -18,7 +18,7 @@ namespace toy
 
 	void FilterInput::filterOn()
 	{
-		this->updateFilter(m_value->ref<string>());
+		this->updateFilter(m_value.value<string>());
 	}
 
 	void FilterInput::filterOff()
@@ -50,6 +50,6 @@ namespace toy
 	void FilterInput::notifyModify()
 	{
 		Input<string>::notifyModify();
-		this->updateFilter(m_value->ref<string>());
+		this->updateFilter(m_value.value<string>());
 	}
 }

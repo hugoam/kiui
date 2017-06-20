@@ -2,14 +2,19 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_UI_H
-#define TOY_UI_H
+#include <toyui/Config.h>
+#include <toyui/Module.h>
 
-#include <toyui/Forward.h>
+#define TOYUI_REFLECTION_IMPL
+#include <toyui/Generated/Imprints.h>
 
 namespace toy
 {
-    
-}
+	toyui toyui::instance;
 
-#endif // TOY_UI_H
+	toyui::toyui()
+		: Module()
+	{
+		toyuiCarbon(*this);
+	}
+}

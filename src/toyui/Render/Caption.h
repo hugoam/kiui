@@ -38,6 +38,8 @@ namespace toy
 		Caption(DrawFrame& frame);
 		Caption(const Caption&) = default;
 
+		std::vector<TextRow>& textRows() { return m_textRows; }
+
 		int caret() { return m_caret; }
 		int selectStart() { return m_selectStart; }
 		int selectEnd() { return m_selectEnd; }
@@ -47,8 +49,6 @@ namespace toy
 		void caret(int value) { m_caret = value; }
 
 		float textSize(Dimension dim);
-
-		void redraw(Renderer& target, const BoxFloat& rect, const BoxFloat& paddedRect, const BoxFloat& contentRect);
 
 		void updateTextRows(Renderer& target, const DimFloat& space);
 		void updateSelection();

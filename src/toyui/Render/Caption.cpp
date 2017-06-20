@@ -34,38 +34,6 @@ namespace toy
 		return result;
 	}
 
-	void Caption::redraw(Renderer& target, const BoxFloat& rect, const BoxFloat& paddedRect, const BoxFloat& contentRect)
-	{
-		static InkStyle textSelectionStyle;
-		textSelectionStyle.m_backgroundColour = Colour(0/255.f, 55/255.f, 255/255.f, 124/255.f);
-
-		static InkStyle caretStyle;
-		caretStyle.m_backgroundColour = Colour::White;
-
-		if(paddedRect.w() <= 0.f || paddedRect.h() <= 0.f)
-			return;
-
-		if(!m_frame.image() && m_frame.text().empty())
-			return;
-
-		target.clipRect(rect);
-
-		if(m_frame.image())
-			target.drawImage(*m_frame.image(), contentRect);
-
-		if(!m_frame.text().empty())
-			for(TextRow& row : m_textRows)
-			{
-				if(!row.selected.null())
-					target.drawRect(BoxFloat(paddedRect.x() + row.selected.x(), paddedRect.y() + row.selected.y(), row.selected.w(), row.selected.h()), BoxFloat(), textSelectionStyle);
-
-				target.drawText(paddedRect.x() + row.rect.x(), paddedRect.y() + row.rect.y(), row.start, row.end, m_frame.inkstyle());
-
-				if(!row.caret.null())
-					target.drawRect(BoxFloat(paddedRect.x() + row.caret.x(), paddedRect.y() + row.caret.y(), row.caret.w(), row.caret.h()), BoxFloat(), caretStyle);
-			}
-	}
-
 	void Caption::updateTextRows(Renderer& target, const DimFloat& space)
 	{
 		std::vector<TextRow> textRows = m_textRows;

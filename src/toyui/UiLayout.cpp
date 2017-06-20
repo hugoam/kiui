@@ -7,7 +7,7 @@
 
 #include <toyui/UiWindow.h>
 
-#include <toyui/Types.h>
+#include <toyui/Bundle.h>
 
 namespace toy
 {
@@ -40,7 +40,7 @@ namespace toy
 	Style& Styler::styledef(const string& name)
 	{
 		if(m_styledefs[name] == nullptr)
-			m_styledefs[name] = std::move(make_unique<Style>(name));
+			m_styledefs[name] = std::move(make_object<Style>(name));
 		return *m_styledefs[name];
 	}
 
@@ -58,7 +58,7 @@ namespace toy
 
 	void Styler::initStyle(Type& type)
 	{
-		unique_ptr<Style> style = make_unique<Style>(type, type.base() ? &this->style(*type.base()) : nullptr);
+		object_ptr<Style> style = make_object<Style>(type, type.base() ? &this->style(*type.base()) : nullptr);
 		this->prepareStyle(*style);
 
 		m_styles[type.name()] = std::move(style);

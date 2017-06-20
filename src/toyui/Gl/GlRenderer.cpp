@@ -29,7 +29,6 @@ namespace toy
 	GlRenderer::GlRenderer(const string& resourcePath, bool clear)
 		: NanoRenderer(resourcePath)
 		, m_clear(clear)
-		, m_clock()
 	{}
 
 	GlRenderer::~GlRenderer()
@@ -81,8 +80,6 @@ namespace toy
 
 	void GlRenderer::render(RenderTarget& target)
 	{
-		this->logFPS();
-
 		if(target.gammaCorrected())
 			glDisable(GL_FRAMEBUFFER_SRGB);
 
@@ -99,22 +96,5 @@ namespace toy
 
 		if(target.gammaCorrected())
 			glEnable(GL_FRAMEBUFFER_SRGB);
-	}
-
-	void GlRenderer::logFPS()
-	{
-		static size_t frames = 0;
-		static double prevtime;
-
-		double time = m_clock.read();
-		double delta = time - prevtime;
-		if(time - prevtime >= 4.f)
-		{
-			printf("INFO: fps %f\n", (frames / (time - prevtime)));
-			prevtime = time;
-			frames = 0;
-		}
-
-		++frames;
 	}
 }

@@ -21,16 +21,10 @@ namespace toy
 		OgreRenderTarget(Renderer& renderer, MasterLayer& masterLayer);
 		~OgreRenderTarget();
 
+	protected:
 		Ogre::SceneManager& m_scene;
 		Ogre::SceneNode& m_node;
 		Ogre::Camera& m_camera;
-	};
-
-	class OgreSpaceTarget : public RenderTarget
-	{
-	public:
-		OgreSpaceTarget(Renderer& renderer, MasterLayer& masterLayer, Ogre::SceneManager& scene, Ogre::Camera& camera);
-		~OgreSpaceTarget();
 	};
 
 	class OgreRenderer : public GlRenderer
@@ -38,7 +32,7 @@ namespace toy
 	public:
 		OgreRenderer(const string& resourcePath);
 
-		virtual unique_ptr<RenderTarget> createRenderTarget(MasterLayer& masterLayer);
+		virtual object_ptr<RenderTarget> createRenderTarget(MasterLayer& masterLayer);
 	};
 }
 

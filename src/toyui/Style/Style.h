@@ -6,7 +6,7 @@
 #define TOY_STYLE_H
 
 /* toy */
-#include <toyobj/Typed.h>
+#include <toyobj/Type.h>
 #include <toyobj/Indexer.h>
 #include <toyobj/Util/Colour.h>
 #include <toyobj/Util/NonCopy.h>
@@ -21,7 +21,7 @@ namespace toy
 {
 	typedef std::function<bool (Frame&, Renderer&)> CustomRenderer;
 
-	class _I_ TOY_UI_EXPORT Shadow : public Struct
+	class _refl_ TOY_UI_EXPORT Shadow : public Struct
 	{
 	public:
 		Shadow(float xpos, float ypos, float blur, float spread, Colour colour = Colour::AlphaBlack)
@@ -45,7 +45,7 @@ namespace toy
 		static Type& cls() { static Type ty(INDEXED); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Paint : public Struct
+	class _refl_ TOY_UI_EXPORT Paint : public Struct
 	{
 	public:
 		Paint() : Struct() {}
@@ -79,7 +79,7 @@ namespace toy
 		bool set;
 	};
 
-	class _I_ TOY_UI_EXPORT LayoutStyle : public Struct
+	class _refl_ TOY_UI_EXPORT LayoutStyle : public Struct
 	{
 	public:
 		LayoutStyle()
@@ -118,20 +118,20 @@ namespace toy
 		void inherit(const LayoutStyle& other) { return this->copy(other, true); }
 		void copy(const LayoutStyle& other) { return this->copy(other, false); }
 
-		/*_A_*/ DimLayout layout() const { return d_layout.val; }
-		/*_A_*/ Flow flow() const { return d_flow.val; }
-		/*_A_*/ Space space() const { return d_space.val; }
-		/*_A_*/ Clipping clipping() const { return d_clipping.val; }
-		/*_A_*/ Opacity opacity() const { return d_opacity.val; }
-		/*_A_*/ Direction direction() const { return d_direction.val; }
-		/*_A_*/ DimAlign& align() { return d_align.val; }
-		/*_A_*/ DimFloat& span() { return d_span.val; }
-		/*_A_*/ DimFloat& size() { return d_size.val; }
-		/*_A_*/ BoxFloat& padding() { return d_padding.val; }
-		/*_A_*/ DimFloat& margin() { return d_margin.val; }
-		/*_A_*/ DimFloat& spacing() { return d_spacing.val; }
-		/*_A_*/ DimPivot& pivot() { return d_pivot.val; }
-		/*_A_*/ int& zorder() { return d_zorder.val; }
+		/*_attr_*/ DimLayout layout() const { return d_layout.val; }
+		/*_attr_*/ Flow flow() const { return d_flow.val; }
+		/*_attr_*/ Space space() const { return d_space.val; }
+		/*_attr_*/ Clipping clipping() const { return d_clipping.val; }
+		/*_attr_*/ Opacity opacity() const { return d_opacity.val; }
+		/*_attr_*/ Direction direction() const { return d_direction.val; }
+		/*_attr_*/ DimAlign& align() { return d_align.val; }
+		/*_attr_*/ DimFloat& span() { return d_span.val; }
+		/*_attr_*/ DimFloat& size() { return d_size.val; }
+		/*_attr_*/ BoxFloat& padding() { return d_padding.val; }
+		/*_attr_*/ DimFloat& margin() { return d_margin.val; }
+		/*_attr_*/ DimFloat& spacing() { return d_spacing.val; }
+		/*_attr_*/ DimPivot& pivot() { return d_pivot.val; }
+		/*_attr_*/ int& zorder() { return d_zorder.val; }
 
 		StyleAttr<DimLayout> d_layout;
 		StyleAttr<Flow> d_flow;
@@ -148,15 +148,15 @@ namespace toy
 		StyleAttr<DimPivot> d_pivot;
 		StyleAttr<int> d_zorder;
 
-		_A_ _M_ size_t d_updated;
+		_attr_ _mut_ size_t d_updated;
 
 		static Type& cls() { static Type ty(INDEXED); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT InkStyle : public Struct
+	class _refl_ TOY_UI_EXPORT InkStyle : public Struct
 	{
 	public:
-		_C_ InkStyle(Style* style = nullptr)
+		_constr_ InkStyle(Style* style = nullptr)
 			: Struct()
 			, m_style(style)
 			, m_empty(true), m_base(nullptr), m_backgroundColour(Colour::None), m_borderColour(Colour::None), m_imageColour(Colour::None), m_textColour(Colour::None)
@@ -214,31 +214,31 @@ namespace toy
 
 		void setEmpty(bool empty) { m_empty = empty; }
 
-		/*_A_*/ bool empty() const { return m_empty.val; }
-		/*_A_*/ Style* base() const { return m_base.val; }
-		/*_A_*/ Colour& backgroundColour() { return m_backgroundColour.val; }
-		/*_A_*/ Colour& borderColour() { return m_borderColour.val; }
-		/*_A_*/ Colour& imageColour() { return m_imageColour.val; }
-		/*_A_*/ Colour& textColour() { return m_textColour.val; }
-		/*_A_*/ const string& textFont() { return m_textFont.val; }
-		/*_A_*/ float& textSize() { return m_textSize.val; }
-		/*_A_*/ bool& textBreak() { return m_textBreak.val; }
-		/*_A_*/ bool& textWrap() { return m_textWrap.val; }
-		/*_A_*/ BoxFloat& borderWidth() { return m_borderWidth.val; }
-		/*_A_*/ BoxFloat& cornerRadius() { return m_cornerRadius.val; }
-		/*_A_*/ bool& weakCorners() { return m_weakCorners.val; }
-		/*_A_*/ BoxFloat& padding() { return m_padding.val; }
-		/*_A_*/ BoxFloat& margin() { return m_margin.val; }
-		/*_A_*/ DimAlign& align() { return m_align.val; }
-		/*_A_*/ DimFloat& linearGradient() { return m_linearGradient.val; }
-		/*_A_*/ Dimension& linearGradientDim() { return m_linearGradientDim.val; }
-		/*_A_*/ Image* image() { return m_image.val; }
-		/*_A_*/ Image* overlay() { return m_overlay.val; }
-		/*_A_*/ Image* tile() { return m_tile.val; }
-		/*_A_*/ ImageSkin& imageSkin() { return m_imageSkin.val; }
-		/*_A_*/ Shadow& shadow() { return m_shadow.val; }
-		/*_A_*/ Type* hoverCursor() { return m_hoverCursor.val; }
-		/*_A_*/ const CustomRenderer& customRenderer() { return m_customRenderer.val; }
+		/*_attr_*/ bool empty() const { return m_empty.val; }
+		/*_attr_*/ Style* base() const { return m_base.val; }
+		/*_attr_*/ Colour& backgroundColour() { return m_backgroundColour.val; }
+		/*_attr_*/ Colour& borderColour() { return m_borderColour.val; }
+		/*_attr_*/ Colour& imageColour() { return m_imageColour.val; }
+		/*_attr_*/ Colour& textColour() { return m_textColour.val; }
+		/*_attr_*/ const string& textFont() { return m_textFont.val; }
+		/*_attr_*/ float& textSize() { return m_textSize.val; }
+		/*_attr_*/ bool& textBreak() { return m_textBreak.val; }
+		/*_attr_*/ bool& textWrap() { return m_textWrap.val; }
+		/*_attr_*/ BoxFloat& borderWidth() { return m_borderWidth.val; }
+		/*_attr_*/ BoxFloat& cornerRadius() { return m_cornerRadius.val; }
+		/*_attr_*/ bool& weakCorners() { return m_weakCorners.val; }
+		/*_attr_*/ BoxFloat& padding() { return m_padding.val; }
+		/*_attr_*/ BoxFloat& margin() { return m_margin.val; }
+		/*_attr_*/ DimAlign& align() { return m_align.val; }
+		/*_attr_*/ DimFloat& linearGradient() { return m_linearGradient.val; }
+		/*_attr_*/ Dimension& linearGradientDim() { return m_linearGradientDim.val; }
+		/*_attr_*/ Image* image() { return m_image.val; }
+		/*_attr_*/ Image* overlay() { return m_overlay.val; }
+		/*_attr_*/ Image* tile() { return m_tile.val; }
+		/*_attr_*/ ImageSkin& imageSkin() { return m_imageSkin.val; }
+		/*_attr_*/ Shadow& shadow() { return m_shadow.val; }
+		/*_attr_*/ Type* hoverCursor() { return m_hoverCursor.val; }
+		/*_attr_*/ const CustomRenderer& customRenderer() { return m_customRenderer.val; }
 
 		void prepare();
 
@@ -286,18 +286,18 @@ namespace toy
 
 	typedef std::vector<SubSkin> StyleTable;
 
-	class _I_ TOY_UI_EXPORT Style : public IdObject
+	class _refl_ TOY_UI_EXPORT Style : public IdObject
 	{
 	public:
 		Style(Type& type, Style* base = nullptr);
 		Style(const string& name);
 		~Style();
 
-		_A_ const string& name() { return m_name.empty() ? m_styleType->name() : m_name; }
-		_A_ Style* base() { return m_base; }
-		_A_ LayoutStyle& layout() { return m_layout; }
-		_A_ InkStyle& skin() { return m_skin; }
-		_A_ _M_ size_t updated() { return m_updated; }
+		_attr_ const string& name() { return m_name.empty() ? m_styleType->name() : m_name; }
+		_attr_ Style* base() { return m_base; }
+		_attr_ LayoutStyle& layout() { return m_layout; }
+		_attr_ InkStyle& skin() { return m_skin; }
+		_attr_ _mut_ size_t updated() { return m_updated; }
 
 		void markUpdate() { ++m_updated; }
 		void setUpdated(size_t update) { m_updated = update; }

@@ -169,7 +169,7 @@ namespace toy
 		while(dockid.size() > 0)
 		{
 			size_t index = dockid.back(); dockid.pop_back();
-			if(index >= dockline->count())
+			while(index >= dockline->count())
 				dockline->appendLine();
 			dockline = &dockline->at(index).as<Dockline>();
 		}

@@ -36,6 +36,7 @@ namespace toy
 	{
 	public:
 		Controller(ControlMode controlMode, DeviceType deviceType = DEVICE_ALL);
+		~Controller();
 
 		ControlMode controlMode() { return m_controlMode; }
 
@@ -48,6 +49,7 @@ namespace toy
 		ControlMode m_controlMode;
 		DeviceType m_deviceType;
 		Widget* m_inputWidget;
+		RootSheet* m_rootSheet; // @kludge
 	};
 }
 

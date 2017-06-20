@@ -71,7 +71,7 @@ namespace toy
 	void Layer::removeLayer(Layer& layer)
 	{
 		size_t index = layer.index();
-		d_sublayers.erase(std::remove(d_sublayers.begin(), d_sublayers.end(), &layer), d_sublayers.end());
+		vector_remove(d_sublayers, &layer);
 		this->reindex(index);
 	}
 

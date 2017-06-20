@@ -20,7 +20,7 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Scroller : public Slider
+	class _refl_ TOY_UI_EXPORT Scroller : public Slider
 	{
 	public:
 		Scroller(Wedge& parent, Dimension dim);
@@ -30,7 +30,7 @@ namespace toy
 		static Type& cls() { static Type ty("Scroller", Slider::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT ScrollerKnob : public SliderKnob
+	class _refl_ TOY_UI_EXPORT ScrollerKnob : public SliderKnob
 	{
 	public:
 		ScrollerKnob(Wedge& parent, Dimension dim);
@@ -38,7 +38,7 @@ namespace toy
 		static Type& cls() { static Type ty("ScrollerKnob", SliderKnob::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT ScrollForward : public Button
+	class _refl_ TOY_UI_EXPORT ScrollForward : public Button
 	{
 	public:
 		ScrollForward(Wedge& parent, const Callback& trigger);
@@ -46,7 +46,7 @@ namespace toy
 		static Type& cls() { static Type ty("ScrollForward", Button::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT ScrollBackward : public Button
+	class _refl_ TOY_UI_EXPORT ScrollBackward : public Button
 	{
 	public:
 		ScrollBackward(Wedge& parent, const Callback& trigger);
@@ -78,7 +78,7 @@ namespace toy
 		static Type& cls() { static Type ty("ScrollRight", Button::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Scrollbar : public Row
+	class _refl_ TOY_UI_EXPORT Scrollbar : public Row
 	{
 	public:
 		Scrollbar(Wedge& parent, Wedge& frameSheet, Wedge& contentSheet, Dimension dim);

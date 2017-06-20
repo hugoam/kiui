@@ -6,7 +6,7 @@
 #define TOY_WIDGET_H
 
 /* toy */
-#include <toyobj/Typed.h>
+#include <toyobj/Type.h>
 #include <toyobj/String/String.h>
 #include <toyobj/Util/Updatable.h>
 #include <toyui/Forward.h>
@@ -19,7 +19,7 @@
 
 namespace toy
 {
-	enum _I_ WidgetState : unsigned int
+	enum _refl_ WidgetState : unsigned int
 	{
 		NOSTATE = 0,			// default state
 		FOCUSED = 1 << 1,		// under input device focus
@@ -33,19 +33,19 @@ namespace toy
 		MODAL = 1 << 9			// widget is modal in the control stack
 	};
 
-	class _I_ TOY_UI_EXPORT Widget : public TypeObject, public InputAdapter, public Updatable
+	class _refl_ TOY_UI_EXPORT Widget : public TypeObject, public InputAdapter, public Updatable
 	{
 	public:
 		Widget(Wedge& parent, Type& type = cls(), FrameType frameType = FRAME);
 		Widget(Type& type = cls(), FrameType frameType = FRAME, Wedge* parent = nullptr);
 		~Widget();
 
-		_A_ inline Wedge* parent() { return m_parent; }
-		_A_ inline Container* container() { return m_container; }
-		_A_ inline size_t index() { return m_index; }
-		_A_ inline Frame& frame() { return *m_frame; }
-		_A_ inline WidgetState state() { return m_state; }
-		_A_ _M_ inline Style& style() { return *m_style; }
+		_attr_ inline Wedge* parent() { return m_parent; }
+		_attr_ inline Container* container() { return m_container; }
+		_attr_ inline size_t index() { return m_index; }
+		_attr_ inline Frame& frame() { return *m_frame; }
+		_attr_ inline WidgetState state() { return m_state; }
+		_attr_ _mut_ inline Style& style() { return *m_style; }
 
 		inline Device* device() { return m_device; }
 
@@ -53,10 +53,10 @@ namespace toy
 		void setContainer(Container& container) { m_container = &container; }
 		DrawFrame& content();
 
-		_A_ _M_ const string& label();
+		_attr_ _mut_ const string& label();
 		void setLabel(const string& label);
 
-		_A_ _M_ Image* image();
+		_attr_ _mut_ Image* image();
 		void setImage(Image* image);
 
 		Image& findImage(const string& name);
@@ -76,10 +76,13 @@ namespace toy
 		void show();
 		void hide();
 
+		virtual void bound(RootSheet& rootSheet);
+		virtual void unbound(RootSheet& rootSheet, bool destroy);
+
 		void bind(Wedge& parent, size_t index);
 		void unbind(bool destroy);
 
-		unique_ptr<Widget> extract();
+		object_ptr<Widget> extract();
 		void destroy();
 
 		template <class T>
@@ -92,7 +95,6 @@ namespace toy
 		virtual void visit(const Visitor& visitor);
 
 		virtual void nextFrame(size_t tick, size_t delta);
-		virtual void render(Renderer& renderer, bool force);
 
 		void updateStyle();
 
@@ -148,7 +150,7 @@ namespace toy
 		Container* m_container;
 		size_t m_index;
 		Style* m_style;
-		unique_ptr<Frame> m_frame;
+		object_ptr<Frame> m_frame;
 		WidgetState m_state;
 
 		Device* m_device;
@@ -156,7 +158,7 @@ namespace toy
 		static string sNullString;
 	};
 
-	class _I_ TOY_UI_EXPORT Item : public Widget
+	class _refl_ TOY_UI_EXPORT Item : public Widget
 	{
 	public:
 		Item(Wedge& parent, Type& type = cls());
@@ -164,7 +166,7 @@ namespace toy
 		static Type& cls() { static Type ty("Item", Widget::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Control : public Item
+	class _refl_ TOY_UI_EXPORT Control : public Item
 	{
 	public:
 		Control(Wedge& parent, Type& type = cls());

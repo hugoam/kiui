@@ -6,7 +6,7 @@
 #define TOY_TREE_H
 
 /* toy */
-#include <toyobj/Typed.h>
+#include <toyobj/Type.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Container/ScrollSheet.h>
 
@@ -32,7 +32,7 @@ namespace toy
 		static Type& cls() { static Type ty("TreeNodeToggle", ExpandboxToggle::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT TreeNode : public Expandbox
+	class _refl_ TOY_UI_EXPORT TreeNode : public Expandbox
 	{
 	public:
 		TreeNode(Wedge& parent, const string& image, const string& title, bool collapsed = false, Type& type = cls());
@@ -51,7 +51,7 @@ namespace toy
 		Icon* m_icon;
 	};
 
-	class _I_ TOY_UI_EXPORT Tree : public Container
+	class _refl_ TOY_UI_EXPORT Tree : public Container
 	{
 	public:
 		Tree(Wedge& parent, const std::function<void (TreeNode&)>& onSelected = nullptr);

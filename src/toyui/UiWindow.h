@@ -17,7 +17,7 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT RenderSystem
+	class TOY_UI_EXPORT RenderSystem : public Object
 	{
 	public:
 		RenderSystem(const string& resourcePath, bool manualRender);
@@ -25,22 +25,24 @@ namespace toy
 		const string& resourcePath() const { return m_resourcePath; }
 		bool manualRender() const { return m_manualRender; }
 
-		virtual unique_ptr<Context> createContext(const string& name, int width, int height, bool fullScreen) = 0;
-		virtual unique_ptr<Renderer> createRenderer(Context& context) = 0;
+		virtual object_ptr<Context> createContext(const string& name, int width, int height, bool fullScreen) = 0;
+		virtual object_ptr<Renderer> createRenderer(Context& context) = 0;
+
+		static Type& cls() { static Type ty; return ty; }
 
 	protected:
 		string m_resourcePath;
 		bool m_manualRender;
 	};
 
-	class TOY_UI_EXPORT Context
+	class TOY_UI_EXPORT Context : public Object
 	{
 	public:
-		Context(RenderSystem& renderSystem, unique_ptr<RenderWindow> renderWindow, unique_ptr<InputWindow> inputWindow);
+		Context(RenderSystem& renderSystem, object_ptr<RenderWindow> renderWindow, object_ptr<InputWindow> inputWindow);
 		Context(RenderSystem& renderSystem);
 		~Context();
 
-		void init(unique_ptr<RenderWindow> renderWindow, unique_ptr<InputWindow> inputWindow);
+		void init(object_ptr<RenderWindow> renderWindow, object_ptr<InputWindow> inputWindow);
 
 		RenderWindow& renderWindow() { return *m_renderWindow; }
 		InputWindow& inputWindow() { return *m_inputWindow; }
@@ -48,15 +50,17 @@ namespace toy
 		RenderSystem& renderSystem() { return m_renderSystem; }
 		const string& resourcePath() const { return m_resourcePath; }
 
+		static Type& cls() { static Type ty; return ty; }
+
 	protected:
-		unique_ptr<RenderWindow> m_renderWindow;
-		unique_ptr<InputWindow> m_inputWindow;
+		object_ptr<RenderWindow> m_renderWindow;
+		object_ptr<InputWindow> m_inputWindow;
 
 		RenderSystem& m_renderSystem;
 		string m_resourcePath;
 	};
 
-	class TOY_UI_EXPORT UiWindow
+	class TOY_UI_EXPORT UiWindow : public Object
 	{
 	public:
 		UiWindow(RenderSystem& system, const string& name, int width, int height, bool fullScreen, User* user = nullptr);
@@ -68,7 +72,6 @@ namespace toy
 		Context& context() { return *m_context; }
 		Renderer& renderer() const { return *m_renderer; }
 
-		std::vector<Image>& images() { return m_images; }
 		ImageAtlas& imageAtlas() { return m_atlas; }
 
 		float width() const { return m_width; }
@@ -99,6 +102,8 @@ namespace toy
 
 		void makeActive(Widget& widget);
 
+		static Type& cls() { static Type ty; return ty; }
+
 	protected:
 		void initResources();
 		void loadResources();
@@ -107,18 +112,18 @@ namespace toy
 		RenderSystem& m_system;
 		string m_resourcePath;
 
-		unique_ptr<Context> m_context;
-		unique_ptr<Renderer> m_renderer;
+		object_ptr<Context> m_context;
+		object_ptr<Renderer> m_renderer;
 
-		std::vector<Image> m_images;
+		std::vector<object_ptr<Image>> m_images;
 		ImageAtlas m_atlas;
 
 		float m_width;
 		float m_height;
 
-		unique_ptr<Styler> m_styler;
+		object_ptr<Styler> m_styler;
 
-		unique_ptr<RootSheet> m_rootSheet;
+		object_ptr<RootSheet> m_rootSheet;
 
 		Widget* m_active;
 

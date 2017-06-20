@@ -255,7 +255,7 @@ namespace toy
 		glfwSetCursorPosCallback(m_glWindow, [](GLFWwindow* w, double x, double y) { static_cast<GlfwInputWindow*>(glfwGetWindowUserPointer(w))->injectMouseMove(x, y); });
 		glfwSetScrollCallback(m_glWindow, [](GLFWwindow* w, double x, double y) { static_cast<GlfwInputWindow*>(glfwGetWindowUserPointer(w))->injectWheel(x, y); });
 
-		glfwSetInputMode(m_glWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		//glfwSetInputMode(m_glWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	}
 
 	GlfwInputWindow::~GlfwInputWindow()
@@ -324,8 +324,8 @@ namespace toy
 	GlfwContext::GlfwContext(RenderSystem& renderSystem, const string& name, int width, int height, bool fullScreen, bool autoSwap)
 		: Context(renderSystem)
 	{
-		unique_ptr<GlfwRenderWindow> renderWindow = make_unique<GlfwRenderWindow>(name, width, height, autoSwap);
-		unique_ptr<GlfwInputWindow> inputWindow = make_unique<GlfwInputWindow>(*renderWindow);
+		object_ptr<GlfwRenderWindow> renderWindow = make_object<GlfwRenderWindow>(name, width, height, autoSwap);
+		object_ptr<GlfwInputWindow> inputWindow = make_object<GlfwInputWindow>(*renderWindow);
 
 		this->init(std::move(renderWindow), std::move(inputWindow));
 	}
@@ -334,13 +334,13 @@ namespace toy
 		: RenderSystem(resourcePath, true)
 	{}
 
-	unique_ptr<Context> GlfwRenderSystem::createContext(const string& name, int width, int height, bool fullScreen)
+	object_ptr<Context> GlfwRenderSystem::createContext(const string& name, int width, int height, bool fullScreen)
 	{
-		return make_unique<GlfwContext>(*this, name, width, height, fullScreen, true);
+		return make_object<GlfwContext>(*this, name, width, height, fullScreen, true);
 	}
 
-	unique_ptr<Renderer> GlfwRenderSystem::createRenderer(Context& context)
+	object_ptr<Renderer> GlfwRenderSystem::createRenderer(Context& context)
 	{
-		return make_unique<GlRenderer>(m_resourcePath, true);
+		return make_object<GlRenderer>(m_resourcePath, true);
 	}
 }

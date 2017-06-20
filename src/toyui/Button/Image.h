@@ -17,8 +17,11 @@ namespace toy
 	{
 	public:
 		Figure(Wedge& parent, Lref& image);
+		
+		virtual void unbound(RootSheet& rootSheet, bool destroy);
 
 		void updateImage();
+		void clearImage();
 
 		static Type& cls() { static Type ty("Figure", Item::cls()); return ty; }
 

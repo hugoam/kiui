@@ -6,6 +6,7 @@
 #define TOY_INPUTDISPATCHER_H
 
 /* toy */
+#include <toyobj/Type.h>
 #include <toyobj/Util/Unique.h>
 #include <toyui/Forward.h>
 #include <toyui/Input/KeyCode.h>
@@ -95,13 +96,15 @@ namespace toy
 		{}
 	};
 
-	class TOY_UI_EXPORT InputWindow
+	class TOY_UI_EXPORT InputWindow : public Object
 	{
 	public:
 		virtual bool nextFrame() = 0;
 
 		virtual void initInput(Mouse& mouse, Keyboard& keyboard) = 0;
 		virtual void resize(size_t width, size_t height) = 0;
+
+		static Type& cls() { static Type ty; return ty; }
 	};
 
 	enum ControlMode
@@ -172,7 +175,7 @@ namespace toy
 		unique_ptr<ControlNode> m_controlGraph;
 	};
 
-	class TOY_UI_EXPORT ControlNode //: public InputReceiver
+	class TOY_UI_EXPORT ControlNode : public Struct//: public InputReceiver
 	{
 	public:
 		ControlNode(InputReceiver& receiver, ControlNode* parent, ControlMode mode, DeviceType device);

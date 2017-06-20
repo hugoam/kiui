@@ -18,65 +18,66 @@ namespace toy
 		~NanoRenderer();
 
 		// targets
-		virtual unique_ptr<RenderTarget> createRenderTarget(MasterLayer& masterLayer);
+		virtual object_ptr<RenderTarget> createRenderTarget(MasterLayer& masterLayer);
 
 		// setup
-		virtual void loadFont();
-		virtual void loadImageRGBA(Image& image, const unsigned char* data);
-		virtual void loadImage(Image& image);
-		virtual void unloadImage(Image& image);
+		virtual void loadFont() final;
+		virtual void loadImageRGBA(Image& image, const unsigned char* data) final;
+		virtual void loadImage(Image& image) final;
+		virtual void unloadImage(Image& image) final;
 
 		// rendering
-		virtual void render(RenderTarget& target);
+		virtual void beginFrame(RenderTarget& target) final;
+		virtual void endFrame() final;
 
 		// drawing
-		virtual void beginTarget();
-		virtual void endTarget();
+		virtual void beginTarget() final;
+		virtual void endTarget() final;
 
 #ifdef TOYUI_DRAW_CACHE
-		virtual void layerCache(Layer& layer, void*& layerCache);
-		virtual void clearLayer(void* layerCache);
-		virtual void drawLayer(void* layerCache, float x, float y, float scale);
+		virtual void layerCache(Layer& layer, void*& layerCache) final;
+		virtual void clearLayer(void* layerCache) final;
+		virtual void drawLayer(void* layerCache, float x, float y, float scale) final;
 
-		virtual void beginUpdate(void* layerCache, float x, float y, float scale);
-		virtual void endUpdate();
+		virtual void beginUpdate(void* layerCache, float x, float y, float scale) final;
+		virtual void endUpdate() final;
 #else
-		virtual void beginUpdate(float x, float y);
-		virtual void endUpdate();
+		virtual void beginUpdate(float x, float y) final;
+		virtual void endUpdate() final;
 #endif
 
-		virtual bool clipTest(const BoxFloat& rect);
-		virtual void clipRect(const BoxFloat& rect);
-		virtual void unclipRect();
+		virtual bool clipTest(const BoxFloat& rect) final;
+		virtual void clipRect(const BoxFloat& rect) final;
+		virtual void unclipRect() final;
 
-		virtual void pathLine(float x1, float y1, float x2, float y2);
-		virtual void pathBezier(float x1, float y1, float c1x, float c1y, float c2x, float c2y, float x2, float y2);
-		virtual void pathRect(const BoxFloat& rect, const BoxFloat& corners, float border);
-		virtual void pathCircle(float x, float y, float r);
+		virtual void pathLine(float x1, float y1, float x2, float y2) final;
+		virtual void pathBezier(float x1, float y1, float c1x, float c1y, float c2x, float c2y, float x2, float y2) final;
+		virtual void pathRect(const BoxFloat& rect, const BoxFloat& corners, float border) final;
+		virtual void pathCircle(float x, float y, float r) final;
 
-		virtual void drawShadow(const BoxFloat& rect, const BoxFloat& corner, const Shadow& shadows);
-		virtual void drawRect(const BoxFloat& rect, const BoxFloat& corners, InkStyle& skin);
-		virtual void drawImage(const Image& image, const BoxFloat& rect);
-		virtual void drawImageStretch(const Image& image, const BoxFloat& rect, float xstretch = 1.f, float ystretch = 1.f);
-		virtual void drawText(float x, float y, const char* start, const char* end, InkStyle& skin);
+		virtual void drawShadow(const BoxFloat& rect, const BoxFloat& corner, const Shadow& shadows) final;
+		virtual void drawRect(const BoxFloat& rect, const BoxFloat& corners, InkStyle& skin) final;
+		virtual void drawImage(const Image& image, const BoxFloat& rect) final;
+		virtual void drawImageStretch(const Image& image, const BoxFloat& rect, float xstretch = 1.f, float ystretch = 1.f) final;
+		virtual void drawText(float x, float y, const char* start, const char* end, InkStyle& skin) final;
 
-		virtual void debugRect(const BoxFloat& rect, const Colour& colour);
+		virtual void debugRect(const BoxFloat& rect, const Colour& colour) final;
 
-		virtual void fill(InkStyle& skin, const BoxFloat& rect);
-		virtual void stroke(InkStyle& skin);
+		virtual void fill(InkStyle& skin, const BoxFloat& rect) final;
+		virtual void stroke(InkStyle& skin) final;
 
-		virtual void strokeGradient(const Paint& paint, const DimFloat& start, const DimFloat& end);
+		virtual void strokeGradient(const Paint& paint, const DimFloat& start, const DimFloat& end) final;
 
-		virtual void fillText(const string& text, const BoxFloat& rect, InkStyle& skin, TextRow& row);
+		virtual void fillText(const string& text, const BoxFloat& rect, InkStyle& skin, TextRow& row) final;
 
-		virtual void breakText(const string& text, const DimFloat& space, InkStyle& skin, std::vector<TextRow>& textRows);
-		virtual void breakTextLine(const BoxFloat& rect, TextRow& textRow);
+		virtual void breakText(const string& text, const DimFloat& space, InkStyle& skin, std::vector<TextRow>& textRows) final;
+		virtual void breakTextLine(const BoxFloat& rect, TextRow& textRow) final;
 
-		virtual void breakTextWidth(const char* string, const char* end, const BoxFloat& rect, InkStyle& skin, TextRow& textRow);
-		virtual void breakTextReturns(const char* string, const char* end, const BoxFloat& rect, InkStyle& skin, TextRow& textRow);
+		virtual void breakTextWidth(const char* string, const char* end, const BoxFloat& rect, InkStyle& skin, TextRow& textRow) final;
+		virtual void breakTextReturns(const char* string, const char* end, const BoxFloat& rect, InkStyle& skin, TextRow& textRow) final;
 
-		virtual float textLineHeight(InkStyle& skin);
-		virtual float textSize(const string& text, Dimension dim, InkStyle& skin);
+		virtual float textLineHeight(InkStyle& skin) final;
+		virtual float textSize(const string& text, Dimension dim, InkStyle& skin) final;
 
 	private:
 		void setupText(InkStyle& skin);

@@ -6,13 +6,13 @@
 #define TOY_LAYOUT_H
 
 /* toy */
-#include <toyobj/Typed.h>
+#include <toyobj/Type.h>
 #include <toyui/Forward.h>
 #include <toyui/Widget/Sheet.h>
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Page : public Container
+	class _refl_ TOY_UI_EXPORT Page : public Container
 	{
 	public:
 		Page(Wedge& parent, Type& type = cls());
@@ -20,7 +20,7 @@ namespace toy
 		static Type& cls() { static Type ty("Page", Container::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Dialog : public Container
+	class _refl_ TOY_UI_EXPORT Dialog : public Container
 	{
 	public:
 		Dialog(Wedge& parent, Type& type = cls());
@@ -28,7 +28,7 @@ namespace toy
 		static Type& cls() { static Type ty("Dialog", Container::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Board : public Container
+	class _refl_ TOY_UI_EXPORT Board : public Container
 	{
 	public:
 		Board(Wedge& parent, Type& type = cls());
@@ -36,7 +36,7 @@ namespace toy
 		static Type& cls() { static Type ty("Board", Container::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Layout : public Board
+	class _refl_ TOY_UI_EXPORT Layout : public Board
 	{
 	public:
 		Layout(Wedge& parent, Type& type = cls());
@@ -44,7 +44,7 @@ namespace toy
 		static Type& cls() { static Type ty("Layout", Board::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Row : public Container
+	class _refl_ TOY_UI_EXPORT Row : public Container
 	{
 	public:
 		Row(Wedge& parent, Type& type = cls());
@@ -52,7 +52,7 @@ namespace toy
 		static Type& cls() { static Type ty("Row", Container::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Div : public Container
+	class _refl_ TOY_UI_EXPORT Div : public Container
 	{
 	public:
 		Div(Wedge& parent, Type& type = cls());
@@ -60,7 +60,7 @@ namespace toy
 		static Type& cls() { static Type ty("Div", Container::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Stack : public Container
+	class _refl_ TOY_UI_EXPORT Stack : public Container
 	{
 	public:
 		Stack(Wedge& parent, Type& type = cls(), FrameType frameType = STRIPE);
@@ -68,7 +68,7 @@ namespace toy
 		static Type& cls() { static Type ty("Stack", Container::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Sheet : public Container
+	class _refl_ TOY_UI_EXPORT Sheet : public Container
 	{
 	public:
 		Sheet(Wedge& parent, Type& type = cls());
@@ -76,7 +76,7 @@ namespace toy
 		static Type& cls() { static Type ty("Sheet", Container::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Header : public Row
+	class _refl_ TOY_UI_EXPORT Header : public Row
 	{
 	public:
 		Header(Wedge& parent, Type& type = cls());

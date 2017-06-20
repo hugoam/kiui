@@ -40,17 +40,17 @@ namespace toy
 		, m_device(nullptr)
 	{
 		if(frameType == MASTER_LAYER)
-			m_frame = make_unique<MasterLayer>(*this);
+			m_frame = make_object<MasterLayer>(*this);
 		else if(frameType == LAYER)
-			m_frame = make_unique<Layer>(*this);
+			m_frame = make_object<Layer>(*this);
 		else if(frameType == GRID)
-			m_frame = make_unique<Grid>(*this);
+			m_frame = make_object<Grid>(*this);
 		else if(frameType == TABLE)
-			m_frame = make_unique<TableGrid>(*this);
+			m_frame = make_object<TableGrid>(*this);
 		else if(frameType == STRIPE)
-			m_frame = make_unique<Stripe>(*this);
+			m_frame = make_object<Stripe>(*this);
 		else if(frameType == FRAME)
-			m_frame = make_unique<Frame>(*this);
+			m_frame = make_object<Frame>(*this);
 
 		if(m_parent)
 			this->updateStyle();
@@ -114,6 +114,19 @@ namespace toy
 		return this->content().text();
 	}
 
+	void Widget::bound(RootSheet& rootSheet)
+	{
+		rootSheet.handleBindWidget(*this);
+	}
+
+	void Widget::unbound(RootSheet& rootSheet, bool destroy)
+	{
+		rootSheet.handleUnbindWidget(*this, destroy);
+
+		if(destroy && m_controlGraph)
+			m_controlGraph = nullptr;
+	}
+
 	void Widget::bind(Wedge& parent, size_t index)
 	{
 		m_parent = &parent;
@@ -124,13 +137,13 @@ namespace toy
 		m_parent->stripe().map(*m_frame);
 
 		RootSheet& rootSheet = this->rootSheet();
-		this->visit([&rootSheet](Widget& widget) { rootSheet.handleBindWidget(widget); return true; });
+		this->visit([&rootSheet](Widget& widget) { widget.bound(rootSheet); return true; });
 	}
 
 	void Widget::unbind(bool destroy)
 	{
 		RootSheet& rootSheet = this->rootSheet();
-		this->visit([&rootSheet, destroy](Widget& widget) { rootSheet.handleUnbindWidget(widget, destroy); return true; });
+		this->visit([&rootSheet, destroy](Widget& widget) { widget.unbound(rootSheet, destroy); return true; });
 
 		if(m_frame->mapped())
 			m_parent->stripe().unmap(*m_frame);
@@ -139,9 +152,9 @@ namespace toy
 		m_index = 0;
 	}
 
-	unique_ptr<Widget> Widget::extract()
+	object_ptr<Widget> Widget::extract()
 	{
-		unique_ptr<Widget> unique = m_container->release(*this, false);
+		object_ptr<Widget> unique = m_container->release(*this, false);
 		m_parent->destroy();
 		return unique;
 	}
@@ -153,7 +166,7 @@ namespace toy
 
 	Widget* Widget::findContainer(Type& type)
 	{
-		Widget* widget = this->parent();
+		Widget* widget = this;
 
 		while(widget)
 		{
@@ -174,13 +187,6 @@ namespace toy
 	{
 		if(m_style->updated() > m_frame->styleStamp())
 			m_frame->resetStyle();
-	}
-
-	void Widget::render(Renderer& renderer, bool force)
-	{
-		m_frame->content().beginDraw(renderer, force);
-		m_frame->content().draw(renderer, force);
-		m_frame->content().endDraw(renderer);
 	}
 
 	void Widget::show()

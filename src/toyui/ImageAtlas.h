@@ -31,7 +31,7 @@ namespace toy
 		const std::vector<Image*>& sprites() const { return m_sprites; }
 
 		void createAtlas();
-		void generateAtlas(std::vector<Image>& images);
+		void generateAtlas(std::vector<object_ptr<Image>>& images);
 
 		void setupAtlas(int index);
 

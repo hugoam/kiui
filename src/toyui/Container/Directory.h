@@ -15,7 +15,7 @@ struct dirent;
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Dir : public MultiButton
+	class _refl_ TOY_UI_EXPORT Dir : public MultiButton
 	{
 	public:
 		Dir(Wedge& parent, Directory& directory, const string& name);
@@ -29,7 +29,7 @@ namespace toy
 		string m_name;
 	};
 
-	class _I_ TOY_UI_EXPORT File : public MultiButton
+	class _refl_ TOY_UI_EXPORT File : public MultiButton
 	{
 	public:
 		File(Wedge& parent, Directory& directory, const string& name);
@@ -43,7 +43,7 @@ namespace toy
 		string m_name;
 	};
 
-	class _I_ TOY_UI_EXPORT Directory : public Container
+	class _refl_ TOY_UI_EXPORT Directory : public Container
 	{
 	public:
 		Directory(Wedge& parent, const string& path);
@@ -60,7 +60,7 @@ namespace toy
 		string m_path;
 	};
 
-	class _I_ TOY_UI_EXPORT FileBrowser : public Wedge
+	class _refl_ TOY_UI_EXPORT FileBrowser : public Wedge
 	{
 	public:
 		FileBrowser(Wedge& parent, const string& path);
@@ -72,7 +72,7 @@ namespace toy
 		Directory m_directory;
 	};
 
-	class _I_ TOY_UI_EXPORT FileNode : public TreeNode
+	class _refl_ TOY_UI_EXPORT FileNode : public TreeNode
 	{
 	public:
 		FileNode(Wedge& parent, const string& name);
@@ -80,7 +80,7 @@ namespace toy
 		static Type& cls() { static Type ty("FileNode", TreeNode::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT DirectoryNode : public TreeNode
+	class _refl_ TOY_UI_EXPORT DirectoryNode : public TreeNode
 	{
 	public:
 		DirectoryNode(Wedge& parent, const string& path, const string& name, bool collapsed);

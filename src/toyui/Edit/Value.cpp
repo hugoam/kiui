@@ -5,6 +5,8 @@
 #include <toyui/Config.h>
 #include <toyui/Edit/Value.h>
 
+#include <toyui/Types.h>
+
 #include <toyobj/Object.h>
 #include <toyobj/String/StringConvert.h>
 #include <toyobj/Util/StatString.h>
@@ -49,12 +51,12 @@ namespace toy
 
 	string Value::getString()
 	{
-		return m_value->getString();
+		return m_value.getString();
 	}
 
 	void Value::setString(const string& value)
 	{
-		m_value->setString(value);
+		m_value.setString(value);
 		this->triggerModify();
 	}
 
@@ -72,10 +74,10 @@ namespace toy
 	{
 		size_t precision = 3;
 
-		string result = m_value->getString();
+		string result = m_value.getString();
 
-		if(&m_value->type() == &typecls<float>() || &m_value->type() == &typecls<double>()
-		|| &m_value->type() == &typecls<AutoStat<float>>() || &m_value->type() == &typecls<AutoStat<double>>())
+		if(m_value.isa<float>() || m_value.isa<double>()
+		|| m_value.isa<AutoStat<float>>() || m_value.isa<AutoStat<double>>())
 		{
 			size_t dot = result.find(".");
 			if(precision > 0 && dot != string::npos)

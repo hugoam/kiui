@@ -31,7 +31,7 @@ namespace toy
 
 	TableGrid::TableGrid(Widget& widget)
 		: Stripe(widget)
-		, d_grid(make_unique<GridOverlay>(widget, *this))
+		, d_grid(make_object<GridOverlay>(widget, *this))
 	{}
 
 	void TableGrid::deepMap(Frame& frame)
@@ -57,7 +57,7 @@ namespace toy
 	void TableGrid::resize(size_t columns)
 	{
 		while(d_columns.size() < columns)
-			d_columns.emplace_back(make_unique<GridColumn>(*d_widget, *d_grid));
+			d_columns.emplace_back(make_object<GridColumn>(*d_widget, *d_grid));
 	}
 
 	Grid::Grid(Widget& widget)
@@ -82,7 +82,7 @@ namespace toy
 	void Grid::resize(size_t lines)
 	{
 		while(d_lines.size() < lines)
-			d_lines.emplace_back(make_unique<GridLine>(*d_widget, *this));
+			d_lines.emplace_back(make_object<GridLine>(*d_widget, *this));
 	}
 
 	void Grid::move(Frame& frame, size_t xindex, size_t yindex)

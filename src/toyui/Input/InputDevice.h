@@ -16,12 +16,14 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT InputDevice
+	class TOY_UI_EXPORT InputDevice : public Object
 	{
 	public:
 		InputDevice(RootSheet& rootSheet);
 
 		RootSheet& rootSheet() { return m_rootSheet; }
+
+		static Type& cls() { static Type ty; return ty; }
 
 	protected:
 		RootSheet& m_rootSheet;

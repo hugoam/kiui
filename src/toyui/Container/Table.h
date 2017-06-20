@@ -12,7 +12,7 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT TableHead : public GridSheet
+	class _refl_ TOY_UI_EXPORT TableHead : public GridSheet
 	{
 	public:
 		TableHead(Table& table);
@@ -25,7 +25,7 @@ namespace toy
 		Table& m_table;
 	};
 
-	class _I_ TOY_UI_EXPORT ColumnHeader : public Label
+	class _refl_ TOY_UI_EXPORT ColumnHeader : public Label
 	{
 	public:
 		ColumnHeader(Wedge& parent, const string& label, float span);
@@ -33,7 +33,7 @@ namespace toy
 		static Type& cls() { static Type ty("ColumnHeader", Label::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Table : public Stack
+	class _refl_ TOY_UI_EXPORT Table : public Stack
 	{
 	public:
 		Table(Wedge& parent, StringVector columns, std::vector<float> weights);

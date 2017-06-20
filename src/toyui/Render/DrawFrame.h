@@ -6,7 +6,7 @@
 #define TOY_DRAWFRAME_H
 
 /* toy Front */
-#include <toyobj/Typed.h>
+#include <toyobj/Type.h>
 #include <toyui/Forward.h>
 #include <toyui/Style/Dim.h>
 #include <toyui/Render/Caption.h>
@@ -39,10 +39,6 @@ namespace toy
 
 		inline InkStyle& inkstyle() { return *d_inkstyle; }
 
-		void beginDraw(Renderer& renderer, bool force);
-		void draw(Renderer& renderer, bool force);
-		void endDraw(Renderer& renderer);
-
 		void updateInkstyle(InkStyle& inkstyle);
 		void resetInkstyle(InkStyle& inkstyle);
 
@@ -69,16 +65,6 @@ namespace toy
 
 	public:
 		static Renderer* s_renderer;
-
-		static size_t s_debugBatch;
-
-		static string s_debugPrintFilter;
-		static bool s_debugPrint;
-		static string s_debugDrawFilter;
-		static bool s_debugDrawFrameRect;
-		static bool s_debugDrawPaddedRect;
-		static bool s_debugDrawContentRect;
-		static bool s_debugDrawClipRect;
 	};
 }
 

@@ -14,7 +14,7 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT DropdownHead : public MultiButton
+	class _refl_ TOY_UI_EXPORT DropdownHead : public MultiButton
 	{
 	public:
 		DropdownHead(Dropdown& dropdown, const Callback& trigger);
@@ -25,7 +25,7 @@ namespace toy
 		Dropdown& m_dropdown;
 	};
 
-	class _I_ TOY_UI_EXPORT DropdownToggle : public Button
+	class _refl_ TOY_UI_EXPORT DropdownToggle : public Button
 	{
 	public:
 		DropdownToggle(Wedge& parent, const Callback& trigger);
@@ -33,7 +33,7 @@ namespace toy
 		static Type& cls() { static Type ty("DropdownToggle", Button::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT DropdownChoice : public MultiButton
+	class _refl_ TOY_UI_EXPORT DropdownChoice : public MultiButton
 	{
 	public:
 		DropdownChoice(Wedge& parent, Dropdown& dropdown, const Callback& trigger, const StringVector& elements);
@@ -46,7 +46,7 @@ namespace toy
 		Dropdown& m_dropdown;
 	};
 
-	class _I_ TOY_UI_EXPORT DropdownList : public Container
+	class _refl_ TOY_UI_EXPORT DropdownList : public Container
 	{
 	public:
 		DropdownList(Dropdown& dropdown);
@@ -60,7 +60,7 @@ namespace toy
 		Dropdown& m_dropdown;
 	};
 
-	class _I_ TOY_UI_EXPORT Dropdown : public WrapButton
+	class _refl_ TOY_UI_EXPORT Dropdown : public WrapButton
 	{
 	public:
 		Dropdown(Wedge& parent, Type& type = cls());
@@ -69,7 +69,7 @@ namespace toy
 		DropdownHead& header() { return m_header; }
 		bool down() { return m_down; }
 
-		virtual Widget& insert(unique_ptr<Widget> widget);
+		virtual Widget& insert(object_ptr<Widget> widget);
 
 		void dropdown(bool modal = true);
 		void dropup();
@@ -87,7 +87,7 @@ namespace toy
 		bool m_down;
 	};
 
-	class _I_ TOY_UI_EXPORT DropdownInput : public Dropdown
+	class _refl_ TOY_UI_EXPORT DropdownInput : public Dropdown
 	{
 	public:
 		DropdownInput(Wedge& parent, const Callback& onSelected = nullptr, StringVector choices = StringVector(), Type& type = cls());

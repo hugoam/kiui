@@ -5,8 +5,10 @@
 #include <toyui/Config.h>
 #include <toyui/Button/Checkbox.h>
 
+#include <toyui/Types.h>
+
 #include <toyobj/String/StringConvert.h>
-#include <toyobj/Ref.h>
+#include <toyobj/Any.h>
 
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Stripe.h>
@@ -26,7 +28,7 @@ namespace toy
 	{
 		if(m_input)
 		{
-			m_input->value()->set<bool>(m_on);
+			m_input->value().value<bool>() = m_on;
 			m_input->triggerModify();
 		}
 	}
@@ -35,7 +37,7 @@ namespace toy
 	{
 		if(m_input)
 		{
-			m_input->value()->set<bool>(m_on);
+			m_input->value().value<bool>() = m_on;
 			m_input->triggerModify();
 		}
 	}

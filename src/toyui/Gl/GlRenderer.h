@@ -6,7 +6,6 @@
 #define TOY_GLRENDERER_H
 
 /* toy Og */
-#include <toyobj/Util/Timer.h>
 #include <toyui/Forward.h>
 #include <toyui/Nano/NanoRenderer.h>
 
@@ -24,14 +23,11 @@ namespace toy
 
 		void render(RenderTarget& target);
 
-		void logFPS();
-
 	protected:
 		void initGlew();
 
 	protected:
 		bool m_clear;
-		Clock m_clock;
 	};
 
 

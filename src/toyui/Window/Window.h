@@ -25,7 +25,7 @@ namespace toy
 		static Type& cls() { static Type ty("Popup", Overlay::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT CloseButton : public Button
+	class _refl_ TOY_UI_EXPORT CloseButton : public Button
 	{
 	public:
 		CloseButton(Wedge& parent, const Callback& trigger);
@@ -33,7 +33,7 @@ namespace toy
 		static Type& cls() { static Type ty("CloseButton", Button::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT WindowHeader : public WrapControl
+	class _refl_ TOY_UI_EXPORT WindowHeader : public WrapControl
 	{
 	public:
 		WindowHeader(Window& window);
@@ -59,7 +59,7 @@ namespace toy
 		string m_tooltip;
 	};
 
-	class _I_ TOY_UI_EXPORT WindowSizer : public Control
+	class _refl_ TOY_UI_EXPORT WindowSizer : public Control
 	{
 	public:
 		WindowSizer(Wedge& parent, Window& window, Type& type, bool left);
@@ -75,7 +75,7 @@ namespace toy
 		bool m_resizeLeft;
 	};
 
-	class _I_ TOY_UI_EXPORT WindowSizerLeft : public WindowSizer
+	class _refl_ TOY_UI_EXPORT WindowSizerLeft : public WindowSizer
 	{
 	public:
 		WindowSizerLeft(Wedge& parent, Window& window);
@@ -83,7 +83,7 @@ namespace toy
 		static Type& cls() { static Type ty("WindowSizerLeft", WindowSizer::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT WindowSizerRight : public WindowSizer
+	class _refl_ TOY_UI_EXPORT WindowSizerRight : public WindowSizer
 	{
 	public:
 		WindowSizerRight(Wedge& parent, Window& window);
@@ -91,7 +91,7 @@ namespace toy
 		static Type& cls() { static Type ty("WindowSizerRight", WindowSizer::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT WindowFooter : public WrapControl
+	class _refl_ TOY_UI_EXPORT WindowFooter : public WrapControl
 	{
 	public:
 		WindowFooter(Window& window);
@@ -103,7 +103,7 @@ namespace toy
 		WindowSizerRight m_secondSizer;
 	};
 
-	class _I_ TOY_UI_EXPORT WindowBody : public ScrollSheet
+	class _refl_ TOY_UI_EXPORT WindowBody : public ScrollSheet
 	{
 	public:
 		WindowBody(Wedge& parent);
@@ -122,7 +122,7 @@ namespace toy
 		WINDOW_DEFAULT = WINDOW_MOVABLE | WINDOW_SIZABLE | WINDOW_CLOSABLE
 	};
 
-	class _I_ TOY_UI_EXPORT Window : public Overlay
+	class _refl_ TOY_UI_EXPORT Window : public Overlay
 	{
 	public:
 		Window(Wedge& parent, const string& title, WindowState state = WINDOW_DEFAULT, const Callback& onClose = nullptr, Docksection* dock = nullptr, Type& type = cls());

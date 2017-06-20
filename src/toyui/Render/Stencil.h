@@ -20,13 +20,7 @@ namespace toy
 		Stencil(DrawFrame& frame);
 		Stencil(const Stencil&) = default;
 
-		void redraw(Renderer& target, BoxFloat& rect, BoxFloat& paddedRect, BoxFloat& contentRect);
-
-		void drawSkinImage(Renderer& target, ImageSkin::Section section, BoxFloat rect);
-
 		BoxFloat selectCorners();
-
-		static int s_debugBatch;
 
 	protected:
 		DrawFrame& m_frame;

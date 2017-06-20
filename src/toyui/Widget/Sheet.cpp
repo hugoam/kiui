@@ -49,21 +49,6 @@ namespace toy
 			m_contents[i]->nextFrame(tick, delta);
 	}
 
-	void Wedge::render(Renderer& renderer, bool force)
-	{
-		if(m_frame->layer().forceRedraw())
-			force = true;
-
-		m_frame->content().beginDraw(renderer, force);
-		m_frame->content().draw(renderer, force);
-
-		for(size_t i = 0; i < m_contents.size(); ++i)
-			if(!m_contents[i]->frame().hidden())
-				m_contents[i]->render(renderer, force);
-
-		m_frame->content().endDraw(renderer);
-	}
-
 	void Wedge::visit(const Visitor& visitor)
 	{
 		bool pursue = visitor(*this);
@@ -128,12 +113,12 @@ namespace toy
 		, m_containerTarget(this)
 	{}
 
-	Widget& Container::append(unique_ptr<Widget> unique)
+	Widget& Container::append(object_ptr<Widget> unique)
 	{
 		return this->insert(std::move(unique), m_containerContents.size());
 	}
 
-	Widget& Container::insert(unique_ptr<Widget> unique, size_t index)
+	Widget& Container::insert(object_ptr<Widget> unique, size_t index)
 	{
 		Widget& widget = *unique;
 		if(widget.parent() == nullptr)
@@ -144,11 +129,11 @@ namespace toy
 		return widget;
 	}
 
-	unique_ptr<Widget> Container::release(Widget& widget, bool destroy)
+	object_ptr<Widget> Container::release(Widget& widget, bool destroy)
 	{
 		widget.parent()->remove(widget, destroy);
 		auto pos = std::find_if(m_containerContents.begin(), m_containerContents.end(), [&widget](auto& pt) { return pt.get() == &widget; });
-		unique_ptr<Widget> pointer = std::move(*pos);
+		object_ptr<Widget> pointer = std::move(*pos);
 		m_containerContents.erase(pos);
 		this->handleRemove(widget);
 		return pointer;

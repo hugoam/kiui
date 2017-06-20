@@ -11,7 +11,7 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Textbox : public TypeIn
+	class _refl_ TOY_UI_EXPORT Textbox : public TypeIn
 	{
 	public:
 		Textbox(WValue& input);

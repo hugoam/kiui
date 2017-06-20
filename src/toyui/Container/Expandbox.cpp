@@ -37,7 +37,7 @@ namespace toy
 		m_containerTarget = &m_container;
 	}
 
-	Widget& Expandbox::insert(unique_ptr<Widget> widget)
+	Widget& Expandbox::insert(object_ptr<Widget> widget)
 	{
 		if(!m_collapsed && m_container.frame().hidden())
 			m_container.show();

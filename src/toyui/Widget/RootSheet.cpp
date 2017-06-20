@@ -28,8 +28,8 @@ namespace toy
 		: Container(type, MASTER_LAYER)
 		, m_window(window)
 		, m_rootController(make_unique<ControlSwitch>(*this))
-		, m_mouse(make_unique<Mouse>(*this))
-		, m_keyboard(make_unique<Keyboard>(*this))
+		, m_mouse(make_object<Mouse>(*this))
+		, m_keyboard(make_object<Keyboard>(*this))
 		, m_cursor(*this)
 	{
 		m_target = window.renderer().createRenderTarget(m_frame->as<MasterLayer>());
@@ -40,8 +40,8 @@ namespace toy
 		: Container(parent, type, LAYER)
 		, m_window(parent.uiWindow())
 		, m_rootController(make_unique<ControlSwitch>(*this))
-		, m_mouse(make_unique<Mouse>(*this))
-		, m_keyboard(make_unique<Keyboard>(*this))
+		, m_mouse(make_object<Mouse>(*this))
+		, m_keyboard(make_object<Keyboard>(*this))
 		, m_cursor(*this)
 	{}
 

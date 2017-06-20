@@ -6,14 +6,14 @@
 #define TOY_SCROLLSHEET_H
 
 /* toy */
-#include <toyobj/Typed.h>
+#include <toyobj/Type.h>
 #include <toyui/Forward.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Button/Scrollbar.h>
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT ScrollZone : public Layout
+	class _refl_ TOY_UI_EXPORT ScrollZone : public Layout
 	{
 	public:
 		ScrollZone(ScrollSheet& parent);
@@ -33,7 +33,7 @@ namespace toy
 		static Type& cls() { static Type ty("NoScrollZone", Wedge::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT ScrollSheet : public Container
+	class _refl_ TOY_UI_EXPORT ScrollSheet : public Container
 	{
 	public:
 		ScrollSheet(Wedge& parent, Type& type = cls());
@@ -72,7 +72,7 @@ namespace toy
 		static Type& cls() { static Type ty("Surface", Sheet::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT ScrollPlan : public ScrollSheet
+	class _refl_ TOY_UI_EXPORT ScrollPlan : public ScrollSheet
 	{
 	public:
 		ScrollPlan(Wedge& parent, Type& type = cls());

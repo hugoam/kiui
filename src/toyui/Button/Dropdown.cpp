@@ -3,6 +3,7 @@
 //  This notice and the license may not be removed or altered from any source distribution.
 
 #include <toyui/Config.h>
+#include <toyui/Types.h>
 #include <toyui/Button/Dropdown.h>
 
 #include <toyui/Container/Layout.h>
@@ -72,15 +73,15 @@ namespace toy
 		return m_list.emplace<DropdownChoice>(*this, trigger, elements);
 	}
 
-	Widget& Dropdown::insert(unique_ptr<Widget> widget)
+	Widget& Dropdown::insert(object_ptr<Widget> widget)
 	{
 		widget->parent()->remove(*widget, false);
 
 		DropdownChoice& choice = this->addChoice({});
-		if(widget->type().upcast(MultiButton::cls()))
+		if(widget->isa<MultiButton>())
 			choice.reset(widget->as<MultiButton>());
-		else if(widget->type().upcast(Button::cls()))
-			choice.reset({ widget->as<Button>().label() });
+		else if(widget->isa<Button>())
+			choice.reset(widget->as<Button>());
 		return choice;
 	}
 

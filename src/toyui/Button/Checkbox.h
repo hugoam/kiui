@@ -11,7 +11,7 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Checkbox : public Toggle
+	class _refl_ TOY_UI_EXPORT Checkbox : public Toggle
 	{
 	public:
 		Checkbox(Wedge& parent, WValue* input, bool on);

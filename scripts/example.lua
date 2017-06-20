@@ -1,7 +1,7 @@
 -- toyui
 -- toyui example application
 
-project "example"
+project "toyui_example"
 	kind "ConsoleApp"
     
 	includedirs {
@@ -32,7 +32,7 @@ project "example"
     
     configuration { "not asmjs" }
         defines {
-            "TOYUI_RESOURCE_PATH=\"" .. path.join(TOYUI_DIR, "data") .. "/\"",
+            "TOYUI_RESOURCE_PATH=\"" .. path.join(TOY_DIR, "data") .. "/\"",
         }
     
 	configuration {}

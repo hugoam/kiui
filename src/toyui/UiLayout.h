@@ -7,8 +7,8 @@
 
 /* toy Front */
 #include <toyui/Forward.h>
+#include <toyobj/Object.h>
 #include <toyobj/Util/Colour.h>
-#include <toyobj/Util/NonCopy.h>
 #include <toyobj/String/String.h>
 #include <toyui/Style/Style.h>
 
@@ -19,7 +19,7 @@ namespace toy
 {
 	typedef std::function<void(Styler&)> StyleInitializer;
 
-	class TOY_UI_EXPORT Styler : public NonCopy
+	class TOY_UI_EXPORT Styler : public Object
 	{
 	public:
 		Styler(UiWindow& uiWindow);
@@ -45,11 +45,13 @@ namespace toy
 
 		Image& findImage(const string& image);
 
+		static Type& cls() { static Type ty; return ty; }
+
 	protected:
 		UiWindow& m_uiWindow;
 
-		std::map<string, unique_ptr<Style>> m_styledefs;
-		std::map<string, unique_ptr<Style>> m_styles;
+		std::map<string, object_ptr<Style>> m_styledefs;
+		std::map<string, object_ptr<Style>> m_styles;
 
 		std::vector<StyleInitializer> m_initializers;
 	};

@@ -6,17 +6,18 @@
 #define TOY_RENDERER_H
 
 /* toy Front */
-#include <toyobj/Typed.h>
+#include <toyobj/Type.h>
+#include <toyobj/Util/Timer.h>
 #include <toyui/Forward.h>
 #include <toyui/Render/Caption.h>
+#include <toyui/Style/ImageSkin.h>
 
 namespace toy
 {
-	class TOY_UI_EXPORT RenderTarget
+	class TOY_UI_EXPORT RenderTarget : public Object
 	{
 	public:
 		RenderTarget(Renderer& renderer, MasterLayer& masterLayer, bool gammaCorrected);
-		virtual ~RenderTarget() {}
 
 		MasterLayer& layer() { return m_masterLayer; }
 
@@ -25,6 +26,8 @@ namespace toy
 
 		void render();
 
+		static Type& cls() { static Type ty; return ty; }
+
 	protected:
 		Renderer& m_renderer;
 		MasterLayer& m_masterLayer;
@@ -32,18 +35,30 @@ namespace toy
 		bool m_gammaCorrected;
 	};
 
-	class TOY_UI_EXPORT Renderer
+	class TOY_UI_EXPORT Renderer : public Object
 	{
 	public:
 		Renderer(const string& resourcePath);
-		virtual ~Renderer() {}
+
+		// drawing implementation
+		void render(RenderTarget& target);
+		void render(Wedge& wedge, bool force);
+		void render(Widget& widget, bool force);
+		void beginDraw(Frame& frame, bool force);
+		void draw(Frame& frame, bool force);
+		void drawCaption(Frame& frame, Caption& caption, const BoxFloat& rect, const BoxFloat& paddedRect, const BoxFloat& contentRect);
+		void drawStencil(Frame& frame, Stencil& stencil, const BoxFloat& rect, const BoxFloat& paddedRect, const BoxFloat& contentRect);
+		void drawSkinImage(Frame& frame, ImageSkin::Section section, BoxFloat rect);
+		void endDraw(Frame& frame);
+
+		void logFPS();
 
 		// init
 		virtual void setupContext() = 0;
 		virtual void releaseContext() = 0;
 
 		// targets
-		virtual unique_ptr<RenderTarget> createRenderTarget(MasterLayer& masterLayer) = 0;
+		virtual object_ptr<RenderTarget> createRenderTarget(MasterLayer& masterLayer) = 0;
 
 		// setup
 		virtual void loadFont() = 0;
@@ -52,7 +67,8 @@ namespace toy
 		virtual void unloadImage(Image& image) = 0;
 
 		// rendering
-		virtual void render(RenderTarget& target) = 0;
+		virtual void beginFrame(RenderTarget& target) = 0;
+		virtual void endFrame() = 0;
 
 		// drawing
 		virtual void beginTarget() = 0;
@@ -99,10 +115,23 @@ namespace toy
 		virtual float textLineHeight(InkStyle& skin) = 0;
 		virtual float textSize(const string& text, Dimension dim, InkStyle& skin) = 0;
 
+		static Type& cls() { static Type ty; return ty; }
+
 	protected:
 		string m_resourcePath;
 		size_t m_debugBatch;
 		size_t m_debugDepth;
+
+		Clock m_clock;
+
+	public:
+		string m_debugPrintFilter;
+		bool m_debugPrint;
+		string m_debugDrawFilter;
+		bool m_debugDrawFrameRect;
+		bool m_debugDrawPaddedRect;
+		bool m_debugDrawContentRect;
+		bool m_debugDrawClipRect;
 	};
 }
 

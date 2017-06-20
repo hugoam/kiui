@@ -163,6 +163,9 @@ namespace toy
 		if(d_sequence.size() < 1)
 			Frame::measureLayout();
 
+		//for(Widget* widget : d_widget->as<Wedge>().contents())
+		//	this->measure(widget->frame());
+
 		for(Frame* pframe : d_contents)
 			this->measure(*pframe);
 	}
@@ -177,6 +180,9 @@ namespace toy
 
 		this->normalizeSpan();
 
+		//for(Widget* widget : d_widget->as<Wedge>().contents())
+			this->resize(widget->frame());
+
 		for(Frame* pframe : d_contents)
 			this->resize(*pframe);
 	}
@@ -186,8 +192,8 @@ namespace toy
 		if(d_dirty < DIRTY_LAYOUT)
 			return;
 
-		if(d_style->name() == "GridColumn")
-			int i = 0;
+		//for(Widget* widget : d_widget->as<Wedge>().contents())
+		//	this->position(widget->frame());
 
 		for(Frame* pframe : d_contents)
 			this->position(*pframe);

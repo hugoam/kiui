@@ -82,11 +82,11 @@ namespace toy
 
 		int shift = -std::min(0, minIndex);
 
-		unique_ptr<CanvasLine> line = make_unique<CanvasLine>(*this, m_plan.stripe());
-		std::vector<unique_ptr<CanvasColumn>> columns;
+		object_ptr<CanvasLine> line = make_object<CanvasLine>(*this, m_plan.stripe());
+		std::vector<object_ptr<CanvasColumn>> columns;
 
 		for(int i = 0; i < maxIndex+shift+1; ++i)
-			columns.emplace_back(make_unique<CanvasColumn>(*this, *line));
+			columns.emplace_back(make_object<CanvasColumn>(*this, *line));
 
 		for(Node* node : nodes)
 			columns[node->order() + shift]->append(node->frame());
@@ -216,7 +216,7 @@ namespace toy
 		for(NodeCable* cable : m_cables)
 			if(&cable->plugIn() == &plugIn)
 			{
-				m_cables.erase(std::find(m_cables.begin(), m_cables.end(), cable));
+				vector_remove(m_cables, cable);
 				cable->destroy();
 				return;
 			}

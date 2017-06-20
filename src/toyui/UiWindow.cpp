@@ -29,7 +29,7 @@ namespace toy
 		, m_manualRender(manualRender)
 	{}
 
-	Context::Context(RenderSystem& renderSystem, unique_ptr<RenderWindow> renderWindow, unique_ptr<InputWindow> inputWindow)
+	Context::Context(RenderSystem& renderSystem, object_ptr<RenderWindow> renderWindow, object_ptr<InputWindow> inputWindow)
 		: m_renderSystem(renderSystem)
 	{
 		this->init(std::move(renderWindow), std::move(inputWindow));
@@ -43,13 +43,13 @@ namespace toy
 	Context::~Context()
 	{}
 
-	void Context::init(unique_ptr<RenderWindow> renderWindow, unique_ptr<InputWindow> inputWindow)
+	void Context::init(object_ptr<RenderWindow> renderWindow, object_ptr<InputWindow> inputWindow)
 	{
 		m_renderWindow = std::move(renderWindow);
 		m_inputWindow = std::move(inputWindow);
 	}
 
-	void spritesInFolder(std::vector<Image>& images, const string& path, const string& subfolder)
+	void spritesInFolder(std::vector<object_ptr<Image>>& images, const string& path, const string& subfolder)
 	{
 		DIR* dir = opendir(path.c_str());
 		dirent* ent;
@@ -65,7 +65,7 @@ namespace toy
 				int width, height, n;
 				unsigned char* img = stbi_load(fullpath.c_str(), &width, &height, &n, 4);
 				stbi_image_free(img);
-				images.emplace_back(name, fullpath, width, height);
+				images.emplace_back(make_object<Image>(name, fullpath, width, height));
 			}
 				
 
@@ -81,7 +81,7 @@ namespace toy
 		, m_atlas(1024, 1024)
 		, m_width(m_context->renderWindow().width())
 		, m_height(m_context->renderWindow().height())
-		, m_styler(make_unique<Styler>(*this))
+		, m_styler(make_object<Styler>(*this))
 		, m_active(nullptr)
 		, m_rootSheet(nullptr)
 		, m_shutdownRequested(false)
@@ -92,8 +92,8 @@ namespace toy
 
 	UiWindow::~UiWindow()
 	{
-		for(Image& image : m_images)
-			m_renderer->unloadImage(image);
+		for(auto& image : m_images)
+			m_renderer->unloadImage(*image);
 
 		m_rootSheet->clear();
 	}
@@ -108,8 +108,8 @@ namespace toy
 
 		m_styler->defaultLayout();
 
-		m_rootSheet = make_unique<RootSheet>(*this);
-		//m_rootDevice = make_unique<RootDevice>(*this, *m_rootSheet);
+		m_rootSheet = make_object<RootSheet>(*this);
+		//m_rootDevice = make_object<RootDevice>(*this, *m_rootSheet);
 
 		m_context->inputWindow().initInput(m_rootSheet->mouse(), m_rootSheet->keyboard());
 
@@ -142,16 +142,16 @@ namespace toy
 
 		m_atlas.generateAtlas(m_images);
 
-		for(Image& image : m_images)
-			m_renderer->loadImage(image);
+		for(auto& image : m_images)
+			m_renderer->loadImage(*image);
 
 		m_renderer->loadImageRGBA(m_atlas.image(), m_atlas.data());
 	}
 
 	Image& UiWindow::createImage(const string& name, int width, int height, uint8_t* data, bool filtering)
 	{
-		m_images.emplace_back(name, name, width, height);
-		Image& image = m_images.back();
+		m_images.emplace_back(make_object<Image>(name, name, width, height));
+		Image& image = *m_images.back();
 		image.d_filtering = filtering;
 		m_renderer->loadImageRGBA(image, data);
 		return image;
@@ -159,14 +159,15 @@ namespace toy
 
 	void UiWindow::removeImage(Image& image)
 	{
-
+		vector_remove_if(m_images, [&image](object_ptr<Image>& current) { return current->d_index == image.d_index; });
+		m_renderer->unloadImage(image);
 	}
 
 	Image& UiWindow::findImage(const string& name)
 	{
-		for(Image& image : m_images)
-			if(image.d_name == name)
-				return image;
+		for(auto& image : m_images)
+			if(image->d_name == name)
+				return *image;
 		static Image null; return null;
 	}
 

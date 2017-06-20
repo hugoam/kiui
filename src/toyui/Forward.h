@@ -17,6 +17,12 @@ namespace toy
 	//enum MouseButton;
 	//enum KeyCode;
 
+	enum Direction : unsigned int;
+	enum Pivot : unsigned int;
+	enum Align : unsigned int;
+	enum AutoLayout : unsigned int;
+	enum Space : unsigned int;
+	enum Clipping : unsigned int;
 	enum Dimension : unsigned int;
 	enum FrameType : unsigned int;
 	enum LayoutType : unsigned int;

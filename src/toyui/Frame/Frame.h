@@ -6,7 +6,7 @@
 #define TOY_FRAME_H
 
 /* toy */
-#include <toyobj/Typed.h>
+#include <toyobj/Type.h>
 #include <toyobj/String/String.h>
 #include <toyobj/Util/Updatable.h>
 #include <toyui/Forward.h>
@@ -17,7 +17,7 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Frame : public Object, public Uibox
+	class _refl_ TOY_UI_EXPORT Frame : public Object, public Uibox
 	{
 	public:
 		Frame(Widget& widget);

@@ -6,10 +6,10 @@
 #define TOY_FILTER_H
 
 /* toy */
-#include <toyobj/Typed.h>
+#include <toyobj/Type.h>
 #include <toyui/Forward.h>
 #include <toyui/Widget/Sheet.h>
-#include <toyui/Edit/TypeIn.h>
+#include <toyui/Edit/Input.h>
 
 namespace toy
 {

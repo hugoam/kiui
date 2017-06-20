@@ -6,8 +6,8 @@
 #define TOY_FVALUE_H
 
 /* toy */
-#include <toyobj/Typed.h>
-#include <toyobj/Ref.h>
+#include <toyobj/Type.h>
+#include <toyobj/Any.h>
 #include <toyui/Forward.h>
 #include <toyui/Widget/Sheet.h>
 
@@ -43,10 +43,10 @@ namespace toy
 		virtual void notifyModify() {}
 
 		template <class T>
-		void modifyValue(T val) { m_value->set<T>(val); this->triggerModify(); }
+		void modifyValue(T val) { m_value.value<T>() = val; this->triggerModify(); }
 
 		template <class T>
-		void updateValue(T val) { m_value->set<T>(val); this->triggerUpdate(); }
+		void updateValue(T val) { m_value.value<T>() = val; this->triggerUpdate(); }
 
 	protected:
 		Lref m_copy;
@@ -57,7 +57,7 @@ namespace toy
 		OnUpdate m_onUpdate;
 	};
 
-	class _I_ TOY_UI_EXPORT WValue : public WrapControl, public Value
+	class _refl_ TOY_UI_EXPORT WValue : public WrapControl, public Value
 	{
 	public:
 		WValue(Wedge& parent, Lref& lref, Type& type, const OnUpdate& onUpdate, bool edit = false);

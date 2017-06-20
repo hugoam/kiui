@@ -5,11 +5,12 @@
 #ifndef TOY_RENDERWINDOW_H
 #define TOY_RENDERWINDOW_H
 
+#include <toyobj/Type.h>
 #include <toyobj/String/String.h>
 
 namespace toy
 {
-	class TOY_UI_EXPORT RenderWindow
+	class TOY_UI_EXPORT RenderWindow : public Object
 	{
 	public:
 		RenderWindow(const string& title, int width, int height, bool fullScreen = false)
@@ -39,6 +40,8 @@ namespace toy
 		bool resized() { return m_resized; }
 		bool active() { return m_active; }
 		bool shutdown() { return m_shutdown; }
+
+		static Type& cls() { static Type ty; return ty; }
 
 	protected:
 		string m_title;

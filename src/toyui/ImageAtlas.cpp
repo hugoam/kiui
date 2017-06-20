@@ -42,14 +42,14 @@ namespace toy
 			}
 	}
 
-	void ImageAtlas::generateAtlas(std::vector<Image>& images)
+	void ImageAtlas::generateAtlas(std::vector<object_ptr<Image>>& images)
 	{
 		this->createAtlas();
 
 		// @todo : sort images
 
-		for(Image& image : images)
-			this->addSprite(image);
+		for(auto& image : images)
+			this->addSprite(*image);
 	}
 
 	void ImageAtlas::setupAtlas(int index)

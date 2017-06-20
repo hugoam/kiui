@@ -20,14 +20,15 @@
 #include <Compositor/Pass/OgreCompositorPass.h>
 #include <Compositor/Pass/OgreCompositorPassProvider.h>
 
+#include <OgreBuildSettings.h>
+
 namespace toy
 {
 	class UiPassProvider : public Ogre::CompositorPassProvider
 	{
 	public:
-		Ogre::CompositorPassDef* addPassDef(Ogre::CompositorPassType passType, Ogre::IdString customId, Ogre::uint32 rtIndex, Ogre::CompositorNodeDef* parentNodeDef);
-
-		Ogre::CompositorPass* addPass(const Ogre::CompositorPassDef* definition, Ogre::Camera* camera, Ogre::CompositorNode* parentNode, const Ogre::CompositorChannel& target, Ogre::SceneManager* sceneManager);
+		virtual Ogre::CompositorPassDef* addPassDef(Ogre::CompositorPassType passType, Ogre::IdString customId, Ogre::CompositorTargetDef* parentTargetDef, Ogre::CompositorNodeDef* parentNodeDef);
+		virtual Ogre::CompositorPass* addPass(const Ogre::CompositorPassDef* definition, Ogre::Camera* camera, Ogre::CompositorNode* parentNode, const Ogre::CompositorChannel& target, Ogre::SceneManager* sceneManager);
 
 		static Ogre::IdString m_passId;
 	};
@@ -35,8 +36,8 @@ namespace toy
 	class UiPassDef : public Ogre::CompositorPassDef
 	{
 	public:
-		UiPassDef(Ogre::uint32 rtIndex)
-			: Ogre::CompositorPassDef(Ogre::PASS_CUSTOM, rtIndex)
+		UiPassDef(Ogre::CompositorTargetDef* parentTargetDef)
+			: Ogre::CompositorPassDef(Ogre::PASS_CUSTOM, parentTargetDef)
 		{}
 	};
 
@@ -58,10 +59,10 @@ namespace toy
 		Ogre::Camera* m_camera;
 	};
 
-	Ogre::CompositorPassDef* UiPassProvider::addPassDef(Ogre::CompositorPassType passType, Ogre::IdString customId, Ogre::uint32 rtIndex, Ogre::CompositorNodeDef* parentNodeDef)
+	Ogre::CompositorPassDef* UiPassProvider::addPassDef(Ogre::CompositorPassType passType, Ogre::IdString customId, Ogre::CompositorTargetDef* parentTargetDef, Ogre::CompositorNodeDef* parentNodeDef)
 	{
 		if(customId == m_passId)
-			return OGRE_NEW UiPassDef(rtIndex);
+			return OGRE_NEW UiPassDef(parentTargetDef);
 		return nullptr;
 	}
 
@@ -76,8 +77,8 @@ namespace toy
 	OgreContext::OgreContext(OgreRenderSystem& renderSystem, const string& name, int width, int height, bool fullScreen)
 		: Context(renderSystem)
 	{
-		unique_ptr<OgreRenderWindow> renderWindow = make_unique<OgreRenderWindow>(renderSystem, name, width, height, fullScreen);
-		unique_ptr<OISInputWindow> inputWindow = make_unique<OISInputWindow>(*renderWindow);
+		object_ptr<OgreRenderWindow> renderWindow = make_object<OgreRenderWindow>(renderSystem, name, width, height, fullScreen);
+		object_ptr<OISInputWindow> inputWindow = make_object<OISInputWindow>(*renderWindow);
 
 		this->init(std::move(renderWindow), std::move(inputWindow));
 	}
@@ -85,19 +86,20 @@ namespace toy
 	OgreRenderSystem::OgreRenderSystem(const string& resourcePath)
 		: RenderSystem(resourcePath, false)
 		, m_ogreRoot(make_unique<Ogre::Root>())
+		, m_contextActive(true)
 	{}
 	
 	OgreRenderSystem::~OgreRenderSystem()
 	{}
 
-	unique_ptr<Context> OgreRenderSystem::createContext(const string& name, int width, int height, bool fullScreen)
+	object_ptr<Context> OgreRenderSystem::createContext(const string& name, int width, int height, bool fullScreen)
 	{
-		return make_unique<OgreContext>(*this, name, width, height, fullScreen);
+		return make_object<OgreContext>(*this, name, width, height, fullScreen);
 	}
 
-	unique_ptr<Renderer> OgreRenderSystem::createRenderer(Context& context)
+	object_ptr<Renderer> OgreRenderSystem::createRenderer(Context& context)
 	{
-		return make_unique<OgreRenderer>(m_resourcePath);
+		return make_object<OgreRenderer>(m_resourcePath);
 	}
 
 	bool OgreRenderSystem::nextFrame()
@@ -112,11 +114,40 @@ namespace toy
 		return true;
 	}
 
-	void OgreRenderSystem::initWorkspace()
+	void OgreRenderSystem::init()
 	{
-		static UiPassProvider m_passProvider;
+		this->setupRenderer("OpenGL 3+ Rendering Subsystem");
+		//this->setupRenderer("Direct3D11 Rendering Subsystem");
 
+		m_ogreRoot->initialise(false);
+
+		this->setupHiddenWindow();
+		this->setupUiWorkspace();
+	}
+
+	void OgreRenderSystem::setupRenderer(const string& name)
+	{
+		m_renderSystem = m_ogreRoot->getRenderSystemByName(name);
+		if(!m_renderSystem)
+			m_renderSystem = m_ogreRoot->getAvailableRenderers().at(0);
+
+		m_ogreRoot->setRenderSystem(m_renderSystem);
+	}
+
+	void OgreRenderSystem::setupHiddenWindow()
+	{
+		Ogre::NameValuePairList params;
+		params["hidden"] = "true";
+		params["gamma"] = "true";
+
+		m_hiddenWindow = m_ogreRoot->createRenderWindow("toyHidden", 1, 1, false, &params);
+	}
+
+	void OgreRenderSystem::setupUiWorkspace()
+	{
 		Ogre::CompositorManager2* compositorManager = m_ogreRoot->getCompositorManager2();
+
+		static UiPassProvider m_passProvider;
 		compositorManager->setCompositorPassProvider(&m_passProvider);
 
 		Ogre::CompositorNodeDef* nodeDef = compositorManager->addNodeDefinition("AutoGen " + (Ogre::IdString("Ui Workspace") + Ogre::IdString("/Node")).getReleaseText());
@@ -129,5 +160,7 @@ namespace toy
 
 		Ogre::CompositorWorkspaceDef* workDef = compositorManager->addWorkspaceDefinition("Ui Workspace");
 		workDef->connectExternal(0, nodeDef->getName(), 0);
+
+		compositorManager->createBasicWorkspaceDef("Clear Workspace", Ogre::ColourValue::Black);
 	}
 }

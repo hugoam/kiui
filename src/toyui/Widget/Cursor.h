@@ -12,7 +12,7 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Tooltip : public Overlay
+	class _refl_ TOY_UI_EXPORT Tooltip : public Overlay
 	{
 	public:
 		Tooltip(RootSheet& rootSheet, const string& label);
@@ -22,7 +22,7 @@ namespace toy
 		static Type& cls() { static Type ty("Tooltip", Overlay::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Rectangle : public Decal
+	class _refl_ TOY_UI_EXPORT Rectangle : public Decal
 	{
 	public:
 		Rectangle(Wedge& parent, Type& type = cls());
@@ -30,7 +30,7 @@ namespace toy
 		static Type& cls() { static Type ty("Rectangle", Decal::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Cursor : public Decal
+	class _refl_ TOY_UI_EXPORT Cursor : public Decal
 	{
 	public:
 		Cursor(RootSheet& rootSheet);

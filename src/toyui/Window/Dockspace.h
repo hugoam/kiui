@@ -14,7 +14,7 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT Placeholder : public Board
+	class _refl_ TOY_UI_EXPORT Placeholder : public Board
 	{
 	public:
 		Placeholder(Wedge& parent);
@@ -22,13 +22,13 @@ namespace toy
 		static Type& cls() { static Type ty("Placeholder", Board::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT DockTab
+	class _refl_ TOY_UI_EXPORT DockTab
 	{
 	public:
 		static Type& cls() { static Type ty("DockTab", Tab::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Docksection : public Tabber
+	class _refl_ TOY_UI_EXPORT Docksection : public Tabber
 	{
 	public:
 		Docksection(Wedge& parent, Dockline& dockline);
@@ -50,7 +50,7 @@ namespace toy
 		Dockline* m_dockline;
 	};
 
-	class _I_ TOY_UI_EXPORT Dockline : public GridSheet
+	class _refl_ TOY_UI_EXPORT Dockline : public GridSheet
 	{
 	public:
 		Dockline(Wedge& parent, Dockspace& dockspace, Dockline* dockline, Dimension dim);
@@ -84,7 +84,7 @@ namespace toy
 		Dockline* m_dockline;
 	};
 
-	class _I_ TOY_UI_EXPORT MasterDockline : public Dockline
+	class _refl_ TOY_UI_EXPORT MasterDockline : public Dockline
 	{
 	public:
 		MasterDockline(Dockspace& dockspace);
@@ -92,7 +92,7 @@ namespace toy
 		static Type& cls() { static Type ty("MasterDockline", Dockline::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Dockspace : public Layout
+	class _refl_ TOY_UI_EXPORT Dockspace : public Layout
 	{
 	public:
 		Dockspace(Wedge& parent);

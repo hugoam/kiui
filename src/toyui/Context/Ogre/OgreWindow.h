@@ -47,7 +47,7 @@ namespace toy
 	{
 	public:
 		OISInputWindow(RenderWindow& renderWindow);
-		virtual ~OISInputWindow();
+		~OISInputWindow();
 
 		void initInput(Mouse& mouse, Keyboard& keyboard);
 		void setupInput(size_t windowHnd);

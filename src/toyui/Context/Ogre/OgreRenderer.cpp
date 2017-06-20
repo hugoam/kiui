@@ -41,8 +41,8 @@ namespace toy
 		: GlRenderer(resourcePath, false)
 	{}
 
-	unique_ptr<RenderTarget> OgreRenderer::createRenderTarget(MasterLayer& masterLayer)
+	object_ptr<RenderTarget> OgreRenderer::createRenderTarget(MasterLayer& masterLayer)
 	{
-		return make_unique<OgreRenderTarget>(*this, masterLayer);
+		return make_object<OgreRenderTarget>(*this, masterLayer);
 	}
 }

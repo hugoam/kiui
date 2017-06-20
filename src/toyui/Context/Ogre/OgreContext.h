@@ -12,6 +12,13 @@
 namespace Ogre
 {
 	class Root;
+	class RenderWindow;
+	class RenderSystem;
+
+	class HlmsManager;
+	class HlmsTextureManager;
+	class HlmsUnlit;
+	class HlmsPbs;
 }
 
 namespace toy
@@ -32,17 +39,23 @@ namespace toy
 		bool contextActive() { return m_contextActive; }
 
 		bool nextFrame();
-		
-		void initWorkspace();
+
+		void init();
+		void setupRenderer(const string& name);
+		void setupHiddenWindow();
+		void setupUiWorkspace();
 
 		void focusChange() { m_contextActive = !m_contextActive; }
 
-		virtual unique_ptr<Context> createContext(const string& name, int width, int height, bool fullScreen);
-		virtual unique_ptr<Renderer> createRenderer(Context& context);
+		virtual object_ptr<Context> createContext(const string& name, int width, int height, bool fullScreen);
+		virtual object_ptr<Renderer> createRenderer(Context& context);
 
 	protected:
 		unique_ptr<Ogre::Root> m_ogreRoot;
 		bool m_contextActive;
+
+		Ogre::RenderWindow* m_hiddenWindow;
+		Ogre::RenderSystem* m_renderSystem;
 	};
 }
 

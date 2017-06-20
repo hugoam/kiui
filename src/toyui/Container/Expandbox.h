@@ -12,7 +12,7 @@
 
 namespace toy
 {
-	class _I_ TOY_UI_EXPORT ExpandboxHeader : public WrapButton
+	class _refl_ TOY_UI_EXPORT ExpandboxHeader : public WrapButton
 	{
 	public:
 		ExpandboxHeader(Wedge& parent, const Callback& trigger = nullptr);
@@ -20,7 +20,7 @@ namespace toy
 		static Type& cls() { static Type ty("ExpandboxHeader", WrapButton::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT ExpandboxBody : public Container
+	class _refl_ TOY_UI_EXPORT ExpandboxBody : public Container
 	{
 	public:
 		ExpandboxBody(Wedge& parent);
@@ -28,7 +28,7 @@ namespace toy
 		static Type& cls() { static Type ty("ExpandboxBody", Container::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT ExpandboxToggle : public Toggle
+	class _refl_ TOY_UI_EXPORT ExpandboxToggle : public Toggle
 	{
 	public:
 		ExpandboxToggle(Wedge& parent, const Callback& triggerOn, const Callback& triggerOff, bool on);
@@ -36,14 +36,14 @@ namespace toy
 		static Type& cls() { static Type ty("ExpandboxToggle", Toggle::cls()); return ty; }
 	};
 
-	class _I_ TOY_UI_EXPORT Expandbox : public Stack
+	class _refl_ TOY_UI_EXPORT Expandbox : public Stack
 	{
 	public:
 		Expandbox(Wedge& parent, const string& title, bool collapsed = false, Type& type = cls());
 
 		Wedge& header() { return m_header; }
 
-		virtual Widget& insert(unique_ptr<Widget> widget);
+		virtual Widget& insert(object_ptr<Widget> widget);
 
 		virtual void expand();
 		virtual void collapse();

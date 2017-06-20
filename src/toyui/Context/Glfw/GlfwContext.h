@@ -71,8 +71,8 @@ namespace toy
 	public:
 		GlfwRenderSystem(const string& resourcePath);
 
-		virtual unique_ptr<Context> createContext(const string& name, int width, int height, bool fullScreen);
-		virtual unique_ptr<Renderer> createRenderer(Context& context);
+		virtual object_ptr<Context> createContext(const string& name, int width, int height, bool fullScreen);
+		virtual object_ptr<Renderer> createRenderer(Context& context);
 	};
 }
 
