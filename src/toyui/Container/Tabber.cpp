@@ -5,18 +5,12 @@
 #include <toyui/Config.h>
 #include <toyui/Container/Tabber.h>
 
-#include <toyui/Container/Layout.h>
-
 #include <toyui/Frame/Frame.h>
 
 namespace toy
 {
-	TabHeader::TabHeader(Wedge& parent, const string& label, const Callback& trigger)
-		: Button(parent, label, trigger, cls())
-	{}
-
 	Tab::Tab(Wedge& parent, Tabber& tabber, Button& header, bool active)
-		: ScrollSheet(parent, cls())
+		: Wedge(parent, cls())
 		, m_tabber(tabber)
 		, m_header(header)
 		, m_active(active)
@@ -27,24 +21,11 @@ namespace toy
 			m_header.enableState(ACTIVATED);
 	}
 
-	void Tab::handleRemove(Widget& widget)
-	{
-		m_tabber.removeTab(*this);
-	}
-
-	TabberHead::TabberHead(Wedge& parent)
-		: Row(parent, cls())
-	{}
-
-	TabberBody::TabberBody(Wedge& parent)
-		: Sheet(parent, cls())
-	{}
-
 	Tabber::Tabber(Wedge& parent, Type& type, bool downtabs)
-		: Container(parent, type)
+		: Wedge(parent, type)
 		, m_currentTab(nullptr)
-		, m_headers(*this)
-		, m_tabs(*this)
+		, m_headers(*this, Head())
+		, m_tabs(*this, Body())
 		, m_downTabs(downtabs)
 	{
 		if(m_downTabs)
@@ -52,17 +33,14 @@ namespace toy
 		m_headers.hide();
 	}
 
-	Tabber::~Tabber()
-	{}
-
 	Tab& Tabber::addTab(const string& name)
 	{
-		TabHeader& header = m_headers.emplace<TabHeader>(name, [this](Widget& button) {return this->headerClicked(button); });
+		Button& header = m_headers.emplace<Button>(name, [this](Widget& button) {return this->headerClicked(button); }, Header());
 		Tab& tab = m_tabs.emplace<Tab>(*this, header, m_currentTab == nullptr);
 
 		if(!m_currentTab)
 			m_currentTab = &tab;
-		else if(m_tabs.containerContents().size() == 2)
+		else if(m_tabs.count() == 2)
 			m_headers.show();
 
 		return tab;
@@ -73,12 +51,12 @@ namespace toy
 		if(&tab == m_currentTab)
 			m_currentTab = nullptr;
 
-		tab.header().destroy();
-		tab.destroy();
+		tab.header().extract();
+		tab.extract();
 
-		if(m_tabs.containerContents().size() > 0)
+		if(m_tabs.count() > 0)
 			this->showTab(size_t(0));
-		if(m_tabs.containerContents().size() == 1)
+		if(m_tabs.count() == 1)
 			m_headers.hide();
 	}
 

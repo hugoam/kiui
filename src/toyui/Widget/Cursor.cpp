@@ -5,18 +5,14 @@
 #include <toyui/Config.h>
 #include <toyui/Widget/Cursor.h>
 
-#include <toyui/Frame/Frame.h>
-#include <toyui/Frame/Stripe.h>
-#include <toyui/Frame/Layer.h>
+#include <toyui/Frame/Caption.h>
 
 #include <toyui/Widget/RootSheet.h>
-
-#include <toyobj/Iterable/Reverse.h>
 
 namespace toy
 {
 	Cursor::Cursor(RootSheet& rootSheet)
-		: Decal(rootSheet, cls())
+		: Wedge(rootSheet, cls(), LAYER)
 		, m_tooltip(rootSheet, "")
 	{
 		m_hovered = &rootSheet;
@@ -26,41 +22,39 @@ namespace toy
 
 	void Cursor::nextFrame(size_t tick, size_t delta)
 	{
-		Wedge::nextFrame(tick, delta);
-
 		if(m_tooltipClock.read() > 0.5f && m_tooltip.frame().hidden() && !m_hovered->tooltip().empty())
 			this->tooltipOn();
 	}
 
-	void Cursor::setPosition(float x, float y)
+	void Cursor::setPosition(const DimFloat& pos)
 	{
-		if(!m_hovered->frame().inside(x, y))
-			this->unhover();
+		//if(!m_hovered->frame().inside(x, y))
+		//	this->unhover();
 
 		if(!m_tooltip.frame().hidden())
 			this->tooltipOff();
 		m_tooltipClock.step();
-		m_frame->setPosition(x, y);
+		m_frame->setPosition(pos);
 	}
 
 	void Cursor::tooltipOn()
 	{
-		m_tooltip.setLabel(m_hovered->tooltip());
-		m_tooltip.frame().setPosition(m_frame->dposition(DIM_X), m_frame->dposition(DIM_Y) + m_frame->dsize(DIM_Y));
+		m_tooltip.setContent(m_hovered->tooltip());
+		m_tooltip.frame().setPosition({ m_frame->d_position.x(), m_frame->d_position.y() + m_frame->d_size.y() });
 		m_tooltip.show();
 	}
 
 	void Cursor::tooltipOff()
 	{
-		m_tooltip.setLabel("");
+		m_tooltip.setContent("");
 		m_tooltip.hide();
 	}
 
 	void Cursor::hover(Widget& widget)
 	{
 		m_hovered = &widget;
-		if(widget.style().skin().hoverCursor())
-			this->setStyle(*widget.style().skin().hoverCursor(), false);
+		if(widget.style().skin().m_hoverCursor)
+			this->setStyle(*widget.style().skin().m_hoverCursor, false);
 	}
 
 	void Cursor::unhover(Widget& widget)
@@ -76,17 +70,12 @@ namespace toy
 	}
 
 	Tooltip::Tooltip(RootSheet& rootSheet, const string& label)
-		: Overlay(rootSheet, cls())
+		: Wedge(rootSheet, cls(), LAYER)
 	{
-		this->content().setText(label);
-	}
-
-	void Tooltip::setLabel(const string& label)
-	{
-		this->content().setText(label);
+		m_frame->setCaption(label);
 	}
 
 	Rectangle::Rectangle(Wedge& parent, Type& type)
-		: Decal(parent, type)
+		: Wedge(parent, type)
 	{}
 }

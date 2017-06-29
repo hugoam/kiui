@@ -13,63 +13,39 @@
 
 namespace toy
 {
-	class _refl_ TOY_UI_EXPORT ScrollZone : public Layout
+	class _refl_ TOY_UI_EXPORT ScrollZone : public Wedge
 	{
 	public:
 		ScrollZone(ScrollSheet& parent);
 
-		Container& container() { return m_container; }
+		Wedge& body() { return m_container; }
 
-		static Type& cls() { static Type ty("ScrollZone", Layout::cls()); return ty; }
+		static Type& cls() { static Type ty("ScrollZone", Wedge::Layout()); return ty; }
 
 	protected:
 		ScrollSheet& m_scrollSheet;
-		Container m_container;
+		Wedge m_container;
 	};
 
-	class TOY_UI_EXPORT NoScrollZone
-	{
-	public:
-		static Type& cls() { static Type ty("NoScrollZone", Wedge::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT ScrollSheet : public Container
+	class _refl_ TOY_UI_EXPORT ScrollSheet : public Wedge
 	{
 	public:
 		ScrollSheet(Wedge& parent, Type& type = cls());
 
-		Container& container() { return m_scrollzone.container(); }
+		Wedge& body() { return m_scrollzone.body(); }
 
-		virtual void clear();
+		virtual void dirtyLayout();
 
 		virtual bool mouseWheel(MouseEvent& mouseEvent);
 
-		void enableWrap();
-		void disableWrap();
+		virtual void makeSolver();
 
-		void updateWrap();
-
-		static Type& cls() { static Type ty("ScrollSheet", Container::cls()); return ty; }
+		static Type& cls() { static Type ty("ScrollSheet", Wedge::cls()); return ty; }
 
 	protected:
 		ScrollZone m_scrollzone;
 		Scrollbar m_scrollbarX;
 		Scrollbar m_scrollbarY;
-		bool m_wrap;
-	};
-
-	class TOY_UI_EXPORT Plan
-	{
-	public:
-		static Type& cls() { static Type ty("Plan", Sheet::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT Surface : public Sheet
-	{
-	public:
-		Surface(Wedge& parent);
-
-		static Type& cls() { static Type ty("Surface", Sheet::cls()); return ty; }
 	};
 
 	class _refl_ TOY_UI_EXPORT ScrollPlan : public ScrollSheet
@@ -77,7 +53,7 @@ namespace toy
 	public:
 		ScrollPlan(Wedge& parent, Type& type = cls());
 
-		Container& plan() { return m_plan; }
+		Wedge& plan() { return m_plan; }
 
 		virtual bool middleDrag(MouseEvent& mouseEvent);
 		virtual bool mouseWheel(MouseEvent& mouseEvent);
@@ -88,15 +64,18 @@ namespace toy
 
 		static Type& cls() { static Type ty("ScrollPlan", ScrollSheet::cls()); return ty; }
 
+		static Type& Plan() { static Type ty("Plan", Wedge::Sheet()); return ty; }
+		static Type& Surface() { static Type ty("Surface", Wedge::Sheet()); return ty; }
+
 	protected:
-		Container& m_plan;
-		Container& m_surface;
+		Wedge& m_plan;
+		Wedge& m_surface;
 		//Surface m_surface;
 		BoxFloat m_bounds;
 		bool m_clamped;
 	};
 
-	TOY_UI_EXPORT bool drawGrid(Frame& frame, Renderer& renderer);
+	TOY_UI_EXPORT bool drawGrid(const Frame& frame, Renderer& renderer);
 }
 
 #endif // TOY_SCROLLSHEET_H

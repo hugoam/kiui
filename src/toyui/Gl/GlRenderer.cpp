@@ -84,7 +84,7 @@ namespace toy
 			glDisable(GL_FRAMEBUFFER_SRGB);
 
 		// Update and render
-		glViewport(0, 0, target.layer().width(), target.layer().height());
+		glViewport(0, 0, target.layer().d_size.x(), target.layer().d_size.y());
 
 		if(m_clear)
 		{

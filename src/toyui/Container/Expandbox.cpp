@@ -7,53 +7,29 @@
 
 #include <toyui/Widget/Sheet.h>
 
-#include <toyui/Container/Layout.h>
-
-#include <toyui/Frame/Frame.h>
-
 namespace toy
 {
-	ExpandboxHeader::ExpandboxHeader(Wedge& parent, const Callback& trigger)
-		: WrapButton(parent, trigger, cls())
-	{}
-
-	ExpandboxBody::ExpandboxBody(Wedge& parent)
-		: Container(parent, cls())
-	{}
-
-	ExpandboxToggle::ExpandboxToggle(Wedge& parent, const Callback& triggerOn, const Callback& triggerOff, bool on)
-		: Toggle(parent, triggerOn, triggerOff, on, cls())
-	{}
-
 	Expandbox::Expandbox(Wedge& parent, const string& title, bool collapsed, Type& type)
-		: Stack(parent, type)
-		, m_header(*this)
-		, m_toggle(m_header, [this](Widget&) { this->expand(); }, [this](Widget&) { this->collapse(); }, !collapsed)
+		: Wedge(parent, type)
+		, m_header(*this, nullptr, Header())
+		, m_toggle(m_header, [this](Widget&, bool on) { on ? this->expand() : this->collapse(); }, !collapsed, Switch())
 		, m_title(m_header, title)
-		, m_container(*this)
+		, m_body(*this, Body())
 		, m_collapsed(collapsed)
 	{
-		m_container.hide();
-		m_containerTarget = &m_container;
-	}
-
-	Widget& Expandbox::insert(object_ptr<Widget> widget)
-	{
-		if(!m_collapsed && m_container.frame().hidden())
-			m_container.show();
-
-		return this->append(std::move(widget));
+		if(collapsed)
+			m_body.hide();
 	}
 
 	void Expandbox::expand()
 	{
-		m_container.show();
+		m_body.show();
 		m_collapsed = false;
 	}
 
 	void Expandbox::collapse()
 	{
-		m_container.hide();
+		m_body.hide();
 		m_collapsed = true;
 	}
 }

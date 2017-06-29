@@ -18,7 +18,7 @@ namespace toy
 	class OgreRenderTarget : public RenderTarget
 	{
 	public:
-		OgreRenderTarget(Renderer& renderer, MasterLayer& masterLayer);
+		OgreRenderTarget(Renderer& renderer, Layer& masterLayer);
 		~OgreRenderTarget();
 
 	protected:
@@ -32,7 +32,7 @@ namespace toy
 	public:
 		OgreRenderer(const string& resourcePath);
 
-		virtual object_ptr<RenderTarget> createRenderTarget(MasterLayer& masterLayer);
+		virtual object_ptr<RenderTarget> createRenderTarget(Layer& masterLayer);
 	};
 }
 

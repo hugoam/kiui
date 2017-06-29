@@ -13,14 +13,14 @@ namespace toy
 		: Dropdown(parent, cls())
 		, m_submenu(submenu)
 	{
-		m_list.setStyle(MenuList::cls());
+		m_list.setStyle(Menu::List());
 		if(submenu)
-			m_list.setStyle(SubMenuList::cls());
+			m_list.setStyle(Menu::SubList());
 
 		m_header.reset({ label });
 	}
 
 	Menubar::Menubar(Wedge& parent)
-		: Header(parent, cls())
+		: Wedge(parent, cls())
 	{}
 }

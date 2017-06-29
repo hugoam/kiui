@@ -15,10 +15,9 @@ namespace toy
 	{
 	public:
 		NanoRenderer(const string& resourcePath);
-		~NanoRenderer();
 
 		// targets
-		virtual object_ptr<RenderTarget> createRenderTarget(MasterLayer& masterLayer);
+		virtual object_ptr<RenderTarget> createRenderTarget(Layer& layer);
 
 		// setup
 		virtual void loadFont() final;

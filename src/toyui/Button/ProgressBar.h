@@ -7,9 +7,6 @@
 
 /* toy */
 #include <toyui/Forward.h>
-#include <toyui/Frame/Uibox.h>
-#include <toyui/Widget/Widget.h>
-#include <toyui/Container/Layout.h>
 #include <toyui/Button/Button.h>
 #include <toyui/Button/Slider.h>
 
@@ -18,22 +15,20 @@ namespace toy
 	class TOY_UI_EXPORT ProgressBar : public Wedge
 	{
 	public:
-		ProgressBar(Wedge& parent, Dimension dim = DIM_X, const Callback& onUpdated = nullptr);
+		ProgressBar(Wedge& parent, Dimension dim = DIM_X);
 
 		float percentage() { return m_percentage; }
 		void setPercentage(float percentage);
 
-		static Type& cls() { static Type ty("ProgressBar", Row::cls()); return ty; }
+		static Type& cls() { static Type ty("ProgressBar", Wedge::Row()); return ty; }
 
 	protected:
 		Dimension m_dim;
-		Filler m_filler;
-		Spacer m_spacer;
-		SliderDisplay m_display;
+		Item m_filler;
+		Item m_spacer;
+		Label m_display;
 
 		float m_percentage;
-
-		Callback m_onUpdated;
 	};
 }
 

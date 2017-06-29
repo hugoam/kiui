@@ -5,11 +5,10 @@
 #include <toyui/Config.h>
 #include <toyui/Input/InputDevice.h>
 
-#include <toyui/Widget/RootSheet.h>
-#include <toyui/Widget/Sheet.h>
-#include <toyui/Widget/Cursor.h>
+#include <toyui/Input/InputEvent.h>
 
-#include <cassert>
+#include <toyui/Widget/RootSheet.h>
+#include <toyui/Widget/Cursor.h>
 
 namespace toy
 {
@@ -22,9 +21,6 @@ namespace toy
 		: InputDevice(rootSheet)
 		, m_shiftPressed(false)
 		, m_ctrlPressed(false)
-	{}
-
-	void Keyboard::nextFrame()
 	{}
 
 	void Keyboard::dispatchKeyPressed(KeyCode key, char c)
@@ -53,32 +49,21 @@ namespace toy
 
 	Mouse::Mouse(RootSheet& rootSheet)
 		: InputDevice(rootSheet)
-		, m_leftButton(*this, DEVICE_MOUSE_LEFT_BUTTON)
-		, m_rightButton(*this, DEVICE_MOUSE_RIGHT_BUTTON)
-		, m_middleButton(*this, DEVICE_MOUSE_MIDDLE_BUTTON)
-		, m_lastX(0.f)
-		, m_lastY(0.f)
+		, m_buttons{ MouseButton{*this, DEVICE_MOUSE_LEFT_BUTTON },
+					 MouseButton{*this, DEVICE_MOUSE_RIGHT_BUTTON},
+					 MouseButton{*this, DEVICE_MOUSE_MIDDLE_BUTTON } }
+		, m_lastPos(0.f, 0.f)
 	{}
 
-	void Mouse::nextFrame()
-	{
-	}
-
-	void Mouse::mouseFocus(float x, float y, std::vector<Widget*>& focused)
+	void Mouse::mouseFocus(DimFloat pos, std::vector<Widget*>& focused)
 	{
 		if(focused.size() > 0)
 			m_rootSheet.cursor().hover(*focused.front());
 		else
 			m_rootSheet.cursor().unhover();
 
-		std::sort(m_focused.begin(), m_focused.end());
-		std::sort(focused.begin(), focused.end());
-
-		MouseEnterEvent mouseEnterEvent(x, y);
-		this->transformMouseEvent(mouseEnterEvent);
-
-		MouseLeaveEvent mouseLeaveEvent(x, y);
-		this->transformMouseEvent(mouseLeaveEvent);
+		MouseEnterEvent mouseEnterEvent(*this, pos);
+		MouseLeaveEvent mouseLeaveEvent(*this, pos);
 
 		for(Widget* newFocus : focused)
 			if(std::find(m_focused.begin(), m_focused.end(), newFocus) == m_focused.end())
@@ -94,77 +79,45 @@ namespace toy
 	void Mouse::transformMouseEvent(MouseEvent& mouseEvent)
 	{
 		m_rootSheet.transformCoordinates(mouseEvent);
-
-		mouseEvent.deltaX = mouseEvent.posX - m_lastX;
-		mouseEvent.deltaY = mouseEvent.posY - m_lastY;
+		mouseEvent.delta = mouseEvent.pos - m_lastPos;
 	}
 
-	void Mouse::dispatchMouseMoved(float x, float y)
+	void Mouse::dispatchMouseMoved(DimFloat pos)
 	{
-		MouseMoveEvent mouseEvent(x, y);
-		this->transformMouseEvent(mouseEvent);
+		MouseMoveEvent mouseEvent(*this, pos);
 
-		m_lastX = mouseEvent.posX;
-		m_lastY = mouseEvent.posY;
-
-		m_rootSheet.cursor().setPosition(mouseEvent.posX, mouseEvent.posY);
+		m_lastPos = mouseEvent.pos;
+		m_rootSheet.cursor().setPosition(mouseEvent.pos);
 
 		m_rootFrame.dispatchEvent(mouseEvent);
 
-		this->mouseFocus(x, y, mouseEvent.visited);
+		this->mouseFocus(pos, mouseEvent.visited);
 
-		m_leftButton.mouseMoved(mouseEvent);
-		m_rightButton.mouseMoved(mouseEvent);
-		m_middleButton.mouseMoved(mouseEvent);
+		for(MouseButton& button : m_buttons)
+			button.mouseMoved(mouseEvent);
 	}
 
-	void Mouse::dispatchMousePressed(float x, float y, MouseButtonCode button)
+	void Mouse::dispatchMousePressed(DimFloat pos, MouseButtonCode button)
 	{
-		if(button == LEFT_BUTTON)
-			m_leftButton.mousePressed(x, y);
-		else if(button == RIGHT_BUTTON)
-			m_rightButton.mousePressed(x, y);
-		else if(button == MIDDLE_BUTTON)
-			m_middleButton.mousePressed(x, y);
+		m_buttons[button].mousePressed(pos);
 	}
 
-	void Mouse::dispatchMouseReleased(float x, float y, MouseButtonCode button)
+	void Mouse::dispatchMouseReleased(DimFloat pos, MouseButtonCode button)
 	{
-		if(button == LEFT_BUTTON)
-			m_leftButton.mouseReleased(x, y);
-		else if(button == RIGHT_BUTTON)
-			m_rightButton.mouseReleased(x, y);
-		else if(button == MIDDLE_BUTTON)
-			m_middleButton.mouseReleased(x, y);
+		m_buttons[button].mouseReleased(pos);
 	}
 
-	void Mouse::dispatchMouseWheeled(float x, float y, float amount)
+	void Mouse::dispatchMouseWheeled(DimFloat pos, float amount)
 	{
-		MouseWheelEvent mouseEvent(x, y, amount);
-		this->transformMouseEvent(mouseEvent);
-
+		MouseWheelEvent mouseEvent(*this, pos, amount);
 		m_rootFrame.dispatchEvent(mouseEvent);
 	}
 
-	void Mouse::handleBindWidget(Widget& widget)
+	void Mouse::handleDestroyWidget(Widget& widget)
 	{
-		m_leftButton.handleBindWidget(widget);
-		m_rightButton.handleBindWidget(widget);
-		m_middleButton.handleBindWidget(widget);
-	}
-
-	void Mouse::handleUnbindWidget(Widget& widget, bool destroy)
-	{
-		m_leftButton.handleUnbindWidget(widget, destroy);
-		m_rightButton.handleUnbindWidget(widget, destroy);
-		m_middleButton.handleUnbindWidget(widget, destroy);
-
 		for(int i = m_focused.size() - 1; i >= 0; --i)
 			if(m_focused.at(i) == &widget)
-			{
-				m_rootSheet.cursor().unhover();
 				m_focused.erase(m_focused.begin() + i);
-			}
 	}
 
 	MouseButton::MouseButton(Mouse& mouse, DeviceType deviceType)
@@ -173,38 +126,31 @@ namespace toy
 		, m_deviceType(deviceType)
 		, m_pressed(nullptr)
 		, m_dragging(false)
-		, m_pressedX(0.f)
-		, m_pressedY(0.f)
+		, m_pressedPos(0.f, 0.f)
 	{}
 
 	void MouseButton::mouseMoved(MouseEvent& mouseEvent)
 	{
 		const float threshold = 3.f;
+		DimFloat delta = mouseEvent.pos - m_pressedPos;
 
 		if(m_dragging)
 			this->dragMove(mouseEvent);
-		else if(m_pressed && (std::abs(mouseEvent.posX - m_pressedX) > threshold
-						   || std::abs(mouseEvent.posY - m_pressedY) > threshold))
-		{
-			m_dragging = true;
+		else if(m_pressed && (std::abs(delta.x()) > threshold || std::abs(delta.y()) > threshold))
 			this->dragStart(mouseEvent);
-		}
 	}
 
-	void MouseButton::mousePressed(float x, float y)
+	void MouseButton::mousePressed(DimFloat pos)
 	{
-		MousePressEvent mouseEvent(m_deviceType, x, y);
-		m_mouse.transformMouseEvent(mouseEvent);
+		MousePressEvent mouseEvent(m_mouse, m_deviceType, pos);
 
 		m_pressed = m_rootFrame.dispatchEvent(mouseEvent);
-		m_pressedX = mouseEvent.posX;
-		m_pressedY = mouseEvent.posY;
+		m_pressedPos = mouseEvent.pos;
 	}
 
-	void MouseButton::mouseReleased(float x, float y)
+	void MouseButton::mouseReleased(DimFloat pos)
 	{
-		MouseReleaseEvent mouseEvent(m_deviceType, x, y);
-		m_mouse.transformMouseEvent(mouseEvent);
+		MouseReleaseEvent mouseEvent(m_mouse, m_deviceType, pos);
 
 		m_rootFrame.dispatchEvent(mouseEvent, m_pressed);
 
@@ -214,54 +160,35 @@ namespace toy
 			this->click(mouseEvent);
 
 		m_pressed = nullptr;
-		m_dragging = false;
 	}
 
 	void MouseButton::dragStart(MouseEvent& mouseEvent)
 	{
-		MouseDragStartEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY, m_pressedX, m_pressedY);
+		MouseDragStartEvent dragEvent(m_mouse, m_deviceType, mouseEvent.pos, m_pressedPos);
 		m_rootFrame.dispatchEvent(dragEvent, m_pressed);
-		//m_pressed->receiveEvent(dragEvent);
+
+		this->dragMove(mouseEvent);
+		m_dragging = true;
 	}
 
 	void MouseButton::dragEnd(MouseEvent& mouseEvent)
 	{
-		MouseDragEndEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY);
+		m_dragging = false;
+		this->dragMove(mouseEvent);
+
+		MouseDragEndEvent dragEvent(m_mouse, m_deviceType, mouseEvent.pos);
 		m_rootFrame.dispatchEvent(dragEvent, m_pressed);
-		//m_pressed->receiveEvent(dragEvent);
 	}
 
 	void MouseButton::dragMove(MouseEvent& mouseEvent)
 	{
-		MouseDragEvent dragEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY, mouseEvent.deltaX, mouseEvent.deltaY);
+		MouseDragEvent dragEvent(m_mouse, m_deviceType, mouseEvent.pos, mouseEvent.delta);
 		m_rootFrame.dispatchEvent(dragEvent, m_pressed);
-		//m_pressed->receiveEvent(dragEvent);
 	}
 
 	void MouseButton::click(MouseEvent& mouseEvent)
 	{
-		MouseClickEvent clickEvent(m_deviceType, mouseEvent.posX, mouseEvent.posY);
+		MouseClickEvent clickEvent(m_mouse, m_deviceType, mouseEvent.pos);
 		m_rootFrame.dispatchEvent(clickEvent, m_pressed);
-	}
-
-	void MouseButton::handleUnbindWidget(Widget& widget, bool destroy)
-	{
-		// @todo remove destroy parameter once we refactor container ownership
-		if(m_pressed == &widget)
-		{
-			m_prevPressed = destroy ? nullptr : &widget;
-			m_pressed = nullptr;
-			m_dragging = false;
-		}
-	}
-	
-	void MouseButton::handleBindWidget(Widget& widget)
-	{
-		if(m_prevPressed == &widget)
-		{
-			m_prevPressed = nullptr;
-			m_pressed = &widget;
-			m_dragging = false;
-		}
 	}
 }

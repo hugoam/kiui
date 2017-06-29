@@ -5,8 +5,9 @@
 #include <toyui/Config.h>
 #include <toyui/Controller/Controller.h>
 
-#include <toyui/Widget/Widget.h>
 #include <toyui/Widget/RootSheet.h>
+
+#include <toyui/Input/InputDevice.h>
 
 namespace toy
 {
@@ -71,8 +72,8 @@ namespace toy
 		if(m_controlMode < CM_MODAL)
 			return false;
 
-		DimFloat local = m_inputWidget->frame().localPosition(mouseEvent.posX, mouseEvent.posY);
-		if(!m_inputWidget->frame().inside(local.x(), local.y()))
+		DimFloat local = m_inputWidget->frame().localPosition(mouseEvent.pos);
+		if(!m_inputWidget->frame().inside(local))
 			this->yield();
 
 		return true;

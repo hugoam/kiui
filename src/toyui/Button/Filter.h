@@ -16,7 +16,10 @@ namespace toy
 	class TOY_UI_EXPORT FilterInput : public Input<string>
 	{
 	public:
-		FilterInput(Wedge& parent, Wedge& list, std::function<void(const string&)> callback = nullptr);
+		using Criteria = std::function<string(Widget&)>;
+
+	public:
+		FilterInput(Wedge& parent, Wedge& list, Criteria criteria = nullptr, Callback callback = nullptr);
 
 		void filterOn();
 		void filterOff();
@@ -28,8 +31,10 @@ namespace toy
 
 		static Type& cls() { static Type ty("FilterInput", Input<string>::cls()); return ty; }
 
+
 	protected:
 		Wedge& m_list;
+		Criteria m_criteria;
 	};
 }
 

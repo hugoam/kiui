@@ -5,15 +5,14 @@
 #include <toyui/Config.h>
 #include <toyui/Button/Filter.h>
 
-#include <toyui/Container/Layout.h>
-
 #include <locale>
 
 namespace toy
 {
-	FilterInput::FilterInput(Wedge& parent, Wedge& list, std::function<void(const string&)> callback)
+	FilterInput::FilterInput(Wedge& parent, Wedge& list, Criteria criteria, Callback callback)
 		: Input<string>(parent, "", callback)
 		, m_list(list)
+		, m_criteria(criteria ? criteria : [](Widget& widget) { return widget.label(); })
 	{}
 
 	void FilterInput::filterOn()
@@ -28,13 +27,11 @@ namespace toy
 
 	void FilterInput::updateFilter(const string& filter)
 	{
-		for(auto& pt : m_list.contents())
+		for(auto& widget : m_list.contents())
 		{
-			bool fit = fitsFilter(filter, pt->contentlabel());
-			if(fit && pt->frame().hidden())
-				pt->show();
-			else if(!fit && !pt->frame().hidden())
-				pt->hide();
+			string text = m_criteria(*widget);
+			bool fit = fitsFilter(filter, text);
+			fit ? widget->show() : widget->hide();
 		}
 	}
 

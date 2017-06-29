@@ -7,54 +7,32 @@
 
 /* toy */
 #include <toyui/Widget/Sheet.h>
-#include <toyui/Container/Layout.h>
 #include <toyui/Button/Button.h>
 
 namespace toy
 {
-	class _refl_ TOY_UI_EXPORT ExpandboxHeader : public WrapButton
-	{
-	public:
-		ExpandboxHeader(Wedge& parent, const Callback& trigger = nullptr);
-
-		static Type& cls() { static Type ty("ExpandboxHeader", WrapButton::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT ExpandboxBody : public Container
-	{
-	public:
-		ExpandboxBody(Wedge& parent);
-
-		static Type& cls() { static Type ty("ExpandboxBody", Container::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT ExpandboxToggle : public Toggle
-	{
-	public:
-		ExpandboxToggle(Wedge& parent, const Callback& triggerOn, const Callback& triggerOff, bool on);
-
-		static Type& cls() { static Type ty("ExpandboxToggle", Toggle::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT Expandbox : public Stack
+	class _refl_ TOY_UI_EXPORT Expandbox : public Wedge
 	{
 	public:
 		Expandbox(Wedge& parent, const string& title, bool collapsed = false, Type& type = cls());
 
 		Wedge& header() { return m_header; }
-
-		virtual Widget& insert(object_ptr<Widget> widget);
+		Wedge& body() { return m_body; }
 
 		virtual void expand();
 		virtual void collapse();
 
-		static Type& cls() { static Type ty("Expandbox", Stack::cls()); return ty; }
+		static Type& cls() { static Type ty("Expandbox", Wedge::Stack()); return ty; }
+
+		static Type& Header() { static Type ty("ExpandboxHeader", WrapButton::cls()); return ty; }
+		static Type& Switch() { static Type ty("ExpandboxToggle", Toggle::cls()); return ty; }
+		static Type& Body() { static Type ty("ExpandboxBody", Wedge::cls()); return ty; }
 
 	protected:
-		ExpandboxHeader m_header;
-		ExpandboxToggle m_toggle;
+		WrapButton m_header;
+		Toggle m_toggle;
 		Label m_title;
-		ExpandboxBody m_container;
+		Wedge m_body;
 		bool m_collapsed;
 	};
 }

@@ -75,13 +75,8 @@ namespace toy
 	Ogre::IdString UiPassProvider::m_passId("Ui");
 
 	OgreContext::OgreContext(OgreRenderSystem& renderSystem, const string& name, int width, int height, bool fullScreen)
-		: Context(renderSystem)
-	{
-		object_ptr<OgreRenderWindow> renderWindow = make_object<OgreRenderWindow>(renderSystem, name, width, height, fullScreen);
-		object_ptr<OISInputWindow> inputWindow = make_object<OISInputWindow>(*renderWindow);
-
-		this->init(std::move(renderWindow), std::move(inputWindow));
-	}
+		: Context(renderSystem, make_object<OgreRenderWindow>(renderSystem, name, width, height, fullScreen), make_object<OISInputWindow>())
+	{}
 
 	OgreRenderSystem::OgreRenderSystem(const string& resourcePath)
 		: RenderSystem(resourcePath, false)

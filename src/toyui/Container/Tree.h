@@ -14,44 +14,25 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT TreeNodeHeader : public Object
-	{
-	public:
-		static Type& cls() { static Type ty("TreeNodeHeader", ExpandboxHeader::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT TreeNodeBody : public Object
-	{
-	public:
-		static Type& cls() { static Type ty("TreeNodeBody", ExpandboxBody::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT TreeNodeToggle : public Object
-	{
-	public:
-		static Type& cls() { static Type ty("TreeNodeToggle", ExpandboxToggle::cls()); return ty; }
-	};
-
 	class _refl_ TOY_UI_EXPORT TreeNode : public Expandbox
 	{
 	public:
 		TreeNode(Wedge& parent, const string& image, const string& title, bool collapsed = false, Type& type = cls());
 
-		Tree& tree();
-
-		virtual void handleAdd(Widget& widget);
-		virtual void handleRemove(Widget& widget);
-
 		void selected();
 
 		static Type& cls() { static Type ty("TreeNode", Expandbox::cls()); return ty; }
 
+		static Type& Header() { static Type ty("TreeNodeHeader", Expandbox::Header()); return ty; }
+		static Type& Switch() { static Type ty("TreeNodeToggle", Expandbox::Switch()); return ty; }
+		static Type& Body() { static Type ty("TreeNodeBody", Expandbox::Body()); return ty; }
+
 	protected:
 		string m_image;
-		Icon* m_icon;
+		Item* m_icon;
 	};
 
-	class _refl_ TOY_UI_EXPORT Tree : public Container
+	class _refl_ TOY_UI_EXPORT Tree : public Wedge
 	{
 	public:
 		Tree(Wedge& parent, const std::function<void (TreeNode&)>& onSelected = nullptr);
@@ -60,7 +41,7 @@ namespace toy
 		void expand(TreeNode& node, bool exclusive = false);
 		void collapse();
 
-		static Type& cls() { static Type ty("Tree", Container::cls()); return ty; }
+		static Type& cls() { static Type ty("Tree", Wedge::cls()); return ty; }
 
 	protected:
 		TreeNode* m_rootNode;

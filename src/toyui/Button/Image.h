@@ -18,7 +18,7 @@ namespace toy
 	public:
 		Figure(Wedge& parent, Lref& image);
 		
-		virtual void unbound(RootSheet& rootSheet, bool destroy);
+		virtual void destroyed();
 
 		void updateImage();
 		void clearImage();

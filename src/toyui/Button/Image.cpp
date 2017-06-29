@@ -18,10 +18,9 @@ namespace toy
 		this->updateImage();
 	}
 
-	void Figure::unbound(RootSheet& rootSheet, bool destroy)
+	void Figure::destroyed()
 	{
-		if(destroy)
-			this->clearImage();
+		this->clearImage();
 	}
 
 	void Figure::updateImage()
@@ -31,7 +30,7 @@ namespace toy
 		std::vector<uint8_t> data = m_source.read();
 		m_image = &this->uiWindow().createImage("Figure", m_source.width, m_source.height, &data[0], false);
 
-		this->setImage(m_image);
+		m_frame->setIcon(m_image);
 	}
 
 	void Figure::clearImage()

@@ -9,81 +9,37 @@
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Button/Button.h>
 #include <toyui/Container/List.h>
+#include <toyui/Window/Popup.h>
 
 #include <functional>
 
 namespace toy
 {
-	class _refl_ TOY_UI_EXPORT DropdownHead : public MultiButton
-	{
-	public:
-		DropdownHead(Dropdown& dropdown, const Callback& trigger);
-
-		static Type& cls() { static Type ty("DropdownHead", MultiButton::cls()); return ty; }
-
-	protected:
-		Dropdown& m_dropdown;
-	};
-
-	class _refl_ TOY_UI_EXPORT DropdownToggle : public Button
-	{
-	public:
-		DropdownToggle(Wedge& parent, const Callback& trigger);
-
-		static Type& cls() { static Type ty("DropdownToggle", Button::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT DropdownChoice : public MultiButton
-	{
-	public:
-		DropdownChoice(Wedge& parent, Dropdown& dropdown, const Callback& trigger, const StringVector& elements);
-
-		virtual bool leftClick(MouseEvent& mouseEvent);
-
-		static Type& cls() { static Type ty("DropdownChoice", MultiButton::cls()); return ty; }
-
-	protected:
-		Dropdown& m_dropdown;
-	};
-
-	class _refl_ TOY_UI_EXPORT DropdownList : public Container
-	{
-	public:
-		DropdownList(Dropdown& dropdown);
-
-		virtual bool leftClick(MouseEvent& mouseEvent);
-		virtual bool rightClick(MouseEvent& mouseEvent);
-		
-		static Type& cls() { static Type ty("DropdownList", Container::cls()); return ty; }
-
-	protected:
-		Dropdown& m_dropdown;
-	};
-
 	class _refl_ TOY_UI_EXPORT Dropdown : public WrapButton
 	{
 	public:
 		Dropdown(Wedge& parent, Type& type = cls());
 
-		DropdownList& list() { return m_list; }
-		DropdownHead& header() { return m_header; }
 		bool down() { return m_down; }
-
-		virtual Widget& insert(object_ptr<Widget> widget);
 
 		void dropdown(bool modal = true);
 		void dropup();
 
-		virtual void selected(DropdownChoice& selected);
+		virtual void selected(MultiButton& selected);
 
-		DropdownChoice& addChoice(const StringVector& elements, const Callback& trigger = nullptr);
+		MultiButton& addChoice(const StringVector& elements, const Callback& trigger = nullptr);
 
 		static Type& cls() { static Type ty("Dropdown", WrapButton::cls()); return ty; }
 
+		static Type& Toggle() { static Type ty("DropdownToggle", Button::cls()); return ty; }
+		static Type& Head() { static Type ty("DropdownHead", MultiButton::cls()); return ty; }
+		static Type& List() { static Type ty("DropdownList", Wedge::cls()); return ty; }
+		static Type& Choice() { static Type ty("DropdownChoice", MultiButton::cls()); return ty; }
+
 	protected:
-		DropdownHead m_header;
-		DropdownToggle m_toggle;
-		DropdownList m_list;
+		MultiButton m_header;
+		Button m_toggle;
+		Popup m_list;
 		bool m_down;
 	};
 
@@ -92,10 +48,10 @@ namespace toy
 	public:
 		DropdownInput(Wedge& parent, const Callback& onSelected = nullptr, StringVector choices = StringVector(), Type& type = cls());
 
-		virtual void selected(DropdownChoice& selected);
-		void select(DropdownChoice& selected);
+		virtual void selected(MultiButton& selected);
+		void select(MultiButton& selected);
 
-		DropdownChoice& addChoice(const StringVector& elements, const Callback& trigger = nullptr);
+		MultiButton& addChoice(const StringVector& elements, const Callback& trigger = nullptr);
 
 		static Type& cls() { static Type ty("DropdownInput", Dropdown::cls()); return ty; }
 

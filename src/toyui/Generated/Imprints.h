@@ -25,10 +25,11 @@ namespace toy
     template <> TOY_UI_EXPORT Type& typecls<Pivot>() { static Type ty("Pivot"); return ty; }
     template <> TOY_UI_EXPORT Type& typecls<Align>() { static Type ty("Align"); return ty; }
     template <> TOY_UI_EXPORT Type& typecls<FrameType>() { static Type ty("FrameType"); return ty; }
+    template <> TOY_UI_EXPORT Type& typecls<LayoutSolver>() { static Type ty("LayoutSolver"); return ty; }
     template <> TOY_UI_EXPORT Type& typecls<AutoLayout>() { static Type ty("AutoLayout"); return ty; }
     template <> TOY_UI_EXPORT Type& typecls<Flow>() { static Type ty("Flow"); return ty; }
     template <> TOY_UI_EXPORT Type& typecls<Sizing>() { static Type ty("Sizing"); return ty; }
-    template <> TOY_UI_EXPORT Type& typecls<Space>() { static Type ty("Space"); return ty; }
+    template <> TOY_UI_EXPORT Type& typecls<SpacePreset>() { static Type ty("SpacePreset"); return ty; }
     template <> TOY_UI_EXPORT Type& typecls<Clipping>() { static Type ty("Clipping"); return ty; }
     template <> TOY_UI_EXPORT Type& typecls<Opacity>() { static Type ty("Opacity"); return ty; }
     template <> TOY_UI_EXPORT Type& typecls<WidgetState>() { static Type ty("WidgetState"); return ty; }
@@ -58,34 +59,20 @@ namespace toy
 
     Object& BoxFloat_construct_0(Lref& ref, Lref* args) {  ref.value<BoxFloat>() = BoxFloat( args[0].any<float>(), args[1].any<float>(), args[2].any<float>(), args[3].any<float>() ); return ref.value<BoxFloat>(); }
 	void BoxFloat_x0(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().x0(); }
-	void BoxFloat_setX0(Object& object, const Lref& ref) { object.as<BoxFloat>().setX0(ref.value<float>()); }
 	void BoxFloat_y0(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().y0(); }
-	void BoxFloat_setY0(Object& object, const Lref& ref) { object.as<BoxFloat>().setY0(ref.value<float>()); }
 	void BoxFloat_x1(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().x1(); }
-	void BoxFloat_setX1(Object& object, const Lref& ref) { object.as<BoxFloat>().setX1(ref.value<float>()); }
 	void BoxFloat_y1(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().y1(); }
-	void BoxFloat_setY1(Object& object, const Lref& ref) { object.as<BoxFloat>().setY1(ref.value<float>()); }
-	void BoxFloat_x(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().x(); }
-	void BoxFloat_y(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().y(); }
-	void BoxFloat_w(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().w(); }
-	void BoxFloat_h(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().h(); }
-	void BoxFloat_v0(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().v0(); }
-	void BoxFloat_v1(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().v1(); }
-	void BoxFloat_v2(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().v2(); }
-	void BoxFloat_v3(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().v3(); }
 
 	void ImageSkin_d_image(Object& object, Lref& ref) { ref.pointer<Image>() = object.as<ImageSkin>().d_image; }
 	void ImageSkin_setD_image(Object& object, const Lref& ref) { object.as<ImageSkin>().d_image = ref.pointer<Image>(); }
-	void ImageSkin_d_filetype(Object& object, Lref& ref) { ref.value<string>() = object.as<ImageSkin>().d_filetype; }
-	void ImageSkin_setD_filetype(Object& object, const Lref& ref) { object.as<ImageSkin>().d_filetype = ref.value<string>(); }
+	void ImageSkin_d_left(Object& object, Lref& ref) { ref.value<int>() = object.as<ImageSkin>().d_left; }
+	void ImageSkin_setD_left(Object& object, const Lref& ref) { object.as<ImageSkin>().d_left = ref.value<int>(); }
 	void ImageSkin_d_top(Object& object, Lref& ref) { ref.value<int>() = object.as<ImageSkin>().d_top; }
 	void ImageSkin_setD_top(Object& object, const Lref& ref) { object.as<ImageSkin>().d_top = ref.value<int>(); }
 	void ImageSkin_d_right(Object& object, Lref& ref) { ref.value<int>() = object.as<ImageSkin>().d_right; }
 	void ImageSkin_setD_right(Object& object, const Lref& ref) { object.as<ImageSkin>().d_right = ref.value<int>(); }
 	void ImageSkin_d_bottom(Object& object, Lref& ref) { ref.value<int>() = object.as<ImageSkin>().d_bottom; }
 	void ImageSkin_setD_bottom(Object& object, const Lref& ref) { object.as<ImageSkin>().d_bottom = ref.value<int>(); }
-	void ImageSkin_d_left(Object& object, Lref& ref) { ref.value<int>() = object.as<ImageSkin>().d_left; }
-	void ImageSkin_setD_left(Object& object, const Lref& ref) { object.as<ImageSkin>().d_left = ref.value<int>(); }
 	void ImageSkin_d_margin(Object& object, Lref& ref) { ref.value<int>() = object.as<ImageSkin>().d_margin; }
 	void ImageSkin_setD_margin(Object& object, const Lref& ref) { object.as<ImageSkin>().d_margin = ref.value<int>(); }
 	void ImageSkin_d_stretch(Object& object, Lref& ref) { ref.value<Dimension>() = object.as<ImageSkin>().d_stretch; }
@@ -102,66 +89,16 @@ namespace toy
 	void Style_base(Object& object, Lref& ref) { ref.pointer<Style>() = object.as<Style>().base(); }
 	void Style_layout(Object& object, Lref& ref) { ref.pointer<LayoutStyle>() = &object.as<Style>().layout(); }
 	void Style_skin(Object& object, Lref& ref) { ref.pointer<InkStyle>() = &object.as<Style>().skin(); }
-	void Style_updated(Object& object, Lref& ref) { ref.value<size_t>() = object.as<Style>().updated(); }
-	void Style_setUpdated(Object& object, const Lref& ref) { object.as<Style>().setUpdated(ref.value<size_t>()); }
 
 	void Widget_parent(Object& object, Lref& ref) { ref.pointer<Wedge>() = object.as<Widget>().parent(); }
-	void Widget_container(Object& object, Lref& ref) { ref.pointer<Container>() = object.as<Widget>().container(); }
+	void Widget_container(Object& object, Lref& ref) { ref.pointer<Wedge>() = object.as<Widget>().container(); }
 	void Widget_index(Object& object, Lref& ref) { ref.value<size_t>() = object.as<Widget>().index(); }
 	void Widget_frame(Object& object, Lref& ref) { ref.pointer<Frame>() = &object.as<Widget>().frame(); }
 	void Widget_state(Object& object, Lref& ref) { ref.value<WidgetState>() = object.as<Widget>().state(); }
 	void Widget_style(Object& object, Lref& ref) { ref.pointer<Style>() = &object.as<Widget>().style(); }
 	void Widget_setStyle(Object& object, const Lref& ref) { object.as<Widget>().setStyle(ref.ref<Style>()); }
-	void Widget_label(Object& object, Lref& ref) { ref.value<string>() = object.as<Widget>().label(); }
-	void Widget_setLabel(Object& object, const Lref& ref) { object.as<Widget>().setLabel(ref.value<string>()); }
-	void Widget_image(Object& object, Lref& ref) { ref.pointer<Image>() = object.as<Widget>().image(); }
-	void Widget_setImage(Object& object, const Lref& ref) { object.as<Widget>().setImage(ref.pointer<Image>()); }
-
 
 	void Wedge_contents(Object& object, Lref& ref) { ref.pointer<std::vector<Widget*>>() = &object.as<Wedge>().contents(); }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -234,7 +171,7 @@ namespace toy
         
         typecls<Direction>().imprint().name = "Direction";
         typecls<Direction>().imprint().typeClass = ENUM;
-        typecls<Direction>().imprint().enumIds = { "READING", "PARAGRAPH", "PARALLEL", "ORTHOGONAL", "DIMENSION", "DIRECTION_AUTO" };
+        typecls<Direction>().imprint().enumIds = { "DIRECTION_NONE", "READING", "PARAGRAPH", "PARALLEL", "ORTHOGONAL" };
         typecls<Direction>().imprint().initRefMethods<Direction>();
         typecls<Direction>().imprint().setup();
         
@@ -252,9 +189,15 @@ namespace toy
         
         typecls<FrameType>().imprint().name = "FrameType";
         typecls<FrameType>().imprint().typeClass = ENUM;
-        typecls<FrameType>().imprint().enumIds = { "FRAME", "STRIPE", "GRID", "TABLE", "LAYER", "MASTER_LAYER", "SPACE_LAYER" };
+        typecls<FrameType>().imprint().enumIds = { "FRAME", "LAYER", "MASTER_LAYER", "SPACE_LAYER" };
         typecls<FrameType>().imprint().initRefMethods<FrameType>();
         typecls<FrameType>().imprint().setup();
+        
+        typecls<LayoutSolver>().imprint().name = "LayoutSolver";
+        typecls<LayoutSolver>().imprint().typeClass = ENUM;
+        typecls<LayoutSolver>().imprint().enumIds = { "FRAME_SOLVER", "ROW_SOLVER", "GRID_SOLVER", "TABLE_SOLVER" };
+        typecls<LayoutSolver>().imprint().initRefMethods<LayoutSolver>();
+        typecls<LayoutSolver>().imprint().setup();
         
         typecls<AutoLayout>().imprint().name = "AutoLayout";
         typecls<AutoLayout>().imprint().typeClass = ENUM;
@@ -270,15 +213,15 @@ namespace toy
         
         typecls<Sizing>().imprint().name = "Sizing";
         typecls<Sizing>().imprint().typeClass = ENUM;
-        typecls<Sizing>().imprint().enumIds = { "FIXED", "MANUAL", "SHRINK", "WRAP", "EXPAND" };
+        typecls<Sizing>().imprint().enumIds = { "FIXED", "SHRINK", "WRAP", "EXPAND" };
         typecls<Sizing>().imprint().initRefMethods<Sizing>();
         typecls<Sizing>().imprint().setup();
         
-        typecls<Space>().imprint().name = "Space";
-        typecls<Space>().imprint().typeClass = ENUM;
-        typecls<Space>().imprint().enumIds = { "MANUAL_SPACE", "SHEET", "ITEM", "BLOCK", "FIXED_BLOCK", "LINE", "STACK", "DIV", "SPACE", "BOARD", "PARALLEL_FLEX" };
-        typecls<Space>().imprint().initRefMethods<Space>();
-        typecls<Space>().imprint().setup();
+        typecls<SpacePreset>().imprint().name = "SpacePreset";
+        typecls<SpacePreset>().imprint().typeClass = ENUM;
+        typecls<SpacePreset>().imprint().enumIds = { "SHEET", "FLEX", "FLEX_O", "ITEM", "UNIT", "BLOCK", "LINE", "STACK", "DIV", "SPACER", "BOARD" };
+        typecls<SpacePreset>().imprint().initRefMethods<SpacePreset>();
+        typecls<SpacePreset>().imprint().setup();
         
         typecls<Clipping>().imprint().name = "Clipping";
         typecls<Clipping>().imprint().typeClass = ENUM;
@@ -389,18 +332,10 @@ namespace toy
         BoxFloat::cls().imprint().typeClass = STRUCT;
         BoxFloat::cls().imprint().serializable = false;
         BoxFloat::cls().imprint().isTypeObject = false;
-        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::x0), typecls<float>(), "x0", &BoxFloat_x0, &BoxFloat_setX0, true, true, false, false));
-        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::y0), typecls<float>(), "y0", &BoxFloat_y0, &BoxFloat_setY0, true, true, false, false));
-        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::x1), typecls<float>(), "x1", &BoxFloat_x1, &BoxFloat_setX1, true, true, false, false));
-        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::y1), typecls<float>(), "y1", &BoxFloat_y1, &BoxFloat_setY1, true, true, false, false));
-        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::x), typecls<float>(), "x", &BoxFloat_x, nullptr, true, false, false, false));
-        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::y), typecls<float>(), "y", &BoxFloat_y, nullptr, true, false, false, false));
-        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::w), typecls<float>(), "w", &BoxFloat_w, nullptr, true, false, false, false));
-        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::h), typecls<float>(), "h", &BoxFloat_h, nullptr, true, false, false, false));
-        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::v0), typecls<float>(), "v0", &BoxFloat_v0, nullptr, true, false, false, false));
-        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::v1), typecls<float>(), "v1", &BoxFloat_v1, nullptr, true, false, false, false));
-        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::v2), typecls<float>(), "v2", &BoxFloat_v2, nullptr, true, false, false, false));
-        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::v3), typecls<float>(), "v3", &BoxFloat_v3, nullptr, true, false, false, false));
+        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::x0), typecls<float>(), "x0", &BoxFloat_x0, nullptr, true, false, false, false));
+        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::y0), typecls<float>(), "y0", &BoxFloat_y0, nullptr, true, false, false, false));
+        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::x1), typecls<float>(), "x1", &BoxFloat_x1, nullptr, true, false, false, false));
+        BoxFloat::cls().imprint().members.push_back(Member(BoxFloat::cls(), method_var(&BoxFloat::y1), typecls<float>(), "y1", &BoxFloat_y1, nullptr, true, false, false, false));
         BoxFloat::cls().imprint().constructors.push_back(Constructor(BoxFloat::cls(), &BoxFloat_construct_0, ParamVector({ Param("x0", var(float()), false, INPUT_PARAM), Param("y0", var(float()), false, INPUT_PARAM), Param("x1", var(float()), false, INPUT_PARAM), Param("y1", var(float()), false, INPUT_PARAM) })));
         BoxFloat::cls().imprint().initRefMethods<BoxFloat>();
         BoxFloat::cls().imprint().setup();
@@ -413,11 +348,10 @@ namespace toy
         ImageSkin::cls().imprint().serializable = false;
         ImageSkin::cls().imprint().isTypeObject = false;
         ImageSkin::cls().imprint().members.push_back(Member(ImageSkin::cls(), member_var(&ImageSkin::d_image), Image::cls(), "d_image", &ImageSkin_d_image, &ImageSkin_setD_image, true, true, false, false));
-        ImageSkin::cls().imprint().members.push_back(Member(ImageSkin::cls(), member_var(&ImageSkin::d_filetype), typecls<string>(), "d_filetype", &ImageSkin_d_filetype, &ImageSkin_setD_filetype, true, true, false, false));
+        ImageSkin::cls().imprint().members.push_back(Member(ImageSkin::cls(), member_var(&ImageSkin::d_left), typecls<int>(), "d_left", &ImageSkin_d_left, &ImageSkin_setD_left, true, true, false, false));
         ImageSkin::cls().imprint().members.push_back(Member(ImageSkin::cls(), member_var(&ImageSkin::d_top), typecls<int>(), "d_top", &ImageSkin_d_top, &ImageSkin_setD_top, true, true, false, false));
         ImageSkin::cls().imprint().members.push_back(Member(ImageSkin::cls(), member_var(&ImageSkin::d_right), typecls<int>(), "d_right", &ImageSkin_d_right, &ImageSkin_setD_right, true, true, false, false));
         ImageSkin::cls().imprint().members.push_back(Member(ImageSkin::cls(), member_var(&ImageSkin::d_bottom), typecls<int>(), "d_bottom", &ImageSkin_d_bottom, &ImageSkin_setD_bottom, true, true, false, false));
-        ImageSkin::cls().imprint().members.push_back(Member(ImageSkin::cls(), member_var(&ImageSkin::d_left), typecls<int>(), "d_left", &ImageSkin_d_left, &ImageSkin_setD_left, true, true, false, false));
         ImageSkin::cls().imprint().members.push_back(Member(ImageSkin::cls(), member_var(&ImageSkin::d_margin), typecls<int>(), "d_margin", &ImageSkin_d_margin, &ImageSkin_setD_margin, true, true, false, false));
         ImageSkin::cls().imprint().members.push_back(Member(ImageSkin::cls(), member_var(&ImageSkin::d_stretch), typecls<Dimension>(), "d_stretch", &ImageSkin_d_stretch, &ImageSkin_setD_stretch, true, true, false, false));
         ImageSkin::cls().imprint().initRefMethods<ImageSkin>();
@@ -476,7 +410,6 @@ namespace toy
         Style::cls().imprint().members.push_back(Member(Style::cls(), method_var(&Style::base), Style::cls(), "base", &Style_base, nullptr, true, false, false, false));
         Style::cls().imprint().members.push_back(Member(Style::cls(), method_var(&Style::layout), LayoutStyle::cls(), "layout", &Style_layout, nullptr, false, false, false, false));
         Style::cls().imprint().members.push_back(Member(Style::cls(), method_var(&Style::skin), InkStyle::cls(), "skin", &Style_skin, nullptr, false, false, false, false));
-        Style::cls().imprint().members.push_back(Member(Style::cls(), method_var(&Style::updated), typecls<unsigned int>(), "updated", &Style_updated, &Style_setUpdated, true, true, false, false));
         Style::cls().imprint().setup();
         
         
@@ -487,23 +420,12 @@ namespace toy
         Widget::cls().imprint().serializable = false;
         Widget::cls().imprint().isTypeObject = true;
         Widget::cls().imprint().members.push_back(Member(Widget::cls(), method_var(&Widget::parent), Wedge::cls(), "parent", &Widget_parent, nullptr, true, false, false, false));
-        Widget::cls().imprint().members.push_back(Member(Widget::cls(), method_var(&Widget::container), Container::cls(), "container", &Widget_container, nullptr, true, false, false, false));
+        Widget::cls().imprint().members.push_back(Member(Widget::cls(), method_var(&Widget::container), Wedge::cls(), "container", &Widget_container, nullptr, true, false, false, false));
         Widget::cls().imprint().members.push_back(Member(Widget::cls(), method_var(&Widget::index), typecls<unsigned int>(), "index", &Widget_index, nullptr, true, false, false, false));
         Widget::cls().imprint().members.push_back(Member(Widget::cls(), method_var(&Widget::frame), Frame::cls(), "frame", &Widget_frame, nullptr, false, false, false, false));
         Widget::cls().imprint().members.push_back(Member(Widget::cls(), method_var(&Widget::state), typecls<WidgetState>(), "state", &Widget_state, nullptr, true, false, false, false));
         Widget::cls().imprint().members.push_back(Member(Widget::cls(), method_var(&Widget::style), Style::cls(), "style", &Widget_style, &Widget_setStyle, false, true, false, false));
-        Widget::cls().imprint().members.push_back(Member(Widget::cls(), method_var(&Widget::label), typecls<string>(), "label", &Widget_label, &Widget_setLabel, true, true, false, false));
-        Widget::cls().imprint().members.push_back(Member(Widget::cls(), method_var(&Widget::image), Image::cls(), "image", &Widget_image, &Widget_setImage, true, true, false, false));
         Widget::cls().imprint().setup();
-        
-        
-        // DockTab
-        DockTab::cls().imprint().inherit();
-        DockTab::cls().imprint().name = "DockTab";
-        DockTab::cls().imprint().typeClass = OBJECT;
-        DockTab::cls().imprint().serializable = false;
-        DockTab::cls().imprint().isTypeObject = false;
-        DockTab::cls().imprint().setup();
         
         
         // Wedge
@@ -514,15 +436,6 @@ namespace toy
         Wedge::cls().imprint().isTypeObject = false;
         Wedge::cls().imprint().members.push_back(Member(Wedge::cls(), method_var(&Wedge::contents), typecls<std::vector<Widget*>>(), "contents", &Wedge_contents, nullptr, false, false, true, false));
         Wedge::cls().imprint().setup();
-        
-        
-        // Spacer
-        Spacer::cls().imprint().inherit();
-        Spacer::cls().imprint().name = "Spacer";
-        Spacer::cls().imprint().typeClass = OBJECT;
-        Spacer::cls().imprint().serializable = false;
-        Spacer::cls().imprint().isTypeObject = false;
-        Spacer::cls().imprint().setup();
         
         
         // Item
@@ -543,87 +456,6 @@ namespace toy
         Label::cls().imprint().setup();
         
         
-        // Icon
-        Icon::cls().imprint().inherit();
-        Icon::cls().imprint().name = "Icon";
-        Icon::cls().imprint().typeClass = OBJECT;
-        Icon::cls().imprint().serializable = false;
-        Icon::cls().imprint().isTypeObject = false;
-        Icon::cls().imprint().setup();
-        
-        
-        // SliderKnob
-        SliderKnob::cls().imprint().inherit();
-        SliderKnob::cls().imprint().name = "SliderKnob";
-        SliderKnob::cls().imprint().typeClass = OBJECT;
-        SliderKnob::cls().imprint().serializable = false;
-        SliderKnob::cls().imprint().isTypeObject = false;
-        SliderKnob::cls().imprint().setup();
-        
-        
-        // FileBrowser
-        FileBrowser::cls().imprint().inherit();
-        FileBrowser::cls().imprint().name = "FileBrowser";
-        FileBrowser::cls().imprint().typeClass = OBJECT;
-        FileBrowser::cls().imprint().serializable = false;
-        FileBrowser::cls().imprint().isTypeObject = false;
-        FileBrowser::cls().imprint().setup();
-        
-        
-        // Container
-        Container::cls().imprint().inherit();
-        Container::cls().imprint().name = "Container";
-        Container::cls().imprint().typeClass = OBJECT;
-        Container::cls().imprint().serializable = false;
-        Container::cls().imprint().isTypeObject = false;
-        Container::cls().imprint().setup();
-        
-        
-        // Filler
-        Filler::cls().imprint().inherit();
-        Filler::cls().imprint().name = "Filler";
-        Filler::cls().imprint().typeClass = OBJECT;
-        Filler::cls().imprint().serializable = false;
-        Filler::cls().imprint().isTypeObject = false;
-        Filler::cls().imprint().setup();
-        
-        
-        // Decal
-        Decal::cls().imprint().inherit();
-        Decal::cls().imprint().name = "Decal";
-        Decal::cls().imprint().typeClass = OBJECT;
-        Decal::cls().imprint().serializable = false;
-        Decal::cls().imprint().isTypeObject = false;
-        Decal::cls().imprint().setup();
-        
-        
-        // Control
-        Control::cls().imprint().inherit();
-        Control::cls().imprint().name = "Control";
-        Control::cls().imprint().typeClass = OBJECT;
-        Control::cls().imprint().serializable = false;
-        Control::cls().imprint().isTypeObject = false;
-        Control::cls().imprint().setup();
-        
-        
-        // Text
-        Text::cls().imprint().inherit();
-        Text::cls().imprint().name = "Text";
-        Text::cls().imprint().typeClass = OBJECT;
-        Text::cls().imprint().serializable = false;
-        Text::cls().imprint().isTypeObject = false;
-        Text::cls().imprint().setup();
-        
-        
-        // Title
-        Title::cls().imprint().inherit();
-        Title::cls().imprint().name = "Title";
-        Title::cls().imprint().typeClass = OBJECT;
-        Title::cls().imprint().serializable = false;
-        Title::cls().imprint().isTypeObject = false;
-        Title::cls().imprint().setup();
-        
-        
         // Button
         Button::cls().imprint().inherit();
         Button::cls().imprint().name = "Button";
@@ -631,6 +463,15 @@ namespace toy
         Button::cls().imprint().serializable = false;
         Button::cls().imprint().isTypeObject = false;
         Button::cls().imprint().setup();
+        
+        
+        // WrapButton
+        WrapButton::cls().imprint().inherit();
+        WrapButton::cls().imprint().name = "WrapButton";
+        WrapButton::cls().imprint().typeClass = OBJECT;
+        WrapButton::cls().imprint().serializable = false;
+        WrapButton::cls().imprint().isTypeObject = false;
+        WrapButton::cls().imprint().setup();
         
         
         // Toggle
@@ -642,31 +483,22 @@ namespace toy
         Toggle::cls().imprint().setup();
         
         
-        // DropdownList
-        DropdownList::cls().imprint().inherit();
-        DropdownList::cls().imprint().name = "DropdownList";
-        DropdownList::cls().imprint().typeClass = OBJECT;
-        DropdownList::cls().imprint().serializable = false;
-        DropdownList::cls().imprint().isTypeObject = false;
-        DropdownList::cls().imprint().setup();
+        // Scrollbar
+        Scrollbar::cls().imprint().inherit();
+        Scrollbar::cls().imprint().name = "Scrollbar";
+        Scrollbar::cls().imprint().typeClass = OBJECT;
+        Scrollbar::cls().imprint().serializable = false;
+        Scrollbar::cls().imprint().isTypeObject = false;
+        Scrollbar::cls().imprint().setup();
         
         
-        // ScrollerKnob
-        ScrollerKnob::cls().imprint().inherit();
-        ScrollerKnob::cls().imprint().name = "ScrollerKnob";
-        ScrollerKnob::cls().imprint().typeClass = OBJECT;
-        ScrollerKnob::cls().imprint().serializable = false;
-        ScrollerKnob::cls().imprint().isTypeObject = false;
-        ScrollerKnob::cls().imprint().setup();
-        
-        
-        // SliderDisplay
-        SliderDisplay::cls().imprint().inherit();
-        SliderDisplay::cls().imprint().name = "SliderDisplay";
-        SliderDisplay::cls().imprint().typeClass = OBJECT;
-        SliderDisplay::cls().imprint().serializable = false;
-        SliderDisplay::cls().imprint().isTypeObject = false;
-        SliderDisplay::cls().imprint().setup();
+        // Slider
+        Slider::cls().imprint().inherit();
+        Slider::cls().imprint().name = "Slider";
+        Slider::cls().imprint().typeClass = OBJECT;
+        Slider::cls().imprint().serializable = false;
+        Slider::cls().imprint().isTypeObject = false;
+        Slider::cls().imprint().setup();
         
         
         // Directory
@@ -678,76 +510,49 @@ namespace toy
         Directory::cls().imprint().setup();
         
         
-        // ExpandboxBody
-        ExpandboxBody::cls().imprint().inherit();
-        ExpandboxBody::cls().imprint().name = "ExpandboxBody";
-        ExpandboxBody::cls().imprint().typeClass = OBJECT;
-        ExpandboxBody::cls().imprint().serializable = false;
-        ExpandboxBody::cls().imprint().isTypeObject = false;
-        ExpandboxBody::cls().imprint().setup();
+        // FileBrowser
+        FileBrowser::cls().imprint().inherit();
+        FileBrowser::cls().imprint().name = "FileBrowser";
+        FileBrowser::cls().imprint().typeClass = OBJECT;
+        FileBrowser::cls().imprint().serializable = false;
+        FileBrowser::cls().imprint().isTypeObject = false;
+        FileBrowser::cls().imprint().setup();
         
         
-        // Page
-        Page::cls().imprint().inherit();
-        Page::cls().imprint().name = "Page";
-        Page::cls().imprint().typeClass = OBJECT;
-        Page::cls().imprint().serializable = false;
-        Page::cls().imprint().isTypeObject = false;
-        Page::cls().imprint().setup();
+        // Expandbox
+        Expandbox::cls().imprint().inherit();
+        Expandbox::cls().imprint().name = "Expandbox";
+        Expandbox::cls().imprint().typeClass = OBJECT;
+        Expandbox::cls().imprint().serializable = false;
+        Expandbox::cls().imprint().isTypeObject = false;
+        Expandbox::cls().imprint().setup();
         
         
-        // Dialog
-        Dialog::cls().imprint().inherit();
-        Dialog::cls().imprint().name = "Dialog";
-        Dialog::cls().imprint().typeClass = OBJECT;
-        Dialog::cls().imprint().serializable = false;
-        Dialog::cls().imprint().isTypeObject = false;
-        Dialog::cls().imprint().setup();
+        // LabelSequence
+        LabelSequence::cls().imprint().inherit();
+        LabelSequence::cls().imprint().name = "LabelSequence";
+        LabelSequence::cls().imprint().typeClass = OBJECT;
+        LabelSequence::cls().imprint().serializable = false;
+        LabelSequence::cls().imprint().isTypeObject = false;
+        LabelSequence::cls().imprint().setup();
         
         
-        // Board
-        Board::cls().imprint().inherit();
-        Board::cls().imprint().name = "Board";
-        Board::cls().imprint().typeClass = OBJECT;
-        Board::cls().imprint().serializable = false;
-        Board::cls().imprint().isTypeObject = false;
-        Board::cls().imprint().setup();
+        // ButtonSequence
+        ButtonSequence::cls().imprint().inherit();
+        ButtonSequence::cls().imprint().name = "ButtonSequence";
+        ButtonSequence::cls().imprint().typeClass = OBJECT;
+        ButtonSequence::cls().imprint().serializable = false;
+        ButtonSequence::cls().imprint().isTypeObject = false;
+        ButtonSequence::cls().imprint().setup();
         
         
-        // Row
-        Row::cls().imprint().inherit();
-        Row::cls().imprint().name = "Row";
-        Row::cls().imprint().typeClass = OBJECT;
-        Row::cls().imprint().serializable = false;
-        Row::cls().imprint().isTypeObject = false;
-        Row::cls().imprint().setup();
-        
-        
-        // Div
-        Div::cls().imprint().inherit();
-        Div::cls().imprint().name = "Div";
-        Div::cls().imprint().typeClass = OBJECT;
-        Div::cls().imprint().serializable = false;
-        Div::cls().imprint().isTypeObject = false;
-        Div::cls().imprint().setup();
-        
-        
-        // Stack
-        Stack::cls().imprint().inherit();
-        Stack::cls().imprint().name = "Stack";
-        Stack::cls().imprint().typeClass = OBJECT;
-        Stack::cls().imprint().serializable = false;
-        Stack::cls().imprint().isTypeObject = false;
-        Stack::cls().imprint().setup();
-        
-        
-        // Sheet
-        Sheet::cls().imprint().inherit();
-        Sheet::cls().imprint().name = "Sheet";
-        Sheet::cls().imprint().typeClass = OBJECT;
-        Sheet::cls().imprint().serializable = false;
-        Sheet::cls().imprint().isTypeObject = false;
-        Sheet::cls().imprint().setup();
+        // ScrollZone
+        ScrollZone::cls().imprint().inherit();
+        ScrollZone::cls().imprint().name = "ScrollZone";
+        ScrollZone::cls().imprint().typeClass = OBJECT;
+        ScrollZone::cls().imprint().serializable = false;
+        ScrollZone::cls().imprint().isTypeObject = false;
+        ScrollZone::cls().imprint().setup();
         
         
         // ScrollSheet
@@ -759,6 +564,15 @@ namespace toy
         ScrollSheet::cls().imprint().setup();
         
         
+        // Tab
+        Tab::cls().imprint().inherit();
+        Tab::cls().imprint().name = "Tab";
+        Tab::cls().imprint().typeClass = OBJECT;
+        Tab::cls().imprint().serializable = false;
+        Tab::cls().imprint().isTypeObject = false;
+        Tab::cls().imprint().setup();
+        
+        
         // Tabber
         Tabber::cls().imprint().inherit();
         Tabber::cls().imprint().name = "Tabber";
@@ -768,13 +582,13 @@ namespace toy
         Tabber::cls().imprint().setup();
         
         
-        // ColumnHeader
-        ColumnHeader::cls().imprint().inherit();
-        ColumnHeader::cls().imprint().name = "ColumnHeader";
-        ColumnHeader::cls().imprint().typeClass = OBJECT;
-        ColumnHeader::cls().imprint().serializable = false;
-        ColumnHeader::cls().imprint().isTypeObject = false;
-        ColumnHeader::cls().imprint().setup();
+        // Table
+        Table::cls().imprint().inherit();
+        Table::cls().imprint().name = "Table";
+        Table::cls().imprint().typeClass = OBJECT;
+        Table::cls().imprint().serializable = false;
+        Table::cls().imprint().isTypeObject = false;
+        Table::cls().imprint().setup();
         
         
         // Tree
@@ -793,6 +607,24 @@ namespace toy
         TypeIn::cls().imprint().serializable = false;
         TypeIn::cls().imprint().isTypeObject = false;
         TypeIn::cls().imprint().setup();
+        
+        
+        // WValue
+        WValue::cls().imprint().inherit();
+        WValue::cls().imprint().name = "WValue";
+        WValue::cls().imprint().typeClass = OBJECT;
+        WValue::cls().imprint().serializable = false;
+        WValue::cls().imprint().isTypeObject = false;
+        WValue::cls().imprint().setup();
+        
+        
+        // Tooltip
+        Tooltip::cls().imprint().inherit();
+        Tooltip::cls().imprint().name = "Tooltip";
+        Tooltip::cls().imprint().typeClass = OBJECT;
+        Tooltip::cls().imprint().serializable = false;
+        Tooltip::cls().imprint().isTypeObject = false;
+        Tooltip::cls().imprint().setup();
         
         
         // Rectangle
@@ -822,24 +654,6 @@ namespace toy
         RootSheet::cls().imprint().setup();
         
         
-        // WrapControl
-        WrapControl::cls().imprint().inherit();
-        WrapControl::cls().imprint().name = "WrapControl";
-        WrapControl::cls().imprint().typeClass = OBJECT;
-        WrapControl::cls().imprint().serializable = false;
-        WrapControl::cls().imprint().isTypeObject = false;
-        WrapControl::cls().imprint().setup();
-        
-        
-        // Overlay
-        Overlay::cls().imprint().inherit();
-        Overlay::cls().imprint().name = "Overlay";
-        Overlay::cls().imprint().typeClass = OBJECT;
-        Overlay::cls().imprint().serializable = false;
-        Overlay::cls().imprint().isTypeObject = false;
-        Overlay::cls().imprint().setup();
-        
-        
         // GridSheet
         GridSheet::cls().imprint().inherit();
         GridSheet::cls().imprint().name = "GridSheet";
@@ -849,265 +663,22 @@ namespace toy
         GridSheet::cls().imprint().setup();
         
         
-        // ToolbarMover
-        ToolbarMover::cls().imprint().inherit();
-        ToolbarMover::cls().imprint().name = "ToolbarMover";
-        ToolbarMover::cls().imprint().typeClass = OBJECT;
-        ToolbarMover::cls().imprint().serializable = false;
-        ToolbarMover::cls().imprint().isTypeObject = false;
-        ToolbarMover::cls().imprint().setup();
+        // Dockspace
+        Dockspace::cls().imprint().inherit();
+        Dockspace::cls().imprint().name = "Dockspace";
+        Dockspace::cls().imprint().typeClass = OBJECT;
+        Dockspace::cls().imprint().serializable = false;
+        Dockspace::cls().imprint().isTypeObject = false;
+        Dockspace::cls().imprint().setup();
         
         
-        // WindowSizer
-        WindowSizer::cls().imprint().inherit();
-        WindowSizer::cls().imprint().name = "WindowSizer";
-        WindowSizer::cls().imprint().typeClass = OBJECT;
-        WindowSizer::cls().imprint().serializable = false;
-        WindowSizer::cls().imprint().isTypeObject = false;
-        WindowSizer::cls().imprint().setup();
-        
-        
-        // WrapButton
-        WrapButton::cls().imprint().inherit();
-        WrapButton::cls().imprint().name = "WrapButton";
-        WrapButton::cls().imprint().typeClass = OBJECT;
-        WrapButton::cls().imprint().serializable = false;
-        WrapButton::cls().imprint().isTypeObject = false;
-        WrapButton::cls().imprint().setup();
-        
-        
-        // Checkbox
-        Checkbox::cls().imprint().inherit();
-        Checkbox::cls().imprint().name = "Checkbox";
-        Checkbox::cls().imprint().typeClass = OBJECT;
-        Checkbox::cls().imprint().serializable = false;
-        Checkbox::cls().imprint().isTypeObject = false;
-        Checkbox::cls().imprint().setup();
-        
-        
-        // DropdownToggle
-        DropdownToggle::cls().imprint().inherit();
-        DropdownToggle::cls().imprint().name = "DropdownToggle";
-        DropdownToggle::cls().imprint().typeClass = OBJECT;
-        DropdownToggle::cls().imprint().serializable = false;
-        DropdownToggle::cls().imprint().isTypeObject = false;
-        DropdownToggle::cls().imprint().setup();
-        
-        
-        // ScrollForward
-        ScrollForward::cls().imprint().inherit();
-        ScrollForward::cls().imprint().name = "ScrollForward";
-        ScrollForward::cls().imprint().typeClass = OBJECT;
-        ScrollForward::cls().imprint().serializable = false;
-        ScrollForward::cls().imprint().isTypeObject = false;
-        ScrollForward::cls().imprint().setup();
-        
-        
-        // ScrollBackward
-        ScrollBackward::cls().imprint().inherit();
-        ScrollBackward::cls().imprint().name = "ScrollBackward";
-        ScrollBackward::cls().imprint().typeClass = OBJECT;
-        ScrollBackward::cls().imprint().serializable = false;
-        ScrollBackward::cls().imprint().isTypeObject = false;
-        ScrollBackward::cls().imprint().setup();
-        
-        
-        // Scrollbar
-        Scrollbar::cls().imprint().inherit();
-        Scrollbar::cls().imprint().name = "Scrollbar";
-        Scrollbar::cls().imprint().typeClass = OBJECT;
-        Scrollbar::cls().imprint().serializable = false;
-        Scrollbar::cls().imprint().isTypeObject = false;
-        Scrollbar::cls().imprint().setup();
-        
-        
-        // Slider
-        Slider::cls().imprint().inherit();
-        Slider::cls().imprint().name = "Slider";
-        Slider::cls().imprint().typeClass = OBJECT;
-        Slider::cls().imprint().serializable = false;
-        Slider::cls().imprint().isTypeObject = false;
-        Slider::cls().imprint().setup();
-        
-        
-        // ExpandboxToggle
-        ExpandboxToggle::cls().imprint().inherit();
-        ExpandboxToggle::cls().imprint().name = "ExpandboxToggle";
-        ExpandboxToggle::cls().imprint().typeClass = OBJECT;
-        ExpandboxToggle::cls().imprint().serializable = false;
-        ExpandboxToggle::cls().imprint().isTypeObject = false;
-        ExpandboxToggle::cls().imprint().setup();
-        
-        
-        // Expandbox
-        Expandbox::cls().imprint().inherit();
-        Expandbox::cls().imprint().name = "Expandbox";
-        Expandbox::cls().imprint().typeClass = OBJECT;
-        Expandbox::cls().imprint().serializable = false;
-        Expandbox::cls().imprint().isTypeObject = false;
-        Expandbox::cls().imprint().setup();
-        
-        
-        // Layout
-        Layout::cls().imprint().inherit();
-        Layout::cls().imprint().name = "Layout";
-        Layout::cls().imprint().typeClass = OBJECT;
-        Layout::cls().imprint().serializable = false;
-        Layout::cls().imprint().isTypeObject = false;
-        Layout::cls().imprint().setup();
-        
-        
-        // Header
-        Header::cls().imprint().inherit();
-        Header::cls().imprint().name = "Header";
-        Header::cls().imprint().typeClass = OBJECT;
-        Header::cls().imprint().serializable = false;
-        Header::cls().imprint().isTypeObject = false;
-        Header::cls().imprint().setup();
-        
-        
-        // List
-        List::cls().imprint().inherit();
-        List::cls().imprint().name = "List";
-        List::cls().imprint().typeClass = OBJECT;
-        List::cls().imprint().serializable = false;
-        List::cls().imprint().isTypeObject = false;
-        List::cls().imprint().setup();
-        
-        
-        // LabelSequence
-        LabelSequence::cls().imprint().inherit();
-        LabelSequence::cls().imprint().name = "LabelSequence";
-        LabelSequence::cls().imprint().typeClass = OBJECT;
-        LabelSequence::cls().imprint().serializable = false;
-        LabelSequence::cls().imprint().isTypeObject = false;
-        LabelSequence::cls().imprint().setup();
-        
-        
-        // ButtonSequence
-        ButtonSequence::cls().imprint().inherit();
-        ButtonSequence::cls().imprint().name = "ButtonSequence";
-        ButtonSequence::cls().imprint().typeClass = OBJECT;
-        ButtonSequence::cls().imprint().serializable = false;
-        ButtonSequence::cls().imprint().isTypeObject = false;
-        ButtonSequence::cls().imprint().setup();
-        
-        
-        // ScrollPlan
-        ScrollPlan::cls().imprint().inherit();
-        ScrollPlan::cls().imprint().name = "ScrollPlan";
-        ScrollPlan::cls().imprint().typeClass = OBJECT;
-        ScrollPlan::cls().imprint().serializable = false;
-        ScrollPlan::cls().imprint().isTypeObject = false;
-        ScrollPlan::cls().imprint().setup();
-        
-        
-        // TabHeader
-        TabHeader::cls().imprint().inherit();
-        TabHeader::cls().imprint().name = "TabHeader";
-        TabHeader::cls().imprint().typeClass = OBJECT;
-        TabHeader::cls().imprint().serializable = false;
-        TabHeader::cls().imprint().isTypeObject = false;
-        TabHeader::cls().imprint().setup();
-        
-        
-        // Tab
-        Tab::cls().imprint().inherit();
-        Tab::cls().imprint().name = "Tab";
-        Tab::cls().imprint().typeClass = OBJECT;
-        Tab::cls().imprint().serializable = false;
-        Tab::cls().imprint().isTypeObject = false;
-        Tab::cls().imprint().setup();
-        
-        
-        // TabberHead
-        TabberHead::cls().imprint().inherit();
-        TabberHead::cls().imprint().name = "TabberHead";
-        TabberHead::cls().imprint().typeClass = OBJECT;
-        TabberHead::cls().imprint().serializable = false;
-        TabberHead::cls().imprint().isTypeObject = false;
-        TabberHead::cls().imprint().setup();
-        
-        
-        // TabberBody
-        TabberBody::cls().imprint().inherit();
-        TabberBody::cls().imprint().name = "TabberBody";
-        TabberBody::cls().imprint().typeClass = OBJECT;
-        TabberBody::cls().imprint().serializable = false;
-        TabberBody::cls().imprint().isTypeObject = false;
-        TabberBody::cls().imprint().setup();
-        
-        
-        // TableHead
-        TableHead::cls().imprint().inherit();
-        TableHead::cls().imprint().name = "TableHead";
-        TableHead::cls().imprint().typeClass = OBJECT;
-        TableHead::cls().imprint().serializable = false;
-        TableHead::cls().imprint().isTypeObject = false;
-        TableHead::cls().imprint().setup();
-        
-        
-        // Table
-        Table::cls().imprint().inherit();
-        Table::cls().imprint().name = "Table";
-        Table::cls().imprint().typeClass = OBJECT;
-        Table::cls().imprint().serializable = false;
-        Table::cls().imprint().isTypeObject = false;
-        Table::cls().imprint().setup();
-        
-        
-        // Textbox
-        Textbox::cls().imprint().inherit();
-        Textbox::cls().imprint().name = "Textbox";
-        Textbox::cls().imprint().typeClass = OBJECT;
-        Textbox::cls().imprint().serializable = false;
-        Textbox::cls().imprint().isTypeObject = false;
-        Textbox::cls().imprint().setup();
-        
-        
-        // WValue
-        WValue::cls().imprint().inherit();
-        WValue::cls().imprint().name = "WValue";
-        WValue::cls().imprint().typeClass = OBJECT;
-        WValue::cls().imprint().serializable = false;
-        WValue::cls().imprint().isTypeObject = false;
-        WValue::cls().imprint().setup();
-        
-        
-        // Tooltip
-        Tooltip::cls().imprint().inherit();
-        Tooltip::cls().imprint().name = "Tooltip";
-        Tooltip::cls().imprint().typeClass = OBJECT;
-        Tooltip::cls().imprint().serializable = false;
-        Tooltip::cls().imprint().isTypeObject = false;
-        Tooltip::cls().imprint().setup();
-        
-        
-        // Placeholder
-        Placeholder::cls().imprint().inherit();
-        Placeholder::cls().imprint().name = "Placeholder";
-        Placeholder::cls().imprint().typeClass = OBJECT;
-        Placeholder::cls().imprint().serializable = false;
-        Placeholder::cls().imprint().isTypeObject = false;
-        Placeholder::cls().imprint().setup();
-        
-        
-        // Docksection
-        Docksection::cls().imprint().inherit();
-        Docksection::cls().imprint().name = "Docksection";
-        Docksection::cls().imprint().typeClass = OBJECT;
-        Docksection::cls().imprint().serializable = false;
-        Docksection::cls().imprint().isTypeObject = false;
-        Docksection::cls().imprint().setup();
-        
-        
-        // Dockline
-        Dockline::cls().imprint().inherit();
-        Dockline::cls().imprint().name = "Dockline";
-        Dockline::cls().imprint().typeClass = OBJECT;
-        Dockline::cls().imprint().serializable = false;
-        Dockline::cls().imprint().isTypeObject = false;
-        Dockline::cls().imprint().setup();
+        // Menubar
+        Menubar::cls().imprint().inherit();
+        Menubar::cls().imprint().name = "Menubar";
+        Menubar::cls().imprint().typeClass = OBJECT;
+        Menubar::cls().imprint().serializable = false;
+        Menubar::cls().imprint().isTypeObject = false;
+        Menubar::cls().imprint().setup();
         
         
         // Tooldock
@@ -1128,15 +699,6 @@ namespace toy
         Toolbar::cls().imprint().setup();
         
         
-        // CloseButton
-        CloseButton::cls().imprint().inherit();
-        CloseButton::cls().imprint().name = "CloseButton";
-        CloseButton::cls().imprint().typeClass = OBJECT;
-        CloseButton::cls().imprint().serializable = false;
-        CloseButton::cls().imprint().isTypeObject = false;
-        CloseButton::cls().imprint().setup();
-        
-        
         // WindowHeader
         WindowHeader::cls().imprint().inherit();
         WindowHeader::cls().imprint().name = "WindowHeader";
@@ -1146,22 +708,13 @@ namespace toy
         WindowHeader::cls().imprint().setup();
         
         
-        // WindowSizerLeft
-        WindowSizerLeft::cls().imprint().inherit();
-        WindowSizerLeft::cls().imprint().name = "WindowSizerLeft";
-        WindowSizerLeft::cls().imprint().typeClass = OBJECT;
-        WindowSizerLeft::cls().imprint().serializable = false;
-        WindowSizerLeft::cls().imprint().isTypeObject = false;
-        WindowSizerLeft::cls().imprint().setup();
-        
-        
-        // WindowSizerRight
-        WindowSizerRight::cls().imprint().inherit();
-        WindowSizerRight::cls().imprint().name = "WindowSizerRight";
-        WindowSizerRight::cls().imprint().typeClass = OBJECT;
-        WindowSizerRight::cls().imprint().serializable = false;
-        WindowSizerRight::cls().imprint().isTypeObject = false;
-        WindowSizerRight::cls().imprint().setup();
+        // WindowSizer
+        WindowSizer::cls().imprint().inherit();
+        WindowSizer::cls().imprint().name = "WindowSizer";
+        WindowSizer::cls().imprint().typeClass = OBJECT;
+        WindowSizer::cls().imprint().serializable = false;
+        WindowSizer::cls().imprint().isTypeObject = false;
+        WindowSizer::cls().imprint().setup();
         
         
         // WindowFooter
@@ -1173,15 +726,6 @@ namespace toy
         WindowFooter::cls().imprint().setup();
         
         
-        // WindowBody
-        WindowBody::cls().imprint().inherit();
-        WindowBody::cls().imprint().name = "WindowBody";
-        WindowBody::cls().imprint().typeClass = OBJECT;
-        WindowBody::cls().imprint().serializable = false;
-        WindowBody::cls().imprint().isTypeObject = false;
-        WindowBody::cls().imprint().setup();
-        
-        
         // Window
         Window::cls().imprint().inherit();
         Window::cls().imprint().name = "Window";
@@ -1189,6 +733,15 @@ namespace toy
         Window::cls().imprint().serializable = false;
         Window::cls().imprint().isTypeObject = false;
         Window::cls().imprint().setup();
+        
+        
+        // Text
+        Text::cls().imprint().inherit();
+        Text::cls().imprint().name = "Text";
+        Text::cls().imprint().typeClass = OBJECT;
+        Text::cls().imprint().serializable = false;
+        Text::cls().imprint().isTypeObject = false;
+        Text::cls().imprint().setup();
         
         
         // MultiButton
@@ -1200,6 +753,15 @@ namespace toy
         MultiButton::cls().imprint().setup();
         
         
+        // Checkbox
+        Checkbox::cls().imprint().inherit();
+        Checkbox::cls().imprint().name = "Checkbox";
+        Checkbox::cls().imprint().typeClass = OBJECT;
+        Checkbox::cls().imprint().serializable = false;
+        Checkbox::cls().imprint().isTypeObject = false;
+        Checkbox::cls().imprint().setup();
+        
+        
         // Dropdown
         Dropdown::cls().imprint().inherit();
         Dropdown::cls().imprint().name = "Dropdown";
@@ -1207,24 +769,6 @@ namespace toy
         Dropdown::cls().imprint().serializable = false;
         Dropdown::cls().imprint().isTypeObject = false;
         Dropdown::cls().imprint().setup();
-        
-        
-        // Scroller
-        Scroller::cls().imprint().inherit();
-        Scroller::cls().imprint().name = "Scroller";
-        Scroller::cls().imprint().typeClass = OBJECT;
-        Scroller::cls().imprint().serializable = false;
-        Scroller::cls().imprint().isTypeObject = false;
-        Scroller::cls().imprint().setup();
-        
-        
-        // ExpandboxHeader
-        ExpandboxHeader::cls().imprint().inherit();
-        ExpandboxHeader::cls().imprint().name = "ExpandboxHeader";
-        ExpandboxHeader::cls().imprint().typeClass = OBJECT;
-        ExpandboxHeader::cls().imprint().serializable = false;
-        ExpandboxHeader::cls().imprint().isTypeObject = false;
-        ExpandboxHeader::cls().imprint().setup();
         
         
         // SelectList
@@ -1245,13 +789,13 @@ namespace toy
         SortList::cls().imprint().setup();
         
         
-        // ScrollZone
-        ScrollZone::cls().imprint().inherit();
-        ScrollZone::cls().imprint().name = "ScrollZone";
-        ScrollZone::cls().imprint().typeClass = OBJECT;
-        ScrollZone::cls().imprint().serializable = false;
-        ScrollZone::cls().imprint().isTypeObject = false;
-        ScrollZone::cls().imprint().setup();
+        // ScrollPlan
+        ScrollPlan::cls().imprint().inherit();
+        ScrollPlan::cls().imprint().name = "ScrollPlan";
+        ScrollPlan::cls().imprint().typeClass = OBJECT;
+        ScrollPlan::cls().imprint().serializable = false;
+        ScrollPlan::cls().imprint().isTypeObject = false;
+        ScrollPlan::cls().imprint().setup();
         
         
         // TreeNode
@@ -1290,49 +834,40 @@ namespace toy
         Input<toy::Colour>::cls().imprint().setup();
         
         
-        // MasterDockline
-        MasterDockline::cls().imprint().inherit();
-        MasterDockline::cls().imprint().name = "MasterDockline";
-        MasterDockline::cls().imprint().typeClass = OBJECT;
-        MasterDockline::cls().imprint().serializable = false;
-        MasterDockline::cls().imprint().isTypeObject = false;
-        MasterDockline::cls().imprint().setup();
+        // Textbox
+        Textbox::cls().imprint().inherit();
+        Textbox::cls().imprint().name = "Textbox";
+        Textbox::cls().imprint().typeClass = OBJECT;
+        Textbox::cls().imprint().serializable = false;
+        Textbox::cls().imprint().isTypeObject = false;
+        Textbox::cls().imprint().setup();
         
         
-        // Dockspace
-        Dockspace::cls().imprint().inherit();
-        Dockspace::cls().imprint().name = "Dockspace";
-        Dockspace::cls().imprint().typeClass = OBJECT;
-        Dockspace::cls().imprint().serializable = false;
-        Dockspace::cls().imprint().isTypeObject = false;
-        Dockspace::cls().imprint().setup();
+        // Docksection
+        Docksection::cls().imprint().inherit();
+        Docksection::cls().imprint().name = "Docksection";
+        Docksection::cls().imprint().typeClass = OBJECT;
+        Docksection::cls().imprint().serializable = false;
+        Docksection::cls().imprint().isTypeObject = false;
+        Docksection::cls().imprint().setup();
         
         
-        // Menubar
-        Menubar::cls().imprint().inherit();
-        Menubar::cls().imprint().name = "Menubar";
-        Menubar::cls().imprint().typeClass = OBJECT;
-        Menubar::cls().imprint().serializable = false;
-        Menubar::cls().imprint().isTypeObject = false;
-        Menubar::cls().imprint().setup();
+        // Dockline
+        Dockline::cls().imprint().inherit();
+        Dockline::cls().imprint().name = "Dockline";
+        Dockline::cls().imprint().typeClass = OBJECT;
+        Dockline::cls().imprint().serializable = false;
+        Dockline::cls().imprint().isTypeObject = false;
+        Dockline::cls().imprint().setup();
         
         
-        // DropdownHead
-        DropdownHead::cls().imprint().inherit();
-        DropdownHead::cls().imprint().name = "DropdownHead";
-        DropdownHead::cls().imprint().typeClass = OBJECT;
-        DropdownHead::cls().imprint().serializable = false;
-        DropdownHead::cls().imprint().isTypeObject = false;
-        DropdownHead::cls().imprint().setup();
-        
-        
-        // DropdownChoice
-        DropdownChoice::cls().imprint().inherit();
-        DropdownChoice::cls().imprint().name = "DropdownChoice";
-        DropdownChoice::cls().imprint().typeClass = OBJECT;
-        DropdownChoice::cls().imprint().serializable = false;
-        DropdownChoice::cls().imprint().isTypeObject = false;
-        DropdownChoice::cls().imprint().setup();
+        // CloseButton
+        CloseButton::cls().imprint().inherit();
+        CloseButton::cls().imprint().name = "CloseButton";
+        CloseButton::cls().imprint().typeClass = OBJECT;
+        CloseButton::cls().imprint().serializable = false;
+        CloseButton::cls().imprint().isTypeObject = false;
+        CloseButton::cls().imprint().setup();
         
         
         // DropdownInput
@@ -1402,47 +937,22 @@ namespace toy
         module.types.push_back(&Image::cls());
         module.types.push_back(&Label::cls());
         module.types.push_back(&Text::cls());
-        module.types.push_back(&Title::cls());
-        module.types.push_back(&Icon::cls());
         module.types.push_back(&Button::cls());
         module.types.push_back(&WrapButton::cls());
         module.types.push_back(&MultiButton::cls());
         module.types.push_back(&Toggle::cls());
         module.types.push_back(&Checkbox::cls());
-        module.types.push_back(&DropdownHead::cls());
-        module.types.push_back(&DropdownToggle::cls());
-        module.types.push_back(&DropdownChoice::cls());
-        module.types.push_back(&DropdownList::cls());
         module.types.push_back(&Dropdown::cls());
         module.types.push_back(&DropdownInput::cls());
-        module.types.push_back(&Scroller::cls());
-        module.types.push_back(&ScrollerKnob::cls());
-        module.types.push_back(&ScrollForward::cls());
-        module.types.push_back(&ScrollBackward::cls());
         module.types.push_back(&Scrollbar::cls());
-        module.types.push_back(&SliderKnob::cls());
         module.types.push_back(&Slider::cls());
-        module.types.push_back(&SliderDisplay::cls());
         module.types.push_back(&Dir::cls());
         module.types.push_back(&File::cls());
         module.types.push_back(&Directory::cls());
         module.types.push_back(&FileBrowser::cls());
         module.types.push_back(&FileNode::cls());
         module.types.push_back(&DirectoryNode::cls());
-        module.types.push_back(&ExpandboxHeader::cls());
-        module.types.push_back(&ExpandboxBody::cls());
-        module.types.push_back(&ExpandboxToggle::cls());
         module.types.push_back(&Expandbox::cls());
-        module.types.push_back(&Page::cls());
-        module.types.push_back(&Dialog::cls());
-        module.types.push_back(&Board::cls());
-        module.types.push_back(&Layout::cls());
-        module.types.push_back(&Row::cls());
-        module.types.push_back(&Div::cls());
-        module.types.push_back(&Stack::cls());
-        module.types.push_back(&Sheet::cls());
-        module.types.push_back(&Header::cls());
-        module.types.push_back(&List::cls());
         module.types.push_back(&SelectList::cls());
         module.types.push_back(&LabelSequence::cls());
         module.types.push_back(&ButtonSequence::cls());
@@ -1450,13 +960,8 @@ namespace toy
         module.types.push_back(&ScrollZone::cls());
         module.types.push_back(&ScrollSheet::cls());
         module.types.push_back(&ScrollPlan::cls());
-        module.types.push_back(&TabHeader::cls());
         module.types.push_back(&Tab::cls());
-        module.types.push_back(&TabberHead::cls());
-        module.types.push_back(&TabberBody::cls());
         module.types.push_back(&Tabber::cls());
-        module.types.push_back(&TableHead::cls());
-        module.types.push_back(&ColumnHeader::cls());
         module.types.push_back(&Table::cls());
         module.types.push_back(&TreeNode::cls());
         module.types.push_back(&Tree::cls());
@@ -1478,10 +983,11 @@ namespace toy
         module.types.push_back(&typecls<Pivot>());
         module.types.push_back(&typecls<Align>());
         module.types.push_back(&typecls<FrameType>());
+        module.types.push_back(&typecls<LayoutSolver>());
         module.types.push_back(&typecls<AutoLayout>());
         module.types.push_back(&typecls<Flow>());
         module.types.push_back(&typecls<Sizing>());
-        module.types.push_back(&typecls<Space>());
+        module.types.push_back(&typecls<SpacePreset>());
         module.types.push_back(&typecls<Clipping>());
         module.types.push_back(&typecls<Opacity>());
         module.types.push_back(&BoxFloat::cls());
@@ -1497,36 +1003,22 @@ namespace toy
         module.types.push_back(&RootSheet::cls());
         module.types.push_back(&Wedge::cls());
         module.types.push_back(&typecls<std::vector<Widget*>>());
-        module.types.push_back(&Container::cls());
-        module.types.push_back(&WrapControl::cls());
-        module.types.push_back(&Spacer::cls());
-        module.types.push_back(&Filler::cls());
-        module.types.push_back(&Decal::cls());
-        module.types.push_back(&Overlay::cls());
         module.types.push_back(&GridSheet::cls());
         module.types.push_back(&typecls<WidgetState>());
         module.types.push_back(&Widget::cls());
         module.types.push_back(&Item::cls());
-        module.types.push_back(&Control::cls());
-        module.types.push_back(&Placeholder::cls());
-        module.types.push_back(&DockTab::cls());
         module.types.push_back(&Docksection::cls());
         module.types.push_back(&Dockline::cls());
-        module.types.push_back(&MasterDockline::cls());
         module.types.push_back(&Dockspace::cls());
         module.types.push_back(&Menu::cls());
         module.types.push_back(&Menubar::cls());
         module.types.push_back(&ToolButton::cls());
         module.types.push_back(&Tooldock::cls());
-        module.types.push_back(&ToolbarMover::cls());
         module.types.push_back(&Toolbar::cls());
         module.types.push_back(&CloseButton::cls());
         module.types.push_back(&WindowHeader::cls());
         module.types.push_back(&WindowSizer::cls());
-        module.types.push_back(&WindowSizerLeft::cls());
-        module.types.push_back(&WindowSizerRight::cls());
         module.types.push_back(&WindowFooter::cls());
-        module.types.push_back(&WindowBody::cls());
         module.types.push_back(&Window::cls());
     
     }

@@ -5,12 +5,7 @@
 #include <toyui/Config.h>
 #include <toyui/Button/Button.h>
 
-#include <toyui/Container/Layout.h>
-
-#include <toyui/Frame/Frame.h>
-#include <toyui/Frame/Stripe.h>
-
-#include <toyui/Render/Caption.h>
+#include <toyui/Frame/Caption.h>
 
 #include <toyui/Widget/RootSheet.h>
 
@@ -19,53 +14,23 @@
 namespace toy
 {
 	Label::Label(Wedge& parent, const string& label, Type& type)
-		: Item(parent, type)
-	{
-		this->setLabel(label);
-	}
+		: Item(parent, label, type)
+	{}
 
 	Text::Text(Wedge& parent, const string& label)
 		: Label(parent, label, cls())
 	{}
 
-	Title::Title(Wedge& parent, const string& label)
-		: Label(parent, label, cls())
-	{}
-
-	Icon::Icon(Wedge& parent, Image& image)
-		: Item(parent, cls())
-	{
-		this->setImage(&image);
-	}
-
-	Icon::Icon(Wedge& parent, const string& image)
-		: Item(parent, cls())
-	{
-		if(image != "")
-			this->setImage(&findImage(toLower(image)));
-	}
-
-	Button::Button(Wedge& parent, const string& label, const Callback& trigger, Type& type)
-		: Control(parent, type)
+	Button::Button(Wedge& parent, const string& content, const Callback& trigger, Type& type)
+		: Item(parent, type)
 		, ClickTrigger(*this, trigger)
 	{
-		this->setLabel(label);
-	}
-
-	Button::Button(Wedge& parent, Image& image, const Callback& trigger, Type& type)
-		: Button(parent, "", trigger, type)
-	{
-		this->setImage(&image);
+		this->setContent(content);
 	}
 
 	bool Button::leftClick(MouseEvent& mouseEvent)
 	{
-		if(this->rootSheet().keyboard().ctrlPressed())
-			return this->clickCtrl(mouseEvent);
-		else if(this->rootSheet().keyboard().shiftPressed())
-			return this->clickShift(mouseEvent);
-		else
-			return this->click(mouseEvent);
+		return this->clickMods(mouseEvent);
 	}
 
 	bool Button::rightClick(MouseEvent& mouseEvent)
@@ -74,18 +39,13 @@ namespace toy
 	}
 
 	WrapButton::WrapButton(Wedge& parent, const Callback& trigger, Type& type)
-		: WrapControl(parent, type)
+		: Wedge(parent, type)
 		, ClickTrigger(*this, trigger)
 	{}
 
 	bool WrapButton::leftClick(MouseEvent& mouseEvent)
 	{
-		if(this->rootSheet().keyboard().ctrlPressed())
-			return this->clickCtrl(mouseEvent);
-		else if(this->rootSheet().keyboard().shiftPressed())
-			return this->clickShift(mouseEvent);
-		else
-			return this->click(mouseEvent);
+		return this->clickMods(mouseEvent);
 	}
 
 	bool WrapButton::rightClick(MouseEvent& mouseEvent)
@@ -93,7 +53,7 @@ namespace toy
 		return this->clickAlt(mouseEvent);
 	}
 
-	MultiButton::MultiButton(Wedge& parent, const Callback& trigger, const StringVector& elements, Type& type)
+	MultiButton::MultiButton(Wedge& parent, const StringVector& elements, const Callback& trigger, Type& type)
 		: WrapButton(parent, trigger, type)
 	{
 		this->reset(elements);
@@ -114,27 +74,21 @@ namespace toy
 		if(trigger)
 			m_trigger = trigger;
 
-		this->clear();
+		this->store().clear();
 		for(const string& value : elements)
-		{
-			if(!findImage(toLower(value)).null())
-				this->emplace<Icon>(value);
-			else
-				this->emplace<Label>(value);
-		}
+			this->emplace<Item>(value);
 		m_elements = elements;
 	}
 
-	Toggle::Toggle(Wedge& parent, const Callback& triggerOn, const Callback& triggerOff, bool on, Type& type)
-		: Control(parent, type)
-		, m_triggerOn(triggerOn)
-		, m_triggerOff(triggerOff)
+	Toggle::Toggle(Wedge& parent, const Callback& callback, bool on, Type& type)
+		: Item(parent, type)
+		, m_callback(callback)
 		, m_on(on)
 	{
 		if(m_on)
 			this->enableState(ACTIVATED);
 	}
-	
+
 	void Toggle::update(bool on)
 	{
 		m_on = on;
@@ -145,7 +99,7 @@ namespace toy
 	{
 		m_on = !m_on;
 		m_on ? this->enableState(ACTIVATED) : this->disableState(ACTIVATED);
-		m_on ? m_triggerOn(*this) : m_triggerOff(*this);
+		m_callback(*this, m_on);
 	}
 
 	bool Toggle::leftClick(MouseEvent& mouseEvent)

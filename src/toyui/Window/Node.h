@@ -10,19 +10,14 @@
 #include <toyui/Forward.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Container/ScrollSheet.h>
-#include <toyui/Widget/Cursor.h>
-#include <toyui/Container/Layout.h>
 #include <toyui/Button/Button.h>
-
-/* std */
-#include <set>
 
 namespace toy
 {
 	class TOY_UI_EXPORT NodeKnob : public Item
 	{
 	public:
-		NodeKnob(Wedge& parent, const Colour& colour = Colour::White);
+		NodeKnob(Wedge& parent, const Colour& colour = Colour::NeonGreen, Type& type = cls());
 
 		const Colour& colour() { return m_colour; }
 		void setColour(const Colour& colour) { m_colour = colour; }
@@ -31,25 +26,19 @@ namespace toy
 
 		static Type& cls() { static Type ty("NodeKnob", Item::cls()); return ty; }
 
+		static Type& Proxy() { static Type ty("NodeKnobProxy", NodeKnob::cls()); return ty; }
+
 	protected:
 		Colour m_colour;
 	};
 
-	class TOY_UI_EXPORT NodeConnectionProxy : public Decal
+	class TOY_UI_EXPORT NodePlug : public Wedge
 	{
 	public:
-		NodeConnectionProxy(Wedge& parent);
-
-		static Type& cls() { static Type ty("NodeConnectionProxy", Decal::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT NodePlug : public WrapControl
-	{
-	public:
-		typedef std::function<void(NodePlug&, NodePlug&)> ConnectTrigger;
+		using ConnectTrigger = std::function<void(NodePlug&, NodePlug&)>;
 
 	public:
-		NodePlug(Wedge& parent, Node& node, const string& name, const string& icon, bool input, ConnectTrigger onConnect = ConnectTrigger());
+		NodePlug(Wedge& parent, Node& node, const string& name, const string& icon, const Colour& colour, bool input, ConnectTrigger onConnect = ConnectTrigger());
 	
 		Node& node() { return m_node; }
 		const string& tooltip() { return m_tooltip; }
@@ -67,100 +56,71 @@ namespace toy
 		NodeCable& connect(NodePlug& plugOut, bool notify = true);
 		void disconnect(NodePlug& plugOut);
 
-		static Type& cls() { static Type ty("NodePlug", WrapControl::cls()); return ty; }
+		static Type& cls() { static Type ty("NodePlug", Wedge::WrapControl()); return ty; }
 
 	protected:
 		Node& m_node;
 		string m_tooltip;
 		bool m_input;
 		Label m_title;
-		Icon m_icon;
+		Item m_icon;
 		NodeKnob m_knob;
 
 		ConnectTrigger m_onConnect;
 
-		NodeConnectionProxy* m_connectionProxy;
+		NodeKnob* m_connectionProxy;
 		NodeCable* m_cableProxy;
 
 		std::vector<NodeCable*> m_cables;
 	};
 
-	class TOY_UI_EXPORT NodeCable : public Decal
+	class TOY_UI_EXPORT NodeCable : public Wedge
 	{
 	public:
-		NodeCable(Wedge& parent, Widget& plugOut, Widget& plugIn);
+		NodeCable(Wedge& parent, NodeKnob& plugOut, NodeKnob& plugIn);
 
-		Widget& plugOut() { return m_plugOut; }
-		Widget& plugIn() { return m_plugIn; }
+		NodeKnob& knobOut() { return m_knobOut; }
+		NodeKnob& knobIn() { return m_knobIn; }
 
 		void updateCable();
 
 		bool customDraw(Renderer& renderer);
 
-		static Type& cls() { static Type ty("NodeCable", Decal::cls()); return ty; }
+		static Type& cls() { static Type ty("NodeCable", Wedge::Decal()); return ty; }
 
 	protected:
-		Widget& m_plugOut;
-		Widget& m_plugIn;
+		NodeKnob& m_knobOut;
+		NodeKnob& m_knobIn;
 		bool m_flipX;
 		bool m_flipY;
 	};
 
-	class TOY_UI_EXPORT NodeHeader : public Row
+	class TOY_UI_EXPORT NodeHeader : public Wedge
 	{
 	public:
 		NodeHeader(Wedge& parent, Node& node);
 
-		static Type& cls() { static Type ty("NodeHeader", Row::cls()); return ty; }
+		static Type& cls() { static Type ty("NodeHeader", Wedge::Row()); return ty; }
 
 	protected:
 		Label m_title;
-		Spacer m_spacer;
+		Item m_spacer;
 	};
 
-	class TOY_UI_EXPORT NodeBody : public Sheet
-	{
-	public:
-		NodeBody(Node& parent);
-
-		NodeHeader& header() { return m_header; }
-
-		static Type& cls() { static Type ty("NodeBody", Sheet::cls()); return ty; }
-
-	protected:
-		NodeHeader m_header;
-	};
-
-	class TOY_UI_EXPORT NodeIn : public Div
-	{
-	public:
-		NodeIn(Wedge& parent);
-
-		static Type& cls() { static Type ty("NodeIn", Div::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT NodeOut : public Div
-	{
-	public:
-		NodeOut(Wedge& parent);
-
-		static Type& cls() { static Type ty("NodeOut", Div::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT Node : public Overlay
+	class TOY_UI_EXPORT Node : public Wedge
 	{
 	public:
 		Node(Wedge& parent, const string& title, int order = 0);
 
 		Canvas& canvas();
-		Container& plan();
+		Wedge& plan();
 
 		const string& name() { return m_name; }
 		int order() { return m_order; }
 
-		NodeIn& inputs() { return m_inputs; }
-		NodeOut& outputs() { return m_outputs; }
-		NodeBody& body() { return m_body; }
+		Wedge& inputs() { return m_inputs; }
+		Wedge& outputs() { return m_outputs; }
+		Wedge& body() { return m_body; }
 
 		void moveNode(const DimFloat& delta);
 		void updateCables();
@@ -173,33 +133,25 @@ namespace toy
 
 		virtual bool leftDragStart(MouseEvent& mouseEvent);
 
-		NodePlug& addInput(const string& name);
-		NodePlug& addOutput(const string& name);
+		NodePlug& addInput(const string& name, const string& icon = "", const Colour& colour = Colour::NeonGreen);
+		NodePlug& addOutput(const string& name, const string& icon = "", const Colour& colour = Colour::NeonGreen);
 
-		static Type& cls() { static Type ty("Node", Overlay::cls()); return ty; }
+		NodePlug& addPlug(const string& name, const string& icon, const Colour& colour, bool input, NodePlug::ConnectTrigger onConnect = {});
+		
+		static Type& cls() { static Type ty("Node", Wedge::Overlay()); return ty; }
+
+		static Type& Inputs() { static Type ty("NodeIn", Wedge::Div()); return ty; }
+		static Type& Body() { static Type ty("NodeBody", Wedge::Sheet()); return ty; }
+		static Type& Outputs() { static Type ty("NodeOut", Wedge::Div()); return ty; }
 
 	protected:
 		string m_name;
 		int m_order;
 
-		NodeIn m_inputs;
-		NodeBody m_body;
-		NodeOut m_outputs;
-	};
-	class TOY_UI_EXPORT CanvasLine : public Stripe
-	{
-	public:
-		CanvasLine(Widget& widget, Stripe& parent);
-
-		static Type& cls() { static Type ty("CanvasLine"); return ty; }
-	};
-
-	class TOY_UI_EXPORT CanvasColumn : public Stripe
-	{
-	public:
-		CanvasColumn(Widget& widget, Stripe& parent);
-
-		static Type& cls() { static Type ty("CanvasColumn"); return ty; }
+		Wedge m_inputs;
+		Wedge m_body;
+		NodeHeader m_header;
+		Wedge m_outputs;
 	};
 
 	class TOY_UI_EXPORT Canvas : public ScrollPlan, public StoreObserver<Node>

@@ -19,7 +19,7 @@
 namespace toy
 {
 	InputRadio::InputRadio(Wedge& parent, const string& label, StringVector choices, std::function<void(const string&)> callback, bool reverse)
-		: WrapControl(parent, cls())
+		: Wedge(parent, cls())
 		, m_label(*this, label)
 		, m_input(*this, [callback](Widget& widget) { if(callback) callback(widget.label()); }, 0, choices)
 	{
@@ -28,7 +28,7 @@ namespace toy
 	}
 
 	InputDropdown::InputDropdown(Wedge& parent, const string& label, StringVector choices, std::function<void(const string&)> callback, bool reverse)
-		: WrapControl(parent, cls())
+		: Wedge(parent, cls())
 		, m_label(*this, label)
 		, m_input(*this, [callback](Widget& widget) { if(callback) callback(widget.label()); }, choices)
 	{

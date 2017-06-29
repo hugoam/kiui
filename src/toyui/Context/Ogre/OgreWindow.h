@@ -46,10 +46,10 @@ namespace toy
 	class OISInputWindow : public InputWindow, public OIS::KeyListener, public OIS::MouseListener
 	{
 	public:
-		OISInputWindow(RenderWindow& renderWindow);
+		OISInputWindow();
 		~OISInputWindow();
 
-		void initInput(Mouse& mouse, Keyboard& keyboard);
+		void initInput(RenderWindow& renderWindow, Mouse& mouse, Keyboard& keyboard);
 		void setupInput(size_t windowHnd);
 		void destroyInput();
 

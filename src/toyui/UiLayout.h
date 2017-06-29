@@ -17,7 +17,7 @@
 
 namespace toy
 {
-	typedef std::function<void(Styler&)> StyleInitializer;
+	using StyleInitializer = std::function<void(Styler&)>;
 
 	class TOY_UI_EXPORT Styler : public Object
 	{
@@ -42,8 +42,6 @@ namespace toy
 
 		void initStyle(Type& type);
 		void prepareStyle(Style& style);
-
-		Image& findImage(const string& image);
 
 		static Type& cls() { static Type ty; return ty; }
 

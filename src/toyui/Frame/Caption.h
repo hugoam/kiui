@@ -10,6 +10,7 @@
 #include <toyobj/Util/NonCopy.h>
 #include <toyui/Forward.h>
 #include <toyui/Style/Dim.h>
+#include <toyui/Frame/Content.h>
 
 namespace toy
 {
@@ -32,40 +33,52 @@ namespace toy
 		std::vector<TextGlyph> glyphs;
 	};
 
-	class TOY_UI_EXPORT Caption
+	class TOY_UI_EXPORT Caption : public Object
 	{
 	public:
-		Caption(DrawFrame& frame);
-		Caption(const Caption&) = default;
+		Caption(Frame& frame);
 
+		const string& text() { return m_text; }
 		std::vector<TextRow>& textRows() { return m_textRows; }
 
 		int caret() { return m_caret; }
 		int selectStart() { return m_selectStart; }
 		int selectEnd() { return m_selectEnd; }
 
-		void selectStart(int value) { m_selectStart = value; }
-		void selectEnd(int value) { m_selectEnd = value; }
-		void caret(int value) { m_caret = value; }
+		void select(int caret, int start, int end);
 
-		float textSize(Dimension dim);
+		DimFloat contentSize() { return{ width(), height() }; }
+		float height();
+		float width();
+
+		void setText(const string& text);
+		void setTextLines(size_t lines);
+
+		DimFloat updateTextSize();
 
 		void updateTextRows(Renderer& target, const DimFloat& space);
 		void updateSelection();
 
 		TextRow& textRow(size_t index);
 
-		size_t caretIndex(float x, float y);
-		void caretCoords(float& x, float& y);
+		size_t caretIndex(const DimFloat& pos);
+		void caretCoords(DimFloat& pos);
+
+		static Type& cls() { static Type ty; return ty; }
 
 	protected:
-		DrawFrame& m_frame;
+		Frame& d_frame;
+		string m_text;
+		size_t m_textLines;
 
 		int m_caret;
 		int m_selectStart;
 		int m_selectEnd;
 
 		std::vector<TextRow> m_textRows;
+
+	public:
+		static Renderer* s_renderer;
 	};
 }
 

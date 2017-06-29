@@ -6,83 +6,16 @@
 #define TOY_SCROLLBAR_H
 
 /* toy */
-#include <toyobj/Id.h>
-#include <toyobj/String/String.h>
-#include <toyobj/Util/Updatable.h>
 #include <toyui/Forward.h>
-#include <toyui/Widget/Widget.h>
-#include <toyui/Container/Layout.h>
 #include <toyui/Button/Button.h>
 #include <toyui/Button/Slider.h>
-#include <toyui/Frame/Stripe.h>
-
-#include <memory>
 
 namespace toy
 {
-	class _refl_ TOY_UI_EXPORT Scroller : public Slider
-	{
-	public:
-		Scroller(Wedge& parent, Dimension dim);
-
-		void sliderStep(float offset, bool ended);
-
-		static Type& cls() { static Type ty("Scroller", Slider::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT ScrollerKnob : public SliderKnob
-	{
-	public:
-		ScrollerKnob(Wedge& parent, Dimension dim);
-
-		static Type& cls() { static Type ty("ScrollerKnob", SliderKnob::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT ScrollForward : public Button
-	{
-	public:
-		ScrollForward(Wedge& parent, const Callback& trigger);
-
-		static Type& cls() { static Type ty("ScrollForward", Button::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT ScrollBackward : public Button
-	{
-	public:
-		ScrollBackward(Wedge& parent, const Callback& trigger);
-
-		static Type& cls() { static Type ty("ScrollBackward", Button::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT ScrollUp
-	{
-	public:
-		static Type& cls() { static Type ty("ScrollUp", Button::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT ScrollDown
-	{
-	public:
-		static Type& cls() { static Type ty("ScrollDown", Button::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT ScrollLeft
-	{
-	public:
-		static Type& cls() { static Type ty("ScrollLeft", Button::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT ScrollRight
-	{
-	public:
-		static Type& cls() { static Type ty("ScrollRight", Button::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT Scrollbar : public Row
+	class _refl_ TOY_UI_EXPORT Scrollbar : public Wedge
 	{
 	public:
 		Scrollbar(Wedge& parent, Wedge& frameSheet, Wedge& contentSheet, Dimension dim);
-		~Scrollbar();
 
 		float contentSize();
 		float visibleSize();
@@ -95,9 +28,20 @@ namespace toy
 		void scroll(float amount);
 		void scrollTo(float offset);
 
-		virtual void nextFrame(size_t tick, size_t delta);
+		void update();
 
-		static Type& cls() { static Type ty("Scrollbar", Row::cls()); return ty; }
+		float nextOffset(Widget& widget, Dimension dim, float pos);
+		float prevOffset(Widget& widget, Dimension dim, float pos);
+
+		static Type& cls() { static Type ty("Scrollbar", Wedge::Row()); return ty; }
+
+		static Type& ScrollUp() { static Type ty("ScrollUp", Button::cls()); return ty; }
+		static Type& ScrollDown() { static Type ty("ScrollDown", Button::cls()); return ty; }
+		static Type& ScrollLeft() { static Type ty("ScrollLeft", Button::cls()); return ty; }
+		static Type& ScrollRight() { static Type ty("ScrollRight", Button::cls()); return ty; }
+
+		static Type& Scroller() { static Type ty("Scroller", Slider::cls()); return ty; }
+		static Type& Knob() { static Type ty("ScrollerKnob", Slider::Knob()); return ty; }
 
 	protected:
 		Dimension m_dim;
@@ -105,9 +49,9 @@ namespace toy
 		Wedge& m_frameSheet;
 		Wedge& m_contentSheet;
 
-		ScrollForward m_up;
-		Scroller m_scroller;
-		ScrollBackward m_down;
+		Button m_rewind;
+		Slider m_scroller;
+		Button m_seek;
 	};
 }
 

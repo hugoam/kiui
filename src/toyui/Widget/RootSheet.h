@@ -11,22 +11,22 @@
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Widget/Cursor.h>
 #include <toyui/Input/InputDispatcher.h>
+#include <toyui/Input/InputDevice.h>
 
 namespace toy
 {
-	class _refl_ TOY_UI_EXPORT RootSheet : public Container
+	class _refl_ TOY_UI_EXPORT RootSheet : public Wedge
 	{
 	public:
-		RootSheet(UiWindow& window, Type& type = cls());
-		RootSheet(Wedge& parent, Type& type = cls());
+		RootSheet(UiWindow& window, Type& type = cls(), Wedge* parent = nullptr);
 		~RootSheet();
 
 		virtual RootSheet& rootSheet() { return *this; }
 
 		UiWindow& uiWindow() { return m_window; }
 		ControlSwitch& controller() { return *m_rootController; }
-		Mouse& mouse() const { return *m_mouse; }
-		Keyboard& keyboard() const { return *m_keyboard; }
+		Mouse& mouse() { return m_mouse; }
+		Keyboard& keyboard() { return m_keyboard; }
 
 		Cursor& cursor() { return m_cursor; }
 
@@ -36,18 +36,17 @@ namespace toy
 
 		virtual void transformCoordinates(MouseEvent& mouseEvent) { UNUSED(mouseEvent); }
 
-		virtual void handleUnbindWidget(Widget& widget, bool destroy);
-		virtual void handleBindWidget(Widget& widget);
+		virtual void handleDestroyWidget(Widget& widget);
 
-		static Type& cls() { static Type ty("RootSheet", Container::cls()); return ty; }
+		static Type& cls() { static Type ty("RootSheet", Wedge::cls()); return ty; }
 
 	protected:
 		UiWindow& m_window;
 
 		unique_ptr<ControlSwitch> m_rootController;
 
-		object_ptr<Mouse> m_mouse;
-		object_ptr<Keyboard> m_keyboard;
+		Mouse m_mouse;
+		Keyboard m_keyboard;
 
 		object_ptr<RenderTarget> m_target;
 

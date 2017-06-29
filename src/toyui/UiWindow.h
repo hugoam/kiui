@@ -39,10 +39,7 @@ namespace toy
 	{
 	public:
 		Context(RenderSystem& renderSystem, object_ptr<RenderWindow> renderWindow, object_ptr<InputWindow> inputWindow);
-		Context(RenderSystem& renderSystem);
 		~Context();
-
-		void init(object_ptr<RenderWindow> renderWindow, object_ptr<InputWindow> inputWindow);
 
 		RenderWindow& renderWindow() { return *m_renderWindow; }
 		InputWindow& inputWindow() { return *m_inputWindow; }
@@ -114,6 +111,7 @@ namespace toy
 
 		object_ptr<Context> m_context;
 		object_ptr<Renderer> m_renderer;
+		RenderWindow& m_renderWindow;
 
 		std::vector<object_ptr<Image>> m_images;
 		ImageAtlas m_atlas;

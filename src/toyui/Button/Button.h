@@ -9,7 +9,7 @@
 #include <toyui/Forward.h>
 #include <toyui/Widget/Widget.h>
 #include <toyui/Widget/Sheet.h>
-#include <toyui/Input/InputDispatcher.h>
+#include <toyui/Input/InputDevice.h>
 #include <toyui/Edit/Value.h>
 
 namespace toy
@@ -30,23 +30,6 @@ namespace toy
 		static Type& cls() { static Type ty("Text", Label::cls()); return ty; }
 	};
 
-	class _refl_ TOY_UI_EXPORT Title : public Label
-	{
-	public:
-		Title(Wedge& parent, const string& label);
-
-		static Type& cls() { static Type ty("Title", Label::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT Icon : public Item
-	{
-	public:
-		Icon(Wedge& parent, Image& image);
-		Icon(Wedge& parent, const string& image);
-
-		static Type& cls() { static Type ty("Icon", Item::cls()); return ty; }
-	};
-
 	class TOY_UI_EXPORT ClickTrigger
 	{
 	public:
@@ -55,19 +38,26 @@ namespace toy
 		const Widget::Callback& trigger() { return m_trigger; }
 		void setTrigger(const Widget::Callback& trigger) { m_trigger = trigger; }
 
-		virtual bool click(MouseEvent& mouseEvent)
+		bool click(MouseEvent& mouseEvent)
 		{
-			if(!m_trigger)
-				return false;
-
-			m_trigger(m_widget);
+			if(!m_trigger) return false; m_trigger(m_widget);
 			mouseEvent.abort = true; // @kludge for buttons that cause destroying a widget
 			return true; 
 		}
 
-		virtual bool clickAlt(MouseEvent& mouseEvent) { if(!m_triggerAlt) return false; m_triggerAlt(m_widget); return true; }
-		virtual bool clickShift(MouseEvent& mouseEvent) { if(!m_triggerShift) return false; m_triggerShift(m_widget); return true; }
-		virtual bool clickCtrl(MouseEvent& mouseEvent) { if(!m_triggerCtrl) return false; m_triggerCtrl(m_widget); return true; }
+		bool clickMods(MouseEvent& mouseEvent)
+		{
+			if(mouseEvent.modifiers & INPUT_CTRL)
+				return this->clickCtrl(mouseEvent);
+			else if(mouseEvent.modifiers & INPUT_SHIFT)
+				return this->clickShift(mouseEvent);
+			else
+				return this->click(mouseEvent);
+		}
+
+		bool clickAlt(MouseEvent& mouseEvent) { if(!m_triggerAlt) return false; m_triggerAlt(m_widget); return true; }
+		bool clickShift(MouseEvent& mouseEvent) { if(!m_triggerShift) return false; m_triggerShift(m_widget); return true; }
+		bool clickCtrl(MouseEvent& mouseEvent) { if(!m_triggerCtrl) return false; m_triggerCtrl(m_widget); return true; }
 
 	protected:
 		Widget& m_widget;
@@ -77,42 +67,37 @@ namespace toy
 		Widget::Callback m_triggerCtrl;
 	};
 
-	class _refl_ TOY_UI_EXPORT Button : public Control, public ClickTrigger
+	class _refl_ TOY_UI_EXPORT Button : public Item, public ClickTrigger
 	{
 	public:
-		Button(Wedge& parent, const string& label, const Callback& trigger = nullptr, Type& type = cls());
-		Button(Wedge& parent, Image& image, const Callback& trigger = nullptr, Type& type = cls());
+		Button(Wedge& parent, const string& content, const Callback& trigger = nullptr, Type& type = cls());
 
 		const string& tooltip() { return m_tooltip; }
 
 		virtual bool leftClick(MouseEvent& mouseEvent);
 		virtual bool rightClick(MouseEvent& mouseEvent);
 
-		static Type& cls() { static Type ty("Button", Control::cls()); return ty; }
+		static Type& cls() { static Type ty("Button", Item::Control()); return ty; }
 
 	protected:
 		string m_tooltip;
 	};
 
-	class _refl_ TOY_UI_EXPORT WrapButton : public WrapControl, public ClickTrigger
+	class _refl_ TOY_UI_EXPORT WrapButton : public Wedge, public ClickTrigger
 	{
 	public:
 		WrapButton(Wedge& parent, const Callback& trigger = nullptr, Type& type = cls());
 
-		Widget& content() { return *m_contents[0]; }
-
 		virtual bool leftClick(MouseEvent& mouseEvent);
 		virtual bool rightClick(MouseEvent& mouseEvent);
 
-		const string& contentlabel() { return this->content().contentlabel(); }
-
-		static Type& cls() { static Type ty("WrapButton", WrapControl::cls()); return ty; }
+		static Type& cls() { static Type ty("WrapButton", Wedge::WrapControl()); return ty; }
 	};
 
 	class _refl_ TOY_UI_EXPORT MultiButton : public WrapButton
 	{
 	public:
-		MultiButton(Wedge& parent, const Callback& trigger = nullptr, const StringVector& elements = {}, Type& type = cls());
+		MultiButton(Wedge& parent, const StringVector& elements = {}, const Callback& trigger = nullptr, Type& type = cls());
 
 		const std::vector<string>& elements() { return m_elements; }
 
@@ -120,19 +105,21 @@ namespace toy
 		void reset(MultiButton& button);
 		void reset(const StringVector& contents, const Callback& trigger = nullptr);
 
+		virtual const string& label() { return m_elements[0]; }
+
 		static Type& cls() { static Type ty("MultiButton", WrapButton::cls()); return ty; }
 
 	protected:
 		std::vector<string> m_elements;
 	};
 
-	class _refl_ TOY_UI_EXPORT Toggle : public Control
+	class _refl_ TOY_UI_EXPORT Toggle : public Item
 	{
 	public:
-		typedef std::function<void(Toggle&)> Callback;
+		typedef std::function<void(Widget&, bool)> Callback;
 
 	public:
-		Toggle(Wedge& parent, const Callback& triggerOn, const Callback& triggerOff, bool isOn = true, Type& type = cls());
+		Toggle(Wedge& parent, const Callback& callback, bool isOn = true, Type& type = cls());
 
 		bool on() { return m_on; }
 
@@ -141,12 +128,10 @@ namespace toy
 
 		virtual bool leftClick(MouseEvent& mouseEvent);
 
-		static Type& cls() { static Type ty("Toggle", Control::cls()); return ty; }
+		static Type& cls() { static Type ty("Toggle", Item::Control()); return ty; }
 
 	protected:
-		Callback m_triggerOn;
-		Callback m_triggerOff;
-
+		Callback m_callback;
 		bool m_on;
 	};
 }

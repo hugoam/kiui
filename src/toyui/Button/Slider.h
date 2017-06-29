@@ -9,7 +9,7 @@
 #include <toyobj/Util/Stat.h>
 #include <toyobj/String/StringConvert.h>
 #include <toyui/Forward.h>
-#include <toyui/Frame/Uibox.h>
+#include <toyui/Frame/UiRect.h>
 #include <toyui/Edit/Value.h>
 #include <toyui/Widget/Widget.h>
 #include <toyui/Button/Button.h>
@@ -17,28 +17,15 @@
 
 namespace toy
 {
-	class _refl_ TOY_UI_EXPORT SliderKnob : public Item
-	{
-	public:
-		SliderKnob(Wedge& parent, Dimension dim = DIM_X, Type& type = cls());
-
-		static Type& cls() { static Type ty("SliderKnob", Item::cls()); return ty; }
-
-	protected:
-		Dimension m_dim;
-	};
-
-	class _refl_ TOY_UI_EXPORT Slider : public WrapControl
+	class _refl_ TOY_UI_EXPORT Slider : public Wedge
 	{
 	public:
 		Slider(Wedge& parent, Dimension dim = DIM_X, const Callback& onUpdated = nullptr, Type& type = cls());
 
 		Widget& filler() { return m_filler; }
-		SliderKnob& slider() { return m_button; }
+		Item& knob() { return m_button; }
 
 		float val() { return m_val; }
-
-		float length();
 
 		virtual void dirtyLayout();
 
@@ -51,19 +38,24 @@ namespace toy
 
 		virtual void sliderStep(float value, bool ended) { UNUSED(value); UNUSED(ended); m_onUpdated(*this); }
 
-		float offset(float pos);
+		float offset(MouseEvent& mouseEvent);
+
+		virtual bool leftClick(MouseEvent& mouseEvent);
 
 		virtual bool leftDragStart(MouseEvent& mouseEvent);
 		virtual bool leftDrag(MouseEvent& mouseEvent);
 		virtual bool leftDragEnd(MouseEvent& mouseEvent);
 
-		static Type& cls() { static Type ty("Slider", WrapControl::cls()); return ty; }
+		static Type& cls() { static Type ty("Slider", Wedge::WrapControl()); return ty; }
+
+		static Type& Knob() { static Type ty("SliderKnob", Item::cls()); return ty; }
+		static Type& Display() { static Type ty("SliderDisplay", Label::cls()); return ty; }
 
 	protected:
 		Dimension m_dim;
-		Filler m_filler;
-		SliderKnob m_button;
-		Spacer m_spacer;
+		Item m_filler;
+		Item m_button;
+		Item m_spacer;
 
 		float m_min;
 		float m_max;
@@ -75,18 +67,7 @@ namespace toy
 		float m_numSteps;
 		int m_step;
 
-		float m_startPos;
-		float m_startOffset;
-
 		Callback m_onUpdated;
-	};
-
-	class _refl_ TOY_UI_EXPORT SliderDisplay : public Label
-	{
-	public:
-		SliderDisplay(Wedge& parent, const string& label);
-
-		static Type& cls() { static Type ty("SliderDisplay", Label::cls()); return ty; }
 	};
 }
 

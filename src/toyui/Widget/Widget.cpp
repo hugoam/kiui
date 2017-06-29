@@ -5,29 +5,24 @@
 #include <toyui/Config.h>
 #include <toyui/Widget/Widget.h>
 
-#include <toyui/Widget/Sheet.h>
 #include <toyui/Widget/RootSheet.h>
 
-#include <toyui/Frame/Frame.h>
-#include <toyui/Frame/Stripe.h>
-#include <toyui/Frame/Grid.h>
 #include <toyui/Frame/Layer.h>
 
 #include <toyui/UiLayout.h>
 #include <toyui/UiWindow.h>
 
-#include <toyobj/Iterable/Reverse.h>
+#include <toyui/Input/InputDevice.h>
 
 #define TOYUI_INSTANT_MAPPING
 
 namespace toy
 {
-	string Widget::sNullString;
-
 	Widget::Widget(Wedge& parent, Type& type, FrameType frameType)
 		: Widget(type, frameType, &parent)
 	{
-		parent.push(*this);
+		parent.append(*this);
+		this->updateStyle();
 	}
 
 	Widget::Widget(Type& type, FrameType frameType, Wedge* parent)
@@ -39,21 +34,10 @@ namespace toy
 		, m_state(NOSTATE)
 		, m_device(nullptr)
 	{
-		if(frameType == MASTER_LAYER)
-			m_frame = make_object<MasterLayer>(*this);
-		else if(frameType == LAYER)
-			m_frame = make_object<Layer>(*this);
-		else if(frameType == GRID)
-			m_frame = make_object<Grid>(*this);
-		else if(frameType == TABLE)
-			m_frame = make_object<TableGrid>(*this);
-		else if(frameType == STRIPE)
-			m_frame = make_object<Stripe>(*this);
+		if(frameType == MASTER_LAYER || frameType == LAYER)
+			m_frame = make_object<Layer>(this->as<Wedge>(), frameType);
 		else if(frameType == FRAME)
 			m_frame = make_object<Frame>(*this);
-
-		if(m_parent)
-			this->updateStyle();
 	}
 
 	Widget::~Widget()
@@ -69,62 +53,39 @@ namespace toy
 		return this->rootSheet().uiWindow();
 	}
 
-	Context& Widget::context()
-	{
-		return this->uiWindow().context();
-	}
-
 	ControlSwitch& Widget::rootController()
 	{
 		return this->rootSheet().controller();
 	}
 
-	DrawFrame& Widget::content()
+	void Widget::setContent(const string& content)
 	{
-		return m_frame->content();
+		if(content.front() == '(' && content.back() == ')')
+		{
+			string name(content.begin() + 1, content.end() - 1);
+			m_frame->setIcon(&this->uiWindow().findImage(toLower(name)));
+		}
+		else if(!m_frame->icon()) // @kludge for buttons whose image is set by the inkstyle
+		{
+			m_frame->setCaption(content);
+		}
 	}
 
 	const string& Widget::label()
 	{
-		return this->content().text();
+		return m_frame->caption()->text();
 	}
 
-	void Widget::setLabel(const string& label)
+	void Widget::destroy()
 	{
-		this->content().setText(label);
+		this->rootSheet().handleDestroyWidget(*this);
+		m_controlGraph = nullptr;
+		this->destroyed();
 	}
 
-	Image* Widget::image()
+	void Widget::destroyTree()
 	{
-		return this->content().image();
-	}
-
-	void Widget::setImage(Image* image)
-	{
-		this->content().setImage(image);
-	}
-
-	Image& Widget::findImage(const string& name)
-	{
-		return this->uiWindow().findImage(name);
-	}
-
-	const string& Widget::contentlabel()
-	{
-		return this->content().text();
-	}
-
-	void Widget::bound(RootSheet& rootSheet)
-	{
-		rootSheet.handleBindWidget(*this);
-	}
-
-	void Widget::unbound(RootSheet& rootSheet, bool destroy)
-	{
-		rootSheet.handleUnbindWidget(*this, destroy);
-
-		if(destroy && m_controlGraph)
-			m_controlGraph = nullptr;
+		this->visit([](Widget& widget) { widget.destroy(); return true; });
 	}
 
 	void Widget::bind(Wedge& parent, size_t index)
@@ -134,34 +95,22 @@ namespace toy
 
 		this->propagateTo(&parent);
 		
-		m_parent->stripe().map(*m_frame);
-
-		RootSheet& rootSheet = this->rootSheet();
-		this->visit([&rootSheet](Widget& widget) { widget.bound(rootSheet); return true; });
+		m_frame->bind(m_parent->frame());
 	}
 
-	void Widget::unbind(bool destroy)
+	void Widget::unbind()
 	{
-		RootSheet& rootSheet = this->rootSheet();
-		this->visit([&rootSheet, destroy](Widget& widget) { widget.unbound(rootSheet, destroy); return true; });
-
-		if(m_frame->mapped())
-			m_parent->stripe().unmap(*m_frame);
-
-		m_parent = nullptr;
-		m_index = 0;
+		m_frame->unbind();
 	}
 
-	object_ptr<Widget> Widget::extract()
+	void Widget::makeSolver()
 	{
-		object_ptr<Widget> unique = m_container->release(*this, false);
-		m_parent->destroy();
-		return unique;
+		m_frame->makeSolver();
 	}
 
-	void Widget::destroy()
+	void Widget::extract()
 	{
-		m_container->release(*this, true);
+		m_container->store().remove(*this);
 	}
 
 	Widget* Widget::findContainer(Type& type)
@@ -178,15 +127,9 @@ namespace toy
 		return nullptr;
 	}
 
-	void Widget::visit(const Visitor& visitor)
+	void Widget::visit(const Visitor& visitor, bool post)
 	{
 		visitor(*this);
-	}
-
-	void Widget::nextFrame(size_t tick, size_t step)
-	{
-		if(m_style->updated() > m_frame->styleStamp())
-			m_frame->resetStyle();
 	}
 
 	void Widget::show()
@@ -220,16 +163,11 @@ namespace toy
 	{
 		return this->uiWindow().styler().style(type);
 	}
-	
-	void Widget::markDirty()
-	{
-		m_frame->setDirty(Frame::DIRTY_CONTENT);
-	}
 
 	void Widget::toggleState(WidgetState state)
 	{
 		m_state = static_cast<WidgetState>(m_state ^ state);
-		this->updateState();
+		m_frame->updateInkstyle(m_style->subskin(m_state));
 	}
 
 	void Widget::enableState(WidgetState state)
@@ -244,21 +182,15 @@ namespace toy
 			this->toggleState(state);
 	}
 
-	void Widget::updateState()
+	Widget* Widget::pinpoint(DimFloat pos)
 	{
-		m_frame->content().updateInkstyle(m_style->subskin(m_state));
-		m_frame->setDirty(Frame::DIRTY_CONTENT);
-	}
-	
-	Widget* Widget::pinpoint(float x, float y)
-	{
-		return this->pinpoint(x, y, [](Frame& frame) { return frame.opaque(); });
+		return this->pinpoint(pos, [](Frame& frame) { return frame.opaque(); });
 	}
 
-	Widget* Widget::pinpoint(float x, float y, const Frame::Filter& filter)
+	Widget* Widget::pinpoint(DimFloat pos, const Frame::Filter& filter)
 	{
-		Frame* frame = m_frame->pinpoint(x, y , filter);
-		return frame ? frame->widget() : nullptr;
+		Frame* frame = m_frame->pinpoint(pos, filter);
+		return frame ? &frame->widget() : nullptr;
 	}
 
 	InputReceiver* Widget::controlEvent(InputEvent& inputEvent)
@@ -269,8 +201,8 @@ namespace toy
 		if(inputEvent.deviceType >= DEVICE_MOUSE)
 		{
 			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
-			DimFloat local = m_frame->localPosition(mouseEvent.posX, mouseEvent.posY);
-			Widget* pinned = this->pinpoint(local.x(), local.y());
+			DimFloat local = m_frame->localPosition(mouseEvent.pos);
+			Widget* pinned = this->pinpoint(local);
 			return (pinned && pinned != this) ? pinned->controlEvent(inputEvent) : this;
 		}
 
@@ -287,9 +219,7 @@ namespace toy
 		if(inputEvent.deviceType >= DEVICE_MOUSE)
 		{
 			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
-			DimFloat local = m_frame->localPosition(mouseEvent.posX, mouseEvent.posY);
-			mouseEvent.relativeX = local.x();
-			mouseEvent.relativeY = local.y();
+			mouseEvent.relative = m_frame->localPosition(mouseEvent.pos);
 		}
 
 		return InputAdapter::receiveEvent(inputEvent);
@@ -366,21 +296,13 @@ namespace toy
 	void Widget::dirtyLayout()
 	{}
 
-	void Widget::debugPrintDepth()
-	{
-		Widget* parent = this->parent();
-		while(parent)
-		{
-			printf("  ");
-			parent = parent->parent();
-		}
-	}
-
 	Item::Item(Wedge& parent, Type& type)
 		: Widget(parent, type)
 	{}
 
-	Control::Control(Wedge& parent, Type& type)
-		: Item(parent, type)
-	{}
+	Item::Item(Wedge& parent, const string& content, Type& type)
+		: Widget(parent, type)
+	{
+		this->setContent(content);
+	}
 }

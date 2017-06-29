@@ -13,15 +13,7 @@
 
 namespace toy
 {
-	class _refl_ TOY_UI_EXPORT List : public ScrollSheet
-	{
-	public:
-		List(Wedge& parent, Type& type = cls(), FrameType frameType = STRIPE);
-
-		static Type& cls() { static Type ty("List", ScrollSheet::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT SelectList : public List
+	class _refl_ TOY_UI_EXPORT SelectList : public ScrollSheet
 	{
 	public:
 		SelectList(Wedge& parent, Type& type = cls());
@@ -30,31 +22,31 @@ namespace toy
 
 		void selected(Widget& selected);
 
-		static Type& cls() { static Type ty("SelectList", List::cls()); return ty; }
+		static Type& cls() { static Type ty("SelectList", ScrollSheet::cls()); return ty; }
 	};
 
-	class _refl_ TOY_UI_EXPORT LabelSequence : public Row
+	class _refl_ TOY_UI_EXPORT LabelSequence : public Wedge
 	{
 	public:
 		LabelSequence(Wedge& parent, StringVector labels = StringVector());
 
-		static Type& cls() { static Type ty("LabelSequence", Row::cls()); return ty; }
+		static Type& cls() { static Type ty("LabelSequence", Wedge::Row()); return ty; }
 	};
 
-	class _refl_ TOY_UI_EXPORT ButtonSequence : public Row
+	class _refl_ TOY_UI_EXPORT ButtonSequence : public Wedge
 	{
 	public:
 		ButtonSequence(Wedge& parent, StringVector labels = StringVector());
 
-		static Type& cls() { static Type ty("ButtonSequence", Row::cls()); return ty; }
+		static Type& cls() { static Type ty("ButtonSequence", Wedge::Row()); return ty; }
 	};
 
-	class _refl_ TOY_UI_EXPORT SortList : public List//, public Dropper
+	class _refl_ TOY_UI_EXPORT SortList : public ScrollSheet//, public Dropper
 	{
 	public:
 		SortList(Wedge& parent);
 
-		static Type& cls() { static Type ty("SortList", List::cls()); return ty; }
+		static Type& cls() { static Type ty("SortList", ScrollSheet::cls()); return ty; }
 	};
 }
 

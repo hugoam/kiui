@@ -15,7 +15,7 @@
 #include <toyui/Widget/RootSheet.h>
 
 #include <toyui/Frame/Frame.h>
-#include <toyui/Frame/Stripe.h>
+#include <toyui/Render/Renderer.h>
 
 #include <toyui/Controller/Controller.h>
 
@@ -31,23 +31,12 @@ namespace toy
 
 	Context::Context(RenderSystem& renderSystem, object_ptr<RenderWindow> renderWindow, object_ptr<InputWindow> inputWindow)
 		: m_renderSystem(renderSystem)
-	{
-		this->init(std::move(renderWindow), std::move(inputWindow));
-	}
-
-	Context::Context(RenderSystem& renderSystem)
-		: m_renderSystem(renderSystem)
-		, m_resourcePath(renderSystem.resourcePath())
+		, m_renderWindow(std::move(renderWindow))
+		, m_inputWindow(std::move(inputWindow))
 	{}
-	
+
 	Context::~Context()
 	{}
-
-	void Context::init(object_ptr<RenderWindow> renderWindow, object_ptr<InputWindow> inputWindow)
-	{
-		m_renderWindow = std::move(renderWindow);
-		m_inputWindow = std::move(inputWindow);
-	}
 
 	void spritesInFolder(std::vector<object_ptr<Image>>& images, const string& path, const string& subfolder)
 	{
@@ -77,10 +66,11 @@ namespace toy
 		, m_resourcePath(system.resourcePath())
 		, m_context(system.createContext(name, width, height, fullScreen))
 		, m_renderer(system.createRenderer(*m_context))
+		, m_renderWindow(m_context->renderWindow())
 		, m_images()
 		, m_atlas(1024, 1024)
-		, m_width(m_context->renderWindow().width())
-		, m_height(m_context->renderWindow().height())
+		, m_width(m_renderWindow.m_width)
+		, m_height(m_renderWindow.m_height)
 		, m_styler(make_object<Styler>(*this))
 		, m_active(nullptr)
 		, m_rootSheet(nullptr)
@@ -95,7 +85,7 @@ namespace toy
 		for(auto& image : m_images)
 			m_renderer->unloadImage(*image);
 
-		m_rootSheet->clear();
+		m_rootSheet->store().clear();
 	}
 
 	void UiWindow::init()
@@ -109,11 +99,10 @@ namespace toy
 		m_styler->defaultLayout();
 
 		m_rootSheet = make_object<RootSheet>(*this);
-		//m_rootDevice = make_object<RootDevice>(*this, *m_rootSheet);
 
-		m_context->inputWindow().initInput(m_rootSheet->mouse(), m_rootSheet->keyboard());
+		m_context->inputWindow().initInput(m_context->renderWindow(), m_rootSheet->mouse(), m_rootSheet->keyboard());
 
-		m_rootSheet->frame().setSize(m_width, m_height);
+		m_rootSheet->frame().setSize({ m_width, m_height });
 
 		this->resize(size_t(m_width), size_t(m_height));
 	}
@@ -178,14 +167,14 @@ namespace toy
 
 		m_context->inputWindow().resize(width, height);
 
-		m_rootSheet->frame().setSize(float(width), float(height));
+		m_rootSheet->frame().setSize({ m_width, m_height });
 	}
 
 	bool UiWindow::nextFrame()
 	{
-		if(m_context->renderWindow().width() != size_t(m_width)
-		|| m_context->renderWindow().height() != size_t(m_height))
-			this->resize(m_context->renderWindow().width(), m_context->renderWindow().height());
+		if(m_renderWindow.m_width != size_t(m_width)
+		|| m_renderWindow.m_height != size_t(m_height))
+			this->resize(m_renderWindow.m_width, m_renderWindow.m_height);
 
 		if(m_context->renderSystem().manualRender())
 		{

@@ -12,32 +12,30 @@
 
 namespace toy
 {
-	class _refl_ TOY_UI_EXPORT Tooltip : public Overlay
+	class _refl_ TOY_UI_EXPORT Tooltip : public Wedge
 	{
 	public:
 		Tooltip(RootSheet& rootSheet, const string& label);
 
-		void setLabel(const string& label);
-
-		static Type& cls() { static Type ty("Tooltip", Overlay::cls()); return ty; }
+		static Type& cls() { static Type ty("Tooltip", Wedge::Overlay()); return ty; }
 	};
 
-	class _refl_ TOY_UI_EXPORT Rectangle : public Decal
+	class _refl_ TOY_UI_EXPORT Rectangle : public Wedge
 	{
 	public:
 		Rectangle(Wedge& parent, Type& type = cls());
 
-		static Type& cls() { static Type ty("Rectangle", Decal::cls()); return ty; }
+		static Type& cls() { static Type ty("Rectangle", Wedge::Decal()); return ty; }
 	};
 
-	class _refl_ TOY_UI_EXPORT Cursor : public Decal
+	class _refl_ TOY_UI_EXPORT Cursor : public Wedge
 	{
 	public:
 		Cursor(RootSheet& rootSheet);
 
 		void nextFrame(size_t tick, size_t delta);
 
-		void setPosition(float x, float y);
+		void setPosition(const DimFloat& pos);
 
 		void hover(Widget& hovered);
 		void unhover(Widget& widget);
@@ -46,49 +44,20 @@ namespace toy
 		void tooltipOn();
 		void tooltipOff();
 
-		static Type& cls() { static Type ty("Cursor", Decal::cls()); return ty; }
+		static Type& cls() { static Type ty("Cursor", Wedge::Decal()); return ty; }
+
+		static Type& ResizeX() { static Type ty("ResizeCursorX", Cursor::cls()); return ty; }
+		static Type& ResizeY() { static Type ty("ResizeCursorY", Cursor::cls()); return ty; }
+		static Type& Move() { static Type ty("MoveCursor", Cursor::cls()); return ty; }
+		static Type& ResizeDiagLeft() { static Type ty("ResizeCursorDiagLeft", Cursor::cls()); return ty; }
+		static Type& ResizeDiagRight() { static Type ty("ResizeCursorDiagRight", Cursor::cls()); return ty; }
+		static Type& Caret() { static Type ty("CaretCursor", Cursor::cls()); return ty; }
 
 	protected:
 		bool m_dirty;
 		Widget* m_hovered;
 		Tooltip m_tooltip;
 		Clock m_tooltipClock;
-	};
-
-	class TOY_UI_EXPORT ResizeCursorX
-	{
-	public:
-		static Type& cls() { static Type ty("ResizeCursorX", Cursor::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT ResizeCursorY
-	{
-	public:
-		static Type& cls() { static Type ty("ResizeCursorY", Cursor::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT MoveCursor
-	{
-	public:
-		static Type& cls() { static Type ty("MoveCursor", Cursor::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT ResizeCursorDiagLeft
-	{
-	public:
-		static Type& cls() { static Type ty("ResizeCursorDiagLeft", Cursor::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT ResizeCursorDiagRight
-	{
-	public:
-		static Type& cls() { static Type ty("ResizeCursorDiagRight", Cursor::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT CaretCursor
-	{
-	public:
-		static Type& cls() { static Type ty("CaretCursor", Cursor::cls()); return ty; }
 	};
 }
 

@@ -12,12 +12,12 @@
 namespace toy
 {
 	Dir::Dir(Wedge& parent, Directory& directory, const string& name)
-		: MultiButton(parent, nullptr, { "folder_20" , name }, cls())
+		: MultiButton(parent, { "(folder_20)" , name }, [this](Widget&) { this->open(); }, cls())
 		, m_directory(directory)
 		, m_name(name)
 	{}
 
-	void Dir::click()
+	void Dir::open()
 	{
 		if(m_name == ".")
 			return;
@@ -29,16 +29,13 @@ namespace toy
 	}
 
 	File::File(Wedge& parent, Directory& directory, const string& name)
-		: MultiButton(parent, nullptr, { "file_20", name }, cls())
+		: MultiButton(parent, { "(file_20)", name }, nullptr, cls())
 		, m_directory(directory)
 		, m_name(name)
 	{}
 
-	void File::click()
-	{}
-
 	Directory::Directory(Wedge& parent, const string& path)
-		: Container(parent, cls())
+		: Wedge(parent, cls())
 		, m_path(path)
 	{
 		this->update();
@@ -65,7 +62,7 @@ namespace toy
 	void Directory::setLocation(const string& path)
 	{
 		m_path = path;
-		this->clear();
+		this->store().clear();
 		this->update();
 	}
 
@@ -87,11 +84,13 @@ namespace toy
 	{}
 
 	FileNode::FileNode(Wedge& parent, const string& name)
-		: TreeNode(parent, "file_20", name, true, cls())
-	{}
+		: TreeNode(parent, "(file_20)", name, true, cls())
+	{
+		m_toggle.enableState(DISABLED);
+	}
 
 	DirectoryNode::DirectoryNode(Wedge& parent, const string& path, const string& name, bool collapsed)
-		: TreeNode(parent, "folder_20", name, collapsed, cls())
+		: TreeNode(parent, "(folder_20)", name, collapsed, cls())
 		, m_path(path)
 	{}
 
@@ -99,9 +98,9 @@ namespace toy
 	{
 		Expandbox::expand();
 
-		for(auto& pt : m_container.contents())
-			if(&pt->type() == &DirectoryNode::cls())
-				pt->as<DirectoryNode>().update();
+		for(Widget* widget : m_body.contents())
+			if(widget->isa<DirectoryNode>())
+				widget->as<DirectoryNode>().update();
 	}
 
 	void DirectoryNode::update()
@@ -112,7 +111,7 @@ namespace toy
 		while((ent = readdir(dir)) != NULL)
 			if(ent->d_type & DT_DIR && string(ent->d_name) != "." && string(ent->d_name) != "..")
 			{
-				DirectoryNode& node = this->emplace<DirectoryNode>(m_path + "/" + ent->d_name, ent->d_name, true);
+				DirectoryNode& node = m_body.emplace<DirectoryNode>(m_path + "/" + ent->d_name, ent->d_name, true);
 				if(!m_collapsed)
 					node.update();
 			}
@@ -121,7 +120,7 @@ namespace toy
 
 		while((ent = readdir(dir)) != NULL)
 			if(ent->d_type & DT_REG)
-				this->emplace<FileNode>(ent->d_name);
+				m_body.emplace<FileNode>(ent->d_name);
 
 		closedir(dir);
 	}

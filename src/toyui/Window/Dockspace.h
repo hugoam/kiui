@@ -10,24 +10,10 @@
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Button/Button.h>
 #include <toyui/Container/Tabber.h>
-#include <toyui/Frame/Grid.h>
+#include <toyui/Solver/Grid.h>
 
 namespace toy
 {
-	class _refl_ TOY_UI_EXPORT Placeholder : public Board
-	{
-	public:
-		Placeholder(Wedge& parent);
-
-		static Type& cls() { static Type ty("Placeholder", Board::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT DockTab
-	{
-	public:
-		static Type& cls() { static Type ty("DockTab", Tab::cls()); return ty; }
-	};
-
 	class _refl_ TOY_UI_EXPORT Docksection : public Tabber
 	{
 	public:
@@ -42,9 +28,12 @@ namespace toy
 		void undock(Window& window);
 
 		Docksection& docktarget(Dimension dim, bool after);
-		Docksection& docktarget(float x, float y);
+		Docksection& docktarget(const DimFloat& pos);
 
 		static Type& cls() { static Type ty("Docksection", Tabber::cls()); return ty; }
+
+		static Type& DockTab() { static Type ty("DockTab", Tab::cls()); return ty; }
+		static Type& Placeholder() { static Type ty("Placeholder", Wedge::Board()); return ty; }
 
 	protected:
 		Dockline* m_dockline;
@@ -84,28 +73,18 @@ namespace toy
 		Dockline* m_dockline;
 	};
 
-	class _refl_ TOY_UI_EXPORT MasterDockline : public Dockline
-	{
-	public:
-		MasterDockline(Dockspace& dockspace);
-
-		static Type& cls() { static Type ty("MasterDockline", Dockline::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT Dockspace : public Layout
+	class _refl_ TOY_UI_EXPORT Dockspace : public Wedge
 	{
 	public:
 		Dockspace(Wedge& parent);
 
-		Dockline& mainline() { return m_mainLine; }
-
 		Docksection& addSection(const GridIndex& dockid);
 		Window& addDockWindow(const string& name, const GridIndex& dockid);
 		
-		static Type& cls() { static Type ty("Dockspace", Layout::cls()); return ty; }
+		static Type& cls() { static Type ty("Dockspace", Wedge::Layout()); return ty; }
 
 	protected:
-		MasterDockline m_mainLine;
+		Dockline m_mainLine;
 	};
 }
 

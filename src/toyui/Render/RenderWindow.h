@@ -28,22 +28,9 @@ namespace toy
 
 		virtual bool nextFrame() = 0;
 
-		string title() { return m_title; }
-		
-		unsigned int width() { return m_width; }
-		unsigned int height() { return m_height; }
-
-		size_t handle() { return m_handle; }
-		void* nativeHandle() { return m_nativeHandle; }
-		void* nativeTarget() { return m_nativeTarget; }
-
-		bool resized() { return m_resized; }
-		bool active() { return m_active; }
-		bool shutdown() { return m_shutdown; }
-
 		static Type& cls() { static Type ty; return ty; }
 
-	protected:
+	public:
 		string m_title;
 		unsigned int m_width;
 		unsigned int m_height;

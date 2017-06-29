@@ -20,7 +20,7 @@ namespace toy
 	public:
 		Dir(Wedge& parent, Directory& directory, const string& name);
 
-		void click();
+		void open();
 
 		static Type& cls() { static Type ty("Dir", MultiButton::cls()); return ty; }
 
@@ -34,8 +34,6 @@ namespace toy
 	public:
 		File(Wedge& parent, Directory& directory, const string& name);
 
-		void click();
-
 		static Type& cls() { static Type ty("File", MultiButton::cls()); return ty; }
 
 	protected:
@@ -43,7 +41,7 @@ namespace toy
 		string m_name;
 	};
 
-	class _refl_ TOY_UI_EXPORT Directory : public Container
+	class _refl_ TOY_UI_EXPORT Directory : public Wedge
 	{
 	public:
 		Directory(Wedge& parent, const string& path);
@@ -54,7 +52,7 @@ namespace toy
 		void moveIn(const string& name);
 		void moveOut();
 
-		static Type& cls() { static Type ty("Directory", Container::cls()); return ty; }
+		static Type& cls() { static Type ty("Directory", Wedge::cls()); return ty; }
 
 	protected:
 		string m_path;

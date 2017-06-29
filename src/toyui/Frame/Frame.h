@@ -10,18 +10,19 @@
 #include <toyobj/String/String.h>
 #include <toyobj/Util/Updatable.h>
 #include <toyui/Forward.h>
-#include <toyui/Frame/Uibox.h>
-#include <toyui/Render/DrawFrame.h>
+#include <toyui/Frame/UiRect.h>
+#include <toyui/Frame/Content.h>
+#include <toyui/Frame/Caption.h>
 
 #include <cmath>
 
 namespace toy
 {
-	class _refl_ TOY_UI_EXPORT Frame : public Object, public Uibox
+	class _refl_ TOY_UI_EXPORT Frame : public Object, public UiRect
 	{
 	public:
 		Frame(Widget& widget);
-		Frame(Style& style, Stripe& parent);
+		~Frame();
 
 		enum Dirty
 		{
@@ -35,34 +36,46 @@ namespace toy
 
 		virtual FrameType frameType() { return FRAME; }
 
-		inline Widget* widget() { return d_widget; }
-		inline DrawFrame& content() { return d_frame; }
-		inline Stripe* parent() { return d_parent; }
-		inline Dirty dirty() { return d_dirty; }
-		inline bool hidden() { return d_hidden; }
-		inline const Index& index() { return d_index; }
-		inline size_t dindex(Dimension dim) { return d_index[dim]; }
-		inline bool mapped() { return d_parent != nullptr; }
+		inline Widget& widget() { return d_widget; }
+		inline Wedge& wedge() { return *d_wedge; }
+		inline Frame* parent() const { return d_parent; }
+		inline Dirty dirty() const { return d_dirty; }
+		inline bool hidden() const { return d_hidden; }
+		inline const DimIndex& index() const { return d_index; }
+		inline size_t dindex(Dimension dim) const { return d_index[dim]; }
 
-		inline const BoxFloat& hardClip() { return d_hardClip; }
+		bool empty() const { return d_caption == nullptr && d_icon == nullptr; }
 
-		inline Style& style() { return *d_style; }
+		inline const BoxFloat& hardClip() const { return d_hardClip; }
 
-		void setIndex(Dimension dim, size_t index) { d_index[dim] = index; }
+		inline bool flow() const { return d_style->layout().d_flow == FLOW; }
+		inline bool clip() const { return d_style->layout().d_clipping == CLIP; }
+
+		inline bool opaque() const { return d_opacity == OPAQUE; }
+		inline bool hollow() const { return d_opacity == HOLLOW; }
+
+		inline FrameSolver& solver() { return *d_solver; }
+
+		inline Style& style() const { return *d_style; }
+		inline InkStyle& inkstyle() const { return *d_inkstyle; }
+
 		void setIndex(size_t xindex, size_t yindex) { d_index[DIM_X] = xindex; d_index[DIM_Y] = yindex; }
 
-		inline float dspace(Dimension dim) { return d_size[dim] - dpadding(dim) - dbackpadding(dim); }
+		void setEmpty() { d_icon = nullptr; d_caption = nullptr; }
 
-		Layer& layer();
-		MasterLayer& masterlayer();
+		Caption* caption() { return d_caption.get(); }
+		Icon* icon() { return d_icon.get(); }
 
-		virtual void bind(Stripe& parent);
+		Caption& setCaption(const string& text);
+		Icon& setIcon(Image* image);
+
+		DimFloat contentSize();
+
+		Frame& lookup(FrameType type = LAYER);
+		Layer& layer(FrameType type = LAYER);
+
+		virtual void bind(Frame& parent);
 		virtual void unbind();
-
-		typedef std::function<bool(Frame&)> Visitor;
-		typedef std::function<bool(Frame&)> Filter;
-
-		virtual void visit(const Visitor& visitor);
 
 		void show();
 		void hide();
@@ -73,62 +86,73 @@ namespace toy
 		void setDirty(Dirty dirty) { if(dirty > d_dirty) d_dirty = dirty; }
 		void markDirty(Dirty dirty);
 
-		virtual Frame* pinpoint(float x, float y, const Filter& filter = nullptr);
+		using Filter = std::function<bool(Frame&)>;
+		virtual Frame* pinpoint(DimFloat pos, const Filter& filter = nullptr);
 
-		void updateFixed(Dimension dim);
-		void setFixedSize(Dimension dim, float size);
-
-		void updateLayout();
-
-		void applySpace(Direction direction, Sizing length, Sizing depth);
+		void makeSolver();
 
 		void setStyle(Style& style, bool reset = false);
-		void updateStyle();
-		void resetStyle();
-
-		virtual void measureLayout();
-		virtual void resizeLayout();
-		virtual void positionLayout();
+		void updateStyle(bool reset = false);
+		void updateInkstyle(InkStyle& inkstyle);
 
 		void setSizeDim(Dimension dim, float size);
 		void setSpanDim(Dimension dim, float span);
-		void setSpanDimDirect(Dimension dim, float span) { d_span[dim] = span; }
 		void setPositionDim(Dimension dim, float position);
 
-		inline void setPosition(float x, float y) { setPositionDim(DIM_X, x); setPositionDim(DIM_Y, y); }
-		inline void setSize(float width, float height) { setSizeDim(DIM_X, width); setSizeDim(DIM_Y, height); }
-		inline void setManualSize(float width, float height) { setFixedSize(DIM_X, width); setFixedSize(DIM_Y, height); }
-		inline void setSize(DimFloat dim) { setSizeDim(DIM_X, dim[DIM_X]); setSizeDim(DIM_Y, dim[DIM_Y]); }
+		inline void setPosition(const DimFloat& pos) { setPositionDim(DIM_X, pos.x()), setPositionDim(DIM_Y, pos.y()); }
+		inline void setSize(const DimFloat& size) { setSizeDim(DIM_X, size.x()); setSizeDim(DIM_Y, size.y()); }
 
-		void integratePosition(Frame& root, DimFloat& local);
+		// global to local
+		void integratePosition(Frame& root, DimFloat& global);
+		inline DimFloat integratePosition(const DimFloat& pos, Frame& root) { DimFloat local = pos; integratePosition(root, local); return local; }
+		inline DimFloat localPosition(const DimFloat& pos) { return integratePosition(pos, lookup(MASTER_LAYER)); }
+
+		// local to global
 		void derivePosition(Frame& root, DimFloat& local);
+		inline DimFloat derivePosition(const DimFloat& pos, Frame& root) { DimFloat local = pos; derivePosition(root, local); return local; }
+		inline DimFloat derivePosition(const DimFloat& pos) { return derivePosition(pos, lookup(MASTER_LAYER)); }
+		inline DimFloat absolutePosition() { return derivePosition({ 0.f, 0.f }); }
+
 		float deriveScale(Frame& root);
+		inline float absoluteScale() { return this->deriveScale(lookup(MASTER_LAYER)); }
 
-		DimFloat absolutePosition();
-		float absoluteScale();
+		bool inside(const DimFloat& pos);
 
-		DimFloat relativePosition(Frame& root);
-		DimFloat localPosition(float x, float y);
+		bool first(Frame& frame);
+		bool last(Frame& frame);
 
-		float doffset(Dimension dim);
-
-		bool inside(float x, float y);
+		void transferPixelSpan(Frame& prev, Frame& next, float pixelSpan);
 
 		void setHardClip(const BoxFloat& hardClip);
+
+		void relayout();
+		void syncSolver();
+		void readSolver();
 
 		void debugPrintDepth();
 
 		static Type& cls() { static Type ty; return ty; }
 
-	protected:
-		Widget* d_widget;
-		DrawFrame d_frame;
-		Stripe* d_parent;
+	public:
+		Widget& d_widget;
+		Wedge* d_wedge;
+		Frame* d_parent;
 		Dirty d_dirty;
 		bool d_hidden;
-		Index d_index;
+		DimIndex d_index;
 
 		BoxFloat d_hardClip;
+
+		Opacity d_opacity;
+		Dimension d_length;
+
+		Style* d_style;
+		InkStyle* d_inkstyle;
+
+	protected:
+		object_ptr<Caption> d_caption;
+		object_ptr<Icon> d_icon;
+		object_ptr<FrameSolver> d_solver;
 	};
 }
 

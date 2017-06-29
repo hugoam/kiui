@@ -11,7 +11,6 @@
 #include <toyobj/Any.h>
 
 #include <toyui/Frame/Frame.h>
-#include <toyui/Frame/Stripe.h>
 
 #include <toyui/Edit/TypeIn.h>
 
@@ -20,25 +19,14 @@
 namespace toy
 {
 	Checkbox::Checkbox(Wedge& parent, WValue* input, bool on)
-		: Toggle(parent, std::bind(&Checkbox::toggleOn, this), std::bind(&Checkbox::toggleOff, this), on, cls())
+		: Toggle(parent, [this](Widget&, bool on) { this->toggle(on); }, on, cls())
 		, m_input(input)
 	{}
 
-	void Checkbox::toggleOn()
+	void Checkbox::toggle(bool on)
 	{
-		if(m_input)
-		{
-			m_input->value().value<bool>() = m_on;
-			m_input->triggerModify();
-		}
-	}
-
-	void Checkbox::toggleOff()
-	{
-		if(m_input)
-		{
-			m_input->value().value<bool>() = m_on;
-			m_input->triggerModify();
-		}
+		if(!m_input) return;
+		m_input->value().value<bool>() = on;
+		m_input->triggerModify();
 	}
 }

@@ -5,11 +5,6 @@
 #include <toyui/Config.h>
 #include <toyui/Input/InputDispatcher.h>
 
-#include <toyobj/Iterable/Reverse.h>
-
-#include <toyui/Widget/RootSheet.h> 
-#include <toyui/Widget/Sheet.h>
-
 namespace toy
 {
 	InputAdapter::InputAdapter()

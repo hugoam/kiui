@@ -5,21 +5,15 @@
 #include <toyui/Config.h>
 #include <toyui/Container/List.h>
 
-#include <toyui/Container/Layout.h>
-
 namespace toy
 {
-	List::List(Wedge& parent, Type& type, FrameType frameType)
-		: ScrollSheet(parent, type)
-	{}
-
 	SelectList::SelectList(Wedge& parent, Type& type)
-		: List(parent, type)
+		: ScrollSheet(parent, type)
 	{}
 
 	WrapButton& SelectList::addChoice()
 	{
-		return this->emplaceLocal<WrapButton>(m_scrollzone.container(), [this](Widget& button) { return this->selected(button); });
+		return this->emplace<WrapButton>([this](Widget& button) { return this->selected(button); });
 	}
 
 	void SelectList::selected(Widget& selected)
@@ -28,21 +22,21 @@ namespace toy
 	}
 
 	LabelSequence::LabelSequence(Wedge& parent, StringVector labels)
-		: Row(parent, cls())
+		: Wedge(parent, cls())
 	{
 		for(string& label : labels)
 			this->emplace<Label>(label);
 	}
 	
 	ButtonSequence::ButtonSequence(Wedge& parent, StringVector labels)
-		: Row(parent, cls())
+		: Wedge(parent, cls())
 	{
 		for(string& label : labels)
 			this->emplace<Button>(label);
 	}
 
 	SortList::SortList(Wedge& parent)
-		: List(parent, cls())
+		: ScrollSheet(parent, cls())
 	{}
 
 	/*void SortList::move(Device* form, size_t index)

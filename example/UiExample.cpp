@@ -33,255 +33,224 @@ namespace toy
 		"Ebbe", "Aron", "Julian", "Elvin", "Ivar", 0
 	};
 
-	class CustomElement : public Row
+	class CustomElement : public Wedge
 	{
 	public:
-		CustomElement(Wedge& parent, const string& name)
-			: Row(parent, cls())
-			, m_label(this->build(name))
+		CustomElement(Wedge& parent, const string& name, const string& gender)
+			: Wedge(parent, cls())
+			, checkbox(*this, nullptr, false)
+			, icon(*this, "(tbb/icon48)")
+			, stack(*this, Wedge::Stack())
+			, name(stack, name)
+			, gender(stack, gender)
+			, close(*this, [this](Widget&) { this->extract(); })
 		{}
 
-		Label& build(const string& name)
-		{
-			this->emplace<Checkbox>(nullptr, false);
-			this->emplace<Icon>("tbb/icon48");
-			Container& sheet = this->emplace<Container>();
-			Label& label = sheet.emplace<Label>(name);
-			sheet.emplace<Label>("Male");
-			this->emplace<CloseButton>([this](Widget&){ this->destroy(); });
-			return label;
-		}
+		Checkbox checkbox;
+		Item icon;
+		Wedge stack;
+		Label name;
+		Label gender;
+		CloseButton close;
 
-		const string& contentlabel() { return m_label.label(); }
-
-		static Type& cls() { static Type ty("CustomElement", Row::cls()); return ty; }
-
-	protected:
-		Label& m_label;
+		static Type& cls() { static Type ty("CustomElement", Wedge::Row()); return ty; }
 	};
 
-	Wedge& createUiTestCustomList(Container& parent)
+	Wedge& createUiTestCustomList(Wedge& parent)
 	{
-		Window& window = parent.emplace<Window>("Customized list items");
-		Page& page = window.emplace<Page>();
-		SelectList& list = page.emplace<SelectList>();
+		SelectList& list = parent.emplace<SelectList>();
 
 		for(int i = 0; boy_names[i]; i++)
-			list.emplace<CustomElement>(boy_names[i]);
-
-		page.emplace<FilterInput>(list.container());
-
-		window.frame().setSize(250.f, 300.f);
-		return window;
-	}
-
-	Wedge& createUiTestFilteredList(Container& parent)
-	{
-		Window& window = parent.emplace<Window>("List and filter");
-		Page& page = window.emplace<Page>();
-		SelectList& list = page.emplace<SelectList>();
-
-		for(int i = 0; boy_names[i]; i++)
-			list.emplace<Label>(boy_names[i]);
+			list.body().emplace<CustomElement>(boy_names[i], "Male");
 		for(int i = 0; girl_names[i]; i++)
-			list.emplace<Label>(boy_names[i]);
+			list.body().emplace<CustomElement>(girl_names[i], "Female");
 
-		page.emplace<FilterInput>(list.container());
-
-		window.frame().setSize(130.f, 300.f);
-		return window;
+		parent.emplace<FilterInput>(list.body(), [](Widget& widget) { return widget.as<CustomElement>().name.label(); });
+		return parent;
 	}
 
-	Wedge& createUiTestScrollList(Container& parent)
+	Wedge& createUiTestFilteredList(Wedge& parent)
 	{
-		Window& window = parent.emplace<Window>("Scroll List");
-		Page& page = window.emplace<Page>();
-		Container& sequence = page.emplace<Container>(Layout::cls());
+		SelectList& list = parent.emplace<SelectList>();
 
-		List& list0 = sequence.emplace<List>();
-		for(int i = 0; i < 100; i++)
-			list0.emplace<Label>("Element " + toString(i));
+		for(int i = 0; boy_names[i]; i++)
+			list.body().emplace<Label>(boy_names[i]);
+		for(int i = 0; girl_names[i]; i++)
+			list.body().emplace<Label>(girl_names[i]);
 
-		List& list1 = sequence.emplace<List>();
-		for(int i = 0; i < 100; i++)
-			list1.emplace<Button>("Element " + toString(i));
-
-		window.frame().setSize(400.f, 600.f);
-		return window;
+		parent.emplace<FilterInput>(list.body());
+		return parent;
 	}
 
-	Wedge& createUiTestTextEditor(Container& parent)
+	Wedge& createUiTestScrollList(Wedge& parent)
 	{
-		Window& window = parent.emplace<Window>("Text Editor");
-		Page& page = window.emplace<Page>();
-		Container& buttons = page.emplace<Menubar>();
+		Wedge& sequence = parent.emplace<Wedge>(Wedge::Layout());
+
+		ScrollSheet& list0 = sequence.emplace<ScrollSheet>();
+		for(int i = 0; i < 100; i++)
+			list0.body().emplace<Label>("Element " + toString(i));
+
+		ScrollSheet& list1 = sequence.emplace<ScrollSheet>();
+		for(int i = 0; i < 100; i++)
+			list1.body().emplace<Button>("Element " + toString(i));
+		return parent;
+	}
+
+	Wedge& createUiTestTextEditor(Wedge& parent)
+	{
+		Wedge& buttons = parent.emplace<Menubar>();
 		Menu& menu = buttons.emplace<Menu>("Menu");
-		menu.emplace<Button>("Redo");
-		menu.emplace<Button>("Undo");
-		Menu& submenu = menu.emplace<Menu>("Change Font", true);
-		submenu.emplace<Button>("Arial");
-		submenu.emplace<Button>("Myriad");
+		menu.addChoice({ "Redo" });
+		menu.addChoice({ "Undo" });
+		Menu& submenu = menu.addChoice({}).emplace<Menu>("Change Font", true);
+		submenu.addChoice({ "Arial" });
+		submenu.addChoice({ "Myriad" });
 
 		buttons.emplace<Button>("Open File");
 		buttons.emplace<Button>("Undo");
 		buttons.emplace<Button>("Redo");
 
 		static string text = "This is an example text editor field\n You can use it as any common editor";
-		page.emplace<Textbox>(text);
-		
-		return window;
-	}
-
-	Wedge& createUiTestApplication(Container& parent)
-	{
-		parent.clear();
-
-		Container& menubar = parent.emplace<Menubar>();
-
-		Menu& menufile = menubar.emplace<Menu>("File");
-		menufile.emplace<Button>("Open");
-		menufile.emplace<Button>("Save");
-		Menu& menusave = menufile.emplace<Menu>("Save As", true);
-		menufile.emplace<Button>("Close");
-
-		menusave.emplace<Button>("Save As JPEG");
-		menusave.emplace<Button>("Save As PNG");
-		menusave.emplace<Button>("Save As PDF");
-
-		Menu& menuedit = menubar.emplace<Menu>("Edit");
-		menuedit.emplace<Button>("Redo");
-		menuedit.emplace<Button>("Undo");
-
-		Menu& menuhelp = menubar.emplace<Menu>("Help");
-		menuhelp.emplace<Button>("About kiUi");
-
-		Tooldock& tooldock = parent.emplace<Tooldock>();
-
-		Toolbar& toolbar0 = tooldock.emplace<Toolbar>();
-		ToolButton& toolUndo = toolbar0.emplace<ToolButton>("arrow_left_15");
-		ToolButton& toolRedo = toolbar0.emplace<ToolButton>("arrow_right_15");
-
-		Toolbar& toolbar1 = tooldock.emplace<Toolbar>();
-		ToolButton& toolOpen =  toolbar1.emplace<ToolButton>("file_15");
-		ToolButton& toolSave =  toolbar1.emplace<ToolButton>("folder_15");
-		ToolButton& toolClose = toolbar1.emplace<ToolButton>("close_15");
-
-		return tooldock;
-	}
-
-	Wedge& createUiTestDockspace(Container& parent)
-	{
-		parent.clear();
-
-		//MasterDockline::cls().layout().d_weights = { 0.2f, 0.6f, 0.2f };
-
-		Dockspace& dockspace = parent.emplace<Dockspace>();
-
-		Page& dock0 = dockspace.addDockWindow("Dock 0", { 0, 0 }).emplace<Page>();
-		createUiTestControls(dock0, false);
-
-		Page& dock1 = dockspace.addDockWindow("Dock 1", { 0, 1 }).emplace<Page>();
-		createUiTestInlineControls(dock1);
-
-		Page& dock2 = dockspace.addDockWindow("Dock 2", { 0, 2 }).emplace<Page>();
-		createUiTestTable(dock2, false);
-
-		return dockspace;
-	}
-
-	Wedge& createUiTestNodes(Container& parent)
-	{
-		parent.clear();
-
-		Canvas& canvas = parent.emplace<Canvas>("Node Editor");
-
-		Node& node0 = canvas.emplace<Node>("A Node");
-		node0.addInput("a");
-		node0.addInput("b");
-		node0.addOutput("result");
-		node0.frame().setPosition(150.f, 250.f);
-
-		Node& node1 = canvas.emplace<Node>("A Node");
-		node1.addInput("a");
-		node1.addInput("b");
-		node1.addOutput("result");
-		node1.frame().setPosition(350.f, 150.f);
-
-		Node& node2 = canvas.emplace<Node>("Another Node");
-		node2.addInput("u");
-		node2.addInput("v");
-		node2.addOutput("x");
-		node2.addOutput("y");
-		node2.addOutput("z");
-		node2.frame().setPosition(450.f, 450.f);
-
-		Node& node3 = canvas.emplace<Node>("End Node");
-		node3.addInput("input 1");
-		node3.addInput("input 2");
-		node3.frame().setPosition(800.f, 200.f);
+		parent.emplace<Textbox>(text);
 
 		return parent;
 	}
 
-	Wedge& createUiTestTabs(Container& parent, bool window)
+	Wedge& createUiTestApplication(Wedge& parent)
 	{
-		if(!window)
-			parent.clear();
+		Wedge& menubar = parent.emplace<Menubar>();
 
-		Container& page = window ? parent.emplace<Window>("Tabs").emplace<Page>()
-							     : parent;
+		Menu& menufile = menubar.emplace<Menu>("File");
+		menufile.addChoice({ "Open" });
+		menufile.addChoice({ "Save" });
+		Menu& menusave = menufile.addChoice({}).emplace<Menu>("Save As", true);
+		menufile.addChoice({ "Close" });
 
-		Tabber& tabber = page.emplace<Tabber>();
+		menusave.addChoice({ "Save As JPEG" });
+		menusave.addChoice({ "Save As PNG" });
+		menusave.addChoice({ "Save As PDF" });
 
-		Page& tab0 = tabber.addTab("Tab 0").emplace<Page>();
-		createUiTestTable(tab0, false);
+		Menu& menuedit = menubar.emplace<Menu>("Edit");
+		menuedit.addChoice({ "Redo" });
+		menuedit.addChoice({ "Undo" });
 
-		Page& tab1 = tabber.addTab("Tab 1").emplace<Page>();
-		createUiTestInlineControls(tab1);
+		Menu& menuhelp = menubar.emplace<Menu>("Help");
+		menuhelp.addChoice({ "About kiUi" });
 
-		Page& tab2 = tabber.addTab("Tab 2").emplace<Page>();
-		createUiTestControls(tab2, false);
+		Tooldock& tooldock = parent.emplace<Tooldock>();
 
-		return page;
+		Toolbar& toolbar0 = tooldock.emplace<Toolbar>();
+		ToolButton& toolUndo = toolbar0.emplace<ToolButton>("(arrow_left_15)");
+		ToolButton& toolRedo = toolbar0.emplace<ToolButton>("(arrow_right_15)");
+
+		Toolbar& toolbar1 = tooldock.emplace<Toolbar>();
+		ToolButton& toolOpen = toolbar1.emplace<ToolButton>("(file_15)");
+		ToolButton& toolSave = toolbar1.emplace<ToolButton>("(folder_15)");
+		ToolButton& toolClose = toolbar1.emplace<ToolButton>("(close_15)");
+
+		return tooldock;
 	}
 
-	Wedge& createUiTestTable(Container& parent, bool window)
+	Wedge& createUiTestDockspace(Wedge& parent)
 	{
-		Container& page = window ? parent.emplace<Window>("Table").emplace<Page>()
-							     : parent.emplace<Page>();
+		//MasterDockline::cls().layout().d_weights = { 0.2f, 0.6f, 0.2f };
 
-		Table& table0 = page.emplace<Table>(StringVector({ "ID", "Name", "Path", "Flags" }), std::vector<float>({ 0.25f, 0.25f, 0.25f, 0.25f }));
+		Dockspace& dockspace = parent.emplace<Dockspace>();
+
+		Wedge& dock0 = dockspace.addDockWindow("Dock 0", { 0, 0 }).body();
+		createUiTestControls(dock0);
+		
+		Wedge& dock1 = dockspace.addDockWindow("Dock 1", { 0, 1 }).body();
+		createUiTestInlineControls(dock1);
+
+		Wedge& dock2 = dockspace.addDockWindow("Dock 2", { 0, 2 }).body();
+		createUiTestTable(dock2);
+
+		return dockspace;
+	}
+
+	Wedge& createUiTestNodes(Wedge& parent)
+	{
+		Canvas& canvas = parent.emplace<Canvas>("Node Editor");
+
+		Node& node0 = canvas.plan().emplace<Node>("A Node");
+		node0.addInput("a", "", Colour::Cyan);
+		node0.addInput("b", "", Colour::Cyan);
+		node0.addOutput("result");
+		node0.frame().setPosition({ 150.f, 250.f });
+
+		Node& node1 = canvas.plan().emplace<Node>("A Node");
+		node1.addInput("a");
+		node1.addInput("b");
+		node1.addOutput("result", "", Colour::Red);
+		node1.frame().setPosition({ 350.f, 150.f });
+
+		Node& node2 = canvas.plan().emplace<Node>("Another Node");
+		node2.addInput("u", "", Colour::Pink);
+		node2.addInput("v", "", Colour::Pink);
+		node2.addOutput("x", "", Colour::Cyan);
+		node2.addOutput("y", "", Colour::Cyan);
+		node2.addOutput("z", "", Colour::Cyan);
+		node2.frame().setPosition({ 450.f, 450.f });
+
+		Node& node3 = canvas.plan().emplace<Node>("End Node");
+		node3.addInput("input 1");
+		node3.addInput("input 2");
+		node3.frame().setPosition({ 800.f, 200.f });
+
+		return parent;
+	}
+
+	Wedge& createUiTestTabs(Wedge& parent)
+	{
+		Tabber& tabber = parent.emplace<Tabber>();
+		
+		Tab& tab0 = tabber.addTab("Tab 0");
+		createUiTestTable(tab0);
+
+		Tab& tab1 = tabber.addTab("Tab 1");
+		createUiTestInlineControls(tab1);
+
+		Tab& tab2 = tabber.addTab("Tab 2");
+		createUiTestControls(tab2);
+
+		return parent;
+	}
+
+	Wedge& createUiTestTable(Wedge& parent)
+	{
+		Table& table0 = parent.emplace<Table>(StringVector({ "ID", "Name", "Path", "Flags" }), std::vector<float>({ 0.25f, 0.25f, 0.25f, 0.25f }));
 
 		table0.emplace<LabelSequence>(StringVector({ "0000", "Robert", "/path/robert", "...." }));
 		table0.emplace<LabelSequence>(StringVector({ "0001", "Stephanie", "/path/stephanie", "line 1" }));
 		table0.emplace<LabelSequence>(StringVector({ "0002", "C64", "/path/computer", "...." }));
 
-		Table& table1 = page.emplace<Table>(StringVector({ "Column 0", "Column 1", "Column 3" }), std::vector<float>({ 0.33f, 0.33f, 0.33f }));
+		Table& table1 = parent.emplace<Table>(StringVector({ "Column 0", "Column 1", "Column 3" }), std::vector<float>({ 0.33f, 0.33f, 0.33f }));
 
 		table1.emplace<LabelSequence>(StringVector({ "Hello", "kiUi", "World!" }));
 		table1.emplace<ButtonSequence>(StringVector({ "Banana", "Apple", "Corniflower" }));
 		table1.emplace<RadioSwitch>(nullptr, 0, StringVector({ "radio a", "radio b", "radio b" }));
 
-		Container& line0 = table1.emplace<Row>();
+		Wedge& line0 = table1.emplace<Wedge>(Wedge::Row());
 
 		Expandbox& box0 = line0.emplace<Expandbox>("Category A");
-		box0.emplace<Label>("Blah blah blah");
+		box0.body().emplace<Label>("Blah blah blah");
 
 		Expandbox& box1 = line0.emplace<Expandbox>("Category B");
-		box1.emplace<Label>("Blah blah blah");
+		box1.body().emplace<Label>("Blah blah blah");
 
 		Expandbox& box2 = line0.emplace<Expandbox>("Category C");
-		box2.emplace<Label>("Blah blah blah");
+		box2.body().emplace<Label>("Blah blah blah");
 
 
-		Table& table2 = page.emplace<Table>(StringVector({ "Left", "Right" }), std::vector<float>({ 0.5f, 0.5f }));
+		Table& table2 = parent.emplace<Table>(StringVector({ "Left", "Right" }), std::vector<float>({ 0.5f, 0.5f }));
 
-		Container& line1 = table2.emplace<Row>();
+		Wedge& line1 = table2.emplace<Wedge>(Wedge::Row());
 
 		line1.emplace<InputFloat>("Red", 0.05f);
 		line1.emplace<InputFloat>("Blue", 0.05f);
 
-		Container& line2 = table2.emplace<Row>();
+		Wedge& line2 = table2.emplace<Wedge>(Wedge::Row());
 
 		static string text1 = "The quick brown fox jumps over the lazy dog.";
 		static string text2 = "The quick brown fox jumps over the lazy dog.";
@@ -289,46 +258,37 @@ namespace toy
 		line2.emplace<TypeIn>(text1);
 		line2.emplace<TypeIn>(text2);
 
-		Container& line3 = table2.emplace<Row>();
+		Wedge& line3 = table2.emplace<Wedge>(Wedge::Row());
 
 		line3.emplace<Label>("Hello Left");
 		line3.emplace<Label>("Hello Right");
 
-		return page;
+		return parent;
 	}
 
-	Wedge& createUiTestTree(Container& parent)
+	Wedge& createUiTestTree(Wedge& parent)
 	{
-		Window& window = parent.emplace<Window>("Tree");
-		Page& page = window.emplace<Page>(); // "Tree"
-
-		Tree& tree = page.emplace<Tree>();
-
+		Tree& tree = parent.emplace<Tree>();
 		TreeNode& node = tree.emplace<TreeNode>("", "Tree");
 
 		for(size_t i = 0; i < 5; i++)
 		{
-			TreeNode& innernode = node.emplace<TreeNode>("", "Child " + toString(i), true);
-			TreeNode* innestnode = &innernode;
+			TreeNode& innerNode = node.body().emplace<TreeNode>("", "Child " + toString(i), true);
+			TreeNode* nestedNode = &innerNode;
 			for(size_t j = 0; j < 5; j++)
-			{
-				innestnode = &innestnode->emplace<TreeNode>("", "Child " + toString(i) + " : " + toString(j), true);
-			}
+				nestedNode = &nestedNode->body().emplace<TreeNode>("", "Child " + toString(i) + " : " + toString(j), true);
 		}
 
 		for(size_t i = 0; i < 5; i++)
 		{
-			TreeNode& innernode = node.emplace<TreeNode>("", "Child " + toString(5+i));
-
-			innernode.emplace<Label>("Blah blah");
-			innernode.emplace<Button>("Print");
+			TreeNode& innerNode = node.body().emplace<TreeNode>("", "Child " + toString(5 + i));
+			innerNode.body().emplace<Label>("Blah blah");
+			innerNode.body().emplace<Button>("Print");
 		}
-
-		window.frame().setSize(300.f, 500.f);
-		return window;
+		return parent;
 	}
 
-	Tree& createUiTestTableTree(Container& parent)
+	Tree& createUiTestTableTree(Wedge& parent)
 	{
 		Tree& tree = parent.emplace<Tree>();
 
@@ -337,7 +297,7 @@ namespace toy
 		TreeNode& node1 = node0.emplace<TreeNode>("", "node 1 (with borders)");
 
 		TreeNode& tablenode0 = node1.emplace<TreeNode>("", "Table Node 0");
-		
+
 		tablenode0.emplace<Label>("aaa");
 		tablenode0.emplace<Label>("bbb");
 		tablenode0.emplace<Label>("ccc");
@@ -353,35 +313,31 @@ namespace toy
 		return tree;
 	}
 
-	Wedge& createUiTestMarkupText(Container& parent)
+	Wedge& createUiTestMarkupText(Wedge& parent)
 	{
 		static string multiline = "This is a long paragraph. The text should automatically wrap on the edge of the window. The current implementation follows no word splitting rules, text is just split at the last character.";
-		Page& page = parent.emplace<Page>(); // "Markup Text"
-		page.emplace<Textbox>(multiline);
-		page.emplace<SliderFloat>("Wrap width", AutoStat<float>(200.f, -20.f, 600.f, 0.1f), [](float){ });
-
-		Container& line0 = page.emplace<Row>();
-		line0.emplace<Icon>("bullet");
+		parent.emplace<Textbox>(multiline);
+		parent.emplace<SliderFloat>("Wrap width", AutoStat<float>(200.f, -20.f, 600.f, 0.1f), [](float) {});
+		
+		Wedge& line0 = parent.emplace<Wedge>(Wedge::Row());
+		line0.emplace<Item>("(bullet)");
 		line0.emplace<Label>("Bullet point 1");
 
 		static string multiline2 = "Bullet point 2\nOn multiple lines";
-		Container& line1 = page.emplace<Row>();
-		line1.emplace<Icon>("bullet");
+		Wedge& line1 = parent.emplace<Wedge>(Wedge::Row());
+		line1.emplace<Item>("(bullet)");
 		line1.emplace<Textbox>(multiline2);
 
-		Container& line2 = page.emplace<Row>();
-		line2.emplace<Icon>("bullet");
+		Wedge& line2 = parent.emplace<Wedge>(Wedge::Row());
+		line2.emplace<Item>("(bullet)");
 		line2.emplace<Label>("Bullet point 3");
 
-		return page;
+		return parent;
 	}
 
-	Wedge& createUiTestControls(Container& parent, bool window)
+	Wedge& createUiTestControls(Wedge& parent)
 	{
-		Container& page = window ? parent.emplace<Window>("Table").emplace<Page>()
-								 : parent.emplace<Page>(); // "Controls"
-
-		Table& table = page.emplace<Table>(StringVector({ "input", "label" }), std::vector<float>({ 0.7f, 0.3f }));
+		Table& table = parent.emplace<Table>(StringVector({ "input", "label" }), std::vector<float>({ 0.7f, 0.3f }));
 
 		table.emplace<InputBool>("checkbox input", false, nullptr, true);
 		table.emplace<InputRadio>("radio input", StringVector({ "radio a", "radio b", "radio c" }), nullptr, true);
@@ -406,13 +362,12 @@ namespace toy
 		// table.emplace<InputVec3>("slider float3", 0.0f, 1.0f);
 		// table.emplace<InputColor>("color input");
 
-		return page;
+		return parent;
 	}
 
-	Wedge& createUiTestFocusTabbing(Container& parent)
+	Wedge& createUiTestFocusTabbing(Wedge& parent)
 	{
-		Page& page = parent.emplace<Page>(); // "Tabbing"
-		page.emplace<Label>("Use TAB/SHIFT+TAB to cycle through keyboard editable fields.");
+		parent.emplace<Label>("Use TAB/SHIFT+TAB to cycle through keyboard editable fields.");
 
 		static string first = "1";
 		static string second = "2";
@@ -420,195 +375,113 @@ namespace toy
 		static string fourth = "4 (tab skip)";
 		static string fifth = "5";
 
-		page.emplace<TypeIn>(first);
-		page.emplace<TypeIn>(second);
-		page.emplace<TypeIn>(third);
-		page.emplace<TypeIn>(fourth);
-		page.emplace<TypeIn>(fifth);
-		return page;
+		parent.emplace<TypeIn>(first);
+		parent.emplace<TypeIn>(second);
+		parent.emplace<TypeIn>(third);
+		parent.emplace<TypeIn>(fourth);
+		parent.emplace<TypeIn>(fifth);
+		return parent;
 	}
 
-	Wedge& createUiTestFileBrowser(Container& parent)
+	Wedge& createUiTestFileBrowser(Wedge& parent)
 	{
-		Window& window = parent.emplace<Window>("File Browser");
-		window.emplace<Directory>("..");
-		return window;
+		parent.emplace<Directory>("..");
+		return parent;
 	}
 
-	Wedge& createUiTestFileTree(Container& parent)
+	Wedge& createUiTestFileTree(Wedge& parent)
 	{
-		Window& window = parent.emplace<Window>("File Tree");
-		Tree& filetree = window.emplace<Tree>();
+		Tree& filetree = parent.emplace<Tree>();
 		DirectoryNode& node = filetree.emplace<DirectoryNode>("..", "..", false);
 		node.update();
-		return window;
+		return parent;
 	}
 
-	Wedge& createUiTestInlineControls(Container& parent)
+	Wedge& createUiTestInlineControls(Wedge& parent)
 	{
-		Page& page = parent.emplace<Page>(); // "Inline Controls"
-
-		Container& line0 = page.emplace<Row>();
+		Wedge& line0 = parent.emplace<Wedge>(Wedge::Row());
 
 		line0.emplace<Label>("Hello");
 		line0.emplace<Label>("World");
 
-		Container& line1 = page.emplace<Row>();
+		Wedge& line1 = parent.emplace<Wedge>(Wedge::Row());
 
 		line1.emplace<Button>("Banana");
 		line1.emplace<Button>("Apple");
 		line1.emplace<Button>("Corniflower");
 
-		Container& line2 = page.emplace<Row>();
+		Wedge& line2 = parent.emplace<Wedge>(Wedge::Row());
 
 		line2.emplace<Label>("Small buttons");
 		line2.emplace<Button>("Like this one");
 		line2.emplace<Label>("can fit within a text block.");
 
-		Container& line3 = page.emplace<Row>();
+		Wedge& line3 = parent.emplace<Wedge>(Wedge::Row());
 
 		line3.emplace<InputBool>("My", true);
 		line3.emplace<InputBool>("Tailor", true);
 		line3.emplace<InputBool>("Is", true);
 		line3.emplace<InputBool>("Rich", true);
 
-		Container& line4 = page.emplace<Row>();
+		Wedge& line4 = parent.emplace<Wedge>(Wedge::Row());
 
 		line4.emplace<InputFloat>("X", 0.f);
 		line4.emplace<InputFloat>("Y", 0.f);
 		line4.emplace<InputFloat>("Z", 0.f);
 
-		return page;
+		return parent;
 	}
 
-	Wedge& createUiTestProgressDialog(Container& parent)
+	Wedge& createUiTestProgressDialog(Wedge& parent)
 	{
-		Window& window = parent.emplace<Window>("Progress Dialog");
-		Page& page = window.emplace<Page>();
-		ProgressBar& bar = page.emplace<ProgressBar>();
+		ProgressBar& bar = parent.emplace<ProgressBar>();
 		bar.setPercentage(0.57f);
-		page.emplace<SliderFloat>("Set progress", AutoStat<float>(0.57f, 0.f, 1.f, 0.01f), [&bar](float val) { bar.setPercentage(val); });
+		parent.emplace<SliderFloat>("Set progress", AutoStat<float>(0.57f, 0.f, 1.f, 0.01f), [&bar](float val) { bar.setPercentage(val); });
+		return parent;
+	}
+
+	Window& createUiTestWindow(Wedge& parent)
+	{
+		Window& window = parent.emplace<Window>("Test Window");
+		createUiTestWindow(window.body());
 		return window;
 	}
 
-	Window& createUiTestWindow(Container& parent)
+	Window& createUiTestWindowPage(Wedge& parent)
 	{
-		Window& window = parent.emplace<Window>("kiUi v0.1");
-		Page& page = window.emplace<Page>();
+		Window& window = *parent.findContainer<Window>();
 
-		page.emplace<Label>("kiui says hello.");
+		parent.emplace<Label>("kiui says hello.\n" "line breaks can happen in a label");
 
 		static string help = "This window is being created by the ShowTestWindow() function. Please refer to the code for programming reference.\n\nUser Guide:";
-		Expandbox& box0 = page.emplace<Expandbox>("Help");
-		//box0.emplace<Text>(help);
+		Expandbox& box0 = parent.emplace<Expandbox>("Help");
+		box0.body().emplace<Text>(help);
 
-		Expandbox& box1 = page.emplace<Expandbox>("Window options");
+		Expandbox& box1 = parent.emplace<Expandbox>("Window options");
 
-		box1.emplace<InputBool>("titlebar", true, [&window](bool on) { on ? window.showTitlebar() : window.hideTitlebar(); }, true);
-		box1.emplace<InputBool>("movable", true, [&window](bool) { window.toggleMovable(); }, true);
-		box1.emplace<InputBool>("resizable", true, [&window](bool) { window.toggleResizable(); }, true);
-		box1.emplace<InputBool>("closable", true, [&window](bool) { window.toggleClosable(); }, true);
-		box1.emplace<InputBool>("wrap content", false, [&window](bool) { window.toggleWrap(); }, true);
+		box1.body().emplace<InputBool>("titlebar", true, [&window](bool on) { on ? window.showTitlebar() : window.hideTitlebar(); }, true);
+		box1.body().emplace<InputBool>("movable", true, [&window](bool) { window.toggleMovable(); }, true);
+		box1.body().emplace<InputBool>("resizable", true, [&window](bool) { window.toggleResizable(); }, true);
+		box1.body().emplace<InputBool>("closable", true, [&window](bool) { window.toggleClosable(); }, true);
 
-		box1.emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha){ window.content().inkstyle().m_backgroundColour.val.setA(alpha); });
+		box1.body().emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha) { window.frame().inkstyle().m_backgroundColour.val.setA(alpha); });
 
-		Expandbox& box2 = page.emplace<Expandbox>("Widgets");
-		createUiTestControls(box2, false);
+		Expandbox& box2 = parent.emplace<Expandbox>("Widgets");
+		createUiTestControls(box2.body());
 
-		Expandbox& box3 = page.emplace<Expandbox>("Table");
-		createUiTestTable(box3, false);
+		Expandbox& box3 = parent.emplace<Expandbox>("Table");
+		createUiTestTable(box3.body());
 
 		return window;
 	}
 
-	class StyleEdit : public Page
-	{
-	public:
-		StyleEdit(Wedge& parent, Styler& styler)
-			: Page(parent)
-			, m_styler(styler)
-			, m_stylePicker(*this, [this](Widget& choice) { this->pickStyle(choice.contentlabel()); })
-			, m_table(*this, { "Field", "Value" }, { 0.3f, 0.7f })
-			, m_empty(m_table, "Empty", true, [this](bool empty) { this->m_skin->setEmpty(empty); this->m_style->markUpdate(); })
-			, m_backgroundColour(m_table, "Background Colour", Colour(), [this](Colour colour) { this->m_skin->backgroundColour() = colour; this->m_style->markUpdate(); })
-			, m_gradientTop(m_table, "Gradient Top", AutoStat<int>(0, -50, +50), [this](int top) { this->m_skin->linearGradient().setX(float(top)); this->m_style->markUpdate(); })
-			, m_gradientDown(m_table, "Gradient Bottom", AutoStat<int>(0, -50, +50), [this](int down) { this->m_skin->linearGradient().setY(float(down)); this->m_style->markUpdate(); })
-			, m_cornerRadius(m_table, "Corner Radius", AutoStat<int>(0, 0, 25), [this](int radius) { this->m_skin->cornerRadius().assign(float(radius)); this->m_style->markUpdate(); })
-			, m_borderWidth(m_table, "Border Width", AutoStat<float>(0.f, 0.f, 10.f, 0.1f), [this](float width) { this->m_skin->borderWidth().assign(width); this->m_style->markUpdate(); })
-			, m_borderColour(m_table, "Border Colour", Colour(), [this](Colour colour) { this->m_skin->borderColour() = colour; this->m_style->markUpdate(); })
-			, m_textSize(m_table, "Text Size", AutoStat<int>(0, 0, 50), [this](int size) { this->m_skin->textSize() = float(size); this->m_style->markUpdate(); })
-			, m_textColour(m_table, "Text Colour", Colour(), [this](Colour colour) { this->m_skin->textColour() = colour; this->m_style->markUpdate(); })
-			, m_padding(m_table, "Padding", AutoStat<int>(0, 0, 25), [this](int padding) { this->m_skin->padding().assign(float(padding)); this->m_style->markUpdate(); })
-			//, m_alignX(m_table, "Align Y", StringVector({ "Left", "Center", "Right", "OutLeft", "OutRight" }), [this](const string&) {})
-			//, m_alignY(m_table, "Align Y", StringVector({ "Left", "Center", "Right", "OutLeft", "OutRight" }), [this](const string&) {})
-			, m_image(m_table, "Image", "", [this](string name) { /*this->m_skin->image().d_name = name;*/ this->m_style->markUpdate(); })
-			, m_skinImage(m_table, "Skin Image", "", [this](string name) { /*this->m_skin->image().d_name = name;*/ this->m_style->markUpdate(); })
-		{
-			for(Object* object : Style::cls().indexer().objects())
-				if(object)
-					m_stylePicker.emplace<Label>(object->as<Style>().name());
-
-			this->pickStyle("Widget");
-		}
-
-		void pickStyle(const string& name)
-		{
-			m_style = &m_styler.styledef(name); // @todo fix with style
-			m_skin = &m_style->skin();
-
-			m_empty.input().modifyValue(m_skin->empty());
-			m_backgroundColour.input().modifyValue<Colour>(m_skin->backgroundColour());
-			m_gradientTop.input().modifyValue(int(m_skin->linearGradient().x()));
-			m_gradientDown.input().modifyValue(int(m_skin->linearGradient().y()));
-			m_cornerRadius.input().modifyValue(int(m_skin->cornerRadius().x0()));
-			m_borderWidth.input().modifyValue(int(m_skin->borderWidth().x0()));
-			m_borderColour.input().modifyValue<Colour>(m_skin->borderColour());
-			m_textSize.input().modifyValue(int(m_skin->textSize()));
-			m_textColour.input().modifyValue<Colour>(m_skin->textColour());
-			m_padding.input().modifyValue(int(m_skin->padding().x0()));
-			//mAlignX.input().modifyValue();
-			//mAlignY.input().modifyValue();
-			if(m_skin->image())
-				m_image.input().modifyValue<string>(m_skin->image()->d_name);
-			if(!m_skin->imageSkin().null())
-				m_skinImage.input().modifyValue<string>(m_skin->imageSkin().d_image->d_name);
-		}
-
-	protected:
-		Styler& m_styler;
-
-		DropdownInput m_stylePicker;
-		Table m_table;
-
-
-		InputBool m_empty;
-		InputColour m_backgroundColour;
-		SliderInt m_gradientTop;
-		SliderInt m_gradientDown;
-		SliderInt m_cornerRadius;
-		SliderFloat m_borderWidth;
-		InputColour m_borderColour;
-		SliderInt m_textSize;
-		InputColour m_textColour;
-		SliderInt m_padding;
-		//InputRadio m_alignX;
-		//InputRadio m_alignY;
-		InputText m_image;
-		InputText m_skinImage;
-
-		Style* m_style;
-		InkStyle* m_skin;
-	};
-
-	Wedge& createUiStyleEdit(Container& parent)
+	Wedge& createUiDebugDock(Wedge& parent)
 	{
 		Dockbar& tooldock = parent.emplace<Dockbar>();
 
-		tooldock.addDock("Style Edit").emplace<StyleEdit>(parent.uiWindow().styler());
+		Renderer& renderer = *Caption::s_renderer;
 
-		Renderer& renderer = *DrawFrame::s_renderer;
-
-		Page& options = tooldock.addDock("Options").emplace<Page>();
+		Wedge& options = tooldock.addDock("Options").body();
 		options.emplace<InputText>("Debug draw filter", "", [&renderer](string value) { renderer.m_debugDrawFilter = value; });
 		options.emplace<InputBool>("Debug draw Frame", false, [&renderer](bool on) { renderer.m_debugDrawFrameRect = on; });
 		options.emplace<InputBool>("Debug draw Padding", false, [&renderer](bool on) { renderer.m_debugDrawPaddedRect = on; });
@@ -638,64 +511,78 @@ namespace toy
 		uiWindow.styler().style(CustomElement::cls()).layout().d_align = DimAlign(LEFT, CENTER);
 	}
 
-	void selectUiTheme(Container& sheet, Widget& selected)
+	void selectUiTheme(Wedge& sheet, Widget& selected)
 	{
-		const string name = selected.contentlabel();
+		const string name = selected.label();
 		switchUiTheme(sheet.uiWindow(), name);
 	}
 
-	void pickUiSample(Container& sheet, Widget& selected)
+	template <class T>
+	auto windowSample(T func)
 	{
-		const string name = selected.contentlabel();
-
-		if(sheet.stripe().sequence().size() > 0)
-			sheet.clear();
-
-		if(name == "Application")
-			createUiTestApplication(sheet);
-		else if(name == "Dockspace")
-			createUiTestDockspace(sheet);
-		else if(name == "Nodes")
-			createUiTestNodes(sheet);
-		else if(name == "Window")
-			createUiTestWindow(sheet);
-		else if(name == "Filtered List")
-			createUiTestFilteredList(sheet);
-		else if(name == "Custom List")
-			createUiTestCustomList(sheet);
-		else if(name == "Text Editor")
-			createUiTestTextEditor(sheet);
-		else if(name == "Tabs")
-			createUiTestTabs(sheet);
-		else if(name == "Table")
-			createUiTestTable(sheet);
-		else if(name == "Tree")
-			createUiTestTree(sheet);
-		else if(name == "Controls")
-			createUiTestControls(sheet);
-		else if(name == "File Browser")
-			createUiTestFileBrowser(sheet);
-		else if(name == "File Tree")
-			createUiTestFileTree(sheet);
-		else if(name == "Progress Dialog")
-			createUiTestProgressDialog(sheet);
+		return [func](const string& name, Wedge& sheet) {
+			Window& window = sheet.emplace<Window>(name);
+			ScrollSheet& scrollSheet = window.body().emplace<ScrollSheet>();
+			func(scrollSheet.body());
+		};
 	}
 
-	void createUiTest(Container& rootSheet)
+	template <class T>
+	auto boardSample(T func)
+	{
+		return [func](const string& name, Wedge& sheet) {
+			sheet.store().clear();
+			func(sheet);
+		};
+	}
+
+	using Sample = std::function<void(const string&, Wedge&)>;
+
+	static std::map<string, Sample>& sampleMap()
+	{
+		static std::map<string, Sample> samples;
+		samples["Application"] = boardSample(createUiTestApplication);
+		samples["Dockspace"] = boardSample(createUiTestDockspace);
+		samples["Nodes"] = boardSample(createUiTestNodes);
+		samples["Window"] = windowSample(createUiTestWindowPage);
+		samples["Filtered List"] = windowSample(createUiTestFilteredList); //window.frame().setSize(130.f, 300.f);
+		samples["Custom List"] = windowSample(createUiTestCustomList);
+		samples["Text Editor"] = windowSample(createUiTestTextEditor);
+		samples["Tabs"] = windowSample(createUiTestTabs);
+		samples["Table"] = windowSample(createUiTestTable);
+		samples["Tree"] = windowSample(createUiTestTree);
+		samples["Controls"] = windowSample(createUiTestControls);
+		samples["File Browser"] = windowSample(createUiTestFileBrowser);
+		samples["File Tree"] = windowSample(createUiTestFileTree);
+		samples["Progress Dialog"] = windowSample(createUiTestProgressDialog);
+		return samples;
+	}
+
+	void createUiTest(Wedge& rootSheet)
 	{
 		switchUiTheme(rootSheet.uiWindow(), "Blendish Dark");
 
-		Container& demoheader = rootSheet.emplace<Container>(Header::cls());
-		Container& demobody = rootSheet.emplace<Container>(Board::cls());
-		Container& samplebody = demobody.emplace<Container>(Layout::cls());
-		createUiStyleEdit(demobody);
+		Wedge& demoheader = rootSheet.emplace<Wedge>(Wedge::Header());
+		Wedge& demobody = rootSheet.emplace<Wedge>(Wedge::Board());
+		Wedge& samplebody = demobody.emplace<Wedge>(Wedge::Layout());
+		createUiDebugDock(demobody);
 
-		StringVector samples({ "Application", "Dockspace", "Nodes", "Window", "Text Editor", "Filtered List", "Custom List", "Tabs", "Table", "Tree", "Controls", "File Browser", "File Tree", "Progress Dialog" });
+		std::map<string, Sample>& samples = sampleMap();
+
+		StringVector sampleNames;
+		for(auto& kv : samples)
+			sampleNames.push_back(kv.first);
+		
 		StringVector themes({ "Blendish", "Blendish Dark", "TurboBadger", "MyGui" });
 
+		auto pickUiSample = [&samplebody, &samples](Widget& selected)
+		{
+			samples[selected.label()](selected.label(), samplebody);
+		};
+
 		demoheader.emplace<Label>("Pick a demo sample : ");
-		demoheader.emplace<DropdownInput>(std::bind(&pickUiSample, std::ref(samplebody), std::placeholders::_1), samples);
+		demoheader.emplace<DropdownInput>(pickUiSample, sampleNames);
 		demoheader.emplace<Label>("Switch theme : ");
-		demoheader.emplace<DropdownInput>(std::bind(&selectUiTheme, std::ref(samplebody), std::placeholders::_1), themes);
+		demoheader.emplace<DropdownInput>([&samplebody](Widget& selected) { selectUiTheme(samplebody, selected); }, themes);
 	}
 }

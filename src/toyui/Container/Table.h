@@ -7,43 +7,28 @@
 
 /* toy */
 #include <toyui/Widget/Sheet.h>
-#include <toyui/Container/Layout.h>
 #include <toyui/Button/Button.h>
 
 namespace toy
 {
-	class _refl_ TOY_UI_EXPORT TableHead : public GridSheet
-	{
-	public:
-		TableHead(Table& table);
-		
-		void gridResized(Frame& first, Frame& second);
-
-		static Type& cls() { static Type ty("TableHead", GridSheet::cls()); return ty; }
-
-	protected:
-		Table& m_table;
-	};
-
-	class _refl_ TOY_UI_EXPORT ColumnHeader : public Label
-	{
-	public:
-		ColumnHeader(Wedge& parent, const string& label, float span);
-
-		static Type& cls() { static Type ty("ColumnHeader", Label::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT Table : public Stack
+	class _refl_ TOY_UI_EXPORT Table : public Wedge
 	{
 	public:
 		Table(Wedge& parent, StringVector columns, std::vector<float> weights);
 
-		static Type& cls() { static Type ty("Table", Stack::cls()); return ty; }
+		virtual void makeSolver();
+
+		void resize(Frame& first, Frame& second);
+
+		static Type& cls() { static Type ty("Table", Wedge::Stack()); return ty; }
+
+		static Type& Head() { static Type ty("TableHead", GridSheet::cls()); return ty; }
+		static Type& ColumnHeader() { static Type ty("ColumnHeader", Wedge::Row()); return ty; }
 
 	protected:
 		StringVector m_columns;
 		std::vector<float> m_weights;
-		TableHead m_head;
+		GridSheet m_head;
 	};
 }
 

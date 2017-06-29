@@ -13,18 +13,6 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT MenuList : public Object
-	{
-	public:
-		static Type& cls() { static Type ty("MenuList", DropdownList::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT SubMenuList : public Object
-	{
-	public:
-		static Type& cls() { static Type ty("SubMenuList", MenuList::cls()); return ty; }
-	};
-
 	class _refl_ TOY_UI_EXPORT Menu : public Dropdown
 	{
 	public:
@@ -32,16 +20,19 @@ namespace toy
 
 		static Type& cls() { static Type ty("Menu", Dropdown::cls()); return ty; }
 
+		static Type& List() { static Type ty("MenuList", Dropdown::List()); return ty; }
+		static Type& SubList() { static Type ty("SubMenuList", Menu::List()); return ty; }
+
 	protected:
 		bool m_submenu;
 	};
 
-	class _refl_ TOY_UI_EXPORT Menubar : public Header
+	class _refl_ TOY_UI_EXPORT Menubar : public Wedge
 	{
 	public:
 		Menubar(Wedge& parent);
 
-		static Type& cls() { static Type ty("Menubar", Header::cls()); return ty; }
+		static Type& cls() { static Type ty("Menubar", Wedge::Header()); return ty; }
 	};
 }
 

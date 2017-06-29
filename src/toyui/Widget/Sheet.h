@@ -9,144 +9,94 @@
 #include <toyobj/Type.h>
 #include <toyui/Forward.h>
 #include <toyui/Widget/Widget.h>
-#include <toyui/Frame/Stripe.h>
 
 namespace toy
 {
+	class TOY_UI_EXPORT WidgetStore : public Object
+	{
+	public:
+		WidgetStore(Wedge& wedge);
+
+		Widget& append(object_ptr<Widget> widget);
+		void remove(Widget& widget);
+		void transfer(Widget& widget, Wedge& target);
+		void clear();
+
+	protected:
+		Wedge& m_wedge;
+		std::vector<object_ptr<Widget>> m_contents;
+	};
+
 	class _refl_ TOY_UI_EXPORT Wedge : public Widget
 	{
 	public:
-		Wedge(Wedge& parent, Type& type = cls(), FrameType frameType = STRIPE);
-		Wedge(Type& type = cls(), FrameType frameType = STRIPE);
+		Wedge(Wedge& parent, Type& type = cls(), FrameType frameType = FRAME);
+		Wedge(Type& type = cls(), FrameType frameType = FRAME, Wedge* parent = nullptr);
 
 		_attr_ _graph_ inline std::vector<Widget*>& contents() { return m_contents; }
 
-		inline Stripe& stripe() { return m_frame->as<Stripe>(); }
 		inline size_t count() { return m_contents.size(); }
-
 		inline Widget& at(size_t index) { return *m_contents.at(index); }
 
-		virtual void nextFrame(size_t tick, size_t delta);
+		WidgetStore& store() { if(!m_store) m_store = make_unique<WidgetStore>(*this);  return *m_store; }
 
-		virtual void visit(const Visitor& visitor);
+		virtual void visit(const Visitor& visitor, bool post = false);
 
-		void unmap();
-		void map();
-
-		void push(Widget& widget);
+		void append(Widget& widget);
 		void insert(Widget& widget, size_t index);
-		void remove(Widget& widget, bool destroy);
+		void remove(Widget& widget);
+		void destroy(Widget& widget);
+		void transfer(Widget& widget, Wedge& target);
 
 		void reindex(size_t from);
 		void move(size_t from, size_t to);
 		void swap(size_t from, size_t to);
 
-		static Type& cls() { static Type ty("Wedge", Widget::cls()); return ty; }
-
-	protected:
-		std::vector<Widget*> m_contents;
-	};
-
-	class _refl_ TOY_UI_EXPORT Container : public Wedge
-	{
-	public:
-		Container(Wedge& parent, Type& type = cls(), FrameType frameType = STRIPE);
-		Container(Type& type = cls(), FrameType frameType = STRIPE);
-
-		Container(const Container& other) = delete;
-
-		inline const std::vector<object_ptr<Widget>>& containerContents() { return m_containerContents; }
-
-		Container& target() { return m_containerTarget == this ? *this : m_containerTarget->target(); }
-
-		virtual void handleAdd(Widget& widget) {}
-		virtual void handleRemove(Widget& widget) {}
-
-		Widget& insert(object_ptr<Widget> widget, size_t index);
-		Widget& append(object_ptr<Widget> widget);
-		object_ptr<Widget> release(Widget& widget, bool destroy);
-
-		virtual Widget& insert(object_ptr<Widget> widget) { return this->append(std::move(widget)); }
-
-		void clear();
-
 		template <class T, class... Args>
 		inline T& emplace(Args&&... args)
 		{
-			return this->insert(make_object<T>(m_containerTarget->as<Wedge>(), std::forward<Args>(args)...)).template as<T>();
+			return this->store().append(make_object<T>(*this, std::forward<Args>(args)...)).template as<T>();
 		}
 
-		template <class T, class... Args>
-		inline T& emplaceLocal(Wedge& container, Args&&... args)
-		{
-			return this->append(make_object<T>(container, std::forward<Args>(args)...)).template as<T>();
-		}
+		static Type& cls() { static Type ty("Wedge", Widget::cls()); return ty; }
 
-		static Type& cls() { static Type ty("Container", Wedge::cls()); return ty; }
+		static Type& Board() { static Type ty("Board", Wedge::cls()); return ty; }
+		static Type& Layout() { static Type ty("Layout", Wedge::Board()); return ty; }
+		static Type& Row() { static Type ty("Row", Wedge::cls()); return ty; }
+		static Type& Div() { static Type ty("Div", Wedge::cls()); return ty; }
+		static Type& Stack() { static Type ty("Stack", Wedge::cls()); return ty; }
+		static Type& Sheet() { static Type ty("Sheet", Wedge::cls()); return ty; }
+		static Type& Header() { static Type ty("Header", Wedge::Row()); return ty; }
+		static Type& Decal() { static Type ty("Decal", Wedge::cls()); return ty; }
+		static Type& Overlay() { static Type ty("Overlay", Wedge::cls()); return ty; }
+
+		static Type& WrapControl() { static Type ty("WrapControl", Wedge::cls()); return ty; }
 
 	protected:
-		Container* m_containerTarget;
-		std::vector<object_ptr<Widget>> m_containerContents;
+		std::vector<Widget*> m_contents;
+		unique_ptr<WidgetStore> m_store;
 	};
 
-	class _refl_ TOY_UI_EXPORT WrapControl : public Container
+	class _refl_ TOY_UI_EXPORT GridSheet : public Wedge
 	{
 	public:
-		WrapControl(Wedge& parent, Type& type = cls());
+		using Callback = std::function<void(Frame&, Frame&)>;
 
-		static Type& cls() { static Type ty("WrapControl", Container::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT Spacer : public Widget
-	{
 	public:
-		Spacer(Wedge& parent, Type& type = cls());
-
-		static Type& cls() { static Type ty("Spacer", Widget::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT Filler : public Spacer
-	{
-	public:
-		Filler(Wedge& parent);
-
-		static Type& cls() { static Type ty("Filler", Spacer::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT Decal : public Wedge
-	{
-	public:
-		Decal(Wedge& parent, Type& type = cls());
-
-		static Type& cls() { static Type ty("Decal", Wedge::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT Overlay : public Container
-	{
-	public:
-		Overlay(Wedge& parent, Type& type = cls());
-
-		static Type& cls() { static Type ty("Overlay", Container::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT GridSheet : public Container
-	{
-	public:
-		GridSheet(Wedge& parent, Dimension dim, Type& type = cls());
+		GridSheet(Wedge& parent, Dimension dim, Callback callback = nullptr, Type& type = cls());
 
 		Dimension dim() { return m_dim; }
 
 		virtual bool leftDragStart(MouseEvent& mouseEvent);
 		virtual bool leftDrag(MouseEvent& mouseEvent);
 
-		virtual void gridResized(Frame& first, Frame& second) { UNUSED(first); UNUSED(second); }
-
-		static Type& cls() { static Type ty("GridSheet", Container::cls()); return ty; }
+		static Type& cls() { static Type ty("GridSheet", Wedge::cls()); return ty; }
 
 	protected:
 		Dimension m_dim;
 		Frame* m_dragPrev;
 		Frame* m_dragNext;
+		Callback m_onResize;
 	};
 }
 

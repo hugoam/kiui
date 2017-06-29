@@ -10,27 +10,22 @@ namespace toy
 	Dockbox::Dockbox(Wedge& parent, Dockbar& dockbar, const string& title, const string& icon)
 		: Window(parent, title, static_cast<WindowState>(0), nullptr, nullptr, cls())
 		, m_dockbar(dockbar)
-		, m_toggle(dockbar, *this, icon)
-	{}
-
-	DockToggle::DockToggle(Dockbar& dockbar, Dockbox& dockbox, const string& icon)
-		: Button(dockbar, dockbar.findImage(icon), [this](Widget&) { this->click(); }, cls())
-		, m_dockbox(dockbox)
-	{}
-
-	void DockToggle::click()
+		, m_toggle(dockbar, [this](Widget&, bool on) { this->toggle(on); }, false, Dockbar::Toggle())
 	{
-		bool open = !m_dockbox.frame().hidden();
-		open ? m_dockbox.hide() : m_dockbox.show();
-		open ? this->disableState(ACTIVATED) : this->enableState(ACTIVATED);
+		m_toggle.setContent(icon);
+	}
+
+	void Dockbox::toggle(bool open)
+	{
+		open ? this->show() : this->hide();
 	}
 
 	Docker::Docker(Wedge& parent)
-		: Row(parent, cls())
+		: Wedge(parent, cls())
 	{}
 
 	Dockbar::Dockbar(Wedge& parent)
-		: Div(parent, cls())
+		: Wedge(parent, cls())
 		, m_docker(*this)
 	{}
 
@@ -44,14 +39,14 @@ namespace toy
 
 	Dockbox& Dockbar::addDock(const string& name)
 	{
-		string icon = replaceAll(name, " ", "");
+		string icon = "(" + replaceAll(name, " ", "") + ")";
 		std::transform(icon.begin(), icon.end(), icon.begin(), ::tolower);
 		return this->addDock(name, icon);
 	}
 
 	void Dockbar::removeDock(Dockbox& dockbox)
 	{
-		dockbox.toggle().destroy();
-		dockbox.destroy();
+		//dockbox.toggle().extract();
+		//dockbox.extract();
 	}
 }

@@ -14,17 +14,6 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT Popup : public Overlay
-	{
-	public:
-		Popup(Wedge& parent);
-
-		virtual bool leftClick(MouseEvent& mouseEvent);
-		virtual bool rightClick(MouseEvent& mouseEvent);
-
-		static Type& cls() { static Type ty("Popup", Overlay::cls()); return ty; }
-	};
-
 	class _refl_ TOY_UI_EXPORT CloseButton : public Button
 	{
 	public:
@@ -33,7 +22,7 @@ namespace toy
 		static Type& cls() { static Type ty("CloseButton", Button::cls()); return ty; }
 	};
 
-	class _refl_ TOY_UI_EXPORT WindowHeader : public WrapControl
+	class _refl_ TOY_UI_EXPORT WindowHeader : public Wedge
 	{
 	public:
 		WindowHeader(Window& window);
@@ -48,9 +37,7 @@ namespace toy
 		virtual bool leftDrag(MouseEvent& mouseEvent);
 		virtual bool leftDragEnd(MouseEvent& mouseEvent);
 
-		Docksection* docktarget(MouseEvent& mouseEvent);
-
-		static Type& cls() { static Type ty("WindowHeader", WrapControl::cls()); return ty; }
+		static Type& cls() { static Type ty("WindowHeader", Wedge::WrapControl()); return ty; }
 
 	protected:
 		Window& m_window;
@@ -59,7 +46,7 @@ namespace toy
 		string m_tooltip;
 	};
 
-	class _refl_ TOY_UI_EXPORT WindowSizer : public Control
+	class _refl_ TOY_UI_EXPORT WindowSizer : public Item
 	{
 	public:
 		WindowSizer(Wedge& parent, Window& window, Type& type, bool left);
@@ -68,47 +55,26 @@ namespace toy
 		virtual bool leftDrag(MouseEvent& mouseEvent);
 		virtual bool leftDragEnd(MouseEvent& mouseEvent);
 
-		static Type& cls() { static Type ty("WindowSizer", Control::cls()); return ty; }
+		static Type& cls() { static Type ty("WindowSizer", Item::Control()); return ty; }
 
 	protected:
 		Window& m_window;
 		bool m_resizeLeft;
 	};
 
-	class _refl_ TOY_UI_EXPORT WindowSizerLeft : public WindowSizer
-	{
-	public:
-		WindowSizerLeft(Wedge& parent, Window& window);
-
-		static Type& cls() { static Type ty("WindowSizerLeft", WindowSizer::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT WindowSizerRight : public WindowSizer
-	{
-	public:
-		WindowSizerRight(Wedge& parent, Window& window);
-
-		static Type& cls() { static Type ty("WindowSizerRight", WindowSizer::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT WindowFooter : public WrapControl
+	class _refl_ TOY_UI_EXPORT WindowFooter : public Wedge
 	{
 	public:
 		WindowFooter(Window& window);
 
-		static Type& cls() { static Type ty("WindowFooter", WrapControl::cls()); return ty; }
+		static Type& cls() { static Type ty("WindowFooter", Wedge::WrapControl()); return ty; }
+
+		static Type& SizerLeft() { static Type ty("WindowSizerLeft", WindowSizer::cls()); return ty; }
+		static Type& SizerRight() { static Type ty("WindowSizerRight", WindowSizer::cls()); return ty; }
 
 	protected:
-		WindowSizerLeft m_firstSizer;
-		WindowSizerRight m_secondSizer;
-	};
-
-	class _refl_ TOY_UI_EXPORT WindowBody : public ScrollSheet
-	{
-	public:
-		WindowBody(Wedge& parent);
-
-		static Type& cls() { static Type ty("WindowBody", ScrollSheet::cls()); return ty; }
+		WindowSizer m_firstSizer;
+		WindowSizer m_secondSizer;
 	};
 
 	enum WindowState
@@ -118,11 +84,10 @@ namespace toy
 		WINDOW_CLOSABLE = 1 << 1,
 		WINDOW_MOVABLE = 1 << 2,
 		WINDOW_SIZABLE = 1 << 3,
-		WINDOW_SHRINK = 1 << 4,
-		WINDOW_DEFAULT = WINDOW_MOVABLE | WINDOW_SIZABLE | WINDOW_CLOSABLE
+		WINDOW_DEFAULT = WINDOW_MOVABLE | WINDOW_SIZABLE | WINDOW_CLOSABLE | WINDOW_DOCKABLE
 	};
 
-	class _refl_ TOY_UI_EXPORT Window : public Overlay
+	class _refl_ TOY_UI_EXPORT Window : public Wedge
 	{
 	public:
 		Window(Wedge& parent, const string& title, WindowState state = WINDOW_DEFAULT, const Callback& onClose = nullptr, Docksection* dock = nullptr, Type& type = cls());
@@ -130,21 +95,19 @@ namespace toy
 		const string& name() { return m_name; }
 
 		WindowState windowState() { return m_windowState; }
-		WindowBody& body() { return m_body; }
+		Wedge& body() { return m_body; }
 		Docksection* dock() { return m_dock; }
 
 		bool closable() { return (m_windowState & WINDOW_CLOSABLE) != 0; }
 		bool dockable() { return (m_windowState & WINDOW_DOCKABLE) != 0; }
 		bool movable()  { return (m_windowState & WINDOW_MOVABLE) != 0; }
 		bool sizable() { return (m_windowState & WINDOW_SIZABLE) != 0; }
-		bool shrink() { return (m_windowState & WINDOW_SHRINK) != 0; }
 
 		void toggleWindowState(WindowState state);
 
 		void toggleClosable();
 		void toggleMovable();
 		void toggleResizable();
-		void toggleWrap();
 
 		void showTitlebar();
 		void hideTitlebar();
@@ -152,37 +115,31 @@ namespace toy
 		virtual bool leftClick(MouseEvent& mouseEvent);
 		virtual bool rightClick(MouseEvent& mouseEvent);
 
+		void dockAt(const DimFloat& pos);
+
 		void dock(Docksection& docksection);
 		void undock();
 
-		void docked();
-		void undocked();
+		void toggleDocked();
 
 		void close();
 
-		static Type& cls() { static Type ty("Window", Overlay::cls()); return ty; }
+		static Type& cls() { static Type ty("Window", Wedge::Overlay()); return ty; }
+
+		static Type& Body() { static Type ty("WindowBody", Wedge::cls()); return ty; }
+
+		static Type& DockWindow() { static Type ty("DockWindow", Window::cls()); return ty; }
+		static Type& WrapWindow() { static Type ty("WrapWindow", Window::cls()); return ty; }
 
 	protected:
 		string m_name;
 		WindowState m_windowState;
 		Callback m_onClose;
 		WindowHeader m_header;
-		WindowBody m_body;
+		Wedge m_body;
 		WindowFooter m_footer;
 
 		Docksection* m_dock;
-	};
-
-	class TOY_UI_EXPORT DockWindow : public Object
-	{
-	public:
-		static Type& cls() { static Type ty("DockWindow", Window::cls()); return ty; }
-	};
-
-	class TOY_UI_EXPORT WrapWindow : public Object
-	{
-	public:
-		static Type& cls() { static Type ty("WrapWindow", Window::cls()); return ty; }
 	};
 }
 

@@ -5,24 +5,13 @@
 #include <toyui/Config.h>
 #include <toyui/Window/Node.h>
 
-#include <toyui/Frame/Frame.h>
-#include <toyui/Frame/Stripe.h>
 #include <toyui/Frame/Layer.h>
-
 #include <toyui/Widget/RootSheet.h>
-#include <toyui/Input/InputDevice.h>
+
+#include <toyui/Render/Renderer.h>
 
 namespace toy
 {
-	CanvasLine::CanvasLine(Widget& widget, Stripe& parent)
-		: Stripe(widget.fetchStyle(cls()), parent)
-	{}
-
-	CanvasColumn::CanvasColumn(Widget& widget, Stripe& parent)
-		: Stripe(widget.fetchStyle(cls()), parent)
-	{}
-
-
 	Canvas::Canvas(Wedge& parent, const string& title, const Callback& contextTrigger)
 		: ScrollPlan(parent, cls())
 		, m_name(title)
@@ -82,11 +71,11 @@ namespace toy
 
 		int shift = -std::min(0, minIndex);
 
-		object_ptr<CanvasLine> line = make_object<CanvasLine>(*this, m_plan.stripe());
-		std::vector<object_ptr<CanvasColumn>> columns;
+		/*object_ptr<Stripe> line = make_object<Stripe>(*this, m_plan.frame());
+		std::vector<object_ptr<Stripe>> columns;
 
 		for(int i = 0; i < maxIndex+shift+1; ++i)
-			columns.emplace_back(make_object<CanvasColumn>(*this, *line));
+			columns.emplace_back(make_object<Stripe>(*this, *line));
 
 		for(Node* node : nodes)
 			columns[node->order() + shift]->append(node->frame());
@@ -100,8 +89,23 @@ namespace toy
 		for(Node* node : nodes)
 			node->updateCables();
 
-		m_plan.stripe().remove(*line);
+		m_plan.frame().remove(*line);
+		
+		
+		*/
 	}
+
+	/*
+		//this->styledef(CanvasLine::cls()).layout().d_space = ITEM;
+
+		//this->styledef(CanvasColumn::cls()).layout().d_space = BLOCK;
+
+		/*this->styledef(CanvasLine::cls()).layout().d_padding = BoxFloat(20.f);
+		this->styledef(CanvasLine::cls()).layout().d_spacing = DimFloat(100.f);
+
+		this->styledef(CanvasColumn::cls()).layout().d_padding = BoxFloat(20.f);
+		this->styledef(CanvasColumn::cls()).layout().d_spacing = DimFloat(20.f);
+		*/
 
 	bool Canvas::leftDragStart(MouseEvent& mouseEvent)
 	{
@@ -112,7 +116,7 @@ namespace toy
 	bool Canvas::leftDrag(MouseEvent& mouseEvent)
 	{
 		for(Node* node : m_selection.store())
-			node->moveNode(DimFloat(mouseEvent.deltaX, mouseEvent.deltaY));
+			node->moveNode(mouseEvent.delta);
 		return true;
 	}
 
@@ -122,9 +126,9 @@ namespace toy
 		return true;
 	}
 
-	NodeKnob::NodeKnob(Wedge& parent, const Colour& colour)
-		: Item(parent, cls())
-		, m_colour(0.f,1.f,0.2f)
+	NodeKnob::NodeKnob(Wedge& parent, const Colour& colour, Type& type)
+		: Item(parent, type)
+		, m_colour(colour)
 	{}
 
 	bool NodeKnob::customDraw(Renderer& renderer)
@@ -133,23 +137,19 @@ namespace toy
 		inkstyle.m_backgroundColour = m_colour;
 
 		float radius = 5.f;
-		renderer.pathCircle(m_frame->size().x() / 2.f, m_frame->size().y() / 2.f, radius);
+		renderer.pathCircle(m_frame->d_size.x() / 2.f, m_frame->d_size.y() / 2.f, radius);
 		renderer.fill(inkstyle, BoxFloat());
 
 		return true;
 	}
 
-	NodeConnectionProxy::NodeConnectionProxy(Wedge& parent)
-		: Decal(parent, cls())
-	{}
-
-	NodePlug::NodePlug(Wedge& parent, Node& node, const string& name, const string& icon, bool input, ConnectTrigger onConnect)
-		: WrapControl(parent, cls())
+	NodePlug::NodePlug(Wedge& parent, Node& node, const string& name, const string& icon, const Colour& colour, bool input, ConnectTrigger onConnect)
+		: Wedge(parent, cls())
 		, m_node(node)
 		, m_input(input)
 		, m_title(*this, name)
 		, m_icon(*this, icon)
-		, m_knob(*this)
+		, m_knob(*this, colour)
 		, m_onConnect(onConnect)
 		, m_cableProxy(nullptr)
 	{
@@ -159,49 +159,35 @@ namespace toy
 
 	bool NodePlug::leftDragStart(MouseEvent& mouseEvent)
 	{
-		DimFloat local = m_node.plan().frame().localPosition(mouseEvent.posX, mouseEvent.posY);
-
-		m_connectionProxy = &m_node.plan().emplace<NodeConnectionProxy>();
-		m_connectionProxy->frame().setPosition(local.x(), local.y());
-
-		if(m_input)
-			m_cableProxy = &m_node.plan().emplace<NodeCable>(*m_connectionProxy, *this);
-		else
-			m_cableProxy = &m_node.plan().emplace<NodeCable>(*this, *m_connectionProxy);
-
+		m_connectionProxy = &m_node.plan().emplace<NodeKnob>(Colour::None, NodeKnob::Proxy());
+		m_cableProxy = &m_node.plan().emplace<NodeCable>((m_input ? *m_connectionProxy : m_knob), (m_input ? m_knob : *m_connectionProxy));
 		return true;
 	}
 
 	bool NodePlug::leftDrag(MouseEvent& mouseEvent)
 	{
-		DimFloat local = m_node.plan().frame().localPosition(mouseEvent.posX, mouseEvent.posY);
-		m_connectionProxy->frame().setPosition(local.x(), local.y());
+		DimFloat local = m_node.plan().frame().localPosition(mouseEvent.pos);
+		m_connectionProxy->frame().setPosition(local);
 		m_cableProxy->updateCable();
 		return true;
 	}
 
 	bool NodePlug::leftDragEnd(MouseEvent& mouseEvent)
 	{
-		Widget* widget = this->rootSheet().pinpoint(mouseEvent.posX, mouseEvent.posY);
-		while(widget && &widget->type() != &NodePlug::cls())
-			widget = widget->parent();
+		Widget* target = this->rootSheet().pinpoint(mouseEvent.pos);
+		NodePlug* plug = target->findContainer<NodePlug>();
 
-		if(widget)
-		{
-			NodePlug& plug = widget->as<NodePlug>();
-			if(plug.m_input != m_input)
-				m_input ? plug.connect(*this) : this->connect(plug);
-		}
+		if(plug && plug->m_input != m_input)
+			m_input ? plug->connect(*this) : this->connect(*plug);
 
-		m_connectionProxy->destroy();
-		m_cableProxy->destroy();
-
+		m_connectionProxy->extract();
+		m_cableProxy->extract();
 		return true;
 	}
 
 	NodeCable& NodePlug::connect(NodePlug& plugIn, bool notify)
 	{
-		NodeCable& cable = m_node.plan().emplace<NodeCable>(*this, plugIn);
+		NodeCable& cable = m_node.plan().emplace<NodeCable>(m_knob, plugIn.knob());
 		m_cables.push_back(&cable);
 		plugIn.m_cables.push_back(&cable);
 
@@ -214,18 +200,18 @@ namespace toy
 	void NodePlug::disconnect(NodePlug& plugIn)
 	{
 		for(NodeCable* cable : m_cables)
-			if(&cable->plugIn() == &plugIn)
+			if(&cable->knobIn() == &plugIn.knob())
 			{
 				vector_remove(m_cables, cable);
-				cable->destroy();
+				cable->extract();
 				return;
 			}
 	}
 
-	NodeCable::NodeCable(Wedge& parent, Widget& plugOut, Widget& plugIn)
-		: Decal(parent, cls())
-		, m_plugOut(plugOut)
-		, m_plugIn(plugIn)
+	NodeCable::NodeCable(Wedge& parent, NodeKnob& knobOut, NodeKnob& knobIn)
+		: Wedge(parent, cls())
+		, m_knobOut(knobOut)
+		, m_knobIn(knobIn)
 	{
 		this->updateCable();
 	}
@@ -234,29 +220,29 @@ namespace toy
 	{
 		Frame& frameCanvas = this->parent()->frame();
 
-		DimFloat relativeOut = m_plugOut.frame().relativePosition(frameCanvas);
-		DimFloat relativeIn = m_plugIn.frame().relativePosition(frameCanvas);
+		DimFloat relativeOut = m_knobOut.frame().derivePosition(DimFloat(), frameCanvas);
+		DimFloat relativeIn = m_knobIn.frame().derivePosition(DimFloat(), frameCanvas);
 
-		float x0 = relativeOut.x() + m_plugOut.frame().width();
-		float y0 = relativeOut.y() + m_plugOut.frame().height() / 2;
+		float x0 = relativeOut.x() + m_knobOut.frame().d_size.x();
+		float y0 = relativeOut.y() + m_knobOut.frame().d_size.y() / 2;
 		float x1 = relativeIn.x();
-		float y1 = relativeIn.y() + m_plugIn.frame().height() / 2;
+		float y1 = relativeIn.y() + m_knobIn.frame().d_size.y() / 2;
 
 		m_flipX = x1 > x0;
 		m_flipY = y1 > y0;
 
-		m_frame->setPosition(m_flipX ? x0 : x1, m_flipY ? y0 : y1);
-		m_frame->setSize(m_flipX ? x1 - x0 : x0 - x1, m_flipY ? y1 - y0 : y0 - y1);
+		m_frame->setPosition({ m_flipX ? x0 : x1, m_flipY ? y0 : y1 });
+		m_frame->setSize({ m_flipX ? x1 - x0 : x0 - x1, m_flipY ? y1 - y0 : y0 - y1 });
 	}
 
 	bool NodeCable::customDraw(Renderer& renderer)
 	{
-		float x0 = m_flipX ? 0.f : m_frame->size().x();
-		float y0 = m_flipY ? 0.f : m_frame->size().y();
-		float x1 = m_flipX ? m_frame->size().x() : 0.f;
-		float y1 = m_flipY ? m_frame->size().y() : 0.f;
+		float x0 = m_flipX ? 0.f : m_frame->d_size.x();
+		float y0 = m_flipY ? 0.f : m_frame->d_size.y();
+		float x1 = m_flipX ? m_frame->d_size.x() : 0.f;
+		float y1 = m_flipY ? m_frame->d_size.y() : 0.f;
 
-		Paint paint(m_plugOut.as<NodePlug>().knob().colour(), m_plugIn.as<NodePlug>().knob().colour());
+		Paint paint(m_knobOut.colour(), m_knobIn.colour());
 		paint.m_width = 1.f;
 		renderer.pathBezier(x0, y0, x0 + 100.f, y0, x1 - 100.f, y1, x1, y1);
 		renderer.strokeGradient(paint, DimFloat(m_flipX ? x0 : x1, m_flipY ? y0 : y1), DimFloat(m_flipX ? x1 : x0,  m_flipY ? y1 : y0));
@@ -264,51 +250,36 @@ namespace toy
 		return true;
 	}
 
-	NodeBody::NodeBody(Node& node)
-		: Sheet(node, cls())
-		, m_header(*this, node)
-	{}
-
-	NodeIn::NodeIn(Wedge& parent)
-		: Div(parent, cls())
-	{}
-
-	NodeOut::NodeOut(Wedge& parent)
-		: Div(parent, cls())
-	{}
-
 	NodeHeader::NodeHeader(Wedge& parent, Node& node)
-		: Row(parent, cls())
+		: Wedge(parent, cls())
 		, m_title(*this, node.name())
-		, m_spacer(*this)
+		, m_spacer(*this, Item::Spacer())
 	{}
 
 	Node::Node(Wedge& parent, const string& title, int order)
-		: Overlay(parent, cls())
+		: Wedge(parent, cls(), LAYER)
 		, m_name(title)
 		, m_order(order)
-		, m_inputs(*this)
-		, m_body(*this)
-		, m_outputs(*this)
-	{
-		m_containerTarget = &m_body;
-	}
+		, m_inputs(*this, Node::Inputs())
+		, m_body(*this, Node::Body())
+		, m_header(m_body, *this)
+		, m_outputs(*this, Node::Outputs())
+	{}
 
 	Canvas& Node::canvas()
 	{
 		return *this->findContainer<Canvas>();
 	}
 
-	Container& Node::plan()
+	Wedge& Node::plan()
 	{
 		return this->canvas().plan();
 	}
 
 	void Node::moveNode(const DimFloat& delta)
 	{
-		float scale = m_frame->absoluteScale();
-		m_frame->setPosition(m_frame->position().x() + delta.x() / scale, m_frame->position().y() + delta.y() / scale);
-
+		DimFloat position = m_frame->d_position + delta / m_frame->absoluteScale();
+		m_frame->setPosition(position);
 		this->updateCables();
 	}
 
@@ -359,13 +330,21 @@ namespace toy
 		return true;
 	}
 
-	NodePlug& Node::addInput(const string& name)
+	NodePlug& Node::addInput(const string& name, const string& icon, const Colour& colour)
 	{
-		return m_inputs.emplace<NodePlug>(*this, name, "", true);
+		return m_inputs.emplace<NodePlug>(*this, name, icon, colour, true);
 	}
 
-	NodePlug& Node::addOutput(const string& name)
+	NodePlug& Node::addOutput(const string& name, const string& icon, const Colour& colour)
 	{
-		return m_outputs.emplace<NodePlug>(*this, name, "", false);
+		return m_outputs.emplace<NodePlug>(*this, name, icon, colour, false);
+	}
+
+	NodePlug& Node::addPlug(const string& name, const string& icon, const Colour& colour, bool input, NodePlug::ConnectTrigger onConnect)
+	{
+		if(input)
+			return m_inputs.emplace<NodePlug>(*this, name, icon, colour, true, onConnect);
+		else
+			return m_outputs.emplace<NodePlug>(*this, name, icon, colour, false, onConnect);
 	}
 }

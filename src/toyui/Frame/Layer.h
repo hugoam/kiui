@@ -6,14 +6,14 @@
 #define TOY_LAYER_H
 
 /* toy */
-#include <toyui/Frame/Stripe.h>
+#include <toyui/Frame/Frame.h>
 
 namespace toy
 {
-	class TOY_UI_EXPORT Layer : public Stripe
+	class TOY_UI_EXPORT Layer : public Frame
 	{
 	public:
-		Layer(Widget& widget);
+		Layer(Wedge& wedge, FrameType layerType);
 		~Layer();
 
 		enum Redraw
@@ -23,11 +23,11 @@ namespace toy
 			FORCE_REDRAW = 2
 		};
 
-		FrameType frameType() { return LAYER; }
+		FrameType frameType() { return d_layerType; }
 
 		Layer* parentLayer() { return d_parentLayer; }
 		size_t index() { return d_index; }
-		size_t z() { return d_style->layout().zorder() ? d_style->layout().zorder() : d_z; }
+		size_t z() { return d_style->layout().d_zorder.val ? d_style->layout().d_zorder.val : d_z; }
 
 		void setIndex(size_t index) { d_index = index; }
 		void setZ(size_t z) { d_z = z; }
@@ -40,9 +40,7 @@ namespace toy
 
 		void endRedraw() { d_redraw = NO_REDRAW; }
 
-		void collectLayers(std::vector<Layer*>& layers, FrameType barrier = LAYER);
-
-		virtual void bind(Stripe& parent);
+		virtual void bind(Frame& parent);
 		virtual void unbind();
 
 		void addLayer(Layer& layer);
@@ -53,7 +51,10 @@ namespace toy
 
 		void reindex(size_t from);
 
-		Frame* pinpoint(float x, float y, const Filter& filter);
+		using Visitor = std::function<void(Layer&)>;
+		void visit(const Visitor& visitor);
+
+		Frame* pinpoint(DimFloat pos, const Filter& filter);
 
 	protected:
 		Layer* d_parentLayer;
@@ -63,34 +64,8 @@ namespace toy
 		Redraw d_redraw;
 
 		std::vector<Layer*> d_sublayers;
-	};
 
-	class TOY_UI_EXPORT MasterLayer : public Layer
-	{
-	public:
-		MasterLayer(Widget& widget);
-
-		FrameType frameType() { return MASTER_LAYER; }
-
-		const std::vector<Layer*>& layers() { return d_layers; }
-		void markReorder() { d_reorder = true; }
-
-		void relayout();
-		void redraw();
-		
-		void reorder();
-
-	protected:
-		std::vector<Layer*> d_layers;
-		bool d_reorder;
-	};
-
-	class TOY_UI_EXPORT Layer3D : public MasterLayer
-	{
-	public:
-		Layer3D(Widget& widget);
-
-		FrameType frameType() { return SPACE_LAYER; }
+		FrameType d_layerType;
 	};
 }
 

@@ -10,17 +10,16 @@
 #include <toyobj/Any.h>
 
 #include <toyui/Frame/Frame.h>
-#include <toyui/Frame/Stripe.h>
 
 #include <toyui/Widget/Sheet.h>
 
 namespace toy
 {
 	Textbox::Textbox(WValue& input)
-		: TypeIn(input, cls())
+		: TypeIn(input, true, cls())
 	{}
 
 	Textbox::Textbox(Wedge& parent, string& text)
-		: TypeIn(parent, text, cls())
+		: TypeIn(parent, text, true, cls())
 	{}
 }

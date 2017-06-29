@@ -5,8 +5,7 @@
 #include <toyui/Config.h>
 #include <toyui/Button/Typedown.h>
 
-#include <toyui/Widget/RootSheet.h>
-#include <toyui/Input/InputDevice.h>
+#include <toyui/Input/InputEvent.h>
 
 #include <toyui/Button/Filter.h>
 
@@ -14,7 +13,7 @@ namespace toy
 {
 	TypedownInput::TypedownInput(Wedge& parent, const Callback& onSelected, StringVector choices)
 		: DropdownInput(parent, onSelected, choices)
-		, m_input(*this, m_list, [this](const string& value) { this->onInput(value); })
+		, m_input(*this, m_list, nullptr, [this](const string& value) { this->onInput(value); })
 	{
 		m_input.hide();
 	}
@@ -22,7 +21,7 @@ namespace toy
 	void TypedownInput::click()
 	{
 		this->showFilter();
-		MouseClickEvent mouseEvent(DEVICE_MOUSE_LEFT_BUTTON, this->rootSheet().mouse().lastX(), this->rootSheet().mouse().lastY());
+		MouseClickEvent mouseEvent(this->rootSheet().mouse(), DEVICE_MOUSE_LEFT_BUTTON, this->rootSheet().mouse().lastPos());
 		m_input.typeIn().leftClick(mouseEvent);
 	}
 
@@ -30,7 +29,7 @@ namespace toy
 	{
 		m_header.hide();
 		m_input.show();
-		m_input.setString(m_header.content().contentlabel());
+		m_input.setString(m_header.label());
 	}
 
 	void TypedownInput::hideFilter()

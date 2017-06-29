@@ -43,7 +43,7 @@ namespace toy
 		bool d_stretch;
 		bool d_filtering;
 
-		static Type& cls() { static Type ty(INDEXED); return ty; }
+		static Type& cls() { static Type ty; return ty; }
 	};
 
 }

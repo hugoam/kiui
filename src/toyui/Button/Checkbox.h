@@ -16,8 +16,7 @@ namespace toy
 	public:
 		Checkbox(Wedge& parent, WValue* input, bool on);
 
-		void toggleOn();
-		void toggleOff();
+		void toggle(bool on);
 
 		static Type& cls() { static Type ty("Checkbox", Toggle::cls()); return ty; }
 

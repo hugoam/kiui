@@ -36,7 +36,7 @@ namespace toy
 	void OgreRenderWindow::initContext()
 	{
 		Ogre::NameValuePairList params;
-		params["border"] = "none";
+		//params["border"] = "none";
 
 		HGLRC context = wglGetCurrentContext();
 		params["externalGLContext"] = Ogre::StringConverter::toString((size_t)(context));
@@ -52,7 +52,7 @@ namespace toy
 
 	bool OgreRenderWindow::nextFrame()
 	{
-		return !this->shutdown();
+		return !m_shutdown;
 	}
 
 	void OgreRenderWindow::updateSize()
@@ -93,20 +93,26 @@ namespace toy
 		}
 	}
 
-	OISInputWindow::OISInputWindow(RenderWindow& renderWindow)
+	OISInputWindow::OISInputWindow()
 		: m_inputManager(nullptr)
 		, m_mouse(nullptr)
 		, m_keyboard(nullptr)
 		, m_uiMouse(nullptr)
 		, m_uiKeyboard(nullptr)
 		, m_shutdownRequested(false)
-	{
-		setupInput(renderWindow.handle());
-	}
+	{}
 
 	OISInputWindow::~OISInputWindow()
 	{
 		destroyInput();
+	}
+
+	void OISInputWindow::initInput(RenderWindow& renderWindow, Mouse& mouse, Keyboard& keyboard)
+	{
+		this->setupInput(renderWindow.m_handle);
+
+		m_uiMouse = &mouse;
+		m_uiKeyboard = &keyboard;
 	}
 
 	void OISInputWindow::setupInput(size_t windowHnd)
@@ -126,12 +132,6 @@ namespace toy
 
 		m_keyboard->setEventCallback(this);
 		m_mouse->setEventCallback(this);
-	}
-
-	void OISInputWindow::initInput(Mouse& mouse, Keyboard& keyboard)
-	{
-		m_uiMouse = &mouse;
-		m_uiKeyboard = &keyboard;
 	}
 
 	bool OISInputWindow::nextFrame()
@@ -163,10 +163,10 @@ namespace toy
 
 	bool OISInputWindow::mouseMoved(const OIS::MouseEvent &arg)
 	{
-		m_uiMouse->dispatchMouseMoved(float(arg.state.X.abs), float(arg.state.Y.abs));
+		m_uiMouse->dispatchMouseMoved(DimFloat(arg.state.X.abs, arg.state.Y.abs));
 
 		if(arg.state.Z.rel != 0)
-			m_uiMouse->dispatchMouseWheeled(float(arg.state.X.abs), float(arg.state.Y.abs), float(arg.state.Z.rel));
+			m_uiMouse->dispatchMouseWheeled(DimFloat(arg.state.X.abs, arg.state.Y.abs), float(arg.state.Z.rel));
 
 		return true;
 	}
@@ -177,7 +177,7 @@ namespace toy
 			this->mouseReleased(arg, id);
 
 		m_pressed[id] = true;
-		m_uiMouse->dispatchMousePressed(float(arg.state.X.abs), float(arg.state.Y.abs), convertOISButton(id));
+		m_uiMouse->dispatchMousePressed(DimFloat(arg.state.X.abs, arg.state.Y.abs), convertOISButton(id));
 		return true;
 	}
 
@@ -187,7 +187,7 @@ namespace toy
 			return true;
 
 		m_pressed[id] = false;
-		m_uiMouse->dispatchMouseReleased(float(arg.state.X.abs), float(arg.state.Y.abs), convertOISButton(id));
+		m_uiMouse->dispatchMouseReleased(DimFloat(arg.state.X.abs, arg.state.Y.abs), convertOISButton(id));
 		return true;
 	}
 

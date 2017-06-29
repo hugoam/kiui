@@ -6,18 +6,14 @@
 #define TOY_IMAGESKIN_H
 
 /* toy */
-#include <toyobj/Object.h>
-#include <toyobj/Indexer.h>
+#include <toyobj/Type.h>
 #include <toyobj/String/String.h>
-#include <toyobj/Util/Global.h>
-#include <toyobj/Util/Colour.h>
 #include <toyui/Forward.h>
 #include <toyui/Style/Dim.h>
 #include <toyui/Image.h>
 
 /* std */
 #include <vector>
-#include <functional>
 
 namespace toy
 {
@@ -40,62 +36,40 @@ namespace toy
 	public:
 		ImageSkin(Image& image, int left, int top, int right, int bottom, int margin = 0, Dimension stretch = DIM_NULL)
 			: d_image(&image)
-			, d_top(top), d_right(right), d_bottom(bottom), d_left(left)
+			, d_left(left), d_top(top), d_right(right), d_bottom(bottom)
 			, d_margin(margin)
 			, d_stretch(stretch)
+			, d_width(image.d_width)
+			, d_height(image.d_height)
+			, d_fillWidth(image.d_width - d_left - d_right)
+			, d_fillHeight(image.d_height - d_top - d_bottom)
+			, d_solidWidth(image.d_width - d_margin - d_margin)
+			, d_solidHeight(image.d_height - d_margin - d_margin)
 			, d_images(9)
-			, d_prepared(false)
 		{
-			this->setupImage(*d_image);
+			for(Image& image : d_images)
+				image = *d_image;
+
+			d_size[DIM_X] = d_stretch == DIM_X ? float(d_solidHeight) : 0.f;
+			d_size[DIM_Y] = d_stretch == DIM_Y ? float(d_solidWidth) : 0.f;
+
+			this->stretchCoords(0, 0, image.d_width, image.d_height, [this](Section s, const BoxFloat& rect) {
+				this->d_images[s].d_left = this->d_image->d_left + int(rect.x());
+				this->d_images[s].d_top = this->d_image->d_top + int(rect.y());
+				this->d_images[s].d_width = int(rect.w());
+				this->d_images[s].d_height = int(rect.h());
+			});
 		}
+
+		ImageSkin(Image& image, const ImageSkin& ref)
+			: ImageSkin(image, ref.d_left, ref.d_top, ref.d_right, ref.d_bottom, ref.d_margin, ref.d_stretch)
+		{}
 
 		ImageSkin()
 			: d_image(nullptr)
 		{}
 
 		bool null() const { return d_image == nullptr; }
-
-		void setupImage(Image& image)
-		{
-			d_image = &image;
-			d_images[TOP_LEFT].d_name = image.d_name + "_topleft";
-			d_images[TOP_RIGHT].d_name = image.d_name + "_topright";
-			d_images[BOTTOM_RIGHT].d_name = image.d_name + "_bottomright";
-			d_images[BOTTOM_LEFT].d_name = image.d_name + "_bottomleft";
-
-			d_images[TOP].d_name = image.d_name + "_top";
-			d_images[RIGHT].d_name = image.d_name + "_right";
-			d_images[BOTTOM].d_name = image.d_name + "_bottom";
-			d_images[LEFT].d_name = image.d_name + "_left";
-
-			d_images[FILL].d_name = image.d_name + "_fill";
-
-			for(size_t i = 0; i < 9; ++i)
-			{
-				d_images[i].d_index = d_image->d_index;
-				d_images[i].d_atlas = d_image->d_atlas;
-			}
-
-			this->setupSize(image.d_width, image.d_height);
-		}
-
-		void setupSize(int width, int height)
-		{
-			d_width = width;
-			d_height = height;
-			d_fillWidth = width - d_left - d_right;
-			d_fillHeight = height - d_top - d_bottom;
-
-			d_solidWidth = width - d_margin - d_margin;
-			d_solidHeight = height - d_margin - d_margin;
-
-			this->stretchCoords(0, 0, width, height, [this](Section s, const BoxFloat& rect) {
-				this->d_images[s].d_left = this->d_image->d_left + int(rect.x());
-				this->d_images[s].d_top = this->d_image->d_top + int(rect.y());
-				this->d_images[s].d_width = int(rect.w());
-				this->d_images[s].d_height = int(rect.h());
-			 });
-		}
 
 		void stretchCoords(int x, int y, int width, int height, std::function<void(Section, const BoxFloat&)> filler) const
 		{
@@ -116,12 +90,11 @@ namespace toy
 		}
 
 		_attr_ _mut_ Image* d_image;
-		_attr_ _mut_ string d_filetype;
 
+		_attr_ _mut_ int d_left;
 		_attr_ _mut_ int d_top;
 		_attr_ _mut_ int d_right;
 		_attr_ _mut_ int d_bottom;
-		_attr_ _mut_ int d_left;
 		_attr_ _mut_ int d_margin;
 		_attr_ _mut_ Dimension d_stretch;
 
@@ -134,9 +107,9 @@ namespace toy
 		int d_fillWidth;
 		int d_fillHeight;
 
-		std::vector<Image> d_images;
+		DimFloat d_size;
 
-		bool d_prepared;
+		std::vector<Image> d_images;
 
 		static Type& cls() { static Type ty; return ty; }
 	};

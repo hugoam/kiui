@@ -22,7 +22,7 @@ namespace toy
 	class TOY_UI_EXPORT Value : public NonCopy
 	{
 	public:
-		typedef std::function<void(Lref&)> OnUpdate;
+		using OnUpdate = std::function<void(Lref&)>;
 
 	public:
 		Value(Lref& lref, const OnUpdate& onUpdate = OnUpdate(), bool edit = false);
@@ -57,7 +57,7 @@ namespace toy
 		OnUpdate m_onUpdate;
 	};
 
-	class _refl_ TOY_UI_EXPORT WValue : public WrapControl, public Value
+	class _refl_ TOY_UI_EXPORT WValue : public Wedge, public Value
 	{
 	public:
 		WValue(Wedge& parent, Lref& lref, Type& type, const OnUpdate& onUpdate, bool edit = false);
@@ -67,7 +67,7 @@ namespace toy
 
 		void notifyUpdate();
 
-		static Type& cls() { static Type ty("WValue", WrapControl::cls()); return ty; }
+		static Type& cls() { static Type ty("WValue", Wedge::WrapControl()); return ty; }
 	};
 }
 

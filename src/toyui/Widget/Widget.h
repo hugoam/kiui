@@ -22,18 +22,18 @@ namespace toy
 	enum _refl_ WidgetState : unsigned int
 	{
 		NOSTATE = 0,			// default state
-		FOCUSED = 1 << 1,		// under input device focus
-		TRIGGERED = 1 << 2,		// triggered by input device (e.g. pressed)
-		ACTIVATED = 1 << 3,		// activated state
-		SELECTED = 1 << 4,		// selected state
-		DRAGGED = 1 << 5,		// dragged by input device
-		DISABLED = 1 << 6,		// disabled state
-		ACTIVE = 1 << 7,		// for the unique currently active widget
-		CONTROL = 1 << 8,		// widget is in the control stack
-		MODAL = 1 << 9			// widget is modal in the control stack
+		FOCUSED = 1 << 0,		// under input device focus
+		TRIGGERED = 1 << 1,		// triggered by input device (e.g. pressed)
+		ACTIVATED = 1 << 2,		// activated state
+		SELECTED = 1 << 3,		// selected state
+		DRAGGED = 1 << 4,		// dragged by input device
+		DISABLED = 1 << 5,		// disabled state
+		ACTIVE = 1 << 6,		// for the unique currently active widget
+		CONTROL = 1 << 7,		// widget is in the control stack
+		MODAL = 1 << 8			// widget is modal in the control stack
 	};
 
-	class _refl_ TOY_UI_EXPORT Widget : public TypeObject, public InputAdapter, public Updatable
+	class _refl_ TOY_UI_EXPORT Widget : public TypeObject, public InputAdapter
 	{
 	public:
 		Widget(Wedge& parent, Type& type = cls(), FrameType frameType = FRAME);
@@ -41,7 +41,7 @@ namespace toy
 		~Widget();
 
 		_attr_ inline Wedge* parent() { return m_parent; }
-		_attr_ inline Container* container() { return m_container; }
+		_attr_ inline Wedge* container() { return m_container; }
 		_attr_ inline size_t index() { return m_index; }
 		_attr_ inline Frame& frame() { return *m_frame; }
 		_attr_ inline WidgetState state() { return m_state; }
@@ -50,51 +50,41 @@ namespace toy
 		inline Device* device() { return m_device; }
 
 		void setIndex(size_t index) { m_index = index; }
-		void setContainer(Container& container) { m_container = &container; }
-		DrawFrame& content();
+		void setContainer(Wedge& container) { m_container = &container; }
 
-		_attr_ _mut_ const string& label();
-		void setLabel(const string& label);
-
-		_attr_ _mut_ Image* image();
-		void setImage(Image* image);
-
-		Image& findImage(const string& name);
+		void setContent(const string& content);
 
 		void setDevice(Device& device) { m_device = &device; }
-		void resetDevice() { m_device = nullptr; }
 
-		virtual const string& tooltip() { return sNullString; }
-		virtual const string& contentlabel();
+		virtual const string& tooltip() { static string str; return str; }
+		virtual const string& label();
 
 		virtual RootSheet& rootSheet();
 
 		UiWindow& uiWindow();
-		Context& context();
 		ControlSwitch& rootController();
 
 		void show();
 		void hide();
 
-		virtual void bound(RootSheet& rootSheet);
-		virtual void unbound(RootSheet& rootSheet, bool destroy);
+		virtual void destroyed() {}
 
 		void bind(Wedge& parent, size_t index);
-		void unbind(bool destroy);
+		void unbind();
 
-		object_ptr<Widget> extract();
+		virtual void makeSolver();
+
+		void destroyTree();
 		void destroy();
+		void extract();
 
 		template <class T>
 		T* findContainer() { Widget* widget = this->findContainer(T::cls()); return widget ? &widget->template as<T>() : nullptr; }
 
 		Widget* findContainer(Type& type);
 
-		typedef std::function<bool(Widget&)> Visitor;
-
-		virtual void visit(const Visitor& visitor);
-
-		virtual void nextFrame(size_t tick, size_t delta);
+		using Visitor = std::function<bool(Widget&)>;
+		virtual void visit(const Visitor& visitor, bool post = false);
 
 		void updateStyle();
 
@@ -107,9 +97,6 @@ namespace toy
 
 		void enableState(WidgetState state);
 		void disableState(WidgetState state);
-		void updateState();
-
-		void markDirty();
 
 		void control(bool modal);
 		void uncontrol(bool modal);
@@ -117,8 +104,8 @@ namespace toy
 		virtual void active() {}
 		virtual void inactive() {}
 
-		Widget* pinpoint(float x, float y);
-		Widget* pinpoint(float x, float y, const Frame::Filter& filter);
+		Widget* pinpoint(DimFloat pos);
+		Widget* pinpoint(DimFloat pos, const Frame::Filter& filter);
 
 		virtual void dirtyLayout();
 
@@ -139,39 +126,32 @@ namespace toy
 		virtual bool mousePressed(MouseEvent& mouseEvent);
 		virtual bool mouseReleased(MouseEvent& mouseEvent);
 
-		typedef std::function<void(Widget&)> Callback;
-
-		void debugPrintDepth();
+		using Callback = std::function<void(Widget&)>;
 
 		static Type& cls() { static Type ty("Widget"); return ty; }
 
 	protected:
 		Wedge* m_parent;
-		Container* m_container;
+		Wedge* m_container;
 		size_t m_index;
 		Style* m_style;
 		object_ptr<Frame> m_frame;
 		WidgetState m_state;
 
 		Device* m_device;
-
-		static string sNullString;
 	};
 
 	class _refl_ TOY_UI_EXPORT Item : public Widget
 	{
 	public:
 		Item(Wedge& parent, Type& type = cls());
+		Item(Wedge& parent, const string& content, Type& type = cls());
+
+		static Type& Control() { static Type ty("Control", Item::cls()); return ty; }
+		static Type& Spacer() { static Type ty("Spacer", Widget::cls()); return ty; }
+		static Type& Filler() { static Type ty("Filler", Item::Spacer()); return ty; }
 
 		static Type& cls() { static Type ty("Item", Widget::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT Control : public Item
-	{
-	public:
-		Control(Wedge& parent, Type& type = cls());
-
-		static Type& cls() { static Type ty("Control", Item::cls()); return ty; }
 	};
 }
 

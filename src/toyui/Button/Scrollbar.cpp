@@ -5,69 +5,34 @@
 #include <toyui/Config.h>
 #include <toyui/Button/Scrollbar.h>
 
-#include <toyui/Frame/Frame.h>
-#include <toyui/Frame/Stripe.h>
 #include <toyui/Frame/Layer.h>
-
-#include <toyui/Button/Slider.h>
-
-#include <toyobj/Iterable/Reverse.h>
 
 namespace toy
 {
-	Scroller::Scroller(Wedge& parent, Dimension dim)
-		: Slider(parent, dim, nullptr, cls())
-	{
-		this->unmap();
-		m_filler.setStyle(Spacer::cls());
-		m_button.setStyle(ScrollerKnob::cls());
-		this->map();
-	}
-
-	void Scroller::sliderStep(float value, bool ended)
-	{
-		UNUSED(ended);
-		m_parent->as<Scrollbar>().scrollTo(value);
-	}
-
-	ScrollerKnob::ScrollerKnob(Wedge& parent, Dimension dim)
-		: SliderKnob(parent, dim, cls())
-	{}
-
-	ScrollForward::ScrollForward(Wedge& parent, const Callback& trigger)
-		: Button(parent, "", trigger, cls())
-	{}
-
-	ScrollBackward::ScrollBackward(Wedge& parent, const Callback& trigger)
-		: Button(parent, "", trigger, cls())
-	{}
-
 	Scrollbar::Scrollbar(Wedge& parent, Wedge& frameSheet, Wedge& contentSheet, Dimension dim)
-		: Row(parent, cls())
+		: Wedge(parent, cls())
 		, m_dim(dim)
 		, d_cursor(0.f)
 		, m_frameSheet(frameSheet)
 		, m_contentSheet(contentSheet)
-		, m_up(*this, [this](Widget&) { this->scrollup(); })
-		, m_scroller(*this, dim)
-		, m_down(*this, [this](Widget&) { this->scrolldown(); })
+		, m_rewind(*this, "", [this](Widget&) { this->scrollup(); }, dim == DIM_Y ? ScrollUp() : ScrollLeft())
+		, m_scroller(*this, dim, [this](Widget& widget) { this->scrollTo(widget.as<Slider>().val()); }, Scroller())
+		, m_seek(*this, "", [this](Widget&) { this->scrolldown(); }, dim == DIM_Y ? ScrollDown() : ScrollRight())
 	{
-		this->unmap();
-		m_frame->setLength(dim);
-		this->map();
-	}
+		m_frame->d_length = dim;
 
-	Scrollbar::~Scrollbar()
-	{}
+		m_scroller.filler().setStyle(Item::Spacer());
+		m_scroller.knob().setStyle(Scrollbar::Knob());
+	}
 
 	float Scrollbar::contentSize()
 	{
-		return m_contentSheet.frame().dsize(m_dim) * m_contentSheet.frame().scale();
+		return m_contentSheet.frame().d_size[m_dim] * m_contentSheet.frame().d_scale;
 	}
 
 	float Scrollbar::visibleSize()
 	{
-		return m_frameSheet.frame().dsize(m_dim);
+		return m_frameSheet.frame().d_size[m_dim];
 	}
 
 	float Scrollbar::overflow()
@@ -75,15 +40,39 @@ namespace toy
 		return m_frameSheet.contents().size() > 0 ? contentSize() - visibleSize() : 0.f;
 	}
 
+	float Scrollbar::nextOffset(Widget& widget, Dimension dim, float pos)
+	{
+		pos -= widget.frame().d_position[dim];
+
+		if(widget.isa<Wedge>())
+			for(Widget* child : widget.as<Wedge>().contents())
+				if(child->frame().flow() && child->frame().d_position[dim] + child->frame().d_size[dim] > pos)
+					return widget.frame().d_position[dim] + this->nextOffset(*child, dim, pos);
+
+		return widget.frame().d_position[dim] + widget.frame().d_size[dim];
+	}
+
+	float Scrollbar::prevOffset(Widget& widget, Dimension dim, float pos)
+	{
+		pos -= widget.frame().d_position[dim];
+
+		if(widget.isa<Wedge>())
+			for(Widget* child : reverse_adapt(widget.as<Wedge>().contents()))
+				if(child->frame().flow() && child->frame().d_position[dim] < pos)
+					return widget.frame().d_position[dim] + this->prevOffset(*child, dim, pos);
+
+		return widget.frame().d_position[dim];
+	}
+
 	void Scrollbar::scrollup()
 	{
-		float pos = m_frameSheet.stripe().prevOffset(m_dim, -10.f);
+		float pos = this->prevOffset(m_frameSheet, m_dim, -10.f);
 		this->scrollTo(std::max(0.f, d_cursor + pos));
 	}
 
 	void Scrollbar::scrolldown()
 	{
-		float pos = m_frameSheet.stripe().nextOffset(m_dim, 10.f);
+		float pos = this->nextOffset(m_frameSheet, m_dim, 10.f);
 		this->scrollTo(std::min(this->overflow(), d_cursor + pos));
 	}
 
@@ -107,10 +96,8 @@ namespace toy
 				this->scrolldown();
 	}
 
-	void Scrollbar::nextFrame(size_t tick, size_t delta)
+	void Scrollbar::update()
 	{
-		Wedge::nextFrame(tick, delta);
-
 		float visibleSize = this->visibleSize();
 		float contentSize = this->contentSize();
 		float overflow = this->overflow();

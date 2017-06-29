@@ -6,23 +6,18 @@
 #include <toyui/Config.h>
 #include <toyui/Frame/Layer.h>
 
+#include <toyui/Widget/Sheet.h>
 #include <toyobj/Iterable/Reverse.h>
-
-#include <toyui/Widget/Widget.h>
-#include <toyui/Render/Renderer.h>
-
-#include <toyui/UiWindow.h>
-
-#include <algorithm>
 
 namespace toy
 {
-	Layer::Layer(Widget& widget)
-		: Stripe(widget)
+	Layer::Layer(Wedge& wedge, FrameType layerType)
+		: Frame(wedge)
 		, d_parentLayer(nullptr)
 		, d_index(-1)
 		, d_z(0)
 		, d_redraw(REDRAW)
+		, d_layerType(layerType)
 	{}
 
 	Layer::~Layer()
@@ -31,24 +26,13 @@ namespace toy
 			d_parentLayer->removeLayer(*this);
 	}
 
-	void Layer::collectLayers(std::vector<Layer*>& layers, FrameType barrier)
-	{
-		layers.clear();
-
-		this->rootvisit([&layers, barrier](Frame& frame) {
-			if(frame.frameType() == LAYER)
-				layers.push_back(&frame.as<Layer>());
-			return frame.frameType() < barrier;
-		});
-	}
-
 	void Layer::reindex(size_t from)
 	{
 		for(size_t i = from; i < d_sublayers.size(); ++i)
 			d_sublayers[i]->setIndex(i);
 	}
 
-	void Layer::bind(Stripe& parent)
+	void Layer::bind(Frame& parent)
 	{
 		Frame::bind(parent);
 		d_parentLayer = &parent.layer();
@@ -81,7 +65,6 @@ namespace toy
 		d_sublayers.erase(d_sublayers.begin() + index);
 		d_sublayers.push_back(&sublayer);
 		this->reindex(index);
-		this->masterlayer().markReorder();
 	}
 
 	void Layer::moveToTop()
@@ -89,75 +72,27 @@ namespace toy
 		d_parent->layer().moveToTop(*this);
 	}
 
-	Frame* Layer::pinpoint(float x, float y, const Filter& filter)
+	Frame* Layer::pinpoint(DimFloat pos, const Filter& filter)
 	{
-		if(!this->visible() || this->hollow() || (this->clip() && !this->inside(x, y)))
+		if(!this->visible() || this->hollow() || (this->clip() && !this->inside(pos)))
 			return nullptr;
 
 		for(Layer* frame : reverse_adapt(d_sublayers))
 		{
-			DimFloat local(x, y);
-			frame->integratePosition(*this, local);
-			Frame* target = frame->pinpoint(local.x(), local.y(), filter);
+			DimFloat local = frame->integratePosition(pos, *this);
+			Frame* target = frame->pinpoint(local, filter);
 			if(target)
 				return target;
 		}
 
-		return Stripe::pinpoint(x, y, filter);
+		return Frame::pinpoint(pos, filter);
 	}
 
-	MasterLayer::MasterLayer(Widget& widget)
-		: Layer(widget)
-	{}
-
-	void MasterLayer::relayout()
+	void Layer::visit(const Visitor& visitor)
 	{
-		if(d_dirty >= DIRTY_STRUCTURE || d_reorder)
-			this->reorder();
+		visitor(*this);
 
-		this->measureLayout();
-		this->resizeLayout();
-		this->positionLayout();
+		for(Layer* layer : d_sublayers)
+			layer->visit(visitor);
 	}
-
-	void MasterLayer::redraw()
-	{
-		this->visit([](Frame& frame) {
-			bool dirty = frame.dirty();
-
-			if(dirty)
-				frame.layer().setForceRedraw();
-			if(dirty && frame.widget())
-				frame.widget()->dirtyLayout();
-
-			frame.clearDirty();
-
-			return true;
-		});
-	}
-
-	void MasterLayer::reorder()
-	{
-		this->collectLayers(d_layers, MASTER_LAYER);
-
-		for(Layer* layer : d_layers)
-			layer->setZ(layer->parentLayer() ? layer->parentLayer()->z() + layer->index() : layer->index());
-
-		auto goesBefore = [](Layer* a, Layer* b) { return a->z() < b->z(); };
-		std::sort(d_layers.begin(), d_layers.end(), goesBefore);
-
-		d_reorder = false;
-
-#if 0 // DEBUG
-		for(Layer* layer: d_layers)
-		{
-			layer->debugPrintDepth();
-			printf("LAYOUT: Layer %s reorder z %u index %u\n", layer->style().name().c_str(), layer->z(), layer->index());
-		}
-#endif
-	}
-
-	Layer3D::Layer3D(Widget& widget)
-		: MasterLayer(widget)
-	{}
 }

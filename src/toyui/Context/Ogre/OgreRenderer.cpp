@@ -16,7 +16,7 @@
 
 namespace toy
 {
-	OgreRenderTarget::OgreRenderTarget(Renderer& renderer, MasterLayer& masterLayer)
+	OgreRenderTarget::OgreRenderTarget(Renderer& renderer, Layer& masterLayer)
 		: RenderTarget(renderer, masterLayer, true)
 		, m_scene(*Ogre::Root::getSingleton().createSceneManager(Ogre::ST_GENERIC, 1, Ogre::INSTANCING_CULLING_SINGLETHREAD))
 		, m_node(*m_scene.getRootSceneNode()->createChildSceneNode())
@@ -25,7 +25,7 @@ namespace toy
 		m_camera.detachFromParent();
 		m_node.attachObject(&m_camera);
 
-		OgreRenderWindow& renderWindow = static_cast<OgreRenderWindow&>(masterLayer.widget()->context().renderWindow());
+		OgreRenderWindow& renderWindow = static_cast<OgreRenderWindow&>(masterLayer.widget().uiWindow().context().renderWindow());
 
 		Ogre::CompositorManager2& compositorManager = *Ogre::Root::getSingleton().getCompositorManager2();
 		compositorManager.addWorkspace(&m_scene, &renderWindow.context(), &m_camera, "Clear Workspace", true);
@@ -41,7 +41,7 @@ namespace toy
 		: GlRenderer(resourcePath, false)
 	{}
 
-	object_ptr<RenderTarget> OgreRenderer::createRenderTarget(MasterLayer& masterLayer)
+	object_ptr<RenderTarget> OgreRenderer::createRenderTarget(Layer& masterLayer)
 	{
 		return make_object<OgreRenderTarget>(*this, masterLayer);
 	}

@@ -7,14 +7,8 @@
 
 #include <toyui/Types.h>
 
-#include <toyobj/Object.h>
 #include <toyobj/String/StringConvert.h>
 #include <toyobj/Util/StatString.h>
-
-#include <toyui/Container/Layout.h>
-
-#include <toyui/Edit/TypeIn.h>
-#include <toyui/Button/Slider.h>
 
 namespace toy
 {
@@ -61,12 +55,12 @@ namespace toy
 	}
 
 	WValue::WValue(Wedge& parent, Lref& value, Type& type, const OnUpdate& onUpdate, bool edit)
-		: WrapControl(parent, type)
+		: Wedge(parent, type)
 		, Value(value, onUpdate, edit)
 	{}
 
 	WValue::WValue(Wedge& parent, Lref&& value, Type& type, const OnUpdate& onUpdate, bool edit)
-		: WrapControl(parent, type)
+		: Wedge(parent, type)
 		, Value(std::move(value), onUpdate, edit)
 	{}
 
@@ -89,6 +83,6 @@ namespace toy
 
 	void WValue::notifyUpdate()
 	{
-		this->markDirty();
+		m_frame->markDirty(Frame::DIRTY_CONTENT);
 	}
 }

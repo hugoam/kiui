@@ -13,43 +13,32 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT DockToggle : public Button
-	{
-	public:
-		DockToggle(Dockbar& dockbar, Dockbox& dockbox, const string& icon);
-
-		void click();
-
-		static Type& cls() { static Type ty("DockToggle", Button::cls()); return ty; }
-
-	protected:
-		Dockbox& m_dockbox;
-	};
-
 	class TOY_UI_EXPORT Dockbox : public Window
 	{
 	public:
 		Dockbox(Wedge& parent, Dockbar& dockbar, const string& title, const string& icon);
 
 		Dockbar& dockbar() { return m_dockbar; }
-		DockToggle& toggle() { return m_toggle; }
+		//DockToggle& toggle() { return m_toggle; }
+
+		void toggle(bool open);
 
 		static Type& cls() { static Type ty("Dockbox", Window::cls()); return ty; }
 
 	protected:
 		Dockbar& m_dockbar;
-		DockToggle m_toggle;
+		Toggle m_toggle;
 	};
 
-	class TOY_UI_EXPORT Docker : public Row
+	class TOY_UI_EXPORT Docker : public Wedge
 	{
 	public:
 		Docker(Wedge& parent);
 
-		static Type& cls() { static Type ty("Docker", Row::cls()); return ty; }
+		static Type& cls() { static Type ty("Docker", Wedge::Row()); return ty; }
 	};
 
-	class TOY_UI_EXPORT Dockbar : public Div
+	class TOY_UI_EXPORT Dockbar : public Wedge
 	{
 	public:
 		Dockbar(Wedge& parent);
@@ -58,7 +47,9 @@ namespace toy
 		Dockbox& addDock(const string& name);
 		void removeDock(Dockbox& dockbox);
 
-		static Type& cls() { static Type ty("Dockbar", Div::cls()); return ty; }
+		static Type& cls() { static Type ty("Dockbar", Wedge::Div()); return ty; }
+
+		static Type& Toggle() { static Type ty("DockToggle", Button::cls()); return ty; }
 
 	protected:
 		Docker m_docker;

@@ -5,23 +5,11 @@
 #include <toyui/Config.h>
 #include <toyui/Window/Dockspace.h>
 
-#include <toyobj/String/StringConvert.h>
-
-#include <toyui/Container/Layout.h>
-
-#include <toyui/Frame/Frame.h>
-#include <toyui/Frame/Stripe.h>
-
 #include <toyui/Window/Window.h>
-
 #include <toyui/Widget/RootSheet.h>
 
 namespace toy
 {
-	Placeholder::Placeholder(Wedge& parent)
-		: Board(parent, cls())
-	{}
-
 	Docksection::Docksection(Wedge& parent, Dockline& dockline)
 		: Tabber(parent, cls(), false)
 		, m_dockline(&dockline)
@@ -29,22 +17,24 @@ namespace toy
 
 	void Docksection::dock(Window& window)
 	{
-		this->addTab(window.name()).append(window.container()->release(window, false));
+		Tab& tab = this->addTab(window.name());
+		window.container()->store().transfer(window, tab);
 	}
 
 	void Docksection::undock(Window& window)
 	{
-		RootSheet& rootSheet = this->rootSheet();
-		rootSheet.append(window.container()->release(window, false));
+		Tab& tab = *window.findContainer<Tab>();
+		window.container()->store().transfer(window, this->rootSheet());
+		this->removeTab(tab);
 
-		if(m_tabs.containerContents().empty())
+		if(m_tabs.contents().empty())
 			m_dockline->removeSection();
 	}
 
 	Tab& Docksection::addTab(const string& name)
 	{
 		Tab& tab = Tabber::addTab(name);
-		tab.setStyle(DockTab::cls());
+		tab.setStyle(Docksection::DockTab());
 		return tab;
 	}
 
@@ -56,28 +46,28 @@ namespace toy
 			return m_dockline->dockline()->insertSection(m_dockline->index() + (after ? 1 : 0));
 	}
 
-	Docksection& Docksection::docktarget(float x, float y)
+	Docksection& Docksection::docktarget(const DimFloat& pos)
 	{
-		DimFloat pos = m_frame->localPosition(x, y);
-		if(pos.x() < m_frame->dsize(DIM_X) * 0.25f)
+		DimFloat local = m_frame->localPosition(pos);
+		if(local.x() < m_frame->d_size.x() * 0.25f)
 			return this->docktarget(DIM_X, false); // dock left
-		else if(pos.x() > m_frame->dsize(DIM_X) * 0.75f)
+		else if(local.x() > m_frame->d_size.x() * 0.75f)
 			return this->docktarget(DIM_X, true); // dock right
-		else if(pos.y() < m_frame->dsize(DIM_Y) * 0.25f)
+		else if(local.y() < m_frame->d_size.y() * 0.25f)
 			return this->docktarget(DIM_Y, false); // dock under
-		else if(pos.y() > m_frame->dsize(DIM_Y) * 0.75f)
+		else if(local.y() > m_frame->d_size.y() * 0.75f)
 			return this->docktarget(DIM_Y, true); // dock above
 		else
 			return *this; // dock on
 	}
 
 	Dockline::Dockline(Wedge& parent, Dockspace& dockspace, Dockline* dockline, Dimension dim)
-		: GridSheet(parent, dim, cls())
+		: GridSheet(parent, dim, nullptr, cls())
 		, m_dockspace(dockspace)
 		, m_dockline(dockline)
 		, m_docksection(nullptr)
 	{
-		m_frame->setLength(dim);
+		m_frame->d_length = dim;
 	}
 
 	void Dockline::resetSpans()
@@ -115,7 +105,7 @@ namespace toy
 
 	void Dockline::moveSection(Docksection& docksection)
 	{
-		this->append(docksection.dockline().release(docksection, false));
+		docksection.dockline().store().transfer(docksection, *this);
 		docksection.setDockline(*this);
 		m_docksection = &docksection;
 	}
@@ -128,7 +118,7 @@ namespace toy
 
 	void Dockline::removeSection()
 	{
-		m_docksection->destroy();
+		m_docksection->extract();
 		m_dockline->removeLine(*this);
 	}
 
@@ -143,13 +133,13 @@ namespace toy
 		if(line->docksection())
 		{
 			this->moveSection(*line->docksection());
-			this->release(firstline, true);
+			this->store().remove(firstline);
 		}
 	}
 
 	void Dockline::removeLine(Dockline& line)
 	{
-		line.destroy();
+		line.extract();
 		this->resetSpans();
 
 		if(m_contents.size() == 1)
@@ -185,17 +175,13 @@ namespace toy
 
 	bool Dockline::mouseEntered(MouseEvent& mouseEvent)
 	{
-		this->rootSheet().cursor().setStyle(m_dim == DIM_X ? ResizeCursorX::cls() : ResizeCursorY::cls());
+		this->rootSheet().cursor().setStyle(m_dim == DIM_X ? Cursor::ResizeX() : Cursor::ResizeY());
 		return true;
 	}
 
-	MasterDockline::MasterDockline(Dockspace& dockspace)
-		: Dockline(dockspace, dockspace, nullptr, DIM_Y)
-	{}
-
 	Dockspace::Dockspace(Wedge& parent)
-		: Layout(parent, cls())
-		, m_mainLine(*this)
+		: Wedge(parent, cls())
+		, m_mainLine(*this, *this, nullptr, DIM_Y)
 	{}
 
 	Docksection& Dockspace::addSection(const GridIndex& dockid)
@@ -208,7 +194,6 @@ namespace toy
 	{
 		Docksection& section = this->addSection(dockid);
 		Window& window = section.addTab(name).emplace<Window>(name, static_cast<WindowState>(WINDOW_DOCKABLE | WINDOW_DEFAULT), nullptr, &section);
-		window.docked();
 		return window;
 	}
 }

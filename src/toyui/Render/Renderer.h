@@ -9,7 +9,7 @@
 #include <toyobj/Type.h>
 #include <toyobj/Util/Timer.h>
 #include <toyui/Forward.h>
-#include <toyui/Render/Caption.h>
+#include <toyui/Frame/Caption.h>
 #include <toyui/Style/ImageSkin.h>
 
 namespace toy
@@ -17,9 +17,9 @@ namespace toy
 	class TOY_UI_EXPORT RenderTarget : public Object
 	{
 	public:
-		RenderTarget(Renderer& renderer, MasterLayer& masterLayer, bool gammaCorrected);
+		RenderTarget(Renderer& renderer, Layer& masterLayer, bool gammaCorrected);
 
-		MasterLayer& layer() { return m_masterLayer; }
+		Layer& layer() { return m_masterLayer; }
 
 		bool gammaCorrected() { return m_gammaCorrected; }
 		void setGammaCorrected(bool enabled) { m_gammaCorrected = enabled; }
@@ -30,7 +30,7 @@ namespace toy
 
 	protected:
 		Renderer& m_renderer;
-		MasterLayer& m_masterLayer;
+		Layer& m_masterLayer;
 
 		bool m_gammaCorrected;
 	};
@@ -46,8 +46,10 @@ namespace toy
 		void render(Widget& widget, bool force);
 		void beginDraw(Frame& frame, bool force);
 		void draw(Frame& frame, bool force);
-		void drawCaption(Frame& frame, Caption& caption, const BoxFloat& rect, const BoxFloat& paddedRect, const BoxFloat& contentRect);
-		void drawStencil(Frame& frame, Stencil& stencil, const BoxFloat& rect, const BoxFloat& paddedRect, const BoxFloat& contentRect);
+		BoxFloat selectCorners(Frame& frame);
+		void contentPos(Frame& frame, const BoxFloat& paddedRect, const DimFloat& size, Dimension dim, DimFloat& pos);
+		void drawContent(Frame& frame, const BoxFloat& rect, const BoxFloat& paddedRect, const BoxFloat& contentRect);
+		void drawBackground(Frame& frame, const BoxFloat& rect, const BoxFloat& paddedRect, const BoxFloat& contentRect);
 		void drawSkinImage(Frame& frame, ImageSkin::Section section, BoxFloat rect);
 		void endDraw(Frame& frame);
 
@@ -58,7 +60,7 @@ namespace toy
 		virtual void releaseContext() = 0;
 
 		// targets
-		virtual object_ptr<RenderTarget> createRenderTarget(MasterLayer& masterLayer) = 0;
+		virtual object_ptr<RenderTarget> createRenderTarget(Layer& masterLayer) = 0;
 
 		// setup
 		virtual void loadFont() = 0;

@@ -19,7 +19,7 @@
 
 namespace toy
 {
-	typedef std::function<bool (Frame&, Renderer&)> CustomRenderer;
+	using CustomRenderer = std::function<bool (const Frame&, Renderer&)>;
 
 	class _refl_ TOY_UI_EXPORT Shadow : public Struct
 	{
@@ -42,7 +42,7 @@ namespace toy
 		Colour d_colour;
 		bool d_null;
 
-		static Type& cls() { static Type ty(INDEXED); return ty; }
+		static Type& cls() { static Type ty; return ty; }
 	};
 
 	class _refl_ TOY_UI_EXPORT Paint : public Struct
@@ -58,7 +58,7 @@ namespace toy
 		std::vector<Colour> m_gradient;
 		Image* m_image;
 
-		static Type& cls() { static Type ty(INDEXED); return ty; }
+		static Type& cls() { static Type ty; return ty; }
 	};
 
 	template <class T>
@@ -70,8 +70,11 @@ namespace toy
 		StyleAttr(const StyleAttr& other) : val(other.val), set(other.set) {}
 
 		operator const T&() const { return val; }
+		operator T&() { return val; }
+
+		template <class U>
+		StyleAttr& operator=(const U& v) { val = v; set = true; return *this; }
 		StyleAttr& operator=(const T& v) { val = v; set = true; return *this; }
-		StyleAttr& operator=(const StyleAttr& other) { val = other.val; set = other.set; return *this; }
 
 		void copy(const StyleAttr& other, bool inherit) { if(set && (inherit || !other.set)) return; val = other.val; if(!inherit) set = other.set; }
 
@@ -84,8 +87,8 @@ namespace toy
 	public:
 		LayoutStyle()
 			: Struct()
-			, d_layout(DimLayout(AUTO_LAYOUT, AUTO_LAYOUT)), d_flow(FLOW), d_clipping(NOCLIP), d_opacity(CLEAR), d_space(SHEET)
-			, d_direction(DIRECTION_AUTO), d_align(DimAlign(LEFT, LEFT))
+			, d_solver(FRAME_SOLVER) , d_layout(DimLayout(AUTO_LAYOUT, AUTO_LAYOUT)), d_flow(FLOW), d_clipping(NOCLIP), d_opacity(CLEAR)
+			, d_space(Space::preset(SHEET)) , d_align(DimAlign(LEFT, LEFT))
 			, d_span(DimFloat(1.f, 1.f)), d_pivot(DimPivot(FORWARD, FORWARD)), d_zorder(0), d_updated(0)
 		{}
 
@@ -95,16 +98,14 @@ namespace toy
 			this->copy(other);
 		}
 
-		LayoutStyle& operator=(const LayoutStyle&) = default;
-
 		void copy(const LayoutStyle& other, bool inherit)
 		{
+			d_solver.copy(other.d_solver, inherit);
 			d_layout.copy(other.d_layout, inherit);
 			d_flow.copy(other.d_flow, inherit);
 			d_space.copy(other.d_space, inherit);
 			d_clipping.copy(other.d_clipping, inherit);
 			d_opacity.copy(other.d_opacity, inherit);
-			d_direction.copy(other.d_direction, inherit);
 			d_align.copy(other.d_align, inherit);
 			d_span.copy(other.d_span, inherit);
 			d_size.copy(other.d_size, inherit);
@@ -118,27 +119,12 @@ namespace toy
 		void inherit(const LayoutStyle& other) { return this->copy(other, true); }
 		void copy(const LayoutStyle& other) { return this->copy(other, false); }
 
-		/*_attr_*/ DimLayout layout() const { return d_layout.val; }
-		/*_attr_*/ Flow flow() const { return d_flow.val; }
-		/*_attr_*/ Space space() const { return d_space.val; }
-		/*_attr_*/ Clipping clipping() const { return d_clipping.val; }
-		/*_attr_*/ Opacity opacity() const { return d_opacity.val; }
-		/*_attr_*/ Direction direction() const { return d_direction.val; }
-		/*_attr_*/ DimAlign& align() { return d_align.val; }
-		/*_attr_*/ DimFloat& span() { return d_span.val; }
-		/*_attr_*/ DimFloat& size() { return d_size.val; }
-		/*_attr_*/ BoxFloat& padding() { return d_padding.val; }
-		/*_attr_*/ DimFloat& margin() { return d_margin.val; }
-		/*_attr_*/ DimFloat& spacing() { return d_spacing.val; }
-		/*_attr_*/ DimPivot& pivot() { return d_pivot.val; }
-		/*_attr_*/ int& zorder() { return d_zorder.val; }
-
+		StyleAttr<LayoutSolver> d_solver;
 		StyleAttr<DimLayout> d_layout;
 		StyleAttr<Flow> d_flow;
 		StyleAttr<Space> d_space;
 		StyleAttr<Clipping> d_clipping;
 		StyleAttr<Opacity> d_opacity;
-		StyleAttr<Direction> d_direction;
 		StyleAttr<DimAlign> d_align;
 		StyleAttr<DimFloat> d_span;
 		StyleAttr<DimFloat> d_size;
@@ -150,7 +136,7 @@ namespace toy
 
 		_attr_ _mut_ size_t d_updated;
 
-		static Type& cls() { static Type ty(INDEXED); return ty; }
+		static Type& cls() { static Type ty; return ty; }
 	};
 
 	class _refl_ TOY_UI_EXPORT InkStyle : public Struct
@@ -173,8 +159,6 @@ namespace toy
 		{
 			this->copy(other);
 		}
-
-		InkStyle& operator=(const InkStyle&) = default;
 
 		void copy(const InkStyle& other, bool inherit)
 		{
@@ -214,32 +198,6 @@ namespace toy
 
 		void setEmpty(bool empty) { m_empty = empty; }
 
-		/*_attr_*/ bool empty() const { return m_empty.val; }
-		/*_attr_*/ Style* base() const { return m_base.val; }
-		/*_attr_*/ Colour& backgroundColour() { return m_backgroundColour.val; }
-		/*_attr_*/ Colour& borderColour() { return m_borderColour.val; }
-		/*_attr_*/ Colour& imageColour() { return m_imageColour.val; }
-		/*_attr_*/ Colour& textColour() { return m_textColour.val; }
-		/*_attr_*/ const string& textFont() { return m_textFont.val; }
-		/*_attr_*/ float& textSize() { return m_textSize.val; }
-		/*_attr_*/ bool& textBreak() { return m_textBreak.val; }
-		/*_attr_*/ bool& textWrap() { return m_textWrap.val; }
-		/*_attr_*/ BoxFloat& borderWidth() { return m_borderWidth.val; }
-		/*_attr_*/ BoxFloat& cornerRadius() { return m_cornerRadius.val; }
-		/*_attr_*/ bool& weakCorners() { return m_weakCorners.val; }
-		/*_attr_*/ BoxFloat& padding() { return m_padding.val; }
-		/*_attr_*/ BoxFloat& margin() { return m_margin.val; }
-		/*_attr_*/ DimAlign& align() { return m_align.val; }
-		/*_attr_*/ DimFloat& linearGradient() { return m_linearGradient.val; }
-		/*_attr_*/ Dimension& linearGradientDim() { return m_linearGradientDim.val; }
-		/*_attr_*/ Image* image() { return m_image.val; }
-		/*_attr_*/ Image* overlay() { return m_overlay.val; }
-		/*_attr_*/ Image* tile() { return m_tile.val; }
-		/*_attr_*/ ImageSkin& imageSkin() { return m_imageSkin.val; }
-		/*_attr_*/ Shadow& shadow() { return m_shadow.val; }
-		/*_attr_*/ Type* hoverCursor() { return m_hoverCursor.val; }
-		/*_attr_*/ const CustomRenderer& customRenderer() { return m_customRenderer.val; }
-
 		void prepare();
 
 		Style* m_style;
@@ -269,10 +227,8 @@ namespace toy
 		StyleAttr<Type*> m_hoverCursor;
 		StyleAttr<CustomRenderer> m_customRenderer;
 
-		static Type& cls() { static Type ty(INDEXED); return ty; }
+		static Type& cls() { static Type ty; return ty; }
 	};
-
-	typedef std::vector<Style*> StyleVector;
 
 	class TOY_UI_EXPORT SubSkin
 	{
@@ -293,14 +249,12 @@ namespace toy
 		Style(const string& name);
 		~Style();
 
+		Style& operator=(const Style&) = default;
+
 		_attr_ const string& name() { return m_name.empty() ? m_styleType->name() : m_name; }
 		_attr_ Style* base() { return m_base; }
 		_attr_ LayoutStyle& layout() { return m_layout; }
 		_attr_ InkStyle& skin() { return m_skin; }
-		_attr_ _mut_ size_t updated() { return m_updated; }
-
-		void markUpdate() { ++m_updated; }
-		void setUpdated(size_t update) { m_updated = update; }
 
 		bool ready() { return m_ready; }
 
@@ -332,7 +286,6 @@ namespace toy
 		LayoutStyle m_layout;
 		InkStyle m_skin;
 		StyleTable m_subskins;
-		size_t m_updated;
 
 		bool m_ready;
 	};

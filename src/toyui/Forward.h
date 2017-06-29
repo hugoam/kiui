@@ -21,7 +21,7 @@ namespace toy
 	enum Pivot : unsigned int;
 	enum Align : unsigned int;
 	enum AutoLayout : unsigned int;
-	enum Space : unsigned int;
+	enum SpacePreset : unsigned int;
 	enum Clipping : unsigned int;
 	enum Dimension : unsigned int;
 	enum FrameType : unsigned int;
@@ -30,6 +30,11 @@ namespace toy
 	enum Flow : unsigned int;
 	enum BoxLayer : unsigned int;
 	enum Opacity : unsigned int;
+	enum LayoutSolver : unsigned int;
+
+	struct Space;
+
+	enum InputModifier : unsigned int;
 
 	class BoxFloat;
 
@@ -53,29 +58,31 @@ namespace toy
 
 	class Style;
 
-	class DrawFrame;
-	class Stencil;
+	class Content;
 	class Caption;
+	class Icon;
 
 	class Shadow;
 	class ImageSkin;
 	class Paint;
 	class InkStyle;
 
-	class Uibox;
+	class FrameSolver;
+	class RowSolver;
+	class GridSolver;
+
+	class UiRect;
 	class Frame;
-	class Stripe;
-	class Grid;
-	class Table;
 	class Layer;
-	class MasterLayer;
+
 	class LayoutStyle;
 
 	enum WidgetState : unsigned int;
 
+	class WidgetStore;
+
 	class Widget;
 	class Wedge;
-	class Container;
 	class RootSheet;
 	class Cursor;
 
@@ -83,7 +90,6 @@ namespace toy
 
 	class Label;
 	class Title;
-	class Icon;
 	class DynamicImage;
 	class Button;
 	class WrapButton;

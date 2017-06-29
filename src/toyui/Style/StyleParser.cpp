@@ -6,31 +6,31 @@
 #include <toyui/Style/StyleParser.h>
 
 #include <toyobj/String/StringConvert.h>
-#include <toyobj/Util/Timer.h>
 
 #include <toyui/Widget/Widget.h>
 #include <toyui/UiLayout.h>
+#include <toyui/UiWindow.h>
 
 #include <yaml.h>
 
 namespace toy
 {
+	template <> Direction fromString<Direction>(const string& str) { if(str == "READING") return READING; else if(str == "PARAGRAPH") return PARAGRAPH; return READING; }
+	template <> Sizing fromString<Sizing>(const string& str) { if(str == "FIXED") return FIXED; else if(str == "SHRINK") return SHRINK; else if(str == "WRAP") return WRAP; else if(str == "EXPAND") return EXPAND; return FIXED; }
+
+	template <> Space fromString<Space>(const string& str) { std::vector<string> elements = splitString(str, ","); return { fromString<Direction>(elements[0]), fromString<Sizing>(elements[1]), fromString<Sizing>(elements[2]) }; }
+
 	template <> Flow fromString<Flow>(const string& str) { if(str == "FLOW") return FLOW; else if(str == "OVERLAY") return OVERLAY; return FLOW; }
-	template <> Space fromString<Space>(const string& str) { if(str == "SHEET") return SHEET; else if(str == "ITEM") return ITEM; else if(str == "BLOCK") return BLOCK; else if(str == "LINE") return LINE; else if(str == "STACK") return STACK; else if(str == "DIV") return DIV; else if(str == "SPACE") return SPACE; else if(str == "BOARD") return BOARD; return SHEET; }
 	template <> Clipping fromString<Clipping>(const string& str) { if(str == "NOCLIP") return NOCLIP; else if(str == "CLIP") return CLIP; return NOCLIP; }
 	template <> Opacity fromString<Opacity>(const string& str) { if(str == "OPAQUE") return OPAQUE; else if(str == "CLEAR") return CLEAR; else if(str == "HOLLOW") return HOLLOW;  return OPAQUE; }
-	template <> Direction fromString<Direction>(const string& str) { if(str == "READING") return READING; else if(str == "PARAGRAPH") return PARAGRAPH; return READING; }
 	template <> Align fromString<Align>(const string& str) { if(str == "CENTER") return CENTER; else if(str == "LEFT") return LEFT; else if(str == "RIGHT") return RIGHT; return LEFT; }
 	template <> Pivot fromString<Pivot>(const string& str) { if(str == "FORWARD") return FORWARD; else if(str == "REVERSE") return REVERSE; return FORWARD; }
 
-	template <> DimPivot fromString<DimPivot>(const string& str) { std::vector<string> dimStr = splitString(str, ","); return DimPivot(fromString<Pivot>(dimStr[0]), fromString<Pivot>(dimStr[1])); }
-	template <> DimAlign fromString<DimAlign>(const string& str) { std::vector<string> dimStr = splitString(str, ","); return DimAlign(fromString<Align>(dimStr[0]), fromString<Align>(dimStr[1])); }
-
+	template <> inline void fromString<DimPivot>(const string& str, DimPivot& dim) { string_to_fixed_vector<DimPivot, Pivot>(str, dim); }
+	template <> inline void fromString<DimAlign>(const string& str, DimAlign& dim) { string_to_fixed_vector<DimAlign, Align>(str, dim); }
+	
 	template <> inline void fromString<DimFloat>(const string& str, DimFloat& vec) { string_to_fixed_vector<DimFloat, float>(str, vec); }
-	template <> inline void toString<DimFloat>(const DimFloat& val, string& str) { return fixed_vector_to_string<DimFloat, 2>(val, str); }
-
 	template <> inline void fromString<BoxFloat>(const string& str, BoxFloat& vec) { string_to_fixed_vector<BoxFloat, float>(str, vec); }
-	template <> inline void toString<BoxFloat>(const BoxFloat& val, string& str) { return fixed_vector_to_string<BoxFloat, 4>(val, str); }
 
 	template <> WidgetState fromString<WidgetState>(const string& str)
 	{
@@ -57,15 +57,8 @@ namespace toy
 	class StyleParser::Impl
 	{
 	public:
-		Impl()
-		{
-			yaml_parser_initialize(&m_parser);
-		}
-
-		~Impl()
-		{
-			yaml_parser_delete(&m_parser);
-		}
+		Impl() { yaml_parser_initialize(&m_parser); }
+		~Impl() { yaml_parser_delete(&m_parser); }
 
 		yaml_parser_t m_parser;
 	};
@@ -89,10 +82,6 @@ namespace toy
 	{
 		m_styler.clear();
 
-		yaml_token_t token;
-
-		int done = 0;
-
 		FILE* input = fopen(path.c_str(), "rb");
 
 		if(!input)
@@ -103,6 +92,8 @@ namespace toy
 
 		yaml_parser_set_input_file(&m_pimpl->m_parser, input);
 
+		yaml_token_t token;
+		bool done = false;
 		while(!done)
 		{
 			if(!yaml_parser_scan(&m_pimpl->m_parser, &token))
@@ -153,7 +144,6 @@ namespace toy
 	{
 		m_state = IN_STYLE_DEFINITION;
 		m_style = &m_styler.styledef(name);
-		m_style->setUpdated(m_style->updated() + 1);
 		m_skin = &m_style->skin();
 		m_style->skin().m_empty = false;
 	}
@@ -173,7 +163,7 @@ namespace toy
 		{
 			WidgetState state = fromString<WidgetState>(strState);
 			string suffix = "_" + replaceAll(strState, "|", "_");
-			m_style->decline(state).m_image = &m_styler.findImage(m_skin->image()->d_name + suffix);
+			m_style->decline(state).m_image = &m_styler.uiWindow().findImage(m_skin->m_image.val->d_name + suffix);
 		}
 	}
 	
@@ -185,8 +175,7 @@ namespace toy
 			WidgetState state = fromString<WidgetState>(strState);
 			string suffix = "_" + replaceAll(strState, "|", "_");
 			InkStyle& inkstyle = m_style->decline(state);
-			inkstyle.m_imageSkin = m_skin->m_imageSkin;
-			inkstyle.m_imageSkin.val.setupImage(m_styler.findImage(m_skin->m_imageSkin.val.d_image->d_name + suffix));
+			inkstyle.m_imageSkin = ImageSkin(m_styler.uiWindow().findImage(m_skin->m_imageSkin.val.d_image->d_name + suffix), m_skin->m_imageSkin);
 		}
 	}
 
@@ -198,7 +187,7 @@ namespace toy
 		if(key == "copy_skin")
 			m_style->copySkin(m_styler.styledef(value));
 		//else if(key == "inherit_skin")
-		//	m_style->skin().m_base = value;
+		//	m_style->inheritSkin(m_styler.styledef(value));
 		else if(key == "reset_skin")
 			m_style->skin().m_base = nullptr;
 
@@ -209,9 +198,7 @@ namespace toy
 		else if(key == "opacity")
 			m_style->layout().d_opacity = fromString<Opacity>(value); // OPAQUE | CLEAR | HOLLOW
 		else if(key == "space")
-			m_style->layout().d_space = fromString<Space>(value); // AUTO | FLEX | BLOCK | DIV | SPACE | BOARD
-		else if(key == "direction")
-			m_style->layout().d_direction = fromString<Direction>(value); // DIM_X | DIM_Y
+			m_style->layout().d_space = fromString<Space>(value);
 		else if(key == "align")
 			m_style->layout().d_align = fromString<DimAlign>(value); // x, y
 		else if(key == "span")
@@ -256,13 +243,13 @@ namespace toy
 		else if(key == "topdown_gradient")
 			m_skin->m_linearGradient = fromString<DimFloat>(value); // top, down
 		else if(key == "image")
-			m_skin->m_image = value == "null" ? nullptr : &m_styler.findImage(value); // image.png
+			m_skin->m_image = value == "null" ? nullptr : &m_styler.uiWindow().findImage(value); // image.png
 		else if(key == "overlay")
-			m_skin->m_overlay = value == "null" ? nullptr : &m_styler.findImage(value); // image.png
+			m_skin->m_overlay = value == "null" ? nullptr : &m_styler.uiWindow().findImage(value); // image.png
 		else if(key == "tile")
-			m_skin->m_tile = value == "null" ? nullptr : &m_styler.findImage(value); // image.png
+			m_skin->m_tile = value == "null" ? nullptr : &m_styler.uiWindow().findImage(value); // image.png
 		else if(key == "image_skin")
-			m_skin->m_imageSkin = ImageSkin(m_styler.findImage(values[0]),
+			m_skin->m_imageSkin = ImageSkin(m_styler.uiWindow().findImage(values[0]),
 											fromString<int>(values[1]), fromString<int>(values[2]),
 											fromString<int>(values[3]), fromString<int>(values[4]),
 											values.size() > 5 ? fromString<int>(values[5]) : 0,

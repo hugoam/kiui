@@ -9,11 +9,13 @@
 
 /* toy ui */
 #include <toyui/Frame/Frame.h>
-#include <toyui/Frame/Stripe.h>
-#include <toyui/Frame/Grid.h>
+#include <toyui/Frame/Layer.h>
 
-#include <toyui/Render/Caption.h>
-#include <toyui/Render/Stencil.h>
+#include <toyui/Solver/Solver.h>
+#include <toyui/Solver/Grid.h>
+
+#include <toyui/Frame/Content.h>
+#include <toyui/Frame/Caption.h>
 
 #include <toyui/Style/StyleParser.h>
 
@@ -21,7 +23,6 @@
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Widget/RootSheet.h>
 #include <toyui/Widget/Cursor.h>
-#include <toyui/Container/Layout.h>
 
 #include <toyui/Button/Button.h>
 #include <toyui/Button/Image.h>
@@ -51,11 +52,13 @@
 #include <toyui/Window/Node.h>
 #include <toyui/Window/Menu.h>
 #include <toyui/Window/Toolbar.h>
-#include <toyui/Window/ContextMenu.h>
+#include <toyui/Window/Popup.h>
 
 #include <toyui/Frame/DimString.h>
 
 #include <toyui/Input/InputDevice.h>
+
+#include <toyui/Render/Renderer.h>
 
 #include <toyui/UiWindow.h>
 #include <toyui/UiLayout.h>

@@ -30,17 +30,14 @@ namespace toy
 {
 	MouseButtonCode convertGlfwButton(int button)
 	{
-		switch(button)
-		{
-		case GLFW_MOUSE_BUTTON_LEFT:
+		if(button == GLFW_MOUSE_BUTTON_LEFT)
 			return LEFT_BUTTON;
-		case GLFW_MOUSE_BUTTON_RIGHT:
+		else if(button == GLFW_MOUSE_BUTTON_RIGHT)
 			return RIGHT_BUTTON;
-		case GLFW_MOUSE_BUTTON_MIDDLE:
+		else if(button == GLFW_MOUSE_BUTTON_MIDDLE)
 			return MIDDLE_BUTTON;
-		default:
+		else
 			return LEFT_BUTTON;
-		}
 	}
 
 	KeyCode convertGlfwKey(int key)

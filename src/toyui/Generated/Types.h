@@ -14,10 +14,11 @@ namespace toy
     template <> TOY_UI_EXPORT Type& typecls<Pivot>();
     template <> TOY_UI_EXPORT Type& typecls<Align>();
     template <> TOY_UI_EXPORT Type& typecls<FrameType>();
+    template <> TOY_UI_EXPORT Type& typecls<LayoutSolver>();
     template <> TOY_UI_EXPORT Type& typecls<AutoLayout>();
     template <> TOY_UI_EXPORT Type& typecls<Flow>();
     template <> TOY_UI_EXPORT Type& typecls<Sizing>();
-    template <> TOY_UI_EXPORT Type& typecls<Space>();
+    template <> TOY_UI_EXPORT Type& typecls<SpacePreset>();
     template <> TOY_UI_EXPORT Type& typecls<Clipping>();
     template <> TOY_UI_EXPORT Type& typecls<Opacity>();
     template <> TOY_UI_EXPORT Type& typecls<WidgetState>();

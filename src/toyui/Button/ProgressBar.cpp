@@ -6,20 +6,19 @@
 #include <toyui/Button/ProgressBar.h>
 
 #include <toyui/Frame/Frame.h>
-#include <toyui/Frame/Stripe.h>
+#include <toyui/Frame/Caption.h>
 
 #include <toyui/Button/Slider.h>
 
 namespace toy
 {
-	ProgressBar::ProgressBar(Wedge& parent, Dimension dim, const Callback& onUpdated)
+	ProgressBar::ProgressBar(Wedge& parent, Dimension dim)
 		: Wedge(parent, cls())
 		, m_dim(dim)
 		, m_percentage(0.f)
-		, m_filler(*this)
-		, m_spacer(*this)
-		, m_display(*this, "0%")
-		, m_onUpdated(onUpdated)
+		, m_filler(*this, Item::Filler())
+		, m_spacer(*this, Item::Spacer())
+		, m_display(*this, "0%", Slider::Display())
 	{}
 
 	void ProgressBar::setPercentage(float percentage)
@@ -27,6 +26,6 @@ namespace toy
 		m_percentage = percentage;
 		m_filler.frame().setSpanDim(m_dim, percentage);
 		m_spacer.frame().setSpanDim(m_dim, 1.f - percentage);
-		m_display.setLabel(toString(m_percentage) + "%");
+		m_display.frame().setCaption(toString(m_percentage) + "%");
 	}
 }

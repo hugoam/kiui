@@ -6,17 +6,13 @@
 #define TOY_DIM_H
 
 /* toy */
-#include <toyobj/Id.h>
 #include <toyobj/String/String.h>
 #include <toyobj/Type.h>
-#include <toyobj/Indexer.h>
-#include <toyobj/Util/Global.h>
 #include <toyobj/Util/Colour.h>
 #include <toyui/Forward.h>
 
 /* std */
 #include <array>
-#include <map>
 
 #if defined _WIN32
 #undef OPAQUE
@@ -35,12 +31,11 @@ namespace toy
 
 	enum _refl_ Direction : unsigned int
 	{
+		DIRECTION_NONE = 4,
 		READING = 0,
 		PARAGRAPH = 1,
 		PARALLEL = 2,
 		ORTHOGONAL = 3,
-		DIMENSION = 4,
-		DIRECTION_AUTO = 5
 	};
 
 	enum _refl_ Pivot : unsigned int
@@ -64,12 +59,17 @@ namespace toy
 	enum _refl_ FrameType : unsigned int
 	{
 		FRAME = 0,
-		STRIPE = 1,
-		GRID = 2,
-		TABLE = 3,
-		LAYER = 4,
-		MASTER_LAYER = 5,
-		SPACE_LAYER = 6
+		LAYER = 2,
+		MASTER_LAYER = 3,
+		SPACE_LAYER = 4
+	};
+
+	enum _refl_ LayoutSolver : unsigned int
+	{
+		FRAME_SOLVER = 0,
+		ROW_SOLVER = 1,
+		GRID_SOLVER = 2,
+		TABLE_SOLVER = 3,
 	};
 
 	enum _refl_ AutoLayout : unsigned int
@@ -89,37 +89,41 @@ namespace toy
 
 	enum _refl_ Sizing : unsigned int
 	{
-		FIXED = 0,
-		MANUAL = 1,
-		SHRINK = 2,
-		WRAP = 3,
-		EXPAND = 4
+		FIXED,
+		SHRINK,
+		WRAP,
+		EXPAND
 	};
 
-	enum _refl_ Space : unsigned int
+	struct TOY_UI_EXPORT Space
 	{
-		MANUAL_SPACE = 0,        // PARAGRAPH   direction, MANUAL length, MANUAL depth
-		SHEET = 1,               // PARAGRAPH   direction, WRAP   length, WRAP   depth
-		ITEM = 2,                // READING     direction, SHRINK length, SHRINK depth
-		BLOCK = 3,               // PARAGRAPH   direction, SHRINK length, SHRINK depth
-		FIXED_BLOCK = 4,         // PARAGRAPH   direction, FIXED  length, FIXED  depth
-		LINE = 5,	             // READING     direction, WRAP   length, SHRINK depth
-		STACK = 6,               // PARAGRAPH   direction, SHRINK length, WRAP   depth 
-		DIV = 7,	             // ORTHOGONAL  direction, WRAP   length, SHRINK depth
-		SPACE = 8,               // PARALLEL    direction, WRAP   length, SHRINK depth
-		BOARD = 9,               // PARAGRAPH   direction, EXPAND length, EXPAND depth
-		PARALLEL_FLEX = 10,      // PARALLEL    direction, WRAP   length, WRAP depth
-	};
+		//Space(Direction dir, Sizing len, Sizing dep) : direction(dir), sizingLength(len), sizingDepth(dep) {}
+		//Space(SpacePreset preset) { *this = preset; }
+		void operator=(SpacePreset preset) { *this = Space::preset(preset); }
 
-	struct SpaceParams
-	{
-		Space space;
 		Direction direction;
-		Sizing length;
-		Sizing depth;
+		Sizing sizingLength;
+		Sizing sizingDepth;
+
+		static Space preset(SpacePreset preset);
 	};
 
-	extern SpaceParams SpaceTable[11];
+	enum _refl_ SpacePreset : unsigned int
+	{
+		SHEET,               // PARAGRAPH   direction, WRAP   length, WRAP   depth
+		FLEX,			     // PARALLEL    direction, WRAP   length, WRAP   depth
+		FLEX_O,			     // ORTHOGONAL  direction, WRAP   length, WRAP   depth
+		ITEM,                // READING     direction, SHRINK length, SHRINK depth
+		UNIT,                // PARAGRAPH   direction, SHRINK length, SHRINK depth
+		BLOCK,               // PARAGRAPH   direction, FIXED  length, FIXED  depth
+		LINE,	             // READING     direction, WRAP   length, SHRINK depth
+		STACK,               // PARAGRAPH   direction, SHRINK length, WRAP   depth 
+		DIV,	             // ORTHOGONAL  direction, WRAP   length, SHRINK depth
+		SPACER,              // PARALLEL    direction, WRAP   length, SHRINK depth
+		BOARD                // PARAGRAPH   direction, EXPAND length, EXPAND depth
+	};
+
+	extern Space SpacePresets[11];
 
 	enum _refl_ Clipping : unsigned int
 	{
@@ -150,8 +154,13 @@ namespace toy
 
 		bool null() const { return d_values[0] == T() && d_values[1] == T(); }
 
-		T operator [](size_t i) const { return d_values[i]; }
-		T& operator [](size_t i) { return d_values[i]; }
+		T operator[](size_t i) const { return d_values[i]; }
+		T& operator[](size_t i) { return d_values[i]; }
+
+		Dim operator+(const Dim& rhs) const { return Dim(x() + rhs.x(), y() + rhs.y()); }
+		Dim operator-(const Dim& rhs) const { return Dim(x() - rhs.x(), y() - rhs.y()); }
+		Dim operator*(const Dim& rhs) const { return Dim(x() * rhs.x(), y() * rhs.y()); }
+		Dim operator/(const Dim& rhs) const { return Dim(x() / rhs.x(), y() / rhs.y()); }
 
 	protected:
 		std::array<T, 2> d_values;
@@ -166,25 +175,18 @@ namespace toy
 		BoxFloat(float uniform) : BoxFloat(uniform, uniform, uniform, uniform) {}
 		BoxFloat() : BoxFloat(0.f) { d_null = true; }
 
-		BoxFloat& operator=(const BoxFloat& other) { this->assign(other.v0(), other.v1(), other.v2(), other.v3()); return *this; }
+		float operator[](size_t i) const { return d_values[i]; }
+		float& operator[](size_t i) { d_null = false; return d_values[i]; }
 
-		float operator [](size_t i) const { return d_values[i]; }
-		float& operator [](size_t i) { d_null = false; return d_values[i]; }
+		_attr_ float x0() const { return d_values[0]; }
+		_attr_ float y0() const { return d_values[1]; }
+		_attr_ float x1() const { return d_values[2]; }
+		_attr_ float y1() const { return d_values[3]; }
 
-		_attr_ _mut_ float x0() const { return d_values[0]; }
-		_attr_ _mut_ float y0() const { return d_values[1]; }
-		_attr_ _mut_ float x1() const { return d_values[2]; }
-		_attr_ _mut_ float y1() const { return d_values[3]; }
-
-		_attr_ float x() const { return x0(); }
-		_attr_ float y() const { return y0(); }
-		_attr_ float w() const { return x1(); }
-		_attr_ float h() const { return y1(); }
-
-		_attr_ float v0() const { return d_values[0]; }
-		_attr_ float v1() const { return d_values[1]; }
-		_attr_ float v2() const { return d_values[2]; }
-		_attr_ float v3() const { return d_values[3]; }
+		float x() const { return x0(); }
+		float y() const { return y0(); }
+		float w() const { return x1(); }
+		float h() const { return y1(); }
 
 		void clear() { this->assign(0.f); d_null = true; }
 
@@ -194,16 +196,6 @@ namespace toy
 
 		void assign(float x0, float y0, float x1, float y1) { d_values[0] = x0; d_values[1] = y0; d_values[2] = x1; d_values[3] = y1; d_null = cnull(); }
 		void assign(float val) { d_values[0] = val; d_values[1] = val; d_values[2] = val; d_values[3] = val; d_null = cnull(); }
-
-		void setX0(float x0) { d_values[0] = x0; d_null = cnull(); }
-		void setY0(float y0) { d_values[1] = y0; d_null = cnull(); }
-		void setX1(float x1) { d_values[2] = x1; d_null = cnull(); }
-		void setY1(float y1) { d_values[3] = y1; d_null = cnull(); }
-
-		void setX(float x) { setX0(x); }
-		void setY(float y) { setY0(y); }
-		void setW(float w) { setX1(w); }
-		void setH(float h) { setY1(h); }
 
 		bool intersects(const BoxFloat& other) const
 		{
@@ -221,12 +213,12 @@ namespace toy
 	};
 
 	// @todo add template reflection mechanism for these
-	typedef Dim<size_t> Index;
-	typedef Dim<float> DimFloat;
-	typedef Dim<AutoLayout> DimLayout;
-	typedef Dim<Sizing> DimSizing;
-	typedef Dim<Align> DimAlign;
-	typedef Dim<Pivot> DimPivot;
+	using DimIndex = Dim<size_t>;
+	using DimFloat = Dim<float>;
+	using DimLayout = Dim<AutoLayout>;
+	using DimSizing = Dim<Sizing>;
+	using DimAlign = Dim<Align>;
+	using DimPivot = Dim<Pivot>;
 }
 
 #endif // TOY_DIM_H

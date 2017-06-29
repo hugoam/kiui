@@ -8,7 +8,6 @@
 #include <toyobj/Util/Colour.h>
 
 #include <toyui/Frame/Frame.h>
-#include <toyui/Frame/Stripe.h>
 #include <toyui/Frame/Layer.h>
 
 #include <toyui/Widget/Widget.h>
@@ -47,15 +46,9 @@ namespace toy
 		, m_ctx(nullptr)
 	{}
 
-	NanoRenderer::~NanoRenderer()
+	object_ptr<RenderTarget> NanoRenderer::createRenderTarget(Layer& layer)
 	{
-		//if(m_ctx)
-			//this->releaseContext();
-	}
-
-	object_ptr<RenderTarget> NanoRenderer::createRenderTarget(MasterLayer& masterLayer)
-	{
-		return make_object<RenderTarget>(*this, masterLayer, false);
+		return make_object<RenderTarget>(*this, layer, false);
 	}
 
 	void NanoRenderer::loadFont()
@@ -85,7 +78,7 @@ namespace toy
 	void NanoRenderer::beginFrame(RenderTarget& target)
 	{
 		float pixelRatio = 1.f;
-		nvgBeginFrame(m_ctx, target.layer().width(), target.layer().height(), pixelRatio);
+		nvgBeginFrame(m_ctx, target.layer().d_size.x(), target.layer().d_size.y(), pixelRatio);
 	}
 
 	void NanoRenderer::endFrame()
@@ -136,7 +129,7 @@ namespace toy
 		if(corners.null())
 			nvgRect(m_ctx, rect.x() + halfborder, rect.y() + halfborder, rect.w() - border, rect.h() - border);
 		else
-			nvgRoundedRectVarying(m_ctx, rect.x() + halfborder, rect.y() + halfborder, rect.w() - border, rect.h() - border, corners.v0(), corners.v1(), corners.v2(), corners.v3());
+			nvgRoundedRectVarying(m_ctx, rect.x() + halfborder, rect.y() + halfborder, rect.w() - border, rect.h() - border, corners[0], corners[1], corners[2], corners[3]);
 	}
 
 	void NanoRenderer::pathCircle(float x, float y, float r)
@@ -149,13 +142,13 @@ namespace toy
 	{
 		//nvgRGBA(0, 0, 0, 128)
 		NVGcolor shadowColour = nvgColour(shadow.d_colour);
-		NVGpaint shadowPaint = nvgBoxGradient(m_ctx, rect.x() + shadow.d_xpos - shadow.d_spread, rect.y() + shadow.d_ypos - shadow.d_spread, rect.w() + shadow.d_spread * 2.f, rect.h() + shadow.d_spread * 2.f, corners.v0() + shadow.d_spread, shadow.d_blur, shadowColour, nvgRGBA(0, 0, 0, 0));
+		NVGpaint shadowPaint = nvgBoxGradient(m_ctx, rect.x() + shadow.d_xpos - shadow.d_spread, rect.y() + shadow.d_ypos - shadow.d_spread, rect.w() + shadow.d_spread * 2.f, rect.h() + shadow.d_spread * 2.f, corners[0] + shadow.d_spread, shadow.d_blur, shadowColour, nvgRGBA(0, 0, 0, 0));
 		nvgBeginPath(m_ctx);
 		nvgRect(m_ctx, rect.x() + shadow.d_xpos - shadow.d_radius, rect.y() + shadow.d_ypos - shadow.d_radius, rect.w() + shadow.d_radius * 2.f, rect.h() + shadow.d_radius * 2.f);
 		if(corners.null())
 			nvgRect(m_ctx, rect.x(), rect.y(), rect.w(), rect.h());
 		else
-			nvgRoundedRectVarying(m_ctx, rect.x(), rect.y(), rect.w(), rect.h(), corners.v0(), corners.v1(), corners.v2(), corners.v3());
+			nvgRoundedRectVarying(m_ctx, rect.x(), rect.y(), rect.w(), rect.h(), corners[0], corners[1], corners[2], corners[3]);
 		nvgPathWinding(m_ctx, NVG_HOLE);
 		nvgFillPaint(m_ctx, shadowPaint);
 		nvgFill(m_ctx);
@@ -163,12 +156,12 @@ namespace toy
 
 	void NanoRenderer::drawRect(const BoxFloat& rect, const BoxFloat& corners, InkStyle& skin)
 	{
-		float border = skin.borderWidth().x0();
+		float border = skin.m_borderWidth.val.x0();
 
 		this->pathRect(rect, corners, border);
 
 		// Fill
-		if(skin.backgroundColour().a() > 0.f)
+		if(skin.m_backgroundColour.val.a() > 0.f)
 			this->fill(skin, rect);
 
 		// Border
@@ -187,15 +180,15 @@ namespace toy
 
 	void NanoRenderer::fill(InkStyle& skin, const BoxFloat& rect)
 	{
-		if(skin.linearGradient().null())
+		if(skin.m_linearGradient.val.null())
 		{
 			nvgFillColor(m_ctx, nvgColour(skin.m_backgroundColour));
 		}
 		else
 		{
-			NVGcolor first = nvgOffsetColour(skin.backgroundColour(), skin.linearGradient().x());
-			NVGcolor second = nvgOffsetColour(skin.backgroundColour(), skin.linearGradient().y());
-			if(skin.linearGradientDim() == DIM_X)
+			NVGcolor first = nvgOffsetColour(skin.m_backgroundColour, skin.m_linearGradient.val.x());
+			NVGcolor second = nvgOffsetColour(skin.m_backgroundColour, skin.m_linearGradient.val.y());
+			if(skin.m_linearGradientDim == DIM_X)
 				nvgFillPaint(m_ctx, nvgLinearGradient(m_ctx, rect.x(), rect.y(), rect.x() + rect.w(), rect.y(), first, second));
 			else
 				nvgFillPaint(m_ctx, nvgLinearGradient(m_ctx, rect.x(), rect.y(), rect.x(), rect.y() + rect.h(), first, second));
@@ -205,10 +198,10 @@ namespace toy
 
 	void NanoRenderer::stroke(InkStyle& skin)
 	{
-		float border = skin.borderWidth().x0();
+		float border = skin.m_borderWidth.val.x0();
 
 		nvgStrokeWidth(m_ctx, border);
-		nvgStrokeColor(m_ctx, nvgColour(skin.borderColour()));
+		nvgStrokeColor(m_ctx, nvgColour(skin.m_borderColour));
 		nvgStroke(m_ctx);
 	}
 
@@ -264,13 +257,13 @@ namespace toy
 	void NanoRenderer::setupText(InkStyle& skin)
 	{
 		NVGalign alignH = NVG_ALIGN_LEFT;
-		if(skin.align()[DIM_X] == CENTER)
+		if(skin.m_align.val.x() == CENTER)
 			alignH = NVG_ALIGN_CENTER;
-		else if(skin.align()[DIM_X] == RIGHT)
+		else if(skin.m_align.val.x() == RIGHT)
 			alignH = NVG_ALIGN_RIGHT;
 
-		nvgFontSize(m_ctx, skin.textSize());
-		nvgFontFace(m_ctx, skin.textFont().c_str());
+		nvgFontSize(m_ctx, skin.m_textSize);
+		nvgFontFace(m_ctx, skin.m_textFont.val.c_str());
 		nvgTextAlign(m_ctx, alignH | NVG_ALIGN_TOP);
 
 		m_lineHeight = 0.f;
@@ -287,7 +280,6 @@ namespace toy
 
 		this->breakTextLine(rect, row);
 	}
-
 
 	void NanoRenderer::breakTextWidth(const char* first, const char* end, const BoxFloat& rect, InkStyle& skin, TextRow& row)
 	{
@@ -325,7 +317,7 @@ namespace toy
 
 		textRows.clear();
 	
-		if(!skin.textBreak())
+		if(!skin.m_textBreak)
 		{
 			textRows.resize(1);
 
@@ -344,7 +336,7 @@ namespace toy
 			TextRow& row = textRows.back();
 
 			BoxFloat rect(0.f, index * m_lineHeight, space.x(), 0.f);
-			if(skin.textWrap())
+			if(skin.m_textWrap)
 				this->breakTextWidth(first, end, rect, skin, row);
 			else
 				this->breakTextReturns(first, end, rect, skin, row);

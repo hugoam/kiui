@@ -5,11 +5,7 @@
 #include <toyui/Config.h>
 #include <toyui/Container/Tree.h>
 
-#include <toyui/Container/Layout.h>
-
 #include <toyui/Container/Expandbox.h>
-
-#include <toyui/Frame/Frame.h>
 
 namespace toy
 {
@@ -17,47 +13,28 @@ namespace toy
 		: Expandbox(parent, title, collapsed, type)
 		, m_image(image)
 	{
-		m_header.setStyle(TreeNodeHeader::cls());
-		m_toggle.setStyle(TreeNodeToggle::cls());
-		m_container.setStyle(TreeNodeBody::cls());
+		m_header.setStyle(TreeNode::Header());
+		m_toggle.setStyle(TreeNode::Switch());
+		m_body.setStyle(TreeNode::Body());
 		
 		m_header.setTrigger([this](Widget&) { this->selected(); });
 
 		if(!m_image.empty())
 		{
-			m_icon = &m_header.emplace<Icon>(m_image);
+			m_icon = &m_header.emplace<Item>(m_image);
 			m_header.swap(1, 2);
 		}
 
-		m_toggle.enableState(DISABLED);
-	}
-
-	void TreeNode::handleAdd(Widget& widget)
-	{
-		m_toggle.disableState(DISABLED);
-	}
-
-	void TreeNode::handleRemove(Widget& widget)
-	{
-		if(m_container.containerContents().size() == 1)
-			m_toggle.disableState(DISABLED);
-	}
-
-	Tree& TreeNode::tree()
-	{
-		Wedge* parent = m_parent;
-		while(&parent->type() != &Tree::cls())
-			parent = parent->parent();
-		return parent->as<Tree>();
+		//m_toggle.enableState(DISABLED);
 	}
 
 	void TreeNode::selected()
 	{
-		this->tree().select(*this);
+		this->findContainer<Tree>()->select(*this);
 	}
 
 	Tree::Tree(Wedge& parent, const std::function<void(TreeNode&)>& onSelected)
-		: Container(parent, cls())
+		: Wedge(parent, cls())
 		, m_rootNode(nullptr)
 		, m_selected(nullptr)
 		, m_onSelected(onSelected)

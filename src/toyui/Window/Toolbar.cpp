@@ -17,20 +17,16 @@ namespace toy
 		m_trigger = nullptr;
 		m_triggerAlt = [this](Widget&) { this->dropdown(true); };
 
-		DropdownChoice& choice = this->addChoice({ icon }, trigger);
+		MultiButton& choice = this->addChoice({ icon }, trigger);
 		m_toggle.hide();
 	}
 
 	Tooldock::Tooldock(Wedge& parent)
-		: Div(parent, cls())//, GRID)
-	{}
-
-	ToolbarMover::ToolbarMover(Wedge& parent)
-		: Control(parent, cls())
+		: Wedge(parent, cls())//, GRID)
 	{}
 
 	Toolbar::Toolbar(Wedge& parent)
-		: WrapControl(parent, cls())
-		, m_mover(*this)
+		: Wedge(parent, cls())
+		, m_mover(*this, Toolbar::Mover())
 	{}
 }

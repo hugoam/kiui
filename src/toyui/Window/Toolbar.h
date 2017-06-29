@@ -21,31 +21,25 @@ namespace toy
 		static Type& cls() { static Type ty("ToolButton", DropdownInput::cls()); return ty; }
 	};
 
-	class _refl_ TOY_UI_EXPORT Tooldock : public Div
+	class _refl_ TOY_UI_EXPORT Tooldock : public Wedge
 	{
 	public:
 		Tooldock(Wedge& parent);
 
-		static Type& cls() { static Type ty("Tooldock", Div::cls()); return ty; }
+		static Type& cls() { static Type ty("Tooldock", Wedge::Div()); return ty; }
 	};
 	
-	class _refl_ TOY_UI_EXPORT ToolbarMover : public Control
-	{
-	public:
-		ToolbarMover(Wedge& parent);
-
-		static Type& cls() { static Type ty("ToolbarMover", Control::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT Toolbar : public WrapControl
+	class _refl_ TOY_UI_EXPORT Toolbar : public Wedge
 	{
 	public:
 		Toolbar(Wedge& parent);
 
-		static Type& cls() { static Type ty("Toolbar", WrapControl::cls()); return ty; }
+		static Type& cls() { static Type ty("Toolbar", Wedge::WrapControl()); return ty; }
+
+		static Type& Mover() { static Type ty("ToolbarMover", Item::Control()); return ty; }
 
 	protected:
-		ToolbarMover m_mover;
+		Item m_mover;
 	};
 }
 

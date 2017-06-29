@@ -16,11 +16,11 @@
 
 namespace toy
 {
-	class _refl_ TOY_UI_EXPORT TypeIn : public Control
+	class _refl_ TOY_UI_EXPORT TypeIn : public Wedge
 	{
 	public:
-		TypeIn(Wedge& parent, string& string, Type& type = cls());
-		TypeIn(WValue& input, Type& type = cls());
+		TypeIn(Wedge& parent, string& string, bool wrap = false, Type& type = cls());
+		TypeIn(WValue& input, bool wrap = false, Type& type = cls());
 
 		virtual void active();
 		virtual void inactive();
@@ -43,11 +43,10 @@ namespace toy
 		void selectFirst(size_t start);
 		void selectSecond(size_t end);
 
-		void moveCaretTo(size_t index);
 		void moveCaretRight();
 		void moveCaretLeft();
 
-		static Type& cls() { static Type ty("TypeIn", Control::cls()); return ty; }
+		static Type& cls() { static Type ty("TypeIn", Wedge::WrapControl()); return ty; }
 
 	protected:
 		WValue* m_input;
@@ -61,7 +60,8 @@ namespace toy
 		size_t m_selectFirst;
 		size_t m_selectSecond;
 
-		//std::vector<TextSelection*> m_selection;
+		Label m_label;
+		Caption& m_caption;
 	};
 }
 

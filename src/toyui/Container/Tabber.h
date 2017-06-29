@@ -12,24 +12,14 @@
 
 namespace toy
 {
-	class _refl_ TOY_UI_EXPORT TabHeader : public Button
-	{
-	public:
-		TabHeader(Wedge& parent, const string& label, const Callback& trigger);
-
-		static Type& cls() { static Type ty("TabHeader", Button::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT Tab : public ScrollSheet
+	class _refl_ TOY_UI_EXPORT Tab : public Wedge
 	{
 	public:
 		Tab(Wedge& parent, Tabber& tabber, Button& header, bool active);
 
-		void handleRemove(Widget& widget);
-
 		Button& header() { return m_header; }
 
-		static Type& cls() { static Type ty("Tab", ScrollSheet::cls()); return ty; }
+		static Type& cls() { static Type ty("Tab", Wedge::cls()); return ty; }
 
 	protected:
 		Tabber& m_tabber;
@@ -37,27 +27,10 @@ namespace toy
 		bool m_active;
 	};
 
-	class _refl_ TOY_UI_EXPORT TabberHead : public Row
-	{
-	public:
-		TabberHead(Wedge& parent);
-
-		static Type& cls() { static Type ty("TabberHead", Row::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT TabberBody : public Sheet
-	{
-	public:
-		TabberBody(Wedge& parent);
-
-		static Type& cls() { static Type ty("TabberBody", Sheet::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT Tabber : public Container
+	class _refl_ TOY_UI_EXPORT Tabber : public Wedge
 	{
 	public:
 		Tabber(Wedge& parent, Type& type = cls(), bool downtabs = false);
-		~Tabber();
 
 		Tab& addTab(const string& name);
 		void removeTab(Tab& tab);
@@ -67,11 +40,15 @@ namespace toy
 		void showTab(Tab& tab);
 		void showTab(size_t index);
 
-		static Type& cls() { static Type ty("Tabber", Container::cls()); return ty; }
+		static Type& cls() { static Type ty("Tabber", Wedge::cls()); return ty; }
+
+		static Type& Head() { static Type ty("TabberHead", Wedge::Row()); return ty; }
+		static Type& Body() { static Type ty("TabberBody", Wedge::Sheet()); return ty; }
+		static Type& Header() { static Type ty("TabButton", Button::cls()); return ty; }
 
 	protected:
-		TabberHead m_headers;
-		TabberBody m_tabs;
+		Wedge m_headers;
+		Wedge m_tabs;
 		Tab* m_currentTab;
 		bool m_downTabs;
 	};

@@ -6,7 +6,7 @@
 #define TOY_DIMSTRING_H
 
 /* Basic headers */
-#include <toyui/Frame/Uibox.h>
+#include <toyui/Frame/UiRect.h>
 #include <toyobj/String/StringConvert.h>
 
 namespace toy

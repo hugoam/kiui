@@ -6,29 +6,31 @@
 #include <toyui/Edit/TypeIn.h>
 
 #include <toyobj/Any.h>
-
 #include <toyobj/String/StringConvert.h>
 
-#include <toyui/Container/Layout.h>
-
 #include <toyui/Frame/Frame.h>
-#include <toyui/Frame/Stripe.h>
+#include <toyui/Frame/Caption.h>
 
 namespace toy
 {
-	TypeIn::TypeIn(Wedge& parent, string& string, Type& type)
-		: Control(parent, type)
+	TypeIn::TypeIn(Wedge& parent, string& string, bool wrap, Type& type)
+		: Wedge(parent, type)
 		, m_input(nullptr)
 		, m_string(string)
 		, m_hasPeriod(false)
 		, m_precision(3)
+		, m_label(*this, "")
+		, m_caption(*m_label.frame().caption())
 	{
-		this->content().setTextLines(1);
+		m_caption.setTextLines(1);
 		this->updateString();
+
+		if(wrap)
+			m_label.setStyle(Text::cls());
 	}
 
-	TypeIn::TypeIn(WValue& input, Type& type)
-		: TypeIn(input, m_valueString, type)
+	TypeIn::TypeIn(WValue& input, bool wrap, Type& type)
+		: TypeIn(input, m_valueString, wrap, type)
 	{
 		m_input = &input;
 		this->updateString();
@@ -54,18 +56,18 @@ namespace toy
 
 	void TypeIn::erase()
 	{
-		if(this->content().caption().caret() == 0 && this->content().caption().selectStart() == this->content().caption().selectEnd())
+		if(m_caption.caret() == 0 && m_caption.selectStart() == m_caption.selectEnd())
 			return;
 
-		if(this->content().caption().selectStart() == this->content().caption().selectEnd())
+		if(m_caption.selectStart() == m_caption.selectEnd())
 		{
-			m_string.erase(m_string.begin() + this->content().caption().selectStart() - 1);
+			m_string.erase(m_string.begin() + m_caption.selectStart() - 1);
 			this->moveCaretLeft();
 		}
 		else
 		{
-			m_string.erase(m_string.begin() + this->content().caption().selectStart(), m_string.begin() + this->content().caption().selectEnd());
-			this->moveCaretTo(this->content().caption().selectStart());
+			m_string.erase(m_string.begin() + m_caption.selectStart(), m_string.begin() + m_caption.selectEnd());
+			this->selectCaret(m_caption.selectStart());
 		}
 
 		this->updateText();
@@ -73,7 +75,7 @@ namespace toy
 
 	void TypeIn::insert(char c)
 	{
-		m_string.insert(m_string.begin() + this->content().caption().caret(), c);
+		m_string.insert(m_string.begin() + m_caption.caret(), c);
 		this->updateText();
 		this->moveCaretRight();
 	}
@@ -83,8 +85,7 @@ namespace toy
 		if(m_input)
 			m_string = m_input->getString();
 
-		this->content().setText(m_string);
-		this->markDirty();
+		m_caption.setText(m_string);
 	}
 
 	void TypeIn::updateText()
@@ -92,14 +93,14 @@ namespace toy
 		if(m_input)
 			m_input->setString(m_string);
 
-		this->content().setText(m_string);
-		this->markDirty();
+		m_caption.setText(m_string);
 	}
 
 	bool TypeIn::leftClick(MouseEvent& mouseEvent)
 	{
-		size_t index = this->content().caption().caretIndex(mouseEvent.relativeX, mouseEvent.relativeY);
-		this->moveCaretTo(index);
+		size_t index = m_caption.caretIndex(mouseEvent.relative);
+		this->selectCaret(index);
+		this->selectFirst(index);
 		if(!(m_state & CONTROL))
 			this->makeActive();
 		return true;
@@ -107,7 +108,7 @@ namespace toy
 
 	bool TypeIn::leftDragStart(MouseEvent& mouseEvent)
 	{
-		size_t index = this->content().caption().caretIndex(mouseEvent.relativeX, mouseEvent.relativeY);
+		size_t index = m_caption.caretIndex(mouseEvent.relative);
 		this->selectFirst(index);
 		if(!(m_state & CONTROL))
 			this->makeActive();
@@ -116,7 +117,7 @@ namespace toy
 
 	bool TypeIn::leftDrag(MouseEvent& mouseEvent)
 	{
-		size_t index = this->content().caption().caretIndex(mouseEvent.relativeX, mouseEvent.relativeY);
+		size_t index = m_caption.caretIndex(mouseEvent.relative);
 		this->selectSecond(index);
 		return true;
 	}
@@ -152,50 +153,33 @@ namespace toy
 
 	void TypeIn::selectCaret(int index)
 	{
-		this->content().caption().caret(index);
-		this->content().caption().selectStart(index);
-		this->content().caption().selectEnd(index);
-		this->content().caption().updateSelection();
-		this->markDirty();
+		m_caption.select(index, index, index);
 	}
 
 	void TypeIn::selectFirst(size_t first)
 	{
 		m_selectFirst = first;
-		this->content().caption().selectStart(first);
-		this->content().caption().selectEnd(first);
-		this->content().caption().updateSelection();
-		this->markDirty();
+		m_caption.select(first, first, first);
 	}
 
 	void TypeIn::selectSecond(size_t second)
 	{
 		m_selectSecond = second;
-		
-		this->content().caption().selectStart(m_selectFirst < m_selectSecond ? m_selectFirst : m_selectSecond);
-		this->content().caption().selectEnd(m_selectFirst < m_selectSecond ? m_selectSecond : m_selectFirst);
-
-		TextRow& secondRow = this->content().caption().textRow(second);
-		this->content().caption().caret(m_selectFirst < m_selectSecond ? std::min(m_selectSecond + 1, secondRow.endIndex) : m_selectSecond);
-		this->content().caption().updateSelection();
-		this->markDirty();
-	}
-
-	void TypeIn::moveCaretTo(size_t index)
-	{
-		this->selectCaret(index);
-		this->selectFirst(index);
+		if(m_selectFirst < m_selectSecond)
+			m_caption.select(std::min(m_selectSecond + 1, m_caption.textRow(second).endIndex), m_selectFirst, m_selectSecond);
+		else
+			m_caption.select(m_selectSecond, m_selectSecond, m_selectFirst);
 	}
 
 	void TypeIn::moveCaretRight()
 	{
-		size_t index = std::min(int(this->content().text().size()), this->content().caption().caret() + 1);
+		size_t index = std::min(int(m_caption.text().size()), m_caption.caret() + 1);
 		this->selectCaret(index);
 	}
 
 	void TypeIn::moveCaretLeft()
 	{
-		size_t index = std::max(0, this->content().caption().caret() - 1);
+		size_t index = std::max(0, m_caption.caret() - 1);
 		this->selectCaret(index);
 	}
 }

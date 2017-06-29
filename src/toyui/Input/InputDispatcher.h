@@ -16,6 +16,13 @@
 
 namespace toy
 {
+	enum InputModifier : unsigned int
+	{
+		INPUT_SHIFT = 1 << 0,
+		INPUT_CTRL = 1 << 1,
+		INPUT_ALT = 1 << 2
+	};
+
 	enum DeviceType : unsigned int
 	{
 		DEVICE_NONE = 0,
@@ -48,6 +55,7 @@ namespace toy
 		EventType eventType;
 		bool consumed;
 		bool abort;
+		InputModifier modifiers;
 
 		std::vector<Widget*> visited;
 
@@ -58,50 +66,12 @@ namespace toy
 		virtual bool receive(InputAdapter& receiver) { return false; }
 	};
 
-	struct TOY_UI_EXPORT MouseEvent : public InputEvent
-	{
-		float posX;
-		float posY;
-		float relativeX;
-		float relativeY;
-		float deltaX;
-		float deltaY;
-		float deltaZ;
-		float lastPressedX;
-		float lastPressedY;
-
-		MouseButtonCode button;
-
-		MouseEvent(DeviceType deviceType, EventType eventType, float x, float y)
-			: InputEvent(deviceType, eventType)
-			, posX(x), posY(y), deltaX(0.f), deltaY(0.f), deltaZ(0.f)
-			, lastPressedX(0.f), lastPressedY(0.f), button(NO_BUTTON)
-		{
-			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
-				button = LEFT_BUTTON;
-			else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
-				button = RIGHT_BUTTON;
-			else if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
-				button = MIDDLE_BUTTON;
-		}
-	};
-
-	struct TOY_UI_EXPORT KeyEvent : public InputEvent
-	{
-		KeyCode code;
-		char c;
-
-		KeyEvent(DeviceType deviceType, EventType eventType, KeyCode code, char c)
-			: InputEvent(deviceType, eventType), code(code), c(c)
-		{}
-	};
-
 	class TOY_UI_EXPORT InputWindow : public Object
 	{
 	public:
 		virtual bool nextFrame() = 0;
 
-		virtual void initInput(Mouse& mouse, Keyboard& keyboard) = 0;
+		virtual void initInput(RenderWindow& renderWindow, Mouse& mouse, Keyboard& keyboard) = 0;
 		virtual void resize(size_t width, size_t height) = 0;
 
 		static Type& cls() { static Type ty; return ty; }

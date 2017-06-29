@@ -18,7 +18,7 @@ namespace toy
 		if(m_base)
 			this->inherit(m_base.val->skin());
 
-		if(backgroundColour().a() > 0.f || textColour().a() > 0.f || borderColour().a() > 0.f || image() || !imageSkin().null())
+		if(m_backgroundColour.val.a() > 0.f || m_textColour.val.a() > 0.f || m_borderColour.val.a() > 0.f || m_image || !m_imageSkin.val.null())
 			m_empty = false;
 	}
 
@@ -30,7 +30,6 @@ namespace toy
 		, m_layout()
 		, m_skin(this)
 		, m_subskins()
-		, m_updated(0)
 		, m_ready(false)
 	{
 		this->index();
@@ -44,7 +43,6 @@ namespace toy
 		, m_layout()
 		, m_skin(this)
 		, m_subskins()
-		, m_updated(0)
 		, m_ready(false)
 	{
 		this->index();
@@ -58,7 +56,6 @@ namespace toy
 		m_layout = LayoutStyle();
 		m_skin = InkStyle(this);
 		m_subskins.clear();
-		++m_updated;
 		m_ready = false;
 	}
 
@@ -85,7 +82,6 @@ namespace toy
 			subskin.m_skin.prepare();
 
 		m_ready = true;
-		++m_updated;
 	}
 
 	void Style::define(Style& style)

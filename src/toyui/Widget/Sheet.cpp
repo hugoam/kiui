@@ -6,66 +6,70 @@
 #include <toyui/Widget/Sheet.h>
 
 #include <toyui/Frame/Frame.h>
-#include <toyui/Frame/Stripe.h>
-#include <toyui/Frame/Grid.h>
-#include <toyui/Frame/Layer.h>
 
-#include <toyui/Container/Layout.h>
-
-#include <toyui/Button/Scrollbar.h>
-#include <toyui/Widget/RootSheet.h>
-
-#include <toyui/UiLayout.h>
-
-#include <toyobj/Iterable/Reverse.h>
+#include <toyui/Input/InputDevice.h>
 
 namespace toy
 {
+	WidgetStore::WidgetStore(Wedge& wedge)
+		: m_wedge(wedge)
+	{}
+
+	Widget& WidgetStore::append(object_ptr<Widget> pointer)
+	{
+		Widget& widget = *pointer;
+		m_contents.push_back(std::move(pointer));
+		widget.setContainer(m_wedge);
+		return widget;
+	}
+
+	void WidgetStore::remove(Widget& widget)
+	{
+		m_wedge.destroy(widget);
+		vector_remove_pt(m_contents, widget);
+	}
+
+	void WidgetStore::transfer(Widget& widget, Wedge& target)
+	{
+		m_wedge.transfer(widget, target);
+		widget.setContainer(target);
+		vector_transfer_pt(m_contents, target.store().m_contents, widget);
+	}
+
+	void WidgetStore::clear()
+	{
+		for(auto& widget : reverse_adapt(m_contents))
+			m_wedge.destroy(*widget);
+
+		m_contents.clear();
+	}
+
 	Wedge::Wedge(Wedge& parent, Type& type, FrameType frameType)
 		: Widget(parent, type, frameType)
 	{}
 
-	Wedge::Wedge(Type& type, FrameType frameType)
-		: Widget(type, frameType)
+	Wedge::Wedge(Type& type, FrameType frameType, Wedge* parent)
+		: Widget(type, frameType, parent)
 	{}
 
-	void Wedge::unmap()
+	void Wedge::visit(const Visitor& visitor, bool post)
 	{
-		for(size_t i = 0; i < m_contents.size(); ++i)
-			this->stripe().unmap(m_contents[i]->frame());
-	}
-
-	void Wedge::map()
-	{
-		for(size_t i = 0; i < m_contents.size(); ++i)
-			this->stripe().map(m_contents[i]->frame());
-	}
-
-	void Wedge::nextFrame(size_t tick, size_t delta)
-	{
-		Widget::nextFrame(tick, delta);
-
-		for(size_t i = 0; i < m_contents.size(); ++i)
-			m_contents[i]->nextFrame(tick, delta);
-	}
-
-	void Wedge::visit(const Visitor& visitor)
-	{
-		bool pursue = visitor(*this);
-		if(!pursue)
-			return;
+		if(!post) if(!visitor(*this)) return;
 
 		for(Widget* pwidget : m_contents)
-			pwidget->visit(visitor);
+			pwidget->visit(visitor, post);
+
+		if(post) visitor(*this);
 	}
 
 	void Wedge::reindex(size_t from)
 	{
 		for(size_t i = from; i < m_contents.size(); ++i)
 			m_contents[i]->setIndex(i);
+		m_frame->markDirty(Frame::DIRTY_STRUCTURE);
 	}
 
-	void Wedge::push(Widget& widget)
+	void Wedge::append(Widget& widget)
 	{
 		m_contents.push_back(&widget);
 		widget.bind(*this, m_contents.size() - 1);
@@ -78,116 +82,64 @@ namespace toy
 		this->reindex(index);
 	}
 
-	void Wedge::remove(Widget& widget, bool destroy)
+	void Wedge::remove(Widget& widget)
 	{
-		size_t index = widget.index();
-		m_contents.erase(m_contents.begin() + index);
-		widget.unbind(destroy);
-		this->reindex(index);
+		m_contents.erase(m_contents.begin() + widget.index());
+		this->reindex(widget.index());
+		widget.unbind();
+	}
+
+	void Wedge::destroy(Widget& widget)
+	{
+		widget.destroyTree();
+		this->remove(widget);
+	}
+
+	void Wedge::transfer(Widget& widget, Wedge& target)
+	{
+		this->remove(widget);
+		target.append(widget);
 	}
 
 	void Wedge::move(size_t from, size_t to)
 	{
-		this->unmap();
 		m_contents.insert(m_contents.begin() + to, m_contents[from]);
 		m_contents.erase(m_contents.begin() + from + 1);
 		this->reindex(from < to ? from : to);
-		this->map();
 	}
 
 	void Wedge::swap(size_t from, size_t to)
 	{
-		this->unmap();
 		std::iter_swap(m_contents.begin() + from, m_contents.begin() + to);
 		this->reindex(from < to ? from : to);
-		this->map();
 	}
 
-	Container::Container(Wedge& parent, Type& type, FrameType frameType)
-		: Wedge(parent, type, frameType)
-		, m_containerTarget(this)
-	{}
-
-	Container::Container(Type& type, FrameType frameType)
-		: Wedge(type, frameType)
-		, m_containerTarget(this)
-	{}
-
-	Widget& Container::append(object_ptr<Widget> unique)
-	{
-		return this->insert(std::move(unique), m_containerContents.size());
-	}
-
-	Widget& Container::insert(object_ptr<Widget> unique, size_t index)
-	{
-		Widget& widget = *unique;
-		if(widget.parent() == nullptr)
-			m_containerTarget->as<Wedge>().insert(widget, index);
-		widget.setContainer(*this);
-		m_containerContents.insert(m_containerContents.begin() + index, std::move(unique));
-		this->handleAdd(widget);
-		return widget;
-	}
-
-	object_ptr<Widget> Container::release(Widget& widget, bool destroy)
-	{
-		widget.parent()->remove(widget, destroy);
-		auto pos = std::find_if(m_containerContents.begin(), m_containerContents.end(), [&widget](auto& pt) { return pt.get() == &widget; });
-		object_ptr<Widget> pointer = std::move(*pos);
-		m_containerContents.erase(pos);
-		this->handleRemove(widget);
-		return pointer;
-	}
-
-	void Container::clear()
-	{
-		for(auto& widget : m_containerContents)
-			widget->parent()->remove(*widget, true);
-
-		m_containerContents.clear();
-	}
-
-	WrapControl::WrapControl(Wedge& parent, Type& type)
-		: Container(parent, type)
-	{}
-
-	Spacer::Spacer(Wedge& parent, Type& type)
-		: Widget(parent, type)
-	{}
-
-	Filler::Filler(Wedge& parent)
-		: Spacer(parent, cls())
-	{}
-
-	Decal::Decal(Wedge& parent, Type& type)
-		: Wedge(parent, type, LAYER)
-	{}
-
-	Overlay::Overlay(Wedge& parent, Type& type)
-		: Container(parent, type, LAYER)
-	{}
-
-	GridSheet::GridSheet(Wedge& parent, Dimension dim, Type& type)
-		: Container(parent, type)
+	GridSheet::GridSheet(Wedge& parent, Dimension dim, Callback callback, Type& type)
+		: Wedge(parent, type)
 		, m_dim(dim)
 		, m_dragPrev(nullptr)
 		, m_dragNext(nullptr)
+		, m_onResize(callback)
 	{}
 
 	bool GridSheet::leftDragStart(MouseEvent& mouseEvent)
 	{
 		// we take the position BEFORE the mouse moved as a reference
-		float pos = m_dim == DIM_X ? mouseEvent.lastPressedX : mouseEvent.lastPressedY;
+		
+		DimFloat local = m_frame->derivePosition(mouseEvent.lastPressed);
+		float pos = local[m_dim];
 		m_dragPrev = nullptr;
 		m_dragNext = nullptr;
 
-		for(Frame* frame : this->stripe().sequence())
-			if(frame->absolutePosition()[m_dim] >= pos)
+		for(auto& widget : this->contents())
+		{
+			if(widget->frame().d_position[m_dim] >= pos)
 			{
-				m_dragNext = frame;
-				m_dragPrev = this->stripe().before(*m_dragNext);
+				m_dragNext = &widget->frame();
 				break;
 			}
+			m_dragPrev = &widget->frame();
+		}
 
 		return true;
 	}
@@ -197,11 +149,9 @@ namespace toy
 		if(!m_dragNext || !m_dragPrev)
 			return true;
 
-		float amount = m_dim == DIM_X ? mouseEvent.deltaX : mouseEvent.deltaY;
-		this->stripe().transferPixelSpan(*m_dragPrev, *m_dragNext, amount);
-
-		this->gridResized(*m_dragPrev, *m_dragNext);
-
+		m_frame->transferPixelSpan(*m_dragPrev, *m_dragNext, mouseEvent.delta[m_dim]);
+		if(m_onResize)
+			m_onResize(*m_dragPrev, *m_dragNext);
 		return true;
 	}
 }
