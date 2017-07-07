@@ -8,20 +8,20 @@
 /* toy */
 #include <toyobj/Type.h>
 #include <toyobj/Any.h>
+#include <toyobj/Util/Dispatch.h>
 #include <toyobj/String/StringConvert.h>
+#include <toyobj/Util/Stat.h>
+#include <toyobj/Util/StatString.h>
 #include <toyui/Forward.h>
 #include <toyui/Types.h>
+
 #include <toyui/Button/Slider.h>
 #include <toyui/Button/RadioButton.h>
 #include <toyui/Button/Dropdown.h>
+#include <toyui/Button/Typedown.h>
 #include <toyui/Button/Checkbox.h>
+
 #include <toyui/Edit/TypeIn.h>
-
-#include <toyobj/Util/Stat.h>
-#include <toyobj/Util/Dispatch.h>
-
-/* std */
-#include <functional>
 
 namespace toy
 {

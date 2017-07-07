@@ -5,16 +5,7 @@
 #include <toyui/Config.h>
 #include <toyui/Edit/Input.h>
 
-#include <toyobj/Object.h>
-#include <toyobj/String/StringConvert.h>
-#include <toyobj/Util/StatString.h>
-
-#include <toyui/Button/Dropdown.h>
-#include <toyui/Button/Typedown.h>
-#include <toyui/Button/RadioButton.h>
 #include <toyui/Button/Image.h>
-
-#include <toyui/Edit/TypeIn.h>
 
 namespace toy
 {
