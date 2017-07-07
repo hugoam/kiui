@@ -78,7 +78,7 @@ namespace toy
 	void NanoRenderer::beginFrame(RenderTarget& target)
 	{
 		float pixelRatio = 1.f;
-		nvgBeginFrame(m_ctx, target.layer().d_size.x(), target.layer().d_size.y(), pixelRatio);
+		nvgBeginFrame(m_ctx, target.layer().d_size.x, target.layer().d_size.y, pixelRatio);
 	}
 
 	void NanoRenderer::endFrame()
@@ -91,7 +91,7 @@ namespace toy
 		BoxFloat scissor;
 		nvgCurrentScissor(m_ctx, scissor.pointer());
 
-		if(scissor.x1() < 0.f || scissor.y1() < 0.f)
+		if(scissor.x1 < 0.f || scissor.y1 < 0.f)
 			return false;
 
 		return !rect.intersects(scissor);
@@ -99,7 +99,7 @@ namespace toy
 
 	void NanoRenderer::clipRect(const BoxFloat& rect)
 	{
-		nvgIntersectScissor(m_ctx, rect.x(), rect.y(), rect.w(), rect.h());
+		nvgIntersectScissor(m_ctx, rect.x, rect.y, rect.w, rect.h);
 	}
 
 	void NanoRenderer::unclipRect()
@@ -127,9 +127,9 @@ namespace toy
 
 		float halfborder = border * 0.5f;
 		if(corners.null())
-			nvgRect(m_ctx, rect.x() + halfborder, rect.y() + halfborder, rect.w() - border, rect.h() - border);
+			nvgRect(m_ctx, rect.x + halfborder, rect.y + halfborder, rect.w - border, rect.h - border);
 		else
-			nvgRoundedRectVarying(m_ctx, rect.x() + halfborder, rect.y() + halfborder, rect.w() - border, rect.h() - border, corners[0], corners[1], corners[2], corners[3]);
+			nvgRoundedRectVarying(m_ctx, rect.x + halfborder, rect.y + halfborder, rect.w - border, rect.h - border, corners[0], corners[1], corners[2], corners[3]);
 	}
 
 	void NanoRenderer::pathCircle(float x, float y, float r)
@@ -142,13 +142,13 @@ namespace toy
 	{
 		//nvgRGBA(0, 0, 0, 128)
 		NVGcolor shadowColour = nvgColour(shadow.d_colour);
-		NVGpaint shadowPaint = nvgBoxGradient(m_ctx, rect.x() + shadow.d_xpos - shadow.d_spread, rect.y() + shadow.d_ypos - shadow.d_spread, rect.w() + shadow.d_spread * 2.f, rect.h() + shadow.d_spread * 2.f, corners[0] + shadow.d_spread, shadow.d_blur, shadowColour, nvgRGBA(0, 0, 0, 0));
+		NVGpaint shadowPaint = nvgBoxGradient(m_ctx, rect.x + shadow.d_xpos - shadow.d_spread, rect.y + shadow.d_ypos - shadow.d_spread, rect.w + shadow.d_spread * 2.f, rect.h + shadow.d_spread * 2.f, corners[0] + shadow.d_spread, shadow.d_blur, shadowColour, nvgRGBA(0, 0, 0, 0));
 		nvgBeginPath(m_ctx);
-		nvgRect(m_ctx, rect.x() + shadow.d_xpos - shadow.d_radius, rect.y() + shadow.d_ypos - shadow.d_radius, rect.w() + shadow.d_radius * 2.f, rect.h() + shadow.d_radius * 2.f);
+		nvgRect(m_ctx, rect.x + shadow.d_xpos - shadow.d_radius, rect.y + shadow.d_ypos - shadow.d_radius, rect.w + shadow.d_radius * 2.f, rect.h + shadow.d_radius * 2.f);
 		if(corners.null())
-			nvgRect(m_ctx, rect.x(), rect.y(), rect.w(), rect.h());
+			nvgRect(m_ctx, rect.x, rect.y, rect.w, rect.h);
 		else
-			nvgRoundedRectVarying(m_ctx, rect.x(), rect.y(), rect.w(), rect.h(), corners[0], corners[1], corners[2], corners[3]);
+			nvgRoundedRectVarying(m_ctx, rect.x, rect.y, rect.w, rect.h, corners[0], corners[1], corners[2], corners[3]);
 		nvgPathWinding(m_ctx, NVG_HOLE);
 		nvgFillPaint(m_ctx, shadowPaint);
 		nvgFill(m_ctx);
@@ -156,7 +156,7 @@ namespace toy
 
 	void NanoRenderer::drawRect(const BoxFloat& rect, const BoxFloat& corners, InkStyle& skin)
 	{
-		float border = skin.m_borderWidth.val.x0();
+		float border = skin.m_borderWidth.val.x0;
 
 		this->pathRect(rect, corners, border);
 
@@ -186,19 +186,19 @@ namespace toy
 		}
 		else
 		{
-			NVGcolor first = nvgOffsetColour(skin.m_backgroundColour, skin.m_linearGradient.val.x());
-			NVGcolor second = nvgOffsetColour(skin.m_backgroundColour, skin.m_linearGradient.val.y());
+			NVGcolor first = nvgOffsetColour(skin.m_backgroundColour, skin.m_linearGradient.val.x);
+			NVGcolor second = nvgOffsetColour(skin.m_backgroundColour, skin.m_linearGradient.val.y);
 			if(skin.m_linearGradientDim == DIM_X)
-				nvgFillPaint(m_ctx, nvgLinearGradient(m_ctx, rect.x(), rect.y(), rect.x() + rect.w(), rect.y(), first, second));
+				nvgFillPaint(m_ctx, nvgLinearGradient(m_ctx, rect.x, rect.y, rect.x + rect.w, rect.y, first, second));
 			else
-				nvgFillPaint(m_ctx, nvgLinearGradient(m_ctx, rect.x(), rect.y(), rect.x(), rect.y() + rect.h(), first, second));
+				nvgFillPaint(m_ctx, nvgLinearGradient(m_ctx, rect.x, rect.y, rect.x, rect.y + rect.h, first, second));
 		}
 		nvgFill(m_ctx);
 	}
 
 	void NanoRenderer::stroke(InkStyle& skin)
 	{
-		float border = skin.m_borderWidth.val.x0();
+		float border = skin.m_borderWidth.val.x0;
 
 		nvgStrokeWidth(m_ctx, border);
 		nvgStrokeColor(m_ctx, nvgColour(skin.m_borderColour));
@@ -211,15 +211,15 @@ namespace toy
 		NVGcolor second = nvgColour(paint.m_gradient[1]);
 
 		nvgStrokeWidth(m_ctx, paint.m_width);
-		nvgStrokePaint(m_ctx, nvgLinearGradient(m_ctx, start.x(), start.y(), end.x(), end.y(), first, second));
+		nvgStrokePaint(m_ctx, nvgLinearGradient(m_ctx, start.x, start.y, end.x, end.y, first, second));
 		nvgStroke(m_ctx);
 	}
 
 	void NanoRenderer::drawImage(int image, const BoxFloat& rect, const BoxFloat& imageRect)
 	{
-		NVGpaint imgPaint = nvgImagePattern(m_ctx, imageRect.x(), imageRect.y(), imageRect.w(), imageRect.h(), 0.0f / 180.0f*NVG_PI, image, 1.f);
+		NVGpaint imgPaint = nvgImagePattern(m_ctx, imageRect.x, imageRect.y, imageRect.w, imageRect.h, 0.0f / 180.0f*NVG_PI, image, 1.f);
 		nvgBeginPath(m_ctx);
-		nvgRect(m_ctx, rect.x(), rect.y(), rect.w(), rect.h());
+		nvgRect(m_ctx, rect.x, rect.y, rect.w, rect.h);
 		nvgFillPaint(m_ctx, imgPaint);
 		nvgFill(m_ctx);
 	}
@@ -229,7 +229,7 @@ namespace toy
 		if(image.d_atlas)
 		{
 			Image& atlas = image.d_atlas->image();
-			BoxFloat imageRect(rect.x() - image.d_left, rect.y() - image.d_top, float(atlas.d_width), float(atlas.d_height));
+			BoxFloat imageRect(rect.x - image.d_left, rect.y - image.d_top, float(atlas.d_width), float(atlas.d_height));
 			this->drawImage(atlas.d_index, rect, imageRect);
 		}
 		else
@@ -243,12 +243,12 @@ namespace toy
 		if(image.d_atlas)
 		{
 			Image& atlas = image.d_atlas->image();
-			BoxFloat imageRect(rect.x() - image.d_left * xstretch, rect.y() - image.d_top * ystretch, atlas.d_width * xstretch, atlas.d_height * ystretch);
+			BoxFloat imageRect(rect.x - image.d_left * xstretch, rect.y - image.d_top * ystretch, atlas.d_width * xstretch, atlas.d_height * ystretch);
 			this->drawImage(atlas.d_index, rect, imageRect);
 		}
 		else
 		{
-			BoxFloat imageRect(rect.x(), rect.y(), image.d_width * xstretch, image.d_height * ystretch);
+			BoxFloat imageRect(rect.x, rect.y, image.d_width * xstretch, image.d_height * ystretch);
 			this->drawImage(image.d_index, rect, imageRect);
 		}
 	}
@@ -257,9 +257,9 @@ namespace toy
 	void NanoRenderer::setupText(InkStyle& skin)
 	{
 		NVGalign alignH = NVG_ALIGN_LEFT;
-		if(skin.m_align.val.x() == CENTER)
+		if(skin.m_align.val.x == CENTER)
 			alignH = NVG_ALIGN_CENTER;
-		else if(skin.m_align.val.x() == RIGHT)
+		else if(skin.m_align.val.x == RIGHT)
 			alignH = NVG_ALIGN_RIGHT;
 
 		nvgFontSize(m_ctx, skin.m_textSize);
@@ -276,7 +276,7 @@ namespace toy
 
 		row.start = text.c_str();
 		row.end = text.c_str() + text.size();
-		row.rect.assign(rect.x(), rect.y(), this->textSize(text, DIM_X, skin), m_lineHeight);
+		row.rect.assign(rect.x, rect.y, this->textSize(text, DIM_X, skin), m_lineHeight);
 
 		this->breakTextLine(rect, row);
 	}
@@ -286,11 +286,11 @@ namespace toy
 		UNUSED(skin);
 
 		NVGtextRow nvgTextRow;
-		nvgTextBreakLines(m_ctx, first, end, rect.w(), &nvgTextRow, 1);
+		nvgTextBreakLines(m_ctx, first, end, rect.w, &nvgTextRow, 1);
 
 		row.start = nvgTextRow.start;
 		row.end = nvgTextRow.end;
-		row.rect.assign(rect.x(), rect.y(), nvgTextRow.width, m_lineHeight);
+		row.rect.assign(rect.x, rect.y, nvgTextRow.width, m_lineHeight);
 
 		if(row.start != row.end)
 			this->breakTextLine(rect, row);
@@ -306,7 +306,7 @@ namespace toy
 
 		row.start = first;
 		row.end = iter;
-		row.rect.assign(rect.x(), rect.y(), this->textSize(string(first, iter - first), DIM_X, skin), m_lineHeight);
+		row.rect.assign(rect.x, rect.y, this->textSize(string(first, iter - first), DIM_X, skin), m_lineHeight);
 
 		this->breakTextLine(rect, row);
 	}
@@ -321,7 +321,7 @@ namespace toy
 		{
 			textRows.resize(1);
 
-			BoxFloat rect(0.f, 0.f, space.x(), m_lineHeight);
+			BoxFloat rect(0.f, 0.f, space.x, m_lineHeight);
 			this->fillText(text, rect, skin, textRows[0]);
 			return;
 		}
@@ -335,7 +335,7 @@ namespace toy
 			textRows.resize(index + 1);
 			TextRow& row = textRows.back();
 
-			BoxFloat rect(0.f, index * m_lineHeight, space.x(), 0.f);
+			BoxFloat rect(0.f, index * m_lineHeight, space.x, 0.f);
 			if(skin.m_textWrap)
 				this->breakTextWidth(first, end, rect, skin, row);
 			else
@@ -354,14 +354,14 @@ namespace toy
 		positions.resize(numGlyphs);
 		textRow.glyphs.resize(numGlyphs);
 
-		nvgTextGlyphPositions(m_ctx, rect.x(), rect.y(), textRow.start, textRow.end, &positions.front(), positions.size());
+		nvgTextGlyphPositions(m_ctx, rect.x, rect.y, textRow.start, textRow.end, &positions.front(), positions.size());
 
 		for(size_t i = 0; i < positions.size(); ++i)
 		{
 			NVGglyphPosition& glyph = positions[i];
 			TextGlyph& out = textRow.glyphs[i];
 			out.position = textRow.start + i;
-			out.rect.assign(glyph.minx, textRow.rect.y(), glyph.maxx - glyph.minx, textRow.rect.h());
+			out.rect.assign(glyph.minx, textRow.rect.y, glyph.maxx - glyph.minx, textRow.rect.h);
 		}
 	}
 
@@ -421,8 +421,6 @@ namespace toy
 		nvgSave(m_ctx);
 		nvgTranslate(m_ctx, x, y);
 		nvgScale(m_ctx, scale, scale);
-
-		++m_debugBatch;
 	}
 
 	void NanoRenderer::endUpdate()

@@ -99,7 +99,7 @@ namespace toy
 	{
 		m_on = !m_on;
 		m_on ? this->enableState(ACTIVATED) : this->disableState(ACTIVATED);
-		m_callback(*this, m_on);
+		if(m_callback) m_callback(*this, m_on);
 	}
 
 	bool Toggle::leftClick(MouseEvent& mouseEvent)

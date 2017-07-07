@@ -52,21 +52,21 @@ namespace toy
 		: Widget(type, frameType, parent)
 	{}
 
-	void Wedge::visit(const Visitor& visitor, bool post)
+	void Wedge::visit(const Visitor& visitor)
 	{
-		if(!post) if(!visitor(*this)) return;
+		bool visit = true;
+		visitor(*this, visit);
 
-		for(Widget* pwidget : m_contents)
-			pwidget->visit(visitor, post);
-
-		if(post) visitor(*this);
+		if(visit)
+			for(Widget* pwidget : m_contents)
+				pwidget->visit(visitor);
 	}
 
 	void Wedge::reindex(size_t from)
 	{
 		for(size_t i = from; i < m_contents.size(); ++i)
 			m_contents[i]->setIndex(i);
-		m_frame->markDirty(Frame::DIRTY_STRUCTURE);
+		m_frame->markDirty(DIRTY_STRUCTURE);
 	}
 
 	void Wedge::append(Widget& widget)
@@ -126,14 +126,13 @@ namespace toy
 	{
 		// we take the position BEFORE the mouse moved as a reference
 		
-		DimFloat local = m_frame->derivePosition(mouseEvent.lastPressed);
-		float pos = local[m_dim];
+		DimFloat local = m_frame->localPosition(mouseEvent.pressed);
 		m_dragPrev = nullptr;
 		m_dragNext = nullptr;
 
 		for(auto& widget : this->contents())
 		{
-			if(widget->frame().d_position[m_dim] >= pos)
+			if(widget->frame().d_position[m_dim] >= local[m_dim])
 			{
 				m_dragNext = &widget->frame();
 				break;

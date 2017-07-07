@@ -9,6 +9,7 @@
 #include <toyui/Widget/RootSheet.h>
 
 #include <toyui/Render/Renderer.h>
+#include <toyui/Solver/Solver.h>
 
 namespace toy
 {
@@ -45,17 +46,23 @@ namespace toy
 
 	void Canvas::autoLayout()
 	{
+		//if(!m_plan.frame().solver()) return;
 		std::vector<Node*> nodes;
 		this->collectNodes(nodes);
 		this->layoutNodes(nodes);
 	}
+	
+	void Canvas::autoLayoutSelected()
+	{
+		//if(!m_plan.frame().solver()) return;
+		this->layoutNodes(m_selection.store());
+	}
 
 	void Canvas::collectNodes(std::vector<Node*>& nodes)
 	{
-		m_plan.visit([&nodes](Widget& widget) {
+		m_plan.visit([&nodes](Widget& widget, bool& visit) {
 			if(&widget.type() == &Node::cls())
 				nodes.push_back(&widget.as<Node>());
-			return true;
 		});
 	}
 
@@ -71,58 +78,39 @@ namespace toy
 
 		int shift = -std::min(0, minIndex);
 
-		/*object_ptr<Stripe> line = make_object<Stripe>(*this, m_plan.frame());
-		std::vector<object_ptr<Stripe>> columns;
+		SolverVector solvers;
 
-		for(int i = 0; i < maxIndex+shift+1; ++i)
-			columns.emplace_back(make_object<Stripe>(*this, *line));
+		RowSolver line(m_plan.frame().solver(), &this->fetchStyle(Canvas::LayoutLine()).layout());
+		solvers.push_back(&line);
+
+		std::vector<RowSolver> columns; columns.reserve(nodes.size());
+		std::vector<FrameSolver> elements; elements.reserve(nodes.size());
+
+		for(int i = 0; i < maxIndex + shift + 1; ++i)
+		{
+			columns.emplace_back(&line, &this->fetchStyle(Canvas::LayoutColumn()).layout());
+			solvers.push_back(&columns.back());
+		}
 
 		for(Node* node : nodes)
-			columns[node->order() + shift]->append(node->frame());
+		{
+			elements.emplace_back(&columns[node->order() + shift], &this->fetchStyle(Canvas::LayoutNode()).layout(), &node->frame());
+			elements.back().sync();
+			solvers.push_back(&elements.back());
+		}
 
 		Style& nodeStyle = this->fetchStyle(Node::cls());
 
-		nodeStyle.layout().d_flow = FLOW;
-		line->relayout();
-		nodeStyle.layout().d_flow = FREE;
+		this->frame().relayout(solvers);
 
 		for(Node* node : nodes)
 			node->updateCables();
-
-		m_plan.frame().remove(*line);
-		
-		
-		*/
-	}
-
-	/*
-		//this->styledef(CanvasLine::cls()).layout().d_space = ITEM;
-
-		//this->styledef(CanvasColumn::cls()).layout().d_space = BLOCK;
-
-		/*this->styledef(CanvasLine::cls()).layout().d_padding = BoxFloat(20.f);
-		this->styledef(CanvasLine::cls()).layout().d_spacing = DimFloat(100.f);
-
-		this->styledef(CanvasColumn::cls()).layout().d_padding = BoxFloat(20.f);
-		this->styledef(CanvasColumn::cls()).layout().d_spacing = DimFloat(20.f);
-		*/
-
-	bool Canvas::leftDragStart(MouseEvent& mouseEvent)
-	{
-		UNUSED(mouseEvent);
-		return true;
 	}
 
 	bool Canvas::leftDrag(MouseEvent& mouseEvent)
 	{
 		for(Node* node : m_selection.store())
 			node->moveNode(mouseEvent.delta);
-		return true;
-	}
-
-	bool Canvas::leftDragEnd(MouseEvent& mouseEvent)
-	{
-		UNUSED(mouseEvent);
 		return true;
 	}
 
@@ -137,7 +125,7 @@ namespace toy
 		inkstyle.m_backgroundColour = m_colour;
 
 		float radius = 5.f;
-		renderer.pathCircle(m_frame->d_size.x() / 2.f, m_frame->d_size.y() / 2.f, radius);
+		renderer.pathCircle(m_frame->d_size.x / 2.f, m_frame->d_size.y / 2.f, radius);
 		renderer.fill(inkstyle, BoxFloat());
 
 		return true;
@@ -223,10 +211,10 @@ namespace toy
 		DimFloat relativeOut = m_knobOut.frame().derivePosition(DimFloat(), frameCanvas);
 		DimFloat relativeIn = m_knobIn.frame().derivePosition(DimFloat(), frameCanvas);
 
-		float x0 = relativeOut.x() + m_knobOut.frame().d_size.x();
-		float y0 = relativeOut.y() + m_knobOut.frame().d_size.y() / 2;
-		float x1 = relativeIn.x();
-		float y1 = relativeIn.y() + m_knobIn.frame().d_size.y() / 2;
+		float x0 = relativeOut.x + m_knobOut.frame().d_size.x;
+		float y0 = relativeOut.y + m_knobOut.frame().d_size.y / 2;
+		float x1 = relativeIn.x;
+		float y1 = relativeIn.y + m_knobIn.frame().d_size.y / 2;
 
 		m_flipX = x1 > x0;
 		m_flipY = y1 > y0;
@@ -237,10 +225,10 @@ namespace toy
 
 	bool NodeCable::customDraw(Renderer& renderer)
 	{
-		float x0 = m_flipX ? 0.f : m_frame->d_size.x();
-		float y0 = m_flipY ? 0.f : m_frame->d_size.y();
-		float x1 = m_flipX ? m_frame->d_size.x() : 0.f;
-		float y1 = m_flipY ? m_frame->d_size.y() : 0.f;
+		float x0 = m_flipX ? 0.f : m_frame->d_size.x;
+		float y0 = m_flipY ? 0.f : m_frame->d_size.y;
+		float x1 = m_flipX ? m_frame->d_size.x : 0.f;
+		float y1 = m_flipY ? m_frame->d_size.y : 0.f;
 
 		Paint paint(m_knobOut.colour(), m_knobIn.colour());
 		paint.m_width = 1.f;

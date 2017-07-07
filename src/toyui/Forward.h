@@ -164,8 +164,6 @@ namespace toy
 
 	class UiWindow;
 
-	class WValue;
-
 	class Device;
 	class RootDevice;
 

@@ -16,7 +16,7 @@ namespace toy
 	class TOY_UI_EXPORT RadioSwitch : public Wedge
 	{
 	public:
-		RadioSwitch(Wedge& parent, const Callback& onSelected, size_t active, StringVector labels = {});
+		RadioSwitch(Wedge& parent, StringVector labels = {}, const Callback& callback = nullptr, size_t active = 0);
 
 		MultiButton& addChoice(const StringVector& elements);
 

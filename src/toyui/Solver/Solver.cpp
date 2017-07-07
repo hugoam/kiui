@@ -6,6 +6,7 @@
 #include <toyui/Solver/Solver.h>
 
 #include <toyui/Widget/Widget.h>
+#include <toyui/Widget/Sheet.h>
 #include <toyobj/Iterable/Reverse.h>
 
 namespace toy
@@ -14,9 +15,8 @@ namespace toy
 	{
 		if(preset == SHEET)  return { PARAGRAPH,  WRAP,   WRAP };
 		if(preset == FLEX)   return { PARALLEL,   WRAP,   WRAP };
-		if(preset == FLEX_O) return { ORTHOGONAL, WRAP,   WRAP };
 		if(preset == ITEM)   return { READING,    SHRINK, SHRINK };
-		if(preset == UNIT)   return { READING,    SHRINK, SHRINK };
+		if(preset == UNIT)   return { PARAGRAPH,  SHRINK, SHRINK };
 		if(preset == BLOCK)  return { PARAGRAPH,  FIXED,  FIXED };
 		if(preset == LINE)   return { READING,    WRAP,   SHRINK };
 		if(preset == STACK)  return { PARAGRAPH,  SHRINK, WRAP };
@@ -74,38 +74,51 @@ namespace toy
 		d_sizing[d_depth] = space.sizingDepth;
 	}
 
-	void FrameSolver::collect(FrameVector& frames)
+	void FrameSolver::collect(SolverVector& solvers)
 	{
 		this->reset();
-		frames.push_back(this);
+		this->sync();
+		solvers.push_back(this);
+	}
+
+	void FrameSolver::sync()
+	{
+		if(d_frame)
+			d_frame->syncSolver(*this);
 	}
 
 	void FrameSolver::compute()
 	{
-		d_prev = nullptr;
+		if(!d_parent) return;
 		d_solvers[DIM_X]->compute(*this, DIM_X);
 		d_solvers[DIM_Y]->compute(*this, DIM_Y);
 
 #if 0 // DEBUG
 		if(!d_frame) return;
 		d_frame->debugPrintDepth();
-		printf("LAYOUT: %s measured content size %i , %i\n", d_frame->style().name().c_str(), int(d_content.x()), int(d_content.y()));
+		printf("LAYOUT: %s measured content size %i , %i\n", d_frame->style().name().c_str(), int(d_content.x), int(d_content.y));
 #endif
 	}
 
 	void FrameSolver::layout()
 	{
-		d_prev = nullptr;
+		if(!d_parent) return;
 		d_solvers[DIM_X]->layout(*this, DIM_X);
 		d_solvers[DIM_Y]->layout(*this, DIM_Y);
 
 #if 0 // DEBUG
 		if(!d_frame) return;
 		d_frame->debugPrintDepth();
-		printf("LAYOUT: %s size %i , %i\n", d_frame->style().name().c_str(), int(d_size.x()), int(d_size.y()));
+		printf("LAYOUT: %s size %i , %i\n", d_frame->style().name().c_str(), int(d_size.x), int(d_size.y));
 		d_frame->debugPrintDepth();
-		printf("        %s position %i , %i\n", d_frame->style().name().c_str(), int(d_position.x()), int(d_position.y()));
+		printf("        %s position %i , %i\n", d_frame->style().name().c_str(), int(d_position.x), int(d_position.y));
 #endif
+	}
+
+	void FrameSolver::read()
+	{
+		if(d_frame)
+			d_frame->readSolver(*this);
 	}
 
 	void FrameSolver::compute(FrameSolver& frame, Dimension dim)
@@ -129,10 +142,8 @@ namespace toy
 		if(frame.d_sizing[dim] <= WRAP)
 			this->measure(frame, d_content, dim);
 
-		if(frame.d_sizing[dim] <= SHRINK && frame.flow())
-			this->measure(frame, d_spaceContent, dim);
-
-		d_prev = &frame;
+		if(frame.d_sizing[dim] <= SHRINK && frame.flow() && dim == d_length)
+			d_spaceContent[dim] += frame.dbounds(dim);
 
 		if(dim == d_length && frame.d_sizing[d_length] >= WRAP)
 			d_contentExpand = true;
@@ -141,16 +152,13 @@ namespace toy
 	void RowSolver::measure(FrameSolver& frame, DimFloat& size, Dimension dim)
 	{
 		if(dim == d_length && frame.flow())
-			size[dim] += frame.dbounds(dim) + this->spacing();
+			size[dim] += frame.dbounds(dim) + (d_count++ ? this->spacing() : 0.f);
 		else
 			size[dim] = std::max(size[dim], frame.dbounds(dim));
 	}
 
 	void RowSolver::layout(FrameSolver& frame, Dimension dim)
 	{
-		if(d_frame && d_frame->style().name() == "Scroller")
-			int i = 0;
-
 		if(dim == d_length && frame.flow() && frame.d_sizing[d_length] >= WRAP)
 			frame.d_span[d_length] = frame.d_span[d_length] / d_totalSpan;
 
@@ -166,17 +174,18 @@ namespace toy
 			return;
 
 		float space = this->dspace(dim);
+		//bool hasSpace = space > d_content[dim]; // @todo: implement scarcity check, current behavior when scarce is wrong
+		float spacings = float(std::max(d_count - 1U, 0U)) * this->spacing();
 		if(dim == d_length)
-			space = (space - d_spaceContent[dim]) * frame.d_span[d_length];
+			space = (space - d_spaceContent[dim] - spacings) * frame.d_span[d_length];
 
 		float content = frame.dcontent(dim);
-		float expand = std::max(0.f, space - content);
 
 		Sizing sizing = frame.d_sizing[dim];
 		if(sizing == SHRINK)
 			frame.d_size[dim] = content;
 		else if(sizing == WRAP)
-			frame.d_size[dim] = content + expand;
+			frame.d_size[dim] = std::max(content, space);
 		else if(sizing == EXPAND)
 			frame.d_size[dim] = space;
 	}
@@ -221,11 +230,11 @@ namespace toy
 		: RowSolver(solver, layout, frame)
 	{}
 
-	void CustomSolver::collect(FrameVector& frames)
+	void CustomSolver::collect(SolverVector& solvers)
 	{
-		FrameSolver::collect(frames);
+		FrameSolver::collect(solvers);
 
 		for(auto& solver : m_solvers)
-			solver->collect(frames);
+			solver->collect(solvers);
 	}
 }

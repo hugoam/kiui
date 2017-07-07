@@ -14,14 +14,6 @@
 
 namespace toy
 {
-	class _refl_ TOY_UI_EXPORT CloseButton : public Button
-	{
-	public:
-		CloseButton(Wedge& parent, const Callback& trigger);
-
-		static Type& cls() { static Type ty("CloseButton", Button::cls()); return ty; }
-	};
-
 	class _refl_ TOY_UI_EXPORT WindowHeader : public Wedge
 	{
 	public:
@@ -42,7 +34,7 @@ namespace toy
 	protected:
 		Window& m_window;
 		Label m_title;
-		CloseButton m_close;
+		Button m_close;
 		string m_tooltip;
 	};
 
@@ -53,7 +45,6 @@ namespace toy
 
 		virtual bool leftDragStart(MouseEvent& mouseEvent);
 		virtual bool leftDrag(MouseEvent& mouseEvent);
-		virtual bool leftDragEnd(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("WindowSizer", Item::Control()); return ty; }
 
@@ -130,6 +121,7 @@ namespace toy
 
 		static Type& DockWindow() { static Type ty("DockWindow", Window::cls()); return ty; }
 		static Type& WrapWindow() { static Type ty("WrapWindow", Window::cls()); return ty; }
+		static Type& CloseButton() { static Type ty("CloseButton", Button::cls()); return ty; }
 
 	protected:
 		string m_name;

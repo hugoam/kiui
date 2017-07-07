@@ -42,16 +42,16 @@ namespace toy
 
 		// drawing implementation
 		void render(RenderTarget& target);
-		void render(Wedge& wedge, bool force);
-		void render(Widget& widget, bool force);
-		void beginDraw(Frame& frame, bool force);
-		void draw(Frame& frame, bool force);
+		void render(Wedge& wedge, Layer& layer, bool force);
+		void render(Widget& widget, Layer& layer, bool force);
+		void beginDraw(Layer& layer, Frame& frame, bool force);
+		void draw(Layer& layer, Frame& frame, bool force);
 		BoxFloat selectCorners(Frame& frame);
 		void contentPos(Frame& frame, const BoxFloat& paddedRect, const DimFloat& size, Dimension dim, DimFloat& pos);
 		void drawContent(Frame& frame, const BoxFloat& rect, const BoxFloat& paddedRect, const BoxFloat& contentRect);
 		void drawBackground(Frame& frame, const BoxFloat& rect, const BoxFloat& paddedRect, const BoxFloat& contentRect);
 		void drawSkinImage(Frame& frame, ImageSkin::Section section, BoxFloat rect);
-		void endDraw(Frame& frame);
+		void endDraw(Layer& layer, Frame& frame);
 
 		void logFPS();
 

@@ -45,6 +45,10 @@ namespace toy
 		, m_rootSheet(nullptr)
 	{
 		m_keyUpHandlers[KC_ESCAPE] = [this]() { this->yield(); };
+
+/*#if 1 // DEBUG
+		InputReceiver::m_name = "Controller";
+#endif*/
 	}
 
 	Controller::~Controller()

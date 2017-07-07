@@ -43,7 +43,7 @@ namespace toy
 			, stack(*this, Wedge::Stack())
 			, name(stack, name)
 			, gender(stack, gender)
-			, close(*this, [this](Widget&) { this->extract(); })
+			, close(*this, "", [this](Widget&) { this->extract(); }, Window::CloseButton())
 		{}
 
 		Checkbox checkbox;
@@ -51,7 +51,7 @@ namespace toy
 		Wedge stack;
 		Label name;
 		Label gender;
-		CloseButton close;
+		Button close;
 
 		static Type& cls() { static Type ty("CustomElement", Wedge::Row()); return ty; }
 	};
@@ -173,6 +173,12 @@ namespace toy
 	{
 		Canvas& canvas = parent.emplace<Canvas>("Node Editor");
 
+		Toolbar& toolbar = parent.emplace<Toolbar>();
+		toolbar.emplace<ToolButton>("autolayout", [&canvas](Widget&) { canvas.autoLayout(); });
+		toolbar.emplace<ToolButton>("autolayout selected", [&canvas](Widget&) { canvas.autoLayoutSelected(); });
+
+		parent.swap(canvas.index(), toolbar.index());
+
 		Node& node0 = canvas.plan().emplace<Node>("A Node");
 		node0.addInput("a", "", Colour::Cyan);
 		node0.addInput("b", "", Colour::Cyan);
@@ -229,7 +235,7 @@ namespace toy
 
 		table1.emplace<LabelSequence>(StringVector({ "Hello", "kiUi", "World!" }));
 		table1.emplace<ButtonSequence>(StringVector({ "Banana", "Apple", "Corniflower" }));
-		table1.emplace<RadioSwitch>(nullptr, 0, StringVector({ "radio a", "radio b", "radio b" }));
+		table1.emplace<RadioSwitch>(StringVector({ "radio a", "radio b", "radio b" }));
 
 		Wedge& line0 = table1.emplace<Wedge>(Wedge::Row());
 
@@ -342,8 +348,8 @@ namespace toy
 		table.emplace<InputBool>("checkbox input", false, nullptr, true);
 		table.emplace<InputRadio>("radio input", StringVector({ "radio a", "radio b", "radio c" }), nullptr, true);
 
-		table.emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {}, true);
-		//table.emplace<InputDropdown>("typedown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](string val) {}, true, true);
+		table.emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](Widget& choice) {}, true);
+		table.emplace<InputTypedown>("typedown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](Widget& choice) {}, true);
 
 		table.emplace<InputText>("string input", "Hello, world!", nullptr, true);
 		table.emplace<InputInt>("int input", AutoStat<int>(123, 0, 1000, 1), nullptr, true);
@@ -581,8 +587,8 @@ namespace toy
 		};
 
 		demoheader.emplace<Label>("Pick a demo sample : ");
-		demoheader.emplace<DropdownInput>(pickUiSample, sampleNames);
+		demoheader.emplace<DropdownInput>(sampleNames, pickUiSample);
 		demoheader.emplace<Label>("Switch theme : ");
-		demoheader.emplace<DropdownInput>([&samplebody](Widget& selected) { selectUiTheme(samplebody, selected); }, themes);
+		demoheader.emplace<DropdownInput>(themes, [&samplebody](Widget& selected) { selectUiTheme(samplebody, selected); });
 	}
 }

@@ -14,14 +14,9 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Checkbox : public Toggle
 	{
 	public:
-		Checkbox(Wedge& parent, WValue* input, bool on);
-
-		void toggle(bool on);
+		Checkbox(Wedge& parent, Callback callback, bool on);
 
 		static Type& cls() { static Type ty("Checkbox", Toggle::cls()); return ty; }
-
-	protected:
-		WValue* m_input;
 	};
 }
 

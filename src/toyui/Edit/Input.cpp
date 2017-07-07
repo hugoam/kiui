@@ -18,29 +18,18 @@
 
 namespace toy
 {
-	InputRadio::InputRadio(Wedge& parent, const string& label, StringVector choices, std::function<void(const string&)> callback, bool reverse)
-		: Wedge(parent, cls())
-		, m_label(*this, label)
-		, m_input(*this, [callback](Widget& widget) { if(callback) callback(widget.label()); }, 0, choices)
-	{
-		if(reverse)
-			this->swap(0, 1);
-	}
-
-	InputDropdown::InputDropdown(Wedge& parent, const string& label, StringVector choices, std::function<void(const string&)> callback, bool reverse)
-		: Wedge(parent, cls())
-		, m_label(*this, label)
-		, m_input(*this, [callback](Widget& widget) { if(callback) callback(widget.label()); }, choices)
-	{
-		if(reverse)
-			this->swap(0, 1);
+	template <class T_Val, class T_Widget>
+	object_ptr<Widget> valueWidget(Lref& lref, T_Val& val, Lref& parent)
+	{ 
+		UNUSED(val);
+		if(lref.mode() == VALUE)
+			return make_object<T_Widget>(parent.ref<Wedge>(), T_Val(lref.any<T_Val>()));
+		else // if(lref.mode() == REF)
+			return make_object<T_Widget>(parent.ref<Wedge>(), lref.any<T_Val>());
 	}
 
 	template <class T_Val, class T_Widget>
-	object_ptr<WValue> valueWidget(Lref& lref, T_Val& val, Lref& parent) { UNUSED(parent); UNUSED(val); return make_object<T_Widget>(parent.ref<Wedge>(), lref); }
-
-	template <class T_Val, class T_Widget>
-	object_ptr<WValue> statValueWidget(Lref& lref, T_Val& val, Lref& parent) { UNUSED(parent); UNUSED(lref); return make_object<T_Widget>(parent.ref<Wedge>(), AutoStat<T_Val>(val, StatDef<T_Val>())); }
+	object_ptr<Widget> statValueWidget(Lref& lref, T_Val& val, Lref& parent) { UNUSED(lref); return make_object<T_Widget>(parent.ref<Wedge>(), AutoStat<T_Val>(val, StatDef<T_Val>())); }
 	
 	class TOY_UI_EXPORT InputDispatch : public Global<InputDispatch>
 	{
@@ -54,7 +43,7 @@ namespace toy
 			DispatchInput::me().singleBranch<double, statValueWidget<double, Input<double>>>();
 			DispatchInput::me().singleBranch<string, valueWidget<string, Input<string>>>();
 
-			DispatchInput::me().singleBranch<AutoStat<int>, valueWidget<AutoStat<int>, StatSlider<float>>>();
+			DispatchInput::me().singleBranch<AutoStat<int>, valueWidget<AutoStat<int>, StatSlider<int>>>();
 			DispatchInput::me().singleBranch<AutoStat<float>, valueWidget<AutoStat<float>, StatSlider<float>>>();
 
 			DispatchInput::me().singleBranch<Image256, valueWidget<Image256, Figure>>();

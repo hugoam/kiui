@@ -15,11 +15,7 @@
 
 namespace toy
 {
-	Textbox::Textbox(WValue& input)
-		: TypeIn(input, true, cls())
-	{}
-
-	Textbox::Textbox(Wedge& parent, string& text)
-		: TypeIn(parent, text, true, cls())
+	Textbox::Textbox(Wedge& parent, const string& text)
+		: TypeIn(parent, text, nullptr, true, cls())
 	{}
 }

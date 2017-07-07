@@ -112,7 +112,6 @@ namespace toy
 	{
 		SHEET,               // PARAGRAPH   direction, WRAP   length, WRAP   depth
 		FLEX,			     // PARALLEL    direction, WRAP   length, WRAP   depth
-		FLEX_O,			     // ORTHOGONAL  direction, WRAP   length, WRAP   depth
 		ITEM,                // READING     direction, SHRINK length, SHRINK depth
 		UNIT,                // PARAGRAPH   direction, SHRINK length, SHRINK depth
 		BLOCK,               // PARAGRAPH   direction, FIXED  length, FIXED  depth
@@ -146,30 +145,36 @@ namespace toy
 		Dim(T val) : Dim(val, val) {}
 		Dim() : Dim(T(), T()) {}
 
-		T x() const { return d_values[0]; }
-		T y() const { return d_values[1]; }
-
-		void setX(T x) { d_values[0] = x; }
-		void setY(T y) { d_values[1] = y; }
-
 		bool null() const { return d_values[0] == T() && d_values[1] == T(); }
 
 		T operator[](size_t i) const { return d_values[i]; }
 		T& operator[](size_t i) { return d_values[i]; }
 
-		Dim operator+(const Dim& rhs) const { return Dim(x() + rhs.x(), y() + rhs.y()); }
-		Dim operator-(const Dim& rhs) const { return Dim(x() - rhs.x(), y() - rhs.y()); }
-		Dim operator*(const Dim& rhs) const { return Dim(x() * rhs.x(), y() * rhs.y()); }
-		Dim operator/(const Dim& rhs) const { return Dim(x() / rhs.x(), y() / rhs.y()); }
+		Dim operator+(const Dim& rhs) const { return Dim(this->x + rhs.x, this->y + rhs.y); }
+		Dim operator-(const Dim& rhs) const { return Dim(this->x - rhs.x, this->y - rhs.y); }
+		Dim operator*(const Dim& rhs) const { return Dim(this->x * rhs.x, this->y * rhs.y); }
+		Dim operator/(const Dim& rhs) const { return Dim(this->x / rhs.x, this->y / rhs.y); }
 
-	protected:
-		std::array<T, 2> d_values;
+	public:
+		union {
+			std::array<T, 2> d_values;
+			struct { T x, y; };
+			struct { T w, h; };
+		};
 	};
+
+	// @todo add template reflection mechanism for these
+	using DimIndex = Dim<size_t>;
+	using DimFloat = Dim<float>;
+	using DimLayout = Dim<AutoLayout>;
+	using DimSizing = Dim<Sizing>;
+	using DimAlign = Dim<Align>;
+	using DimPivot = Dim<Pivot>;
 
 	class _refl_ BoxFloat : public Struct
 	{
 	public:
-		_constr_ BoxFloat(float x0, float y0, float x1, float y1) : d_values{{ x0, y0, x1, y1 }}, d_uniform(false), d_null(cnull()) {}
+		/*_constr_*/ BoxFloat(float x0, float y0, float x1, float y1) : d_values{{ x0, y0, x1, y1 }}, d_uniform(false), d_null(cnull()) {}
 
 		BoxFloat(int x0, int y0, int x1, int y1) : BoxFloat(float(x0), float(y0), float(x1), float(y1)) {}
 		BoxFloat(float uniform) : BoxFloat(uniform, uniform, uniform, uniform) {}
@@ -177,16 +182,6 @@ namespace toy
 
 		float operator[](size_t i) const { return d_values[i]; }
 		float& operator[](size_t i) { d_null = false; return d_values[i]; }
-
-		_attr_ float x0() const { return d_values[0]; }
-		_attr_ float y0() const { return d_values[1]; }
-		_attr_ float x1() const { return d_values[2]; }
-		_attr_ float y1() const { return d_values[3]; }
-
-		float x() const { return x0(); }
-		float y() const { return y0(); }
-		float w() const { return x1(); }
-		float h() const { return y1(); }
 
 		void clear() { this->assign(0.f); d_null = true; }
 
@@ -199,26 +194,25 @@ namespace toy
 
 		bool intersects(const BoxFloat& other) const
 		{
-			return !(other.x() > x() + w() || other.y() > y() + h() || other.x() + other.w() < x() || other.y() + other.h() < y());
+			return !(other.x > x + w || other.y > y + h || other.x + other.w < x || other.y + other.h < y);
 		}
 
 		float* pointer() { return &d_values[0]; }
 
+		DimFloat offset() const { return DimFloat{ this->x0, this->y0 }; }
+		DimFloat size() const { return DimFloat{ this->x0, this->y0 } + DimFloat{ this->x1, this->y1 }; }
+
 		static Type& cls() { static Type ty; return ty; }
 
-	protected:
-		std::array<float, 4> d_values;
+	public:
+		union {
+			std::array<float, 4> d_values;
+			struct { float x0, y0, x1, y1; };
+			struct { float x, y, w, h; };
+		};
 		bool d_uniform;
 		bool d_null;
 	};
-
-	// @todo add template reflection mechanism for these
-	using DimIndex = Dim<size_t>;
-	using DimFloat = Dim<float>;
-	using DimLayout = Dim<AutoLayout>;
-	using DimSizing = Dim<Sizing>;
-	using DimAlign = Dim<Align>;
-	using DimPivot = Dim<Pivot>;
 }
 
 #endif // TOY_DIM_H

@@ -12,7 +12,6 @@ namespace toy
 	Scrollbar::Scrollbar(Wedge& parent, Wedge& frameSheet, Wedge& contentSheet, Dimension dim)
 		: Wedge(parent, cls())
 		, m_dim(dim)
-		, d_cursor(0.f)
 		, m_frameSheet(frameSheet)
 		, m_contentSheet(contentSheet)
 		, m_rewind(*this, "", [this](Widget&) { this->scrollup(); }, dim == DIM_Y ? ScrollUp() : ScrollLeft())
@@ -23,21 +22,6 @@ namespace toy
 
 		m_scroller.filler().setStyle(Item::Spacer());
 		m_scroller.knob().setStyle(Scrollbar::Knob());
-	}
-
-	float Scrollbar::contentSize()
-	{
-		return m_contentSheet.frame().d_size[m_dim] * m_contentSheet.frame().d_scale;
-	}
-
-	float Scrollbar::visibleSize()
-	{
-		return m_frameSheet.frame().d_size[m_dim];
-	}
-
-	float Scrollbar::overflow()
-	{
-		return m_frameSheet.contents().size() > 0 ? contentSize() - visibleSize() : 0.f;
 	}
 
 	float Scrollbar::nextOffset(Widget& widget, Dimension dim, float pos)
@@ -67,18 +51,17 @@ namespace toy
 	void Scrollbar::scrollup()
 	{
 		float pos = this->prevOffset(m_frameSheet, m_dim, -10.f);
-		this->scrollTo(std::max(0.f, d_cursor + pos));
+		this->scrollTo(std::max(0.f, this->cursor() + pos));
 	}
 
 	void Scrollbar::scrolldown()
 	{
 		float pos = this->nextOffset(m_frameSheet, m_dim, 10.f);
-		this->scrollTo(std::min(this->overflow(), d_cursor + pos));
+		this->scrollTo(std::min(this->overflow(), this->cursor() + pos));
 	}
 
 	void Scrollbar::scrollTo(float offset)
 	{
-		d_cursor = offset;
 		m_contentSheet.frame().setPositionDim(m_dim, -offset);
 		m_contentSheet.frame().layer().setForceRedraw();
 	}
@@ -101,10 +84,11 @@ namespace toy
 		float visibleSize = this->visibleSize();
 		float contentSize = this->contentSize();
 		float overflow = this->overflow();
+		float cursor = this->cursor();
 
-		m_scroller.updateMetrics(0.f, overflow, d_cursor, 1.f, visibleSize);
+		m_scroller.updateMetrics(0.f, overflow, cursor, 1.f, visibleSize);
 
-		if(d_cursor > 0.f && contentSize - d_cursor < visibleSize)
+		if(cursor > 0.f && contentSize - cursor < visibleSize)
 			this->scrollTo(std::max(contentSize - visibleSize, 0.f));
 
 		if(overflow > 0.f && m_frame->hidden())

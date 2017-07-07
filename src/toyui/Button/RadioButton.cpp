@@ -7,7 +7,7 @@
 
 namespace toy
 {
-	RadioSwitch::RadioSwitch(Wedge& parent, const Callback& onSelected, size_t active, StringVector labels)
+	RadioSwitch::RadioSwitch(Wedge& parent, StringVector labels, const Callback& onSelected, size_t active)
 		: Wedge(parent, cls())
 		, m_onSelected(onSelected)
 		, m_active(nullptr)

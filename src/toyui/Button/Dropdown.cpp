@@ -10,10 +10,9 @@ namespace toy
 {
 	Dropdown::Dropdown(Wedge& parent, Type& type)
 		: WrapButton(parent, [this](Widget&) { this->dropdown(true); }, type)
-		, m_header(*this, {}, [this](Widget&) { this->dropdown(true); }, Head())
+		, m_header(*this, {}, nullptr, Head())
 		, m_toggle(*this, "", [this](Widget&) { this->dropdown(true); }, Toggle())
 		, m_list(*this, nullptr, List())
-		, m_down(false)
 	{}
 
 	MultiButton& Dropdown::addChoice(const StringVector& elements, const Callback& trigger)
@@ -25,13 +24,11 @@ namespace toy
 	void Dropdown::dropup()
 	{
 		m_list.close();
-		m_down = false;
 	}
 
 	void Dropdown::dropdown(bool modal)
 	{
 		m_list.open(modal);
-		m_down = true;
 	}
 
 	void Dropdown::selected(MultiButton& selected)
@@ -39,16 +36,13 @@ namespace toy
 		this->dropup();
 	}
 
-	DropdownInput::DropdownInput(Wedge& parent, const Callback& onSelected, StringVector choices, Type& type)
+	DropdownInput::DropdownInput(Wedge& parent, StringVector choices, const Callback& onSelected, Type& type)
 		: Dropdown(parent, type)
-		, m_onSelected()
+		, m_onSelected(onSelected)
 		, m_selected(nullptr)
-		, m_activeHeader(false)
 	{
 		for(string& choice : choices)
 			this->addChoice({ choice });
-
-		m_onSelected = onSelected;
 	}
 
 	MultiButton& DropdownInput::addChoice(const StringVector& elements, const Callback& trigger)
@@ -67,7 +61,7 @@ namespace toy
 		m_selected = &choice;
 		m_selected->enableState(SELECTED);
 
-		m_activeHeader ? m_header.reset(*m_selected) : m_header.reset(m_selected->elements());
+		m_header.reset(m_selected->elements());
 	}
 
 	void DropdownInput::selected(MultiButton& choice)

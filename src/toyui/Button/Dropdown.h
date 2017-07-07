@@ -20,10 +20,8 @@ namespace toy
 	public:
 		Dropdown(Wedge& parent, Type& type = cls());
 
-		bool down() { return m_down; }
-
-		void dropdown(bool modal = true);
-		void dropup();
+		virtual void dropdown(bool modal = true);
+		virtual void dropup();
 
 		virtual void selected(MultiButton& selected);
 
@@ -40,13 +38,12 @@ namespace toy
 		MultiButton m_header;
 		Button m_toggle;
 		Popup m_list;
-		bool m_down;
 	};
 
 	class _refl_ TOY_UI_EXPORT DropdownInput : public Dropdown
 	{
 	public:
-		DropdownInput(Wedge& parent, const Callback& onSelected = nullptr, StringVector choices = StringVector(), Type& type = cls());
+		DropdownInput(Wedge& parent, StringVector choices = {}, const Callback& callback = nullptr, Type& type = cls());
 
 		virtual void selected(MultiButton& selected);
 		void select(MultiButton& selected);
@@ -58,7 +55,6 @@ namespace toy
 	protected:
 		Callback m_onSelected;
 		MultiButton* m_selected;
-		bool m_activeHeader;
 	};
 }
 

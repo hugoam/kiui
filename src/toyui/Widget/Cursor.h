@@ -35,6 +35,9 @@ namespace toy
 
 		void nextFrame(size_t tick, size_t delta);
 
+		void lock() { m_locked = true; }
+		void unlock() { m_locked = false; }
+
 		void setPosition(const DimFloat& pos);
 
 		void hover(Widget& hovered);
@@ -54,8 +57,9 @@ namespace toy
 		static Type& Caret() { static Type ty("CaretCursor", Cursor::cls()); return ty; }
 
 	protected:
-		bool m_dirty;
 		Widget* m_hovered;
+		bool m_locked;
+
 		Tooltip m_tooltip;
 		Clock m_tooltipClock;
 	};

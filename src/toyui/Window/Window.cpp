@@ -17,7 +17,7 @@ namespace toy
 		, m_window(window)
 		, m_tooltip("Drag me")
 		, m_title(*this, m_window.name())
-		, m_close(*this, [&window](Widget&) { window.close(); })
+		, m_close(*this, "", [&window](Widget&) { window.close(); }, Window::CloseButton())
 	{
 		if(!m_window.closable())
 			m_close.hide();
@@ -75,16 +75,12 @@ namespace toy
 	bool WindowSizer::leftDrag(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		DimFloat size = m_window.frame().d_size + mouseEvent.delta;
 		if(m_resizeLeft)
-			m_window.frame().setPositionDim(DIM_X, m_window.frame().d_position.x() - mouseEvent.delta.x());
-		m_window.frame().setSize({ std::max(10.f, size.x()), std::max(25.f, size.y()) });
-		return true;
-	}
-
-	bool WindowSizer::leftDragEnd(MouseEvent& mouseEvent)
-	{
-		UNUSED(mouseEvent);
+			m_window.frame().setPositionDim(DIM_X, m_window.frame().d_position.x + mouseEvent.delta.x);
+		if(m_resizeLeft)
+			m_window.frame().setSize({ std::max(50.f, m_window.frame().d_size.x - mouseEvent.delta.x), std::max(50.f, m_window.frame().d_size.y + mouseEvent.delta.y) });
+		else
+			m_window.frame().setSize({ std::max(50.f, m_window.frame().d_size.x + mouseEvent.delta.x), std::max(50.f, m_window.frame().d_size.y + mouseEvent.delta.y) });
 		return true;
 	}
 
@@ -92,10 +88,6 @@ namespace toy
 		: Wedge(window, cls())
 		, m_firstSizer(*this, window, WindowFooter::SizerLeft(), true)
 		, m_secondSizer(*this, window, WindowFooter::SizerRight(), false)
-	{}
-
-	CloseButton::CloseButton(Wedge& parent, const Callback& trigger)
-		: Button(parent, "", trigger, cls())
 	{}
 
 	Window::Window(Wedge& parent, const string& title, WindowState state, const Callback& onClose, Docksection* dock, Type& type)

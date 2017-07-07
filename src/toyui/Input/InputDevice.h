@@ -104,14 +104,14 @@ namespace toy
 		DimFloat relative;
 		DimFloat delta;
 		float deltaZ;
-		DimFloat lastPressed;
+		DimFloat pressed;
 
 		MouseButtonCode button;
 
 		MouseEvent(Mouse& mouse, DeviceType deviceType, EventType eventType, DimFloat pos)
 			: InputEvent(deviceType, eventType)
 			, pos(pos), delta(0.f, 0.f), deltaZ(0.f)
-			, lastPressed(0.f, 0.f), button(NO_BUTTON)
+			, pressed(0.f, 0.f), button(NO_BUTTON)
 		{
 			mouse.transformMouseEvent(*this);
 

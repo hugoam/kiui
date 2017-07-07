@@ -17,10 +17,10 @@ namespace toy
 	public:
 		Scrollbar(Wedge& parent, Wedge& frameSheet, Wedge& contentSheet, Dimension dim);
 
-		float contentSize();
-		float visibleSize();
-
-		float overflow();
+		float cursor() { return -m_contentSheet.frame().d_position[m_dim]; }
+		float contentSize() { return m_contentSheet.frame().d_size[m_dim] * m_contentSheet.frame().d_scale; }
+		float visibleSize() { return m_frameSheet.frame().d_size[m_dim]; }
+		float overflow() { return m_frameSheet.contents().size() > 0 ? contentSize() - visibleSize() : 0.f; }
 
 		void scrollup();
 		void scrolldown();
@@ -45,7 +45,6 @@ namespace toy
 
 	protected:
 		Dimension m_dim;
-		float d_cursor;
 		Wedge& m_frameSheet;
 		Wedge& m_contentSheet;
 

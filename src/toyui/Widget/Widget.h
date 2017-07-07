@@ -83,8 +83,8 @@ namespace toy
 
 		Widget* findContainer(Type& type);
 
-		using Visitor = std::function<bool(Widget&)>;
-		virtual void visit(const Visitor& visitor, bool post = false);
+		using Visitor = std::function<void(Widget&, bool& visit)>;
+		virtual void visit(const Visitor& visitor);
 
 		void updateStyle();
 

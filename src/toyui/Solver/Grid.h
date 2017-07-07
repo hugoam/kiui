@@ -15,8 +15,8 @@ namespace toy
 	public:
 		TableSolver(FrameSolver* solver, LayoutStyle* layout, Frame* frame = nullptr);
 
-		void divide(std::vector<float> spans);
-		void setSpan(size_t index, float span);
+		void divide(const std::vector<float>& spans);
+		void update(const std::vector<float>& spans);
 
 		virtual FrameSolver& solver(FrameSolver& frame, Dimension dim);
 		virtual FrameSolver* grid(FrameSolver& frame) { return this; }

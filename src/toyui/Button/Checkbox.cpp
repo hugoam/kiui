@@ -5,28 +5,9 @@
 #include <toyui/Config.h>
 #include <toyui/Button/Checkbox.h>
 
-#include <toyui/Types.h>
-
-#include <toyobj/String/StringConvert.h>
-#include <toyobj/Any.h>
-
-#include <toyui/Frame/Frame.h>
-
-#include <toyui/Edit/TypeIn.h>
-
-#include <toyui/Widget/Sheet.h>
-
 namespace toy
 {
-	Checkbox::Checkbox(Wedge& parent, WValue* input, bool on)
-		: Toggle(parent, [this](Widget&, bool on) { this->toggle(on); }, on, cls())
-		, m_input(input)
+	Checkbox::Checkbox(Wedge& parent, Callback callback, bool on)
+		: Toggle(parent, callback, on, cls())
 	{}
-
-	void Checkbox::toggle(bool on)
-	{
-		if(!m_input) return;
-		m_input->value().value<bool>() = on;
-		m_input->triggerModify();
-	}
 }

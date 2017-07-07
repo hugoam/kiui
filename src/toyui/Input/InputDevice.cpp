@@ -136,7 +136,7 @@ namespace toy
 
 		if(m_dragging)
 			this->dragMove(mouseEvent);
-		else if(m_pressed && (std::abs(delta.x()) > threshold || std::abs(delta.y()) > threshold))
+		else if(m_pressed && (std::abs(delta.x) > threshold || std::abs(delta.y) > threshold))
 			this->dragStart(mouseEvent);
 	}
 
@@ -168,12 +168,14 @@ namespace toy
 		m_rootFrame.dispatchEvent(dragEvent, m_pressed);
 
 		this->dragMove(mouseEvent);
+		m_rootSheet.cursor().lock();
 		m_dragging = true;
 	}
 
 	void MouseButton::dragEnd(MouseEvent& mouseEvent)
 	{
 		m_dragging = false;
+		m_rootSheet.cursor().unlock();
 		this->dragMove(mouseEvent);
 
 		MouseDragEndEvent dragEvent(m_mouse, m_deviceType, mouseEvent.pos);
@@ -182,7 +184,7 @@ namespace toy
 
 	void MouseButton::dragMove(MouseEvent& mouseEvent)
 	{
-		MouseDragEvent dragEvent(m_mouse, m_deviceType, mouseEvent.pos, mouseEvent.delta);
+		MouseDragEvent dragEvent(m_mouse, m_deviceType, mouseEvent.pos, m_pressedPos, mouseEvent.delta);
 		m_rootFrame.dispatchEvent(dragEvent, m_pressed);
 	}
 

@@ -12,17 +12,20 @@
 
 namespace toy
 {
+	ScrollSurface::ScrollSurface(Wedge& parent)
+		: Wedge(parent, cls())
+	{}
+
 	ScrollZone::ScrollZone(ScrollSheet& parent)
 		: Wedge(parent, cls())
-		, m_scrollSheet(parent)
-		, m_container(this->as<Wedge>())
+		, body(*this)
 	{}
 
 	ScrollSheet::ScrollSheet(Wedge& parent, Type& type)
 		: Wedge(parent, type)
 		, m_scrollzone(*this)
-		, m_scrollbarX(*this, m_scrollzone, m_scrollzone.body(), DIM_X)
-		, m_scrollbarY(*this, m_scrollzone, m_scrollzone.body(), DIM_Y)
+		, m_scrollbarX(*this, m_scrollzone, m_scrollzone.body, DIM_X)
+		, m_scrollbarY(*this, m_scrollzone, m_scrollzone.body, DIM_Y)
 	{
 		m_scrollzone.frame().setIndex(0, 0);
 		m_scrollbarX.frame().setIndex(0, 1);
@@ -33,7 +36,7 @@ namespace toy
 	{
 		Widget::makeSolver();
 
-		m_frame->solver().as<GridSolver>().divide({ Space::preset(BOARD), Space::preset(LINE) });
+		m_frame->solver()->as<GridSolver>().divide({ Space::preset(BOARD), Space::preset(LINE) });
 	}
 
 	void ScrollSheet::dirtyLayout()
@@ -45,15 +48,14 @@ namespace toy
 	bool ScrollSheet::mouseWheel(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		m_scrollbarX.scroll(mouseEvent.delta.x());
-		m_scrollbarY.scroll(mouseEvent.delta.y());
+		m_scrollbarX.scroll(mouseEvent.delta.x);
+		m_scrollbarY.scroll(mouseEvent.delta.y);
 		return true;
 	}
 
 	ScrollPlan::ScrollPlan(Wedge& parent, Type& type)
 		: ScrollSheet(parent, type)
-		, m_plan(m_scrollzone.body())
-		, m_surface(m_plan)
+		, m_plan(m_scrollzone.body)
 		, m_clamped(true)
 	{
 		m_plan.setStyle(ScrollPlan::Plan());
@@ -63,6 +65,7 @@ namespace toy
 	void ScrollPlan::dirtyLayout()
 	{
 		this->updateBounds();
+		ScrollSheet::dirtyLayout();
 	}
 
 	void ScrollPlan::updateBounds()
@@ -75,20 +78,20 @@ namespace toy
 		for(auto& widget : m_plan.contents())
 		{
 			Frame& frame = widget->frame();
-			m_bounds[DIM_X] = std::min(frame.d_position.x() - margin, m_bounds.x());
-			m_bounds[DIM_Y] = std::min(frame.d_position.y() - margin, m_bounds.y());
-			m_bounds[DIM_XX] = std::max(frame.d_position.x() + frame.d_size.x() + margin, m_bounds.w());
-			m_bounds[DIM_YY] = std::max(frame.d_position.y() + frame.d_size.y() + margin, m_bounds.h());
+			m_bounds.x0 = std::min(frame.d_position.x - margin, m_bounds.x);
+			m_bounds.y0 = std::min(frame.d_position.y - margin, m_bounds.y);
+			m_bounds.x1 = std::max(frame.d_position.x + frame.d_size.x + margin, m_bounds.w);
+			m_bounds.y1 = std::max(frame.d_position.y + frame.d_size.y + margin, m_bounds.h);
 		}
 
-		m_surface.frame().setSize({ m_bounds.x1() - m_bounds.x0(), m_bounds.y1() - m_bounds.y0() });
+		m_plan.frame().setSize({ m_bounds.x1 - m_bounds.x0, m_bounds.y1 - m_bounds.y0 });
 	}
 
 	bool ScrollPlan::middleDrag(MouseEvent& mouseEvent)
 	{
 		DimFloat pos = m_plan.frame().d_position + mouseEvent.delta;
-		m_plan.frame().setPosition({ std::min(0.f, pos.x()), std::min(0.f, pos.y()) });
-		m_plan.frame().layer().setForceRedraw();
+		m_plan.frame().setPosition({ std::min(0.f, pos.x), std::min(0.f, pos.y) });
+		m_frame->markDirty(DIRTY_FORCE_LAYOUT);
 		return true;
 	}
 
@@ -100,17 +103,17 @@ namespace toy
 		if(m_clamped)
 		{
 			DimFloat minScale = m_scrollzone.frame().d_size / m_plan.frame().d_size;
-			scale = std::max(scale, std::max(minScale.x(), minScale.y()));
+			scale = std::max(scale, std::max(minScale.x, minScale.y));
 		}
 
 		m_plan.frame().d_scale = scale;
-		m_plan.frame().layer().setForceRedraw();
+		m_frame->markDirty(DIRTY_FORCE_LAYOUT);
 
 		DimFloat offset = mouseEvent.relative - mouseEvent.relative * deltaScale;
 		DimFloat pos = offset + m_plan.frame().d_position;
 
 		if(m_clamped)
-			m_plan.frame().setPosition({ std::min(0.f, pos.x()), std::min(0.f, pos.y()) });
+			m_plan.frame().setPosition({ std::min(0.f, pos.x), std::min(0.f, pos.y) });
 		else
 			m_plan.frame().setPosition(pos);
 
@@ -122,15 +125,15 @@ namespace toy
 		float gridsizeX = 100.f;
 		float gridsizeY = 50.f;
 
-		for(float x = 0.f; x < frame.d_size.x(); x += gridsizeX)
+		for(float x = 0.f; x < frame.d_size.x; x += gridsizeX)
 		{
-			renderer.pathLine(x, 0.f, x, frame.d_size.y());
+			renderer.pathLine(x, 0.f, x, frame.d_size.y);
 			renderer.stroke(frame.inkstyle());
 		}
 
-		for(float y = 0.f; y < frame.d_size.y(); y += gridsizeY)
+		for(float y = 0.f; y < frame.d_size.y; y += gridsizeY)
 		{
-			renderer.pathLine(0.f, y, frame.d_size.x(), y);
+			renderer.pathLine(0.f, y, frame.d_size.x, y);
 			renderer.stroke(frame.inkstyle());
 		}
 

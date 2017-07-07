@@ -101,6 +101,11 @@ namespace toy
 
 	protected:
 		InputReceiver* m_propagate;
+
+/*#if 1 // DEBUG
+	public:
+		string m_name;
+#endif*/
 	};
 
 	class TOY_UI_EXPORT InputAdapter : public InputReceiver
@@ -165,6 +170,8 @@ namespace toy
 
 		bool controls(DeviceType device);
 
+		//void debugPrint(size_t depth);
+
 	protected:
 		InputReceiver* m_receiver;
 		ControlNode* m_parent;
@@ -186,6 +193,8 @@ namespace toy
 		bool takeControl(InputReceiver& receiver, InputReceiver& controller, ControlMode mode, DeviceType channel);
 		void takeControl(InputReceiver& receiver, ControlMode mode, DeviceType channels);
 		void yieldControl(InputReceiver& receiver);
+
+		//void debugPrint();
 
 	protected:
 		std::vector<DeviceType> m_channels;

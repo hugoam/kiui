@@ -22,6 +22,6 @@ namespace toy
 	void Icon::setImage(Image* image)
 	{
 		m_image = image;
-		d_frame.markDirty(Frame::DIRTY_CONTENT);
+		d_frame.markDirty(DIRTY_LAYOUT);
 	}
 }

@@ -13,18 +13,22 @@
 
 namespace toy
 {
+	class _refl_ TOY_UI_EXPORT ScrollSurface : public Wedge
+	{
+	public:
+		ScrollSurface(Wedge& parent);
+
+		static Type& cls() { static Type ty("ScrollSurface", Wedge::cls()); return ty; }
+	};
+
 	class _refl_ TOY_UI_EXPORT ScrollZone : public Wedge
 	{
 	public:
 		ScrollZone(ScrollSheet& parent);
 
-		Wedge& body() { return m_container; }
+		ScrollSurface body;
 
 		static Type& cls() { static Type ty("ScrollZone", Wedge::Layout()); return ty; }
-
-	protected:
-		ScrollSheet& m_scrollSheet;
-		Wedge m_container;
 	};
 
 	class _refl_ TOY_UI_EXPORT ScrollSheet : public Wedge
@@ -32,7 +36,7 @@ namespace toy
 	public:
 		ScrollSheet(Wedge& parent, Type& type = cls());
 
-		Wedge& body() { return m_scrollzone.body(); }
+		Wedge& body() { return m_scrollzone.body; }
 
 		virtual void dirtyLayout();
 
@@ -69,8 +73,6 @@ namespace toy
 
 	protected:
 		Wedge& m_plan;
-		Wedge& m_surface;
-		//Surface m_surface;
 		BoxFloat m_bounds;
 		bool m_clamped;
 	};

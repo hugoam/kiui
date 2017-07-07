@@ -24,15 +24,15 @@ namespace toy
 		virtual RootSheet& rootSheet() { return *this; }
 
 		UiWindow& uiWindow() { return m_window; }
-		ControlSwitch& controller() { return *m_rootController; }
+		ControlSwitch& controller() { return m_rootController; }
 		Mouse& mouse() { return m_mouse; }
 		Keyboard& keyboard() { return m_keyboard; }
-
 		Cursor& cursor() { return m_cursor; }
-
 		RenderTarget& target() { return *m_target; }
 
 		void nextFrame(size_t tick, size_t delta);
+
+		void makeActive(Widget& widget);
 
 		virtual void transformCoordinates(MouseEvent& mouseEvent) { UNUSED(mouseEvent); }
 
@@ -42,15 +42,15 @@ namespace toy
 
 	protected:
 		UiWindow& m_window;
-
-		unique_ptr<ControlSwitch> m_rootController;
-
+		ControlSwitch m_rootController;
 		Mouse m_mouse;
 		Keyboard m_keyboard;
 
 		object_ptr<RenderTarget> m_target;
 
 		Cursor m_cursor;
+
+		Widget* m_active;
 	};
 }
 

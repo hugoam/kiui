@@ -121,6 +121,7 @@ namespace toy
 		Wedge& inputs() { return m_inputs; }
 		Wedge& outputs() { return m_outputs; }
 		Wedge& body() { return m_body; }
+		NodeHeader& header() { return m_header; }
 
 		void moveNode(const DimFloat& delta);
 		void updateCables();
@@ -164,11 +165,10 @@ namespace toy
 		virtual bool leftClick(MouseEvent& mouseEvent);
 		virtual bool rightClick(MouseEvent& mouseEvent);
 
-		virtual bool leftDragStart(MouseEvent& mouseEvent);
 		virtual bool leftDrag(MouseEvent& mouseEvent);
-		virtual bool leftDragEnd(MouseEvent& mouseEvent);
 
 		void autoLayout();
+		void autoLayoutSelected();
 
 		void collectNodes(std::vector<Node*>& nodes);
 		void layoutNodes(const std::vector<Node*>& nodes);
@@ -177,6 +177,10 @@ namespace toy
 		void handleRemove(Node& node);
 
 		static Type& cls() { static Type ty("Canvas", ScrollSheet::cls()); return ty; }
+
+		static Type& LayoutLine() { static Type ty("CanvasLine", Item::cls()); return ty; }
+		static Type& LayoutColumn() { static Type ty("CanvasColumn", Item::cls()); return ty; }
+		static Type& LayoutNode() { static Type ty("CanvasNode", Item::cls()); return ty; }
 
 	protected:
 		string m_name;

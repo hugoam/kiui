@@ -10,7 +10,6 @@
 #include <toyui/Widget/Widget.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Input/InputDevice.h>
-#include <toyui/Edit/Value.h>
 
 namespace toy
 {

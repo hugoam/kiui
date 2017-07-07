@@ -76,7 +76,7 @@ Button :
     copy_skin : Label
     skin_padding : 8.0,4.0,8.0,4.0
     image_skin : mygui/button, 6, 6, 8, 8
-    decline_image_skin : focused, pressed
+    decline_image_skin : focused, pressed, activated
     
 RadioChoice :
     copy_skin : Button

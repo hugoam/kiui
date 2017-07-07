@@ -66,7 +66,7 @@ List :
     border_colour : 0.275,0.275,0.275,1.0
     border_width : 1.0,1.0,1.0,1.0
     
-TabHeader :
+TabButton :
     copy_skin : Label
     background_colour : 0.407,0.407,0.407,1.0
     border_width : 0.0,0.0,0.0,0.0
@@ -165,10 +165,7 @@ Node :
     
 NodeBody :
     copy_skin : WindowHeader
-    
-NodeKnob :
-    size : 10.0,22.0
-        
+ 
 NodeCable :
     border_width : 2.0,2.0,2.0,2.0
     border_colour : 1.0,1.0,1.0,1.0
@@ -210,12 +207,14 @@ Checkbox :
     skin_padding : 0.0,0.0,0.0,0.0
     
     activated :
-        image : blendish_check
+        overlay : blendish_check
+        skin_padding : 2.0,2.0,0.0,0.0
         background_colour : 0.275,0.275,0.275,1.0
         topdown_gradient : -15,15
                 
     activated|focused :
-        image : blendish_check
+        overlay : blendish_check
+        skin_padding : 2.0,2.0,0.0,0.0
         background_colour : 0.275,0.275,0.275,1.0
     
 RadioSwitch :
@@ -265,14 +264,6 @@ Scrollbar :
     reset_skin : true
     padding : 6.0,6.0,6.0,6.0
     
-ScrollForward :
-    reset_skin : true
-    image : arrow_up_15
-    
-ScrollBackward :
-    reset_skin : true
-    image : arrow_down_15
-    
 ScrollUp :
     reset_skin : true
     image : arrow_up_15
@@ -311,7 +302,7 @@ ExpandboxToggle :
     activated|focused :
         image : arrow_down_15
     disabled :
-        image : 
+        image : empty_15
         
 TreeNodeToggle :
     copy_skin : ExpandboxToggle

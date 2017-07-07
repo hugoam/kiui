@@ -103,8 +103,21 @@ namespace toy
 			m_controller->yieldControl(receiver);
 
 		if(m_receiver == &receiver)
+		{
+			if(m_controller) m_controller->m_parent = m_parent;
 			m_parent->m_controller = m_controller ? std::move(m_controller) : nullptr;
+		}
 	}
+
+	/*void ControlNode::debugPrint(size_t depth)
+	{
+		for(size_t i = 0; i < depth; ++i)
+			printf("  ");
+
+		printf("ControlNode %s\n", m_receiver->m_name.c_str());
+		if(m_controller)
+			m_controller->debugPrint(depth + 1);
+	}*/
 
 	ControlSwitch::ControlSwitch(InputReceiver& receiver)
 		: ControlNode(receiver, nullptr, CM_CONTROL, DEVICE_ALL)
@@ -135,6 +148,8 @@ namespace toy
 		ControlNode* controlNode = this->channel(device).findReceiver(controller);
 		if(controlNode)
 			controlNode->takeControl(receiver, mode, device);
+		/*printf("ControlSwitch :: tookControl\n");
+		this->debugPrint();*/
 		return controlNode != nullptr;
 	}
 
@@ -143,11 +158,23 @@ namespace toy
 		for(auto& channel : m_controllers)
 			if(channel->deviceFilter() & device)
 				channel->takeControl(receiver, mode, device);
+
+		/*printf("ControlSwitch :: tookControl\n");
+		this->debugPrint();*/
 	}
 
 	void ControlSwitch::yieldControl(InputReceiver& receiver)
 	{
 		for(auto& channel : m_controllers)
 			channel->yieldControl(receiver);
+
+		/*printf("ControlSwitch :: yieldedControl\n");
+		this->debugPrint();*/
 	}
+
+/*	void ControlSwitch::debugPrint()
+	{
+		for(auto& channel : m_controllers)
+			channel->debugPrint(0);
+	}*/
 }

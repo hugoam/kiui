@@ -46,10 +46,10 @@ namespace toy
 		void addLayer(Layer& layer);
 		void removeLayer(Layer& layer);
 
-		void moveToTop(Layer& sublayer);
 		void moveToTop();
 
-		void reindex(size_t from);
+		void reindex();
+		void reorder();
 
 		using Visitor = std::function<void(Layer&)>;
 		void visit(const Visitor& visitor);

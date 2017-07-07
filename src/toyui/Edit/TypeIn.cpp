@@ -13,27 +13,32 @@
 
 namespace toy
 {
-	TypeIn::TypeIn(Wedge& parent, string& string, bool wrap, Type& type)
+	/*
+		size_t precision = 3;
+
+		string result = m_value.getString();
+
+		if(m_value.isa<float>() || m_value.isa<double>()
+		|| m_value.isa<AutoStat<float>>() || m_value.isa<AutoStat<double>>())
+		{
+			size_t dot = result.find(".");
+			if(precision > 0 && dot != string::npos)
+				result.resize(std::min(result.size(), dot + precision + 1));
+		}
+
+	*/
+
+	TypeIn::TypeIn(Wedge& parent, const string& text, Callback callback, bool wrap, Type& type)
 		: Wedge(parent, type)
-		, m_input(nullptr)
-		, m_string(string)
-		, m_hasPeriod(false)
-		, m_precision(3)
-		, m_label(*this, "")
+		, m_string(text)
+		, m_label(*this, text)
 		, m_caption(*m_label.frame().caption())
+		, m_callback(callback ? callback : [](const string& val) { return val; })
 	{
 		m_caption.setTextLines(1);
-		this->updateString();
 
 		if(wrap)
 			m_label.setStyle(Text::cls());
-	}
-
-	TypeIn::TypeIn(WValue& input, bool wrap, Type& type)
-		: TypeIn(input, m_valueString, wrap, type)
-	{
-		m_input = &input;
-		this->updateString();
 	}
 
 	void TypeIn::active()
@@ -47,6 +52,18 @@ namespace toy
 		this->disableState(ACTIVE);
 		this->yieldControl();
 		this->selectCaret(-1);
+	}
+
+	void TypeIn::activate()
+	{
+		if(!(m_state & CONTROL))
+			this->makeActive();
+	}
+
+	void TypeIn::setString(const string& value)
+	{
+		m_string = value;
+		this->updated();
 	}
 
 	void TypeIn::setAllowedChars(const string& chars)
@@ -70,39 +87,33 @@ namespace toy
 			this->selectCaret(m_caption.selectStart());
 		}
 
-		this->updateText();
+		this->changed();
 	}
 
 	void TypeIn::insert(char c)
 	{
 		m_string.insert(m_string.begin() + m_caption.caret(), c);
-		this->updateText();
+		this->changed();
 		this->moveCaretRight();
 	}
 
-	void TypeIn::updateString()
+	void TypeIn::updated()
 	{
-		if(m_input)
-			m_string = m_input->getString();
-
 		m_caption.setText(m_string);
 	}
 
-	void TypeIn::updateText()
+	void TypeIn::changed()
 	{
-		if(m_input)
-			m_input->setString(m_string);
-
 		m_caption.setText(m_string);
+		if(m_callback)
+			m_callback(m_string);
 	}
 
 	bool TypeIn::leftClick(MouseEvent& mouseEvent)
 	{
 		size_t index = m_caption.caretIndex(mouseEvent.relative);
 		this->selectCaret(index);
-		this->selectFirst(index);
-		if(!(m_state & CONTROL))
-			this->makeActive();
+		this->activate();
 		return true;
 	}
 
@@ -110,8 +121,7 @@ namespace toy
 	{
 		size_t index = m_caption.caretIndex(mouseEvent.relative);
 		this->selectFirst(index);
-		if(!(m_state & CONTROL))
-			this->makeActive();
+		this->activate();
 		return true;
 	}
 
@@ -119,12 +129,6 @@ namespace toy
 	{
 		size_t index = m_caption.caretIndex(mouseEvent.relative);
 		this->selectSecond(index);
-		return true;
-	}
-
-	bool TypeIn::leftDragEnd(MouseEvent& mouseEvent)
-	{
-		UNUSED(mouseEvent);
 		return true;
 	}
 

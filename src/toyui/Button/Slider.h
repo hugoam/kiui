@@ -6,14 +6,8 @@
 #define TOY_SLIDER_H
 
 /* toy */
-#include <toyobj/Util/Stat.h>
-#include <toyobj/String/StringConvert.h>
 #include <toyui/Forward.h>
-#include <toyui/Frame/UiRect.h>
-#include <toyui/Edit/Value.h>
-#include <toyui/Widget/Widget.h>
 #include <toyui/Button/Button.h>
-#include <toyui/Edit/TypeIn.h>
 
 namespace toy
 {
@@ -68,6 +62,8 @@ namespace toy
 		int m_step;
 
 		Callback m_onUpdated;
+
+		float m_dragOffset;
 	};
 }
 

@@ -72,7 +72,6 @@ namespace toy
 		, m_width(m_renderWindow.m_width)
 		, m_height(m_renderWindow.m_height)
 		, m_styler(make_object<Styler>(*this))
-		, m_active(nullptr)
 		, m_rootSheet(nullptr)
 		, m_shutdownRequested(false)
 		, m_user(user)
@@ -192,17 +191,9 @@ namespace toy
 
 		return !m_shutdownRequested;
 	}
-
+	
 	void UiWindow::shutdown()
 	{
 		m_shutdownRequested = true;
-	}
-
-	void UiWindow::makeActive(Widget& widget)
-	{
-		if(m_active)
-			m_active->inactive();
-		m_active = &widget;
-		m_active->active();
 	}
 }

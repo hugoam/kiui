@@ -25,20 +25,20 @@ namespace toy
 	void Caption::setText(const string& text)
 	{
 		m_text = text;
-		d_frame.markDirty(Frame::DIRTY_CONTENT);
+		d_frame.markDirty(DIRTY_LAYOUT);
 	}
 
 	void Caption::setTextLines(size_t lines)
 	{
 		m_textLines = lines;
-		d_frame.markDirty(Frame::DIRTY_CONTENT);
+		d_frame.markDirty(DIRTY_LAYOUT);
 	}
 
 	DimFloat Caption::updateTextSize()
 	{
 		//DimFloat paddedSize = d_frame.d_size - d_frame.inkstyle().m_padding.val - d_frame.inkstyle().m_padding.val;
-		float paddedWidth = floor(d_frame.d_size.x() - d_frame.inkstyle().m_padding.val.x0() - d_frame.inkstyle().m_padding.val.x1());
-		float paddedHeight = floor(d_frame.d_size.y() - d_frame.inkstyle().m_padding.val.y0() - d_frame.inkstyle().m_padding.val.y1());
+		float paddedWidth = floor(d_frame.d_size.x - d_frame.inkstyle().m_padding.val.x0 - d_frame.inkstyle().m_padding.val.x1);
+		float paddedHeight = floor(d_frame.d_size.y - d_frame.inkstyle().m_padding.val.y0 - d_frame.inkstyle().m_padding.val.y1);
 
 		DimFloat paddedSize(paddedWidth, paddedHeight);
 
@@ -52,7 +52,7 @@ namespace toy
 		if(m_text.empty())
 			return s_renderer->textLineHeight(d_frame.inkstyle()) * m_textLines;
 		else if(!m_textRows.empty())
-			return m_textRows.back().rect.y() + m_textRows.back().rect.h();
+			return m_textRows.back().rect.y + m_textRows.back().rect.h;
 		else
 			return 0.f;
 	}
@@ -61,7 +61,7 @@ namespace toy
 	{
 		float result = 0.f;
 		for(TextRow& row : m_textRows)
-			result = std::max(result, row.rect.w());
+			result = std::max(result, row.rect.w);
 		return result;
 	}
 
@@ -82,7 +82,7 @@ namespace toy
 		m_selectEnd = end;
 
 		this->updateSelection();
-		d_frame.markDirty(Frame::DIRTY_CONTENT);
+		d_frame.markDirty(DIRTY_REDRAW);
 	}
 
 	void Caption::updateSelection()
@@ -104,7 +104,7 @@ namespace toy
 			{
 				DimFloat pos;
 				this->caretCoords(pos);
-				row.caret.assign(pos.x(), pos.y(), 2.f, row.rect.h());
+				row.caret.assign(pos.x, pos.y, 2.f, row.rect.h);
 			}
 
 			if(m_selectStart != m_selectEnd && indexEnd > m_selectStart && indexStart < m_selectEnd)
@@ -114,14 +114,14 @@ namespace toy
 
 				if(row.glyphs.empty())
 				{
-					row.selected.assign(row.rect.x(), row.rect.y(), 5.f, row.rect.h());
+					row.selected.assign(row.rect.x, row.rect.y, 5.f, row.rect.h);
 					continue;
 				}
 
 				TextGlyph& startGlyph = row.glyphs[lineSelectStart - indexStart];
 				TextGlyph& endGlyph = row.glyphs[lineSelectEnd - indexStart];
 
-				row.selected.assign(startGlyph.rect.x(), row.rect.y(), endGlyph.rect.x() + endGlyph.rect.w() - startGlyph.rect.x(), row.rect.h());
+				row.selected.assign(startGlyph.rect.x, row.rect.y, endGlyph.rect.x + endGlyph.rect.w - startGlyph.rect.x, row.rect.h);
 			}
 		}
 	}
@@ -132,10 +132,10 @@ namespace toy
 		const char* end = start + m_text.size();
 
 		for(TextRow& row : m_textRows)
-			if(pos.y() >= row.rect.y() && pos.y() < row.rect.y() + row.rect.h())
+			if(pos.y >= row.rect.y && pos.y < row.rect.y + row.rect.h)
 			{
 				for(TextGlyph& glyph : row.glyphs)
-					if(pos.x() >= glyph.rect.x() && pos.x() < glyph.rect.x() + glyph.rect.w())
+					if(pos.x >= glyph.rect.x && pos.x < glyph.rect.x + glyph.rect.w)
 						return glyph.position - start;
 
 				return row.end - start;
@@ -152,13 +152,13 @@ namespace toy
 		{
 			size_t offset = row.start - m_text.c_str();
 			TextGlyph& glyph = row.glyphs[m_caret - offset];
-			pos[DIM_X] = glyph.rect.x();
-			pos[DIM_Y] = glyph.rect.y();
+			pos.x = glyph.rect.x;
+			pos.y = glyph.rect.y;
 		}
 		else
 		{
-			pos[DIM_X] = row.rect.x() + row.rect.w();
-			pos[DIM_Y] = row.rect.y();
+			pos.x = row.rect.x + row.rect.w;
+			pos.y = row.rect.y;
 		}
 	}
 

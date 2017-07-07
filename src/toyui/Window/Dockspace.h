@@ -63,9 +63,10 @@ namespace toy
 
 		void resetSpans();
 
-		virtual bool mouseEntered(MouseEvent& mouseEvent);
-
 		static Type& cls() { static Type ty("Dockline", GridSheet::cls()); return ty; }
+
+		static Type& DocklineX() { static Type ty("DocklineX", Dockline::cls()); return ty; }
+		static Type& DocklineY() { static Type ty("DocklineY", Dockline::cls()); return ty; }
 
 	protected:
 		Dockspace& m_dockspace;

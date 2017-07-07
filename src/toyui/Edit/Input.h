@@ -8,12 +8,13 @@
 /* toy */
 #include <toyobj/Type.h>
 #include <toyobj/Any.h>
+#include <toyobj/String/StringConvert.h>
 #include <toyui/Forward.h>
 #include <toyui/Types.h>
-#include <toyui/Edit/Value.h>
 #include <toyui/Button/Slider.h>
 #include <toyui/Button/RadioButton.h>
 #include <toyui/Button/Dropdown.h>
+#include <toyui/Button/Checkbox.h>
 #include <toyui/Edit/TypeIn.h>
 
 #include <toyobj/Util/Stat.h>
@@ -24,64 +25,58 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT DispatchInput : public Dispatcher<object_ptr<WValue>, Lref&>, public LazyGlobal<DispatchInput>
+	class TOY_UI_EXPORT DispatchInput : public Dispatcher<object_ptr<Widget>, Lref&>, public LazyGlobal<DispatchInput>
 	{};
 	
 	class TOY_UI_EXPORT DispatchDisplay : public Dispatcher<object_ptr<Widget>, Lref&>, public LazyGlobal<DispatchDisplay>
 	{};
 
-
 	template <class T>
-	class StatSlider : public WValue
+	class InputValue
 	{
 	public:
-		StatSlider(Wedge& parent, Lref& lref, std::function<void(T)> callback = nullptr, Dimension dim = DIM_X)
-			: WValue(parent, lref, this->cls(), callback ? [callback](Lref& lref) { callback(lref.value<AutoStat<T>>()); } : OnUpdate())
-			, m_stat(this->m_value.template any<AutoStat<T>>())
-			, m_dim(dim)
-			, m_slider(*this, m_dim, [this](Widget&) { this->updateStat(); })
-			, m_display(*this, this->getString())
+		InputValue(T value, const std::function<void(T)>& callback = nullptr) : m_value(value), m_ref(m_value), m_callback(callback) {}
+
+		T m_value;
+		T& m_ref;
+		std::function<void(T)> m_callback;
+	};
+
+	template <class T>
+	class StatSlider : public Wedge, public InputValue<AutoStat<T>>
+	{
+	public:
+		using Callback = std::function<void(AutoStat<T>)>;
+
+		StatSlider(Wedge& parent, AutoStat<T> value, const Callback& callback = nullptr, Dimension dim = DIM_X)
+			: Wedge(parent, this->cls())
+			, InputValue<AutoStat<T>>(value, callback)
+			, m_slider(*this, dim, [this](Widget&) { this->changed(); })
+			, m_display(*this, "", Slider::Display())
 		{
-			this->updateSlider();
+			this->update();
 		}
 
-		StatSlider(Wedge& parent, AutoStat<T> value, std::function<void(T)> callback = nullptr, Dimension dim = DIM_X)
-			: WValue(parent, var(value), this->cls(), callback ? [callback](Lref& lref) { callback(lref.value<AutoStat<T>>()); } : OnUpdate())
-			, m_stat(this->m_value.template any<AutoStat<T>>())
-			, m_dim(dim)
-			, m_slider(*this, m_dim, [this](Widget&) { this->updateStat(); })
-			, m_display(*this, this->getString(), Slider::Display())
+		void update()
 		{
-			this->updateSlider();
-		}
-
-		void updateSlider()
-		{
-			m_slider.resetMetrics(float(m_stat.min()), float(m_stat.max()), float(m_stat.value()), float(m_stat.step()));
+			m_slider.resetMetrics(float(m_ref.min()), float(m_ref.max()), float(m_ref.value()), float(m_ref.step()));
 			m_slider.updateKnob();
-			m_display.setContent(this->getString());
+			m_display.setContent(toString(m_ref));
 		}
 
-		void updateStat()
+		void changed()
 		{
-			m_stat.modify(T(m_slider.val()));
-			m_display.setContent(this->getString());
-			this->triggerModify();
+			m_ref.modify(T(m_slider.val()));
+			m_display.setContent(toString(m_ref));
+			if(m_callback) m_callback(m_ref);
 		}
 
-		void updateValue(T val) { m_stat.modify(val); this->triggerUpdate(); }
-		void modifyValue(T val) { m_stat.modify(val); this->triggerModify(); }
+		void update(T val) { m_ref.modify(val); }
+		void change(T val) { m_ref.modify(val); if(m_callback) m_callback(m_ref); }
 
-		void notifyUpdate() { this->updateSlider(); }
-		void notifyModify() { this->updateSlider(); }
-
-		static Type& cls() { static Type ty("StatSlider<" + typecls<T>().name() + ">", WValue::cls()); return ty; }
+		static Type& cls() { static Type ty("StatSlider<" + typecls<T>().name() + ">", Wedge::Row()); return ty; }
 
 	protected:
-		AutoStat<T>& m_stat;
-
-		Dimension m_dim;
-
 		Slider m_slider;
 		Label m_display;
 	};
@@ -90,57 +85,49 @@ namespace toy
 	template class _refl_ TOY_UI_EXPORT StatSlider<int>;
 
 	template <class T>
-	class NumberInput : public WValue
+	class NumberInput : public Wedge, public InputValue<AutoStat<T>>
 	{
 	public:
-		NumberInput(Wedge& parent, Lref& lref, std::function<void(T)> callback = nullptr)
-			: WValue(parent, lref, this->cls(), callback ? [callback](Lref& lref) { callback(lref.value<AutoStat<T>>()); } : OnUpdate())
-			, m_stat(this->m_value.template any<AutoStat<T>>())
-			, m_typeIn(*this)
+		using Callback = std::function<void(AutoStat<T>)>;
+
+		NumberInput(Wedge& parent, AutoStat<T> value, const Callback& callback = nullptr)
+			: Wedge(parent, this->cls())
+			, InputValue<AutoStat<T>>(value, callback)
+			, m_typeIn(*this, "", [this](const string& val) { this->typein(val); return val; })
 			, m_plus(*this, "+", [this](Widget&) { this->increment(); })
 			, m_minus(*this, "-", [this](Widget&) { this->decrement(); })
-		{
-			this->build();
-		}
-
-		NumberInput(Wedge& parent, AutoStat<T> value, std::function<void(T)> callback = nullptr)
-			: WValue(parent, var(value), this->cls(), callback ? [callback](Lref& lref) { callback(lref.value<AutoStat<T>>()); } : OnUpdate())
-			, m_stat(this->m_value.template any<AutoStat<T>>())
-			, m_typeIn(*this)
-			, m_plus(*this, "+", [this](Widget&) { this->increment(); })
-			, m_minus(*this, "-", [this](Widget&) { this->decrement(); })
-		{
-			this->build();
-		}
-
-		void build()
 		{
 			if(typecls<T>().is<float>() || typecls<T>().is<double>())
 				m_typeIn.setAllowedChars("1234567890.");
 			else
 				m_typeIn.setAllowedChars("1234567890");
+
+			m_typeIn.setString(toString(m_ref));
+		}
+
+		void typein(const string& str)
+		{
+			m_ref.modify(fromString<T>(str));
+			if(m_callback) m_callback(m_ref);
 		}
 
 		void increment()
 		{
-			m_stat.increment();
-			m_typeIn.updateString();
-			this->triggerModify();
+			m_ref.increment();
+			m_typeIn.setString(toString(m_ref));
+			if(m_callback) m_callback(m_ref);
 		}
 
 		void decrement()
 		{
-			m_stat.decrement();
-			m_typeIn.updateString();
-			this->triggerModify();
+			m_ref.decrement();
+			m_typeIn.setString(toString(m_ref));
+			if(m_callback) m_callback(m_ref);
 		}
 
-		void notifyUpdate() { m_typeIn.updateString(); }
-
-		static Type& cls() { static Type ty("NumberInput<" + typecls<T>().name() + ">", WValue::cls()); return ty; }
+		static Type& cls() { static Type ty("NumberInput<" + typecls<T>().name() + ">", Wedge::Row()); return ty; }
 
 	protected:
-		AutoStat<T>& m_stat;
 		TypeIn m_typeIn;
 		Button m_plus;
 		Button m_minus;
@@ -150,13 +137,9 @@ namespace toy
 	class Input : public NumberInput<T>
 	{
 	public:
-		using Callback = std::function<void(T)>;
+		using typename NumberInput<T>::Callback;
 
-		Input(Wedge& parent, Lref& lref, Callback callback = nullptr)
-			: NumberInput<T>(parent, lref, callback)
-		{}
-
-		Input(Wedge& parent, AutoStat<T> value, Callback callback = nullptr)
+		Input(Wedge& parent, AutoStat<T> value, const Callback& callback = nullptr)
 			: NumberInput<T>(parent, value, callback)
 		{}
 	};
@@ -167,89 +150,81 @@ namespace toy
 	template class _refl_ TOY_UI_EXPORT Input<double>;
 
 	template <>
-	class _refl_ TOY_UI_EXPORT Input<bool> : public WValue
+	class _refl_ TOY_UI_EXPORT Input<bool> : public Wedge, public InputValue<bool>
 	{
 	public:
 		using Callback = std::function<void(bool)>;
 
-		Input(Wedge& parent, Lref& value, Callback callback = nullptr)
-			: WValue(parent, value, this->cls(), callback ? [callback](Lref& lref) { callback(lref.value<bool>()); } : OnUpdate())
-			, m_checkbox(*this, this, m_value.value<bool>())
+		Input(Wedge& parent, bool value, const Callback& callback = nullptr)
+			: Wedge(parent, this->cls())
+			, InputValue<bool>(value, callback)
+			, m_checkbox(*this, [this](Widget&, bool on) { this->changed(on); }, value)
 		{}
 
-		Input(Wedge& parent, bool value, Callback callback = nullptr)
-			: WValue(parent, var(value), this->cls(), callback ? [callback](Lref& lref) { callback(lref.value<bool>()); } : OnUpdate())
-			, m_checkbox(*this, this, m_value.value<bool>())
-		{}
+		void changed(bool on) { m_ref = on; if(m_callback) m_callback(on); }
 
-		void notifyUpdate() { m_checkbox.update(m_value.value<bool>()); }
-
-		static Type& cls() { static Type ty("Input<bool>", WValue::cls()); return ty; }
+		static Type& cls() { static Type ty("Input<bool>", Wedge::cls()); return ty; }
 
 	protected:
 		Checkbox m_checkbox;
 	};
 
 	template <>
-	class _refl_ TOY_UI_EXPORT Input<string> : public WValue
+	class _refl_ TOY_UI_EXPORT Input<string> : public TypeIn
 	{
 	public:
 		using Callback = std::function<void(string)>;
 
-		Input(Wedge& parent, Lref& value, Callback callback = nullptr)
-			: WValue(parent, value, this->cls(), callback ? [callback](Lref& lref) { callback(lref.value<string>()); } : OnUpdate())
-			, m_typeIn(*this)
-		{}
-
 		Input(Wedge& parent, const string& value, Callback callback = nullptr)
-			: WValue(parent, var(value), this->cls(), callback ? [callback](Lref& lref) { callback(lref.value<string>()); } : OnUpdate())
-			, m_typeIn(*this)
+			: TypeIn(parent, value, [this](const string& val) { if(m_callback) m_callback(val); return val; }, false, this->cls())
+			, m_callback(callback)
 		{}
 
-		TypeIn& typeIn() { return m_typeIn; }
-
-		void notifyUpdate() { m_typeIn.updateString(); }
-		//void notifyModify() { if(this->m_onUpdate) this->m_onUpdate(this->m_value.value<string>()); }
+		static Type& cls() { static Type ty("Input<string>", TypeIn::cls()); return ty; }
 
 	protected:
-		TypeIn m_typeIn;
+		Callback m_callback;
 	};
 
 	template <>
-	class _refl_ TOY_UI_EXPORT Input<Colour> : public WValue
+	class _refl_ TOY_UI_EXPORT Input<Colour> : public Wedge, public InputValue<Colour>
 	{
 	public:
-		Input(Wedge& parent, Colour value, std::function<void(Colour)> callback = nullptr)
-			: WValue(parent, var(value), this->cls(), [callback](Lref& lref) { callback(lref.value<Colour>()); })
-			, m_r(*this, AutoStat<float>(value.r(), 0.f, 1.f, 0.01f), [this](float val) { this->m_value.value<Colour>().setR(val); this->triggerModify(); })
-			, m_g(*this, AutoStat<float>(value.g(), 0.f, 1.f, 0.01f), [this](float val) { this->m_value.value<Colour>().setG(val); this->triggerModify(); })
-			, m_b(*this, AutoStat<float>(value.b(), 0.f, 1.f, 0.01f), [this](float val) { this->m_value.value<Colour>().setB(val); this->triggerModify(); })
-			, m_a(*this, AutoStat<float>(value.a(), 0.f, 1.f, 0.01f), [this](float val) { this->m_value.value<Colour>().setA(val); this->triggerModify(); })
+		using Callback = std::function<void(Colour)>;
+
+		Input(Wedge& parent, Colour value, const Callback& callback = nullptr)
+			: Wedge(parent, this->cls())
+			, InputValue<Colour>(value, callback)
+			, m_r(*this, AutoStat<float>(value.r(), 0.f, 1.f, 0.01f), [this](float val) { m_ref.setR(val); this->changed(); })
+			, m_g(*this, AutoStat<float>(value.g(), 0.f, 1.f, 0.01f), [this](float val) { m_ref.setG(val); this->changed(); })
+			, m_b(*this, AutoStat<float>(value.b(), 0.f, 1.f, 0.01f), [this](float val) { m_ref.setB(val); this->changed(); })
+			, m_a(*this, AutoStat<float>(value.a(), 0.f, 1.f, 0.01f), [this](float val) { m_ref.setA(val); this->changed(); })
 		{}
+
+		void changed()
+		{
+			if(m_callback) m_callback(m_ref);
+		}
 
 		void notifyUpdate()
 		{
-			Colour colour = this->m_value.value<Colour>();
-			m_r.updateValue(colour.r());
-			m_g.updateValue(colour.g());
-			m_b.updateValue(colour.b());
-			m_a.updateValue(colour.a());
+			m_r.update(m_ref.r());
+			m_g.update(m_ref.g());
+			m_b.update(m_ref.b());
+			m_a.update(m_ref.a());
 		}
 
-		static Type& cls() { static Type ty("InputColour", WValue::cls()); return ty; }
+		static Type& cls() { static Type ty("InputColour", Wedge::Row()); return ty; }
 
 	protected:
-		StatSlider<float> m_r;
-		StatSlider<float> m_g;
-		StatSlider<float> m_b;
-		StatSlider<float> m_a;
+		StatSlider<float> m_r, m_g, m_b, m_a;
 	};
 
-	template <class T_Val, class T_Arg, class T_Input>
+	template <class T_Val, class T_Input>
 	class Field : public Wedge
 	{
 	public:
-		Field(Wedge& parent, const string& label, const T_Val& value, std::function<void(T_Arg)> callback = nullptr, bool reverse = false)
+		Field(Wedge& parent, const string& label, const T_Val& value, typename T_Input::Callback callback = nullptr, bool reverse = false)
 			: Wedge(parent, cls())
 			, m_label(*this, label)
 			, m_input(*this, value, callback)
@@ -267,39 +242,19 @@ namespace toy
 		T_Input m_input;
 	};
 
-	using InputBool = Field<bool, bool, Input<bool>>;
-	using InputInt = Field<AutoStat<int>, int, Input<int>> ;
-	using InputFloat = Field<AutoStat<float>, float, Input<float>>;
-	using InputText = Field<string, string, Input<string>>;
+	using InputBool = Field<bool, Input<bool>>;
+	using InputInt = Field<AutoStat<int>, Input<int>> ;
+	using InputFloat = Field<AutoStat<float>, Input<float>>;
+	using InputText = Field<string, Input<string>>;
 
-	using InputColour = Field<Colour, Colour, Input<Colour>>;
+	using InputColour = Field<Colour, Input<Colour>>;
 
-	using SliderInt = Field<AutoStat<int>, int, StatSlider<int>>;
-	using SliderFloat = Field<AutoStat<float>, float, StatSlider<float>>;
+	using SliderInt = Field<AutoStat<int>, StatSlider<int>>;
+	using SliderFloat = Field<AutoStat<float>, StatSlider<float>>;
 
-	class TOY_UI_EXPORT InputRadio : public Wedge
-	{
-	public:
-		InputRadio(Wedge& parent, const string& label, StringVector choices, std::function<void(const string&)> callback = nullptr, bool reverse = false);
-
-		static Type& cls() { static Type ty("InputRadio", Wedge::WrapControl()); return ty; }
-
-	protected:
-		Label m_label;
-		RadioSwitch m_input;
-	};
-
-	class TOY_UI_EXPORT InputDropdown : public Wedge
-	{
-	public:
-		InputDropdown(Wedge& parent, const string& label, StringVector choices, std::function<void(const string&)> callback = nullptr, bool reverse = false);
-
-		static Type& cls() { static Type ty("InputDropdown", Wedge::WrapControl()); return ty; }
-
-	protected:
-		Label m_label;
-		DropdownInput m_input;
-	};
+	using InputRadio = Field<StringVector, RadioSwitch>;
+	using InputDropdown = Field<StringVector, DropdownInput>;
+	using InputTypedown = Field<StringVector, TypedownInput>;
 }
 
 #endif // TOY_INPUT_H

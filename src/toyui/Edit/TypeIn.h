@@ -8,36 +8,36 @@
 /* toy */
 #include <toyui/Forward.h>
 #include <toyui/Widget/Sheet.h>
-#include <toyui/Widget/Cursor.h>
-#include <toyui/Button/Checkbox.h>
-#include <toyui/Edit/Value.h>
-
-#include <toyobj/String/StringConvert.h>
+#include <toyui/Button/Button.h>
 
 namespace toy
 {
 	class _refl_ TOY_UI_EXPORT TypeIn : public Wedge
 	{
 	public:
-		TypeIn(Wedge& parent, string& string, bool wrap = false, Type& type = cls());
-		TypeIn(WValue& input, bool wrap = false, Type& type = cls());
+		using Callback = std::function<string(const string&)>;
+
+	public:
+		TypeIn(Wedge& parent, const string& text, Callback callback = nullptr, bool wrap = false, Type& type = cls());
 
 		virtual void active();
 		virtual void inactive();
 
+		void setString(const string& value);
 		void setAllowedChars(const string& chars);
 
 		void erase();
 		void insert(char c);
-		void updateString();
-		void updateText();
+		void updated();
+		void changed();
+
+		void activate();
 
 		virtual bool leftClick(MouseEvent& mouseEvent);
 		virtual bool keyDown(KeyEvent& keyEvent);
 
 		virtual bool leftDragStart(MouseEvent& mouseEvent);
 		virtual bool leftDrag(MouseEvent& mouseEvent);
-		virtual bool leftDragEnd(MouseEvent& mouseEvent);
 
 		void selectCaret(int index);
 		void selectFirst(size_t start);
@@ -49,19 +49,16 @@ namespace toy
 		static Type& cls() { static Type ty("TypeIn", Wedge::WrapControl()); return ty; }
 
 	protected:
-		WValue* m_input;
-		string& m_string;
-		bool m_hasPeriod;
+		string m_string;
 		string m_allowedChars;
-		size_t m_precision;
-
-		string m_valueString;
 
 		size_t m_selectFirst;
 		size_t m_selectSecond;
 
 		Label m_label;
 		Caption& m_caption;
+
+		Callback m_callback;
 	};
 }
 

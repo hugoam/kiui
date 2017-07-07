@@ -13,8 +13,6 @@
 
 namespace toy
 {
-	using FrameVector = std::vector<FrameSolver*>;
-
 	class TOY_UI_EXPORT FrameSolver : public Object, public UiRect
 	{
 	public:
@@ -38,40 +36,45 @@ namespace toy
 		inline float dspace(Dimension dim) { return d_size[dim] - dpadding(dim) - dbackpadding(dim); }
 
 		//inline float spacing(FrameSolver& frame) { return d_prev ? d_style->d_spacing.val[d_length] : 0.f; }
-		inline float spacing() { return d_prev ? d_style->d_spacing.val[d_length] : 0.f; }
+		inline float spacing() { return d_style->d_spacing.val[d_length]; }
 
 		inline Dimension orthogonal(Dimension dim) { return dim == DIM_X ? DIM_Y : DIM_X; }
 
-		void setup(const DimFloat& position, const DimFloat& size, const DimFloat& span)
+		void setup(const DimFloat& position, const DimFloat& size, const DimFloat& span, const DimFloat* content)
 		{
 			d_position = position;
 			d_span = span;
+			d_size = size;
 
-			if(d_sizing.x() == FIXED) d_size[DIM_X] = size.x();
-			if(d_sizing.y() == FIXED) d_size[DIM_Y] = size.y();
-
-			d_content = d_size;
+			if(d_sizing.x == FIXED) d_content.x = (content ? content->x : d_size.x - dpadding(DIM_X) - dbackpadding(DIM_X));
+			if(d_sizing.y == FIXED) d_content.y = (content ? content->y : d_size.y - dpadding(DIM_Y) - dbackpadding(DIM_Y));
+			if(d_sizing.x == FIXED) d_size.x = d_content.x + dpadding(DIM_X) + dbackpadding(DIM_X);
+			if(d_sizing.y == FIXED) d_size.y = d_content.y + dpadding(DIM_Y) + dbackpadding(DIM_Y);
 		}
 
-		void reset()
+		void reset(bool partial = false)
 		{
-			d_size = DimFloat(0.f, 0.f);
-			d_content = DimFloat(0.f, 0.f);
-			d_spaceContent = DimFloat(0.f, 0.f);
+			d_size = { 0.f, 0.f };
+			if(!partial)
+				d_content = { 0.f, 0.f };
+			d_spaceContent = { 0.f, 0.f };
 			d_contentExpand = false;
 			d_totalSpan = 0.f;
 			d_prev = nullptr;
+			d_count = 0;
 		}
 
 		void applySpace(Dimension length = DIM_NULL);
 
-		virtual void collect(FrameVector& frames);
+		virtual void collect(SolverVector& solvers);
 
 		virtual FrameSolver& solver(FrameSolver& frame, Dimension dim);
 		virtual FrameSolver* grid(FrameSolver& frame) { return nullptr; }
 
+		void sync();
 		void compute();
 		void layout();
+		void read();
 
 		virtual void compute(FrameSolver& frame, Dimension dim);
 		virtual void layout(FrameSolver& frame, Dimension dim);
@@ -98,6 +101,7 @@ namespace toy
 		DimIndex d_index;
 
 		FrameSolver* d_prev;
+		size_t d_count;
 	};
 
 	class TOY_UI_EXPORT RowSolver : public FrameSolver
@@ -122,7 +126,7 @@ namespace toy
 	public:
 		CustomSolver(FrameSolver* solver, LayoutStyle* layout, Frame* frame = nullptr);
 
-		virtual void collect(FrameVector& frames);
+		virtual void collect(SolverVector& solvers);
 
 	protected:
 		std::vector<unique_ptr<FrameSolver>> m_solvers;

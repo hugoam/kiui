@@ -50,14 +50,14 @@ namespace toy
 			for(Image& image : d_images)
 				image = *d_image;
 
-			d_size[DIM_X] = d_stretch == DIM_X ? float(d_solidHeight) : 0.f;
-			d_size[DIM_Y] = d_stretch == DIM_Y ? float(d_solidWidth) : 0.f;
+			d_size.x = d_stretch == DIM_X ? float(d_solidHeight) : 0.f;
+			d_size.y = d_stretch == DIM_Y ? float(d_solidWidth) : 0.f;
 
 			this->stretchCoords(0, 0, image.d_width, image.d_height, [this](Section s, const BoxFloat& rect) {
-				this->d_images[s].d_left = this->d_image->d_left + int(rect.x());
-				this->d_images[s].d_top = this->d_image->d_top + int(rect.y());
-				this->d_images[s].d_width = int(rect.w());
-				this->d_images[s].d_height = int(rect.h());
+				this->d_images[s].d_left = this->d_image->d_left + int(rect.x);
+				this->d_images[s].d_top = this->d_image->d_top + int(rect.y);
+				this->d_images[s].d_width = int(rect.w);
+				this->d_images[s].d_height = int(rect.h);
 			});
 		}
 

@@ -26,10 +26,16 @@ namespace toy
 			d_parentLayer->removeLayer(*this);
 	}
 
-	void Layer::reindex(size_t from)
+	void Layer::reindex()
 	{
-		for(size_t i = from; i < d_sublayers.size(); ++i)
+		for(size_t i = 0; i < d_sublayers.size(); ++i)
 			d_sublayers[i]->setIndex(i);
+	}
+
+	void Layer::reorder()
+	{
+		std::sort(d_sublayers.begin(), d_sublayers.end(), [](Layer* first, Layer* second) { if(first->z() < second->z()) return true; else if(first->z() > second->z()) return false; return first->index() < second->index(); });
+		this->reindex();
 	}
 
 	void Layer::bind(Frame& parent)
@@ -50,26 +56,20 @@ namespace toy
 	{
 		layer.setIndex(d_sublayers.size());
 		d_sublayers.push_back(&layer);
+		this->reorder();
 	}
 
 	void Layer::removeLayer(Layer& layer)
 	{
-		size_t index = layer.index();
 		vector_remove(d_sublayers, &layer);
-		this->reindex(index);
-	}
-
-	void Layer::moveToTop(Layer& sublayer)
-	{
-		size_t index = sublayer.index();
-		d_sublayers.erase(d_sublayers.begin() + index);
-		d_sublayers.push_back(&sublayer);
-		this->reindex(index);
+		this->reindex();
+		this->reorder();
 	}
 
 	void Layer::moveToTop()
 	{
-		d_parent->layer().moveToTop(*this);
+		d_parentLayer->removeLayer(*this);
+		d_parentLayer->addLayer(*this);
 	}
 
 	Frame* Layer::pinpoint(DimFloat pos, const Filter& filter)

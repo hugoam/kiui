@@ -50,7 +50,7 @@ namespace toy
 
 		this->beginFrame(target);
 
-		this->render(target.layer().wedge(), false);
+		this->render(target.layer().wedge(), target.layer(), false);
 
 #ifdef TOYUI_DRAW_CACHE
 		target.layer().visit([this](Layer& layer) {
@@ -63,7 +63,7 @@ namespace toy
 		});
 #endif
 
-		if(m_debugBatch > 1 && m_debugBatch != prevBatch)
+		if(m_debugBatch > 1 /*&& m_debugBatch != prevBatch*/)
 		{
 			prevBatch = m_debugBatch;
 			//printf("DEBUG: Render Frame : %i frames redrawn\n", m_debugBatch);
@@ -72,45 +72,46 @@ namespace toy
 		this->endFrame();
 	}
 
-	void Renderer::render(Widget& widget, bool force)
+	void Renderer::render(Widget& widget, Layer& layer, bool force)
 	{
-		this->beginDraw(widget.frame(), force);
-		this->draw(widget.frame(), force);
-		this->endDraw(widget.frame());
+		this->beginDraw(layer, widget.frame(), force);
+		this->draw(layer, widget.frame(), force);
+		this->endDraw(layer, widget.frame());
 	}
 
-	void Renderer::render(Wedge& wedge, bool force)
+	void Renderer::render(Wedge& wedge, Layer& toplayer, bool force)
 	{
-		if(wedge.frame().layer().forceRedraw())
+		Layer& layer = wedge.frame().frameType() == LAYER ? wedge.frame().as<Layer>() : toplayer;
+
+		if(layer.forceRedraw())
 			force = true;
 
-		this->beginDraw(wedge.frame(), force);
-		this->draw(wedge.frame(), force);
+		this->beginDraw(layer, wedge.frame(), force);
+		this->draw(layer, wedge.frame(), force);
 
 		for(size_t i = 0; i < wedge.contents().size(); ++i)
 			if(!wedge.contents()[i]->frame().hidden())
 				if(wedge.contents()[i]->isa<Wedge>())
-					this->render(wedge.contents()[i]->as<Wedge>(), force);
+					this->render(wedge.contents()[i]->as<Wedge>(), layer, force);
 				else
-					this->render(*wedge.contents()[i], force);
+					this->render(*wedge.contents()[i], layer, force);
 
-
-		this->endDraw(wedge.frame());
+		this->endDraw(layer, wedge.frame());
 	}
 
-	void Renderer::beginDraw(Frame& frame, bool force)
+	void Renderer::beginDraw(Layer& layer, Frame& frame, bool force)
 	{
-		float x = floor(frame.d_position.x());
-		float y = floor(frame.d_position.y());
+		float x = floor(frame.d_position.x);
+		float y = floor(frame.d_position.y);
 
 		if(frame.frameType() > LAYER)
 			this->beginTarget();
 
 #ifdef TOYUI_DRAW_CACHE
 		void* layerCache = nullptr;
-		this->layerCache(frame.layer(), layerCache);
+		this->layerCache(layer, layerCache);
 
-		if(frame.frameType() >= LAYER && (frame.layer().redraw() || force))
+		if(&frame == &layer && (layer.redraw() || force))
 			this->clearLayer(layerCache);
 
 		this->beginUpdate(layerCache, x, y, frame.d_scale);
@@ -119,14 +120,14 @@ namespace toy
 #endif
 	}
 
-	void Renderer::draw(Frame& frame, bool force)
+	void Renderer::draw(Layer& layer, Frame& frame, bool force)
 	{
 		InkStyle& inkstyle = frame.inkstyle();
 
-		float left = floor(inkstyle.m_margin.val.x0());
-		float top = floor(inkstyle.m_margin.val.y0());
-		float width = floor(frame.d_size.x() - inkstyle.m_margin.val.x0() - inkstyle.m_margin.val.x1());
-		float height = floor(frame.d_size.y() - inkstyle.m_margin.val.y0() - inkstyle.m_margin.val.y1());
+		float left = floor(inkstyle.m_margin.val.x0);
+		float top = floor(inkstyle.m_margin.val.y0);
+		float width = floor(frame.d_size.x - inkstyle.m_margin.val.x0 - inkstyle.m_margin.val.x1);
+		float height = floor(frame.d_size.y - inkstyle.m_margin.val.y0 - inkstyle.m_margin.val.y1);
 
 		BoxFloat rect(left, top, width, height);
 
@@ -134,39 +135,27 @@ namespace toy
 			this->clipRect(rect);
 
 #ifdef TOYUI_DRAW_CACHE
-		if(!(frame.layer().redraw() || force))
+		if(!(layer.redraw() || force))
 			return;
-#endif
-
-#if 1 // DEBUG
-		if(m_debugDrawFrameRect)
-			this->debugRect(rect, Colour::Red);
 #endif
 
 		if(inkstyle.m_empty || this->clipTest(rect))
 			return;
 
 		bool custom = frame.widget().customDraw(*this);
+
+		if(inkstyle.m_customRenderer.val != nullptr)
+			custom = inkstyle.m_customRenderer.val(frame, *this);
+
 		if(custom)
 			return;
 
-		if(inkstyle.m_customRenderer.val != nullptr)
-		{
-			CustomRenderer func = inkstyle.m_customRenderer;
-			custom = func(frame, *this);
-			if(custom)
-				return;
-		}
+		//printf("DEBUG: Render Frame : %s\n", frame.style().name().c_str());
 
-#if 1 // DEBUG
-		if(frame.style().name() == m_debugDrawFilter)
-			this->debugRect(rect, Colour::Red);
-#endif
-
-		float paddedLeft = floor(inkstyle.m_padding.val.x0());
-		float paddedTop = floor(inkstyle.m_padding.val.y0());
-		float paddedWidth = floor(frame.d_size.x() - inkstyle.m_padding.val.x0() - inkstyle.m_padding.val.x1());
-		float paddedHeight = floor(frame.d_size.y() - inkstyle.m_padding.val.y0() - inkstyle.m_padding.val.y1());
+		float paddedLeft = floor(inkstyle.m_padding.val.x0);
+		float paddedTop = floor(inkstyle.m_padding.val.y0);
+		float paddedWidth = floor(frame.d_size.x - inkstyle.m_padding.val.x0 - inkstyle.m_padding.val.x1);
+		float paddedHeight = floor(frame.d_size.y - inkstyle.m_padding.val.y0 - inkstyle.m_padding.val.y1);
 
 		BoxFloat paddedRect(paddedLeft, paddedTop, paddedWidth, paddedHeight);
 
@@ -176,16 +165,13 @@ namespace toy
 		this->contentPos(frame, paddedRect, contentSize, DIM_X, contentPos);
 		this->contentPos(frame, paddedRect, contentSize, DIM_Y, contentPos);
 
-		BoxFloat contentRect(contentPos.x(), contentPos.y(), contentSize.x(), contentSize.y());
+		BoxFloat contentRect(contentPos.x, contentPos.y, contentSize.x, contentSize.y);
 		
-		this->drawBackground(frame, rect, paddedRect, contentRect);
-		this->drawContent(frame, rect, paddedRect, contentRect);
-
 #if 1 // DEBUG
 		if(frame.style().name() == m_debugDrawFilter)
 			this->debugRect(rect, Colour::Red);
-		//if(m_debugDrawFrameRect)
-		//	this->debugRect(rect, Colour::Red);
+		if(m_debugDrawFrameRect)
+			this->debugRect(rect, Colour::Red);
 		if(m_debugDrawPaddedRect)
 			this->debugRect(paddedRect, Colour::Green);
 		if(m_debugDrawContentRect)
@@ -193,14 +179,17 @@ namespace toy
 		if(m_debugDrawClipRect && frame.clip())
 			this->debugRect(rect, Colour::Red);
 #endif
+
+		this->drawBackground(frame, rect, paddedRect, contentRect);
+		this->drawContent(frame, rect, paddedRect, contentRect);
 	}
 
-	void Renderer::endDraw(Frame& frame)
+	void Renderer::endDraw(Layer& layer, Frame& frame)
 	{
 		this->endUpdate();
 
 		if(frame.frameType() >= LAYER)
-			frame.layer().endRedraw();
+			layer.endRedraw();
 
 		if(frame.frameType() > LAYER)
 			this->endTarget();
@@ -230,8 +219,6 @@ namespace toy
 
 	void Renderer::drawBackground(Frame& frame, const BoxFloat& rect, const BoxFloat& paddedRect, const BoxFloat& contentRect)
 	{
-		UNUSED(paddedRect);
-
 		if(!frame.hardClip().null())
 			return;
 
@@ -246,7 +233,7 @@ namespace toy
 		}
 
 		// Rect
-		if((inkstyle.m_borderWidth.val.x0() || inkstyle.m_backgroundColour.val.a() > 0.f))
+		if(inkstyle.m_borderWidth.val.x0 || inkstyle.m_backgroundColour.val.a() > 0.f)
 		{
 			BoxFloat cornerRadius = inkstyle.m_weakCorners ? this->selectCorners(frame) : inkstyle.m_cornerRadius;
 			this->drawRect(rect, cornerRadius, inkstyle);
@@ -260,14 +247,14 @@ namespace toy
 			float margin = imageSkin.d_margin * 2.f;
 
 			if(imageSkin.d_stretch == DIM_X)
-				skinRect.assign(rect.x(), contentRect.y() + margin, rect.w() + margin, imageSkin.d_height);
+				skinRect.assign(rect.x, contentRect.y + margin, rect.w + margin, imageSkin.d_height);
 			else if(imageSkin.d_stretch == DIM_Y)
-				skinRect.assign(contentRect.x() + imageSkin.d_margin, rect.y(), imageSkin.d_width, rect.h() + margin);
+				skinRect.assign(contentRect.x + imageSkin.d_margin, rect.y, imageSkin.d_width, rect.h + margin);
 			else
-				skinRect.assign(rect.x(), rect.y(), rect.w() + margin, rect.h() + margin);
+				skinRect.assign(rect.x, rect.y, rect.w + margin, rect.h + margin);
 
 			auto func = [this, &frame](ImageSkin::Section section, const BoxFloat& rect) { this->drawSkinImage(frame, section, rect); };
-			imageSkin.stretchCoords(skinRect.x(), skinRect.y(), skinRect.w(), skinRect.h(), func);
+			imageSkin.stretchCoords(skinRect.x, skinRect.y, skinRect.w, skinRect.h, func);
 		}
 
 		// Image
@@ -280,16 +267,16 @@ namespace toy
 	void Renderer::drawSkinImage(Frame& frame, ImageSkin::Section section, BoxFloat rect)
 	{
 		ImageSkin& imageSkin = frame.inkstyle().m_imageSkin.val;
-		rect[DIM_X] = rect.x() - imageSkin.d_margin;
-		rect[DIM_Y] = rect.y() - imageSkin.d_margin;
+		rect.x = rect.x - imageSkin.d_margin;
+		rect.y = rect.y - imageSkin.d_margin;
 
 		float xratio = 1.f;
 		float yratio = 1.f;
 
 		if(section == ImageSkin::TOP || section == ImageSkin::BOTTOM || section == ImageSkin::FILL)
-			xratio = rect.w() / imageSkin.d_fillWidth;
+			xratio = rect.w / imageSkin.d_fillWidth;
 		if(section == ImageSkin::LEFT || section == ImageSkin::RIGHT || section == ImageSkin::FILL)
-			yratio = rect.h() / imageSkin.d_fillHeight;
+			yratio = rect.h / imageSkin.d_fillHeight;
 
 		this->drawImageStretch(imageSkin.d_images[section], rect, xratio, yratio);
 	}
@@ -302,13 +289,10 @@ namespace toy
 		static InkStyle caretStyle;
 		caretStyle.m_backgroundColour = Colour::White;
 
-		if(paddedRect.w() <= 0.f || paddedRect.h() <= 0.f)
+		if(frame.empty() || paddedRect.w <= 0.f || paddedRect.h <= 0.f)
 			return;
 
-		if(frame.empty())
-			return;
-
-		this->clipRect(rect);
+		//this->clipRect(rect);
 
 		if(frame.icon())
 			this->drawImage(*frame.icon()->image(), contentRect);
@@ -317,12 +301,12 @@ namespace toy
 			for(TextRow& row : frame.caption()->textRows())
 			{
 				if(!row.selected.null())
-					this->drawRect(BoxFloat(paddedRect.x() + row.selected.x(), paddedRect.y() + row.selected.y(), row.selected.w(), row.selected.h()), BoxFloat(), textSelectionStyle);
+					this->drawRect(BoxFloat(paddedRect.x + row.selected.x, paddedRect.y + row.selected.y, row.selected.w, row.selected.h), BoxFloat(), textSelectionStyle);
 
-				this->drawText(paddedRect.x() + row.rect.x(), paddedRect.y() + row.rect.y(), row.start, row.end, frame.inkstyle());
+				this->drawText(paddedRect.x + row.rect.x, paddedRect.y + row.rect.y, row.start, row.end, frame.inkstyle());
 
 				if(!row.caret.null())
-					this->drawRect(BoxFloat(paddedRect.x() + row.caret.x(), paddedRect.y() + row.caret.y(), row.caret.w(), row.caret.h()), BoxFloat(), caretStyle);
+					this->drawRect(BoxFloat(paddedRect.x + row.caret.x, paddedRect.y + row.caret.y, row.caret.w, row.caret.h), BoxFloat(), caretStyle);
 			}
 	}
 

@@ -14,8 +14,7 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Textbox : public TypeIn
 	{
 	public:
-		Textbox(WValue& input);
-		Textbox(Wedge& parent, string& text);
+		Textbox(Wedge& parent, const string& text);
 
 		static Type& cls() { static Type ty("Textbox", TypeIn::cls()); return ty; }
 

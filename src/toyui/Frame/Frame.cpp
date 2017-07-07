@@ -20,12 +20,14 @@
 
 namespace toy
 {
+	template <> string toString<DirtyLayout>(const DirtyLayout& dirty) { if(dirty == CLEAN) return "CLEAN"; else if(dirty == DIRTY_REDRAW) return "DIRTY_REDRAW"; else if(dirty == DIRTY_PARENT) return "DIRTY_PARENT"; else if(dirty == DIRTY_LAYOUT) return "DIRTY_LAYOUT"; else if(dirty == DIRTY_FORCE_LAYOUT) return "DIRTY_FORCE_LAYOUT"; else /*if(dirty == DIRTY_STRUCTURE)*/ return "DIRTY_STRUCTURE"; }
+
 	Frame::Frame(Widget& widget)
 		: UiRect()
 		, d_widget(widget)
 		, d_wedge(widget.isa<Wedge>() ? &widget.as<Wedge>() : nullptr)
 		, d_parent(nullptr)
-		, d_dirty(DIRTY_LAYOUT)
+		, d_dirty(DIRTY_STRUCTURE)
 		, d_hidden(false)
 		, d_index(0, 0)
 		, d_style(nullptr)
@@ -43,7 +45,7 @@ namespace toy
 	void Frame::makeSolver()
 	{
 		LayoutSolver type = d_style->layout().d_solver;
-		FrameSolver* solver = d_parent ? &d_parent->solver() : nullptr;
+		FrameSolver* solver = d_parent ? d_parent->solver() : nullptr;
 
 		if(type == FRAME_SOLVER)
 			d_solver = make_object<FrameSolver>(solver, &d_style->layout(), this);
@@ -70,11 +72,11 @@ namespace toy
 		return this->lookup(type).as<Layer>();
 	}
 
-	void Frame::markDirty(Dirty dirty)
+	void Frame::markDirty(DirtyLayout dirty)
 	{
-		//if(d_style)
-		//	printf("%s dirty\n", d_style->name().c_str());
 		this->setDirty(dirty);
+		if(dirty == DIRTY_FORCE_LAYOUT)
+			dirty = DIRTY_LAYOUT;
 		Frame* parent = this->parent();
 		while(parent)
 		{
@@ -98,6 +100,7 @@ namespace toy
 
 	void Frame::setStyle(Style& style, bool reset)
 	{
+		if(d_style == &style) return;
 		d_style = &style;
 		this->updateStyle();
 	}
@@ -116,7 +119,7 @@ namespace toy
 	{
 		if(d_inkstyle == &inkstyle) return;
 		d_inkstyle = &inkstyle;
-		this->markDirty(DIRTY_CONTENT);
+		this->markDirty(DIRTY_REDRAW);
 
 		if(d_inkstyle->m_image.val)
 			this->setIcon(d_inkstyle->m_image.val);
@@ -149,22 +152,21 @@ namespace toy
 	{
 		if(d_size[dim] == size) return;
 		d_size[dim] = size;
-		this->markDirty(DIRTY_LAYOUT);
+		this->markDirty(DIRTY_FORCE_LAYOUT);
 	}
 
 	void Frame::setSpanDim(Dimension dim, float span)
 	{
 		if(d_span[dim] == span) return;
 		d_span[dim] = span;
-		this->markDirty(DIRTY_LAYOUT);
+		this->markDirty(DIRTY_FORCE_LAYOUT);
 	}
 
 	void Frame::setPositionDim(Dimension dim, float position)
 	{
-		//if(d_position[dim] == position) return;
+		if(d_position[dim] == position) return;
 		d_position[dim] = position;
-		this->markDirty(DIRTY_LAYOUT);
-		//this->setDirty(DIRTY_ABSOLUTE);
+		this->markDirty(DIRTY_REDRAW);
 	}
 
 	void Frame::show()
@@ -193,8 +195,8 @@ namespace toy
 			return;
 		
 		d_parent->integratePosition(root, global);
-		global[DIM_X] = (global.x() - d_position.x()) / d_scale;
-		global[DIM_Y] = (global.y() - d_position.y()) / d_scale;
+		global.x = (global.x - d_position.x) / d_scale;
+		global.y = (global.y - d_position.y) / d_scale;
 	}
 
 	void Frame::derivePosition(Frame& root, DimFloat& local)
@@ -202,8 +204,8 @@ namespace toy
 		if(this == &root)
 			return;
 
-		local[DIM_X] = d_position.x() + local.x() * d_scale;
-		local[DIM_Y] = d_position.y() + local.y() * d_scale;
+		local.x = d_position.x + local.x * d_scale;
+		local.y = d_position.y + local.y * d_scale;
 		d_parent->derivePosition(root, local);
 	}
 
@@ -217,8 +219,8 @@ namespace toy
 
 	bool Frame::inside(const DimFloat& pos)
 	{
-		return (pos.x() >= 0.f && pos.x() <= d_size.x()
-			 && pos.y() >= 0.f && pos.y() <= d_size.y());
+		return (pos.x >= 0.f && pos.x <= d_size.x
+			 && pos.y >= 0.f && pos.y <= d_size.y);
 	}
 
 	void Frame::setHardClip(const BoxFloat& hardClip)
@@ -264,74 +266,106 @@ namespace toy
 
 		prev.setSpanDim(d_length, std::max(0.01f, prev.d_span[d_length] + offset));
 		next.setSpanDim(d_length, std::max(0.01f, next.d_span[d_length] - offset));
+		this->markDirty(DIRTY_FORCE_LAYOUT);
 	}
 
 	void Frame::relayout()
 	{
-		if(d_dirty >= DIRTY_STRUCTURE)
+		DirtyLayout dirty = this->clearDirty();
+		if(!dirty) return;
+
+		if(dirty >= DIRTY_STRUCTURE)
 		{
-			d_wedge->visit([](Widget& widget) -> bool
+			d_wedge->visit([](Widget& widget, bool& visit)
 			{
-				widget.makeSolver(); return true;
+				widget.makeSolver();
 			});
 		}
 
-		FrameVector solvers;
-		d_wedge->visit([&solvers](Widget& widget) -> bool
-		{
-			if(widget.frame().hidden() || !widget.frame().dirty()) return false;
-			widget.frame().solver().collect(solvers);
-			widget.frame().syncSolver();
-			widget.frame().clearDirty();
-			widget.frame().layer().setForceRedraw();
-			widget.dirtyLayout();
-			return true;
-		});
-
-		if(solvers.size() == 0)
-			return;
-
-		printf("Relayout %u frames\n", solvers.size());
-		solvers.erase(solvers.begin());
+		SolverVector solvers;
+		for(Widget* widget : d_wedge->contents())
+			widget->frame().collect(solvers, dirty);
 
 		d_solver->reset();
 		d_solver->d_size = d_size;
 
+		this->relayout(solvers);
+	}
+
+	void Frame::collect(SolverVector& solvers, DirtyLayout dirtyTop)
+	{
+		if(dirtyTop >= DIRTY_FORCE_LAYOUT)
+			this->setDirty(DIRTY_FORCE_LAYOUT);
+		else if(dirtyTop >= DIRTY_LAYOUT)
+			this->setDirty(DIRTY_PARENT);
+
+		if(d_hidden || !d_dirty)
+			return;
+
+		//this->debugPrintDepth();
+		//printf(" >> %s %s\n", d_style->name().c_str(), toString(d_dirty).c_str());
+
+		if(d_dirty >= DIRTY_PARENT)
+		{
+			d_solver->collect(solvers);
+			d_widget.dirtyLayout();
+		}
+
+		if(d_dirty >= DIRTY_REDRAW)
+		{
+			this->layer().setRedraw();
+			this->layer().setForceRedraw(); // @ kludge for nodes in canvas when moving the canvas window
+		}
+
+		if(d_wedge)
+			for(Widget* widget : d_wedge->contents())
+				widget->frame().collect(solvers, d_dirty);
+
+		this->clearDirty();
+	}
+
+	void Frame::relayout(SolverVector& solvers)
+	{
+		//for(FrameSolver* solver : solvers)
+		//	solver->sync();
+
 		for(FrameSolver* solver : reverse_adapt(solvers))
 			solver->compute();
-
-		d_solver->d_prev = nullptr;
 
 		for(FrameSolver* solver : solvers)
 			solver->layout();
 
 		for(FrameSolver* solver : solvers)
-			if(solver->d_frame)
-				solver->d_frame->readSolver();
+			solver->read();
 	}
 
-	void Frame::syncSolver()
+	void Frame::syncSolver(FrameSolver& solver)
 	{
-		DimFloat size = d_size;
+		if(d_caption || d_icon)
+		{
+			DimFloat content = (d_caption ? d_caption->updateTextSize() : d_icon->contentSize()) + d_inkstyle->m_padding.val.size();
+			solver.setup(d_position, d_size, d_span, &content);
+		}
+		else
+		{
+			solver.setup(d_position, d_size, d_span, nullptr);
+		}
 
-		const BoxFloat& padding = d_inkstyle->m_padding;
-		if(d_caption)
-			size = d_caption->updateTextSize() + DimFloat{ padding.x0(), padding.y0() } + DimFloat{ padding.x1(), padding.y1() };
-		else if(d_icon)
-			size = d_icon->contentSize() + DimFloat{ padding.x0(), padding.y0() } + DimFloat{ padding.x1(), padding.y1() };
-
-		d_solver->setup(d_position, size, d_span);
+		if(d_dirty == DIRTY_PARENT)
+		{
+			// @bug this causes a bug in the relayout if we want to implement scarce behavior for wrap frames, since here the content is instead just the unpadded size
+			solver.d_content = d_size - solver.d_style->d_padding.val.size();
+		}
 	}
 
-	void Frame::readSolver()
+	void Frame::readSolver(FrameSolver& solver)
 	{
-		this->setPosition(d_solver->d_position);
-		this->setSize(d_solver->d_size);
-		d_span = d_solver->d_span;
-		d_length = d_solver->d_length;
+		this->setPosition(solver.d_position);
+		this->setSize(solver.d_size);
+		d_span = solver.d_span;
 
-		if(d_solver->d_solvers[DIM_X] && !d_solver->d_solvers[DIM_X]->d_frame)
-			d_position = d_position + d_solver->d_solvers[DIM_X]->d_position;
+		if(solver.d_solvers[DIM_X] && !solver.d_solvers[DIM_X]->d_frame)
+			d_position = d_position + solver.d_solvers[DIM_X]->d_position;
 	}
 
 	void Frame::debugPrintDepth()

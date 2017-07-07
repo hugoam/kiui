@@ -40,7 +40,7 @@ namespace toy
 
 		WidgetStore& store() { if(!m_store) m_store = make_unique<WidgetStore>(*this);  return *m_store; }
 
-		virtual void visit(const Visitor& visitor, bool post = false);
+		virtual void visit(const Visitor& visitor);
 
 		void append(Widget& widget);
 		void insert(Widget& widget, size_t index);

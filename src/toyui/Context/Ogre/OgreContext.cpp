@@ -51,6 +51,7 @@ namespace toy
 
 		virtual void execute(const Ogre::Camera* lodCameraconst)
 		{
+			m_camera->getSceneManager()->_setViewport(mViewport); // @kludge : investigate, ask on the forums ?
 			RenderTarget* renderer = Ogre::any_cast<RenderTarget*>(m_camera->getUserAny());
 			renderer->render();
 		}

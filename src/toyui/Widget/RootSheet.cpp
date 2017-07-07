@@ -17,10 +17,11 @@ namespace toy
 	RootSheet::RootSheet(UiWindow& window, Type& type, Wedge* parent)
 		: Wedge(type, MASTER_LAYER, parent)
 		, m_window(window)
-		, m_rootController(make_unique<ControlSwitch>(*this))
+		, m_rootController(*this)
 		, m_mouse(*this)
 		, m_keyboard(*this)
 		, m_cursor(*this)
+		, m_active(nullptr)
 	{
 		if(!parent)
 		{
@@ -40,9 +41,20 @@ namespace toy
 
 	void RootSheet::handleDestroyWidget(Widget& widget)
 	{
-		m_rootController->yieldControl(widget);
+		if(m_active == &widget)
+			m_active = nullptr;
+
+		m_rootController.yieldControl(widget);
 
 		m_cursor.unhover(widget);
 		m_mouse.handleDestroyWidget(widget);
+	}
+
+	void RootSheet::makeActive(Widget& widget)
+	{
+		if(m_active)
+			m_active->inactive();
+		m_active = &widget;
+		m_active->active();
 	}
 }

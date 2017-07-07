@@ -9,21 +9,11 @@
 
 namespace toy
 {
-	FilterInput::FilterInput(Wedge& parent, Wedge& list, Criteria criteria, Callback callback)
-		: Input<string>(parent, "", callback)
+	FilterInput::FilterInput(Wedge& parent, Wedge& list, Criteria criteria)
+		: Input<string>(parent, "", [this](string value) { this->updateFilter(value); })
 		, m_list(list)
 		, m_criteria(criteria ? criteria : [](Widget& widget) { return widget.label(); })
 	{}
-
-	void FilterInput::filterOn()
-	{
-		this->updateFilter(m_value.value<string>());
-	}
-
-	void FilterInput::filterOff()
-	{
-		this->updateFilter("");
-	}
 
 	void FilterInput::updateFilter(const string& filter)
 	{
@@ -42,11 +32,5 @@ namespace toy
 				return false;
 
 		return true;
-	}
-
-	void FilterInput::notifyModify()
-	{
-		Input<string>::notifyModify();
-		this->updateFilter(m_value.value<string>());
 	}
 }

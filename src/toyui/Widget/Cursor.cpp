@@ -13,10 +13,10 @@ namespace toy
 {
 	Cursor::Cursor(RootSheet& rootSheet)
 		: Wedge(rootSheet, cls(), LAYER)
+		, m_hovered(&rootSheet)
+		, m_locked(false)
 		, m_tooltip(rootSheet, "")
 	{
-		m_hovered = &rootSheet;
-
 		this->tooltipOff();
 	}
 
@@ -28,9 +28,6 @@ namespace toy
 
 	void Cursor::setPosition(const DimFloat& pos)
 	{
-		//if(!m_hovered->frame().inside(x, y))
-		//	this->unhover();
-
 		if(!m_tooltip.frame().hidden())
 			this->tooltipOff();
 		m_tooltipClock.step();
@@ -40,7 +37,7 @@ namespace toy
 	void Cursor::tooltipOn()
 	{
 		m_tooltip.setContent(m_hovered->tooltip());
-		m_tooltip.frame().setPosition({ m_frame->d_position.x(), m_frame->d_position.y() + m_frame->d_size.y() });
+		m_tooltip.frame().setPosition({ m_frame->d_position.x, m_frame->d_position.y + m_frame->d_size.y });
 		m_tooltip.show();
 	}
 
@@ -52,9 +49,9 @@ namespace toy
 
 	void Cursor::hover(Widget& widget)
 	{
+		if(m_locked) return;
 		m_hovered = &widget;
-		if(widget.style().skin().m_hoverCursor)
-			this->setStyle(*widget.style().skin().m_hoverCursor, false);
+		this->setStyle(widget.style().skin().m_hoverCursor ? *widget.style().skin().m_hoverCursor : Cursor::cls(), false);
 	}
 
 	void Cursor::unhover(Widget& widget)
@@ -65,6 +62,7 @@ namespace toy
 
 	void Cursor::unhover()
 	{
+		if(m_locked) return;
 		this->setStyle(Cursor::cls(), false);
 		m_hovered = &this->rootSheet();
 	}

@@ -19,18 +19,12 @@ namespace toy
 		using Criteria = std::function<string(Widget&)>;
 
 	public:
-		FilterInput(Wedge& parent, Wedge& list, Criteria criteria = nullptr, Callback callback = nullptr);
-
-		void filterOn();
-		void filterOff();
-
-		void notifyModify();
+		FilterInput(Wedge& parent, Wedge& list, Criteria criteria = nullptr);
 
 		void updateFilter(const string& filter);
 		bool fitsFilter(const string& filter, const string& value);
 
 		static Type& cls() { static Type ty("FilterInput", Input<string>::cls()); return ty; }
-
 
 	protected:
 		Wedge& m_list;

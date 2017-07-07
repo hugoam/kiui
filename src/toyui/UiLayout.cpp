@@ -36,9 +36,8 @@ namespace toy
 		for(auto& kv : m_styles)
 			this->prepareStyle(*kv.second);
 
-		m_uiWindow.rootSheet().visit([](Widget& widget) {
+		m_uiWindow.rootSheet().visit([](Widget& widget, bool& visit) {
 			widget.frame().updateStyle(true);
-			return true;
 		});
 	}
 
@@ -133,9 +132,11 @@ namespace toy
 
 		this->styledef(Window::cls()).layout().d_space = BLOCK;
 
-		this->styledef(Dockbox::cls()).layout().d_space = { PARAGRAPH, WRAP, FIXED };
 		this->styledef(Window::DockWindow()).layout().d_flow = FLOW;
 		this->styledef(Window::DockWindow()).layout().d_space = SHEET;
+
+		this->styledef(Dockbox::cls()).layout().d_flow = FLOW;
+		this->styledef(Dockbox::cls()).layout().d_space = { PARAGRAPH, WRAP, FIXED };
 
 		// BLOCKS
 		this->styledef(Window::WrapWindow()).layout().d_space = UNIT;
@@ -210,10 +211,7 @@ namespace toy
 
 		this->styledef(Popup::cls()).layout().d_size = { 280.f, 350.f };
 
-		this->styledef(Dockbox::cls()).layout().d_flow = FLOW;
 		this->styledef(Dockbox::cls()).layout().d_size = { 300.f, 0.f };
-		//this->styledef(Dockbox::cls()).skin().m_base = &this->style(DockWindow::cls());
-		// this initializes Window before the styledef is set
 
 		this->styledef(ScrollZone::cls()).layout().d_layout = { AUTO_SIZE, AUTO_SIZE };
 		this->styledef(ScrollZone::cls()).layout().d_clipping = CLIP;
@@ -221,9 +219,18 @@ namespace toy
 
 		this->styledef(Item::Control()).layout().d_align = { LEFT, CENTER };
 		this->styledef(Button::cls()).layout().d_align = { LEFT, CENTER };
-		this->styledef(CloseButton::cls()).layout().d_align = { RIGHT, CENTER };
+		this->styledef(Window::CloseButton()).layout().d_align = { RIGHT, CENTER };
 
-		this->styledef(NodeKnob::cls()).layout().d_size = { 10.f, 10.f };
+		this->styledef(Canvas::LayoutLine()).layout().d_space = ITEM;
+		this->styledef(Canvas::LayoutColumn()).layout().d_space = UNIT;
+
+		this->styledef(Canvas::LayoutLine()).layout().d_padding = BoxFloat(20.f);
+		this->styledef(Canvas::LayoutLine()).layout().d_spacing = DimFloat(100.f);
+
+		this->styledef(Canvas::LayoutColumn()).layout().d_padding = BoxFloat(20.f);
+		this->styledef(Canvas::LayoutColumn()).layout().d_spacing = DimFloat(20.f);
+
+		this->styledef(NodeKnob::cls()).layout().d_size = { 10.f, 22.f };
 
 		this->styledef(Wedge::Header()).layout().d_padding = BoxFloat(6.f);
 
@@ -258,7 +265,8 @@ namespace toy
 		this->styledef(Table::cls()).layout().d_spacing = DimFloat(0.f, 2.f);
 
 		this->styledef(WindowHeader::cls()).skin().m_hoverCursor = &Cursor::Move();
-		this->styledef(Dockspace::cls()).skin().m_hoverCursor = &Cursor::ResizeX();
+		this->styledef(Dockline::DocklineX()).skin().m_hoverCursor = &Cursor::ResizeX();
+		this->styledef(Dockline::DocklineY()).skin().m_hoverCursor = &Cursor::ResizeY();
 		this->styledef(WindowFooter::SizerLeft()).skin().m_hoverCursor = &Cursor::ResizeDiagLeft();
 		this->styledef(WindowFooter::SizerRight()).skin().m_hoverCursor = &Cursor::ResizeDiagRight();
 
@@ -276,7 +284,7 @@ namespace toy
 		this->styledef(Cursor::ResizeDiagRight()).skin().m_padding = { -10.f, -10.f, +10.f, +10.f };
 		this->styledef(Cursor::Caret()).skin().m_image = &m_uiWindow.findImage("caret_white");
 		this->styledef(Cursor::Caret()).skin().m_padding = { -4.f, -9.f, +4.f, +9.f };
-		
+
 		this->styledef(Toolbar::Mover()).skin().m_image = &m_uiWindow.findImage("mousepointer");
 
 		this->styledef(Text::cls()).skin().m_textWrap = true;

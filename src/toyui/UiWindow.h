@@ -97,8 +97,6 @@ namespace toy
 		void removeImage(Image& image);
 		Image& findImage(const string& name);
 
-		void makeActive(Widget& widget);
-
 		static Type& cls() { static Type ty; return ty; }
 
 	protected:
@@ -122,9 +120,6 @@ namespace toy
 		object_ptr<Styler> m_styler;
 
 		object_ptr<RootSheet> m_rootSheet;
-
-		Widget* m_active;
-
 		RootDevice* m_rootDevice;
 
 		bool m_shutdownRequested;

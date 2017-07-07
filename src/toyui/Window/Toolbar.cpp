@@ -8,16 +8,13 @@
 namespace toy
 {
 	ToolButton::ToolButton(Wedge& parent, const string& icon, const Callback& trigger)
-		: DropdownInput(parent, nullptr, {}, cls())
+		: DropdownInput(parent, {}, nullptr, cls())
 	{
-		// header is a button
-		m_activeHeader = true;
+		m_trigger = nullptr; // don't drop on left click
+		m_triggerAlt = [this](Widget&) { this->dropdown(true); }; // drop on right
 
-		// don't drop on left click, but on right click
-		m_trigger = nullptr;
-		m_triggerAlt = [this](Widget&) { this->dropdown(true); };
-
-		MultiButton& choice = this->addChoice({ icon }, trigger);
+		// MultiButton& choice = this->addChoice({ icon }); // @todo multiple tools, dropdown is complicated to retrofit
+		m_header.reset({ icon }, trigger);
 		m_toggle.hide();
 	}
 

@@ -14,15 +14,13 @@
 
 #include <toyui/Input/InputDevice.h>
 
-#define TOYUI_INSTANT_MAPPING
-
 namespace toy
 {
 	Widget::Widget(Wedge& parent, Type& type, FrameType frameType)
 		: Widget(type, frameType, &parent)
 	{
-		parent.append(*this);
 		this->updateStyle();
+		parent.append(*this);
 	}
 
 	Widget::Widget(Type& type, FrameType frameType, Wedge* parent)
@@ -38,6 +36,10 @@ namespace toy
 			m_frame = make_object<Layer>(this->as<Wedge>(), frameType);
 		else if(frameType == FRAME)
 			m_frame = make_object<Frame>(*this);
+
+/*#if 1 // DEBUG
+		InputReceiver::m_name = "Widget: " + type.name();
+#endif*/
 	}
 
 	Widget::~Widget()
@@ -85,7 +87,7 @@ namespace toy
 
 	void Widget::destroyTree()
 	{
-		this->visit([](Widget& widget) { widget.destroy(); return true; });
+		this->visit([](Widget& widget, bool& visit) { widget.destroy(); });
 	}
 
 	void Widget::bind(Wedge& parent, size_t index)
@@ -127,9 +129,10 @@ namespace toy
 		return nullptr;
 	}
 
-	void Widget::visit(const Visitor& visitor, bool post)
+	void Widget::visit(const Visitor& visitor)
 	{
-		visitor(*this);
+		bool visit;
+		visitor(*this, visit);
 	}
 
 	void Widget::show()
@@ -227,7 +230,7 @@ namespace toy
 
 	void Widget::makeActive()
 	{
-		this->uiWindow().makeActive(*this);
+		this->rootSheet().makeActive(*this);
 	}
 
 	void Widget::giveControl(InputReceiver& receiver, ControlMode mode, DeviceType device)

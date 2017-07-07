@@ -49,20 +49,20 @@ namespace toy
 	Docksection& Docksection::docktarget(const DimFloat& pos)
 	{
 		DimFloat local = m_frame->localPosition(pos);
-		if(local.x() < m_frame->d_size.x() * 0.25f)
+		if(local.x < m_frame->d_size.x * 0.25f)
 			return this->docktarget(DIM_X, false); // dock left
-		else if(local.x() > m_frame->d_size.x() * 0.75f)
+		else if(local.x > m_frame->d_size.x * 0.75f)
 			return this->docktarget(DIM_X, true); // dock right
-		else if(local.y() < m_frame->d_size.y() * 0.25f)
+		else if(local.y < m_frame->d_size.y * 0.25f)
 			return this->docktarget(DIM_Y, false); // dock under
-		else if(local.y() > m_frame->d_size.y() * 0.75f)
+		else if(local.y > m_frame->d_size.y * 0.75f)
 			return this->docktarget(DIM_Y, true); // dock above
 		else
 			return *this; // dock on
 	}
 
 	Dockline::Dockline(Wedge& parent, Dockspace& dockspace, Dockline* dockline, Dimension dim)
-		: GridSheet(parent, dim, nullptr, cls())
+		: GridSheet(parent, dim, nullptr, dim == DIM_X ? Dockline::DocklineX() : Dockline::DocklineY())
 		, m_dockspace(dockspace)
 		, m_dockline(dockline)
 		, m_docksection(nullptr)
@@ -171,12 +171,6 @@ namespace toy
 	{
 		Dockline& dockline = this->findLine(dockid);
 		return dockline.appendSection();
-	}
-
-	bool Dockline::mouseEntered(MouseEvent& mouseEvent)
-	{
-		this->rootSheet().cursor().setStyle(m_dim == DIM_X ? Cursor::ResizeX() : Cursor::ResizeY());
-		return true;
 	}
 
 	Dockspace::Dockspace(Wedge& parent)

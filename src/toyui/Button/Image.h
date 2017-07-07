@@ -9,14 +9,13 @@
 #include <toyobj/Util/Image.h>
 #include <toyui/Forward.h>
 #include <toyui/Widget/Widget.h>
-#include <toyui/Edit/Value.h>
 
 namespace toy
 {
-	class TOY_UI_EXPORT Figure : public WValue
+	class TOY_UI_EXPORT Figure : public Widget
 	{
 	public:
-		Figure(Wedge& parent, Lref& image);
+		Figure(Wedge& parent, Image256& source);
 		
 		virtual void destroyed();
 

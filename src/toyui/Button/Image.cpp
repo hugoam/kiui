@@ -10,9 +10,9 @@
 
 namespace toy
 {
-	Figure::Figure(Wedge& parent, Lref& image)
-		: WValue(parent, image, cls(), [this](Lref& value) { this->updateImage(); })
-		, m_source(m_value.any<Image256>())
+	Figure::Figure(Wedge& parent, Image256& source)
+		: Widget(parent, cls()) //, [this](Lref& value) { this->updateImage(); })
+		, m_source(source)
 		, m_image(nullptr)
 	{
 		this->updateImage();

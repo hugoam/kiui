@@ -7,8 +7,6 @@
 
 /* toy */
 #include <toyobj/Type.h>
-#include <toyobj/String/String.h>
-#include <toyobj/Util/Updatable.h>
 #include <toyui/Forward.h>
 #include <toyui/Frame/UiRect.h>
 #include <toyui/Frame/Content.h>
@@ -18,28 +16,30 @@
 
 namespace toy
 {
+	using SolverVector = std::vector<FrameSolver*>;
+
+	enum DirtyLayout
+	{
+		CLEAN,				// Frame doesn't need update
+		DIRTY_REDRAW,		// The parent layout has changed
+		DIRTY_PARENT,		// The parent layout has changed
+		DIRTY_LAYOUT,		// The frame layout has changed
+		DIRTY_FORCE_LAYOUT,	// The frame layout has changed
+		DIRTY_STRUCTURE		// The structure (tree) has changed
+	};
+
 	class _refl_ TOY_UI_EXPORT Frame : public Object, public UiRect
 	{
 	public:
 		Frame(Widget& widget);
 		~Frame();
 
-		enum Dirty
-		{
-			CLEAN,				// Frame doesn't need update
-			DIRTY_ABSOLUTE,		// The absolute position of the frame has changed
-			DIRTY_POSITION,		// The relative position of the frame has changed
-			DIRTY_CONTENT,		// The content of the widget has changed
-			DIRTY_LAYOUT,		// The skin of the frame has changed
-			DIRTY_STRUCTURE
-		};
-
 		virtual FrameType frameType() { return FRAME; }
 
 		inline Widget& widget() { return d_widget; }
 		inline Wedge& wedge() { return *d_wedge; }
 		inline Frame* parent() const { return d_parent; }
-		inline Dirty dirty() const { return d_dirty; }
+		inline DirtyLayout dirty() const { return d_dirty; }
 		inline bool hidden() const { return d_hidden; }
 		inline const DimIndex& index() const { return d_index; }
 		inline size_t dindex(Dimension dim) const { return d_index[dim]; }
@@ -54,12 +54,13 @@ namespace toy
 		inline bool opaque() const { return d_opacity == OPAQUE; }
 		inline bool hollow() const { return d_opacity == HOLLOW; }
 
-		inline FrameSolver& solver() { return *d_solver; }
+		inline FrameSolver* solver() { return d_solver.get(); }
 
 		inline Style& style() const { return *d_style; }
 		inline InkStyle& inkstyle() const { return *d_inkstyle; }
 
-		void setIndex(size_t xindex, size_t yindex) { d_index[DIM_X] = xindex; d_index[DIM_Y] = yindex; }
+		void setIndex(size_t xindex, size_t yindex) { d_index.x = xindex; d_index.y = yindex; }
+		void setIndexDim(Dimension dim, size_t index) { d_index[dim] = index; }
 
 		void setEmpty() { d_icon = nullptr; d_caption = nullptr; }
 
@@ -82,9 +83,9 @@ namespace toy
 
 		bool visible();
 
-		void clearDirty() { d_dirty = CLEAN; }
-		void setDirty(Dirty dirty) { if(dirty > d_dirty) d_dirty = dirty; }
-		void markDirty(Dirty dirty);
+		DirtyLayout clearDirty() { DirtyLayout dirty = d_dirty; d_dirty = CLEAN; return dirty; }
+		void setDirty(DirtyLayout dirty) { if(dirty > d_dirty) d_dirty = dirty; }
+		void markDirty(DirtyLayout dirty);
 
 		using Filter = std::function<bool(Frame&)>;
 		virtual Frame* pinpoint(DimFloat pos, const Filter& filter = nullptr);
@@ -99,8 +100,8 @@ namespace toy
 		void setSpanDim(Dimension dim, float span);
 		void setPositionDim(Dimension dim, float position);
 
-		inline void setPosition(const DimFloat& pos) { setPositionDim(DIM_X, pos.x()), setPositionDim(DIM_Y, pos.y()); }
-		inline void setSize(const DimFloat& size) { setSizeDim(DIM_X, size.x()); setSizeDim(DIM_Y, size.y()); }
+		inline void setPosition(const DimFloat& pos) { setPositionDim(DIM_X, pos.x), setPositionDim(DIM_Y, pos.y); }
+		inline void setSize(const DimFloat& size) { setSizeDim(DIM_X, size.x); setSizeDim(DIM_Y, size.y); }
 
 		// global to local
 		void integratePosition(Frame& root, DimFloat& global);
@@ -126,8 +127,11 @@ namespace toy
 		void setHardClip(const BoxFloat& hardClip);
 
 		void relayout();
-		void syncSolver();
-		void readSolver();
+		void collect(SolverVector& solvers, DirtyLayout dirtyTop);
+		void relayout(SolverVector& solvers);
+
+		void syncSolver(FrameSolver& solver);
+		void readSolver(FrameSolver& solver);
 
 		void debugPrintDepth();
 
@@ -137,7 +141,7 @@ namespace toy
 		Widget& d_widget;
 		Wedge* d_wedge;
 		Frame* d_parent;
-		Dirty d_dirty;
+		DirtyLayout d_dirty;
 		bool d_hidden;
 		DimIndex d_index;
 

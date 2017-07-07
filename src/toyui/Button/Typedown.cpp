@@ -11,42 +11,34 @@
 
 namespace toy
 {
-	TypedownInput::TypedownInput(Wedge& parent, const Callback& onSelected, StringVector choices)
-		: DropdownInput(parent, onSelected, choices)
-		, m_input(*this, m_list, nullptr, [this](const string& value) { this->onInput(value); })
+	TypedownInput::TypedownInput(Wedge& parent, StringVector choices, const Callback& callback)
+		: DropdownInput(parent, choices, callback)
+		, m_input(*this, m_list, nullptr)
 	{
+		this->move(m_input.index(), 0);
+		m_trigger = [this](Widget&) { this->dropdown(); };
 		m_input.hide();
 	}
 
-	void TypedownInput::click()
+	void TypedownInput::dropdown()
 	{
-		this->showFilter();
-		MouseClickEvent mouseEvent(this->rootSheet().mouse(), DEVICE_MOUSE_LEFT_BUTTON, this->rootSheet().mouse().lastPos());
-		m_input.typeIn().leftClick(mouseEvent);
-	}
+		DropdownInput::dropdown();
 
-	void TypedownInput::showFilter()
-	{
 		m_header.hide();
 		m_input.show();
-		m_input.setString(m_header.label());
+
+		m_input.setString(""); // m_header.label()
+		m_input.selectCaret(0);
+		m_input.activate();
 	}
 
-	void TypedownInput::hideFilter()
+	void TypedownInput::dropup()
 	{
-		if(!(m_input.typeIn().state() & CONTROL))
-			return;
-
-		m_input.filterOff();
-		m_input.typeIn().yieldControl();
+		m_header.show();
 		m_input.hide();
-	}
 
-	void TypedownInput::onInput(string value)
-	{
-		m_input.filterOn();
+		m_input.yieldControl();
 
-		if(!m_down)
-			this->dropdown(false);
+		DropdownInput::dropup();
 	}
 }
