@@ -59,20 +59,20 @@ namespace toy
 
 		void update()
 		{
-			m_slider.resetMetrics(float(m_ref.min()), float(m_ref.max()), float(m_ref.value()), float(m_ref.step()));
+			m_slider.resetMetrics(float(this->m_ref.min()), float(this->m_ref.max()), float(this->m_ref.value()), float(this->m_ref.step()));
 			m_slider.updateKnob();
-			m_display.setContent(toString(m_ref));
+			m_display.setContent(toString(this->m_ref));
 		}
 
 		void changed()
 		{
-			m_ref.modify(T(m_slider.val()));
-			m_display.setContent(toString(m_ref));
-			if(m_callback) m_callback(m_ref);
+			this->m_ref.modify(T(m_slider.val()));
+			m_display.setContent(toString(this->m_ref));
+			if(this->m_callback) this->m_callback(this->m_ref);
 		}
 
-		void update(T val) { m_ref.modify(val); }
-		void change(T val) { m_ref.modify(val); if(m_callback) m_callback(m_ref); }
+		void update(T val) { this->m_ref.modify(val); }
+		void change(T val) { this->m_ref.modify(val); if(this->m_callback) this->m_callback(this->m_ref); }
 
 		static Type& cls() { static Type ty("StatSlider<" + typecls<T>().name() + ">", Wedge::Row()); return ty; }
 
@@ -97,32 +97,32 @@ namespace toy
 			, m_plus(*this, "+", [this](Widget&) { this->increment(); })
 			, m_minus(*this, "-", [this](Widget&) { this->decrement(); })
 		{
-			if(typecls<T>().is<float>() || typecls<T>().is<double>())
+			if(typecls<T>().template is<float>() || typecls<T>().template is<double>())
 				m_typeIn.setAllowedChars("1234567890.");
 			else
 				m_typeIn.setAllowedChars("1234567890");
 
-			m_typeIn.setString(toString(m_ref));
+			m_typeIn.setString(toString(this->m_ref));
 		}
 
 		void typein(const string& str)
 		{
-			m_ref.modify(fromString<T>(str));
-			if(m_callback) m_callback(m_ref);
+			this->m_ref.modify(fromString<T>(str));
+			if(this->m_callback) this->m_callback(this->m_ref);
 		}
 
 		void increment()
 		{
-			m_ref.increment();
-			m_typeIn.setString(toString(m_ref));
-			if(m_callback) m_callback(m_ref);
+			this->m_ref.increment();
+			m_typeIn.setString(toString(this->m_ref));
+			if(this->m_callback) this->m_callback(this->m_ref);
 		}
 
 		void decrement()
 		{
-			m_ref.decrement();
-			m_typeIn.setString(toString(m_ref));
-			if(m_callback) m_callback(m_ref);
+			this->m_ref.decrement();
+			m_typeIn.setString(toString(this->m_ref));
+			if(this->m_callback) this->m_callback(this->m_ref);
 		}
 
 		static Type& cls() { static Type ty("NumberInput<" + typecls<T>().name() + ">", Wedge::Row()); return ty; }
@@ -161,7 +161,7 @@ namespace toy
 			, m_checkbox(*this, [this](Widget&, bool on) { this->changed(on); }, value)
 		{}
 
-		void changed(bool on) { m_ref = on; if(m_callback) m_callback(on); }
+		void changed(bool on) { this->m_ref = on; if(this->m_callback) this->m_callback(on); }
 
 		static Type& cls() { static Type ty("Input<bool>", Wedge::cls()); return ty; }
 
@@ -195,23 +195,23 @@ namespace toy
 		Input(Wedge& parent, Colour value, const Callback& callback = nullptr)
 			: Wedge(parent, this->cls())
 			, InputValue<Colour>(value, callback)
-			, m_r(*this, AutoStat<float>(value.r(), 0.f, 1.f, 0.01f), [this](float val) { m_ref.setR(val); this->changed(); })
-			, m_g(*this, AutoStat<float>(value.g(), 0.f, 1.f, 0.01f), [this](float val) { m_ref.setG(val); this->changed(); })
-			, m_b(*this, AutoStat<float>(value.b(), 0.f, 1.f, 0.01f), [this](float val) { m_ref.setB(val); this->changed(); })
-			, m_a(*this, AutoStat<float>(value.a(), 0.f, 1.f, 0.01f), [this](float val) { m_ref.setA(val); this->changed(); })
+			, m_r(*this, AutoStat<float>(value.r(), 0.f, 1.f, 0.01f), [this](float val) { this->m_ref.setR(val); this->changed(); })
+			, m_g(*this, AutoStat<float>(value.g(), 0.f, 1.f, 0.01f), [this](float val) { this->m_ref.setG(val); this->changed(); })
+			, m_b(*this, AutoStat<float>(value.b(), 0.f, 1.f, 0.01f), [this](float val) { this->m_ref.setB(val); this->changed(); })
+			, m_a(*this, AutoStat<float>(value.a(), 0.f, 1.f, 0.01f), [this](float val) { this->m_ref.setA(val); this->changed(); })
 		{}
 
 		void changed()
 		{
-			if(m_callback) m_callback(m_ref);
+			if(this->m_callback) this->m_callback(this->m_ref);
 		}
 
 		void notifyUpdate()
 		{
-			m_r.update(m_ref.r());
-			m_g.update(m_ref.g());
-			m_b.update(m_ref.b());
-			m_a.update(m_ref.a());
+			m_r.update(this->m_ref.r());
+			m_g.update(this->m_ref.g());
+			m_b.update(this->m_ref.b());
+			m_a.update(this->m_ref.a());
 		}
 
 		static Type& cls() { static Type ty("InputColour", Wedge::Row()); return ty; }

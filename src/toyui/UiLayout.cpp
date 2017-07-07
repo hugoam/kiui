@@ -36,7 +36,7 @@ namespace toy
 		for(auto& kv : m_styles)
 			this->prepareStyle(*kv.second);
 
-		m_uiWindow.rootSheet().visit([](Widget& widget, bool& visit) {
+		m_uiWindow.rootSheet().visit([](Widget& widget, bool&) {
 			widget.frame().updateStyle(true);
 		});
 	}
@@ -44,7 +44,7 @@ namespace toy
 	Style& Styler::styledef(const string& name)
 	{
 		if(m_styledefs[name] == nullptr)
-			m_styledefs[name] = std::move(make_object<Style>(name));
+			m_styledefs[name] = make_object<Style>(name);
 		return *m_styledefs[name];
 	}
 

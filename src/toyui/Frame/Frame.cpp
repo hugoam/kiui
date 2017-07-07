@@ -30,10 +30,11 @@ namespace toy
 		, d_dirty(DIRTY_STRUCTURE)
 		, d_hidden(false)
 		, d_index(0, 0)
-		, d_style(nullptr)
 		, d_hardClip()
 		, d_opacity(CLEAR)
 		, d_length(DIM_NULL)
+		, d_style(nullptr)
+		, d_inkstyle(nullptr)
 		, d_caption()
 		, d_icon()
 		, d_solver()
@@ -108,7 +109,7 @@ namespace toy
 	void Frame::updateStyle(bool reset)
 	{
 		d_opacity = d_style->layout().d_opacity;
-		d_size = d_style->layout().d_size.val.null() ? d_size : d_style->layout().d_size;
+		d_size = d_style->layout().d_size.val.null() ? d_size : d_style->layout().d_size.val;
 
 		this->updateInkstyle(d_style->subskin(d_widget.state()));
 

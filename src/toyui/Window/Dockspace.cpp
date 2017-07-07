@@ -64,8 +64,8 @@ namespace toy
 	Dockline::Dockline(Wedge& parent, Dockspace& dockspace, Dockline* dockline, Dimension dim)
 		: GridSheet(parent, dim, nullptr, dim == DIM_X ? Dockline::DocklineX() : Dockline::DocklineY())
 		, m_dockspace(dockspace)
-		, m_dockline(dockline)
 		, m_docksection(nullptr)
+		, m_dockline(dockline)
 	{
 		m_frame->d_length = dim;
 	}

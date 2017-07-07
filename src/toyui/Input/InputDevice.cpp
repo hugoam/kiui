@@ -49,9 +49,9 @@ namespace toy
 
 	Mouse::Mouse(RootSheet& rootSheet)
 		: InputDevice(rootSheet)
-		, m_buttons{ MouseButton{*this, DEVICE_MOUSE_LEFT_BUTTON },
-					 MouseButton{*this, DEVICE_MOUSE_RIGHT_BUTTON},
-					 MouseButton{*this, DEVICE_MOUSE_MIDDLE_BUTTON } }
+		, m_buttons{ { MouseButton{ *this, DEVICE_MOUSE_LEFT_BUTTON },
+					   MouseButton{ *this, DEVICE_MOUSE_RIGHT_BUTTON },
+					   MouseButton{ *this, DEVICE_MOUSE_MIDDLE_BUTTON } } }
 		, m_lastPos(0.f, 0.f)
 	{}
 

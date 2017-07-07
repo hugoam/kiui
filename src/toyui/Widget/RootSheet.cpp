@@ -35,7 +35,8 @@ namespace toy
 
 	void RootSheet::nextFrame(size_t tick, size_t delta)
 	{
-		m_cursor.nextFrame(tick, delta);
+		UNUSED(tick); UNUSED(delta);
+		m_cursor.update();
 		m_frame->relayout();
 	}
 

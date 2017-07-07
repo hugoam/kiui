@@ -87,8 +87,8 @@ namespace toy
 	public:
 		LayoutStyle()
 			: Struct()
-			, d_solver(FRAME_SOLVER) , d_layout(DimLayout(AUTO_LAYOUT, AUTO_LAYOUT)), d_flow(FLOW), d_clipping(NOCLIP), d_opacity(CLEAR)
-			, d_space(Space::preset(SHEET)) , d_align(DimAlign(LEFT, LEFT))
+			, d_solver(FRAME_SOLVER) , d_layout(DimLayout(AUTO_LAYOUT, AUTO_LAYOUT)), d_flow(FLOW), d_space(Space::preset(SHEET))
+			, d_clipping(NOCLIP), d_opacity(CLEAR), d_align(DimAlign(LEFT, LEFT))
 			, d_span(DimFloat(1.f, 1.f)), d_pivot(DimPivot(FORWARD, FORWARD)), d_zorder(0), d_updated(0)
 		{}
 

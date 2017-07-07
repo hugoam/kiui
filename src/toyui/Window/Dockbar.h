@@ -19,7 +19,6 @@ namespace toy
 		Dockbox(Wedge& parent, Dockbar& dockbar, const string& title, const string& icon);
 
 		Dockbar& dockbar() { return m_dockbar; }
-		//DockToggle& toggle() { return m_toggle; }
 
 		void toggle(bool open);
 
@@ -45,7 +44,6 @@ namespace toy
 
 		Dockbox& addDock(const string& name, const string& icon);
 		Dockbox& addDock(const string& name);
-		void removeDock(Dockbox& dockbox);
 
 		static Type& cls() { static Type ty("Dockbar", Wedge::Div()); return ty; }
 

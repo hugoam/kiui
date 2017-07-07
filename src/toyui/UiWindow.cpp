@@ -30,9 +30,9 @@ namespace toy
 	{}
 
 	Context::Context(RenderSystem& renderSystem, object_ptr<RenderWindow> renderWindow, object_ptr<InputWindow> inputWindow)
-		: m_renderSystem(renderSystem)
-		, m_renderWindow(std::move(renderWindow))
+		: m_renderWindow(std::move(renderWindow))
 		, m_inputWindow(std::move(inputWindow))
+		, m_renderSystem(renderSystem)
 	{}
 
 	Context::~Context()

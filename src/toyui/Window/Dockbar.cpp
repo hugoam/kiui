@@ -43,10 +43,4 @@ namespace toy
 		std::transform(icon.begin(), icon.end(), icon.begin(), ::tolower);
 		return this->addDock(name, icon);
 	}
-
-	void Dockbar::removeDock(Dockbox& dockbox)
-	{
-		//dockbox.toggle().extract();
-		//dockbox.extract();
-	}
 }

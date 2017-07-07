@@ -13,7 +13,7 @@
 #include <toyui/Image.h>
 
 /* std */
-#include <vector>
+#include <array>
 
 namespace toy
 {
@@ -41,11 +41,11 @@ namespace toy
 			, d_stretch(stretch)
 			, d_width(image.d_width)
 			, d_height(image.d_height)
-			, d_fillWidth(image.d_width - d_left - d_right)
-			, d_fillHeight(image.d_height - d_top - d_bottom)
 			, d_solidWidth(image.d_width - d_margin - d_margin)
 			, d_solidHeight(image.d_height - d_margin - d_margin)
-			, d_images(9)
+			, d_fillWidth(image.d_width - d_left - d_right)
+			, d_fillHeight(image.d_height - d_top - d_bottom)
+			, d_images()
 		{
 			for(Image& subimage : d_images)
 				subimage = *d_image;
@@ -109,7 +109,7 @@ namespace toy
 
 		DimFloat d_size;
 
-		std::vector<Image> d_images;
+		std::array<Image, 9> d_images;
 
 		static Type& cls() { static Type ty; return ty; }
 	};

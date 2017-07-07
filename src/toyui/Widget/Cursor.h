@@ -33,7 +33,7 @@ namespace toy
 	public:
 		Cursor(RootSheet& rootSheet);
 
-		void nextFrame(size_t tick, size_t delta);
+		void update();
 
 		void lock() { m_locked = true; }
 		void unlock() { m_locked = false; }

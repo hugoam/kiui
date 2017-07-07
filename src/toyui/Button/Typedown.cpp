@@ -20,9 +20,9 @@ namespace toy
 		m_input.hide();
 	}
 
-	void TypedownInput::dropdown()
+	void TypedownInput::dropdown(bool modal)
 	{
-		DropdownInput::dropdown();
+		DropdownInput::dropdown(modal);
 
 		m_header.hide();
 		m_input.show();

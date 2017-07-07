@@ -87,7 +87,7 @@ namespace toy
 
 	void Widget::destroyTree()
 	{
-		this->visit([](Widget& widget, bool& visit) { widget.destroy(); });
+		this->visit([](Widget& widget, bool&) { widget.destroy(); });
 	}
 
 	void Widget::bind(Wedge& parent, size_t index)

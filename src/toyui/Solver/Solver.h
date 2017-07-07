@@ -88,10 +88,10 @@ namespace toy
 		FrameSolver* d_grid;
 		LayoutStyle* d_style;
 
-		DimSizing d_sizing;
-
 		Dimension d_length;
 		Dimension d_depth;
+
+		DimSizing d_sizing;
 
 		DimFloat d_content;
 		DimFloat d_spaceContent;

@@ -15,9 +15,9 @@ namespace toy
 	WindowHeader::WindowHeader(Window& window)
 		: Wedge(window, cls())
 		, m_window(window)
-		, m_tooltip("Drag me")
 		, m_title(*this, m_window.name())
 		, m_close(*this, "", [&window](Widget&) { window.close(); }, Window::CloseButton())
+		, m_tooltip("Drag me")
 	{
 		if(!m_window.closable())
 			m_close.hide();
@@ -95,10 +95,10 @@ namespace toy
 		, m_name(title)
 		, m_windowState(state)
 		, m_onClose(onClose)
-		, m_dock(dock)
 		, m_header(*this)
 		, m_body(*this, Window::Body())
 		, m_footer(*this)
+		, m_dock(dock)
 	{
 		if(!this->sizable())
 			m_footer.hide();

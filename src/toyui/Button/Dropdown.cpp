@@ -33,6 +33,7 @@ namespace toy
 
 	void Dropdown::selected(MultiButton& selected)
 	{
+		UNUSED(selected);
 		this->dropup();
 	}
 

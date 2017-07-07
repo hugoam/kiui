@@ -17,7 +17,7 @@ namespace toy
 	public:
 		TypedownInput(Wedge& parent, StringVector choices = {}, const Callback& callback = nullptr);
 
-		virtual void dropdown();
+		virtual void dropdown(bool modal = true);
 		virtual void dropup();
 
 		static Type& cls() { static Type ty("TypedownInput", DropdownInput::cls()); return ty; }

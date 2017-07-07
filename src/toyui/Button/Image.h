@@ -15,7 +15,7 @@ namespace toy
 	class TOY_UI_EXPORT Figure : public Widget
 	{
 	public:
-		Figure(Wedge& parent, Image256& source);
+		Figure(Wedge& parent, const Image256& source);
 		
 		virtual void destroyed();
 
@@ -25,7 +25,7 @@ namespace toy
 		static Type& cls() { static Type ty("Figure", Item::cls()); return ty; }
 
 	protected:
-		Image256& m_source;
+		const Image256& m_source;
 		Image* m_image;
 	};
 }

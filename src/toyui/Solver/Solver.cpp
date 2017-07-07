@@ -13,16 +13,17 @@ namespace toy
 {
 	Space Space::preset(SpacePreset preset)
 	{
-		if(preset == SHEET)  return { PARAGRAPH,  WRAP,   WRAP };
-		if(preset == FLEX)   return { PARALLEL,   WRAP,   WRAP };
-		if(preset == ITEM)   return { READING,    SHRINK, SHRINK };
-		if(preset == UNIT)   return { PARAGRAPH,  SHRINK, SHRINK };
-		if(preset == BLOCK)  return { PARAGRAPH,  FIXED,  FIXED };
-		if(preset == LINE)   return { READING,    WRAP,   SHRINK };
-		if(preset == STACK)  return { PARAGRAPH,  SHRINK, WRAP };
-		if(preset == DIV)    return { ORTHOGONAL, WRAP,   SHRINK };
-		if(preset == SPACER) return { PARALLEL,   WRAP,   SHRINK };
-		if(preset == BOARD)  return { PARAGRAPH,  EXPAND, EXPAND };
+		if     (preset == SHEET)  return { PARAGRAPH,  WRAP,   WRAP };
+		else if(preset == FLEX)	  return { PARALLEL,   WRAP,   WRAP };
+		else if(preset == ITEM)   return { READING,    SHRINK, SHRINK };
+		else if(preset == UNIT)   return { PARAGRAPH,  SHRINK, SHRINK };
+		else if(preset == BLOCK)  return { PARAGRAPH,  FIXED,  FIXED };
+		else if(preset == LINE)   return { READING,    WRAP,   SHRINK };
+		else if(preset == STACK)  return { PARAGRAPH,  SHRINK, WRAP };
+		else if(preset == DIV)    return { ORTHOGONAL, WRAP,   SHRINK };
+		else if(preset == SPACER) return { PARALLEL,   WRAP,   SHRINK };
+		else if(preset == BOARD)  return { PARAGRAPH,  EXPAND, EXPAND };
+		else 					  return{ PARAGRAPH,  WRAP,   WRAP };
 	}
 
 	float AlignSpace[5] = { 0.f, 0.5f, 1.f, 0.f, 1.f };
@@ -33,7 +34,6 @@ namespace toy
 		, d_parent(solver)
 		, d_solvers{ solver ? &solver->solver(*this, DIM_X) : nullptr, solver ? &solver->solver(*this, DIM_Y) : nullptr }
 		, d_grid(solver ? solver->grid() : nullptr)
-		, d_prev(nullptr)
 		, d_style(layout)
 		, d_length(DIM_NULL)
 		, d_depth(DIM_NULL)
@@ -41,6 +41,7 @@ namespace toy
 		, d_content(0.f, 0.f)
 		, d_spaceContent(0.f, 0.f)
 		, d_contentExpand(false)
+		, d_prev(nullptr)
 	{
 		if(d_style)
 			this->applySpace();
@@ -179,7 +180,7 @@ namespace toy
 
 		float space = this->dspace(dim);
 		//bool hasSpace = space > d_content[dim]; // @todo: implement scarcity check, current behavior when scarce is wrong
-		float spacings = float(std::max(d_count - 1U, 0U)) * this->spacing();
+		float spacings = float(std::max(int(d_count) - 1, 0)) * this->spacing();
 		if(dim == d_length)
 			space = (space - d_spaceContent[dim] - spacings) * frame.d_span[d_length];
 

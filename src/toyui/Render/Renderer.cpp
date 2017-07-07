@@ -91,10 +91,12 @@ namespace toy
 
 		for(size_t i = 0; i < wedge.contents().size(); ++i)
 			if(!wedge.contents()[i]->frame().hidden())
+			{
 				if(wedge.contents()[i]->isa<Wedge>())
 					this->render(wedge.contents()[i]->as<Wedge>(), layer, force);
 				else
 					this->render(*wedge.contents()[i], layer, force);
+			}
 
 		this->endDraw(layer, wedge.frame());
 	}
@@ -235,7 +237,7 @@ namespace toy
 		// Rect
 		if(inkstyle.m_borderWidth.val.x0 || inkstyle.m_backgroundColour.val.a() > 0.f)
 		{
-			BoxFloat cornerRadius = inkstyle.m_weakCorners ? this->selectCorners(frame) : inkstyle.m_cornerRadius;
+			BoxFloat cornerRadius = inkstyle.m_weakCorners ? this->selectCorners(frame) : inkstyle.m_cornerRadius.val;
 			this->drawRect(rect, cornerRadius, inkstyle);
 		}
 
@@ -316,7 +318,6 @@ namespace toy
 		static double prevtime;
 
 		double time = m_clock.read();
-		double delta = time - prevtime;
 		if(time - prevtime >= 4.f)
 		{
 			printf("INFO: fps %f\n", (frames / (time - prevtime)));

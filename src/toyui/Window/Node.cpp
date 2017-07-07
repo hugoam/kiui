@@ -33,12 +33,14 @@ namespace toy
 
 	bool Canvas::leftClick(MouseEvent& mouseEvent)
 	{
+		UNUSED(mouseEvent);
 		m_selection.clear();
 		return true;
 	}
 
 	bool Canvas::rightClick(MouseEvent& mouseEvent)
 	{
+		UNUSED(mouseEvent);
 		if(m_contextTrigger)
 			m_contextTrigger(*this);
 		return true;
@@ -60,7 +62,7 @@ namespace toy
 
 	void Canvas::collectNodes(std::vector<Node*>& nodes)
 	{
-		m_plan.visit([&nodes](Widget& widget, bool& visit) {
+		m_plan.visit([&nodes](Widget& widget, bool&) {
 			if(&widget.type() == &Node::cls())
 				nodes.push_back(&widget.as<Node>());
 		});
@@ -98,8 +100,6 @@ namespace toy
 			elements.back().sync();
 			solvers.push_back(&elements.back());
 		}
-
-		Style& nodeStyle = this->fetchStyle(Node::cls());
 
 		this->frame().relayout(solvers);
 
@@ -147,6 +147,7 @@ namespace toy
 
 	bool NodePlug::leftDragStart(MouseEvent& mouseEvent)
 	{
+		UNUSED(mouseEvent);
 		m_connectionProxy = &m_node.plan().emplace<NodeKnob>(Colour::None, NodeKnob::Proxy());
 		m_cableProxy = &m_node.plan().emplace<NodeCable>((m_input ? *m_connectionProxy : m_knob), (m_input ? m_knob : *m_connectionProxy));
 		return true;
