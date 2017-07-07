@@ -49,6 +49,7 @@ namespace toy
 
 	FrameSolver& TableSolver::solver(FrameSolver& frame, Dimension dim)
 	{
+		UNUSED(dim);
 		if(frame.d_frame && frame.d_parent != this)
 		{
 			//size_t column0 = frame.d_frame->dindex(d_depth);

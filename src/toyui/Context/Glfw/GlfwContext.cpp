@@ -239,23 +239,10 @@ namespace toy
 		m_height = winHeight;
 	}
 
-	GlfwInputWindow::GlfwInputWindow(GlfwRenderWindow& renderWindow)
+	GlfwInputWindow::GlfwInputWindow()
 		: InputWindow()
-		, m_renderWindow(renderWindow)
-		, m_glWindow(renderWindow.glWindow())
-	{
-		glfwSetWindowUserPointer(m_glWindow, this);
-		 
-		glfwSetKeyCallback(m_glWindow, [](GLFWwindow* w, int key, int scancode, int action, int mods) { static_cast<GlfwInputWindow*>(glfwGetWindowUserPointer(w))->injectKey(key, scancode, action, mods); });
-		glfwSetCharCallback(m_glWindow, [](GLFWwindow* w, unsigned int c) { static_cast<GlfwInputWindow*>(glfwGetWindowUserPointer(w))->injectChar(c); });
-		glfwSetMouseButtonCallback(m_glWindow, [](GLFWwindow* w, int button, int action, int mods) { static_cast<GlfwInputWindow*>(glfwGetWindowUserPointer(w))->injectMouseButton(button, action, mods); });
-		glfwSetCursorPosCallback(m_glWindow, [](GLFWwindow* w, double x, double y) { static_cast<GlfwInputWindow*>(glfwGetWindowUserPointer(w))->injectMouseMove(x, y); });
-		glfwSetScrollCallback(m_glWindow, [](GLFWwindow* w, double x, double y) { static_cast<GlfwInputWindow*>(glfwGetWindowUserPointer(w))->injectWheel(x, y); });
-
-		//glfwSetInputMode(m_glWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-	}
-
-	GlfwInputWindow::~GlfwInputWindow()
+		, m_renderWindow(nullptr)
+		, m_glWindow(nullptr)
 	{}
 
 	bool GlfwInputWindow::nextFrame()
@@ -264,10 +251,23 @@ namespace toy
 		return true;
 	}
 
-	void GlfwInputWindow::initInput(Mouse& mouse, Keyboard& keyboard)
+	void GlfwInputWindow::initInput(RenderWindow& renderWindow, Mouse& mouse, Keyboard& keyboard)
 	{
+		m_renderWindow = &static_cast<GlfwRenderWindow&>(renderWindow);
+		m_glWindow = m_renderWindow->glWindow();
+
 		m_mouse = &mouse;
 		m_keyboard = &keyboard;
+
+		glfwSetWindowUserPointer(m_glWindow, this);
+
+		glfwSetKeyCallback(m_glWindow, [](GLFWwindow* w, int key, int scancode, int action, int mods) { static_cast<GlfwInputWindow*>(glfwGetWindowUserPointer(w))->injectKey(key, scancode, action, mods); });
+		glfwSetCharCallback(m_glWindow, [](GLFWwindow* w, unsigned int c) { static_cast<GlfwInputWindow*>(glfwGetWindowUserPointer(w))->injectChar(c); });
+		glfwSetMouseButtonCallback(m_glWindow, [](GLFWwindow* w, int button, int action, int mods) { static_cast<GlfwInputWindow*>(glfwGetWindowUserPointer(w))->injectMouseButton(button, action, mods); });
+		glfwSetCursorPosCallback(m_glWindow, [](GLFWwindow* w, double x, double y) { static_cast<GlfwInputWindow*>(glfwGetWindowUserPointer(w))->injectMouseMove(x, y); });
+		glfwSetScrollCallback(m_glWindow, [](GLFWwindow* w, double x, double y) { static_cast<GlfwInputWindow*>(glfwGetWindowUserPointer(w))->injectWheel(x, y); });
+
+		//glfwSetInputMode(m_glWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	}
 
 	void GlfwInputWindow::resize(size_t width, size_t height)
@@ -280,22 +280,22 @@ namespace toy
 		m_mouseX = float(x);
 		m_mouseY = float(y);
 
-		float clampedX = std::max(0.f, std::min(float(m_renderWindow.width()), m_mouseX));
-		float clampedY = std::max(0.f, std::min(float(m_renderWindow.height()), m_mouseY));
+		float clampedX = std::max(0.f, std::min(float(m_renderWindow->m_width), m_mouseX));
+		float clampedY = std::max(0.f, std::min(float(m_renderWindow->m_height), m_mouseY));
 
-		m_mouse->dispatchMouseMoved(clampedX, clampedY);
+		m_mouse->dispatchMouseMoved({ clampedX, clampedY });
 	}
 
 	void GlfwInputWindow::injectMouseButton(int button, int action, int mods)
 	{
-		float clampedX = std::max(0.f, std::min(float(m_renderWindow.width()), m_mouseX));
-		float clampedY = std::max(0.f, std::min(float(m_renderWindow.height()), m_mouseY));
+		float clampedX = std::max(0.f, std::min(float(m_renderWindow->m_width), m_mouseX));
+		float clampedY = std::max(0.f, std::min(float(m_renderWindow->m_height), m_mouseY));
 
 		UNUSED(mods);
 		if(action == GLFW_PRESS)
-			m_mouse->dispatchMousePressed(clampedX, clampedY, convertGlfwButton(button));
+			m_mouse->dispatchMousePressed({ clampedX, clampedY }, convertGlfwButton(button));
 		else if(action == GLFW_RELEASE)
-			m_mouse->dispatchMouseReleased(clampedX, clampedY, convertGlfwButton(button));
+			m_mouse->dispatchMouseReleased({ clampedX, clampedY }, convertGlfwButton(button));
 	}
 
 	void GlfwInputWindow::injectKey(int key, int scancode, int action, int mods)
@@ -315,17 +315,12 @@ namespace toy
 
 	void GlfwInputWindow::injectWheel(double x, double y)
 	{
-		m_mouse->dispatchMouseWheeled(m_mouseX, m_mouseY, x + y);
+		m_mouse->dispatchMouseWheeled({ m_mouseX, m_mouseY }, x + y);
 	}
 
 	GlfwContext::GlfwContext(RenderSystem& renderSystem, const string& name, int width, int height, bool fullScreen, bool autoSwap)
-		: Context(renderSystem)
-	{
-		object_ptr<GlfwRenderWindow> renderWindow = make_object<GlfwRenderWindow>(name, width, height, autoSwap);
-		object_ptr<GlfwInputWindow> inputWindow = make_object<GlfwInputWindow>(*renderWindow);
-
-		this->init(std::move(renderWindow), std::move(inputWindow));
-	}
+		: Context(renderSystem, make_object<GlfwRenderWindow>(name, width, height, autoSwap), make_object<GlfwInputWindow>())
+	{}
 
 	GlfwRenderSystem::GlfwRenderSystem(const string& resourcePath)
 		: RenderSystem(resourcePath, true)

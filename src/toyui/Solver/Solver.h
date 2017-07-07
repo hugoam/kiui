@@ -69,7 +69,7 @@ namespace toy
 		virtual void collect(SolverVector& solvers);
 
 		virtual FrameSolver& solver(FrameSolver& frame, Dimension dim);
-		virtual FrameSolver* grid(FrameSolver& frame) { return nullptr; }
+		virtual FrameSolver* grid() { return nullptr; }
 
 		void sync();
 		void compute();

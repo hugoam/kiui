@@ -89,7 +89,7 @@ namespace toy
 	{
 		d_parent = &parent;
 		d_parent->markDirty(DIRTY_STRUCTURE);
-		d_index[d_parent->d_length] = d_widget.index();
+		//d_index[d_parent->d_length] = d_widget.index();
 	}
 
 	void Frame::unbind()
@@ -102,7 +102,7 @@ namespace toy
 	{
 		if(d_style == &style) return;
 		d_style = &style;
-		this->updateStyle();
+		this->updateStyle(reset);
 	}
 
 	void Frame::updateStyle(bool reset)
@@ -276,7 +276,7 @@ namespace toy
 
 		if(dirty >= DIRTY_STRUCTURE)
 		{
-			d_wedge->visit([](Widget& widget, bool& visit)
+			d_wedge->visit([](Widget& widget, bool&)
 			{
 				widget.makeSolver();
 			});

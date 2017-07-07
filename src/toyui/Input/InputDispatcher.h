@@ -62,8 +62,8 @@ namespace toy
 		InputEvent(DeviceType deviceType, EventType eventType) : deviceType(deviceType), eventType(eventType), consumed(false), abort(false) {}
 		virtual ~InputEvent() {}
 
-		virtual void dispatch(RootSheet& rootSheet) {}
-		virtual bool receive(InputAdapter& receiver) { return false; }
+		virtual void dispatch(RootSheet& rootSheet) { UNUSED(rootSheet); }
+		virtual bool receive(InputAdapter& receiver) { UNUSED(receiver); return false; }
 	};
 
 	class TOY_UI_EXPORT InputWindow : public Object
@@ -90,14 +90,14 @@ namespace toy
 	public:
 		InputReceiver() : m_propagate(nullptr) {}
 
-		virtual InputReceiver* controlEvent(InputEvent& inputEvent) { return this; }
+		virtual InputReceiver* controlEvent(InputEvent& inputEvent) { UNUSED(inputEvent); return this; }
 		virtual InputReceiver* receiveEvent(InputEvent& inputEvent) = 0;
-		virtual InputReceiver* propagateEvent(InputEvent& inputEvent) { return m_propagate; }
+		virtual InputReceiver* propagateEvent(InputEvent& inputEvent) { UNUSED(inputEvent); return m_propagate; }
 
 		void propagateTo(InputReceiver* propagate) { m_propagate = propagate; }
 
-		virtual void control(bool modal) {};
-		virtual void uncontrol(bool modal) {};
+		virtual void control(bool modal) { UNUSED(modal); };
+		virtual void uncontrol(bool modal) { UNUSED(modal); };
 
 	protected:
 		InputReceiver* m_propagate;

@@ -130,7 +130,8 @@ namespace toy
 			if(state == skin.m_state)
 				return skin.m_skin;
 
-		m_subskins.emplace_back(state, *this, m_name + toString(state));
+		// name = m_name + toString(state)
+		m_subskins.emplace_back(state, *this);
 		m_subskins.back().m_skin.copy(m_skin);
 		return m_subskins.back().m_skin;
 	}

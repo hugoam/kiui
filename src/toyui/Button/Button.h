@@ -54,9 +54,9 @@ namespace toy
 				return this->click(mouseEvent);
 		}
 
-		bool clickAlt(MouseEvent& mouseEvent) { if(!m_triggerAlt) return false; m_triggerAlt(m_widget); return true; }
-		bool clickShift(MouseEvent& mouseEvent) { if(!m_triggerShift) return false; m_triggerShift(m_widget); return true; }
-		bool clickCtrl(MouseEvent& mouseEvent) { if(!m_triggerCtrl) return false; m_triggerCtrl(m_widget); return true; }
+		bool clickAlt(MouseEvent& mouseEvent) { UNUSED(mouseEvent); if(!m_triggerAlt) return false; m_triggerAlt(m_widget); return true; }
+		bool clickShift(MouseEvent& mouseEvent) { UNUSED(mouseEvent); if(!m_triggerShift) return false; m_triggerShift(m_widget); return true; }
+		bool clickCtrl(MouseEvent& mouseEvent) { UNUSED(mouseEvent); if(!m_triggerCtrl) return false; m_triggerCtrl(m_widget); return true; }
 
 	protected:
 		Widget& m_widget;

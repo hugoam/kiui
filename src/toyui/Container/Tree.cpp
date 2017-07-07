@@ -67,7 +67,7 @@ namespace toy
 
 	void Tree::collapse()
 	{
-		m_rootNode->visit([](Widget& widget, bool& visit) {
+		m_rootNode->visit([](Widget& widget, bool&) {
 			if(&widget.type() == &TreeNode::cls())
 				widget.as<TreeNode>().collapse();
 		});

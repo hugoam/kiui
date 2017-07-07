@@ -21,7 +21,7 @@ namespace toy
 		virtual void setupContext();
 		virtual void releaseContext();
 
-		void render(RenderTarget& target);
+		virtual void render(RenderTarget& target);
 
 	protected:
 		void initGlew();

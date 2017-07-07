@@ -32,7 +32,7 @@ namespace toy
 		: d_frame(frame)
 		, d_parent(solver)
 		, d_solvers{ solver ? &solver->solver(*this, DIM_X) : nullptr, solver ? &solver->solver(*this, DIM_Y) : nullptr }
-		, d_grid(solver ? solver->grid(*this) : nullptr)
+		, d_grid(solver ? solver->grid() : nullptr)
 		, d_prev(nullptr)
 		, d_style(layout)
 		, d_length(DIM_NULL)
@@ -122,10 +122,14 @@ namespace toy
 	}
 
 	void FrameSolver::compute(FrameSolver& frame, Dimension dim)
-	{}
+	{
+		UNUSED(frame); UNUSED(dim);
+	}
 
 	void FrameSolver::layout(FrameSolver& frame, Dimension dim)
-	{}
+	{
+		UNUSED(frame); UNUSED(dim);
+	}
 
 	RowSolver::RowSolver(FrameSolver* solver, LayoutStyle* layout, Frame* frame)
 		: FrameSolver(solver, layout, frame)

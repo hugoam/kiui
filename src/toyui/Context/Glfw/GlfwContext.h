@@ -34,10 +34,9 @@ namespace toy
 	class GlfwInputWindow : public InputWindow
 	{
 	public:
-		GlfwInputWindow(GlfwRenderWindow& renderWindow);
-		~GlfwInputWindow();
+		GlfwInputWindow();
 
-		void initInput(Mouse& mouse, Keyboard& keyboard);
+		void initInput(RenderWindow& renderWindow, Mouse& mouse, Keyboard& keyboard);
 
 		bool nextFrame();
 
@@ -50,7 +49,7 @@ namespace toy
 		void resize(size_t width, size_t height);
 
 	protected:
-		GlfwRenderWindow& m_renderWindow;
+		GlfwRenderWindow* m_renderWindow;
 		GLFWwindow* m_glWindow;
 
 		float m_mouseX;

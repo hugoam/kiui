@@ -233,7 +233,7 @@ namespace toy
 	class TOY_UI_EXPORT SubSkin
 	{
 	public:
-		SubSkin(WidgetState state, Style& style, const string& name) : m_state(state), m_skin(&style) {}
+		SubSkin(WidgetState state, Style& style) : m_state(state), m_skin(&style) {}
 		SubSkin(WidgetState state, const InkStyle& skin) : m_state(state), m_skin(skin) {}
 
 		WidgetState m_state;

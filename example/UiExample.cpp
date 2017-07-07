@@ -140,13 +140,13 @@ namespace toy
 		Tooldock& tooldock = parent.emplace<Tooldock>();
 
 		Toolbar& toolbar0 = tooldock.emplace<Toolbar>();
-		ToolButton& toolUndo = toolbar0.emplace<ToolButton>("(arrow_left_15)");
-		ToolButton& toolRedo = toolbar0.emplace<ToolButton>("(arrow_right_15)");
+		toolbar0.emplace<ToolButton>("(arrow_left_15)");
+		toolbar0.emplace<ToolButton>("(arrow_right_15)");
 
 		Toolbar& toolbar1 = tooldock.emplace<Toolbar>();
-		ToolButton& toolOpen = toolbar1.emplace<ToolButton>("(file_15)");
-		ToolButton& toolSave = toolbar1.emplace<ToolButton>("(folder_15)");
-		ToolButton& toolClose = toolbar1.emplace<ToolButton>("(close_15)");
+		toolbar1.emplace<ToolButton>("(file_15)");
+		toolbar1.emplace<ToolButton>("(folder_15)");
+		toolbar1.emplace<ToolButton>("(close_15)");
 
 		return tooldock;
 	}
@@ -348,8 +348,8 @@ namespace toy
 		table.emplace<InputBool>("checkbox input", false, nullptr, true);
 		table.emplace<InputRadio>("radio input", StringVector({ "radio a", "radio b", "radio c" }), nullptr, true);
 
-		table.emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](Widget& choice) {}, true);
-		table.emplace<InputTypedown>("typedown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](Widget& choice) {}, true);
+		table.emplace<InputDropdown>("dropdown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](Widget&) {}, true);
+		table.emplace<InputTypedown>("typedown input", StringVector({ "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK" }), [](Widget&) {}, true);
 
 		table.emplace<InputText>("string input", "Hello, world!", nullptr, true);
 		table.emplace<InputInt>("int input", AutoStat<int>(123, 0, 1000, 1), nullptr, true);
@@ -537,6 +537,7 @@ namespace toy
 	auto boardSample(T func)
 	{
 		return [func](const string& name, Wedge& sheet) {
+			UNUSED(name);
 			sheet.store().clear();
 			func(sheet);
 		};

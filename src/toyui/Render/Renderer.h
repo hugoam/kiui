@@ -41,7 +41,6 @@ namespace toy
 		Renderer(const string& resourcePath);
 
 		// drawing implementation
-		void render(RenderTarget& target);
 		void render(Wedge& wedge, Layer& layer, bool force);
 		void render(Widget& widget, Layer& layer, bool force);
 		void beginDraw(Layer& layer, Frame& frame, bool force);
@@ -54,6 +53,9 @@ namespace toy
 		void endDraw(Layer& layer, Frame& frame);
 
 		void logFPS();
+
+		// render
+		virtual void render(RenderTarget& target);
 
 		// init
 		virtual void setupContext() = 0;

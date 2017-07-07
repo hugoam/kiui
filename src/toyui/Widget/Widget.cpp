@@ -62,7 +62,7 @@ namespace toy
 
 	void Widget::setContent(const string& content)
 	{
-		if(content.front() == '(' && content.back() == ')')
+		if(!content.empty() && content.front() == '(' && content.back() == ')')
 		{
 			string name(content.begin() + 1, content.end() - 1);
 			m_frame->setIcon(&this->uiWindow().findImage(toLower(name)));

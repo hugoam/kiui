@@ -30,8 +30,8 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Wedge : public Widget
 	{
 	public:
-		Wedge(Wedge& parent, Type& type = cls(), FrameType frameType = FRAME);
-		Wedge(Type& type = cls(), FrameType frameType = FRAME, Wedge* parent = nullptr);
+		Wedge(Wedge& parent, Type& type, FrameType frameType = FRAME);
+		Wedge(Type& type, FrameType frameType = FRAME, Wedge* parent = nullptr);
 
 		_attr_ _graph_ inline std::vector<Widget*>& contents() { return m_contents; }
 

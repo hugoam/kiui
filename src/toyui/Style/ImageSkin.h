@@ -47,8 +47,8 @@ namespace toy
 			, d_solidHeight(image.d_height - d_margin - d_margin)
 			, d_images(9)
 		{
-			for(Image& image : d_images)
-				image = *d_image;
+			for(Image& subimage : d_images)
+				subimage = *d_image;
 
 			d_size.x = d_stretch == DIM_X ? float(d_solidHeight) : 0.f;
 			d_size.y = d_stretch == DIM_Y ? float(d_solidWidth) : 0.f;
