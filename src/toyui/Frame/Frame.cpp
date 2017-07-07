@@ -90,7 +90,7 @@ namespace toy
 	{
 		d_parent = &parent;
 		d_parent->markDirty(DIRTY_STRUCTURE);
-		//d_index[d_parent->d_length] = d_widget.index();
+		d_index[d_parent->d_length] = d_widget.index();
 	}
 
 	void Frame::unbind()
@@ -364,6 +364,7 @@ namespace toy
 		this->setPosition(solver.d_position);
 		this->setSize(solver.d_size);
 		d_span = solver.d_span;
+		d_length = solver.d_length;
 
 		if(solver.d_solvers[DIM_X] && !solver.d_solvers[DIM_X]->d_frame)
 			d_position = d_position + solver.d_solvers[DIM_X]->d_position;
