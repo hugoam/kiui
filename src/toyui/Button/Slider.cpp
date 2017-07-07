@@ -55,6 +55,7 @@ namespace toy
 
 	bool Slider::leftDragEnd(MouseEvent& mouseEvent)
 	{
+		UNUSED(mouseEvent);
 		this->disableState(TRIGGERED);
 		m_button.disableState(TRIGGERED);
 		return true;

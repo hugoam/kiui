@@ -23,9 +23,9 @@ namespace toy
 
 	Tabber::Tabber(Wedge& parent, Type& type, bool downtabs)
 		: Wedge(parent, type)
-		, m_currentTab(nullptr)
 		, m_headers(*this, Head())
 		, m_tabs(*this, Body())
+		, m_currentTab(nullptr)
 		, m_downTabs(downtabs)
 	{
 		if(m_downTabs)

@@ -9,11 +9,11 @@
 #include <toyobj/Type.h>
 #include <toyui/Forward.h>
 #include <toyui/Widget/Sheet.h>
-#include <toyui/Edit/Input.h>
+#include <toyui/Edit/TypeIn.h>
 
 namespace toy
 {
-	class TOY_UI_EXPORT FilterInput : public Input<string>
+	class TOY_UI_EXPORT FilterInput : public TypeIn
 	{
 	public:
 		using Criteria = std::function<string(Widget&)>;
@@ -24,7 +24,7 @@ namespace toy
 		void updateFilter(const string& filter);
 		bool fitsFilter(const string& filter, const string& value);
 
-		static Type& cls() { static Type ty("FilterInput", Input<string>::cls()); return ty; }
+		static Type& cls() { static Type ty("FilterInput", TypeIn::cls()); return ty; }
 
 	protected:
 		Wedge& m_list;

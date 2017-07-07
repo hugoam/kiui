@@ -10,7 +10,7 @@
 namespace toy
 {
 	FilterInput::FilterInput(Wedge& parent, Wedge& list, Criteria criteria)
-		: Input<string>(parent, "", [this](string value) { this->updateFilter(value); })
+		: TypeIn(parent, "", [this](const string& value) { this->updateFilter(value); return value; })
 		, m_list(list)
 		, m_criteria(criteria ? criteria : [](Widget& widget) { return widget.label(); })
 	{}

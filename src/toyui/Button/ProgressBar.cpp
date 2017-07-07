@@ -15,10 +15,10 @@ namespace toy
 	ProgressBar::ProgressBar(Wedge& parent, Dimension dim)
 		: Wedge(parent, cls())
 		, m_dim(dim)
-		, m_percentage(0.f)
 		, m_filler(*this, Item::Filler())
 		, m_spacer(*this, Item::Spacer())
 		, m_display(*this, "0%", Slider::Display())
+		, m_percentage(0.f)
 	{}
 
 	void ProgressBar::setPercentage(float percentage)
