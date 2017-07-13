@@ -121,7 +121,7 @@ namespace toy
 	}
 
 	MouseButton::MouseButton(Mouse& mouse, DeviceType deviceType)
-		: InputDevice(mouse.rootSheet())
+		: InputDevice(mouse.m_rootSheet)
 		, m_mouse(mouse)
 		, m_deviceType(deviceType)
 		, m_pressed(nullptr)

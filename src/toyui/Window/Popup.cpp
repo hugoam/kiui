@@ -14,7 +14,7 @@ namespace toy
 		: Wedge(parent, type, LAYER)
 		, m_onClose(onClose)
 	{
-		DimFloat local = m_parent->frame().localPosition(this->rootSheet().m_mouse.lastPos());
+		DimFloat local = m_parent->frame().localPosition(this->rootSheet().m_mouse.m_lastPos);
 		m_frame->setPosition(local);
 
 		open ? this->open(true) : this->hide();

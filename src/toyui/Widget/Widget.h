@@ -126,7 +126,7 @@ namespace toy
 		_attr_ Wedge* m_container;
 		_attr_ size_t m_index;
 		_attr_ _mut_ Style* m_style;
-		/*_attr_*/ object_ptr<Frame> m_frame;
+		/*_attr_*/ object_ptr<Frame> m_frame; // @todo make this a member, separate Layer, and separate caption and image (only for Items)
 		_attr_ WidgetState m_state;
 
 		Device* m_device;

@@ -32,7 +32,7 @@ namespace toy
 	Dockbox& Dockbar::addDock(const string& name, const string& icon)
 	{
 		Dockbox& dockbox = m_docker.emplace<Dockbox>(*this, name, icon);
-		//dockbox.body().enableWrap();
+		//dockbox.m_body.enableWrap();
 		dockbox.hide();
 		return dockbox;
 	}

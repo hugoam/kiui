@@ -54,18 +54,18 @@ namespace toy
 
 	void TypeIn::erase()
 	{
-		if(m_caption.caret() == 0 && m_caption.selectStart() == m_caption.selectEnd())
+		if(m_caption.m_caret == 0 && m_caption.m_selectStart == m_caption.m_selectEnd)
 			return;
 
-		if(m_caption.selectStart() == m_caption.selectEnd())
+		if(m_caption.m_selectStart == m_caption.m_selectEnd)
 		{
-			m_string.erase(m_string.begin() + m_caption.selectStart() - 1);
+			m_string.erase(m_string.begin() + m_caption.m_selectStart - 1);
 			this->moveCaretLeft();
 		}
 		else
 		{
-			m_string.erase(m_string.begin() + m_caption.selectStart(), m_string.begin() + m_caption.selectEnd());
-			this->selectCaret(m_caption.selectStart());
+			m_string.erase(m_string.begin() + m_caption.m_selectStart, m_string.begin() + m_caption.m_selectEnd);
+			this->selectCaret(m_caption.m_selectStart);
 		}
 
 		this->changed();
@@ -73,7 +73,7 @@ namespace toy
 
 	void TypeIn::insert(char c)
 	{
-		m_string.insert(m_string.begin() + m_caption.caret(), c);
+		m_string.insert(m_string.begin() + m_caption.m_caret, c);
 		this->changed();
 		this->moveCaretRight();
 	}
@@ -158,13 +158,13 @@ namespace toy
 
 	void TypeIn::moveCaretRight()
 	{
-		size_t index = std::min(int(m_caption.text().size()), m_caption.caret() + 1);
+		size_t index = std::min(int(m_caption.m_text.size()), m_caption.m_caret + 1);
 		this->selectCaret(index);
 	}
 
 	void TypeIn::moveCaretLeft()
 	{
-		size_t index = std::max(0, m_caption.caret() - 1);
+		size_t index = std::max(0, m_caption.m_caret - 1);
 		this->selectCaret(index);
 	}
 }

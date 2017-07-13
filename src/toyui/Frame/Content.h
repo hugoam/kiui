@@ -18,14 +18,13 @@ namespace toy
 	public:
 		Icon(Frame& frame);
 
-		Image* image() { return m_image; }
 		void setImage(Image* image);
 
 		DimFloat contentSize() { return{ float(m_image->d_width), float(m_image->d_height) }; }
 
 		static Type& cls() { static Type ty; return ty; }
 
-	protected:
+	public:
 		Frame& d_frame;
 		Image* m_image;
 	};

@@ -22,11 +22,9 @@ namespace toy
 	public:
 		InputDevice(RootSheet& rootSheet);
 
-		RootSheet& rootSheet() { return m_rootSheet; }
-
 		static Type& cls() { static Type ty; return ty; }
 
-	protected:
+	public:
 		RootSheet& m_rootSheet;
 		ControlNode& m_rootFrame;
 	};
@@ -36,13 +34,10 @@ namespace toy
 	public:
 		Keyboard(RootSheet& rootSheet);
 
-		bool shiftPressed() { return m_shiftPressed; }
-		bool ctrlPressed() { return m_ctrlPressed; }
-
 		void dispatchKeyPressed(KeyCode key, char c);
 		void dispatchKeyReleased(KeyCode key, char c);
 
-	protected:
+	public:
 		bool m_shiftPressed;
 		bool m_ctrlPressed;
 	};
@@ -77,8 +72,6 @@ namespace toy
 	public:
 		Mouse(RootSheet& rootSheet);
 
-		DimFloat lastPos() { return m_lastPos; }
-
 		void transformMouseEvent(MouseEvent& mouseEvent);
 
 		void dispatchMousePressed(DimFloat pos, MouseButtonCode button);
@@ -90,7 +83,7 @@ namespace toy
 
 		void handleDestroyWidget(Widget& widget);
 
-	protected:
+	public:
 		std::array<MouseButton, 3> m_buttons;
 
 		DimFloat m_lastPos;

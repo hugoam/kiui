@@ -17,12 +17,11 @@ namespace toy
 	public:
 		ProgressBar(Wedge& parent, Dimension dim = DIM_X);
 
-		float percentage() { return m_percentage; }
 		void setPercentage(float percentage);
 
 		static Type& cls() { static Type ty("ProgressBar", Wedge::Row()); return ty; }
 
-	protected:
+	public:
 		Dimension m_dim;
 		Item m_filler;
 		Item m_spacer;

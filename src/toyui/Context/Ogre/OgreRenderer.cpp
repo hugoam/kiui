@@ -25,7 +25,7 @@ namespace toy
 		m_camera.detachFromParent();
 		m_node.attachObject(&m_camera);
 
-		OgreRenderWindow& renderWindow = static_cast<OgreRenderWindow&>(masterLayer.widget().uiWindow().context().renderWindow());
+		OgreRenderWindow& renderWindow = static_cast<OgreRenderWindow&>(masterLayer.d_widget.uiWindow().m_renderWindow);
 
 		Ogre::CompositorManager2& compositorManager = *Ogre::Root::getSingleton().getCompositorManager2();
 		compositorManager.addWorkspace(&m_scene, &renderWindow.context(), &m_camera, "Clear Workspace", true);

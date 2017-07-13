@@ -61,7 +61,7 @@ namespace toy
 
 	void MultiButton::reset(Button& button)
 	{
-		this->reset({ button.label() }, button.trigger());
+		this->reset({ button.label() }, button.m_trigger);
 	}
 
 	void MultiButton::reset(MultiButton& button)

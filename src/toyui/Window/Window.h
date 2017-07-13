@@ -82,12 +82,6 @@ namespace toy
 	{
 	public:
 		Window(Wedge& parent, const string& title, WindowState state = WINDOW_DEFAULT, const Callback& onClose = nullptr, Docksection* dock = nullptr, Type& type = cls());
-		
-		const string& name() { return m_name; }
-
-		WindowState windowState() { return m_windowState; }
-		Wedge& body() { return m_body; }
-		Docksection* dock() { return m_dock; }
 
 		bool closable() { return (m_windowState & WINDOW_CLOSABLE) != 0; }
 		bool dockable() { return (m_windowState & WINDOW_DOCKABLE) != 0; }

@@ -62,7 +62,7 @@ namespace toy
 	}
 
 	UiWindow::UiWindow(RenderSystem& system, const string& name, int width, int height, bool fullScreen, User* user)
-		: m_system(system)
+		: m_renderSystem(system)
 		, m_resourcePath(system.m_resourcePath)
 		, m_context(system.createContext(name, width, height, fullScreen))
 		, m_renderer(system.createRenderer(*m_context))

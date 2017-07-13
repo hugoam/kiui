@@ -15,7 +15,7 @@ namespace toy
 	WindowHeader::WindowHeader(Window& window)
 		: Wedge(window, cls())
 		, m_window(window)
-		, m_title(*this, m_window.name())
+		, m_title(*this, m_window.m_name)
 		, m_close(*this, "", [&window](Widget&) { window.close(); }, Window::CloseButton())
 		, m_tooltip("Drag me")
 	{
@@ -29,7 +29,7 @@ namespace toy
 	{
 		UNUSED(mouseEvent);
 		m_window.enableState(ACTIVATED);
-		if(!m_window.dock()) // crashes for some reason
+		if(!m_window.m_dock) // crashes for some reason
 			m_window.frame().layer().moveToTop();
 		return true;
 	}
@@ -37,7 +37,7 @@ namespace toy
 	bool WindowHeader::leftDragStart(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		if(m_window.dock())
+		if(m_window.m_dock)
 			m_window.undock();
 
 		m_window.frame().layer().moveToTop();

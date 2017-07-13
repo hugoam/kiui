@@ -297,10 +297,10 @@ namespace toy
 		//this->clipRect(rect);
 
 		if(frame.d_icon)
-			this->drawImage(*frame.d_icon->image(), contentRect);
+			this->drawImage(*frame.d_icon->m_image, contentRect);
 
 		if(frame.d_caption)
-			for(TextRow& row : frame.d_caption->textRows())
+			for(TextRow& row : frame.d_caption->m_textRows)
 			{
 				if(!row.selected.null())
 					this->drawRect(BoxFloat(paddedRect.x + row.selected.x, paddedRect.y + row.selected.y, row.selected.w, row.selected.h), BoxFloat(), textSelectionStyle);

@@ -17,7 +17,7 @@ namespace toy
 		m_toggle.setStyle(TreeNode::Switch());
 		m_body.setStyle(TreeNode::Body());
 		
-		m_header.setTrigger([this](Widget&) { this->selected(); });
+		m_header.m_trigger = [this](Widget&) { this->selected(); };
 
 		if(!m_image.empty())
 		{

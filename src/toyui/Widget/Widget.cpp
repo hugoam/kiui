@@ -75,7 +75,7 @@ namespace toy
 
 	const string& Widget::label()
 	{
-		return m_frame->d_caption->text();
+		return m_frame->d_caption->m_text;
 	}
 
 	void Widget::destroy()

@@ -34,9 +34,6 @@ namespace toy
 	public:
 		ClickTrigger(Widget& widget, const Widget::Callback& trigger) : m_widget(widget), m_trigger(trigger) {}
 
-		const Widget::Callback& trigger() { return m_trigger; }
-		void setTrigger(const Widget::Callback& trigger) { m_trigger = trigger; }
-
 		bool click(MouseEvent& mouseEvent)
 		{
 			if(!m_trigger) return false; m_trigger(m_widget);
@@ -58,7 +55,7 @@ namespace toy
 		bool clickShift(MouseEvent& mouseEvent) { UNUSED(mouseEvent); if(!m_triggerShift) return false; m_triggerShift(m_widget); return true; }
 		bool clickCtrl(MouseEvent& mouseEvent) { UNUSED(mouseEvent); if(!m_triggerCtrl) return false; m_triggerCtrl(m_widget); return true; }
 
-	protected:
+	public:
 		Widget& m_widget;
 		Widget::Callback m_trigger;
 		Widget::Callback m_triggerAlt;

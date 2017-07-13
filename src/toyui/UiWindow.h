@@ -72,7 +72,7 @@ namespace toy
 		void loadResources();
 
 	public:
-		RenderSystem& m_system;
+		RenderSystem& m_renderSystem;
 		const string m_resourcePath;
 
 		object_ptr<Context> m_context;

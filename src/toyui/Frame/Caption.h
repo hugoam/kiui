@@ -38,13 +38,6 @@ namespace toy
 	public:
 		Caption(Frame& frame);
 
-		const string& text() { return m_text; }
-		std::vector<TextRow>& textRows() { return m_textRows; }
-
-		int caret() { return m_caret; }
-		int selectStart() { return m_selectStart; }
-		int selectEnd() { return m_selectEnd; }
-
 		void select(int caret, int start, int end);
 
 		DimFloat contentSize() { return{ width(), height() }; }
@@ -66,7 +59,7 @@ namespace toy
 
 		static Type& cls() { static Type ty; return ty; }
 
-	protected:
+	public:
 		Frame& d_frame;
 		string m_text;
 		size_t m_textLines;

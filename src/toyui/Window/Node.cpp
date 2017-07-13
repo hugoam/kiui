@@ -297,7 +297,7 @@ namespace toy
 	bool Node::leftClick(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		if(this->rootSheet().m_keyboard.shiftPressed())
+		if(this->rootSheet().m_keyboard.m_shiftPressed)
 			this->canvas().selection().swap(*this);
 		else
 			this->canvas().selection().select(*this);

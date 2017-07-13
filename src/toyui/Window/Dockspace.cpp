@@ -17,7 +17,7 @@ namespace toy
 
 	void Docksection::dock(Window& window)
 	{
-		Tab& tab = this->addTab(window.name());
+		Tab& tab = this->addTab(window.m_name);
 		window.m_container->store().transfer(window, tab);
 	}
 
