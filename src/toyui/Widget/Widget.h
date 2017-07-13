@@ -40,21 +40,9 @@ namespace toy
 		Widget(Type& type = cls(), FrameType frameType = FRAME, Wedge* parent = nullptr);
 		~Widget();
 
-		_attr_ inline Wedge* parent() { return m_parent; }
-		_attr_ inline Wedge* container() { return m_container; }
-		_attr_ inline size_t index() { return m_index; }
-		_attr_ inline Frame& frame() { return *m_frame; }
-		_attr_ inline WidgetState state() { return m_state; }
-		_attr_ _mut_ inline Style& style() { return *m_style; }
-
-		inline Device* device() { return m_device; }
-
-		void setIndex(size_t index) { m_index = index; }
-		void setContainer(Wedge& container) { m_container = &container; }
+		inline Frame& frame() { return *m_frame; }
 
 		void setContent(const string& content);
-
-		void setDevice(Device& device) { m_device = &device; }
 
 		virtual const string& tooltip() { static string str; return str; }
 		virtual const string& label();
@@ -133,13 +121,13 @@ namespace toy
 
 		static Type& cls() { static Type ty("Widget"); return ty; }
 
-	protected:
-		Wedge* m_parent;
-		Wedge* m_container;
-		size_t m_index;
-		Style* m_style;
-		object_ptr<Frame> m_frame;
-		WidgetState m_state;
+	public:
+		_attr_ Wedge* m_parent;
+		_attr_ Wedge* m_container;
+		_attr_ size_t m_index;
+		_attr_ _mut_ Style* m_style;
+		/*_attr_*/ object_ptr<Frame> m_frame;
+		_attr_ WidgetState m_state;
 
 		Device* m_device;
 	};

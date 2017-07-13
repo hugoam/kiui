@@ -63,10 +63,10 @@ namespace toy
 
 	UiWindow::UiWindow(RenderSystem& system, const string& name, int width, int height, bool fullScreen, User* user)
 		: m_system(system)
-		, m_resourcePath(system.resourcePath())
+		, m_resourcePath(system.m_resourcePath)
 		, m_context(system.createContext(name, width, height, fullScreen))
 		, m_renderer(system.createRenderer(*m_context))
-		, m_renderWindow(m_context->renderWindow())
+		, m_renderWindow(*m_context->m_renderWindow)
 		, m_images()
 		, m_atlas(1024, 1024)
 		, m_width(m_renderWindow.m_width)
@@ -99,7 +99,7 @@ namespace toy
 
 		m_rootSheet = make_object<RootSheet>(*this);
 
-		m_context->inputWindow().initInput(m_context->renderWindow(), m_rootSheet->m_mouse, m_rootSheet->m_keyboard);
+		m_context->m_inputWindow->initInput(*m_context->m_renderWindow, m_rootSheet->m_mouse, m_rootSheet->m_keyboard);
 
 		m_rootSheet->frame().setSize({ m_width, m_height });
 
@@ -164,7 +164,7 @@ namespace toy
 		m_width = float(width);
 		m_height = float(height);
 
-		m_context->inputWindow().resize(width, height);
+		m_context->m_inputWindow->resize(width, height);
 
 		m_rootSheet->frame().setSize({ m_width, m_height });
 	}
@@ -175,15 +175,15 @@ namespace toy
 		|| m_renderWindow.m_height != size_t(m_height))
 			this->resize(m_renderWindow.m_width, m_renderWindow.m_height);
 
-		if(m_context->renderSystem().manualRender())
+		if(m_context->m_renderSystem.m_manualRender)
 		{
 			m_rootSheet->m_target->render();
 			// add sub layers
 		}
 
 		bool pursue = !m_shutdownRequested;
-		pursue &= m_context->renderWindow().nextFrame();
-		pursue &= m_context->inputWindow().nextFrame();
+		pursue &= m_context->m_renderWindow->nextFrame();
+		pursue &= m_context->m_inputWindow->nextFrame();
 
 		size_t tick = m_clock.readTick();
 		size_t delta = m_clock.stepTick();

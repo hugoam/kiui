@@ -67,7 +67,7 @@ namespace toy
 
 	void Tabber::headerClicked(Widget& header)
 	{
-		this->showTab(header.index());
+		this->showTab(header.m_index);
 	}
 
 	void Tabber::showTab(Tab& tab)

@@ -16,7 +16,7 @@ namespace toy
 	void InkStyle::prepare()
 	{
 		if(m_base)
-			this->inherit(m_base.val->skin());
+			this->inherit(m_base.val->m_skin);
 
 		if(m_backgroundColour.val.a() > 0.f || m_textColour.val.a() > 0.f || m_borderColour.val.a() > 0.f || m_image || !m_imageSkin.val.null())
 			m_empty = false;
@@ -24,7 +24,7 @@ namespace toy
 
 	Style::Style(Type& type, Style* base)
 		: IdObject(cls())
-		, m_styleType(&type)
+		, m_style(&type)
 		, m_base(base)
 		, m_name(type.name())
 		, m_layout()
@@ -37,7 +37,7 @@ namespace toy
 
 	Style::Style(const string& name)
 		: IdObject(cls())
-		, m_styleType(nullptr)
+		, m_style(nullptr)
 		, m_base(nullptr)
 		, m_name(name)
 		, m_layout()
@@ -92,17 +92,17 @@ namespace toy
 
 	void Style::inheritLayout(Style& base)
 	{
-		m_layout.inherit(base.layout());
+		m_layout.inherit(base.m_layout);
 	}
 
 	void Style::copyLayout(Style& base)
 	{
-		m_layout.copy(base.layout());
+		m_layout.copy(base.m_layout);
 	}
 
 	void Style::inheritSkin(Style& base)
 	{
-		m_skin.inherit(base.skin());
+		m_skin.inherit(base.m_skin);
 
 		for(auto& subskin : base.m_subskins)
 			this->fetchSubskin(subskin.m_state).inherit(subskin.m_skin);
@@ -110,7 +110,7 @@ namespace toy
 
 	void Style::copySkin(Style& base)
 	{
-		m_skin.copy(base.skin());
+		m_skin.copy(base.m_skin);
 
 		for(auto& subskin : base.m_subskins)
 			this->fetchSubskin(subskin.m_state).copy(subskin.m_skin);

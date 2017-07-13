@@ -251,15 +251,7 @@ namespace toy
 
 		Style& operator=(const Style&) = default;
 
-		_attr_ const string& name() { return m_name.empty() ? m_styleType->name() : m_name; }
-		_attr_ Style* base() { return m_base; }
-		_attr_ LayoutStyle& layout() { return m_layout; }
-		_attr_ InkStyle& skin() { return m_skin; }
-
-		bool ready() { return m_ready; }
-
-		Type* styleType() { return m_styleType; }
-		const StyleTable& subskins() { return m_subskins; }
+		const string& name() { return m_name.empty() ? m_style->name() : m_name; }
 		
 		void clear();
 		void prepare(Style* definition);
@@ -279,12 +271,12 @@ namespace toy
 
 		static Type& cls() { static Type ty(INDEXED); return ty; }
 
-	protected:
-		Type* m_styleType;
-		Style* m_base;
-		string m_name;
-		LayoutStyle m_layout;
-		InkStyle m_skin;
+	public:
+		Type* m_style;
+		_attr_ Style* m_base;
+		_attr_ string m_name;
+		_attr_ LayoutStyle m_layout;
+		_attr_ InkStyle m_skin;
 		StyleTable m_subskins;
 
 		bool m_ready;

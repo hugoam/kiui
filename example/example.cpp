@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 
 	toy::UiWindow uiwindow(renderSystem, "kiUi demo", 1200, 800, false);
 
-	toy::Wedge& rootSheet = uiwindow.rootSheet();
+	toy::Wedge& rootSheet = *uiwindow.m_rootSheet;
 	createUiTest(rootSheet);
 
 #ifdef TOY_PLATFORM_EMSCRIPTEN

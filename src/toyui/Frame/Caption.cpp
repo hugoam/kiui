@@ -36,9 +36,9 @@ namespace toy
 
 	DimFloat Caption::updateTextSize()
 	{
-		//DimFloat paddedSize = d_frame.d_size - d_frame.inkstyle().m_padding.val - d_frame.inkstyle().m_padding.val;
-		float paddedWidth = floor(d_frame.d_size.x - d_frame.inkstyle().m_padding.val.x0 - d_frame.inkstyle().m_padding.val.x1);
-		float paddedHeight = floor(d_frame.d_size.y - d_frame.inkstyle().m_padding.val.y0 - d_frame.inkstyle().m_padding.val.y1);
+		//DimFloat paddedSize = d_frame.d_size - d_frame.d_inkstyle->m_padding.val - d_frame.d_inkstyle->m_padding.val;
+		float paddedWidth = floor(d_frame.d_size.x - d_frame.d_inkstyle->m_padding.val.x0 - d_frame.d_inkstyle->m_padding.val.x1);
+		float paddedHeight = floor(d_frame.d_size.y - d_frame.d_inkstyle->m_padding.val.y0 - d_frame.d_inkstyle->m_padding.val.y1);
 
 		DimFloat paddedSize(paddedWidth, paddedHeight);
 
@@ -50,7 +50,7 @@ namespace toy
 	float Caption::height()
 	{
 		if(m_text.empty())
-			return s_renderer->textLineHeight(d_frame.inkstyle()) * m_textLines;
+			return s_renderer->textLineHeight(*d_frame.d_inkstyle) * m_textLines;
 		else if(!m_textRows.empty())
 			return m_textRows.back().rect.y + m_textRows.back().rect.h;
 		else
@@ -68,7 +68,7 @@ namespace toy
 	void Caption::updateTextRows(Renderer& target, const DimFloat& space)
 	{
 		if(!m_text.empty())
-			target.breakText(m_text, space, d_frame.inkstyle(), m_textRows);
+			target.breakText(m_text, space, *d_frame.d_inkstyle, m_textRows);
 		else
 			m_textRows.clear();
 

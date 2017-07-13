@@ -14,7 +14,7 @@ namespace toy
 		: Wedge(parent, type)
 		, m_string(text)
 		, m_label(*this, text)
-		, m_caption(*m_label.frame().caption())
+		, m_caption(*m_label.frame().d_caption)
 		, m_callback(callback ? callback : [](const string& val) { return val; })
 	{
 		m_caption.setTextLines(1);

@@ -15,7 +15,7 @@ namespace toy
 		: DropdownInput(parent, choices, callback, cls())
 		, m_input(*this, m_list, nullptr)
 	{
-		this->move(m_input.index(), 0);
+		this->move(m_input.m_index, 0);
 		m_trigger = [this](Widget&) { this->dropdown(); };
 		m_input.hide();
 	}

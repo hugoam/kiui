@@ -53,12 +53,6 @@ namespace toy
 
 		std::vector<StyleInitializer> m_initializers;
 	};
-
-	class TOY_UI_EXPORT EmptyStyle : public Object
-	{
-	public:
-		static Type& cls() { static Type ty("Empty"); return ty; }
-	};
 }
 
 #endif

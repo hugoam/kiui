@@ -29,12 +29,12 @@ namespace toy
 	void Layer::reindex()
 	{
 		for(size_t i = 0; i < d_sublayers.size(); ++i)
-			d_sublayers[i]->setIndex(i);
+			d_sublayers[i]->d_index = i;
 	}
 
 	void Layer::reorder()
 	{
-		std::sort(d_sublayers.begin(), d_sublayers.end(), [](Layer* first, Layer* second) { if(first->z() < second->z()) return true; else if(first->z() > second->z()) return false; return first->index() < second->index(); });
+		std::sort(d_sublayers.begin(), d_sublayers.end(), [](Layer* first, Layer* second) { if(first->z() < second->z()) return true; else if(first->z() > second->z()) return false; return first->d_index < second->d_index; });
 		this->reindex();
 	}
 
@@ -54,7 +54,7 @@ namespace toy
 
 	void Layer::addLayer(Layer& layer)
 	{
-		layer.setIndex(d_sublayers.size());
+		layer.d_index = d_sublayers.size();
 		d_sublayers.push_back(&layer);
 		this->reorder();
 	}

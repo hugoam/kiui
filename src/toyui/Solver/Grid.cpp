@@ -53,8 +53,8 @@ namespace toy
 		if(frame.d_frame && frame.d_parent != this)
 		{
 			//size_t column0 = frame.d_frame->dindex(d_depth);
-			size_t column = frame.d_frame->widget().index();
-			frame.d_frame->setIndexDim(d_depth, column);
+			size_t column = frame.d_frame->d_widget.m_index;
+			frame.d_frame->d_index[d_depth] = column;
 			return 1 + column < m_solvers.size() ? *m_solvers[1 + column] : *this;
 		}
 		return *this;
@@ -86,7 +86,7 @@ namespace toy
 		UNUSED(dim);
 		if(frame.d_frame)
 		{
-			size_t row = frame.d_frame->dindex(d_length);
+			size_t row = frame.d_frame->d_index[d_length];
 			return *m_solvers[row];
 		}
 		return *this;

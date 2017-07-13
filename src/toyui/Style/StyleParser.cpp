@@ -144,8 +144,8 @@ namespace toy
 	{
 		m_state = IN_STYLE_DEFINITION;
 		m_style = &m_styler.styledef(name);
-		m_skin = &m_style->skin();
-		m_style->skin().m_empty = false;
+		m_skin = &m_style->m_skin;
+		m_style->m_skin.m_empty = false;
 	}
 
 	void StyleParser::startSubskin(const string& name)
@@ -189,30 +189,30 @@ namespace toy
 		//else if(key == "inherit_skin")
 		//	m_style->inheritSkin(m_styler.styledef(value));
 		else if(key == "reset_skin")
-			m_style->skin().m_base = nullptr;
+			m_style->m_skin.m_base = nullptr;
 
 		else if(key == "flow")
-			m_style->layout().d_flow = fromString<Flow>(value); // FLOW | OVERLAY | FLOAT
+			m_style->m_layout.d_flow = fromString<Flow>(value); // FLOW | OVERLAY | FLOAT
 		else if(key == "clipping")
-			m_style->layout().d_clipping = fromString<Clipping>(value); // NOCLIP | CLIP
+			m_style->m_layout.d_clipping = fromString<Clipping>(value); // NOCLIP | CLIP
 		else if(key == "opacity")
-			m_style->layout().d_opacity = fromString<Opacity>(value); // OPAQUE | CLEAR | HOLLOW
+			m_style->m_layout.d_opacity = fromString<Opacity>(value); // OPAQUE | CLEAR | HOLLOW
 		else if(key == "space")
-			m_style->layout().d_space = fromString<Space>(value);
+			m_style->m_layout.d_space = fromString<Space>(value);
 		else if(key == "align")
-			m_style->layout().d_align = fromString<DimAlign>(value); // x, y
+			m_style->m_layout.d_align = fromString<DimAlign>(value); // x, y
 		else if(key == "span")
-			m_style->layout().d_span = fromString<DimFloat>(value); // 1.0, 1.0
+			m_style->m_layout.d_span = fromString<DimFloat>(value); // 1.0, 1.0
 		else if(key == "size")
-			m_style->layout().d_size = fromString<DimFloat>(value); // 123.0, 123.0
+			m_style->m_layout.d_size = fromString<DimFloat>(value); // 123.0, 123.0
 		else if(key == "padding")
-			m_style->layout().d_padding = fromString<BoxFloat>(value); // left, right, top, bottom
+			m_style->m_layout.d_padding = fromString<BoxFloat>(value); // left, right, top, bottom
 		else if(key == "margin")
-			m_style->layout().d_margin = fromString<DimFloat>(value); // x, y
+			m_style->m_layout.d_margin = fromString<DimFloat>(value); // x, y
 		else if(key == "spacing")
-			m_style->layout().d_spacing = fromString<DimFloat>(value); // x, y
+			m_style->m_layout.d_spacing = fromString<DimFloat>(value); // x, y
 		else if(key == "pivot")
-			m_style->layout().d_pivot = fromString<DimPivot>(value);// FORWARD | REVERSE
+			m_style->m_layout.d_pivot = fromString<DimPivot>(value);// FORWARD | REVERSE
 
 		else if(key == "empty")
 			m_skin->m_empty = (value == "false" ? false : true);

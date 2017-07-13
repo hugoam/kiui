@@ -25,11 +25,11 @@ namespace toy
 
 	/*void SortList::move(Device* form, size_t index)
 	{
-		if(form->index() == index) // @required because after droping in a specific spot, a move is issued, and if the item was dropped at the end the move will crash
+		if(form->d_index == index) // @required because after droping in a specific spot, a move is issued, and if the item was dropped at the end the move will crash
 			return;
 
-		size_t from = form->index();
-		m_contents.move(form->index(), index);
+		size_t from = form->d_index;
+		m_contents.move(form->d_index, index);
 		moved(from, index);
 
 		//this->altered();

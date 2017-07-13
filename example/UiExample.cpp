@@ -177,7 +177,7 @@ namespace toy
 		toolbar.emplace<ToolButton>("autolayout", [&canvas](Widget&) { canvas.autoLayout(); return false; });
 		toolbar.emplace<ToolButton>("autolayout selected", [&canvas](Widget&) { canvas.autoLayoutSelected(); return false; });
 
-		parent.swap(canvas.index(), toolbar.index());
+		parent.swap(canvas.m_index, toolbar.m_index);
 
 		Node& node0 = canvas.m_body.emplace<Node>("A Node");
 		node0.addInput("a", "", Colour::Cyan);
@@ -474,7 +474,7 @@ namespace toy
 		box1.m_body.emplace<InputBool>("resizable", true, [&window](bool) { window.toggleResizable(); }, true);
 		box1.m_body.emplace<InputBool>("closable", true, [&window](bool) { window.toggleClosable(); }, true);
 
-		box1.m_body.emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha) { window.frame().inkstyle().m_backgroundColour.val.setA(alpha); });
+		box1.m_body.emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha) { window.frame().d_inkstyle->m_backgroundColour.val.setA(alpha); });
 
 		Expandbox& box2 = parent.emplace<Expandbox>("Widgets");
 		createUiTestControls(box2.m_body);
@@ -503,22 +503,22 @@ namespace toy
 
 	void switchUiTheme(UiWindow& uiWindow, const string& name)
 	{
-		StyleParser parser(uiWindow.styler());
+		StyleParser parser(*uiWindow.m_styler);
 
 		if(name == "Blendish")
-			parser.loadStyleSheet(uiWindow.resourcePath() + "interface/styles/blendish.yml");
+			parser.loadStyleSheet(uiWindow.m_resourcePath + "interface/styles/blendish.yml");
 		else if(name == "Blendish Dark")
-			parser.loadStyleSheet(uiWindow.resourcePath() + "interface/styles/blendish_dark.yml");
+			parser.loadStyleSheet(uiWindow.m_resourcePath + "interface/styles/blendish_dark.yml");
 		else if(name == "TurboBadger")
-			parser.loadStyleSheet(uiWindow.resourcePath() + "interface/styles/turbobadger.yml");
+			parser.loadStyleSheet(uiWindow.m_resourcePath + "interface/styles/turbobadger.yml");
 		else if(name == "MyGui")
-			parser.loadStyleSheet(uiWindow.resourcePath() + "interface/styles/mygui.yml");
+			parser.loadStyleSheet(uiWindow.m_resourcePath + "interface/styles/mygui.yml");
 		else if(name == "Photoshop")
-			parser.loadStyleSheet(uiWindow.resourcePath() + "interface/styles/photoshop.yml");
+			parser.loadStyleSheet(uiWindow.m_resourcePath + "interface/styles/photoshop.yml");
 		else if(name == "Default")
 			parser.loadDefaultStyle();
 
-		uiWindow.styler().style(CustomElement::cls()).layout().d_align = DimAlign(LEFT, CENTER);
+		uiWindow.m_styler->style(CustomElement::cls()).m_layout.d_align = DimAlign(LEFT, CENTER);
 	}
 
 	void selectUiTheme(Wedge& sheet, Widget& selected)

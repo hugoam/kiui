@@ -22,13 +22,13 @@ namespace toy
 
 	void Cursor::update()
 	{
-		if(m_tooltipClock.read() > 0.5f && m_tooltip.frame().hidden() && !m_hovered->tooltip().empty())
+		if(m_tooltipClock.read() > 0.5f && m_tooltip.frame().d_hidden && !m_hovered->tooltip().empty())
 			this->tooltipOn();
 	}
 
 	void Cursor::setPosition(const DimFloat& pos)
 	{
-		if(!m_tooltip.frame().hidden())
+		if(!m_tooltip.frame().d_hidden)
 			this->tooltipOff();
 		m_tooltipClock.step();
 		m_frame->setPosition(pos);
@@ -51,7 +51,7 @@ namespace toy
 	{
 		if(m_locked) return;
 		m_hovered = &widget;
-		this->setStyle(widget.style().skin().m_hoverCursor ? *widget.style().skin().m_hoverCursor : Cursor::cls(), false);
+		this->setStyle(widget.m_style->m_skin.m_hoverCursor ? *widget.m_style->m_skin.m_hoverCursor : Cursor::cls(), false);
 	}
 
 	void Cursor::unhover(Widget& widget)

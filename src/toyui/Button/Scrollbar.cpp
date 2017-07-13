@@ -91,9 +91,9 @@ namespace toy
 		if(cursor > 0.f && contentSize - cursor < visibleSize)
 			this->scrollTo(std::max(contentSize - visibleSize, 0.f));
 
-		if(overflow > 0.f && m_frame->hidden())
+		if(overflow > 0.f && m_frame->d_hidden)
 			this->show();
-		else if(overflow <= 0.f && !m_frame->hidden())
+		else if(overflow <= 0.f && !m_frame->d_hidden)
 			this->hide();
 	}
 }

@@ -19,7 +19,7 @@ namespace toy
 	{
 		Widget& widget = *pointer;
 		m_contents.push_back(std::move(pointer));
-		widget.setContainer(m_wedge);
+		widget.m_container = &m_wedge;
 		return widget;
 	}
 
@@ -32,7 +32,7 @@ namespace toy
 	void WidgetStore::transfer(Widget& widget, Wedge& target)
 	{
 		m_wedge.transfer(widget, target);
-		widget.setContainer(target);
+		widget.m_container = &target;
 		vector_transfer_pt(m_contents, target.store().m_contents, widget);
 	}
 
@@ -65,7 +65,7 @@ namespace toy
 	void Wedge::reindex(size_t from)
 	{
 		for(size_t i = from; i < m_contents.size(); ++i)
-			m_contents[i]->setIndex(i);
+			m_contents[i]->m_index = i;
 		m_frame->markDirty(DIRTY_STRUCTURE);
 	}
 
@@ -84,8 +84,8 @@ namespace toy
 
 	void Wedge::remove(Widget& widget)
 	{
-		m_contents.erase(m_contents.begin() + widget.index());
-		this->reindex(widget.index());
+		m_contents.erase(m_contents.begin() + widget.m_index);
+		this->reindex(widget.m_index);
 		widget.unbind();
 	}
 

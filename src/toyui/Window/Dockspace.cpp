@@ -18,13 +18,13 @@ namespace toy
 	void Docksection::dock(Window& window)
 	{
 		Tab& tab = this->addTab(window.name());
-		window.container()->store().transfer(window, tab);
+		window.m_container->store().transfer(window, tab);
 	}
 
 	void Docksection::undock(Window& window)
 	{
 		Tab& tab = *window.findContainer<Tab>();
-		window.container()->store().transfer(window, this->rootSheet());
+		window.m_container->store().transfer(window, this->rootSheet());
 		this->removeTab(tab);
 
 		if(m_tabs.contents().empty())
@@ -43,7 +43,7 @@ namespace toy
 		if(m_dockline->dim() == dim)
 			return m_dockline->divideSection((after ? 1 : 0));
 		else
-			return m_dockline->m_dockline->insertSection(m_dockline->index() + (after ? 1 : 0));
+			return m_dockline->m_dockline->insertSection(m_dockline->m_index + (after ? 1 : 0));
 	}
 
 	Docksection& Docksection::docktarget(const DimFloat& pos)

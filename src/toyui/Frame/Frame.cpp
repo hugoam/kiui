@@ -45,17 +45,17 @@ namespace toy
 
 	void Frame::makeSolver()
 	{
-		LayoutSolver type = d_style->layout().d_solver;
-		FrameSolver* solver = d_parent ? d_parent->solver() : nullptr;
+		LayoutSolver type = d_style->m_layout.d_solver;
+		FrameSolver* solver = d_parent ? d_parent->d_solver.get() : nullptr;
 
 		if(type == FRAME_SOLVER)
-			d_solver = make_object<FrameSolver>(solver, &d_style->layout(), this);
+			d_solver = make_object<FrameSolver>(solver, &d_style->m_layout, this);
 		else if(type == ROW_SOLVER)
-			d_solver = make_object<RowSolver>(solver, &d_style->layout(), this);
+			d_solver = make_object<RowSolver>(solver, &d_style->m_layout, this);
 		else if(type == GRID_SOLVER)
-			d_solver = make_object<GridSolver>(solver, &d_style->layout(), this);
+			d_solver = make_object<GridSolver>(solver, &d_style->m_layout, this);
 		else if(type == TABLE_SOLVER)
-			d_solver = make_object<TableSolver>(solver, &d_style->layout(), this);
+			d_solver = make_object<TableSolver>(solver, &d_style->m_layout, this);
 
 		d_solver->applySpace(d_length);
 	}
@@ -78,11 +78,11 @@ namespace toy
 		this->setDirty(dirty);
 		if(dirty == DIRTY_FORCE_LAYOUT)
 			dirty = DIRTY_LAYOUT;
-		Frame* parent = this->parent();
+		Frame* parent = this->d_parent;
 		while(parent)
 		{
 			parent->setDirty(dirty);
-			parent = parent->parent();
+			parent = parent->d_parent;
 		}
 	}
 
@@ -90,7 +90,7 @@ namespace toy
 	{
 		d_parent = &parent;
 		d_parent->markDirty(DIRTY_STRUCTURE);
-		//d_index[d_parent->d_length] = d_widget.index();
+		//d_index[d_parent->d_length] = d_widget.d_index;
 	}
 
 	void Frame::unbind()
@@ -108,10 +108,10 @@ namespace toy
 
 	void Frame::updateStyle(bool reset)
 	{
-		d_opacity = d_style->layout().d_opacity;
-		d_size = d_style->layout().d_size.val.null() ? d_size : d_style->layout().d_size.val;
+		d_opacity = d_style->m_layout.d_opacity;
+		d_size = d_style->m_layout.d_size.val.null() ? d_size : d_style->m_layout.d_size.val;
 
-		this->updateInkstyle(d_style->subskin(d_widget.state()));
+		this->updateInkstyle(d_style->subskin(d_widget.m_state));
 
 		reset ? this->markDirty(DIRTY_STRUCTURE) : this->markDirty(DIRTY_LAYOUT);
 	}
@@ -243,7 +243,7 @@ namespace toy
 
 	Frame* Frame::pinpoint(DimFloat pos, const Filter& filter)
 	{
-		if(this->hidden() || this->hollow() || (this->clip() && !this->inside(pos)))
+		if(this->d_hidden || this->hollow() || (this->clip() && !this->inside(pos)))
 			return nullptr;
 
 		if(d_wedge)
@@ -373,11 +373,11 @@ namespace toy
 
 	void Frame::debugPrintDepth()
 	{
-		Frame* parent = this->parent();
+		Frame* parent = this->d_parent;
 		while(parent)
 		{
 			printf("  ");
-			parent = parent->parent();
+			parent = parent->d_parent;
 		}
 	}
 }

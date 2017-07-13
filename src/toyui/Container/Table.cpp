@@ -27,14 +27,14 @@ namespace toy
 	void Table::makeSolver()
 	{
 		Widget::makeSolver();
-		m_frame->solver()->as<TableSolver>().divide(m_weights);
+		m_frame->d_solver->as<TableSolver>().divide(m_weights);
 	}
 
 	void Table::resize(Frame& first, Frame& second)
 	{
-		m_weights[first.dindex(DIM_X)] = first.d_span.x;
-		m_weights[second.dindex(DIM_X)] = second.d_span.x;
-		m_frame->solver()->as<TableSolver>().update(m_weights);
+		m_weights[first.d_index[DIM_X]] = first.d_span.x;
+		m_weights[second.d_index[DIM_X]] = second.d_span.x;
+		m_frame->d_solver->as<TableSolver>().update(m_weights);
 		m_frame->markDirty(DIRTY_FORCE_LAYOUT);
 	}
 }

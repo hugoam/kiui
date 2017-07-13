@@ -48,7 +48,7 @@ namespace toy
 
 	void Canvas::autoLayout()
 	{
-		//if(!m_plan.frame().solver()) return;
+		//if(!m_plan.frame().d_solver) return;
 		std::vector<Node*> nodes;
 		this->collectNodes(nodes);
 		this->layoutNodes(nodes);
@@ -56,7 +56,7 @@ namespace toy
 	
 	void Canvas::autoLayoutSelected()
 	{
-		//if(!m_plan.frame().solver()) return;
+		//if(!m_plan.frame().d_solver) return;
 		this->layoutNodes(m_selection.store());
 	}
 
@@ -82,7 +82,7 @@ namespace toy
 
 		SolverVector solvers;
 
-		RowSolver line(m_plan.frame().solver(), &this->fetchStyle(Canvas::LayoutLine()).layout());
+		RowSolver line(m_plan.frame().d_solver.get(), &this->fetchStyle(Canvas::LayoutLine()).m_layout);
 		solvers.push_back(&line);
 
 		std::vector<RowSolver> columns; columns.reserve(nodes.size());
@@ -90,13 +90,13 @@ namespace toy
 
 		for(int i = 0; i < maxIndex + shift + 1; ++i)
 		{
-			columns.emplace_back(&line, &this->fetchStyle(Canvas::LayoutColumn()).layout());
+			columns.emplace_back(&line, &this->fetchStyle(Canvas::LayoutColumn()).m_layout);
 			solvers.push_back(&columns.back());
 		}
 
 		for(Node* node : nodes)
 		{
-			elements.emplace_back(&columns[node->m_order + shift], &this->fetchStyle(Canvas::LayoutNode()).layout(), &node->frame());
+			elements.emplace_back(&columns[node->m_order + shift], &this->fetchStyle(Canvas::LayoutNode()).m_layout, &node->frame());
 			elements.back().sync();
 			solvers.push_back(&elements.back());
 		}
@@ -207,7 +207,7 @@ namespace toy
 
 	void NodeCable::updateCable()
 	{
-		Frame& frameCanvas = this->parent()->frame();
+		Frame& frameCanvas = m_parent->frame();
 
 		DimFloat relativeOut = m_knobOut.frame().derivePosition(DimFloat(), frameCanvas);
 		DimFloat relativeIn = m_knobIn.frame().derivePosition(DimFloat(), frameCanvas);

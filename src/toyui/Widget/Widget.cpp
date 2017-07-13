@@ -67,7 +67,7 @@ namespace toy
 			string name(content.begin() + 1, content.end() - 1);
 			m_frame->setIcon(&this->uiWindow().findImage(toLower(name)));
 		}
-		else if(!m_frame->icon()) // @kludge for buttons whose image is set by the inkstyle
+		else if(!m_frame->d_icon) // @kludge for buttons whose image is set by the inkstyle
 		{
 			m_frame->setCaption(content);
 		}
@@ -75,7 +75,7 @@ namespace toy
 
 	const string& Widget::label()
 	{
-		return m_frame->caption()->text();
+		return m_frame->d_caption->text();
 	}
 
 	void Widget::destroy()
@@ -123,7 +123,7 @@ namespace toy
 		{
 			if(&widget->type() == &type)
 				return widget;
-			widget = widget->parent();
+			widget = widget->m_parent;
 		}
 
 		return nullptr;
@@ -164,7 +164,7 @@ namespace toy
 
 	Style& Widget::fetchStyle(Type& type)
 	{
-		return this->uiWindow().styler().style(type);
+		return this->uiWindow().m_styler->style(type);
 	}
 
 	void Widget::toggleState(WidgetState state)
@@ -193,7 +193,7 @@ namespace toy
 	Widget* Widget::pinpoint(DimFloat pos, const Frame::Filter& filter)
 	{
 		Frame* frame = m_frame->pinpoint(pos, filter);
-		return frame ? &frame->widget() : nullptr;
+		return frame ? &frame->d_widget : nullptr;
 	}
 
 	void Widget::transformEvent(InputEvent& inputEvent)

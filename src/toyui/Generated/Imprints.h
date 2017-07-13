@@ -71,19 +71,18 @@ namespace toy
 
     Object& InkStyle_construct_0(Lref& ref, Lref* args) {  ref.value<InkStyle>() = InkStyle( args[0].pointer<Style>() ); return ref.value<InkStyle>(); }
 
-	void Style_name(Object& object, Lref& ref) { ref.value<string>() = object.as<Style>().name(); }
-	void Style_base(Object& object, Lref& ref) { ref.pointer<Style>() = object.as<Style>().base(); }
-	void Style_layout(Object& object, Lref& ref) { ref.pointer<LayoutStyle>() = &object.as<Style>().layout(); }
-	void Style_skin(Object& object, Lref& ref) { ref.pointer<InkStyle>() = &object.as<Style>().skin(); }
+	void Style_m_base(Object& object, Lref& ref) { ref.pointer<Style>() = object.as<Style>().m_base; }
+	void Style_m_name(Object& object, Lref& ref) { ref.value<string>() = object.as<Style>().m_name; }
+	void Style_m_layout(Object& object, Lref& ref) { ref.value<LayoutStyle>() = object.as<Style>().m_layout; }
+	void Style_m_skin(Object& object, Lref& ref) { ref.value<InkStyle>() = object.as<Style>().m_skin; }
 
 
-	void Widget_parent(Object& object, Lref& ref) { ref.pointer<Wedge>() = object.as<Widget>().parent(); }
-	void Widget_container(Object& object, Lref& ref) { ref.pointer<Wedge>() = object.as<Widget>().container(); }
-	void Widget_index(Object& object, Lref& ref) { ref.value<size_t>() = object.as<Widget>().index(); }
-	void Widget_frame(Object& object, Lref& ref) { ref.pointer<Frame>() = &object.as<Widget>().frame(); }
-	void Widget_state(Object& object, Lref& ref) { ref.value<WidgetState>() = object.as<Widget>().state(); }
-	void Widget_style(Object& object, Lref& ref) { ref.pointer<Style>() = &object.as<Widget>().style(); }
-	void Widget_setStyle(Object& object, const Lref& ref) { object.as<Widget>().setStyle(ref.ref<Style>()); }
+	void Widget_m_parent(Object& object, Lref& ref) { ref.pointer<Wedge>() = object.as<Widget>().m_parent; }
+	void Widget_m_container(Object& object, Lref& ref) { ref.pointer<Wedge>() = object.as<Widget>().m_container; }
+	void Widget_m_index(Object& object, Lref& ref) { ref.value<size_t>() = object.as<Widget>().m_index; }
+	void Widget_m_style(Object& object, Lref& ref) { ref.pointer<Style>() = object.as<Widget>().m_style; }
+	void Widget_setM_style(Object& object, const Lref& ref) { object.as<Widget>().m_style = ref.pointer<Style>(); }
+	void Widget_m_state(Object& object, Lref& ref) { ref.value<WidgetState>() = object.as<Widget>().m_state; }
 
 
 
@@ -325,10 +324,10 @@ namespace toy
         Style::cls().imprint().typeClass = OBJECT;
         Style::cls().imprint().serializable = false;
         Style::cls().imprint().isTypeObject = true;
-        Style::cls().imprint().members.push_back(Member(Style::cls(), method_var(&Style::name), typecls<string>(), "name", &Style_name, nullptr, true, false, false, false));
-        Style::cls().imprint().members.push_back(Member(Style::cls(), method_var(&Style::base), Style::cls(), "base", &Style_base, nullptr, true, false, false, false));
-        Style::cls().imprint().members.push_back(Member(Style::cls(), method_var(&Style::layout), LayoutStyle::cls(), "layout", &Style_layout, nullptr, false, false, false, false));
-        Style::cls().imprint().members.push_back(Member(Style::cls(), method_var(&Style::skin), InkStyle::cls(), "skin", &Style_skin, nullptr, false, false, false, false));
+        Style::cls().imprint().members.push_back(Member(Style::cls(), member_var(&Style::m_base), Style::cls(), "m_base", &Style_m_base, nullptr, true, false, false, false));
+        Style::cls().imprint().members.push_back(Member(Style::cls(), member_var(&Style::m_name), typecls<string>(), "m_name", &Style_m_name, nullptr, true, false, false, false));
+        Style::cls().imprint().members.push_back(Member(Style::cls(), member_var(&Style::m_layout), LayoutStyle::cls(), "m_layout", &Style_m_layout, nullptr, true, false, false, false));
+        Style::cls().imprint().members.push_back(Member(Style::cls(), member_var(&Style::m_skin), InkStyle::cls(), "m_skin", &Style_m_skin, nullptr, true, false, false, false));
         Style::cls().imprint().setup();
         
         
@@ -347,12 +346,11 @@ namespace toy
         Widget::cls().imprint().typeClass = OBJECT;
         Widget::cls().imprint().serializable = false;
         Widget::cls().imprint().isTypeObject = true;
-        Widget::cls().imprint().members.push_back(Member(Widget::cls(), method_var(&Widget::parent), Wedge::cls(), "parent", &Widget_parent, nullptr, true, false, false, false));
-        Widget::cls().imprint().members.push_back(Member(Widget::cls(), method_var(&Widget::container), Wedge::cls(), "container", &Widget_container, nullptr, true, false, false, false));
-        Widget::cls().imprint().members.push_back(Member(Widget::cls(), method_var(&Widget::index), typecls<unsigned int>(), "index", &Widget_index, nullptr, true, false, false, false));
-        Widget::cls().imprint().members.push_back(Member(Widget::cls(), method_var(&Widget::frame), Frame::cls(), "frame", &Widget_frame, nullptr, false, false, false, false));
-        Widget::cls().imprint().members.push_back(Member(Widget::cls(), method_var(&Widget::state), typecls<WidgetState>(), "state", &Widget_state, nullptr, true, false, false, false));
-        Widget::cls().imprint().members.push_back(Member(Widget::cls(), method_var(&Widget::style), Style::cls(), "style", &Widget_style, &Widget_setStyle, false, true, false, false));
+        Widget::cls().imprint().members.push_back(Member(Widget::cls(), member_var(&Widget::m_parent), Wedge::cls(), "m_parent", &Widget_m_parent, nullptr, true, false, false, false));
+        Widget::cls().imprint().members.push_back(Member(Widget::cls(), member_var(&Widget::m_container), Wedge::cls(), "m_container", &Widget_m_container, nullptr, true, false, false, false));
+        Widget::cls().imprint().members.push_back(Member(Widget::cls(), member_var(&Widget::m_index), typecls<unsigned int>(), "m_index", &Widget_m_index, nullptr, true, false, false, false));
+        Widget::cls().imprint().members.push_back(Member(Widget::cls(), member_var(&Widget::m_style), Style::cls(), "m_style", &Widget_m_style, &Widget_setM_style, true, true, false, false));
+        Widget::cls().imprint().members.push_back(Member(Widget::cls(), member_var(&Widget::m_state), typecls<WidgetState>(), "m_state", &Widget_m_state, nullptr, true, false, false, false));
         Widget::cls().imprint().setup();
         
         

@@ -25,7 +25,7 @@ namespace toy
 	{
 		if(!parent)
 		{
-			m_target = window.renderer().createRenderTarget(m_frame->as<Layer>());
+			m_target = window.m_renderer->createRenderTarget(m_frame->as<Layer>());
 			this->updateStyle();
 		}
 	}

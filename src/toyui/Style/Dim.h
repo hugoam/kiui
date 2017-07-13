@@ -97,8 +97,6 @@ namespace toy
 
 	struct TOY_UI_EXPORT Space
 	{
-		//Space(Direction dir, Sizing len, Sizing dep) : direction(dir), sizingLength(len), sizingDepth(dep) {}
-		//Space(SpacePreset preset) { *this = preset; }
 		void operator=(SpacePreset preset) { *this = Space::preset(preset); }
 
 		Direction direction;

@@ -98,7 +98,7 @@ namespace toy
 
 	void Slider::updateKnob()
 	{
-		if(m_frame->hidden())
+		if(m_frame->d_hidden)
 			return;
 
 		float knobspan = m_knobLength / m_range;

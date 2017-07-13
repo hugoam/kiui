@@ -61,7 +61,7 @@ namespace toy
 		while(node)
 		{
 			node->expand();
-			node = node->parent()->findContainer<TreeNode>();
+			node = node->m_parent->findContainer<TreeNode>();
 		}
 	}
 

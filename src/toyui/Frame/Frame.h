@@ -37,36 +37,15 @@ namespace toy
 
 		virtual FrameType frameType() { return FRAME; }
 
-		inline Widget& widget() { return d_widget; }
-		inline Wedge& wedge() { return *d_wedge; }
-		inline Frame* parent() const { return d_parent; }
-		inline DirtyLayout dirty() const { return d_dirty; }
-		inline bool hidden() const { return d_hidden; }
-		inline const DimIndex& index() const { return d_index; }
-		inline size_t dindex(Dimension dim) const { return d_index[dim]; }
-
 		bool empty() const { return d_caption == nullptr && d_icon == nullptr; }
 
-		inline const BoxFloat& hardClip() const { return d_hardClip; }
-
-		inline bool flow() const { return d_style->layout().d_flow == FLOW; }
-		inline bool clip() const { return d_style->layout().d_clipping == CLIP; }
+		inline bool flow() const { return d_style->m_layout.d_flow == FLOW; }
+		inline bool clip() const { return d_style->m_layout.d_clipping == CLIP; }
 
 		inline bool opaque() const { return d_opacity == OPAQUE; }
 		inline bool hollow() const { return d_opacity == HOLLOW; }
 
-		inline FrameSolver* solver() { return d_solver.get(); }
-
-		inline Style& style() const { return *d_style; }
-		inline InkStyle& inkstyle() const { return *d_inkstyle; }
-
-		void setIndex(size_t xindex, size_t yindex) { d_index.x = xindex; d_index.y = yindex; }
-		void setIndexDim(Dimension dim, size_t index) { d_index[dim] = index; }
-
 		void setEmpty() { d_icon = nullptr; d_caption = nullptr; }
-
-		Caption* caption() { return d_caption.get(); }
-		Icon* icon() { return d_icon.get(); }
 
 		Caption& setCaption(const string& text);
 		Icon& setIcon(Image* image);
@@ -154,7 +133,7 @@ namespace toy
 		Style* d_style;
 		InkStyle* d_inkstyle;
 
-	protected:
+	public:
 		object_ptr<Caption> d_caption;
 		object_ptr<Icon> d_icon;
 		object_ptr<FrameSolver> d_solver;

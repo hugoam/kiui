@@ -19,16 +19,16 @@ namespace toy
 		, m_scrollbarX(*this, m_scrollzone, m_body, DIM_X)
 		, m_scrollbarY(*this, m_scrollzone, m_body, DIM_Y)
 	{
-		m_scrollzone.frame().setIndex(0, 0);
-		m_scrollbarX.frame().setIndex(0, 1);
-		m_scrollbarY.frame().setIndex(1, 0);
+		m_scrollzone.frame().d_index = { 0, 0 };
+		m_scrollbarX.frame().d_index = { 0, 1 };
+		m_scrollbarY.frame().d_index = { 1, 0 };
 	}
 
 	void ScrollSheet::makeSolver()
 	{
 		Widget::makeSolver();
 
-		m_frame->solver()->as<GridSolver>().divide({ Space::preset(BOARD), Space::preset(LINE) });
+		m_frame->d_solver->as<GridSolver>().divide({ Space::preset(BOARD), Space::preset(LINE) });
 	}
 
 	void ScrollSheet::dirtyLayout()
@@ -120,13 +120,13 @@ namespace toy
 		for(float x = 0.f; x < frame.d_size.x; x += gridsizeX)
 		{
 			renderer.pathLine(x, 0.f, x, frame.d_size.y);
-			renderer.stroke(frame.inkstyle());
+			renderer.stroke(*frame.d_inkstyle);
 		}
 
 		for(float y = 0.f; y < frame.d_size.y; y += gridsizeY)
 		{
 			renderer.pathLine(0.f, y, frame.d_size.x, y);
-			renderer.stroke(frame.inkstyle());
+			renderer.stroke(*frame.d_inkstyle);
 		}
 
 		return false;

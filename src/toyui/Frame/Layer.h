@@ -23,14 +23,9 @@ namespace toy
 			FORCE_REDRAW = 2
 		};
 
-		FrameType frameType() { return d_layerType; }
+		virtual FrameType frameType() { return d_layerType; }
 
-		Layer* parentLayer() { return d_parentLayer; }
-		size_t index() { return d_index; }
-		size_t z() { return d_style->layout().d_zorder.val ? d_style->layout().d_zorder.val : d_z; }
-
-		void setIndex(size_t index) { d_index = index; }
-		void setZ(size_t z) { d_z = z; }
+		size_t z() { return d_style->m_layout.d_zorder.val ? d_style->m_layout.d_zorder.val : d_z; }
 
 		bool redraw() { return d_redraw >= REDRAW; }
 		bool forceRedraw() { return d_redraw >= FORCE_REDRAW; }
