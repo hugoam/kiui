@@ -17,7 +17,7 @@ namespace toy
 	RootSheet::RootSheet(UiWindow& window, Type& type, Wedge* parent)
 		: Wedge(type, MASTER_LAYER, parent)
 		, m_window(window)
-		, m_rootController(*this)
+		, m_controller(*this)
 		, m_mouse(*this)
 		, m_keyboard(*this)
 		, m_cursor(*this)
@@ -45,7 +45,7 @@ namespace toy
 		if(m_active == &widget)
 			m_active = nullptr;
 
-		m_rootController.yieldControl(widget);
+		m_controller.yieldControl(widget);
 
 		m_cursor.unhover(widget);
 		m_mouse.handleDestroyWidget(widget);

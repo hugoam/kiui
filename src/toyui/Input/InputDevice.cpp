@@ -14,7 +14,7 @@ namespace toy
 {
 	InputDevice::InputDevice(RootSheet& rootSheet)
 		: m_rootSheet(rootSheet)
-		, m_rootFrame(rootSheet.controller())
+		, m_rootFrame(rootSheet.m_controller)
 	{}
 
 	Keyboard::Keyboard(RootSheet& rootSheet)
@@ -58,9 +58,9 @@ namespace toy
 	void Mouse::mouseFocus(DimFloat pos, std::vector<Widget*>& focused)
 	{
 		if(focused.size() > 0)
-			m_rootSheet.cursor().hover(*focused.front());
+			m_rootSheet.m_cursor.hover(*focused.front());
 		else
-			m_rootSheet.cursor().unhover();
+			m_rootSheet.m_cursor.unhover();
 
 		MouseEnterEvent mouseEnterEvent(*this, pos);
 		MouseLeaveEvent mouseLeaveEvent(*this, pos);
@@ -87,7 +87,7 @@ namespace toy
 		MouseMoveEvent mouseEvent(*this, pos);
 
 		m_lastPos = mouseEvent.pos;
-		m_rootSheet.cursor().setPosition(mouseEvent.pos);
+		m_rootSheet.m_cursor.setPosition(mouseEvent.pos);
 
 		m_rootFrame.dispatchEvent(mouseEvent);
 
@@ -169,14 +169,14 @@ namespace toy
 		m_rootFrame.dispatchEvent(dragEvent, m_pressed);
 
 		this->dragMove(mouseEvent);
-		m_rootSheet.cursor().lock();
+		m_rootSheet.m_cursor.lock();
 		m_dragging = true;
 	}
 
 	void MouseButton::dragEnd(MouseEvent& mouseEvent)
 	{
 		m_dragging = false;
-		m_rootSheet.cursor().unlock();
+		m_rootSheet.m_cursor.unlock();
 
 		MouseDragEndEvent dragEvent(m_mouse, m_deviceType, mouseEvent);
 		m_rootFrame.dispatchEvent(dragEvent, m_pressed);

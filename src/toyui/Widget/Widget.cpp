@@ -52,12 +52,12 @@ namespace toy
 
 	UiWindow& Widget::uiWindow()
 	{
-		return this->rootSheet().uiWindow();
+		return this->rootSheet().m_window;
 	}
 
 	ControlSwitch& Widget::rootController()
 	{
-		return this->rootSheet().controller();
+		return this->rootSheet().m_controller;
 	}
 
 	void Widget::setContent(const string& content)

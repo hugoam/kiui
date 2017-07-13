@@ -23,13 +23,6 @@ namespace toy
 
 		virtual RootSheet& rootSheet() { return *this; }
 
-		UiWindow& uiWindow() { return m_window; }
-		ControlSwitch& controller() { return m_rootController; }
-		Mouse& mouse() { return m_mouse; }
-		Keyboard& keyboard() { return m_keyboard; }
-		Cursor& cursor() { return m_cursor; }
-		RenderTarget& target() { return *m_target; }
-
 		void nextFrame(size_t tick, size_t delta);
 
 		void makeActive(Widget& widget);
@@ -40,9 +33,9 @@ namespace toy
 
 		static Type& cls() { static Type ty("RootSheet", Wedge::cls()); return ty; }
 
-	protected:
+	public:
 		UiWindow& m_window;
-		ControlSwitch m_rootController;
+		ControlSwitch m_controller;
 		Mouse m_mouse;
 		Keyboard m_keyboard;
 

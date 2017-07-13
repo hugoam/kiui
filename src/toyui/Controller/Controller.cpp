@@ -66,7 +66,7 @@ namespace toy
 
 	void Controller::yield()
 	{
-		m_rootSheet->controller().yieldControl(*this);
+		m_rootSheet->m_controller.yieldControl(*this);
 		//m_inputWidget->rootController().yieldControl(*this);
 		m_inputWidget = nullptr;
 	}

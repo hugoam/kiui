@@ -99,7 +99,7 @@ namespace toy
 
 		m_rootSheet = make_object<RootSheet>(*this);
 
-		m_context->inputWindow().initInput(m_context->renderWindow(), m_rootSheet->mouse(), m_rootSheet->keyboard());
+		m_context->inputWindow().initInput(m_context->renderWindow(), m_rootSheet->m_mouse, m_rootSheet->m_keyboard);
 
 		m_rootSheet->frame().setSize({ m_width, m_height });
 
@@ -177,7 +177,7 @@ namespace toy
 
 		if(m_context->renderSystem().manualRender())
 		{
-			m_rootSheet->target().render();
+			m_rootSheet->m_target->render();
 			// add sub layers
 		}
 
