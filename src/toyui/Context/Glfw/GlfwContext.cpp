@@ -248,7 +248,7 @@ namespace toy
 	bool GlfwInputWindow::nextFrame()
 	{
 		glfwPollEvents();
-		return true;
+		return !glfwWindowShouldClose(m_glWindow);
 	}
 
 	void GlfwInputWindow::initInput(RenderWindow& renderWindow, Mouse& mouse, Keyboard& keyboard)

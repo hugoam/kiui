@@ -181,15 +181,16 @@ namespace toy
 			// add sub layers
 		}
 
-		m_context->renderWindow().nextFrame();
-		m_context->inputWindow().nextFrame();
+		bool pursue = !m_shutdownRequested;
+		pursue &= m_context->renderWindow().nextFrame();
+		pursue &= m_context->inputWindow().nextFrame();
 
 		size_t tick = m_clock.readTick();
 		size_t delta = m_clock.stepTick();
 
 		m_rootSheet->nextFrame(tick, delta);
 
-		return !m_shutdownRequested;
+		return pursue;
 	}
 	
 	void UiWindow::shutdown()
