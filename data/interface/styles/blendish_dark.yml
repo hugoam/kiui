@@ -184,9 +184,18 @@ ColumnHeader :
 Dropdown:
     copy_skin : Toggle
     
-Typedown:
+DropdownInput:
+    copy_skin : Toggle
+  
+TypedownInput:
     copy_skin : TypeIn
     
+ToolButton :
+    copy_skin : Toggle
+    
+    focused :
+        background_colour : 0.65,0.65,0.65,1.0
+        
 Checkbox :
     copy_skin : Toggle
     size : 16.0,16.0

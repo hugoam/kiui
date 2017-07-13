@@ -198,7 +198,10 @@ ColumnHeader :
 Dropdown:
     copy_skin : Toggle
     
-Typedown:
+DropdownInput:
+    copy_skin : Toggle
+  
+TypedownInput:
     copy_skin : TypeIn
     
 Checkbox :
