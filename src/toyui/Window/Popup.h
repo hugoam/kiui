@@ -14,7 +14,7 @@ namespace toy
 	class TOY_UI_EXPORT Popup : public Wedge
 	{
 	public:
-		Popup(Wedge& parent, Callback onClose = nullptr, Type& type = cls());
+		Popup(Wedge& parent, Callback onClose = nullptr, bool open = true, Type& type = cls());
 
 		virtual bool leftClick(MouseEvent& mouseEvent);
 		virtual bool rightClick(MouseEvent& mouseEvent);

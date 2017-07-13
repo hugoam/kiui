@@ -110,8 +110,7 @@ namespace toy
 
 		MouseEvent(Mouse& mouse, DeviceType deviceType, EventType eventType, DimFloat pos)
 			: InputEvent(deviceType, eventType)
-			, pos(pos), delta(0.f, 0.f), deltaZ(0.f)
-			, pressed(0.f, 0.f), button(NO_BUTTON)
+			, pos(pos), relative{ 0.f, 0.f }, delta{ 0.f, 0.f }, deltaZ(0.f), pressed{ 0.f, 0.f }, button(NO_BUTTON)
 		{
 			mouse.transformMouseEvent(*this);
 
@@ -121,6 +120,12 @@ namespace toy
 				button = RIGHT_BUTTON;
 			else if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
 				button = MIDDLE_BUTTON;
+		}
+
+		MouseEvent(Mouse& mouse, DeviceType deviceType, EventType eventType, MouseEvent& source)
+			: MouseEvent(mouse, deviceType, eventType, {})
+		{
+			this->pos = source.pos; this->relative = source.relative; this->delta = source.delta; this->pressed = source.pressed;
 		}
 	};
 

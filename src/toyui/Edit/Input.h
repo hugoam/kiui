@@ -7,8 +7,6 @@
 
 /* toy */
 #include <toyobj/Type.h>
-#include <toyobj/Any.h>
-#include <toyobj/Util/Dispatch.h>
 #include <toyobj/String/StringConvert.h>
 #include <toyobj/Util/Stat.h>
 #include <toyobj/Util/StatString.h>
@@ -23,14 +21,10 @@
 
 #include <toyui/Edit/TypeIn.h>
 
+static const size_t g_num_precision = 3;
+
 namespace toy
 {
-	class TOY_UI_EXPORT DispatchInput : public Dispatcher<object_ptr<Widget>, Lref&>, public LazyGlobal<DispatchInput>
-	{};
-	
-	class TOY_UI_EXPORT DispatchDisplay : public Dispatcher<object_ptr<Widget>, Lref&>, public LazyGlobal<DispatchDisplay>
-	{};
-
 	template <class T>
 	class InputValue
 	{
@@ -42,6 +36,16 @@ namespace toy
 		std::function<void(T)> m_callback;
 	};
 
+	inline string truncateNumber(const string& str)
+	{
+		size_t dot = str.find(".");
+		if(dot == string::npos) return str;
+		string result = str;
+		while(result.size() > 1 + dot + g_num_precision || (result.size() > 1 + dot + 1 && result.back() == '0'))
+			result.pop_back();
+		return result;
+	}
+
 	template <class T>
 	class StatSlider : public Wedge, public InputValue<AutoStat<T>>
 	{
@@ -51,7 +55,7 @@ namespace toy
 		StatSlider(Wedge& parent, AutoStat<T> value, const Callback& callback = nullptr, Dimension dim = DIM_X)
 			: Wedge(parent, this->cls())
 			, InputValue<AutoStat<T>>(value, callback)
-			, m_slider(*this, dim, [this](Widget&) { this->changed(); })
+			, m_slider(*this, dim, [this](Widget&) { this->m_ref.modify(T(m_slider.val())); this->changed(); })
 			, m_display(*this, "", Slider::Display())
 		{
 			this->update();
@@ -61,18 +65,20 @@ namespace toy
 		{
 			m_slider.resetMetrics(float(this->m_ref.min()), float(this->m_ref.max()), float(this->m_ref.value()), float(this->m_ref.step()));
 			m_slider.updateKnob();
-			m_display.setContent(toString(this->m_ref));
+			m_display.setContent(truncateNumber(toString(this->m_ref)));
 		}
 
 		void changed()
 		{
-			this->m_ref.modify(T(m_slider.val()));
-			m_display.setContent(toString(this->m_ref));
+			this->update();
 			if(this->m_callback) this->m_callback(this->m_ref);
 		}
 
-		void update(T val) { this->m_ref.modify(val); }
-		void change(T val) { this->m_ref.modify(val); if(this->m_callback) this->m_callback(this->m_ref); }
+		void sync(T val)
+		{
+			this->m_ref.modify(val);
+			this->update();
+		}
 
 		static Type& cls() { static Type ty("StatSlider<" + typecls<T>().name() + ">", Wedge::Row()); return ty; }
 
@@ -93,36 +99,40 @@ namespace toy
 		NumberInput(Wedge& parent, AutoStat<T> value, const Callback& callback = nullptr)
 			: Wedge(parent, this->cls())
 			, InputValue<AutoStat<T>>(value, callback)
-			, m_typeIn(*this, "", [this](const string& val) { this->typein(val); return val; })
-			, m_plus(*this, "+", [this](Widget&) { this->increment(); })
-			, m_minus(*this, "-", [this](Widget&) { this->decrement(); })
+			, m_typeIn(*this, "", [this](const string& val) { return this->typein(val); })
+			, m_plus(*this, "+", [this](Widget&) { this->m_ref.increment(); this->changed(); })
+			, m_minus(*this, "-", [this](Widget&) { this->m_ref.decrement(); this->changed(); })
 		{
 			if(typecls<T>().template is<float>() || typecls<T>().template is<double>())
 				m_typeIn.setAllowedChars("1234567890.");
 			else
 				m_typeIn.setAllowedChars("1234567890");
 
-			m_typeIn.setString(toString(this->m_ref));
+			this->update();
 		}
 
-		void typein(const string& str)
+		void update()
+		{
+			m_typeIn.setString(truncateNumber(toString(this->m_ref)));
+		}
+
+		void changed()
+		{
+			this->update();
+			if(this->m_callback) this->m_callback(this->m_ref);
+		}
+
+		void sync(T val)
+		{
+			this->m_ref.modify(val);
+			this->update();
+		}
+
+		string typein(const string& str)
 		{
 			this->m_ref.modify(fromString<T>(str));
-			if(this->m_callback) this->m_callback(this->m_ref);
-		}
-
-		void increment()
-		{
-			this->m_ref.increment();
-			m_typeIn.setString(toString(this->m_ref));
-			if(this->m_callback) this->m_callback(this->m_ref);
-		}
-
-		void decrement()
-		{
-			this->m_ref.decrement();
-			m_typeIn.setString(toString(this->m_ref));
-			if(this->m_callback) this->m_callback(this->m_ref);
+			this->changed();
+			return truncateNumber(str);
 		}
 
 		static Type& cls() { static Type ty("NumberInput<" + typecls<T>().name() + ">", Wedge::Row()); return ty; }
@@ -158,10 +168,12 @@ namespace toy
 		Input(Wedge& parent, bool value, const Callback& callback = nullptr)
 			: Wedge(parent, this->cls())
 			, InputValue<bool>(value, callback)
-			, m_checkbox(*this, [this](Widget&, bool on) { this->changed(on); }, value)
+			, m_checkbox(*this, [this](Widget&, bool on) { this->m_ref = on; this->changed(); }, value)
 		{}
 
-		void changed(bool on) { this->m_ref = on; if(this->m_callback) this->m_callback(on); }
+		void update() { m_checkbox.update(this->m_ref); }
+		void changed() { this->update(); if(this->m_callback) this->m_callback(this->m_ref); }
+		void sync(bool on) { this->m_ref = on; this->update(); }
 
 		static Type& cls() { static Type ty("Input<bool>", Wedge::cls()); return ty; }
 
@@ -179,6 +191,9 @@ namespace toy
 			: TypeIn(parent, value, [this](const string& val) { if(m_callback) m_callback(val); return val; }, false, this->cls())
 			, m_callback(callback)
 		{}
+
+		void changed() { this->update(); if(this->m_callback) this->m_callback(this->value()); }
+		void sync(string text) { this->setString(text); }
 
 		static Type& cls() { static Type ty("Input<string>", TypeIn::cls()); return ty; }
 
@@ -201,17 +216,24 @@ namespace toy
 			, m_a(*this, AutoStat<float>(value.a(), 0.f, 1.f, 0.01f), [this](float val) { this->m_ref.setA(val); this->changed(); })
 		{}
 
+		void update()
+		{
+			m_r.sync(this->m_ref.r());
+			m_g.sync(this->m_ref.g());
+			m_b.sync(this->m_ref.b());
+			m_a.sync(this->m_ref.a());
+		}
+
 		void changed()
 		{
+			this->update();
 			if(this->m_callback) this->m_callback(this->m_ref);
 		}
 
-		void notifyUpdate()
+		void sync(Colour& colour)
 		{
-			m_r.update(this->m_ref.r());
-			m_g.update(this->m_ref.g());
-			m_b.update(this->m_ref.b());
-			m_a.update(this->m_ref.a());
+			this->m_ref = colour;
+			this->update();
 		}
 
 		static Type& cls() { static Type ty("InputColour", Wedge::Row()); return ty; }

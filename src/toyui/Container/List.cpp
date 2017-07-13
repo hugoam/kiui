@@ -5,6 +5,8 @@
 #include <toyui/Config.h>
 #include <toyui/Container/List.h>
 
+#include <toyui/Button/Dropdown.h>
+
 namespace toy
 {
 	SelectList::SelectList(Wedge& parent, Type& type)
@@ -13,31 +15,13 @@ namespace toy
 
 	WrapButton& SelectList::addChoice()
 	{
-		return this->emplace<WrapButton>([this](Widget& button) { return this->selected(button); });
+		return this->body().emplace<WrapButton>([this](Widget& button) { return this->selected(button); });
 	}
 
 	void SelectList::selected(Widget& selected)
 	{
 		selected.toggleState(SELECTED);
 	}
-
-	LabelSequence::LabelSequence(Wedge& parent, StringVector labels)
-		: Wedge(parent, cls())
-	{
-		for(string& label : labels)
-			this->emplace<Label>(label);
-	}
-	
-	ButtonSequence::ButtonSequence(Wedge& parent, StringVector labels)
-		: Wedge(parent, cls())
-	{
-		for(string& label : labels)
-			this->emplace<Button>(label);
-	}
-
-	SortList::SortList(Wedge& parent)
-		: ScrollSheet(parent, cls())
-	{}
 
 	/*void SortList::move(Device* form, size_t index)
 	{

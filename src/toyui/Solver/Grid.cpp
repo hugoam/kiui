@@ -55,7 +55,7 @@ namespace toy
 			//size_t column0 = frame.d_frame->dindex(d_depth);
 			size_t column = frame.d_frame->widget().index();
 			frame.d_frame->setIndexDim(d_depth, column);
-			return *m_solvers[1 + column];
+			return 1 + column < m_solvers.size() ? *m_solvers[1 + column] : *this;
 		}
 		return *this;
 	}
@@ -83,6 +83,7 @@ namespace toy
 
 	FrameSolver& GridSolver::solver(FrameSolver& frame, Dimension dim)
 	{
+		UNUSED(dim);
 		if(frame.d_frame)
 		{
 			size_t row = frame.d_frame->dindex(d_length);

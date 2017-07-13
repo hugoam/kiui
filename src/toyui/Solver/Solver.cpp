@@ -6,8 +6,7 @@
 #include <toyui/Solver/Solver.h>
 
 #include <toyui/Widget/Widget.h>
-#include <toyui/Widget/Sheet.h>
-#include <toyobj/Iterable/Reverse.h>
+#include <toyui/Frame/Caption.h>
 
 namespace toy
 {

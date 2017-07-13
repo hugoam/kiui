@@ -10,13 +10,14 @@
 
 namespace toy
 {
-	Slider::Slider(Wedge& parent, Dimension dim, const Callback& onUpdated, Type& type)
+	Slider::Slider(Wedge& parent, Dimension dim, const Callback& onUpdated, bool relative, Type& type)
 		: Wedge(parent, type)
 		, m_dim(dim)
 		, m_filler(*this, Item::Filler())
 		, m_button(*this, Slider::Knob())
 		, m_spacer(*this, Item::Spacer())
 		, m_onUpdated(onUpdated)
+		, m_dragRelative(relative)
 	{
 		m_frame->d_length = dim;
 	}
@@ -26,22 +27,23 @@ namespace toy
 		this->updateKnob();
 	}
 
-	float Slider::offset(MouseEvent& mouseEvent)
+	float Slider::cursor(MouseEvent& mouseEvent, float offset)
 	{
 		float size = m_frame->d_size[m_dim];
 		float knob = m_button.frame().d_size[m_dim];
-		return std::min(size - knob, std::max(0.f, mouseEvent.relative[m_dim] - m_dragOffset)) / size;
+		return std::min(size - knob, std::max(0.f, mouseEvent.relative[m_dim] + offset)) / size;
 	}
 
 	bool Slider::leftClick(MouseEvent& mouseEvent)
 	{
-		this->offsetChange(this->offset(mouseEvent), false);
+		float offset = -m_button.frame().d_size[m_dim] / 2.f;
+		this->cursorChange(this->cursor(mouseEvent, offset));
 		return true;
 	}
 
 	bool Slider::leftDragStart(MouseEvent& mouseEvent)
 	{
-		m_dragOffset = mouseEvent.relative[m_dim] - m_filler.frame().d_size[m_dim];
+		m_dragOffset = m_dragRelative ? mouseEvent.relative[m_dim] - m_filler.frame().d_size[m_dim] : 0.f;
 		this->enableState(TRIGGERED);
 		m_button.enableState(TRIGGERED);
 		return true;
@@ -49,7 +51,7 @@ namespace toy
 
 	bool Slider::leftDrag(MouseEvent& mouseEvent)
 	{
-		this->offsetChange(this->offset(mouseEvent), false);
+		this->cursorChange(this->cursor(mouseEvent, -m_dragOffset));
 		return true;
 	}
 
@@ -61,7 +63,7 @@ namespace toy
 		return true;
 	}
 
-	void Slider::offsetChange(float offset, bool ended)
+	void Slider::cursorChange(float offset)
 	{
 		int step = int(round(offset * (m_numSteps - 1.f)));
 		if(step != m_step)
@@ -69,7 +71,7 @@ namespace toy
 			m_step = step;
 			m_val = m_min + step * m_stepLength;
 			this->updateKnob();
-			this->sliderStep(m_val, ended);
+			m_onUpdated(*this);
 		}
 	}
 

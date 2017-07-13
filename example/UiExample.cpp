@@ -174,8 +174,8 @@ namespace toy
 		Canvas& canvas = parent.emplace<Canvas>("Node Editor");
 
 		Toolbar& toolbar = parent.emplace<Toolbar>();
-		toolbar.emplace<ToolButton>("autolayout", [&canvas](Widget&) { canvas.autoLayout(); });
-		toolbar.emplace<ToolButton>("autolayout selected", [&canvas](Widget&) { canvas.autoLayoutSelected(); });
+		toolbar.emplace<ToolButton>("autolayout", [&canvas](Widget&) { canvas.autoLayout(); return false; });
+		toolbar.emplace<ToolButton>("autolayout selected", [&canvas](Widget&) { canvas.autoLayoutSelected(); return false; });
 
 		parent.swap(canvas.index(), toolbar.index());
 
@@ -227,14 +227,27 @@ namespace toy
 	{
 		Table& table0 = parent.emplace<Table>(StringVector({ "ID", "Name", "Path", "Flags" }), std::vector<float>({ 0.25f, 0.25f, 0.25f, 0.25f }));
 
-		table0.emplace<LabelSequence>(StringVector({ "0000", "Robert", "/path/robert", "...." }));
-		table0.emplace<LabelSequence>(StringVector({ "0001", "Stephanie", "/path/stephanie", "line 1" }));
-		table0.emplace<LabelSequence>(StringVector({ "0002", "C64", "/path/computer", "...." }));
+		string contents[3][4] = { { "0000", "Robert",    "/path/robert",    "...." },
+								  { "0001", "Stephanie", "/path/stephanie", "line 1" },
+								  { "0002", "C64",       "/path/computer",  "...." } };
+
+		for(auto& r : contents)
+		{
+			Wedge& row = table0.emplace<Wedge>(Wedge::Row());
+			for(const string& name : r)
+				row.emplace<Label>(name);
+		}
 
 		Table& table1 = parent.emplace<Table>(StringVector({ "Column 0", "Column 1", "Column 3" }), std::vector<float>({ 0.33f, 0.33f, 0.33f }));
 
-		table1.emplace<LabelSequence>(StringVector({ "Hello", "kiUi", "World!" }));
-		table1.emplace<ButtonSequence>(StringVector({ "Banana", "Apple", "Corniflower" }));
+		Wedge& labels = table1.emplace<Wedge>(Wedge::Row());
+		for(const string& name : { "Hello", "kiUi", "World!" })
+			labels.emplace<Label>(name);
+
+		Wedge& buttons = table1.emplace<Wedge>(Wedge::Row());
+		for(const string& name : { "Banana", "Apple", "Corniflower" })
+			buttons.emplace<Button>(name);
+
 		table1.emplace<RadioSwitch>(StringVector({ "radio a", "radio b", "radio b" }));
 
 		Wedge& line0 = table1.emplace<Wedge>(Wedge::Row());
@@ -258,11 +271,8 @@ namespace toy
 
 		Wedge& line2 = table2.emplace<Wedge>(Wedge::Row());
 
-		static string text1 = "The quick brown fox jumps over the lazy dog.";
-		static string text2 = "The quick brown fox jumps over the lazy dog.";
-
-		line2.emplace<TypeIn>(text1);
-		line2.emplace<TypeIn>(text2);
+		line2.emplace<TypeIn>("The quick brown fox jumps over the lazy dog.");
+		line2.emplace<TypeIn>("The quick brown fox jumps over the lazy dog.");
 
 		Wedge& line3 = table2.emplace<Wedge>(Wedge::Row());
 
@@ -375,17 +385,11 @@ namespace toy
 	{
 		parent.emplace<Label>("Use TAB/SHIFT+TAB to cycle through keyboard editable fields.");
 
-		static string first = "1";
-		static string second = "2";
-		static string third = "3";
-		static string fourth = "4 (tab skip)";
-		static string fifth = "5";
-
-		parent.emplace<TypeIn>(first);
-		parent.emplace<TypeIn>(second);
-		parent.emplace<TypeIn>(third);
-		parent.emplace<TypeIn>(fourth);
-		parent.emplace<TypeIn>(fifth);
+		parent.emplace<TypeIn>("1");
+		parent.emplace<TypeIn>("2");
+		parent.emplace<TypeIn>("3");
+		parent.emplace<TypeIn>("4 (tab skip)");
+		parent.emplace<TypeIn>("5");
 		return parent;
 	}
 
@@ -449,7 +453,7 @@ namespace toy
 	Window& createUiTestWindow(Wedge& parent)
 	{
 		Window& window = parent.emplace<Window>("Test Window");
-		createUiTestWindow(window.body());
+		createUiTestWindowPage(window.body());
 		return window;
 	}
 

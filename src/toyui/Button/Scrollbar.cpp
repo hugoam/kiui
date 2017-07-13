@@ -15,7 +15,7 @@ namespace toy
 		, m_frameSheet(frameSheet)
 		, m_contentSheet(contentSheet)
 		, m_rewind(*this, "", [this](Widget&) { this->scrollup(); }, dim == DIM_Y ? ScrollUp() : ScrollLeft())
-		, m_scroller(*this, dim, [this](Widget& widget) { this->scrollTo(widget.as<Slider>().val()); }, Scroller())
+		, m_scroller(*this, dim, [this](Widget& widget) { this->scrollTo(widget.as<Slider>().val()); }, true, Scroller())
 		, m_seek(*this, "", [this](Widget&) { this->scrolldown(); }, dim == DIM_Y ? ScrollDown() : ScrollRight())
 	{
 		m_frame->d_length = dim;

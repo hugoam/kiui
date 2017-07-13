@@ -16,7 +16,13 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT ToolButton : public DropdownInput
 	{
 	public:
+		using Callback = std::function<void(ToolButton&)>;
+
+	public:
 		ToolButton(Wedge& parent, const string& icon, const Callback& trigger = nullptr);
+
+		void activate();
+		void deactivate();
 
 		static Type& cls() { static Type ty("ToolButton", DropdownInput::cls()); return ty; }
 	};

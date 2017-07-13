@@ -196,16 +196,26 @@ namespace toy
 		return frame ? &frame->widget() : nullptr;
 	}
 
+	void Widget::transformEvent(InputEvent& inputEvent)
+	{
+		if(inputEvent.deviceType >= DEVICE_MOUSE)
+		{
+			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
+			mouseEvent.relative = m_frame->localPosition(mouseEvent.pos);
+		}
+	}
+
 	InputReceiver* Widget::controlEvent(InputEvent& inputEvent)
 	{
+		this->transformEvent(inputEvent);
+
 		if(m_controlGraph)
 			return m_controlGraph->controlEvent(inputEvent);
 
 		if(inputEvent.deviceType >= DEVICE_MOUSE)
 		{
 			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
-			DimFloat local = m_frame->localPosition(mouseEvent.pos);
-			Widget* pinned = this->pinpoint(local);
+			Widget* pinned = this->pinpoint(mouseEvent.relative);
 			return (pinned && pinned != this) ? pinned->controlEvent(inputEvent) : this;
 		}
 
@@ -219,11 +229,7 @@ namespace toy
 
 		inputEvent.visited.push_back(this);
 
-		if(inputEvent.deviceType >= DEVICE_MOUSE)
-		{
-			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
-			mouseEvent.relative = m_frame->localPosition(mouseEvent.pos);
-		}
+		this->transformEvent(inputEvent);
 
 		return InputAdapter::receiveEvent(inputEvent);
 	}

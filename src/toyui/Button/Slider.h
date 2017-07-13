@@ -14,7 +14,7 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Slider : public Wedge
 	{
 	public:
-		Slider(Wedge& parent, Dimension dim = DIM_X, const Callback& onUpdated = nullptr, Type& type = cls());
+		Slider(Wedge& parent, Dimension dim = DIM_X, const Callback& onUpdated = nullptr, bool relative = false, Type& type = cls());
 
 		Widget& filler() { return m_filler; }
 		Item& knob() { return m_button; }
@@ -26,13 +26,11 @@ namespace toy
 		void updateMetrics(float min, float max, float val, float stepLength, float knobLength = 0.f);
 		void resetMetrics(float min, float max, float val, float stepLength, float knobLength = 0.f);
 
-		void offsetChange(float offset, bool ended);
+		void cursorChange(float cursor);
 		
 		void updateKnob();
 
-		virtual void sliderStep(float value, bool ended) { UNUSED(value); UNUSED(ended); m_onUpdated(*this); }
-
-		float offset(MouseEvent& mouseEvent);
+		float cursor(MouseEvent& mouseEvent, float offset);
 
 		virtual bool leftClick(MouseEvent& mouseEvent);
 
@@ -64,6 +62,7 @@ namespace toy
 		Callback m_onUpdated;
 
 		float m_dragOffset;
+		bool m_dragRelative;
 	};
 }
 

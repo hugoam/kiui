@@ -12,7 +12,7 @@ namespace toy
 		: WrapButton(parent, [this](Widget&) { this->dropdown(true); }, type)
 		, m_header(*this, {}, nullptr, Head())
 		, m_toggle(*this, "", [this](Widget&) { this->dropdown(true); }, Toggle())
-		, m_list(*this, nullptr, List())
+		, m_list(*this, nullptr, false, List())
 	{}
 
 	MultiButton& Dropdown::addChoice(const StringVector& elements, const Callback& trigger)

@@ -5,7 +5,7 @@
 #ifndef TOY_DRAWFRAME_H
 #define TOY_DRAWFRAME_H
 
-/* toy Front */
+/* toy */
 #include <toyobj/Type.h>
 #include <toyui/Forward.h>
 #include <toyui/Style/Dim.h>

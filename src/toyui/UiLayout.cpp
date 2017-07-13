@@ -213,8 +213,8 @@ namespace toy
 
 		this->styledef(Dockbox::cls()).layout().d_size = { 300.f, 0.f };
 
-		this->styledef(ScrollZone::cls()).layout().d_layout = { AUTO_SIZE, AUTO_SIZE };
-		this->styledef(ScrollZone::cls()).layout().d_clipping = CLIP;
+		this->styledef(ScrollSheet::ScrollZone()).layout().d_layout = { AUTO_SIZE, AUTO_SIZE };
+		this->styledef(ScrollSheet::ScrollZone()).layout().d_clipping = CLIP;
 
 
 		this->styledef(Item::Control()).layout().d_align = { LEFT, CENTER };
@@ -285,7 +285,7 @@ namespace toy
 		this->styledef(Cursor::Caret()).skin().m_image = &m_uiWindow.findImage("caret_white");
 		this->styledef(Cursor::Caret()).skin().m_padding = { -4.f, -9.f, +4.f, +9.f };
 
-		this->styledef(Toolbar::Mover()).skin().m_image = &m_uiWindow.findImage("mousepointer");
+		this->styledef(Toolbar::Mover()).skin().m_image = &m_uiWindow.findImage("handle");
 
 		this->styledef(Text::cls()).skin().m_textWrap = true;
 		this->styledef(Textbox::cls()).skin().m_textWrap = true;

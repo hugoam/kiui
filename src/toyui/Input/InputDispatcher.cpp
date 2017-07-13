@@ -5,6 +5,8 @@
 #include <toyui/Config.h>
 #include <toyui/Input/InputDispatcher.h>
 
+#include <toyui/Input/InputDevice.h>
+
 namespace toy
 {
 	InputAdapter::InputAdapter()

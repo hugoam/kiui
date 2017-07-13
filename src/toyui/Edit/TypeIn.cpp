@@ -5,29 +5,11 @@
 #include <toyui/Config.h>
 #include <toyui/Edit/TypeIn.h>
 
-#include <toyobj/Any.h>
-#include <toyobj/String/StringConvert.h>
-
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Caption.h>
 
 namespace toy
 {
-	/*
-		size_t precision = 3;
-
-		string result = m_value.getString();
-
-		if(m_value.isa<float>() || m_value.isa<double>()
-		|| m_value.isa<AutoStat<float>>() || m_value.isa<AutoStat<double>>())
-		{
-			size_t dot = result.find(".");
-			if(precision > 0 && dot != string::npos)
-				result.resize(std::min(result.size(), dot + precision + 1));
-		}
-
-	*/
-
 	TypeIn::TypeIn(Wedge& parent, const string& text, Callback callback, bool wrap, Type& type)
 		: Wedge(parent, type)
 		, m_string(text)
@@ -56,14 +38,13 @@ namespace toy
 
 	void TypeIn::activate()
 	{
-		if(!(m_state & CONTROL))
-			this->makeActive();
+		this->makeActive();
 	}
 
 	void TypeIn::setString(const string& value)
 	{
 		m_string = value;
-		this->updated();
+		this->update();
 	}
 
 	void TypeIn::setAllowedChars(const string& chars)
@@ -97,16 +78,16 @@ namespace toy
 		this->moveCaretRight();
 	}
 
-	void TypeIn::updated()
+	void TypeIn::update()
 	{
 		m_caption.setText(m_string);
 	}
 
 	void TypeIn::changed()
 	{
-		m_caption.setText(m_string);
 		if(m_callback)
-			m_callback(m_string);
+			m_string = m_callback(m_string);
+		m_caption.setText(m_string);
 	}
 
 	bool TypeIn::leftClick(MouseEvent& mouseEvent)

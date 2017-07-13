@@ -12,7 +12,7 @@
 namespace toy
 {
 	TypedownInput::TypedownInput(Wedge& parent, StringVector choices, const Callback& callback)
-		: DropdownInput(parent, choices, callback)
+		: DropdownInput(parent, choices, callback, cls())
 		, m_input(*this, m_list, nullptr)
 	{
 		this->move(m_input.index(), 0);
@@ -37,7 +37,7 @@ namespace toy
 		m_header.show();
 		m_input.hide();
 
-		m_input.yieldControl();
+		//m_input.yieldControl();
 
 		DropdownInput::dropup();
 	}

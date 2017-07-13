@@ -10,14 +10,14 @@
 
 namespace toy
 {
-	Popup::Popup(Wedge& parent, Callback onClose, Type& type)
+	Popup::Popup(Wedge& parent, Callback onClose, bool open, Type& type)
 		: Wedge(parent, type, LAYER)
 		, m_onClose(onClose)
 	{
 		DimFloat local = m_parent->frame().localPosition(this->rootSheet().mouse().lastPos());
 		m_frame->setPosition(local);
 
-		this->hide();
+		open ? this->open(true) : this->hide();
 	}
 
 	bool Popup::leftClick(MouseEvent& mouseEvent)

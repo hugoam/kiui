@@ -24,30 +24,6 @@ namespace toy
 
 		static Type& cls() { static Type ty("SelectList", ScrollSheet::cls()); return ty; }
 	};
-
-	class _refl_ TOY_UI_EXPORT LabelSequence : public Wedge
-	{
-	public:
-		LabelSequence(Wedge& parent, StringVector labels = StringVector());
-
-		static Type& cls() { static Type ty("LabelSequence", Wedge::Row()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT ButtonSequence : public Wedge
-	{
-	public:
-		ButtonSequence(Wedge& parent, StringVector labels = StringVector());
-
-		static Type& cls() { static Type ty("ButtonSequence", Wedge::Row()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT SortList : public ScrollSheet//, public Dropper
-	{
-	public:
-		SortList(Wedge& parent);
-
-		static Type& cls() { static Type ty("SortList", ScrollSheet::cls()); return ty; }
-	};
 }
 
 #endif // TOY_WIDGET_H

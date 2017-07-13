@@ -24,8 +24,6 @@ namespace toy
     template <> TOY_UI_EXPORT Type& typecls<WidgetState>();
     template <> TOY_UI_EXPORT Type& typecls<std::vector<Widget*>>();
     
-	template <> TOY_UI_EXPORT Type& typecls<MemberPointer<BoxFloat>>();
-	template <> TOY_UI_EXPORT Type& typecls<MethodPointer<BoxFloat>>();
 	template <> TOY_UI_EXPORT Type& typecls<MemberPointer<ImageSkin>>();
 	template <> TOY_UI_EXPORT Type& typecls<MethodPointer<ImageSkin>>();
 	template <> TOY_UI_EXPORT Type& typecls<MemberPointer<LayoutStyle>>();

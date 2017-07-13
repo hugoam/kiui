@@ -21,6 +21,11 @@ namespace toy
 			m_header.enableState(ACTIVATED);
 	}
 
+	void Tab::destroyz()
+	{
+		m_tabber.removeTab(*this);
+	}
+
 	Tabber::Tabber(Wedge& parent, Type& type, bool downtabs)
 		: Wedge(parent, type)
 		, m_headers(*this, Head())

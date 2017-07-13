@@ -32,9 +32,9 @@ namespace toy
 	enum Opacity : unsigned int;
 	enum LayoutSolver : unsigned int;
 
-	struct Space;
-
 	enum InputModifier : unsigned int;
+
+	struct Space;
 
 	class BoxFloat;
 
@@ -57,8 +57,8 @@ namespace toy
 	class Controller;
 
 	class Style;
+	class LayoutStyle;
 
-	class Content;
 	class Caption;
 	class Icon;
 
@@ -75,11 +75,7 @@ namespace toy
 	class Frame;
 	class Layer;
 
-	class LayoutStyle;
-
 	enum WidgetState : unsigned int;
-
-	class WidgetStore;
 
 	class Widget;
 	class Wedge;
@@ -89,36 +85,25 @@ namespace toy
 	class Tooltip;
 
 	class Label;
-	class Title;
-	class DynamicImage;
 	class Button;
 	class WrapButton;
 	class Toggle;
 	class TypeIn;
 	class FilterInput;
 
-	class Board;
-
 	class Slider;
-	class SliderKnob;
-	class Scroller;
 	class Scrollbar;
 
-	class ScrollZone;
 	class ScrollSheet;
-	class ScrollPlan;
 
 	template <class T>
 	class StatSlider;
-
-	class Dropper;
 
 	class Tabber;
 	class Dropdown;
 	class Expandbox;
 	class RadioSwitch;
 
-	class List;
 	class Table;
 	class Tree;
 	class TreeNode;
@@ -132,10 +117,8 @@ namespace toy
 	class Dropdown;
 	class DropdownInput;
 	class TypedownInput;
-	class DropdownList;
 
 	class Menu;
-	class MenuList;
 
 	class Docksection;
 	class Dockline;
@@ -154,7 +137,6 @@ namespace toy
 	class Renderer;
 	class RenderTarget;
 
-	class Skinner;
 	class Styler;
 
 	class RenderWindow;

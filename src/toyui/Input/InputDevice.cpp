@@ -164,7 +164,8 @@ namespace toy
 
 	void MouseButton::dragStart(MouseEvent& mouseEvent)
 	{
-		MouseDragStartEvent dragEvent(m_mouse, m_deviceType, mouseEvent.pos, m_pressedPos);
+		MouseDragStartEvent dragEvent(m_mouse, m_deviceType, mouseEvent);
+		dragEvent.pressed = m_pressedPos;
 		m_rootFrame.dispatchEvent(dragEvent, m_pressed);
 
 		this->dragMove(mouseEvent);
@@ -176,21 +177,21 @@ namespace toy
 	{
 		m_dragging = false;
 		m_rootSheet.cursor().unlock();
-		this->dragMove(mouseEvent);
 
-		MouseDragEndEvent dragEvent(m_mouse, m_deviceType, mouseEvent.pos);
+		MouseDragEndEvent dragEvent(m_mouse, m_deviceType, mouseEvent);
 		m_rootFrame.dispatchEvent(dragEvent, m_pressed);
 	}
 
 	void MouseButton::dragMove(MouseEvent& mouseEvent)
 	{
-		MouseDragEvent dragEvent(m_mouse, m_deviceType, mouseEvent.pos, m_pressedPos, mouseEvent.delta);
+		MouseDragEvent dragEvent(m_mouse, m_deviceType, mouseEvent);
+		dragEvent.pressed = m_pressedPos;
 		m_rootFrame.dispatchEvent(dragEvent, m_pressed);
 	}
 
 	void MouseButton::click(MouseEvent& mouseEvent)
 	{
-		MouseClickEvent clickEvent(m_mouse, m_deviceType, mouseEvent.pos);
+		MouseClickEvent clickEvent(m_mouse, m_deviceType, mouseEvent);
 		m_rootFrame.dispatchEvent(clickEvent, m_pressed);
 	}
 }

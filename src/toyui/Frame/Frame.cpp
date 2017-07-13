@@ -90,7 +90,7 @@ namespace toy
 	{
 		d_parent = &parent;
 		d_parent->markDirty(DIRTY_STRUCTURE);
-		d_index[d_parent->d_length] = d_widget.index();
+		//d_index[d_parent->d_length] = d_widget.index();
 	}
 
 	void Frame::unbind()
@@ -260,13 +260,13 @@ namespace toy
 		return nullptr;
 	}
 
-	void Frame::transferPixelSpan(Frame& prev, Frame& next, float pixelSpan)
+	void Frame::transferPixelSpan(Frame& prev, Frame& next, Dimension dim, float pixelSpan)
 	{
-		float pixspan = 1.f / this->d_size[d_length];
+		float pixspan = 1.f / this->d_size[dim];
 		float offset = pixelSpan * pixspan;
 
-		prev.setSpanDim(d_length, std::max(0.01f, prev.d_span[d_length] + offset));
-		next.setSpanDim(d_length, std::max(0.01f, next.d_span[d_length] - offset));
+		prev.setSpanDim(dim, std::max(0.01f, prev.d_span[dim] + offset));
+		next.setSpanDim(dim, std::max(0.01f, next.d_span[dim] - offset));
 		this->markDirty(DIRTY_FORCE_LAYOUT);
 	}
 
@@ -298,7 +298,8 @@ namespace toy
 		if(dirtyTop >= DIRTY_FORCE_LAYOUT)
 			this->setDirty(DIRTY_FORCE_LAYOUT);
 		else if(dirtyTop >= DIRTY_LAYOUT)
-			this->setDirty(DIRTY_PARENT);
+			//this->setDirty(DIRTY_PARENT);
+			this->setDirty(DIRTY_LAYOUT); // @kludge because relayout with DIRTY_PARENT isn't always correct due to size / content issue
 
 		if(d_hidden || !d_dirty)
 			return;
@@ -364,7 +365,7 @@ namespace toy
 		this->setPosition(solver.d_position);
 		this->setSize(solver.d_size);
 		d_span = solver.d_span;
-		d_length = solver.d_length;
+		//d_length = solver.d_length;
 
 		if(solver.d_solvers[DIM_X] && !solver.d_solvers[DIM_X]->d_frame)
 			d_position = d_position + solver.d_solvers[DIM_X]->d_position;

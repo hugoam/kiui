@@ -14,8 +14,18 @@ namespace toy
 		m_triggerAlt = [this](Widget&) { this->dropdown(true); }; // drop on right
 
 		// MultiButton& choice = this->addChoice({ icon }); // @todo multiple tools, dropdown is complicated to retrofit
-		m_header.reset({ icon }, trigger);
+		m_header.reset({ icon }, [this, trigger](Widget&) { if(trigger) trigger(*this); });
 		m_toggle.hide();
+	}
+
+	void ToolButton::activate()
+	{
+		this->enableState(ACTIVATED);
+	}
+
+	void ToolButton::deactivate()
+	{
+		this->disableState(ACTIVATED);
 	}
 
 	Tooldock::Tooldock(Wedge& parent)

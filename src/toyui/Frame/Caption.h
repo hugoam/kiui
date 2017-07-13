@@ -5,7 +5,7 @@
 #ifndef TOY_CAPTION_H
 #define TOY_CAPTION_H
 
-/* toy Front */
+/* toy */
 #include <toyobj/Indexer.h>
 #include <toyobj/Util/NonCopy.h>
 #include <toyui/Forward.h>

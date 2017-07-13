@@ -23,6 +23,7 @@ namespace toy
 		CLEAN,				// Frame doesn't need update
 		DIRTY_REDRAW,		// The parent layout has changed
 		DIRTY_PARENT,		// The parent layout has changed
+		DIRTY_MARK,		    // 
 		DIRTY_LAYOUT,		// The frame layout has changed
 		DIRTY_FORCE_LAYOUT,	// The frame layout has changed
 		DIRTY_STRUCTURE		// The structure (tree) has changed
@@ -122,7 +123,7 @@ namespace toy
 		bool first(Frame& frame);
 		bool last(Frame& frame);
 
-		void transferPixelSpan(Frame& prev, Frame& next, float pixelSpan);
+		void transferPixelSpan(Frame& prev, Frame& next, Dimension dim, float pixelSpan);
 
 		void setHardClip(const BoxFloat& hardClip);
 

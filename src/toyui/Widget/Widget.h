@@ -77,6 +77,8 @@ namespace toy
 		void destroyTree();
 		void destroy();
 		void extract();
+		
+		virtual void destroyz() { this->extract(); }
 
 		template <class T>
 		T* findContainer() { Widget* widget = this->findContainer(T::cls()); return widget ? &widget->template as<T>() : nullptr; }
@@ -111,6 +113,7 @@ namespace toy
 
 		virtual bool customDraw(Renderer& renderer) { UNUSED(renderer); return false; }
 
+		void transformEvent(InputEvent& inputEvent);
 		virtual InputReceiver* controlEvent(InputEvent& inputEvent);
 		virtual InputReceiver* receiveEvent(InputEvent& inputEvent);
 

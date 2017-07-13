@@ -184,9 +184,12 @@ namespace toy
 		return section;
 	}
 
-	Window& Dockspace::addDockWindow(const string& name, const GridIndex& dockid)
+	Window& Dockspace::addDockWindow(const string& name, const GridIndex& dockid, float span)
 	{
 		Docksection& section = this->addSection(dockid);
+		Dockline& line = section.dockline();
+		if(span)
+			line.frame().setSpanDim(line.dockline()->dim(), span);
 		Window& window = section.addTab(name).emplace<Window>(name, static_cast<WindowState>(WINDOW_DOCKABLE | WINDOW_DEFAULT), nullptr, &section);
 		return window;
 	}

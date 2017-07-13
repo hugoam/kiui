@@ -53,6 +53,7 @@ namespace toy
 
 	void RootSheet::makeActive(Widget& widget)
 	{
+		if(m_active == &widget) return;
 		if(m_active)
 			m_active->inactive();
 		m_active = &widget;

@@ -5,7 +5,7 @@
 #ifndef TOY_UILAYOUT_H
 #define TOY_UILAYOUT_H
 
-/* toy Front */
+/* toy */
 #include <toyui/Forward.h>
 #include <toyobj/Object.h>
 #include <toyobj/Util/Colour.h>

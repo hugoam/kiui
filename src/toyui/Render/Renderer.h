@@ -5,7 +5,7 @@
 #ifndef TOY_RENDERER_H
 #define TOY_RENDERER_H
 
-/* toy Front */
+/* toy */
 #include <toyobj/Type.h>
 #include <toyobj/Util/Timer.h>
 #include <toyui/Forward.h>

@@ -80,7 +80,7 @@ namespace toy
 		Dockspace(Wedge& parent);
 
 		Docksection& addSection(const GridIndex& dockid);
-		Window& addDockWindow(const string& name, const GridIndex& dockid);
+		Window& addDockWindow(const string& name, const GridIndex& dockid, float span = 0.f);
 		
 		static Type& cls() { static Type ty("Dockspace", Wedge::Layout()); return ty; }
 

@@ -12,20 +12,12 @@
 
 namespace toy
 {
-	ScrollSurface::ScrollSurface(Wedge& parent)
-		: Wedge(parent, cls())
-	{}
-
-	ScrollZone::ScrollZone(ScrollSheet& parent)
-		: Wedge(parent, cls())
-		, body(*this)
-	{}
-
 	ScrollSheet::ScrollSheet(Wedge& parent, Type& type)
 		: Wedge(parent, type)
-		, m_scrollzone(*this)
-		, m_scrollbarX(*this, m_scrollzone, m_scrollzone.body, DIM_X)
-		, m_scrollbarY(*this, m_scrollzone, m_scrollzone.body, DIM_Y)
+		, m_scrollzone(*this, ScrollSheet::ScrollZone())
+		, m_body(m_scrollzone, ScrollSheet::ScrollSurface())
+		, m_scrollbarX(*this, m_scrollzone, m_body, DIM_X)
+		, m_scrollbarY(*this, m_scrollzone, m_body, DIM_Y)
 	{
 		m_scrollzone.frame().setIndex(0, 0);
 		m_scrollbarX.frame().setIndex(0, 1);
@@ -55,7 +47,7 @@ namespace toy
 
 	ScrollPlan::ScrollPlan(Wedge& parent, Type& type)
 		: ScrollSheet(parent, type)
-		, m_plan(m_scrollzone.body)
+		, m_plan(m_body)
 		, m_clamped(true)
 	{
 		m_plan.setStyle(ScrollPlan::Plan());

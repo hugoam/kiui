@@ -35,8 +35,6 @@ namespace toy
     template <> TOY_UI_EXPORT Type& typecls<WidgetState>() { static Type ty("WidgetState"); return ty; }
     template <> TOY_UI_EXPORT Type& typecls<std::vector<Widget*>>() { static Type ty("std::vector<Widget*>"); return ty; }
     
-	template <> TOY_UI_EXPORT Type& typecls<MemberPointer<BoxFloat>>() { static Type ty; return ty; }
-	template <> TOY_UI_EXPORT Type& typecls<MethodPointer<BoxFloat>>() { static Type ty; return ty; }
 	template <> TOY_UI_EXPORT Type& typecls<MemberPointer<ImageSkin>>() { static Type ty; return ty; }
 	template <> TOY_UI_EXPORT Type& typecls<MethodPointer<ImageSkin>>() { static Type ty; return ty; }
 	template <> TOY_UI_EXPORT Type& typecls<MemberPointer<LayoutStyle>>() { static Type ty; return ty; }
@@ -49,11 +47,6 @@ namespace toy
 	template <> TOY_UI_EXPORT Type& typecls<MethodPointer<Wedge>>() { static Type ty; return ty; }
     
 
-    Object& BoxFloat_construct_0(Lref& ref, Lref* args) {  ref.value<BoxFloat>() = BoxFloat( args[0].any<float>(), args[1].any<float>(), args[2].any<float>(), args[3].any<float>() ); return ref.value<BoxFloat>(); }
-	void BoxFloat_x0(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().x0; }
-	void BoxFloat_y0(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().y0; }
-	void BoxFloat_x1(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().x1; }
-	void BoxFloat_y1(Object& object, Lref& ref) { ref.value<float>() = object.as<BoxFloat>().y1; }
 
 
 	void ImageSkin_d_image(Object& object, Lref& ref) { ref.pointer<Image>() = object.as<ImageSkin>().d_image; }
@@ -100,12 +93,6 @@ namespace toy
 
 
 	void Wedge_contents(Object& object, Lref& ref) { ref.pointer<std::vector<Widget*>>() = &object.as<Wedge>().contents(); }
-
-
-
-
-
-
 
 
 
@@ -259,7 +246,6 @@ namespace toy
         BoxFloat::cls().imprint().typeClass = STRUCT;
         BoxFloat::cls().imprint().serializable = false;
         BoxFloat::cls().imprint().isTypeObject = false;
-        BoxFloat::cls().imprint().constructors.push_back(Constructor(BoxFloat::cls(), &BoxFloat_construct_0, ParamVector({ Param("x0", var(float()), false, INPUT_PARAM), Param("y0", var(float()), false, INPUT_PARAM), Param("x1", var(float()), false, INPUT_PARAM), Param("y1", var(float()), false, INPUT_PARAM) })));
         BoxFloat::cls().imprint().initRefMethods<BoxFloat>();
         BoxFloat::cls().imprint().setup();
         
@@ -542,24 +528,6 @@ namespace toy
         Scrollbar::cls().imprint().setup();
         
         
-        // ScrollSurface
-        ScrollSurface::cls().imprint().inherit();
-        ScrollSurface::cls().imprint().name = "ScrollSurface";
-        ScrollSurface::cls().imprint().typeClass = OBJECT;
-        ScrollSurface::cls().imprint().serializable = false;
-        ScrollSurface::cls().imprint().isTypeObject = false;
-        ScrollSurface::cls().imprint().setup();
-        
-        
-        // ScrollZone
-        ScrollZone::cls().imprint().inherit();
-        ScrollZone::cls().imprint().name = "ScrollZone";
-        ScrollZone::cls().imprint().typeClass = OBJECT;
-        ScrollZone::cls().imprint().serializable = false;
-        ScrollZone::cls().imprint().isTypeObject = false;
-        ScrollZone::cls().imprint().setup();
-        
-        
         // ScrollSheet
         ScrollSheet::cls().imprint().inherit();
         ScrollSheet::cls().imprint().name = "ScrollSheet";
@@ -567,24 +535,6 @@ namespace toy
         ScrollSheet::cls().imprint().serializable = false;
         ScrollSheet::cls().imprint().isTypeObject = false;
         ScrollSheet::cls().imprint().setup();
-        
-        
-        // LabelSequence
-        LabelSequence::cls().imprint().inherit();
-        LabelSequence::cls().imprint().name = "LabelSequence";
-        LabelSequence::cls().imprint().typeClass = OBJECT;
-        LabelSequence::cls().imprint().serializable = false;
-        LabelSequence::cls().imprint().isTypeObject = false;
-        LabelSequence::cls().imprint().setup();
-        
-        
-        // ButtonSequence
-        ButtonSequence::cls().imprint().inherit();
-        ButtonSequence::cls().imprint().name = "ButtonSequence";
-        ButtonSequence::cls().imprint().typeClass = OBJECT;
-        ButtonSequence::cls().imprint().serializable = false;
-        ButtonSequence::cls().imprint().isTypeObject = false;
-        ButtonSequence::cls().imprint().setup();
         
         
         // TypeIn
@@ -794,15 +744,6 @@ namespace toy
         SelectList::cls().imprint().setup();
         
         
-        // SortList
-        SortList::cls().imprint().inherit();
-        SortList::cls().imprint().name = "SortList";
-        SortList::cls().imprint().typeClass = OBJECT;
-        SortList::cls().imprint().serializable = false;
-        SortList::cls().imprint().isTypeObject = false;
-        SortList::cls().imprint().setup();
-        
-        
         // Dropdown
         Dropdown::cls().imprint().inherit();
         Dropdown::cls().imprint().name = "Dropdown";
@@ -812,15 +753,6 @@ namespace toy
         Dropdown::cls().imprint().setup();
         
         
-        // Input<string>
-        Input<string>::cls().imprint().inherit();
-        Input<string>::cls().imprint().name = "Input<string>";
-        Input<string>::cls().imprint().typeClass = OBJECT;
-        Input<string>::cls().imprint().serializable = false;
-        Input<string>::cls().imprint().isTypeObject = false;
-        Input<string>::cls().imprint().setup();
-        
-        
         // Textbox
         Textbox::cls().imprint().inherit();
         Textbox::cls().imprint().name = "Textbox";
@@ -828,6 +760,15 @@ namespace toy
         Textbox::cls().imprint().serializable = false;
         Textbox::cls().imprint().isTypeObject = false;
         Textbox::cls().imprint().setup();
+        
+        
+        // Input<string>
+        Input<string>::cls().imprint().inherit();
+        Input<string>::cls().imprint().name = "Input<string>";
+        Input<string>::cls().imprint().typeClass = OBJECT;
+        Input<string>::cls().imprint().serializable = false;
+        Input<string>::cls().imprint().isTypeObject = false;
+        Input<string>::cls().imprint().setup();
         
         
         // TreeNode
@@ -855,7 +796,8 @@ namespace toy
         Dockline::cls().imprint().serializable = false;
         Dockline::cls().imprint().isTypeObject = false;
         Dockline::cls().imprint().setup();
- 
+        
+        
         // DropdownInput
         DropdownInput::cls().imprint().inherit();
         DropdownInput::cls().imprint().name = "DropdownInput";
@@ -960,17 +902,13 @@ namespace toy
         module.types.push_back(&Slider::cls());
         module.types.push_back(&Scrollbar::cls());
         module.types.push_back(&Checkbox::cls());
-        module.types.push_back(&ScrollSurface::cls());
-        module.types.push_back(&ScrollZone::cls());
         module.types.push_back(&ScrollSheet::cls());
         module.types.push_back(&ScrollPlan::cls());
         module.types.push_back(&SelectList::cls());
-        module.types.push_back(&LabelSequence::cls());
-        module.types.push_back(&ButtonSequence::cls());
-        module.types.push_back(&SortList::cls());
         module.types.push_back(&Dropdown::cls());
         module.types.push_back(&DropdownInput::cls());
         module.types.push_back(&TypeIn::cls());
+        module.types.push_back(&Textbox::cls());
         module.types.push_back(&StatSlider<float>::cls());
         module.types.push_back(&StatSlider<int>::cls());
         module.types.push_back(&Input<unsigned int>::cls());
@@ -980,7 +918,6 @@ namespace toy
         module.types.push_back(&Input<bool>::cls());
         module.types.push_back(&Input<string>::cls());
         module.types.push_back(&Input<toy::Colour>::cls());
-        module.types.push_back(&Textbox::cls());
         module.types.push_back(&Expandbox::cls());
         module.types.push_back(&TreeNode::cls());
         module.types.push_back(&Tree::cls());

@@ -69,7 +69,7 @@ namespace toy
 
 	struct TOY_UI_EXPORT MouseClickEvent : public MouseEvent
 	{
-		MouseClickEvent(Mouse& mouse, DeviceType deviceType, DimFloat pos) : MouseEvent(mouse, deviceType, EVENT_STROKED, pos) {}
+		MouseClickEvent(Mouse& mouse, DeviceType deviceType, MouseEvent& source) : MouseEvent(mouse, deviceType, EVENT_STROKED, source) {}
 		virtual bool receive(InputAdapter& receiver) {
 			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
 				return receiver.leftClick(*this);
@@ -82,7 +82,7 @@ namespace toy
 
 	struct TOY_UI_EXPORT MouseDragEvent : public MouseEvent
 	{
-		MouseDragEvent(Mouse& mouse, DeviceType deviceType, DimFloat pos, DimFloat start, DimFloat delta) : MouseEvent(mouse, deviceType, EVENT_DRAGGED, pos) { this->pressed = start; this->delta = delta; }
+		MouseDragEvent(Mouse& mouse, DeviceType deviceType, MouseEvent& source) : MouseEvent(mouse, deviceType, EVENT_DRAGGED, source) {}
 
 		virtual bool receive(InputAdapter& receiver) {
 			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
@@ -96,7 +96,7 @@ namespace toy
 
 	struct TOY_UI_EXPORT MouseDragStartEvent : public MouseEvent
 	{
-		MouseDragStartEvent(Mouse& mouse, DeviceType deviceType, DimFloat pos, DimFloat start) : MouseEvent(mouse, deviceType, EVENT_DRAGGED_START, pos) { this->pressed = start; }
+		MouseDragStartEvent(Mouse& mouse, DeviceType deviceType, MouseEvent& source) : MouseEvent(mouse, deviceType, EVENT_DRAGGED_START, source) {}
 
 		virtual bool receive(InputAdapter& receiver) {
 			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
@@ -110,7 +110,7 @@ namespace toy
 
 	struct TOY_UI_EXPORT MouseDragEndEvent : public MouseEvent
 	{
-		MouseDragEndEvent(Mouse& mouse, DeviceType deviceType, DimFloat pos) : MouseEvent(mouse, deviceType, EVENT_DRAGGED_END, pos) {}
+		MouseDragEndEvent(Mouse& mouse, DeviceType deviceType, MouseEvent& source) : MouseEvent(mouse, deviceType, EVENT_DRAGGED_END, source) {}
 
 		virtual bool receive(InputAdapter& receiver) {
 			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)

@@ -148,7 +148,7 @@ namespace toy
 		if(!m_dragNext || !m_dragPrev)
 			return true;
 
-		m_frame->transferPixelSpan(*m_dragPrev, *m_dragNext, mouseEvent.delta[m_dim]);
+		m_frame->transferPixelSpan(*m_dragPrev, *m_dragNext, m_dim, mouseEvent.delta[m_dim]);
 		if(m_onResize)
 			m_onResize(*m_dragPrev, *m_dragNext);
 		return true;

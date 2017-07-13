@@ -5,11 +5,10 @@
 #ifndef TOY_UIWINDOW_H
 #define TOY_UIWINDOW_H
 
-/* toy Front */
+/* toy */
 #include <toyobj/Util/Colour.h>
 #include <toyobj/Util/Timer.h>
 #include <toyui/Forward.h>
-//#include <toyui/Device/RootDevice.h>
 #include <toyui/Render/RenderWindow.h>
 #include <toyui/ImageAtlas.h>
 

@@ -19,6 +19,8 @@ namespace toy
 
 		Button& header() { return m_header; }
 
+		virtual void destroyz() override;
+
 		static Type& cls() { static Type ty("Tab", Wedge::cls()); return ty; }
 
 	protected:

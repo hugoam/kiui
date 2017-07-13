@@ -20,6 +20,8 @@ namespace toy
 	public:
 		TypeIn(Wedge& parent, const string& text, Callback callback = nullptr, bool wrap = false, Type& type = cls());
 
+		const string& value() { return m_string; }
+
 		virtual void active();
 		virtual void inactive();
 
@@ -28,7 +30,7 @@ namespace toy
 
 		void erase();
 		void insert(char c);
-		void updated();
+		void update();
 		void changed();
 
 		void activate();
