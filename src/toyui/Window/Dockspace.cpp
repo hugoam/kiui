@@ -43,7 +43,7 @@ namespace toy
 		if(m_dockline->dim() == dim)
 			return m_dockline->divideSection((after ? 1 : 0));
 		else
-			return m_dockline->dockline()->insertSection(m_dockline->index() + (after ? 1 : 0));
+			return m_dockline->m_dockline->insertSection(m_dockline->index() + (after ? 1 : 0));
 	}
 
 	Docksection& Docksection::docktarget(const DimFloat& pos)
@@ -127,12 +127,12 @@ namespace toy
 		Dockline& firstline = m_contents.at(0)->as<Dockline>();
 		Dockline* line = &firstline;
 
-		while(line->contents().size() == 1 && !line->docksection())
+		while(line->contents().size() == 1 && !line->m_docksection)
 			line = &line->contents().at(0)->as<Dockline>();
 
-		if(line->docksection())
+		if(line->m_docksection)
 		{
-			this->moveSection(*line->docksection());
+			this->moveSection(*line->m_docksection);
 			this->store().remove(firstline);
 		}
 	}
@@ -189,7 +189,7 @@ namespace toy
 		Docksection& section = this->addSection(dockid);
 		Dockline& line = section.dockline();
 		if(span)
-			line.frame().setSpanDim(line.dockline()->dim(), span);
+			line.frame().setSpanDim(line.m_dockline->dim(), span);
 		Window& window = section.addTab(name).emplace<Window>(name, static_cast<WindowState>(WINDOW_DOCKABLE | WINDOW_DEFAULT), nullptr, &section);
 		return window;
 	}

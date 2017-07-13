@@ -44,10 +44,6 @@ namespace toy
 	public:
 		Dockline(Wedge& parent, Dockspace& dockspace, Dockline* dockline, Dimension dim);
 
-		Dockspace& dockspace() { return m_dockspace; }
-		Docksection* docksection() { return m_docksection; }
-		Dockline* dockline() { return m_dockline; }
-
 		Docksection& insertSection(size_t index);
 		Docksection& divideSection(size_t index);
 		Docksection& appendSection();
@@ -68,7 +64,7 @@ namespace toy
 		static Type& DocklineX() { static Type ty("DocklineX", Dockline::cls()); return ty; }
 		static Type& DocklineY() { static Type ty("DocklineY", Dockline::cls()); return ty; }
 
-	protected:
+	public:
 		Dockspace& m_dockspace;
 		Docksection* m_docksection;
 		Dockline* m_dockline;

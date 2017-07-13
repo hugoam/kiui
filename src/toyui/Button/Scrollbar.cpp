@@ -20,8 +20,8 @@ namespace toy
 	{
 		m_frame->d_length = dim;
 
-		m_scroller.filler().setStyle(Item::Spacer());
-		m_scroller.knob().setStyle(Scrollbar::Knob());
+		m_scroller.m_filler.setStyle(Item::Spacer());
+		m_scroller.m_button.setStyle(Scrollbar::Knob());
 	}
 
 	float Scrollbar::nextOffset(Widget& widget, Dimension dim, float pos)

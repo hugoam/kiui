@@ -21,6 +21,8 @@ namespace toy
 	{
 		if(!m_window.closable())
 			m_close.hide();
+		if(m_window.movable())
+			this->setStyle(WindowHeader::Movable());
 	}
 
 	bool WindowHeader::leftClick(MouseEvent& mouseEvent)
@@ -120,12 +122,14 @@ namespace toy
 
 	void Window::toggleClosable()
 	{
-		m_header.close().frame().hidden() ? m_header.close().show() : m_header.close().hide();
+		this->toggleWindowState(WINDOW_CLOSABLE);
+		this->closable() ? m_header.m_close.show() : m_header.m_close.hide();
 	}
 
 	void Window::toggleMovable()
 	{
 		this->toggleWindowState(WINDOW_MOVABLE);
+		this->movable() ? m_header.setStyle(WindowHeader::Movable()) : m_header.setStyle(WindowHeader::cls());
 	}
 
 	void Window::toggleResizable()

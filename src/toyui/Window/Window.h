@@ -21,21 +21,21 @@ namespace toy
 
 		const string& tooltip() { return m_tooltip; }
 
-		Label& title() { return m_title; }
-		Button& close() { return m_close; }
-
 		virtual bool leftClick(MouseEvent& mouseEvent);
 		virtual bool leftDragStart(MouseEvent& mouseEvent);
 		virtual bool leftDrag(MouseEvent& mouseEvent);
 		virtual bool leftDragEnd(MouseEvent& mouseEvent);
 
 		static Type& cls() { static Type ty("WindowHeader", Wedge::WrapControl()); return ty; }
+		static Type& Movable() { static Type ty("WindowMovableHeader", WindowHeader::cls()); return ty; }
 
 	protected:
 		Window& m_window;
+		string m_tooltip;
+
+	public:
 		Label m_title;
 		Button m_close;
-		string m_tooltip;
 	};
 
 	class _refl_ TOY_UI_EXPORT WindowSizer : public Item
@@ -123,10 +123,11 @@ namespace toy
 		static Type& WrapWindow() { static Type ty("WrapWindow", Window::cls()); return ty; }
 		static Type& CloseButton() { static Type ty("CloseButton", Button::cls()); return ty; }
 
-	protected:
+	public:
 		string m_name;
 		WindowState m_windowState;
-		Callback m_onClose;
+		const Callback m_onClose;
+
 		WindowHeader m_header;
 		Wedge m_body;
 		WindowFooter m_footer;

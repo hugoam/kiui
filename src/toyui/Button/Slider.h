@@ -16,9 +16,6 @@ namespace toy
 	public:
 		Slider(Wedge& parent, Dimension dim = DIM_X, const Callback& onUpdated = nullptr, bool relative = false, Type& type = cls());
 
-		Widget& filler() { return m_filler; }
-		Item& knob() { return m_button; }
-
 		float val() { return m_val; }
 
 		virtual void dirtyLayout();
@@ -43,12 +40,13 @@ namespace toy
 		static Type& Knob() { static Type ty("SliderKnob", Item::cls()); return ty; }
 		static Type& Display() { static Type ty("SliderDisplay", Label::cls()); return ty; }
 
-	protected:
+	public:
 		Dimension m_dim;
 		Item m_filler;
 		Item m_button;
 		Item m_spacer;
 
+	protected:
 		float m_min;
 		float m_max;
 		float m_range;

@@ -56,7 +56,7 @@ namespace toy
 		if(&tab == m_currentTab)
 			m_currentTab = nullptr;
 
-		tab.header().extract();
+		tab.m_header.extract();
 		tab.extract();
 
 		if(m_tabs.count() > 0)
@@ -75,10 +75,10 @@ namespace toy
 		if(m_currentTab)
 		{
 			m_currentTab->hide();
-			m_currentTab->header().disableState(ACTIVATED);
+			m_currentTab->m_header.disableState(ACTIVATED);
 		}
 		tab.show();
-		tab.header().enableState(ACTIVATED);
+		tab.m_header.enableState(ACTIVATED);
 		m_currentTab = &tab;
 	}
 

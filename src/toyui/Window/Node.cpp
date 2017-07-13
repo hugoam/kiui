@@ -74,8 +74,8 @@ namespace toy
 		int maxIndex = 0;
 		for(Node* node : nodes)
 		{
-			minIndex = std::min(minIndex, node->order());
-			maxIndex = std::max(maxIndex, node->order());
+			minIndex = std::min(minIndex, node->m_order);
+			maxIndex = std::max(maxIndex, node->m_order);
 		}
 
 		int shift = -std::min(0, minIndex);
@@ -96,7 +96,7 @@ namespace toy
 
 		for(Node* node : nodes)
 		{
-			elements.emplace_back(&columns[node->order() + shift], &this->fetchStyle(Canvas::LayoutNode()).layout(), &node->frame());
+			elements.emplace_back(&columns[node->m_order + shift], &this->fetchStyle(Canvas::LayoutNode()).layout(), &node->frame());
 			elements.back().sync();
 			solvers.push_back(&elements.back());
 		}
@@ -241,7 +241,7 @@ namespace toy
 
 	NodeHeader::NodeHeader(Wedge& parent, Node& node)
 		: Wedge(parent, cls())
-		, m_title(*this, node.name())
+		, m_title(*this, node.m_name)
 		, m_spacer(*this, Item::Spacer())
 	{}
 
@@ -262,7 +262,7 @@ namespace toy
 
 	Wedge& Node::plan()
 	{
-		return this->canvas().plan();
+		return this->canvas().m_body;
 	}
 
 	void Node::moveNode(const DimFloat& delta)

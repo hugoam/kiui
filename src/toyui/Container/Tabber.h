@@ -17,13 +17,11 @@ namespace toy
 	public:
 		Tab(Wedge& parent, Tabber& tabber, Button& header, bool active);
 
-		Button& header() { return m_header; }
-
 		virtual void destroyz() override;
 
 		static Type& cls() { static Type ty("Tab", Wedge::cls()); return ty; }
 
-	protected:
+	public:
 		Tabber& m_tabber;
 		Button& m_header;
 		bool m_active;
@@ -48,7 +46,7 @@ namespace toy
 		static Type& Body() { static Type ty("TabberBody", Wedge::Sheet()); return ty; }
 		static Type& Header() { static Type ty("TabButton", Button::cls()); return ty; }
 
-	protected:
+	public:
 		Wedge m_headers;
 		Wedge m_tabs;
 		Tab* m_currentTab;

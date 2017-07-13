@@ -264,7 +264,7 @@ namespace toy
 
 		this->styledef(Table::cls()).layout().d_spacing = DimFloat(0.f, 2.f);
 
-		this->styledef(WindowHeader::cls()).skin().m_hoverCursor = &Cursor::Move();
+		this->styledef(WindowHeader::Movable()).skin().m_hoverCursor = &Cursor::Move();
 		this->styledef(Dockline::DocklineX()).skin().m_hoverCursor = &Cursor::ResizeX();
 		this->styledef(Dockline::DocklineY()).skin().m_hoverCursor = &Cursor::ResizeY();
 		this->styledef(WindowFooter::SizerLeft()).skin().m_hoverCursor = &Cursor::ResizeDiagLeft();

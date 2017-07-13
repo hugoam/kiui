@@ -34,7 +34,7 @@ namespace toy
 		static Type& List() { static Type ty("DropdownList", Wedge::cls()); return ty; }
 		static Type& Choice() { static Type ty("DropdownChoice", MultiButton::cls()); return ty; }
 
-	protected:
+	public:
 		MultiButton m_header;
 		Button m_toggle;
 		Popup m_list;

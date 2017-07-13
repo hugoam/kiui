@@ -18,13 +18,11 @@ namespace toy
 	public:
 		Dockbox(Wedge& parent, Dockbar& dockbar, const string& title, const string& icon);
 
-		Dockbar& dockbar() { return m_dockbar; }
-
 		void toggle(bool open);
 
 		static Type& cls() { static Type ty("Dockbox", Window::cls()); return ty; }
 
-	protected:
+	public:
 		Dockbar& m_dockbar;
 		Toggle m_toggle;
 	};

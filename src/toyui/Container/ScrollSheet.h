@@ -18,8 +18,6 @@ namespace toy
 	public:
 		ScrollSheet(Wedge& parent, Type& type = cls());
 
-		Wedge& body() { return m_body; }
-
 		virtual void dirtyLayout();
 
 		virtual bool mouseWheel(MouseEvent& mouseEvent);
@@ -42,8 +40,6 @@ namespace toy
 	{
 	public:
 		ScrollPlan(Wedge& parent, Type& type = cls());
-
-		Wedge& plan() { return m_plan; }
 
 		virtual bool middleDrag(MouseEvent& mouseEvent);
 		virtual bool mouseWheel(MouseEvent& mouseEvent);

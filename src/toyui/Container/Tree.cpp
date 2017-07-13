@@ -43,9 +43,9 @@ namespace toy
 	void Tree::select(TreeNode& selected)
 	{
 		if(m_selected)
-			m_selected->header().disableState(SELECTED);
+			m_selected->m_header.disableState(SELECTED);
 
-		selected.header().enableState(SELECTED);
+		selected.m_header.enableState(SELECTED);
 		m_selected = &selected;
 
 		if(m_onSelected)

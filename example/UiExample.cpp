@@ -61,11 +61,11 @@ namespace toy
 		SelectList& list = parent.emplace<SelectList>();
 
 		for(int i = 0; boy_names[i]; i++)
-			list.body().emplace<CustomElement>(boy_names[i], "Male");
+			list.m_body.emplace<CustomElement>(boy_names[i], "Male");
 		for(int i = 0; girl_names[i]; i++)
-			list.body().emplace<CustomElement>(girl_names[i], "Female");
+			list.m_body.emplace<CustomElement>(girl_names[i], "Female");
 
-		parent.emplace<FilterInput>(list.body(), [](Widget& widget) { return widget.as<CustomElement>().name.label(); });
+		parent.emplace<FilterInput>(list.m_body, [](Widget& widget) { return widget.as<CustomElement>().name.label(); });
 		return parent;
 	}
 
@@ -74,11 +74,11 @@ namespace toy
 		SelectList& list = parent.emplace<SelectList>();
 
 		for(int i = 0; boy_names[i]; i++)
-			list.body().emplace<Label>(boy_names[i]);
+			list.m_body.emplace<Label>(boy_names[i]);
 		for(int i = 0; girl_names[i]; i++)
-			list.body().emplace<Label>(girl_names[i]);
+			list.m_body.emplace<Label>(girl_names[i]);
 
-		parent.emplace<FilterInput>(list.body());
+		parent.emplace<FilterInput>(list.m_body);
 		return parent;
 	}
 
@@ -88,11 +88,11 @@ namespace toy
 
 		ScrollSheet& list0 = sequence.emplace<ScrollSheet>();
 		for(int i = 0; i < 100; i++)
-			list0.body().emplace<Label>("Element " + toString(i));
+			list0.m_body.emplace<Label>("Element " + toString(i));
 
 		ScrollSheet& list1 = sequence.emplace<ScrollSheet>();
 		for(int i = 0; i < 100; i++)
-			list1.body().emplace<Button>("Element " + toString(i));
+			list1.m_body.emplace<Button>("Element " + toString(i));
 		return parent;
 	}
 
@@ -157,13 +157,13 @@ namespace toy
 
 		Dockspace& dockspace = parent.emplace<Dockspace>();
 
-		Wedge& dock0 = dockspace.addDockWindow("Dock 0", { 0, 0 }).body();
+		Wedge& dock0 = dockspace.addDockWindow("Dock 0", { 0, 0 }).m_body;
 		createUiTestControls(dock0);
 		
-		Wedge& dock1 = dockspace.addDockWindow("Dock 1", { 0, 1 }).body();
+		Wedge& dock1 = dockspace.addDockWindow("Dock 1", { 0, 1 }).m_body;
 		createUiTestInlineControls(dock1);
 
-		Wedge& dock2 = dockspace.addDockWindow("Dock 2", { 0, 2 }).body();
+		Wedge& dock2 = dockspace.addDockWindow("Dock 2", { 0, 2 }).m_body;
 		createUiTestTable(dock2);
 
 		return dockspace;
@@ -179,19 +179,19 @@ namespace toy
 
 		parent.swap(canvas.index(), toolbar.index());
 
-		Node& node0 = canvas.plan().emplace<Node>("A Node");
+		Node& node0 = canvas.m_body.emplace<Node>("A Node");
 		node0.addInput("a", "", Colour::Cyan);
 		node0.addInput("b", "", Colour::Cyan);
 		node0.addOutput("result");
 		node0.frame().setPosition({ 150.f, 250.f });
 
-		Node& node1 = canvas.plan().emplace<Node>("A Node");
+		Node& node1 = canvas.m_body.emplace<Node>("A Node");
 		node1.addInput("a");
 		node1.addInput("b");
 		node1.addOutput("result", "", Colour::Red);
 		node1.frame().setPosition({ 350.f, 150.f });
 
-		Node& node2 = canvas.plan().emplace<Node>("Another Node");
+		Node& node2 = canvas.m_body.emplace<Node>("Another Node");
 		node2.addInput("u", "", Colour::Pink);
 		node2.addInput("v", "", Colour::Pink);
 		node2.addOutput("x", "", Colour::Cyan);
@@ -199,7 +199,7 @@ namespace toy
 		node2.addOutput("z", "", Colour::Cyan);
 		node2.frame().setPosition({ 450.f, 450.f });
 
-		Node& node3 = canvas.plan().emplace<Node>("End Node");
+		Node& node3 = canvas.m_body.emplace<Node>("End Node");
 		node3.addInput("input 1");
 		node3.addInput("input 2");
 		node3.frame().setPosition({ 800.f, 200.f });
@@ -253,13 +253,13 @@ namespace toy
 		Wedge& line0 = table1.emplace<Wedge>(Wedge::Row());
 
 		Expandbox& box0 = line0.emplace<Expandbox>("Category A");
-		box0.body().emplace<Label>("Blah blah blah");
+		box0.m_body.emplace<Label>("Blah blah blah");
 
 		Expandbox& box1 = line0.emplace<Expandbox>("Category B");
-		box1.body().emplace<Label>("Blah blah blah");
+		box1.m_body.emplace<Label>("Blah blah blah");
 
 		Expandbox& box2 = line0.emplace<Expandbox>("Category C");
-		box2.body().emplace<Label>("Blah blah blah");
+		box2.m_body.emplace<Label>("Blah blah blah");
 
 
 		Table& table2 = parent.emplace<Table>(StringVector({ "Left", "Right" }), std::vector<float>({ 0.5f, 0.5f }));
@@ -289,17 +289,17 @@ namespace toy
 
 		for(size_t i = 0; i < 5; i++)
 		{
-			TreeNode& innerNode = node.body().emplace<TreeNode>("", "Child " + toString(i), true);
+			TreeNode& innerNode = node.m_body.emplace<TreeNode>("", "Child " + toString(i), true);
 			TreeNode* nestedNode = &innerNode;
 			for(size_t j = 0; j < 5; j++)
-				nestedNode = &nestedNode->body().emplace<TreeNode>("", "Child " + toString(i) + " : " + toString(j), true);
+				nestedNode = &nestedNode->m_body.emplace<TreeNode>("", "Child " + toString(i) + " : " + toString(j), true);
 		}
 
 		for(size_t i = 0; i < 5; i++)
 		{
-			TreeNode& innerNode = node.body().emplace<TreeNode>("", "Child " + toString(5 + i));
-			innerNode.body().emplace<Label>("Blah blah");
-			innerNode.body().emplace<Button>("Print");
+			TreeNode& innerNode = node.m_body.emplace<TreeNode>("", "Child " + toString(5 + i));
+			innerNode.m_body.emplace<Label>("Blah blah");
+			innerNode.m_body.emplace<Button>("Print");
 		}
 		return parent;
 	}
@@ -453,7 +453,7 @@ namespace toy
 	Window& createUiTestWindow(Wedge& parent)
 	{
 		Window& window = parent.emplace<Window>("Test Window");
-		createUiTestWindowPage(window.body());
+		createUiTestWindowPage(window.m_body);
 		return window;
 	}
 
@@ -465,22 +465,22 @@ namespace toy
 
 		static string help = "This window is being created by the ShowTestWindow() function. Please refer to the code for programming reference.\n\nUser Guide:";
 		Expandbox& box0 = parent.emplace<Expandbox>("Help");
-		box0.body().emplace<Text>(help);
+		box0.m_body.emplace<Text>(help);
 
 		Expandbox& box1 = parent.emplace<Expandbox>("Window options");
 
-		box1.body().emplace<InputBool>("titlebar", true, [&window](bool on) { on ? window.showTitlebar() : window.hideTitlebar(); }, true);
-		box1.body().emplace<InputBool>("movable", true, [&window](bool) { window.toggleMovable(); }, true);
-		box1.body().emplace<InputBool>("resizable", true, [&window](bool) { window.toggleResizable(); }, true);
-		box1.body().emplace<InputBool>("closable", true, [&window](bool) { window.toggleClosable(); }, true);
+		box1.m_body.emplace<InputBool>("titlebar", true, [&window](bool on) { on ? window.showTitlebar() : window.hideTitlebar(); }, true);
+		box1.m_body.emplace<InputBool>("movable", true, [&window](bool) { window.toggleMovable(); }, true);
+		box1.m_body.emplace<InputBool>("resizable", true, [&window](bool) { window.toggleResizable(); }, true);
+		box1.m_body.emplace<InputBool>("closable", true, [&window](bool) { window.toggleClosable(); }, true);
 
-		box1.body().emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha) { window.frame().inkstyle().m_backgroundColour.val.setA(alpha); });
+		box1.m_body.emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha) { window.frame().inkstyle().m_backgroundColour.val.setA(alpha); });
 
 		Expandbox& box2 = parent.emplace<Expandbox>("Widgets");
-		createUiTestControls(box2.body());
+		createUiTestControls(box2.m_body);
 
 		Expandbox& box3 = parent.emplace<Expandbox>("Table");
-		createUiTestTable(box3.body());
+		createUiTestTable(box3.m_body);
 
 		return window;
 	}
@@ -491,7 +491,7 @@ namespace toy
 
 		Renderer& renderer = *Caption::s_renderer;
 
-		Wedge& options = tooldock.addDock("Options").body();
+		Wedge& options = tooldock.addDock("Options").m_body;
 		options.emplace<InputText>("Debug draw filter", "", [&renderer](string value) { renderer.m_debugDrawFilter = value; });
 		options.emplace<InputBool>("Debug draw Frame", false, [&renderer](bool on) { renderer.m_debugDrawFrameRect = on; });
 		options.emplace<InputBool>("Debug draw Padding", false, [&renderer](bool on) { renderer.m_debugDrawPaddedRect = on; });
@@ -532,8 +532,8 @@ namespace toy
 	{
 		return [func](const string& name, Wedge& sheet) {
 			Window& window = sheet.emplace<Window>(name);
-			ScrollSheet& scrollSheet = window.body().emplace<ScrollSheet>();
-			func(scrollSheet.body());
+			ScrollSheet& scrollSheet = window.m_body.emplace<ScrollSheet>();
+			func(scrollSheet.m_body);
 		};
 	}
 

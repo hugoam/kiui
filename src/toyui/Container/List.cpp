@@ -15,7 +15,7 @@ namespace toy
 
 	WrapButton& SelectList::addChoice()
 	{
-		return this->body().emplace<WrapButton>([this](Widget& button) { return this->selected(button); });
+		return m_body.emplace<WrapButton>([this](Widget& button) { return this->selected(button); });
 	}
 
 	void SelectList::selected(Widget& selected)

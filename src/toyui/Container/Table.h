@@ -28,6 +28,8 @@ namespace toy
 	protected:
 		StringVector m_columns;
 		std::vector<float> m_weights;
+
+	public:
 		GridSheet m_head;
 	};
 }

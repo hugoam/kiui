@@ -115,14 +115,6 @@ namespace toy
 		Canvas& canvas();
 		Wedge& plan();
 
-		const string& name() { return m_name; }
-		int order() { return m_order; }
-
-		Wedge& inputs() { return m_inputs; }
-		Wedge& outputs() { return m_outputs; }
-		Wedge& body() { return m_body; }
-		NodeHeader& header() { return m_header; }
-
 		void moveNode(const DimFloat& delta);
 		void updateCables();
 
@@ -145,10 +137,11 @@ namespace toy
 		static Type& Body() { static Type ty("NodeBody", Wedge::Sheet()); return ty; }
 		static Type& Outputs() { static Type ty("NodeOut", Wedge::Div()); return ty; }
 
-	protected:
+	public:
 		string m_name;
 		int m_order;
 
+	public:
 		Wedge m_inputs;
 		Wedge m_body;
 		NodeHeader m_header;

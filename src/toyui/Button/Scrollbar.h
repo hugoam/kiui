@@ -48,6 +48,7 @@ namespace toy
 		Wedge& m_frameSheet;
 		Wedge& m_contentSheet;
 
+	public:
 		Button m_rewind;
 		Slider m_scroller;
 		Button m_seek;

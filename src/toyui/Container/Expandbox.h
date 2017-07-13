@@ -16,9 +16,6 @@ namespace toy
 	public:
 		Expandbox(Wedge& parent, const string& title, bool collapsed = false, Type& type = cls());
 
-		Wedge& header() { return m_header; }
-		Wedge& body() { return m_body; }
-
 		virtual void expand();
 		virtual void collapse();
 
@@ -28,11 +25,13 @@ namespace toy
 		static Type& Switch() { static Type ty("ExpandboxToggle", Toggle::cls()); return ty; }
 		static Type& Body() { static Type ty("ExpandboxBody", Wedge::cls()); return ty; }
 
-	protected:
+	public:
 		WrapButton m_header;
 		Toggle m_toggle;
 		Label m_title;
 		Wedge m_body;
+
+	protected:
 		bool m_collapsed;
 	};
 }
