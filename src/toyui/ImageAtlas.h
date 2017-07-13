@@ -21,15 +21,6 @@ namespace toy
 		ImageAtlas(size_t width, size_t height);
 		~ImageAtlas();
 
-		size_t width() const { return m_width; }
-		size_t height() const { return m_height; }
-
-		const unsigned char* data() const { return m_data; }
-
-		Image& image() { return m_image; }
-
-		const std::vector<Image*>& sprites() const { return m_sprites; }
-
 		void createAtlas();
 		void generateAtlas(std::vector<object_ptr<Image>>& images);
 
@@ -39,14 +30,16 @@ namespace toy
 		void placeSprite(Image& sprite);
 		void blitSprite(Image& sprite);
 
-	protected:
+	public:
 		size_t m_width;
 		size_t m_height;
 
-		std::vector<Image*> m_sprites;
 		unsigned char* m_data;
 		Image m_image;
 
+		std::vector<Image*> m_sprites;
+
+	protected:
 		unique_ptr<GuillotineBinPack> m_rectPacker;
 	};
 }

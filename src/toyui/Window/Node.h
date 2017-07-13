@@ -19,16 +19,13 @@ namespace toy
 	public:
 		NodeKnob(Wedge& parent, const Colour& colour = Colour::NeonGreen, Type& type = cls());
 
-		const Colour& colour() { return m_colour; }
-		void setColour(const Colour& colour) { m_colour = colour; }
-
 		bool customDraw(Renderer& renderer);
 
 		static Type& cls() { static Type ty("NodeKnob", Item::cls()); return ty; }
 
 		static Type& Proxy() { static Type ty("NodeKnobProxy", NodeKnob::cls()); return ty; }
 
-	protected:
+	public:
 		Colour m_colour;
 	};
 
@@ -40,14 +37,7 @@ namespace toy
 	public:
 		NodePlug(Wedge& parent, Node& node, const string& name, const string& icon, const Colour& colour, bool input, ConnectTrigger onConnect = ConnectTrigger());
 	
-		Node& node() { return m_node; }
 		const string& tooltip() { return m_tooltip; }
-		bool input() { return m_input; }
-		NodeKnob& knob() { return m_knob; }
-
-		std::vector<NodeCable*>& cables() { return m_cables; }
-
-		void setTooltip(const string& tooltip) { m_tooltip = tooltip; }
 
 		virtual bool leftDragStart(MouseEvent& mouseEvent);
 		virtual bool leftDrag(MouseEvent& mouseEvent);
@@ -58,7 +48,7 @@ namespace toy
 
 		static Type& cls() { static Type ty("NodePlug", Wedge::WrapControl()); return ty; }
 
-	protected:
+	public:
 		Node& m_node;
 		string m_tooltip;
 		bool m_input;
@@ -66,12 +56,13 @@ namespace toy
 		Item m_icon;
 		NodeKnob m_knob;
 
-		ConnectTrigger m_onConnect;
+		std::vector<NodeCable*> m_cables;
 
+		const ConnectTrigger m_onConnect;
+
+	protected:
 		NodeKnob* m_connectionProxy;
 		NodeCable* m_cableProxy;
-
-		std::vector<NodeCable*> m_cables;
 	};
 
 	class TOY_UI_EXPORT NodeCable : public Wedge
@@ -79,18 +70,16 @@ namespace toy
 	public:
 		NodeCable(Wedge& parent, NodeKnob& plugOut, NodeKnob& plugIn);
 
-		NodeKnob& knobOut() { return m_knobOut; }
-		NodeKnob& knobIn() { return m_knobIn; }
-
 		void updateCable();
 
 		bool customDraw(Renderer& renderer);
 
 		static Type& cls() { static Type ty("NodeCable", Wedge::Decal()); return ty; }
 
-	protected:
+	public:
 		NodeKnob& m_knobOut;
 		NodeKnob& m_knobIn;
+	protected:
 		bool m_flipX;
 		bool m_flipY;
 	};

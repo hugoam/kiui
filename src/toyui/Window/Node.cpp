@@ -176,7 +176,7 @@ namespace toy
 
 	NodeCable& NodePlug::connect(NodePlug& plugIn, bool notify)
 	{
-		NodeCable& cable = m_node.plan().emplace<NodeCable>(m_knob, plugIn.knob());
+		NodeCable& cable = m_node.plan().emplace<NodeCable>(m_knob, plugIn.m_knob);
 		m_cables.push_back(&cable);
 		plugIn.m_cables.push_back(&cable);
 
@@ -189,7 +189,7 @@ namespace toy
 	void NodePlug::disconnect(NodePlug& plugIn)
 	{
 		for(NodeCable* cable : m_cables)
-			if(&cable->knobIn() == &plugIn.knob())
+			if(&cable->m_knobIn == &plugIn.m_knob)
 			{
 				vector_remove(m_cables, cable);
 				cable->extract();
@@ -231,7 +231,7 @@ namespace toy
 		float x1 = m_flipX ? m_frame->d_size.x : 0.f;
 		float y1 = m_flipY ? m_frame->d_size.y : 0.f;
 
-		Paint paint(m_knobOut.colour(), m_knobIn.colour());
+		Paint paint(m_knobOut.m_colour, m_knobIn.m_colour);
 		paint.m_width = 1.f;
 		renderer.pathBezier(x0, y0, x0 + 100.f, y0, x1 - 100.f, y1, x1, y1);
 		renderer.strokeGradient(paint, DimFloat(m_flipX ? x0 : x1, m_flipY ? y0 : y1), DimFloat(m_flipX ? x1 : x0,  m_flipY ? y1 : y0));
@@ -275,11 +275,11 @@ namespace toy
 	void Node::updateCables()
 	{
 		for(Widget* widget : m_inputs.contents())
-			for(NodeCable* cable : widget->as<NodePlug>().cables())
+			for(NodeCable* cable : widget->as<NodePlug>().m_cables)
 				cable->updateCable();
 
 		for(Widget* widget : m_outputs.contents())
-			for(NodeCable* cable : widget->as<NodePlug>().cables())
+			for(NodeCable* cable : widget->as<NodePlug>().m_cables)
 				cable->updateCable();
 	}
 

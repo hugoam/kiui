@@ -133,7 +133,7 @@ namespace toy
 		for(auto& image : m_images)
 			m_renderer->loadImage(*image);
 
-		m_renderer->loadImageRGBA(m_atlas.image(), m_atlas.data());
+		m_renderer->loadImageRGBA(m_atlas.m_image, m_atlas.m_data);
 	}
 
 	Image& UiWindow::createImage(const string& name, int width, int height, uint8_t* data, bool filtering)

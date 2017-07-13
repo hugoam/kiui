@@ -228,7 +228,7 @@ namespace toy
 	{
 		if(image.d_atlas)
 		{
-			Image& atlas = image.d_atlas->image();
+			Image& atlas = image.d_atlas->m_image;
 			BoxFloat imageRect(rect.x - image.d_left, rect.y - image.d_top, float(atlas.d_width), float(atlas.d_height));
 			this->drawImage(atlas.d_index, rect, imageRect);
 		}
@@ -242,7 +242,7 @@ namespace toy
 	{
 		if(image.d_atlas)
 		{
-			Image& atlas = image.d_atlas->image();
+			Image& atlas = image.d_atlas->m_image;
 			BoxFloat imageRect(rect.x - image.d_left * xstretch, rect.y - image.d_top * ystretch, atlas.d_width * xstretch, atlas.d_height * ystretch);
 			this->drawImage(atlas.d_index, rect, imageRect);
 		}
