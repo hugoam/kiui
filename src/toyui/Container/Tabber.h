@@ -17,7 +17,7 @@ namespace toy
 	public:
 		Tab(Wedge& parent, Tabber& tabber, Button& header, bool active);
 
-		virtual void destroyz() override;
+		virtual void extract() override;
 
 		static Type& cls() { static Type ty("Tab", Wedge::cls()); return ty; }
 

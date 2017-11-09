@@ -18,7 +18,7 @@ namespace toy
 		if(m_base)
 			this->inherit(m_base.val->m_skin);
 
-		if(m_backgroundColour.val.a() > 0.f || m_textColour.val.a() > 0.f || m_borderColour.val.a() > 0.f || m_image || !m_imageSkin.val.null())
+		if(!m_backgroundColour.val.null() || !m_textColour.val.null() || !m_borderColour.val.null() || m_image || !m_imageSkin.val.null())
 			m_empty = false;
 	}
 
@@ -26,7 +26,7 @@ namespace toy
 		: IdObject(cls())
 		, m_style(&type)
 		, m_base(base)
-		, m_name(type.name())
+		, m_name(type.m_name)
 		, m_layout()
 		, m_skin(this)
 		, m_subskins()

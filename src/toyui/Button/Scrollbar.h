@@ -20,7 +20,7 @@ namespace toy
 		float cursor() { return -m_contentSheet.frame().d_position[m_dim]; }
 		float contentSize() { return m_contentSheet.frame().d_size[m_dim] * m_contentSheet.frame().d_scale; }
 		float visibleSize() { return m_frameSheet.frame().d_size[m_dim]; }
-		float overflow() { return m_frameSheet.contents().size() > 0 ? contentSize() - visibleSize() : 0.f; }
+		float overflow() { return m_frameSheet.m_contents.size() > 0 ? contentSize() - visibleSize() : 0.f; }
 
 		void scrollup();
 		void scrolldown();

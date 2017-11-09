@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_OGREWINDOW_H
-#define TOY_OGREWINDOW_H
+#ifndef TOY_GFXREWINDOW_H
+#define TOY_GFXREWINDOW_H
 
 /* toy */
 #include <toyui/Forward.h>
@@ -78,4 +78,4 @@ namespace toy
 	};
 }
 
-#endif // TOY_OGREWINDOW_H
+#endif // TOY_GFXREWINDOW_H

@@ -20,7 +20,7 @@ namespace toy
 		m_caption.setTextLines(1);
 
 		if(wrap)
-			m_label.setStyle(Text::cls());
+			m_label.setStyle(Label::Text());
 	}
 
 	void TypeIn::active()

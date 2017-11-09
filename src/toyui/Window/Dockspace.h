@@ -19,8 +19,7 @@ namespace toy
 	public:
 		Docksection(Wedge& parent, Dockline& dockline);
 
-		Dockline& dockline() { return *m_dockline; }
-		void setDockline(Dockline& dockline) { m_dockline = &dockline; }
+		Dockline* m_dockline;
 
 		Tab& addTab(const string& name);
 
@@ -34,9 +33,6 @@ namespace toy
 
 		static Type& DockTab() { static Type ty("DockTab", Tab::cls()); return ty; }
 		static Type& Placeholder() { static Type ty("Placeholder", Wedge::Board()); return ty; }
-
-	protected:
-		Dockline* m_dockline;
 	};
 
 	class _refl_ TOY_UI_EXPORT Dockline : public GridSheet

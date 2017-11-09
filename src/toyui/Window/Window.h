@@ -75,7 +75,7 @@ namespace toy
 		WINDOW_CLOSABLE = 1 << 1,
 		WINDOW_MOVABLE = 1 << 2,
 		WINDOW_SIZABLE = 1 << 3,
-		WINDOW_DEFAULT = WINDOW_MOVABLE | WINDOW_SIZABLE | WINDOW_CLOSABLE | WINDOW_DOCKABLE
+		WINDOW_DEFAULT = WINDOW_MOVABLE | WINDOW_SIZABLE | WINDOW_CLOSABLE
 	};
 
 	class _refl_ TOY_UI_EXPORT Window : public Wedge
@@ -85,13 +85,14 @@ namespace toy
 
 		bool closable() { return (m_windowState & WINDOW_CLOSABLE) != 0; }
 		bool dockable() { return (m_windowState & WINDOW_DOCKABLE) != 0; }
-		bool movable()  { return (m_windowState & WINDOW_MOVABLE) != 0; }
+		bool movable() { return (m_windowState & WINDOW_MOVABLE) != 0; }
 		bool sizable() { return (m_windowState & WINDOW_SIZABLE) != 0; }
 
 		void toggleWindowState(WindowState state);
 
 		void toggleClosable();
 		void toggleMovable();
+		void toggleHeader();
 		void toggleResizable();
 
 		void showTitlebar();

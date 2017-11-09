@@ -23,6 +23,7 @@ namespace toy
 
 		static Type& cls() { static Type ty("NodeKnob", Item::cls()); return ty; }
 
+		static Type& Output() { static Type ty("NodeKnobOutput", NodeKnob::cls()); return ty; }
 		static Type& Proxy() { static Type ty("NodeKnobProxy", NodeKnob::cls()); return ty; }
 
 	public:
@@ -37,7 +38,7 @@ namespace toy
 	public:
 		NodePlug(Wedge& parent, Node& node, const string& name, const string& icon, const Colour& colour, bool input, ConnectTrigger onConnect = ConnectTrigger());
 	
-		const string& tooltip() { return m_tooltip; }
+		virtual const string& tooltip() { return m_tooltip; }
 
 		virtual bool leftDragStart(MouseEvent& mouseEvent);
 		virtual bool leftDrag(MouseEvent& mouseEvent);
@@ -142,7 +143,7 @@ namespace toy
 	public:
 		Canvas(Wedge& parent, const string& title, const Callback& contextTrigger = nullptr);
 
-		Array<Node>& selection() { return m_selection; }
+		Array<Node> m_selection;
 
 		virtual bool leftClick(MouseEvent& mouseEvent);
 		virtual bool rightClick(MouseEvent& mouseEvent);
@@ -167,8 +168,6 @@ namespace toy
 	protected:
 		string m_name;
 		Callback m_contextTrigger;
-
-		Array<Node> m_selection;
 	};
 }
 

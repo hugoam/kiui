@@ -84,13 +84,13 @@ namespace toy
 	{}
 
 	FileNode::FileNode(Wedge& parent, const string& name)
-		: TreeNode(parent, "(file_20)", name, true, cls())
+		: TreeNode(parent, { "(file_20)", name }, true, nullptr, nullptr, cls())
 	{
 		m_toggle.enableState(DISABLED);
 	}
 
 	DirectoryNode::DirectoryNode(Wedge& parent, const string& path, const string& name, bool collapsed)
-		: TreeNode(parent, "(folder_20)", name, collapsed, cls())
+		: TreeNode(parent, { "(folder_20)", name }, collapsed, nullptr, nullptr, cls())
 		, m_path(path)
 	{}
 
@@ -98,7 +98,7 @@ namespace toy
 	{
 		Expandbox::expand();
 
-		for(Widget* widget : m_body.contents())
+		for(Widget* widget : m_body.m_contents)
 			if(widget->isa<DirectoryNode>())
 				widget->as<DirectoryNode>().update();
 	}

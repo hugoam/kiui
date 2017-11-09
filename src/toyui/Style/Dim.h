@@ -145,6 +145,8 @@ namespace toy
 
 		bool null() const { return d_values[0] == T() && d_values[1] == T(); }
 
+		bool operator==(const Dim<T>& other) const { return (x == other.x) && (y == other.y); }
+
 		T operator[](size_t i) const { return d_values[i]; }
 		T& operator[](size_t i) { return d_values[i]; }
 

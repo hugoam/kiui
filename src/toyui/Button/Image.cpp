@@ -28,7 +28,7 @@ namespace toy
 		this->clearImage();
 
 		std::vector<uint8_t> data = m_source.read();
-		m_image = &this->uiWindow().createImage("Figure", m_source.width, m_source.height, &data[0], false);
+		m_image = &this->uiWindow().createImage("Figure", m_source.m_width, m_source.m_height, &data[0], false);
 
 		m_frame->setIcon(m_image);
 	}

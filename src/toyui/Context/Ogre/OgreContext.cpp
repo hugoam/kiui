@@ -17,8 +17,8 @@
 #include <Compositor/OgreCompositorManager2.h>
 #include <Compositor/OgreCompositorNodeDef.h>
 #include <Compositor/OgreCompositorWorkspaceDef.h>
-#include <Compositor/Pass/OgreCompositorPass.h>
-#include <Compositor/Pass/OgreCompositorPassProvider.h>
+#include <Compositor/RenderPass/OgreCompositorPass.h>
+#include <Compositor/RenderPass/OgreCompositorPassProvider.h>
 
 #include <OgreBuildSettings.h>
 

@@ -80,15 +80,15 @@ namespace toy
 			this->update();
 		}
 
-		static Type& cls() { static Type ty("StatSlider<" + typecls<T>().name() + ">", Wedge::Row()); return ty; }
+		static Type& cls() { static Type ty("StatSlider<" + toy::cls<T>().m_name + ">", Wedge::Row()); return ty; }
 
 	protected:
 		Slider m_slider;
 		Label m_display;
 	};
 
-	template class _refl_ TOY_UI_EXPORT StatSlider<float>;
-	template class _refl_ TOY_UI_EXPORT StatSlider<int>;
+	template class /*_refl_*/ TOY_UI_EXPORT StatSlider<float>;
+	template class /*_refl_*/ TOY_UI_EXPORT StatSlider<int>;
 
 	template <class T>
 	class NumberInput : public Wedge, public InputValue<AutoStat<T>>
@@ -103,7 +103,7 @@ namespace toy
 			, m_plus(*this, "+", [this](Widget&) { this->m_ref.increment(); this->changed(); })
 			, m_minus(*this, "-", [this](Widget&) { this->m_ref.decrement(); this->changed(); })
 		{
-			if(typecls<T>().template is<float>() || typecls<T>().template is<double>())
+			if(toy::cls<T>().template is<float>() || toy::cls<T>().template is<double>())
 				m_typeIn.setAllowedChars("1234567890.");
 			else
 				m_typeIn.setAllowedChars("1234567890");
@@ -135,7 +135,7 @@ namespace toy
 			return truncateNumber(str);
 		}
 
-		static Type& cls() { static Type ty("NumberInput<" + typecls<T>().name() + ">", Wedge::Row()); return ty; }
+		static Type& cls() { static Type ty("NumberInput<" + toy::cls<T>().m_name + ">", Wedge::Row()); return ty; }
 
 	protected:
 		TypeIn m_typeIn;
@@ -154,10 +154,10 @@ namespace toy
 		{}
 	};
 
-	template class _refl_ TOY_UI_EXPORT Input<unsigned int>;
-	template class _refl_ TOY_UI_EXPORT Input<int>;
-	template class _refl_ TOY_UI_EXPORT Input<float>;
-	template class _refl_ TOY_UI_EXPORT Input<double>;
+	template class /*_refl_*/ TOY_UI_EXPORT Input<unsigned int>;
+	template class /*_refl_*/ TOY_UI_EXPORT Input<int>;
+	template class /*_refl_*/ TOY_UI_EXPORT Input<float>;
+	template class /*_refl_*/ TOY_UI_EXPORT Input<double>;
 
 	template <>
 	class _refl_ TOY_UI_EXPORT Input<bool> : public Wedge, public InputValue<bool>
@@ -210,18 +210,18 @@ namespace toy
 		Input(Wedge& parent, Colour value, const Callback& callback = nullptr)
 			: Wedge(parent, this->cls())
 			, InputValue<Colour>(value, callback)
-			, m_r(*this, AutoStat<float>(value.r(), 0.f, 1.f, 0.01f), [this](float val) { this->m_ref.setR(val); this->changed(); })
-			, m_g(*this, AutoStat<float>(value.g(), 0.f, 1.f, 0.01f), [this](float val) { this->m_ref.setG(val); this->changed(); })
-			, m_b(*this, AutoStat<float>(value.b(), 0.f, 1.f, 0.01f), [this](float val) { this->m_ref.setB(val); this->changed(); })
-			, m_a(*this, AutoStat<float>(value.a(), 0.f, 1.f, 0.01f), [this](float val) { this->m_ref.setA(val); this->changed(); })
+			, m_r(*this, AutoStat<float>(value.m_r, 0.f, 1.f, 0.01f), [this](float val) { this->m_ref.m_r = val; this->changed(); })
+			, m_g(*this, AutoStat<float>(value.m_g, 0.f, 1.f, 0.01f), [this](float val) { this->m_ref.m_g = val; this->changed(); })
+			, m_b(*this, AutoStat<float>(value.m_b, 0.f, 1.f, 0.01f), [this](float val) { this->m_ref.m_b = val; this->changed(); })
+			, m_a(*this, AutoStat<float>(value.m_a, 0.f, 1.f, 0.01f), [this](float val) { this->m_ref.m_a = val; this->changed(); })
 		{}
 
 		void update()
 		{
-			m_r.sync(this->m_ref.r());
-			m_g.sync(this->m_ref.g());
-			m_b.sync(this->m_ref.b());
-			m_a.sync(this->m_ref.a());
+			m_r.sync(this->m_ref.m_r);
+			m_g.sync(this->m_ref.m_g);
+			m_b.sync(this->m_ref.m_b);
+			m_a.sync(this->m_ref.m_a);
 		}
 
 		void changed()
@@ -255,13 +255,10 @@ namespace toy
 				this->swap(0, 1);
 		}
 
-		T_Input& input() { return m_input; }
-
-		static Type& cls() { static Type ty("Field<" + typecls<T_Val>().name() + ">", Wedge::WrapControl()); return ty; }
-
-	protected:
 		Label m_label;
 		T_Input m_input;
+
+		static Type& cls() { static Type ty("Field<" + toy::cls<T_Val>().m_name + ">", Wedge::WrapControl()); return ty; }
 	};
 
 	using InputBool = Field<bool, Input<bool>>;

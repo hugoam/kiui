@@ -33,6 +33,7 @@ namespace toy
 		: m_renderWindow(std::move(renderWindow))
 		, m_inputWindow(std::move(inputWindow))
 		, m_renderSystem(renderSystem)
+		, m_resourcePath(renderSystem.m_resourcePath)
 	{}
 
 	Context::~Context()

@@ -19,14 +19,8 @@ namespace toy
 		Label(Wedge& parent, const string& label, Type& type = cls());
 
 		static Type& cls() { static Type ty("Label", Item::cls()); return ty; }
-	};
-
-	class _refl_ TOY_UI_EXPORT Text : public Label
-	{
-	public:
-		Text(Wedge& parent, const string& label);
-
-		static Type& cls() { static Type ty("Text", Label::cls()); return ty; }
+		static Type& Title() { static Type ty("Title", Item::cls()); return ty; }
+		static Type& Text() { static Type ty("Text", Item::cls()); return ty; }
 	};
 
 	class TOY_UI_EXPORT ClickTrigger
@@ -95,7 +89,7 @@ namespace toy
 	public:
 		MultiButton(Wedge& parent, const StringVector& elements = {}, const Callback& trigger = nullptr, Type& type = cls());
 
-		const std::vector<string>& elements() { return m_elements; }
+		std::vector<string> m_elements;
 
 		void reset(Button& button);
 		void reset(MultiButton& button);
@@ -104,9 +98,6 @@ namespace toy
 		virtual const string& label() { return m_elements[0]; }
 
 		static Type& cls() { static Type ty("MultiButton", WrapButton::cls()); return ty; }
-
-	protected:
-		std::vector<string> m_elements;
 	};
 
 	class _refl_ TOY_UI_EXPORT Toggle : public Item
@@ -117,8 +108,6 @@ namespace toy
 	public:
 		Toggle(Wedge& parent, const Callback& callback, bool isOn = true, Type& type = cls());
 
-		bool on() { return m_on; }
-
 		void update(bool on);
 		void toggle();
 
@@ -126,9 +115,9 @@ namespace toy
 
 		static Type& cls() { static Type ty("Toggle", Item::Control()); return ty; }
 
-	protected:
-		Callback m_callback;
+	public:
 		bool m_on;
+		const Callback m_callback;
 	};
 }
 

@@ -5,7 +5,7 @@
 #ifndef TOY_GLFW_CONTEXT_H
 #define TOY_GLFW_CONTEXT_H
 
-/* toy Og */
+/* toy */
 #include <toyui/Forward.h>
 #include <toyui/Render/RenderWindow.h>
 #include <toyui/Input/InputDispatcher.h>

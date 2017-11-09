@@ -27,7 +27,7 @@ namespace toy
 	void Table::makeSolver()
 	{
 		Widget::makeSolver();
-		m_frame->d_solver->as<TableSolver>().divide(m_weights);
+		//m_frame->d_solver->as<TableSolver>().divide(m_weights);
 	}
 
 	void Table::resize(Frame& first, Frame& second)

@@ -5,7 +5,7 @@
 #ifndef TOY_NANOATLAS_H
 #define TOY_NANOATLAS_H
 
-/* toy Og */
+/* toy */
 #include <toyui/Forward.h>
 #include <toyui/Image.h>
 

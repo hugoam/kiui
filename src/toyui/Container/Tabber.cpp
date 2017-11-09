@@ -21,7 +21,7 @@ namespace toy
 			m_header.enableState(ACTIVATED);
 	}
 
-	void Tab::destroyz()
+	void Tab::extract()
 	{
 		m_tabber.removeTab(*this);
 	}
@@ -56,8 +56,8 @@ namespace toy
 		if(&tab == m_currentTab)
 			m_currentTab = nullptr;
 
-		tab.m_header.extract();
-		tab.extract();
+		tab.m_header.destroy();
+		tab.destroy();
 
 		if(m_tabs.count() > 0)
 			this->showTab(size_t(0));

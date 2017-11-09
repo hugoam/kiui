@@ -14,16 +14,9 @@ namespace toy
 	{
 	public:
 		RenderWindow(const string& title, int width, int height, bool fullScreen = false)
-			: m_title(title)
-			, m_width(width)
-			, m_height(height)
-			, m_fullScreen(fullScreen)
-			, m_handle(0)
-			, m_nativeHandle(nullptr)
-			, m_nativeTarget(nullptr)
-			, m_resized(false)
-			, m_active(true)
-			, m_shutdown(false)
+			: m_title(title), m_width(width), m_height(height), m_fullScreen(fullScreen)
+			, m_handle(0), m_nativeHandle(nullptr), m_nativeTarget(nullptr)
+			, m_resized(false), m_active(true), m_shutdown(false)
 		{}
 
 		virtual bool nextFrame() = 0;

@@ -15,7 +15,7 @@ namespace toy
 	WindowHeader::WindowHeader(Window& window)
 		: Wedge(window, cls())
 		, m_window(window)
-		, m_title(*this, m_window.m_name)
+		, m_title(*this, m_window.m_name, Label::Title())
 		, m_close(*this, "", [&window](Widget&) { window.close(); }, Window::CloseButton())
 		, m_tooltip("Drag me")
 	{
@@ -125,6 +125,12 @@ namespace toy
 		this->toggleWindowState(WINDOW_CLOSABLE);
 		this->closable() ? m_header.m_close.show() : m_header.m_close.hide();
 	}
+	
+	void Window::toggleHeader()
+	{
+		this->toggleWindowState(WINDOW_MOVABLE);
+		this->movable() ? m_header.show() : m_header.hide();
+	}
 
 	void Window::toggleMovable()
 	{
@@ -179,7 +185,8 @@ namespace toy
 	void Window::toggleDocked()
 	{
 		m_dock ? this->setStyle(Window::DockWindow()) : this->setStyle(Window::cls());
-		this->toggleMovable();
+		//this->toggleMovable();
+		this->toggleHeader();
 		this->toggleResizable();
 	}
 

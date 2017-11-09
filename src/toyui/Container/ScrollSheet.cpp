@@ -67,7 +67,7 @@ namespace toy
 		float margin = 1000.f;
 		m_bounds = BoxFloat(-margin, -margin, +margin, +margin);
 
-		for(auto& widget : m_plan.contents())
+		for(auto& widget : m_plan.m_contents)
 		{
 			Frame& frame = widget->frame();
 			m_bounds.x0 = std::min(frame.d_position.x - margin, m_bounds.x);
@@ -111,23 +111,38 @@ namespace toy
 
 		return true;
 	}
+	
+	void drawLines(const Frame& frame, Dimension dim, float frequency, InkStyle& style, Renderer& renderer)
+	{
+		float start = frequency;
+		for(float val = start; val < frame.d_size[dim]; val += frequency)
+		{
+			if(dim == DIM_X)
+				renderer.pathLine(val, 0.f, val, frame.d_size.y);
+			else
+				renderer.pathLine(0.f, val, frame.d_size.x, val);
+			renderer.stroke(style);
+		}
+	}
 
 	bool drawGrid(const Frame& frame, Renderer& renderer)
 	{
-		float gridsizeX = 100.f;
-		float gridsizeY = 50.f;
+		static InkStyle mainStyle;
+		mainStyle.m_borderWidth = 1.f;
+		mainStyle.m_borderColour = Colour(132 / 255.f, 132 / 255.f, 132 / 255.f, 1.f);
 
-		for(float x = 0.f; x < frame.d_size.x; x += gridsizeX)
-		{
-			renderer.pathLine(x, 0.f, x, frame.d_size.y);
-			renderer.stroke(*frame.d_inkstyle);
-		}
+		static InkStyle secondaryStyle;
+		secondaryStyle.m_borderWidth = 1.f;
+		secondaryStyle.m_borderColour = Colour(34 / 255.f, 34 / 255.f, 34 / 255.f, 1.f);
 
-		for(float y = 0.f; y < frame.d_size.y; y += gridsizeY)
-		{
-			renderer.pathLine(0.f, y, frame.d_size.x, y);
-			renderer.stroke(*frame.d_inkstyle);
-		}
+		float mainFrequency = 100.f;
+		float secondaryFrequency = 20.f;
+
+		drawLines(frame, DIM_X, mainFrequency, mainStyle, renderer);
+		drawLines(frame, DIM_Y, mainFrequency, mainStyle, renderer);
+
+		drawLines(frame, DIM_X, secondaryFrequency, secondaryStyle, renderer);
+		drawLines(frame, DIM_Y, secondaryFrequency, secondaryStyle, renderer);
 
 		return false;
 	}

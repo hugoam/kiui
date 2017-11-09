@@ -80,11 +80,11 @@ namespace toy
 
 	void GlRenderer::render(RenderTarget& target)
 	{
-		if(target.gammaCorrected())
+		if(target.m_gammaCorrected)
 			glDisable(GL_FRAMEBUFFER_SRGB);
 
 		// Update and render
-		glViewport(0, 0, target.layer().d_size.x, target.layer().d_size.y);
+		glViewport(0, 0, target.m_layer.d_size.x, target.m_layer.d_size.y);
 
 		if(m_clear)
 		{
@@ -94,7 +94,7 @@ namespace toy
 
 		Renderer::render(target);
 
-		if(target.gammaCorrected())
+		if(target.m_gammaCorrected)
 			glEnable(GL_FRAMEBUFFER_SRGB);
 	}
 }

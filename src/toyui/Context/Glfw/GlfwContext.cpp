@@ -182,7 +182,7 @@ namespace toy
 
 		glfwSetErrorCallback(errorcb);
 
-		//glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
 #ifndef TOY_PLATFORM_WINDOWS
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -282,6 +282,9 @@ namespace toy
 
 		float clampedX = std::max(0.f, std::min(float(m_renderWindow->m_width), m_mouseX));
 		float clampedY = std::max(0.f, std::min(float(m_renderWindow->m_height), m_mouseY));
+
+		m_cursorX = clampedX;
+		m_cursorY = clampedY;
 
 		m_mouse->dispatchMouseMoved({ clampedX, clampedY });
 	}

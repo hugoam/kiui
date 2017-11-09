@@ -50,22 +50,22 @@ namespace toy
 
 	Style& Styler::styledef(Type& type)
 	{
-		return styledef(type.name());
+		return styledef(type.m_name);
 	}
 
 	Style& Styler::style(Type& type)
 	{
-		if(m_styles[type.name()] == nullptr)
+		if(m_styles[type.m_name] == nullptr)
 			this->initStyle(type);
-		return *m_styles[type.name()];
+		return *m_styles[type.m_name];
 	}
 
 	void Styler::initStyle(Type& type)
 	{
-		object_ptr<Style> style = make_object<Style>(type, type.base() ? &this->style(*type.base()) : nullptr);
+		object_ptr<Style> style = make_object<Style>(type, type.m_base ? &this->style(*type.m_base) : nullptr);
 		this->prepareStyle(*style);
 
-		m_styles[type.name()] = std::move(style);
+		m_styles[type.m_name] = std::move(style);
 	}
 
 	void Styler::prepareStyle(Style& style)
@@ -73,7 +73,7 @@ namespace toy
 		if(style.m_base)
 			this->prepareStyle(*style.m_base);
 
-		style.prepare(m_styledefs[style.name()].get());
+		style.prepare(m_styledefs[style.m_name].get());
 	}
 
 	void Styler::defaultLayout()
@@ -81,7 +81,7 @@ namespace toy
 		this->styledef(Widget::cls()).m_layout.d_solver = FRAME_SOLVER;
 		this->styledef(Wedge::cls()).m_layout.d_solver = ROW_SOLVER;
 		this->styledef(ScrollSheet::cls()).m_layout.d_solver = GRID_SOLVER;
-		this->styledef(Table::cls()).m_layout.d_solver = TABLE_SOLVER;
+		//this->styledef(Table::cls()).m_layout.d_solver = TABLE_SOLVER;
 		
 		this->styledef(RootSheet::cls()).m_layout.d_space = BOARD;
 		this->styledef(RootSheet::cls()).m_layout.d_clipping = CLIP;
@@ -168,7 +168,7 @@ namespace toy
 
 		// STACKS
 		this->styledef(Wedge::Stack()).m_layout.d_space = STACK;
-		this->styledef(Text::cls()).m_layout.d_space = { PARAGRAPH, FIXED, WRAP };
+		this->styledef(Label::Text()).m_layout.d_space = { PARAGRAPH, FIXED, WRAP };
 
 		// CONTROLS
 		this->styledef(Item::cls()).m_layout.d_space = BLOCK;
@@ -217,9 +217,11 @@ namespace toy
 		this->styledef(ScrollSheet::ScrollZone()).m_layout.d_clipping = CLIP;
 
 
-		this->styledef(Item::Control()).m_layout.d_align = { LEFT, CENTER };
-		this->styledef(Button::cls()).m_layout.d_align = { LEFT, CENTER };
+		this->styledef(Item::cls()).m_layout.d_align = { LEFT, CENTER };
+		this->styledef(Label::cls()).m_layout.d_align = { LEFT, CENTER };
 		this->styledef(Window::CloseButton()).m_layout.d_align = { RIGHT, CENTER };
+
+		this->styledef(NodeKnob::Output()).m_layout.d_align = { RIGHT, CENTER };
 
 		this->styledef(Canvas::LayoutLine()).m_layout.d_space = ITEM;
 		this->styledef(Canvas::LayoutColumn()).m_layout.d_space = UNIT;
@@ -231,25 +233,8 @@ namespace toy
 		this->styledef(Canvas::LayoutColumn()).m_layout.d_spacing = DimFloat(20.f);
 
 		this->styledef(NodeKnob::cls()).m_layout.d_size = { 10.f, 22.f };
-
-		this->styledef(Wedge::Header()).m_layout.d_padding = BoxFloat(6.f);
-
-		this->styledef(WrapButton::cls()).m_layout.d_spacing = DimFloat(2.f);
-		this->styledef(MultiButton::cls()).m_layout.d_padding = BoxFloat(2.f);
-
-		this->styledef(Dropdown::Head()).m_layout.d_padding = BoxFloat(2.f);
-
-		this->styledef(Dockbar::cls()).m_layout.d_padding = BoxFloat(4.f);
-		this->styledef(Dockbar::cls()).m_layout.d_spacing = DimFloat(4.f);
-
-		this->styledef(Toolbar::cls()).m_layout.d_padding = BoxFloat(6.f);
-		this->styledef(Toolbar::cls()).m_layout.d_spacing = DimFloat(6.f);
-		this->styledef(Menubar::cls()).m_layout.d_spacing = DimFloat(6.f);
 		
 		this->styledef(GridSheet::cls()).m_layout.d_spacing = DimFloat(5.f);
-
-		this->styledef(Tab::cls()).m_layout.d_padding = BoxFloat(6.f);
-		this->styledef(Docksection::DockTab()).m_layout.d_padding = BoxFloat(0.f);
 
 		//this->styledef(GridSubdiv::cls()).m_layout.d_spacing = DimFloat(6.f);
 		this->styledef(Dockspace::cls()).m_layout.d_spacing = DimFloat(6.f);
@@ -287,7 +272,7 @@ namespace toy
 
 		this->styledef(Toolbar::Mover()).m_skin.m_image = &m_uiWindow.findImage("handle");
 
-		this->styledef(Text::cls()).m_skin.m_textWrap = true;
+		this->styledef(Label::Text()).m_skin.m_textWrap = true;
 		this->styledef(Textbox::cls()).m_skin.m_textWrap = true;
 
 		this->styledef(Item::cls()).m_skin.m_empty = false;
@@ -296,8 +281,7 @@ namespace toy
 
 		this->styledef(Figure::cls()).m_skin.m_empty = false;
 
-		this->styledef(ScrollPlan::Plan()).m_skin.m_borderWidth = BoxFloat(2.f);
-		this->styledef(ScrollPlan::Plan()).m_skin.m_borderColour = Colour::AlphaGrey;
+		this->styledef(ScrollPlan::Plan()).m_skin.m_empty = false;
 
 		this->styledef(Rectangle::cls()).m_skin.m_borderWidth = BoxFloat(1.f);
 		this->styledef(Rectangle::cls()).m_skin.m_borderColour = Colour::Cyan;

@@ -21,16 +21,16 @@ namespace toy
 {
 	enum _refl_ WidgetState : unsigned int
 	{
-		NOSTATE = 0,			// default state
-		FOCUSED = 1 << 0,		// under input device focus
+		NOSTATE   = 0,			// default state
+		FOCUSED   = 1 << 0,		// under input device focus
 		TRIGGERED = 1 << 1,		// triggered by input device (e.g. pressed)
 		ACTIVATED = 1 << 2,		// activated state
-		SELECTED = 1 << 3,		// selected state
-		DRAGGED = 1 << 4,		// dragged by input device
-		DISABLED = 1 << 5,		// disabled state
-		ACTIVE = 1 << 6,		// for the unique currently active widget
-		CONTROL = 1 << 7,		// widget is in the control stack
-		MODAL = 1 << 8			// widget is modal in the control stack
+		SELECTED  = 1 << 3,		// selected state
+		DRAGGED   = 1 << 4,		// dragged by input device
+		DISABLED  = 1 << 5,		// disabled state
+		ACTIVE    = 1 << 6,		// for the unique currently active widget
+		CONTROL   = 1 << 7,		// widget is in the control stack
+		MODAL     = 1 << 8		// widget is modal in the control stack
 	};
 
 	class _refl_ TOY_UI_EXPORT Widget : public TypeObject, public InputAdapter
@@ -63,10 +63,10 @@ namespace toy
 		virtual void makeSolver();
 
 		void destroyTree();
+		void destroySelf();
 		void destroy();
-		void extract();
-		
-		virtual void destroyz() { this->extract(); }
+
+		virtual void extract() { this->destroy(); }
 
 		template <class T>
 		T* findContainer() { Widget* widget = this->findContainer(T::cls()); return widget ? &widget->template as<T>() : nullptr; }
@@ -80,6 +80,7 @@ namespace toy
 
 		void setStyle(Type& type, bool hard = true);
 		void setStyle(Style& style, bool hard = true);
+		void setStyle(Style* style) { this->setStyle(*style); }
 
 		Style& fetchStyle(Type& type);
 
@@ -129,7 +130,7 @@ namespace toy
 		/*_attr_*/ object_ptr<Frame> m_frame; // @todo make this a member, separate Layer, and separate caption and image (only for Items)
 		_attr_ WidgetState m_state;
 
-		Device* m_device;
+		Lref m_object;
 	};
 
 	class _refl_ TOY_UI_EXPORT Item : public Widget

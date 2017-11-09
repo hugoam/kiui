@@ -21,7 +21,6 @@
 
 namespace toy
 {
-
 	inline float clamp(float v, float mn, float mx)
 	{
 		return (v > mx) ? mx : (v < mn) ? mn : v;
@@ -29,16 +28,16 @@ namespace toy
 
 	NVGcolor nvgColour(const Colour& colour)
 	{
-		return nvgRGBAf(colour.r(), colour.g(), colour.b(), colour.a());
+		return nvgRGBAf(colour.m_r, colour.m_g, colour.m_b, colour.m_a);
 	}
 
 	NVGcolor nvgOffsetColour(const Colour& colour, float delta)
 	{
 		float offset = delta / 255.0f;
-		return nvgRGBAf(	clamp(colour.r() + offset, 0, 1),
-							clamp(colour.g() + offset, 0, 1),
-							clamp(colour.b() + offset, 0, 1),
-							colour.a());
+		return nvgRGBAf(	clamp(colour.m_r + offset, 0, 1),
+							clamp(colour.m_g + offset, 0, 1),
+							clamp(colour.m_b + offset, 0, 1),
+							colour.m_a);
 	}
 
 	NanoRenderer::NanoRenderer(const string& resourcePath)
@@ -53,6 +52,7 @@ namespace toy
 
 	void NanoRenderer::loadFont()
 	{
+		if(m_null) return;
 		string fontPath = m_resourcePath + "interface/fonts/DejaVuSans.ttf";
 		nvgCreateFont(m_ctx, "dejavu", fontPath.c_str());
 		nvgFontSize(m_ctx, 14.0f);
@@ -61,16 +61,19 @@ namespace toy
 
 	void NanoRenderer::loadImageRGBA(Image& image, const unsigned char* data)
 	{
+		if(m_null) return;
 		image.d_index = nvgCreateImageRGBA(m_ctx, image.d_width, image.d_height, image.d_filtering ? 0 : NVG_IMAGE_NEAREST, data);
 	}
 
 	void NanoRenderer::loadImage(Image& image)
 	{
+		if(m_null) return;
 		image.d_index = nvgCreateImage(m_ctx, image.d_path.c_str(), image.d_tile ? (NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY) : 0);
 	}
 
 	void NanoRenderer::unloadImage(Image& image)
 	{
+		if(m_null) return;
 		nvgDeleteImage(m_ctx, image.d_index);
 		image.d_index = 0;
 	}
@@ -78,7 +81,7 @@ namespace toy
 	void NanoRenderer::beginFrame(RenderTarget& target)
 	{
 		float pixelRatio = 1.f;
-		nvgBeginFrame(m_ctx, target.layer().d_size.x, target.layer().d_size.y, pixelRatio);
+		nvgBeginFrame(m_ctx, target.m_layer.d_size.x, target.m_layer.d_size.y, pixelRatio);
 	}
 
 	void NanoRenderer::endFrame()
@@ -161,7 +164,7 @@ namespace toy
 		this->pathRect(rect, corners, border);
 
 		// Fill
-		if(skin.m_backgroundColour.val.a() > 0.f)
+		if(!skin.m_backgroundColour.val.null())
 			this->fill(skin, rect);
 
 		// Border

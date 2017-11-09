@@ -163,7 +163,7 @@ namespace toy
 		{
 			WidgetState state = fromString<WidgetState>(strState);
 			string suffix = "_" + replaceAll(strState, "|", "_");
-			m_style->decline(state).m_image = &m_styler.uiWindow().findImage(m_skin->m_image.val->d_name + suffix);
+			m_style->decline(state).m_image = &m_styler.m_uiWindow.findImage(m_skin->m_image.val->d_name + suffix);
 		}
 	}
 	
@@ -175,7 +175,7 @@ namespace toy
 			WidgetState state = fromString<WidgetState>(strState);
 			string suffix = "_" + replaceAll(strState, "|", "_");
 			InkStyle& inkstyle = m_style->decline(state);
-			inkstyle.m_imageSkin = ImageSkin(m_styler.uiWindow().findImage(m_skin->m_imageSkin.val.d_image->d_name + suffix), m_skin->m_imageSkin);
+			inkstyle.m_imageSkin = ImageSkin(m_styler.m_uiWindow.findImage(m_skin->m_imageSkin.val.d_image->d_name + suffix), m_skin->m_imageSkin);
 		}
 	}
 
@@ -243,13 +243,13 @@ namespace toy
 		else if(key == "topdown_gradient")
 			m_skin->m_linearGradient = fromString<DimFloat>(value); // top, down
 		else if(key == "image")
-			m_skin->m_image = value == "null" ? nullptr : &m_styler.uiWindow().findImage(value); // image.png
+			m_skin->m_image = value == "null" ? nullptr : &m_styler.m_uiWindow.findImage(value); // image.png
 		else if(key == "overlay")
-			m_skin->m_overlay = value == "null" ? nullptr : &m_styler.uiWindow().findImage(value); // image.png
+			m_skin->m_overlay = value == "null" ? nullptr : &m_styler.m_uiWindow.findImage(value); // image.png
 		else if(key == "tile")
-			m_skin->m_tile = value == "null" ? nullptr : &m_styler.uiWindow().findImage(value); // image.png
+			m_skin->m_tile = value == "null" ? nullptr : &m_styler.m_uiWindow.findImage(value); // image.png
 		else if(key == "image_skin")
-			m_skin->m_imageSkin = ImageSkin(m_styler.uiWindow().findImage(values[0]),
+			m_skin->m_imageSkin = ImageSkin(m_styler.m_uiWindow.findImage(values[0]),
 											fromString<int>(values[1]), fromString<int>(values[2]),
 											fromString<int>(values[3]), fromString<int>(values[4]),
 											values.size() > 5 ? fromString<int>(values[5]) : 0,

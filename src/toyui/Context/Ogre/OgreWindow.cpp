@@ -30,7 +30,7 @@ namespace toy
 	{
 		Ogre::WindowEventUtilities::removeWindowEventListener(m_context, this);
 
-		m_renderSystem.ogreRoot().destroyRenderTarget(m_context);
+		m_renderSystem.m_ogreRoot->destroyRenderTarget(m_context);
 	}
 
 	void OgreRenderWindow::initContext()
@@ -43,7 +43,7 @@ namespace toy
 		params["vsync"] = "No";
 		params["gamma"] = "true";
 
-		m_context = m_renderSystem.ogreRoot().createRenderWindow(m_title, m_width, m_height, m_fullScreen, &params);
+		m_context = m_renderSystem.m_ogreRoot->createRenderWindow(m_title, m_width, m_height, m_fullScreen, &params);
 
 		m_context->getCustomAttribute("WINDOW", &m_handle);
 

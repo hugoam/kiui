@@ -233,12 +233,12 @@ namespace toy
 
 	bool Frame::first(Frame& frame)
 	{
-		return &frame.d_widget == d_wedge->contents().front();
+		return &frame.d_widget == d_wedge->m_contents.front();
 	}
 
 	bool Frame::last(Frame& frame)
 	{
-		return &frame.d_widget == d_wedge->contents().back();
+		return &frame.d_widget == d_wedge->m_contents.back();
 	}
 
 	Frame* Frame::pinpoint(DimFloat pos, const Filter& filter)
@@ -247,7 +247,7 @@ namespace toy
 			return nullptr;
 
 		if(d_wedge)
-			for(Widget* widget : reverse_adapt(d_wedge->contents()))
+			for(Widget* widget : reverse_adapt(d_wedge->m_contents))
 			{
 				DimFloat local = widget->frame().integratePosition(pos, *this);
 				Frame* target = widget->frame().pinpoint(local, filter);
@@ -284,7 +284,7 @@ namespace toy
 		}
 
 		SolverVector solvers;
-		for(Widget* widget : d_wedge->contents())
+		for(Widget* widget : d_wedge->m_contents)
 			widget->frame().collect(solvers, dirty);
 
 		d_solver->reset();
@@ -305,7 +305,7 @@ namespace toy
 			return;
 
 		//this->debugPrintDepth();
-		//printf(" >> %s %s\n", d_style->name().c_str(), toString(d_dirty).c_str());
+		//printf(" >> %s %s\n", d_style->m_name.c_str(), toString(d_dirty).c_str());
 
 		if(d_dirty >= DIRTY_PARENT)
 		{
@@ -320,7 +320,7 @@ namespace toy
 		}
 
 		if(d_wedge)
-			for(Widget* widget : d_wedge->contents())
+			for(Widget* widget : d_wedge->m_contents)
 				widget->frame().collect(solvers, d_dirty);
 
 		this->clearDirty();

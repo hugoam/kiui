@@ -25,8 +25,6 @@ namespace toy
 		Styler(UiWindow& uiWindow);
 		~Styler();
 
-		UiWindow& uiWindow() { return m_uiWindow; }
-
 		void addInitializer(const StyleInitializer& initializer) { m_initializers.push_back(initializer); }
 
 		void clear();
@@ -45,9 +43,10 @@ namespace toy
 
 		static Type& cls() { static Type ty; return ty; }
 
-	protected:
+	public:
 		UiWindow& m_uiWindow;
 
+	protected:
 		std::map<string, object_ptr<Style>> m_styledefs;
 		std::map<string, object_ptr<Style>> m_styles;
 

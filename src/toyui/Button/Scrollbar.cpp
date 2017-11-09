@@ -29,7 +29,7 @@ namespace toy
 		pos -= widget.frame().d_position[dim];
 
 		if(widget.isa<Wedge>())
-			for(Widget* child : widget.as<Wedge>().contents())
+			for(Widget* child : widget.as<Wedge>().m_contents)
 				if(child->frame().flow() && child->frame().d_position[dim] + child->frame().d_size[dim] > pos)
 					return widget.frame().d_position[dim] + this->nextOffset(*child, dim, pos);
 
@@ -41,7 +41,7 @@ namespace toy
 		pos -= widget.frame().d_position[dim];
 
 		if(widget.isa<Wedge>())
-			for(Widget* child : reverse_adapt(widget.as<Wedge>().contents()))
+			for(Widget* child : reverse_adapt(widget.as<Wedge>().m_contents))
 				if(child->frame().flow() && child->frame().d_position[dim] < pos)
 					return widget.frame().d_position[dim] + this->prevOffset(*child, dim, pos);
 

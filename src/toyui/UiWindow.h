@@ -16,7 +16,7 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT RenderSystem : public Object
+	class _refl_ TOY_UI_EXPORT RenderSystem : public Object
 	{
 	public:
 		RenderSystem(const string& resourcePath, bool manualRender);

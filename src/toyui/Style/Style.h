@@ -250,8 +250,6 @@ namespace toy
 		~Style();
 
 		Style& operator=(const Style&) = default;
-
-		const string& name() { return m_name.empty() ? m_style->name() : m_name; }
 		
 		void clear();
 		void prepare(Style* definition);

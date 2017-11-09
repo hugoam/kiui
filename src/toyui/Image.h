@@ -5,7 +5,7 @@
 #ifndef TOY_IMAGE_H
 #define TOY_IMAGE_H
 
-/* toy Og */
+/* toy */
 #include <toyobj/Object.h>
 #include <toyobj/String/String.h>
 #include <toyui/Forward.h>

@@ -79,46 +79,66 @@ namespace toy
 
 	class Widget;
 	class Wedge;
+	class GridSheet;
 	class RootSheet;
 	class Cursor;
 
 	class Tooltip;
 
+	class Item;
 	class Label;
 	class Button;
 	class WrapButton;
+	class MultiButton;
 	class Toggle;
+	class Checkbox;
 	class TypeIn;
 	class FilterInput;
+	class Textbox;
+
+	class Rectangle;
+
+	class Dropdown;
+	class DropdownInput;
+	class TypedownInput;
 
 	class Slider;
 	class Scrollbar;
 
 	class ScrollSheet;
+	class ScrollPlan;
 
 	template <class T>
 	class StatSlider;
 
+	template <class T>
+	class Input;
+
+	class Tab;
 	class Tabber;
-	class Dropdown;
 	class Expandbox;
 	class RadioSwitch;
+	class SelectList;
 
 	class Table;
 	class Tree;
 	class TreeNode;
 
+	class WindowHeader;
+	class WindowFooter;
+	class WindowSizer;
 	class Window;
 
 	class Node;
 	class NodeCable;
 	class Canvas;
 
-	class Dropdown;
-	class DropdownInput;
-	class TypedownInput;
-
+	class Menubar;
 	class Menu;
+
+	class ToolButton;
+	class Tooldock;
+	class Toolbar;
 
 	class Docksection;
 	class Dockline;
@@ -130,6 +150,9 @@ namespace toy
 	class Directory;
 	class Dir;
 	class File;
+	class FileNode;
+	class DirectoryNode;
+	class FileBrowser;
 
 	class Image;
 	class ImageAtlas;
@@ -163,6 +186,8 @@ namespace toy
 	class OISInputWindow;
 	class OgreContext;
 	class OgreRenderSystem;
+
+	struct UiNode;
 }
 
 #endif // TOY_UIFORWARD_H

@@ -63,7 +63,7 @@ namespace toy
 	void Canvas::collectNodes(std::vector<Node*>& nodes)
 	{
 		m_plan.visit([&nodes](Widget& widget, bool&) {
-			if(&widget.type() == &Node::cls())
+			if(&widget.m_type == &Node::cls())
 				nodes.push_back(&widget.as<Node>());
 		});
 	}
@@ -137,7 +137,7 @@ namespace toy
 		, m_input(input)
 		, m_title(*this, name)
 		, m_icon(*this, icon)
-		, m_knob(*this, colour)
+		, m_knob(*this, colour, input ? NodeKnob::cls() : NodeKnob::Output())
 		, m_onConnect(onConnect)
 		, m_cableProxy(nullptr)
 	{
@@ -274,11 +274,11 @@ namespace toy
 
 	void Node::updateCables()
 	{
-		for(Widget* widget : m_inputs.contents())
+		for(Widget* widget : m_inputs.m_contents)
 			for(NodeCable* cable : widget->as<NodePlug>().m_cables)
 				cable->updateCable();
 
-		for(Widget* widget : m_outputs.contents())
+		for(Widget* widget : m_outputs.m_contents)
 			for(NodeCable* cable : widget->as<NodePlug>().m_cables)
 				cable->updateCable();
 	}
@@ -298,24 +298,24 @@ namespace toy
 	{
 		UNUSED(mouseEvent);
 		if(this->rootSheet().m_keyboard.m_shiftPressed)
-			this->canvas().selection().swap(*this);
+			this->canvas().m_selection.swap(*this);
 		else
-			this->canvas().selection().select(*this);
+			this->canvas().m_selection.select(*this);
 		return true;
 	}
 
 	bool Node::rightClick(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		this->canvas().selection().select(*this);
+		this->canvas().m_selection.select(*this);
 		return true;
 	}
 
 	bool Node::leftDragStart(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		if(!this->canvas().selection().has(*this))
-			this->canvas().selection().select(*this);
+		if(!this->canvas().m_selection.has(*this))
+			this->canvas().m_selection.select(*this);
 		return true;
 	}
 

@@ -17,7 +17,7 @@ namespace toy
 	public:
 		Tooltip(RootSheet& rootSheet, const string& label);
 
-		static Type& cls() { static Type ty("Tooltip", Wedge::Overlay()); return ty; }
+		static Type& cls() { static Type ty("Tooltip", Wedge::Decal()); return ty; }
 	};
 
 	class _refl_ TOY_UI_EXPORT Rectangle : public Wedge

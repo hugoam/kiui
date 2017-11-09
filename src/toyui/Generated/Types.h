@@ -9,31 +9,31 @@
 namespace toy
 {   
     // Exported types
-    template <> TOY_UI_EXPORT Type& typecls<Dimension>();
-    template <> TOY_UI_EXPORT Type& typecls<Direction>();
-    template <> TOY_UI_EXPORT Type& typecls<Pivot>();
-    template <> TOY_UI_EXPORT Type& typecls<Align>();
-    template <> TOY_UI_EXPORT Type& typecls<FrameType>();
-    template <> TOY_UI_EXPORT Type& typecls<LayoutSolver>();
-    template <> TOY_UI_EXPORT Type& typecls<AutoLayout>();
-    template <> TOY_UI_EXPORT Type& typecls<Flow>();
-    template <> TOY_UI_EXPORT Type& typecls<Sizing>();
-    template <> TOY_UI_EXPORT Type& typecls<SpacePreset>();
-    template <> TOY_UI_EXPORT Type& typecls<Clipping>();
-    template <> TOY_UI_EXPORT Type& typecls<Opacity>();
-    template <> TOY_UI_EXPORT Type& typecls<WidgetState>();
-    template <> TOY_UI_EXPORT Type& typecls<std::vector<Widget*>>();
+    template <> TOY_UI_EXPORT Type& cls<Dimension>();
+    template <> TOY_UI_EXPORT Type& cls<Direction>();
+    template <> TOY_UI_EXPORT Type& cls<Pivot>();
+    template <> TOY_UI_EXPORT Type& cls<Align>();
+    template <> TOY_UI_EXPORT Type& cls<FrameType>();
+    template <> TOY_UI_EXPORT Type& cls<LayoutSolver>();
+    template <> TOY_UI_EXPORT Type& cls<AutoLayout>();
+    template <> TOY_UI_EXPORT Type& cls<Flow>();
+    template <> TOY_UI_EXPORT Type& cls<Sizing>();
+    template <> TOY_UI_EXPORT Type& cls<SpacePreset>();
+    template <> TOY_UI_EXPORT Type& cls<Clipping>();
+    template <> TOY_UI_EXPORT Type& cls<Opacity>();
+    template <> TOY_UI_EXPORT Type& cls<WidgetState>();
+    template <> TOY_UI_EXPORT Type& cls<std::vector<Widget*>>();
     
-	template <> TOY_UI_EXPORT Type& typecls<MemberPointer<ImageSkin>>();
-	template <> TOY_UI_EXPORT Type& typecls<MethodPointer<ImageSkin>>();
-	template <> TOY_UI_EXPORT Type& typecls<MemberPointer<LayoutStyle>>();
-	template <> TOY_UI_EXPORT Type& typecls<MethodPointer<LayoutStyle>>();
-	template <> TOY_UI_EXPORT Type& typecls<MemberPointer<Style>>();
-	template <> TOY_UI_EXPORT Type& typecls<MethodPointer<Style>>();
-	template <> TOY_UI_EXPORT Type& typecls<MemberPointer<Widget>>();
-	template <> TOY_UI_EXPORT Type& typecls<MethodPointer<Widget>>();
-	template <> TOY_UI_EXPORT Type& typecls<MemberPointer<Wedge>>();
-	template <> TOY_UI_EXPORT Type& typecls<MethodPointer<Wedge>>();
+	template <> TOY_UI_EXPORT Type& cls<MemberPointer<ImageSkin>>();
+	template <> TOY_UI_EXPORT Type& cls<MethodPointer<ImageSkin>>();
+	template <> TOY_UI_EXPORT Type& cls<MemberPointer<LayoutStyle>>();
+	template <> TOY_UI_EXPORT Type& cls<MethodPointer<LayoutStyle>>();
+	template <> TOY_UI_EXPORT Type& cls<MemberPointer<Style>>();
+	template <> TOY_UI_EXPORT Type& cls<MethodPointer<Style>>();
+	template <> TOY_UI_EXPORT Type& cls<MemberPointer<Widget>>();
+	template <> TOY_UI_EXPORT Type& cls<MethodPointer<Widget>>();
+	template <> TOY_UI_EXPORT Type& cls<MemberPointer<Wedge>>();
+	template <> TOY_UI_EXPORT Type& cls<MethodPointer<Wedge>>();
 }
 
 #endif // TOYUI_TYPES_GEN_H

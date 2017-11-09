@@ -17,7 +17,7 @@ namespace toy
 
 	void FilterInput::updateFilter(const string& filter)
 	{
-		for(auto& widget : m_list.contents())
+		for(auto& widget : m_list.m_contents)
 		{
 			string text = m_criteria(*widget);
 			bool fit = fitsFilter(filter, text);

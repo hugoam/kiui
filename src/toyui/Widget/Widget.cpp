@@ -30,7 +30,7 @@ namespace toy
 		, m_style(nullptr)
 		, m_frame()
 		, m_state(NOSTATE)
-		, m_device(nullptr)
+		, m_object()
 	{
 		if(frameType == MASTER_LAYER || frameType == LAYER)
 			m_frame = make_object<Layer>(this->as<Wedge>(), frameType);
@@ -38,7 +38,7 @@ namespace toy
 			m_frame = make_object<Frame>(*this);
 
 /*#if 1 // DEBUG
-		InputReceiver::m_name = "Widget: " + type.name();
+		InputReceiver::m_name = "Widget: " + type.m_name;
 #endif*/
 	}
 
@@ -62,7 +62,7 @@ namespace toy
 
 	void Widget::setContent(const string& content)
 	{
-		if(!content.empty() && content.front() == '(' && content.back() == ')')
+		if(content.front() == '(' && content.back() == ')')
 		{
 			string name(content.begin() + 1, content.end() - 1);
 			m_frame->setIcon(&this->uiWindow().findImage(toLower(name)));
@@ -78,7 +78,7 @@ namespace toy
 		return m_frame->d_caption->m_text;
 	}
 
-	void Widget::destroy()
+	void Widget::destroySelf()
 	{
 		this->rootSheet().handleDestroyWidget(*this);
 		m_controlGraph = nullptr;
@@ -87,7 +87,7 @@ namespace toy
 
 	void Widget::destroyTree()
 	{
-		this->visit([](Widget& widget, bool&) { widget.destroy(); });
+		this->visit([](Widget& widget, bool&) { widget.destroySelf(); });
 	}
 
 	void Widget::bind(Wedge& parent, size_t index)
@@ -110,8 +110,9 @@ namespace toy
 		m_frame->makeSolver();
 	}
 
-	void Widget::extract()
+	void Widget::destroy()
 	{
+		this->destroyTree();
 		m_container->store().remove(*this);
 	}
 
@@ -121,7 +122,7 @@ namespace toy
 
 		while(widget)
 		{
-			if(&widget->type() == &type)
+			if(&widget->m_type == &type)
 				return widget;
 			widget = widget->m_parent;
 		}

@@ -62,7 +62,7 @@ namespace toy
 		m_selected = &choice;
 		m_selected->enableState(SELECTED);
 
-		m_header.reset(m_selected->elements());
+		m_header.reset(m_selected->m_elements);
 	}
 
 	void DropdownInput::selected(MultiButton& choice)

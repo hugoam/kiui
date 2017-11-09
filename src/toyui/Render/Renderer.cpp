@@ -12,9 +12,9 @@
 
 namespace toy
 {
-	RenderTarget::RenderTarget(Renderer& renderer, Layer& masterLayer, bool gammaCorrected)
+	RenderTarget::RenderTarget(Renderer& renderer, Layer& layer, bool gammaCorrected)
 		: m_renderer(renderer)
-		, m_masterLayer(masterLayer)
+		, m_layer(layer)
 		, m_gammaCorrected(gammaCorrected)
 	{}
 
@@ -23,10 +23,9 @@ namespace toy
 		m_renderer.render(*this);
 	}
 
-
-
 	Renderer::Renderer(const string& resourcePath)
 		: m_resourcePath(resourcePath)
+		, m_null(false)
 		, m_debugBatch(0)
 		, m_debugDepth(0)
 		, m_debugPrintFilter("")
@@ -50,10 +49,10 @@ namespace toy
 
 		this->beginFrame(target);
 
-		this->render(*target.layer().d_wedge, target.layer(), false);
+		this->render(*target.m_layer.d_wedge, target.m_layer, false);
 
 #ifdef TOYUI_DRAW_CACHE
-		target.layer().visit([this](Layer& layer) {
+		target.m_layer.visit([this](Layer& layer) {
 			if(layer.visible())
 			{
 				void* layerCache = nullptr;
@@ -89,13 +88,13 @@ namespace toy
 		this->beginDraw(layer, wedge.frame(), force);
 		this->draw(layer, wedge.frame(), force);
 
-		for(size_t i = 0; i < wedge.contents().size(); ++i)
-			if(!wedge.contents()[i]->frame().d_hidden)
+		for(size_t i = 0; i < wedge.m_contents.size(); ++i)
+			if(!wedge.m_contents[i]->frame().d_hidden)
 			{
-				if(wedge.contents()[i]->isa<Wedge>())
-					this->render(wedge.contents()[i]->as<Wedge>(), layer, force);
+				if(wedge.m_contents[i]->isa<Wedge>())
+					this->render(wedge.m_contents[i]->as<Wedge>(), layer, force);
 				else
-					this->render(*wedge.contents()[i], layer, force);
+					this->render(*wedge.m_contents[i], layer, force);
 			}
 
 		this->endDraw(layer, wedge.frame());
@@ -152,7 +151,7 @@ namespace toy
 		if(custom)
 			return;
 
-		//printf("DEBUG: Render Frame : %s\n", frame.style().name().c_str());
+		//printf("DEBUG: Render Frame : %s\n", frame.style().m_name.c_str());
 
 		float paddedLeft = floor(inkstyle.m_padding.val.x0);
 		float paddedTop = floor(inkstyle.m_padding.val.y0);
@@ -170,7 +169,7 @@ namespace toy
 		BoxFloat contentRect(contentPos.x, contentPos.y, contentSize.x, contentSize.y);
 		
 #if 1 // DEBUG
-		if(frame.d_style->name() == m_debugDrawFilter)
+		if(frame.d_style->m_name == m_debugDrawFilter)
 			this->debugRect(rect, Colour::Red);
 		if(m_debugDrawFrameRect)
 			this->debugRect(rect, Colour::Red);
@@ -235,7 +234,7 @@ namespace toy
 		}
 
 		// Rect
-		if(inkstyle.m_borderWidth.val.x0 || inkstyle.m_backgroundColour.val.a() > 0.f)
+		if(inkstyle.m_borderWidth.val.x0 || !inkstyle.m_backgroundColour.val.null())
 		{
 			BoxFloat cornerRadius = inkstyle.m_weakCorners ? this->selectCorners(frame) : inkstyle.m_cornerRadius.val;
 			this->drawRect(rect, cornerRadius, inkstyle);

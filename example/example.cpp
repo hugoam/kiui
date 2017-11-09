@@ -4,7 +4,7 @@
 
 #include <toyui/Bundle.h>
 
-#ifdef TOY_PLATFORM_EMSCRIPTEN
+#if TOY_PLATFORM_EMSCRIPTEN
 	#include <toyui/Context/EmscriptenContext.h>
 	#define TOYUI_RESOURCE_PATH "/data/"
 	#include <emscripten/emscripten.h>
@@ -14,8 +14,10 @@
 	{
 		gWindow->nextFrame();
 	}
-#elif defined TOY_RENDERER_OGRE
+#elif TOY_CONTEXT_OGRE
 	#include <toyui/Context/Ogre/OgreContext.h>
+#elif TOY_CONTEXT_WINDOWS
+	#include <toyui/Context/Windows/WindowsContext.h>
 #else
 	#include <toyui/Context/Glfw/GlfwContext.h>
 #endif
@@ -28,9 +30,11 @@ int main(int argc, char *argv[])
 {
 #ifdef TOY_PLATFORM_EMSCRIPTEN
 	toy::EmRenderSystem renderSystem(TOYUI_RESOURCE_PATH);
-#elif defined TOY_RENDERER_OGRE
+#elif defined TOY_CONTEXT_OGRE
 	toy::OgreRenderSystem renderSystem(TOYUI_RESOURCE_PATH);
 	renderSystem.init();
+#elif TOY_CONTEXT_WINDOWS
+	toy::WinRenderSystem renderSystem(TOYUI_RESOURCE_PATH);
 #else
 	toy::GlfwRenderSystem renderSystem(TOYUI_RESOURCE_PATH);
 #endif

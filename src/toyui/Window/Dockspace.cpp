@@ -27,7 +27,7 @@ namespace toy
 		window.m_container->store().transfer(window, this->rootSheet());
 		this->removeTab(tab);
 
-		if(m_tabs.contents().empty())
+		if(m_tabs.m_contents.empty())
 			m_dockline->removeSection();
 	}
 
@@ -105,8 +105,8 @@ namespace toy
 
 	void Dockline::moveSection(Docksection& docksection)
 	{
-		docksection.dockline().store().transfer(docksection, *this);
-		docksection.setDockline(*this);
+		docksection.m_dockline->store().transfer(docksection, *this);
+		docksection.m_dockline = this;
 		m_docksection = &docksection;
 	}
 
@@ -118,7 +118,7 @@ namespace toy
 
 	void Dockline::removeSection()
 	{
-		m_docksection->extract();
+		m_docksection->destroy();
 		m_dockline->removeLine(*this);
 	}
 
@@ -127,8 +127,8 @@ namespace toy
 		Dockline& firstline = m_contents.at(0)->as<Dockline>();
 		Dockline* line = &firstline;
 
-		while(line->contents().size() == 1 && !line->m_docksection)
-			line = &line->contents().at(0)->as<Dockline>();
+		while(line->m_contents.size() == 1 && !line->m_docksection)
+			line = &line->m_contents.at(0)->as<Dockline>();
 
 		if(line->m_docksection)
 		{
@@ -187,7 +187,7 @@ namespace toy
 	Window& Dockspace::addDockWindow(const string& name, const GridIndex& dockid, float span)
 	{
 		Docksection& section = this->addSection(dockid);
-		Dockline& line = section.dockline();
+		Dockline& line = *section.m_dockline;
 		if(span)
 			line.frame().setSpanDim(line.m_dockline->dim(), span);
 		Window& window = section.addTab(name).emplace<Window>(name, static_cast<WindowState>(WINDOW_DOCKABLE | WINDOW_DEFAULT), nullptr, &section);

@@ -14,7 +14,7 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Expandbox : public Wedge
 	{
 	public:
-		Expandbox(Wedge& parent, const string& title, bool collapsed = false, Type& type = cls());
+		Expandbox(Wedge& parent, const StringVector& elements, bool collapsed = false, Type& type = cls());
 
 		virtual void expand();
 		virtual void collapse();
@@ -26,9 +26,8 @@ namespace toy
 		static Type& Body() { static Type ty("ExpandboxBody", Wedge::cls()); return ty; }
 
 	public:
-		WrapButton m_header;
+		MultiButton m_header;
 		Toggle m_toggle;
-		Label m_title;
 		Wedge m_body;
 
 	protected:

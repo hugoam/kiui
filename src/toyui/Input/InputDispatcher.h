@@ -18,6 +18,7 @@ namespace toy
 {
 	enum InputModifier : unsigned int
 	{
+		INPUT_NO_MOD = 0,
 		INPUT_SHIFT = 1 << 0,
 		INPUT_CTRL = 1 << 1,
 		INPUT_ALT = 1 << 2
@@ -59,7 +60,7 @@ namespace toy
 
 		std::vector<Widget*> visited;
 
-		InputEvent(DeviceType deviceType, EventType eventType) : deviceType(deviceType), eventType(eventType), consumed(false), abort(false) {}
+		InputEvent(DeviceType deviceType, EventType eventType) : deviceType(deviceType), eventType(eventType), consumed(false), abort(false), modifiers(INPUT_NO_MOD) {}
 		virtual ~InputEvent() {}
 
 		virtual void dispatch(RootSheet& rootSheet) { UNUSED(rootSheet); }
@@ -73,6 +74,9 @@ namespace toy
 
 		virtual void initInput(RenderWindow& renderWindow, Mouse& mouse, Keyboard& keyboard) = 0;
 		virtual void resize(size_t width, size_t height) = 0;
+
+		float m_cursorX;
+		float m_cursorY;
 
 		static Type& cls() { static Type ty; return ty; }
 	};

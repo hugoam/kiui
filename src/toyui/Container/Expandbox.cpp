@@ -9,14 +9,15 @@
 
 namespace toy
 {
-	Expandbox::Expandbox(Wedge& parent, const string& title, bool collapsed, Type& type)
+	Expandbox::Expandbox(Wedge& parent, const StringVector& elements, bool collapsed, Type& type)
 		: Wedge(parent, type)
-		, m_header(*this, nullptr, Header())
+		, m_header(*this, {}, nullptr, Header())
 		, m_toggle(m_header, [this](Widget&, bool on) { on ? this->expand() : this->collapse(); }, !collapsed, Switch())
-		, m_title(m_header, title)
 		, m_body(*this, Body())
 		, m_collapsed(collapsed)
 	{
+		m_header.reset(elements);
+
 		if(collapsed)
 			m_body.hide();
 	}

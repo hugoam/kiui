@@ -17,15 +17,12 @@ namespace toy
 		: Item(parent, label, type)
 	{}
 
-	Text::Text(Wedge& parent, const string& label)
-		: Label(parent, label, cls())
-	{}
-
 	Button::Button(Wedge& parent, const string& content, const Callback& trigger, Type& type)
 		: Item(parent, type)
 		, ClickTrigger(*this, trigger)
 	{
-		this->setContent(content);
+		if(!content.empty())
+			this->setContent(content);
 	}
 
 	bool Button::leftClick(MouseEvent& mouseEvent)
@@ -82,8 +79,8 @@ namespace toy
 
 	Toggle::Toggle(Wedge& parent, const Callback& callback, bool on, Type& type)
 		: Item(parent, type)
-		, m_callback(callback)
 		, m_on(on)
+		, m_callback(callback)
 	{
 		if(m_on)
 			this->enableState(ACTIVATED);

@@ -7,9 +7,7 @@
 
 /* toy */
 #include <toyobj/Type.h>
-#include <toyui/Widget/Sheet.h>
-#include <toyui/Container/ScrollSheet.h>
-
+#include <toyobj/Store/Array.h>
 #include <toyui/Container/Expandbox.h>
 
 namespace toy
@@ -17,9 +15,10 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT TreeNode : public Expandbox
 	{
 	public:
-		TreeNode(Wedge& parent, const string& image, const string& title, bool collapsed = false, Type& type = cls());
+		TreeNode(Wedge& parent, const StringVector& elements, bool collapsed = false, const Callback& onSelect = nullptr, const Callback& onUnselect = nullptr, Type& type = cls());
 
-		void selected();
+		void select();
+		void unselect();
 
 		static Type& cls() { static Type ty("TreeNode", Expandbox::cls()); return ty; }
 
@@ -28,16 +27,20 @@ namespace toy
 		static Type& Body() { static Type ty("TreeNodeBody", Expandbox::Body()); return ty; }
 
 	protected:
-		string m_image;
-		Item* m_icon;
+		Callback m_onSelect;
+		Callback m_onUnselect;
 	};
 
-	class _refl_ TOY_UI_EXPORT Tree : public Wedge
+	class _refl_ TOY_UI_EXPORT Tree : public Wedge, public StoreObserver<TreeNode>
 	{
 	public:
-		Tree(Wedge& parent, const std::function<void (TreeNode&)>& onSelected = nullptr);
+		Tree(Wedge& parent);
 
-		void select(TreeNode& node);
+		Array<TreeNode> m_selection;
+
+		void handleAdd(TreeNode& node);
+		void handleRemove(TreeNode& node);
+
 		void expand(TreeNode& node, bool exclusive = false);
 		void collapse();
 
@@ -45,8 +48,6 @@ namespace toy
 
 	protected:
 		TreeNode* m_rootNode;
-		TreeNode* m_selected;
-		std::function<void(TreeNode&)> m_onSelected;
 	};
 }
 

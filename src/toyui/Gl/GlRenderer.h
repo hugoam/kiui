@@ -5,7 +5,7 @@
 #ifndef TOY_GLRENDERER_H
 #define TOY_GLRENDERER_H
 
-/* toy Og */
+/* toy */
 #include <toyui/Forward.h>
 #include <toyui/Nano/NanoRenderer.h>
 

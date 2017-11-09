@@ -22,7 +22,7 @@ namespace toy
 		else if(preset == DIV)    return { ORTHOGONAL, WRAP,   SHRINK };
 		else if(preset == SPACER) return { PARALLEL,   WRAP,   SHRINK };
 		else if(preset == BOARD)  return { PARAGRAPH,  EXPAND, EXPAND };
-		else 					  return{ PARAGRAPH,  WRAP,   WRAP };
+		else 					  return { PARAGRAPH,  WRAP,   WRAP };
 	}
 
 	float AlignSpace[5] = { 0.f, 0.5f, 1.f, 0.f, 1.f };
@@ -96,7 +96,7 @@ namespace toy
 #if 0 // DEBUG
 		if(!d_frame) return;
 		d_frame->debugPrintDepth();
-		printf("LAYOUT: %s measured content size %i , %i\n", d_frame->style().name().c_str(), int(d_content.x), int(d_content.y));
+		printf("LAYOUT: %s measured content size %i , %i\n", d_frame->style().m_name.c_str(), int(d_content.x), int(d_content.y));
 #endif
 	}
 
@@ -109,9 +109,9 @@ namespace toy
 #if 0 // DEBUG
 		if(!d_frame) return;
 		d_frame->debugPrintDepth();
-		printf("LAYOUT: %s size %i , %i\n", d_frame->style().name().c_str(), int(d_size.x), int(d_size.y));
+		printf("LAYOUT: %s size %i , %i\n", d_frame->style().m_name.c_str(), int(d_size.x), int(d_size.y));
 		d_frame->debugPrintDepth();
-		printf("        %s position %i , %i\n", d_frame->style().name().c_str(), int(d_position.x), int(d_position.y));
+		printf("        %s position %i , %i\n", d_frame->style().m_name.c_str(), int(d_position.x), int(d_position.y));
 #endif
 	}
 

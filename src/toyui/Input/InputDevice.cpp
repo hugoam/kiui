@@ -80,6 +80,10 @@ namespace toy
 	{
 		m_rootSheet.transformCoordinates(mouseEvent);
 		mouseEvent.delta = mouseEvent.pos - m_lastPos;
+		if(m_rootSheet.m_keyboard.m_shiftPressed)
+			mouseEvent.modifiers = static_cast<InputModifier>(mouseEvent.modifiers ^ INPUT_SHIFT);
+		if(m_rootSheet.m_keyboard.m_ctrlPressed)
+			mouseEvent.modifiers = static_cast<InputModifier>(mouseEvent.modifiers ^ INPUT_CTRL);
 	}
 
 	void Mouse::dispatchMouseMoved(DimFloat pos)

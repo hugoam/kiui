@@ -11,11 +11,20 @@
 
 /* std */
 #include <map>
-#include <vector>
 #include <functional>
 
 namespace toy
 {
+	struct TOY_UI_EXPORT KeyCombo
+	{
+		KeyCombo(KeyCode key) : m_key(key) {}
+		KeyCombo(KeyCode modifier, KeyCode key) : m_modifier(modifier), m_key(key) {}
+		KeyCode m_modifier;
+		KeyCode m_key;
+		uint64_t value() const { return (uint64_t) m_modifier << 32 | m_key; }
+		friend bool operator<(const KeyCombo& lhs, const KeyCombo& rhs) { return lhs.value() < rhs.value(); }
+	};
+
 	class TOY_UI_EXPORT KeyInputFrame : public InputAdapter
 	{
 	public:
@@ -26,10 +35,9 @@ namespace toy
 
 	protected:
 		typedef std::function<void()> KeyHandler;
-		typedef std::map<KeyCode, KeyHandler> KeyMap;
 
-		KeyMap m_keyDownHandlers;
-		KeyMap m_keyUpHandlers;
+		std::map<KeyCombo, KeyHandler> m_keyDownHandlers;
+		std::map<KeyCombo, KeyHandler> m_keyUpHandlers;
 	};
 
 	class TOY_UI_EXPORT Controller : public KeyInputFrame

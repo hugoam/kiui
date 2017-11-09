@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_OGRECONTEXT_H
-#define TOY_OGRECONTEXT_H
+#ifndef TOY_GFXRECONTEXT_H
+#define TOY_GFXRECONTEXT_H
 
 /* toy */
 #include <toyui/Forward.h>
@@ -35,8 +35,8 @@ namespace toy
 		OgreRenderSystem(const string& resourcePath);
 		~OgreRenderSystem();
 
-		Ogre::Root& ogreRoot() { return *m_ogreRoot; }
-		bool contextActive() { return m_contextActive; }
+		unique_ptr<Ogre::Root> m_ogreRoot;
+		bool m_contextActive;
 
 		bool nextFrame();
 
@@ -51,12 +51,9 @@ namespace toy
 		virtual object_ptr<Renderer> createRenderer(Context& context);
 
 	protected:
-		unique_ptr<Ogre::Root> m_ogreRoot;
-		bool m_contextActive;
-
 		Ogre::RenderWindow* m_hiddenWindow;
 		Ogre::RenderSystem* m_renderSystem;
 	};
 }
 
-#endif // TOY_OGRECONTEXT_H
+#endif // TOY_GFXRECONTEXT_H

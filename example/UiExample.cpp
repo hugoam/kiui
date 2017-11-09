@@ -6,8 +6,6 @@
 
 #include <cfloat>
 
-using namespace std::placeholders;
-
 namespace toy
 {
 	const char* girl_names[] =
@@ -252,13 +250,13 @@ namespace toy
 
 		Wedge& line0 = table1.emplace<Wedge>(Wedge::Row());
 
-		Expandbox& box0 = line0.emplace<Expandbox>("Category A");
+		Expandbox& box0 = line0.emplace<Expandbox>(StringVector{ "Category A" });
 		box0.m_body.emplace<Label>("Blah blah blah");
 
-		Expandbox& box1 = line0.emplace<Expandbox>("Category B");
+		Expandbox& box1 = line0.emplace<Expandbox>(StringVector{ "Category B" });
 		box1.m_body.emplace<Label>("Blah blah blah");
 
-		Expandbox& box2 = line0.emplace<Expandbox>("Category C");
+		Expandbox& box2 = line0.emplace<Expandbox>(StringVector{ "Category C" });
 		box2.m_body.emplace<Label>("Blah blah blah");
 
 
@@ -285,19 +283,19 @@ namespace toy
 	Wedge& createUiTestTree(Wedge& parent)
 	{
 		Tree& tree = parent.emplace<Tree>();
-		TreeNode& node = tree.emplace<TreeNode>("", "Tree");
+		TreeNode& node = tree.emplace<TreeNode>(StringVector{ "Tree" });
 
 		for(size_t i = 0; i < 5; i++)
 		{
-			TreeNode& innerNode = node.m_body.emplace<TreeNode>("", "Child " + toString(i), true);
+			TreeNode& innerNode = node.m_body.emplace<TreeNode>(StringVector{ "Child " + toString(i) }, true);
 			TreeNode* nestedNode = &innerNode;
 			for(size_t j = 0; j < 5; j++)
-				nestedNode = &nestedNode->m_body.emplace<TreeNode>("", "Child " + toString(i) + " : " + toString(j), true);
+				nestedNode = &nestedNode->m_body.emplace<TreeNode>(StringVector{ "Child " + toString(i) + " : " + toString(j) }, true);
 		}
 
 		for(size_t i = 0; i < 5; i++)
 		{
-			TreeNode& innerNode = node.m_body.emplace<TreeNode>("", "Child " + toString(5 + i));
+			TreeNode& innerNode = node.m_body.emplace<TreeNode>(StringVector{ "Child " + toString(5 + i) });
 			innerNode.m_body.emplace<Label>("Blah blah");
 			innerNode.m_body.emplace<Button>("Print");
 		}
@@ -308,18 +306,18 @@ namespace toy
 	{
 		Tree& tree = parent.emplace<Tree>();
 
-		TreeNode& node0 = tree.emplace<TreeNode>("", "Inside a tree...");
+		TreeNode& node0 = tree.emplace<TreeNode>(StringVector{ "Inside a tree..." });
 
-		TreeNode& node1 = node0.emplace<TreeNode>("", "node 1 (with borders)");
+		TreeNode& node1 = node0.emplace<TreeNode>(StringVector{ "node 1 (with borders)" });
 
-		TreeNode& tablenode0 = node1.emplace<TreeNode>("", "Table Node 0");
+		TreeNode& tablenode0 = node1.emplace<TreeNode>(StringVector{ "Table Node 0" });
 
 		tablenode0.emplace<Label>("aaa");
 		tablenode0.emplace<Label>("bbb");
 		tablenode0.emplace<Label>("ccc");
 		tablenode0.emplace<Label>("ddd");
 
-		TreeNode& tablenode1 = node1.emplace<TreeNode>("", "Table Node 1");
+		TreeNode& tablenode1 = node1.emplace<TreeNode>(StringVector{ "", "Table Node 1" });
 
 		tablenode1.emplace<Label>("eee");
 		tablenode1.emplace<Label>("fff");
@@ -464,22 +462,22 @@ namespace toy
 		parent.emplace<Label>("kiui says hello.\n" "line breaks can happen in a label");
 
 		static string help = "This window is being created by the ShowTestWindow() function. Please refer to the code for programming reference.\n\nUser Guide:";
-		Expandbox& box0 = parent.emplace<Expandbox>("Help");
-		box0.m_body.emplace<Text>(help);
+		Expandbox& box0 = parent.emplace<Expandbox>(StringVector{ "Help" });
+		box0.m_body.emplace<Label>(help, Label::Text());
 
-		Expandbox& box1 = parent.emplace<Expandbox>("Window options");
+		Expandbox& box1 = parent.emplace<Expandbox>(StringVector{ "Window options" });
 
 		box1.m_body.emplace<InputBool>("titlebar", true, [&window](bool on) { on ? window.showTitlebar() : window.hideTitlebar(); }, true);
 		box1.m_body.emplace<InputBool>("movable", true, [&window](bool) { window.toggleMovable(); }, true);
 		box1.m_body.emplace<InputBool>("resizable", true, [&window](bool) { window.toggleResizable(); }, true);
 		box1.m_body.emplace<InputBool>("closable", true, [&window](bool) { window.toggleClosable(); }, true);
 
-		box1.m_body.emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha) { window.frame().d_inkstyle->m_backgroundColour.val.setA(alpha); });
+		box1.m_body.emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha) { window.frame().d_inkstyle->m_backgroundColour.val.m_a = alpha; });
 
-		Expandbox& box2 = parent.emplace<Expandbox>("Widgets");
+		Expandbox& box2 = parent.emplace<Expandbox>(StringVector{ "Widgets" });
 		createUiTestControls(box2.m_body);
 
-		Expandbox& box3 = parent.emplace<Expandbox>("Table");
+		Expandbox& box3 = parent.emplace<Expandbox>(StringVector{ "Table" });
 		createUiTestTable(box3.m_body);
 
 		return window;

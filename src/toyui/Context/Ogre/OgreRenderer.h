@@ -2,8 +2,8 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_OGRERENDERER_H
-#define TOY_OGRERENDERER_H
+#ifndef TOY_GFXRERENDERER_H
+#define TOY_GFXRERENDERER_H
 
 /* toy */
 #include <toyui/Forward.h>
@@ -36,4 +36,4 @@ namespace toy
 	};
 }
 
-#endif // TOY_OGRERENDERER_H
+#endif // TOY_GFXRERENDERER_H

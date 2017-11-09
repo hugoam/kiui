@@ -17,22 +17,15 @@ namespace toy
 	class TOY_UI_EXPORT RenderTarget : public Object
 	{
 	public:
-		RenderTarget(Renderer& renderer, Layer& masterLayer, bool gammaCorrected);
+		RenderTarget(Renderer& renderer, Layer& layer, bool gammaCorrected);
 
-		Layer& layer() { return m_masterLayer; }
-
-		bool gammaCorrected() { return m_gammaCorrected; }
-		void setGammaCorrected(bool enabled) { m_gammaCorrected = enabled; }
+		Renderer& m_renderer;
+		Layer& m_layer;
+		bool m_gammaCorrected;
 
 		void render();
 
 		static Type& cls() { static Type ty; return ty; }
-
-	protected:
-		Renderer& m_renderer;
-		Layer& m_masterLayer;
-
-		bool m_gammaCorrected;
 	};
 
 	class TOY_UI_EXPORT Renderer : public Object
@@ -127,6 +120,8 @@ namespace toy
 		size_t m_debugDepth;
 
 		Clock m_clock;
+
+		bool m_null;
 
 	public:
 		string m_debugPrintFilter;
