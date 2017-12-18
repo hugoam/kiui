@@ -6,25 +6,21 @@
 #define TOY_RADIOBUTTON_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Frame/UiRect.h>
 #include <toyui/Widget/Widget.h>
 #include <toyui/Button/Button.h>
 
 namespace toy
 {
-	class TOY_UI_EXPORT RadioSwitch : public Wedge
+	class _refl_ TOY_UI_EXPORT RadioSwitch : public Wedge
 	{
 	public:
-		RadioSwitch(Wedge& parent, StringVector labels = {}, const Callback& callback = nullptr, size_t active = 0);
+		RadioSwitch(const Params& params, StringVector labels = {}, const Callback& callback = nullptr, size_t active = 0);
 
 		MultiButton& addChoice(const StringVector& elements);
 
 		void activated(MultiButton& choice);
-
-		static Type& cls() { static Type ty("RadioSwitch", Wedge::WrapControl()); return ty; }
-
-		static Type& Choice() { static Type ty("RadioChoice", MultiButton::cls()); return ty; }
 
 	protected:
 		Callback m_onSelected;

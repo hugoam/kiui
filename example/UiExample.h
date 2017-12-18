@@ -2,7 +2,7 @@
 #ifndef MK_UI_EXAMPLE_H
 #define MK_UI_EXAMPLE_H
 
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 
 namespace toy
 {

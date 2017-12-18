@@ -7,7 +7,7 @@
 
 /* toy */
 #include <toyobj/Type.h>
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Style/Style.h>
 
 namespace toy
@@ -15,11 +15,11 @@ namespace toy
 	class TOY_UI_EXPORT UiRect
 	{
 	public:
-		UiRect() : d_position(0.f, 0.f), d_size(0.f, 0.f), d_span(1.f, 1.f), d_scale(1.f) {}
+		UiRect() : d_position(0.f, 0.f), m_size(0.f, 0.f), m_span(1.f, 1.f), d_scale(1.f) {}
 
 		DimFloat d_position;
-		DimFloat d_size;
-		DimFloat d_span;
+		DimFloat m_size;
+		DimFloat m_span;
 		float d_scale;
 	};
 }

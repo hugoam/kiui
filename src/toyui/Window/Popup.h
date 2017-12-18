@@ -6,23 +6,21 @@
 #define TOY_POPUP_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Widget/Sheet.h>
 
 namespace toy
 {
-	class TOY_UI_EXPORT Popup : public Wedge
+	class _refl_ TOY_UI_EXPORT Popup : public Wedge
 	{
 	public:
-		Popup(Wedge& parent, Callback onClose = nullptr, bool open = true, Type& type = cls());
+		Popup(const Params& params, Callback onClose = nullptr, bool open = true);
 
 		virtual bool leftClick(MouseEvent& mouseEvent);
 		virtual bool rightClick(MouseEvent& mouseEvent);
 
 		void open(bool modal);
 		void close();
-
-		static Type& cls() { static Type ty("Popup", Wedge::Overlay()); return ty; }
 
 	protected:
 		Callback m_onClose;

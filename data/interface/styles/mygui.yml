@@ -57,7 +57,7 @@ Dockbar :
 TypeIn :
     copy_skin : Label
     image_skin : mygui/editbox, 6, 6, 8, 8
-    decline_image_skin : focused, pressed, active, active|focused
+    decline_image_skin : focused, triggered, active, active|focused
 
 Dropdown :
     copy_skin : TypeIn
@@ -66,7 +66,7 @@ DropdownToggle :
     reset_skin : true
     skin_padding : 4.0,4.0,4.0,4.0
     image : mygui/arrow_down
-    decline_image : focused, pressed
+    decline_image : focused, triggered
     
 ColumnHeader :
     copy_skin : Label
@@ -76,7 +76,7 @@ Button :
     copy_skin : Label
     skin_padding : 8.0,4.0,8.0,4.0
     image_skin : mygui/button, 6, 6, 8, 8
-    decline_image_skin : focused, pressed, activated
+    decline_image_skin : focused, triggered, activated
     
 RadioChoice :
     copy_skin : Button
@@ -84,7 +84,7 @@ RadioChoice :
 Checkbox :
     copy_skin : Icon
     image : mygui/checkbox
-    decline_image : focused, pressed, activated, activated|focused, activated|pressed
+    decline_image : focused, triggered, activated, activated|focused, activated|triggered
     
 ExpandboxToggle :
     reset_skin : true
@@ -104,12 +104,12 @@ Expandbox :
 ScrollUp :
     reset_skin : true
     image : mygui/arrow_up
-    decline_image : focused, pressed
+    decline_image : focused, triggered
     
 ScrollDown :
     reset_skin : true
     image : mygui/arrow_down
-    decline_image : focused, pressed
+    decline_image : focused, triggered
 
 Scroller :
     padding : 2.0, 2.0, 1.0, 1.0
@@ -117,13 +117,13 @@ Scroller :
 CloseButton :
     reset_skin : true
     image : mygui/closebutton
-    decline_image : focused, pressed
+    decline_image : focused, triggered
 
 SliderKnob :
     reset_skin : true
     image_skin : mygui/sliderknobx, 1, 1, 3, 3
     size : 7.0,0.0
-    decline_image_skin : focused, pressed
+    decline_image_skin : focused, triggered
     
 Filler :
     background_colour : 1.0,1.0,1.0,0.3
@@ -144,7 +144,7 @@ ScrollerKnob :
     reset_skin : true
     align : CENTER, LEFT
     image_skin : mygui/scrollerknoby, 5, 2, 7, 4
-    decline_image_skin : focused, pressed, activated
+    decline_image_skin : focused, triggered, activated
 
 DropdownList :
     copy_skin : Frame

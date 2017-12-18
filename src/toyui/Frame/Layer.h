@@ -10,7 +10,7 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT Layer : public Frame
+	class _refl_ TOY_UI_EXPORT Layer : public Frame
 	{
 	public:
 		Layer(Wedge& wedge, FrameType layerType);
@@ -25,7 +25,7 @@ namespace toy
 
 		virtual FrameType frameType() { return d_layerType; }
 
-		size_t z() { return d_style->m_layout.d_zorder.val ? d_style->m_layout.d_zorder.val : d_z; }
+		size_t z() { return d_style->m_layout.m_zorder ? d_style->m_layout.m_zorder : d_z; }
 
 		bool redraw() { return d_redraw >= REDRAW; }
 		bool forceRedraw() { return d_redraw >= FORCE_REDRAW; }

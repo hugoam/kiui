@@ -7,8 +7,8 @@
 
 namespace toy
 {
-	RadioSwitch::RadioSwitch(Wedge& parent, StringVector labels, const Callback& onSelected, size_t active)
-		: Wedge(parent, cls())
+	RadioSwitch::RadioSwitch(const Params& params, StringVector labels, const Callback& onSelected, size_t active)
+		: Wedge({ params, &cls<RadioSwitch>() })
 		, m_onSelected(onSelected)
 		, m_active(nullptr)
 		, m_activeIndex(active)
@@ -19,7 +19,7 @@ namespace toy
 
 	MultiButton& RadioSwitch::addChoice(const StringVector& elements)
 	{
-		MultiButton& choice = this->emplace<MultiButton>(elements, [this](Widget& button) { this->activated(button.as<MultiButton>()); }, RadioSwitch::Choice());
+		MultiButton& choice = this->emplace_style<MultiButton>(styles().radio_choice , elements, [&](Widget& button) { this->activated(as<MultiButton>(button)); });
 		
 		if(m_contents.size() - 1 == m_activeIndex)
 		{

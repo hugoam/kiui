@@ -6,7 +6,8 @@
 #define TOY_NANOATLAS_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
+#include <toyobj/Util/Unique.h>
 #include <toyui/Image.h>
 
 #include <memory>

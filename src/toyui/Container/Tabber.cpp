@@ -9,8 +9,8 @@
 
 namespace toy
 {
-	Tab::Tab(Wedge& parent, Tabber& tabber, Button& header, bool active)
-		: Wedge(parent, cls())
+	Tab::Tab(const Params& params, Tabber& tabber, Button& header, bool active)
+		: Wedge({ params, &cls<Tab>() })
 		, m_tabber(tabber)
 		, m_header(header)
 		, m_active(active)
@@ -26,26 +26,28 @@ namespace toy
 		m_tabber.removeTab(*this);
 	}
 
-	Tabber::Tabber(Wedge& parent, Type& type, bool downtabs)
-		: Wedge(parent, type)
-		, m_headers(*this, Head())
-		, m_tabs(*this, Body())
+	Tabber::Tabber(const Params& params, bool downtabs)
+		: Wedge({ params, &cls<Tabber>() })
+		, m_headers({ this, &styles().head })
+		, m_tabs({ this, &styles().body })
 		, m_currentTab(nullptr)
 		, m_downTabs(downtabs)
+		, m_hideSingleHeader(false)
 	{
 		if(m_downTabs)
 			this->swap(0, 1);
-		m_headers.hide();
+		if(m_hideSingleHeader)
+			m_headers.hide();
 	}
 
 	Tab& Tabber::addTab(const string& name)
 	{
-		Button& header = m_headers.emplace<Button>(name, [this](Widget& button) {return this->headerClicked(button); }, Header());
+		Button& header = m_headers.emplace_style<Button>(styles().tab_button, name, [this](Widget& button) {return this->headerClicked(button); });
 		Tab& tab = m_tabs.emplace<Tab>(*this, header, m_currentTab == nullptr);
 
 		if(!m_currentTab)
 			m_currentTab = &tab;
-		else if(m_tabs.count() == 2)
+		else if(m_hideSingleHeader && m_tabs.count() == 2)
 			m_headers.show();
 
 		return tab;
@@ -61,7 +63,7 @@ namespace toy
 
 		if(m_tabs.count() > 0)
 			this->showTab(size_t(0));
-		if(m_tabs.count() == 1)
+		if(m_hideSingleHeader && m_tabs.count() == 1)
 			m_headers.hide();
 	}
 
@@ -84,6 +86,6 @@ namespace toy
 
 	void Tabber::showTab(size_t index)
 	{
-		this->showTab(m_tabs.at(index).as<Tab>());
+		this->showTab(as<Tab>(m_tabs.at(index)));
 	}
 }

@@ -330,7 +330,7 @@ namespace toy
 
 	void WinInputWindow::initInput(RenderWindow& renderWindow, Mouse& mouse, Keyboard& keyboard)
 	{
-		m_renderWindow = &renderWindow.as<WinRenderWindow>();
+		m_renderWindow = &as<WinRenderWindow>(renderWindow);
 		m_hwnd = m_renderWindow->m_hwnd;
 		m_mouse = &mouse;
 		m_keyboard = &keyboard;
@@ -383,8 +383,8 @@ namespace toy
 
 	WinContext::WinContext(RenderSystem& renderSystem, const string& name, int width, int height, bool fullScreen)
 		: Context(renderSystem, initialize(name, width, height, fullScreen), make_object<WinInputWindow>())
-		, m_render(Context::m_renderWindow->as<WinRenderWindow>())
-		, m_input(Context::m_inputWindow->as<WinInputWindow>())
+		, m_render(as<WinRenderWindow>(*Context::m_renderWindow))
+		, m_input(as<WinInputWindow>(*Context::m_inputWindow))
 	{
 		WindowHolder::instance().add(*this);
 

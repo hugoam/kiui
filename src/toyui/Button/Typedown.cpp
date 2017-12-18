@@ -11,9 +11,9 @@
 
 namespace toy
 {
-	TypedownInput::TypedownInput(Wedge& parent, StringVector choices, const Callback& callback)
-		: DropdownInput(parent, choices, callback, cls())
-		, m_input(*this, m_list, nullptr)
+	TypedownInput::TypedownInput(const Params& params, StringVector choices, const Callback& callback)
+		: DropdownInput({ params, &cls<TypedownInput>() }, choices, callback)
+		, m_input({ this }, m_list, nullptr)
 	{
 		this->move(m_input.m_index, 0);
 		m_trigger = [this](Widget&) { this->dropdown(); };

@@ -89,7 +89,7 @@ TreeNodeToggle :
 Checkbox :
     reset_skin : true
     image : tbb/checkbox
-    decline_image : pressed
+    decline_image : triggered
     
     activated:
         overlay : tbb/checkbox_activated
@@ -97,13 +97,13 @@ Checkbox :
 CloseButton :
     reset_skin : true
     image : tbb/window_close
-    decline_image : pressed
+    decline_image : triggered
     
 Button :
     copy_skin : Label
     skin_padding : 8.0,4.0,8.0,4.0
     image_skin : tbb/button, 12, 12, 12, 12, 7
-    decline_image_skin : pressed
+    decline_image_skin : triggered
 
 RadioChoice :
     copy_skin : Button
@@ -111,7 +111,7 @@ RadioChoice :
     skin_padding : 8.0,4.0,8.0,4.0
     image_skin : tbb/button_grouped_x_middle, 12, 12, 12, 12, 7
 
-    decline_image_skin : pressed
+    decline_image_skin : triggered
     
 Dropdown :
     copy_skin : Button
@@ -167,5 +167,5 @@ ColumnHeader :
 WrapButton :
     reset_skin : true
     image_skin : tbb/item, 7, 7, 7, 7
-    decline_image_skin : focused, pressed, selected
+    decline_image_skin : focused, triggered, selected
     

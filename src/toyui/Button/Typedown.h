@@ -15,12 +15,10 @@ namespace toy
 	class TOY_UI_EXPORT TypedownInput : public DropdownInput
 	{
 	public:
-		TypedownInput(Wedge& parent, StringVector choices = {}, const Callback& callback = nullptr);
+		TypedownInput(const Params& params, StringVector choices = {}, const Callback& callback = nullptr);
 
 		virtual void dropdown(bool modal = true);
 		virtual void dropup();
-
-		static Type& cls() { static Type ty("TypedownInput", DropdownInput::cls()); return ty; }
 
 	protected:
 		FilterInput m_input;

@@ -8,13 +8,13 @@
 /* toy */
 #include <toyobj/Type.h>
 #include <toyobj/Util/Timer.h>
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Frame/Caption.h>
 #include <toyui/Style/ImageSkin.h>
 
 namespace toy
 {
-	class TOY_UI_EXPORT RenderTarget : public Object
+	class _refl_ TOY_UI_EXPORT RenderTarget : public Object
 	{
 	public:
 		RenderTarget(Renderer& renderer, Layer& layer, bool gammaCorrected);
@@ -24,8 +24,6 @@ namespace toy
 		bool m_gammaCorrected;
 
 		void render();
-
-		static Type& cls() { static Type ty; return ty; }
 	};
 
 	class TOY_UI_EXPORT Renderer : public Object
@@ -111,8 +109,6 @@ namespace toy
 
 		virtual float textLineHeight(InkStyle& skin) = 0;
 		virtual float textSize(const string& text, Dimension dim, InkStyle& skin) = 0;
-
-		static Type& cls() { static Type ty; return ty; }
 
 	protected:
 		string m_resourcePath;

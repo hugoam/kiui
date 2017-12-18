@@ -16,48 +16,48 @@ namespace toy
 	class TOY_UI_EXPORT FrameSolver : public Object, public UiRect
 	{
 	public:
-		FrameSolver(FrameSolver* solver, LayoutStyle* layout, Frame* frame = nullptr);
+		FrameSolver(FrameSolver* solver, Layout* layout, Frame* frame = nullptr);
 
-		inline bool flow() { return d_style->d_flow == FLOW; }
-		inline bool posflow() { return d_style->d_flow <= ALIGN; }
-		inline bool sizeflow() { return d_style->d_flow <= OVERLAY; }
+		inline bool flow() { return d_style->m_flow == FLOW; }
+		inline bool posflow() { return d_style->m_flow <= ALIGN; }
+		inline bool sizeflow() { return d_style->m_flow <= OVERLAY; }
 
-		inline float dpadding(Dimension dim) { return d_style->d_padding.val[dim]; }
-		inline float dbackpadding(Dimension dim) { return d_style->d_padding.val[dim + 2]; }
-		inline float dmargin(Dimension dim) { return d_style->d_margin.val[dim]; }
+		inline float dpadding(Dimension dim) { return d_style->m_padding[dim]; }
+		inline float dbackpadding(Dimension dim) { return d_style->m_padding[dim + 2]; }
+		inline float dmargin(Dimension dim) { return d_style->m_margin[dim]; }
 
-		inline Align dalign(Dimension dim) { return d_style->d_align.val[dim]; }
+		inline Align dalign(Dimension dim) { return d_style->m_align[dim]; }
 
 		inline float dcontent(Dimension dim) { return d_content[dim] + dpadding(dim) + dbackpadding(dim); }
 		inline float dbounds(Dimension dim) { return dcontent(dim) + dmargin(dim) * 2.f; }
 
-		inline float dextent(Dimension dim) { return d_size[dim] + dmargin(dim) * 2.f; }
-		inline float doffset(Dimension dim) { return d_position[dim] + d_size[dim] + dmargin(dim); }
-		inline float dspace(Dimension dim) { return d_size[dim] - dpadding(dim) - dbackpadding(dim); }
+		inline float dextent(Dimension dim) { return m_size[dim] + dmargin(dim) * 2.f; }
+		inline float doffset(Dimension dim) { return d_position[dim] + m_size[dim] + dmargin(dim); }
+		inline float dspace(Dimension dim) { return m_size[dim] - dpadding(dim) - dbackpadding(dim); }
 
-		//inline float spacing(FrameSolver& frame) { return d_prev ? d_style->d_spacing.val[d_length] : 0.f; }
-		inline float spacing() { return d_style->d_spacing.val[d_length]; }
+		//inline float spacing(FrameSolver& frame) { return d_prev ? d_style->m_spacing[d_length] : 0.f; }
+		inline float spacing() { return d_style->m_spacing[d_length]; }
 
 		inline Dimension orthogonal(Dimension dim) { return dim == DIM_X ? DIM_Y : DIM_X; }
 
 		void setup(const DimFloat& position, const DimFloat& size, const DimFloat& span, const DimFloat* content)
 		{
 			d_position = position;
-			d_span = span;
-			d_size = size;
+			m_span = span;
+			m_size = size;
 
-			if(d_sizing.x == FIXED) d_content.x = (content ? content->x : d_size.x - dpadding(DIM_X) - dbackpadding(DIM_X));
-			if(d_sizing.y == FIXED) d_content.y = (content ? content->y : d_size.y - dpadding(DIM_Y) - dbackpadding(DIM_Y));
-			if(d_sizing.x == FIXED) d_size.x = d_content.x + dpadding(DIM_X) + dbackpadding(DIM_X);
-			if(d_sizing.y == FIXED) d_size.y = d_content.y + dpadding(DIM_Y) + dbackpadding(DIM_Y);
+			if(d_sizing.x == FIXED) d_content.x = (content ? content->x : m_size.x - dpadding(DIM_X) - dbackpadding(DIM_X));
+			if(d_sizing.y == FIXED) d_content.y = (content ? content->y : m_size.y - dpadding(DIM_Y) - dbackpadding(DIM_Y));
+			if(d_sizing.x == FIXED) m_size.x = d_content.x + dpadding(DIM_X) + dbackpadding(DIM_X);
+			if(d_sizing.y == FIXED) m_size.y = d_content.y + dpadding(DIM_Y) + dbackpadding(DIM_Y);
 		}
 
 		void reset(bool partial = false)
 		{
-			d_size = { 0.f, 0.f };
+			m_size = { 0.f, 0.f };
 			if(!partial)
 				d_content = { 0.f, 0.f };
-			d_spaceContent = { 0.f, 0.f };
+			m_spaceContent = { 0.f, 0.f };
 			d_contentExpand = false;
 			d_totalSpan = 0.f;
 			d_prev = nullptr;
@@ -79,26 +79,24 @@ namespace toy
 		virtual void compute(FrameSolver& frame, Dimension dim);
 		virtual void layout(FrameSolver& frame, Dimension dim);
 
-		static Type& cls() { static Type ty; return ty; }
-
 	public:
 		Frame* d_frame;
 		FrameSolver* d_parent;
-		FrameSolver* d_solvers[2];
+		FrameSolver* m_solvers[2];
 		FrameSolver* d_grid;
-		LayoutStyle* d_style;
+		Layout* d_style;
 
 		Dimension d_length;
 		Dimension d_depth;
 
-		DimSizing d_sizing;
+		Dim<Sizing> d_sizing;
 
 		DimFloat d_content;
-		DimFloat d_spaceContent;
+		DimFloat m_spaceContent;
 		bool d_contentExpand;
 		float d_totalSpan;
 
-		DimIndex d_index;
+		Dim<size_t> d_index;
 
 		FrameSolver* d_prev;
 		size_t d_count;
@@ -107,7 +105,7 @@ namespace toy
 	class TOY_UI_EXPORT RowSolver : public FrameSolver
 	{
 	public:
-		RowSolver(FrameSolver* solver, LayoutStyle* layout, Frame* frame = nullptr);
+		RowSolver(FrameSolver* solver, Layout* layout, Frame* frame = nullptr);
 
 		virtual void compute(FrameSolver& frame, Dimension dim);
 		virtual void layout(FrameSolver& frame, Dimension dim);
@@ -124,7 +122,7 @@ namespace toy
 	class TOY_UI_EXPORT CustomSolver : public RowSolver
 	{
 	public:
-		CustomSolver(FrameSolver* solver, LayoutStyle* layout, Frame* frame = nullptr);
+		CustomSolver(FrameSolver* solver, Layout* layout, Frame* frame = nullptr);
 
 		virtual void collect(SolverVector& solvers);
 

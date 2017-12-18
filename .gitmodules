@@ -1,6 +1,3 @@
-[submodule "toyobj"]
-	path = sub/toyobj
-	url = https://github.com/hugoam/toyobj
 [submodule "3rdparty/nanovg"]
 	path = 3rdparty/nanovg
 	url = https://github.com/memononen/nanovg

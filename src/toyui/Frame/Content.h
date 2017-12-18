@@ -7,8 +7,8 @@
 
 /* toy */
 #include <toyobj/Type.h>
-#include <toyui/Forward.h>
-#include <toyui/Style/Dim.h>
+#include <toyui/Types.h>
+#include <toyui/Frame/Dim.h>
 #include <toyui/Image.h>
 
 namespace toy
@@ -21,8 +21,6 @@ namespace toy
 		void setImage(Image* image);
 
 		DimFloat contentSize() { return{ float(m_image->d_width), float(m_image->d_height) }; }
-
-		static Type& cls() { static Type ty; return ty; }
 
 	public:
 		Frame& d_frame;

@@ -14,16 +14,11 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Table : public Wedge
 	{
 	public:
-		Table(Wedge& parent, StringVector columns, std::vector<float> weights);
+		Table(const Params& params, StringVector columns, std::vector<float> weights);
 
 		virtual void makeSolver();
 
 		void resize(Frame& first, Frame& second);
-
-		static Type& cls() { static Type ty("Table", Wedge::Stack()); return ty; }
-
-		static Type& Head() { static Type ty("TableHead", GridSheet::cls()); return ty; }
-		static Type& ColumnHeader() { static Type ty("ColumnHeader", Wedge::Row()); return ty; }
 
 	protected:
 		StringVector m_columns;

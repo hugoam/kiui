@@ -13,12 +13,12 @@
 
 namespace toy
 {
-	Label::Label(Wedge& parent, const string& label, Type& type)
-		: Item(parent, label, type)
+	Label::Label(const Params& params, const string& label)
+		: Widget({ params, &cls<Label>() }, label)
 	{}
 
-	Button::Button(Wedge& parent, const string& content, const Callback& trigger, Type& type)
-		: Item(parent, type)
+	Button::Button(const Params& params, const string& content, const Callback& trigger)
+		: Widget({ params, &cls<Button>() })
 		, ClickTrigger(*this, trigger)
 	{
 		if(!content.empty())
@@ -35,8 +35,8 @@ namespace toy
 		return this->clickAlt(mouseEvent);
 	}
 
-	WrapButton::WrapButton(Wedge& parent, const Callback& trigger, Type& type)
-		: Wedge(parent, type)
+	WrapButton::WrapButton(const Params& params, const Callback& trigger)
+		: Wedge({ params, &cls<WrapButton>() })
 		, ClickTrigger(*this, trigger)
 	{}
 
@@ -50,8 +50,8 @@ namespace toy
 		return this->clickAlt(mouseEvent);
 	}
 
-	MultiButton::MultiButton(Wedge& parent, const StringVector& elements, const Callback& trigger, Type& type)
-		: WrapButton(parent, trigger, type)
+	MultiButton::MultiButton(const Params& params, const StringVector& elements, const Callback& trigger)
+		: WrapButton({ params, &cls<MultiButton>() }, trigger)
 	{
 		this->reset(elements);
 	}
@@ -71,14 +71,14 @@ namespace toy
 		if(trigger)
 			m_trigger = trigger;
 
-		this->store().clear();
+		this->clear();
 		for(const string& value : elements)
-			this->emplace<Item>(value);
+			this->emplace_style<Widget>(styles().item, value);
 		m_elements = elements;
 	}
 
-	Toggle::Toggle(Wedge& parent, const Callback& callback, bool on, Type& type)
-		: Item(parent, type)
+	Toggle::Toggle(const Params& params, const Callback& callback, bool on)
+		: Widget({ params, &cls<Toggle>() })
 		, m_on(on)
 		, m_callback(callback)
 	{

@@ -8,7 +8,7 @@
 /* toy */
 #include <toyobj/Type.h>
 #include <toyobj/Util/Unique.h>
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Input/KeyCode.h>
 
 #include <vector>
@@ -77,8 +77,6 @@ namespace toy
 
 		float m_cursorX;
 		float m_cursorY;
-
-		static Type& cls() { static Type ty; return ty; }
 	};
 
 	enum ControlMode

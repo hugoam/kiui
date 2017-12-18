@@ -8,8 +8,8 @@
 /* toy */
 #include <toyobj/Indexer.h>
 #include <toyobj/Util/NonCopy.h>
-#include <toyui/Forward.h>
-#include <toyui/Style/Dim.h>
+#include <toyui/Types.h>
+#include <toyui/Frame/Dim.h>
 #include <toyui/Frame/Content.h>
 
 namespace toy
@@ -33,7 +33,7 @@ namespace toy
 		std::vector<TextGlyph> glyphs;
 	};
 
-	class TOY_UI_EXPORT Caption : public Object
+	class _refl_ TOY_UI_EXPORT Caption : public Object
 	{
 	public:
 		Caption(Frame& frame);
@@ -56,8 +56,6 @@ namespace toy
 
 		size_t caretIndex(const DimFloat& pos);
 		void caretCoords(DimFloat& pos);
-
-		static Type& cls() { static Type ty; return ty; }
 
 	public:
 		Frame& d_frame;

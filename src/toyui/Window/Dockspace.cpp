@@ -10,8 +10,8 @@
 
 namespace toy
 {
-	Docksection::Docksection(Wedge& parent, Dockline& dockline)
-		: Tabber(parent, cls(), false)
+	Docksection::Docksection(const Params& params, Dockline& dockline)
+		: Tabber({ params, &cls<Docksection>() }, false)
 		, m_dockline(&dockline)
 	{}
 
@@ -34,7 +34,7 @@ namespace toy
 	Tab& Docksection::addTab(const string& name)
 	{
 		Tab& tab = Tabber::addTab(name);
-		tab.setStyle(Docksection::DockTab());
+		tab.setStyle(Dockspace::styles().docktab);
 		return tab;
 	}
 
@@ -49,24 +49,25 @@ namespace toy
 	Docksection& Docksection::docktarget(const DimFloat& pos)
 	{
 		DimFloat local = m_frame->localPosition(pos);
-		if(local.x < m_frame->d_size.x * 0.25f)
+		if(local.x < m_frame->m_size.x * 0.25f)
 			return this->docktarget(DIM_X, false); // dock left
-		else if(local.x > m_frame->d_size.x * 0.75f)
+		else if(local.x > m_frame->m_size.x * 0.75f)
 			return this->docktarget(DIM_X, true); // dock right
-		else if(local.y < m_frame->d_size.y * 0.25f)
+		else if(local.y < m_frame->m_size.y * 0.25f)
 			return this->docktarget(DIM_Y, false); // dock under
-		else if(local.y > m_frame->d_size.y * 0.75f)
+		else if(local.y > m_frame->m_size.y * 0.75f)
 			return this->docktarget(DIM_Y, true); // dock above
 		else
 			return *this; // dock on
 	}
 
-	Dockline::Dockline(Wedge& parent, Dockspace& dockspace, Dockline* dockline, Dimension dim)
-		: GridSheet(parent, dim, nullptr, dim == DIM_X ? Dockline::DocklineX() : Dockline::DocklineY())
+	Dockline::Dockline(const Params& params, Dockspace& dockspace, Dockline* dockline, Dimension dim)
+		: GridSheet({ params, &cls<Dockline>() }, dim, nullptr)
 		, m_dockspace(dockspace)
 		, m_docksection(nullptr)
 		, m_dockline(dockline)
 	{
+		this->setStyle(dim == DIM_X ? Dockspace::styles().dockline_x : Dockspace::styles().dockline_y);
 		m_frame->d_length = dim;
 	}
 
@@ -124,11 +125,11 @@ namespace toy
 
 	void Dockline::collapseSection()
 	{
-		Dockline& firstline = m_contents.at(0)->as<Dockline>();
+		Dockline& firstline = as<Dockline>(*m_contents.at(0));
 		Dockline* line = &firstline;
 
 		while(line->m_contents.size() == 1 && !line->m_docksection)
-			line = &line->m_contents.at(0)->as<Dockline>();
+			line = &as<Dockline>(*line->m_contents.at(0));
 
 		if(line->m_docksection)
 		{
@@ -161,7 +162,7 @@ namespace toy
 			size_t index = dockid.back(); dockid.pop_back();
 			while(index >= dockline->count())
 				dockline->appendLine();
-			dockline = &dockline->at(index).as<Dockline>();
+			dockline = &as<Dockline>(dockline->at(index));
 		}
 
 		return *dockline;
@@ -173,9 +174,9 @@ namespace toy
 		return dockline.appendSection();
 	}
 
-	Dockspace::Dockspace(Wedge& parent)
-		: Wedge(parent, cls())
-		, m_mainLine(*this, *this, nullptr, DIM_Y)
+	Dockspace::Dockspace(const Params& params)
+		: Wedge({ params, &cls<Dockspace>() })
+		, m_mainLine({ this }, *this, nullptr, DIM_Y)
 	{}
 
 	Docksection& Dockspace::addSection(const GridIndex& dockid)

@@ -15,16 +15,19 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT TreeNode : public Expandbox
 	{
 	public:
-		TreeNode(Wedge& parent, const StringVector& elements, bool collapsed = false, const Callback& onSelect = nullptr, const Callback& onUnselect = nullptr, Type& type = cls());
+		TreeNode(const Params& params, const StringVector& elements, bool collapsed = false, const Callback& onSelect = nullptr, const Callback& onUnselect = nullptr);
 
 		void select();
 		void unselect();
 
-		static Type& cls() { static Type ty("TreeNode", Expandbox::cls()); return ty; }
-
-		static Type& Header() { static Type ty("TreeNodeHeader", Expandbox::Header()); return ty; }
-		static Type& Switch() { static Type ty("TreeNodeToggle", Expandbox::Switch()); return ty; }
-		static Type& Body() { static Type ty("TreeNodeBody", Expandbox::Body()); return ty; }
+		struct Styles
+		{
+			Style treenode = { cls<TreeNode>(), Expandbox::styles().expandbox };
+			Style header = { "TreeNodeHeader", Expandbox::styles().header };
+			Style toggle = { "TreeNodeHeader", Expandbox::styles().toggle };
+			Style body = { "TreeNodeHeader", Expandbox::styles().body, Args{ { &Layout::m_padding, BoxFloat{ 18.f, 0.f, 0.f, 0.f } },{ &Layout::m_spacing, DimFloat(0.f) } } };
+		};
+		static Styles& styles() { static Styles styles; return styles; }
 
 	protected:
 		Callback m_onSelect;
@@ -34,7 +37,7 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Tree : public Wedge, public StoreObserver<TreeNode>
 	{
 	public:
-		Tree(Wedge& parent);
+		Tree(const Params& params);
 
 		Array<TreeNode> m_selection;
 
@@ -43,8 +46,6 @@ namespace toy
 
 		void expand(TreeNode& node, bool exclusive = false);
 		void collapse();
-
-		static Type& cls() { static Type ty("Tree", Wedge::cls()); return ty; }
 
 	protected:
 		TreeNode* m_rootNode;

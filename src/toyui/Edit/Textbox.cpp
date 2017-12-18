@@ -15,7 +15,7 @@
 
 namespace toy
 {
-	Textbox::Textbox(Wedge& parent, const string& text)
-		: TypeIn(parent, text, nullptr, true, cls())
+	Textbox::Textbox(const Params& params, const string& text)
+		: TypeIn({ params, &cls<Textbox>() }, text, nullptr, true)
 	{}
 }

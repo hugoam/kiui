@@ -5,7 +5,7 @@
 #ifndef TOY_RENDERWINDOW_H
 #define TOY_RENDERWINDOW_H
 
-#include <toyobj/Type.h>
+#include <toyobj/Object.h>
 #include <toyobj/String/String.h>
 
 namespace toy
@@ -21,9 +21,6 @@ namespace toy
 
 		virtual bool nextFrame() = 0;
 
-		static Type& cls() { static Type ty; return ty; }
-
-	public:
 		string m_title;
 		unsigned int m_width;
 		unsigned int m_height;

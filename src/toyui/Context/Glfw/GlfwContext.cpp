@@ -182,7 +182,11 @@ namespace toy
 
 		glfwSetErrorCallback(errorcb);
 
+#ifdef TOY_RENDERER_BGFX
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+#else
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+#endif
 
 #ifndef TOY_PLATFORM_WINDOWS
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -191,7 +195,7 @@ namespace toy
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
 
-		//glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
 		m_glWindow = glfwCreateWindow(m_width, m_height, m_title.c_str(), NULL, NULL);
 

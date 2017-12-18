@@ -6,21 +6,17 @@
 #define TOY_BUTTON_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Widget/Widget.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Input/InputDevice.h>
 
 namespace toy
 {
-	class _refl_ TOY_UI_EXPORT Label : public Item
+	class _refl_ TOY_UI_EXPORT Label : public Widget
 	{
 	public:
-		Label(Wedge& parent, const string& label, Type& type = cls());
-
-		static Type& cls() { static Type ty("Label", Item::cls()); return ty; }
-		static Type& Title() { static Type ty("Title", Item::cls()); return ty; }
-		static Type& Text() { static Type ty("Text", Item::cls()); return ty; }
+		Label(const Params& params, const string& label);
 	};
 
 	class TOY_UI_EXPORT ClickTrigger
@@ -57,17 +53,15 @@ namespace toy
 		Widget::Callback m_triggerCtrl;
 	};
 
-	class _refl_ TOY_UI_EXPORT Button : public Item, public ClickTrigger
+	class _refl_ TOY_UI_EXPORT Button : public Widget, public ClickTrigger
 	{
 	public:
-		Button(Wedge& parent, const string& content, const Callback& trigger = nullptr, Type& type = cls());
+		Button(const Params& params, const string& content, const Callback& trigger = nullptr);
 
 		const string& tooltip() { return m_tooltip; }
 
 		virtual bool leftClick(MouseEvent& mouseEvent);
 		virtual bool rightClick(MouseEvent& mouseEvent);
-
-		static Type& cls() { static Type ty("Button", Item::Control()); return ty; }
 
 	protected:
 		string m_tooltip;
@@ -76,18 +70,16 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT WrapButton : public Wedge, public ClickTrigger
 	{
 	public:
-		WrapButton(Wedge& parent, const Callback& trigger = nullptr, Type& type = cls());
+		WrapButton(const Params& params, const Callback& trigger = nullptr);
 
 		virtual bool leftClick(MouseEvent& mouseEvent);
 		virtual bool rightClick(MouseEvent& mouseEvent);
-
-		static Type& cls() { static Type ty("WrapButton", Wedge::WrapControl()); return ty; }
 	};
 
 	class _refl_ TOY_UI_EXPORT MultiButton : public WrapButton
 	{
 	public:
-		MultiButton(Wedge& parent, const StringVector& elements = {}, const Callback& trigger = nullptr, Type& type = cls());
+		MultiButton(const Params& params, const StringVector& elements = {}, const Callback& trigger = nullptr);
 
 		std::vector<string> m_elements;
 
@@ -96,24 +88,20 @@ namespace toy
 		void reset(const StringVector& contents, const Callback& trigger = nullptr);
 
 		virtual const string& label() { return m_elements[0]; }
-
-		static Type& cls() { static Type ty("MultiButton", WrapButton::cls()); return ty; }
 	};
 
-	class _refl_ TOY_UI_EXPORT Toggle : public Item
+	class _refl_ TOY_UI_EXPORT Toggle : public Widget
 	{
 	public:
 		typedef std::function<void(Widget&, bool)> Callback;
 
 	public:
-		Toggle(Wedge& parent, const Callback& callback, bool isOn = true, Type& type = cls());
+		Toggle(const Params& params, const Callback& callback, bool isOn = true);
 
 		void update(bool on);
 		void toggle();
 
 		virtual bool leftClick(MouseEvent& mouseEvent);
-
-		static Type& cls() { static Type ty("Toggle", Item::Control()); return ty; }
 
 	public:
 		bool m_on;

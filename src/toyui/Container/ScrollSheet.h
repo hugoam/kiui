@@ -7,7 +7,7 @@
 
 /* toy */
 #include <toyobj/Type.h>
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Button/Scrollbar.h>
 
@@ -16,18 +16,13 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT ScrollSheet : public Wedge
 	{
 	public:
-		ScrollSheet(Wedge& parent, Type& type = cls());
+		ScrollSheet(const Params& params);
 
 		virtual void dirtyLayout();
 
 		virtual bool mouseWheel(MouseEvent& mouseEvent);
 
 		virtual void makeSolver();
-
-		static Type& cls() { static Type ty("ScrollSheet", Wedge::cls()); return ty; }
-
-		static Type& ScrollZone() { static Type ty("ScrollZone", Wedge::Layout()); return ty; }
-		static Type& ScrollSurface() { static Type ty("ScrollSurface", Wedge::cls()); return ty; }
 
 	public:
 		Wedge m_scrollzone;
@@ -39,7 +34,7 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT ScrollPlan : public ScrollSheet
 	{
 	public:
-		ScrollPlan(Wedge& parent, Type& type = cls());
+		ScrollPlan(const Params& params);
 
 		virtual bool middleDrag(MouseEvent& mouseEvent);
 		virtual bool mouseWheel(MouseEvent& mouseEvent);
@@ -47,11 +42,6 @@ namespace toy
 		virtual void dirtyLayout();
 
 		void updateBounds();
-
-		static Type& cls() { static Type ty("ScrollPlan", ScrollSheet::cls()); return ty; }
-
-		static Type& Plan() { static Type ty("Plan", Wedge::Sheet()); return ty; }
-		static Type& Surface() { static Type ty("Surface", Wedge::Sheet()); return ty; }
 
 	protected:
 		Wedge& m_plan;

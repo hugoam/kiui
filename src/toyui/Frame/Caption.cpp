@@ -36,9 +36,9 @@ namespace toy
 
 	DimFloat Caption::updateTextSize()
 	{
-		//DimFloat paddedSize = d_frame.d_size - d_frame.d_inkstyle->m_padding.val - d_frame.d_inkstyle->m_padding.val;
-		float paddedWidth = floor(d_frame.d_size.x - d_frame.d_inkstyle->m_padding.val.x0 - d_frame.d_inkstyle->m_padding.val.x1);
-		float paddedHeight = floor(d_frame.d_size.y - d_frame.d_inkstyle->m_padding.val.y0 - d_frame.d_inkstyle->m_padding.val.y1);
+		//DimFloat paddedSize = d_frame.m_size - d_frame.d_inkstyle->m_padding - d_frame.d_inkstyle->m_padding;
+		float paddedWidth = floor(d_frame.m_size.x - d_frame.d_inkstyle->m_padding.x0 - d_frame.d_inkstyle->m_padding.x1);
+		float paddedHeight = floor(d_frame.m_size.y - d_frame.d_inkstyle->m_padding.y0 - d_frame.d_inkstyle->m_padding.y1);
 
 		DimFloat paddedSize(paddedWidth, paddedHeight);
 

@@ -16,30 +16,33 @@
 
 namespace toy
 {
-	Widget::Widget(Wedge& parent, Type& type, FrameType frameType)
-		: Widget(type, frameType, &parent)
-	{
-		this->updateStyle();
-		parent.append(*this);
-	}
+	std::map<string, Style*> Widget::s_styles;
 
-	Widget::Widget(Type& type, FrameType frameType, Wedge* parent)
-		: TypeObject(type)
-		, m_parent(parent)
+	Widget::Widget(const Params& params)
+		: TypeObject(params.type ? *params.type : cls<Widget>())
+		, m_parent(params.parent)
 		, m_container(nullptr)
-		, m_style(nullptr)
+		, m_style(params.style)
 		, m_frame()
 		, m_state(NOSTATE)
 		, m_object()
 	{
-		if(frameType == MASTER_LAYER || frameType == LAYER)
-			m_frame = make_object<Layer>(this->as<Wedge>(), frameType);
-		else if(frameType == FRAME)
+		if(params.frameType == MASTER_LAYER || params.frameType == LAYER)
+			m_frame = make_object<Layer>(as<Wedge>(*this), params.frameType);
+		else if(params.frameType == FRAME)
 			m_frame = make_object<Frame>(*this);
 
-/*#if 1 // DEBUG
-		InputReceiver::m_name = "Widget: " + type.m_name;
-#endif*/
+		if(m_parent)
+		{
+			this->updateStyle();
+			m_parent->append(*this);
+		}
+	}
+
+	Widget::Widget(const Params& params, const string& content)
+		: Widget(params)
+	{
+		this->setContent(content);
 	}
 
 	Widget::~Widget()
@@ -90,6 +93,12 @@ namespace toy
 		this->visit([](Widget& widget, bool&) { widget.destroySelf(); });
 	}
 
+	void Widget::destroy()
+	{
+		this->destroyTree();
+		m_container->store().remove(*this);
+	}
+
 	void Widget::bind(Wedge& parent, size_t index)
 	{
 		m_parent = &parent;
@@ -108,12 +117,6 @@ namespace toy
 	void Widget::makeSolver()
 	{
 		m_frame->makeSolver();
-	}
-
-	void Widget::destroy()
-	{
-		this->destroyTree();
-		m_container->store().remove(*this);
 	}
 
 	Widget* Widget::findContainer(Type& type)
@@ -148,7 +151,10 @@ namespace toy
 
 	void Widget::updateStyle()
 	{
-		m_style = &this->fetchStyle(m_type);
+		for(Type* type = &m_type; type && !m_style; type = type->m_base)
+			m_style = s_styles[type->m_name];
+		if(!m_style)
+			m_style = s_styles["Widget"];
 		m_frame->setStyle(*m_style);
 	}
 
@@ -158,20 +164,10 @@ namespace toy
 		m_frame->setStyle(*m_style, hard);
 	}
 
-	void Widget::setStyle(Type& type, bool hard)
-	{
-		this->setStyle(this->fetchStyle(type), hard);
-	}
-
-	Style& Widget::fetchStyle(Type& type)
-	{
-		return this->uiWindow().m_styler->style(type);
-	}
-
 	void Widget::toggleState(WidgetState state)
 	{
 		m_state = static_cast<WidgetState>(m_state ^ state);
-		m_frame->updateInkstyle(m_style->subskin(m_state));
+		m_frame->updateInkstyle(m_style->skin(m_state));
 	}
 
 	void Widget::enableState(WidgetState state)
@@ -305,14 +301,4 @@ namespace toy
 
 	void Widget::dirtyLayout()
 	{}
-
-	Item::Item(Wedge& parent, Type& type)
-		: Widget(parent, type)
-	{}
-
-	Item::Item(Wedge& parent, const string& content, Type& type)
-		: Widget(parent, type)
-	{
-		this->setContent(content);
-	}
 }

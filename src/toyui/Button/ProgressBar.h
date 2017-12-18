@@ -6,7 +6,7 @@
 #define TOY_PROGRESSBAR_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Button/Button.h>
 #include <toyui/Button/Slider.h>
 
@@ -15,16 +15,14 @@ namespace toy
 	class TOY_UI_EXPORT ProgressBar : public Wedge
 	{
 	public:
-		ProgressBar(Wedge& parent, Dimension dim = DIM_X);
+		ProgressBar(const Params& params, Dimension dim = DIM_X);
 
 		void setPercentage(float percentage);
 
-		static Type& cls() { static Type ty("ProgressBar", Wedge::Row()); return ty; }
-
 	public:
 		Dimension m_dim;
-		Item m_filler;
-		Item m_spacer;
+		Widget m_filler;
+		Widget m_spacer;
 		Label m_display;
 
 		float m_percentage;

@@ -7,7 +7,7 @@
 
 /* toy */
 #include <toyobj/Util/Image.h>
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Widget/Widget.h>
 
 namespace toy
@@ -15,14 +15,12 @@ namespace toy
 	class TOY_UI_EXPORT Figure : public Widget
 	{
 	public:
-		Figure(Wedge& parent, const Image256& source);
+		Figure(const Params& params, const Image256& source);
 		
 		virtual void destroyed();
 
 		void updateImage();
 		void clearImage();
-
-		static Type& cls() { static Type ty("Figure", Item::cls()); return ty; }
 
 	protected:
 		const Image256& m_source;

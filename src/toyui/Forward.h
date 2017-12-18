@@ -36,6 +36,10 @@ namespace toy
 
 	struct Space;
 
+	template <class T>
+	class Dim;
+
+	class DimFloat;
 	class BoxFloat;
 
 	class User;
@@ -57,7 +61,7 @@ namespace toy
 	class Controller;
 
 	class Style;
-	class LayoutStyle;
+	class Layout;
 
 	class Caption;
 	class Icon;
@@ -85,7 +89,6 @@ namespace toy
 
 	class Tooltip;
 
-	class Item;
 	class Label;
 	class Button;
 	class WrapButton;
@@ -124,12 +127,17 @@ namespace toy
 	class Tree;
 	class TreeNode;
 
+	class Popup;
+
 	class WindowHeader;
 	class WindowFooter;
 	class WindowSizer;
 	class Window;
 
 	class Node;
+	class NodeHeader;
+	class NodeKnob;
+	class NodePlug;
 	class NodeCable;
 	class Canvas;
 
@@ -146,6 +154,7 @@ namespace toy
 
 	class Dockbox;
 	class Dockbar;
+	class Docker;
 
 	class Directory;
 	class Dir;

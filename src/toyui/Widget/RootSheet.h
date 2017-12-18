@@ -7,7 +7,7 @@
 
 /* toy */
 #include <toyobj/Util/Timer.h>
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Widget/Cursor.h>
 #include <toyui/Input/InputDispatcher.h>
@@ -18,7 +18,7 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT RootSheet : public Wedge
 	{
 	public:
-		RootSheet(UiWindow& window, Type& type = cls(), Wedge* parent = nullptr);
+		RootSheet(UiWindow& window, const Params& params = {});
 		~RootSheet();
 
 		virtual RootSheet& rootSheet() { return *this; }
@@ -30,8 +30,6 @@ namespace toy
 		virtual void transformCoordinates(MouseEvent& mouseEvent) { UNUSED(mouseEvent); }
 
 		virtual void handleDestroyWidget(Widget& widget);
-
-		static Type& cls() { static Type ty("RootSheet", Wedge::cls()); return ty; }
 
 	public:
 		UiWindow& m_window;

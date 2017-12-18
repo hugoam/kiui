@@ -6,16 +6,15 @@
 #include <toyui/Button/Slider.h>
 
 #include <toyobj/String/StringConvert.h>
-#include <toyobj/Util/StatString.h>
 
 namespace toy
 {
-	Slider::Slider(Wedge& parent, Dimension dim, const Callback& onUpdated, bool relative, Type& type)
-		: Wedge(parent, type)
+	Slider::Slider(const Params& params, Dimension dim, const Callback& onUpdated, bool relative)
+		: Wedge({ params, &cls<Slider>() })
 		, m_dim(dim)
-		, m_filler(*this, Item::Filler())
-		, m_button(*this, Slider::Knob())
-		, m_spacer(*this, Item::Spacer())
+		, m_filler({ this, &styles().filler })
+		, m_button({ this, &styles().slider_knob })
+		, m_spacer({ this, &styles().spacer })
 		, m_onUpdated(onUpdated)
 		, m_dragRelative(relative)
 	{
@@ -29,21 +28,21 @@ namespace toy
 
 	float Slider::cursor(MouseEvent& mouseEvent, float offset)
 	{
-		float size = m_frame->d_size[m_dim];
-		float knob = m_button.frame().d_size[m_dim];
+		float size = m_frame->m_size[m_dim];
+		float knob = m_button.frame().m_size[m_dim];
 		return std::min(size - knob, std::max(0.f, mouseEvent.relative[m_dim] + offset)) / size;
 	}
 
 	bool Slider::leftClick(MouseEvent& mouseEvent)
 	{
-		float offset = -m_button.frame().d_size[m_dim] / 2.f;
+		float offset = -m_button.frame().m_size[m_dim] / 2.f;
 		this->cursorChange(this->cursor(mouseEvent, offset));
 		return true;
 	}
 
 	bool Slider::leftDragStart(MouseEvent& mouseEvent)
 	{
-		m_dragOffset = m_dragRelative ? mouseEvent.relative[m_dim] - m_filler.frame().d_size[m_dim] : 0.f;
+		m_dragOffset = m_dragRelative ? mouseEvent.relative[m_dim] - m_filler.frame().m_size[m_dim] : 0.f;
 		this->enableState(TRIGGERED);
 		m_button.enableState(TRIGGERED);
 		return true;

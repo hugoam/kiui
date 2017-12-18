@@ -8,8 +8,8 @@
 /* toy */
 #include <toyobj/Type.h>
 #include <toyobj/String/String.h>
-#include <toyui/Forward.h>
-#include <toyui/Style/Dim.h>
+#include <toyui/Types.h>
+#include <toyui/Frame/Dim.h>
 #include <toyui/Image.h>
 
 /* std */
@@ -34,15 +34,15 @@ namespace toy
 		};
 
 	public:
-		ImageSkin(Image& image, int left, int top, int right, int bottom, int margin = 0, Dimension stretch = DIM_NULL)
+		_constr_ ImageSkin(Image& image, int left, int top, int right, int bottom, int margin = 0, Dimension stretch = DIM_NULL)
 			: d_image(&image)
 			, d_left(left), d_top(top), d_right(right), d_bottom(bottom)
-			, d_margin(margin)
+			, m_margin(margin)
 			, d_stretch(stretch)
 			, d_width(image.d_width)
 			, d_height(image.d_height)
-			, d_solidWidth(image.d_width - d_margin - d_margin)
-			, d_solidHeight(image.d_height - d_margin - d_margin)
+			, d_solidWidth(image.d_width - m_margin - m_margin)
+			, d_solidHeight(image.d_height - m_margin - m_margin)
 			, d_fillWidth(image.d_width - d_left - d_right)
 			, d_fillHeight(image.d_height - d_top - d_bottom)
 			, d_images()
@@ -50,8 +50,8 @@ namespace toy
 			for(Image& subimage : d_images)
 				subimage = *d_image;
 
-			d_size.x = d_stretch == DIM_X ? float(d_solidHeight) : 0.f;
-			d_size.y = d_stretch == DIM_Y ? float(d_solidWidth) : 0.f;
+			m_size.x = d_stretch == DIM_X ? float(d_solidHeight) : 0.f;
+			m_size.y = d_stretch == DIM_Y ? float(d_solidWidth) : 0.f;
 
 			this->stretchCoords(0, 0, image.d_width, image.d_height, [this](Section s, const BoxFloat& rect) {
 				this->d_images[s].d_left = this->d_image->d_left + int(rect.x);
@@ -62,7 +62,7 @@ namespace toy
 		}
 
 		ImageSkin(Image& image, const ImageSkin& ref)
-			: ImageSkin(image, ref.d_left, ref.d_top, ref.d_right, ref.d_bottom, ref.d_margin, ref.d_stretch)
+			: ImageSkin(image, ref.d_left, ref.d_top, ref.d_right, ref.d_bottom, ref.m_margin, ref.d_stretch)
 		{}
 
 		ImageSkin()
@@ -76,17 +76,17 @@ namespace toy
 			int fillWidth = width - d_left - d_right;
 			int fillHeight = height - d_top - d_bottom;
 
-			filler(TOP_LEFT, BoxFloat(x, y, d_left, d_top));
-			filler(TOP_RIGHT, BoxFloat(x + fillWidth + d_left, y, d_right, d_top));
-			filler(BOTTOM_RIGHT, BoxFloat(x + fillWidth + d_left, y + fillHeight + d_top, d_right, d_bottom));
-			filler(BOTTOM_LEFT, BoxFloat(x, y + fillHeight + d_top, d_left, d_bottom));
+			filler(TOP_LEFT, { x, y, d_left, d_top });
+			filler(TOP_RIGHT, { x + fillWidth + d_left, y, d_right, d_top });
+			filler(BOTTOM_RIGHT, { x + fillWidth + d_left, y + fillHeight + d_top, d_right, d_bottom });
+			filler(BOTTOM_LEFT, { x, y + fillHeight + d_top, d_left, d_bottom });
 
-			filler(TOP, BoxFloat(x + d_left, y, fillWidth, d_top));
-			filler(RIGHT, BoxFloat(x + fillWidth + d_left, y + d_top, d_right, fillHeight));
-			filler(BOTTOM, BoxFloat(x + d_left, y + fillHeight + d_top, fillWidth, d_bottom));
-			filler(LEFT, BoxFloat(x, y + d_top, d_left, fillHeight));
+			filler(TOP, { x + d_left, y, fillWidth, d_top });
+			filler(RIGHT, { x + fillWidth + d_left, y + d_top, d_right, fillHeight });
+			filler(BOTTOM, { x + d_left, y + fillHeight + d_top, fillWidth, d_bottom });
+			filler(LEFT, { x, y + d_top, d_left, fillHeight });
 
-			filler(FILL, BoxFloat(x + d_left, y + d_top, fillWidth, fillHeight));
+			filler(FILL, { x + d_left, y + d_top, fillWidth, fillHeight });
 		}
 
 		_attr_ _mut_ Image* d_image;
@@ -95,7 +95,7 @@ namespace toy
 		_attr_ _mut_ int d_top;
 		_attr_ _mut_ int d_right;
 		_attr_ _mut_ int d_bottom;
-		_attr_ _mut_ int d_margin;
+		_attr_ _mut_ int m_margin;
 		_attr_ _mut_ Dimension d_stretch;
 
 		int d_width;
@@ -107,11 +107,9 @@ namespace toy
 		int d_fillWidth;
 		int d_fillHeight;
 
-		DimFloat d_size;
+		DimFloat m_size;
 
 		std::array<Image, 9> d_images;
-
-		static Type& cls() { static Type ty; return ty; }
 	};
 }
 

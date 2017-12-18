@@ -54,8 +54,6 @@
 #include <toyui/Window/Toolbar.h>
 #include <toyui/Window/Popup.h>
 
-#include <toyui/Frame/DimString.h>
-
 #include <toyui/Input/InputDevice.h>
 
 #include <toyui/Render/Renderer.h>

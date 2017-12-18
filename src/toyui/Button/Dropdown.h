@@ -18,7 +18,7 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Dropdown : public WrapButton
 	{
 	public:
-		Dropdown(Wedge& parent, Type& type = cls());
+		Dropdown(const Params& params);
 
 		virtual void dropdown(bool modal = true);
 		virtual void dropup();
@@ -27,12 +27,16 @@ namespace toy
 
 		MultiButton& addChoice(const StringVector& elements, const Callback& trigger = nullptr);
 
-		static Type& cls() { static Type ty("Dropdown", WrapButton::cls()); return ty; }
-
-		static Type& Toggle() { static Type ty("DropdownToggle", Button::cls()); return ty; }
-		static Type& Head() { static Type ty("DropdownHead", MultiButton::cls()); return ty; }
-		static Type& List() { static Type ty("DropdownList", Wedge::cls()); return ty; }
-		static Type& Choice() { static Type ty("DropdownChoice", MultiButton::cls()); return ty; }
+		struct Styles
+		{
+			Style dropdown = { cls<Dropdown>(), Widget::styles().wrap_button };
+			Style toggle = { "DropdownToggle", Widget::styles().button };
+			Style head = { "DropdownHead", Widget::styles().multi_button };
+			Style list = { "DropdownList", Widget::styles().wedge, Args{ { &Layout::m_flow, ALIGN },{ &Layout::m_align, Dim<Align>{ LEFT, OUT_RIGHT } } } };
+			Style choice = { "DropdownChoice", Widget::styles().multi_button };
+			Style dropdown_input = { cls<DropdownInput>(), dropdown };
+		};
+		static Styles& styles() { static Styles styles; return styles; }
 
 	public:
 		MultiButton m_header;
@@ -43,14 +47,12 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT DropdownInput : public Dropdown
 	{
 	public:
-		DropdownInput(Wedge& parent, StringVector choices = {}, const Callback& callback = nullptr, Type& type = cls());
+		DropdownInput(const Params& params, StringVector choices = {}, const Callback& callback = nullptr);
 
 		virtual void selected(MultiButton& selected);
 		void select(MultiButton& selected);
 
 		MultiButton& addChoice(const StringVector& elements, const Callback& trigger = nullptr);
-
-		static Type& cls() { static Type ty("DropdownInput", Dropdown::cls()); return ty; }
 
 	protected:
 		Callback m_onSelected;

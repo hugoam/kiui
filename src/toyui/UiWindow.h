@@ -8,7 +8,7 @@
 /* toy */
 #include <toyobj/Util/Colour.h>
 #include <toyobj/Util/Timer.h>
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Render/RenderWindow.h>
 #include <toyui/ImageAtlas.h>
 
@@ -24,20 +24,16 @@ namespace toy
 		virtual object_ptr<Context> createContext(const string& name, int width, int height, bool fullScreen) = 0;
 		virtual object_ptr<Renderer> createRenderer(Context& context) = 0;
 
-		static Type& cls() { static Type ty; return ty; }
-
 	public:
 		const string m_resourcePath;
 		const bool m_manualRender;
 	};
 
-	class TOY_UI_EXPORT Context : public Object
+	class _refl_ TOY_UI_EXPORT Context : public Object
 	{
 	public:
 		Context(RenderSystem& renderSystem, object_ptr<RenderWindow> renderWindow, object_ptr<InputWindow> inputWindow);
 		~Context();
-
-		static Type& cls() { static Type ty; return ty; }
 
 	public:
 		object_ptr<RenderWindow> m_renderWindow;
@@ -47,7 +43,7 @@ namespace toy
 		const string m_resourcePath;
 	};
 
-	class TOY_UI_EXPORT UiWindow : public Object
+	class _refl_ TOY_UI_EXPORT UiWindow : public Object
 	{
 	public:
 		UiWindow(RenderSystem& system, const string& name, int width, int height, bool fullScreen, User* user = nullptr);
@@ -64,8 +60,6 @@ namespace toy
 		Image& createImage(const string& image, int width, int height, uint8_t* data, bool filtering = true);
 		void removeImage(Image& image);
 		Image& findImage(const string& name);
-
-		static Type& cls() { static Type ty; return ty; }
 
 	protected:
 		void initResources();

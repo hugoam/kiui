@@ -7,10 +7,10 @@
 
 namespace toy
 {
-	Dockbox::Dockbox(Wedge& parent, Dockbar& dockbar, const string& title, const string& icon)
-		: Window(parent, title, static_cast<WindowState>(0), nullptr, nullptr, cls())
+	Dockbox::Dockbox(const Params& params, Dockbar& dockbar, const string& title, const string& icon)
+		: Window({ params, &cls<Dockbox>() }, title, static_cast<WindowState>(0), nullptr, nullptr)
 		, m_dockbar(dockbar)
-		, m_toggle(dockbar, [this](Widget&, bool on) { this->toggle(on); }, false, Dockbar::Toggle())
+		, m_toggle({ &dockbar, &Dockbar::styles().toggle }, [this](Widget&, bool on) { this->toggle(on); }, false)
 	{
 		m_toggle.setContent(icon);
 	}
@@ -20,13 +20,13 @@ namespace toy
 		open ? this->show() : this->hide();
 	}
 
-	Docker::Docker(Wedge& parent)
-		: Wedge(parent, cls())
+	Docker::Docker(const Params& params)
+		: Wedge({ params, &cls<Docker>() })
 	{}
 
-	Dockbar::Dockbar(Wedge& parent)
-		: Wedge(parent, cls())
-		, m_docker(*this)
+	Dockbar::Dockbar(const Params& params)
+		: Wedge({ params, &cls<Dockbar>() })
+		, m_docker(Params{ this })
 	{}
 
 	Dockbox& Dockbar::addDock(const string& name, const string& icon)

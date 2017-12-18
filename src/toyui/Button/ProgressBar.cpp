@@ -5,6 +5,8 @@
 #include <toyui/Config.h>
 #include <toyui/Button/ProgressBar.h>
 
+#include <toyobj/String/StringConvert.h>
+
 #include <toyui/Frame/Frame.h>
 #include <toyui/Frame/Caption.h>
 
@@ -12,12 +14,12 @@
 
 namespace toy
 {
-	ProgressBar::ProgressBar(Wedge& parent, Dimension dim)
-		: Wedge(parent, cls())
+	ProgressBar::ProgressBar(const Params& params, Dimension dim)
+		: Wedge({ params, &cls<ProgressBar>() })
 		, m_dim(dim)
-		, m_filler(*this, Item::Filler())
-		, m_spacer(*this, Item::Spacer())
-		, m_display(*this, "0%", Slider::Display())
+		, m_filler({ this, &styles().filler })
+		, m_spacer({ this, &styles().spacer })
+		, m_display({ this, &styles().slider_display }, "0%")
 		, m_percentage(0.f)
 	{}
 

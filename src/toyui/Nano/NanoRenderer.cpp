@@ -81,7 +81,7 @@ namespace toy
 	void NanoRenderer::beginFrame(RenderTarget& target)
 	{
 		float pixelRatio = 1.f;
-		nvgBeginFrame(m_ctx, target.m_layer.d_size.x, target.m_layer.d_size.y, pixelRatio);
+		nvgBeginFrame(m_ctx, target.m_layer.m_size.x, target.m_layer.m_size.y, pixelRatio);
 	}
 
 	void NanoRenderer::endFrame()
@@ -143,7 +143,6 @@ namespace toy
 
 	void NanoRenderer::drawShadow(const BoxFloat& rect, const BoxFloat& corners, const Shadow& shadow)
 	{
-		//nvgRGBA(0, 0, 0, 128)
 		NVGcolor shadowColour = nvgColour(shadow.d_colour);
 		NVGpaint shadowPaint = nvgBoxGradient(m_ctx, rect.x + shadow.d_xpos - shadow.d_spread, rect.y + shadow.d_ypos - shadow.d_spread, rect.w + shadow.d_spread * 2.f, rect.h + shadow.d_spread * 2.f, corners[0] + shadow.d_spread, shadow.d_blur, shadowColour, nvgRGBA(0, 0, 0, 0));
 		nvgBeginPath(m_ctx);
@@ -159,15 +158,11 @@ namespace toy
 
 	void NanoRenderer::drawRect(const BoxFloat& rect, const BoxFloat& corners, InkStyle& skin)
 	{
-		float border = skin.m_borderWidth.val.x0;
-
+		float border = skin.m_border_width.x0;
 		this->pathRect(rect, corners, border);
 
-		// Fill
-		if(!skin.m_backgroundColour.val.null())
+		if(!skin.m_background_colour.null())
 			this->fill(skin, rect);
-
-		// Border
 		if(border > 0.f)
 			this->stroke(skin);
 	}
@@ -175,23 +170,23 @@ namespace toy
 	void NanoRenderer::debugRect(const BoxFloat& rect, const Colour& colour)
 	{
 		static InkStyle debugStyle;
-		debugStyle.m_borderWidth = 1.f;
-		debugStyle.m_borderColour = colour;
+		debugStyle.m_border_width = 1.f;
+		debugStyle.m_border_colour = colour;
 
 		this->drawRect(rect, BoxFloat(), debugStyle);
 	}
 
 	void NanoRenderer::fill(InkStyle& skin, const BoxFloat& rect)
 	{
-		if(skin.m_linearGradient.val.null())
+		if(skin.m_linear_gradient.null())
 		{
-			nvgFillColor(m_ctx, nvgColour(skin.m_backgroundColour));
+			nvgFillColor(m_ctx, nvgColour(skin.m_background_colour));
 		}
 		else
 		{
-			NVGcolor first = nvgOffsetColour(skin.m_backgroundColour, skin.m_linearGradient.val.x);
-			NVGcolor second = nvgOffsetColour(skin.m_backgroundColour, skin.m_linearGradient.val.y);
-			if(skin.m_linearGradientDim == DIM_X)
+			NVGcolor first = nvgOffsetColour(skin.m_background_colour, skin.m_linear_gradient.x);
+			NVGcolor second = nvgOffsetColour(skin.m_background_colour, skin.m_linear_gradient.y);
+			if(skin.m_linear_gradient_dim == DIM_X)
 				nvgFillPaint(m_ctx, nvgLinearGradient(m_ctx, rect.x, rect.y, rect.x + rect.w, rect.y, first, second));
 			else
 				nvgFillPaint(m_ctx, nvgLinearGradient(m_ctx, rect.x, rect.y, rect.x, rect.y + rect.h, first, second));
@@ -201,10 +196,10 @@ namespace toy
 
 	void NanoRenderer::stroke(InkStyle& skin)
 	{
-		float border = skin.m_borderWidth.val.x0;
+		float border = skin.m_border_width.x0;
 
 		nvgStrokeWidth(m_ctx, border);
-		nvgStrokeColor(m_ctx, nvgColour(skin.m_borderColour));
+		nvgStrokeColor(m_ctx, nvgColour(skin.m_border_colour));
 		nvgStroke(m_ctx);
 	}
 
@@ -260,13 +255,13 @@ namespace toy
 	void NanoRenderer::setupText(InkStyle& skin)
 	{
 		NVGalign alignH = NVG_ALIGN_LEFT;
-		if(skin.m_align.val.x == CENTER)
+		if(skin.m_align.x == CENTER)
 			alignH = NVG_ALIGN_CENTER;
-		else if(skin.m_align.val.x == RIGHT)
+		else if(skin.m_align.x == RIGHT)
 			alignH = NVG_ALIGN_RIGHT;
 
-		nvgFontSize(m_ctx, skin.m_textSize);
-		nvgFontFace(m_ctx, skin.m_textFont.val.c_str());
+		nvgFontSize(m_ctx, skin.m_text_size);
+		nvgFontFace(m_ctx, skin.m_text_font.c_str());
 		nvgTextAlign(m_ctx, alignH | NVG_ALIGN_TOP);
 
 		m_lineHeight = 0.f;
@@ -320,7 +315,7 @@ namespace toy
 
 		textRows.clear();
 	
-		if(!skin.m_textBreak)
+		if(!skin.m_text_break)
 		{
 			textRows.resize(1);
 
@@ -339,7 +334,7 @@ namespace toy
 			TextRow& row = textRows.back();
 
 			BoxFloat rect(0.f, index * m_lineHeight, space.x, 0.f);
-			if(skin.m_textWrap)
+			if(skin.m_text_wrap)
 				this->breakTextWidth(first, end, rect, skin, row);
 			else
 				this->breakTextReturns(first, end, rect, skin, row);
@@ -372,7 +367,7 @@ namespace toy
 	{
 		this->setupText(skin);
 
-		nvgFillColor(m_ctx, nvgColour(skin.m_textColour));
+		nvgFillColor(m_ctx, nvgColour(skin.m_text_colour));
 		nvgText(m_ctx, x, y, start, end);
 	}
 

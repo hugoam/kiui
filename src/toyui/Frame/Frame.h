@@ -7,7 +7,7 @@
 
 /* toy */
 #include <toyobj/Type.h>
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Frame/UiRect.h>
 #include <toyui/Frame/Content.h>
 #include <toyui/Frame/Caption.h>
@@ -39,11 +39,11 @@ namespace toy
 
 		bool empty() const { return d_caption == nullptr && d_icon == nullptr; }
 
-		inline bool flow() const { return d_style->m_layout.d_flow == FLOW; }
-		inline bool clip() const { return d_style->m_layout.d_clipping == CLIP; }
+		inline bool flow() const { return d_style->m_layout.m_flow == FLOW; }
+		inline bool clip() const { return d_style->m_layout.m_clipping == CLIP; }
 
-		inline bool opaque() const { return d_opacity == OPAQUE; }
-		inline bool hollow() const { return d_opacity == HOLLOW; }
+		inline bool opaque() const { return m_opacity == OPAQUE; }
+		inline bool hollow() const { return m_opacity == HOLLOW; }
 
 		void setEmpty() { d_icon = nullptr; d_caption = nullptr; }
 
@@ -115,19 +115,17 @@ namespace toy
 
 		void debugPrintDepth();
 
-		static Type& cls() { static Type ty; return ty; }
-
 	public:
 		Widget& d_widget;
 		Wedge* d_wedge;
 		Frame* d_parent;
 		DirtyLayout d_dirty;
 		bool d_hidden;
-		DimIndex d_index;
+		Dim<size_t> d_index;
 
 		BoxFloat d_hardClip;
 
-		Opacity d_opacity;
+		Opacity m_opacity;
 		Dimension d_length;
 
 		Style* d_style;
@@ -136,7 +134,7 @@ namespace toy
 	public:
 		object_ptr<Caption> d_caption;
 		object_ptr<Icon> d_icon;
-		object_ptr<FrameSolver> d_solver;
+		object_ptr<FrameSolver> m_solver;
 	};
 }
 

@@ -96,13 +96,11 @@ namespace toy
 		this->initResources();
 		this->loadResources();
 
-		m_styler->defaultLayout();
+		Widget::styles().setup(*this);
 
 		m_rootSheet = make_object<RootSheet>(*this);
 
 		m_context->m_inputWindow->initInput(*m_context->m_renderWindow, m_rootSheet->m_mouse, m_rootSheet->m_keyboard);
-
-		m_rootSheet->frame().setSize({ m_width, m_height });
 
 		this->resize(size_t(m_width), size_t(m_height));
 	}
@@ -148,7 +146,7 @@ namespace toy
 
 	void UiWindow::removeImage(Image& image)
 	{
-		vector_remove_if(m_images, [&image](object_ptr<Image>& current) { return current->d_index == image.d_index; });
+		vector_remove_if(m_images, [&](object_ptr<Image>& current) { return current->d_index == image.d_index; });
 		m_renderer->unloadImage(image);
 	}
 

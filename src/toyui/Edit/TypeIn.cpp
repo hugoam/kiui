@@ -10,17 +10,17 @@
 
 namespace toy
 {
-	TypeIn::TypeIn(Wedge& parent, const string& text, Callback callback, bool wrap, Type& type)
-		: Wedge(parent, type)
+	TypeIn::TypeIn(const Params& params, const string& text, Callback callback, bool wrap)
+		: Wedge({ params, &cls<TypeIn>() })
 		, m_string(text)
-		, m_label(*this, text)
+		, m_label({ this }, text)
 		, m_caption(*m_label.frame().d_caption)
 		, m_callback(callback ? callback : [](const string& val) { return val; })
 	{
 		m_caption.setTextLines(1);
 
 		if(wrap)
-			m_label.setStyle(Label::Text());
+			m_label.setStyle(styles().text);
 	}
 
 	void TypeIn::active()

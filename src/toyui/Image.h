@@ -8,7 +8,7 @@
 /* toy */
 #include <toyobj/Object.h>
 #include <toyobj/String/String.h>
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 
 namespace toy
 {
@@ -42,8 +42,6 @@ namespace toy
 		bool d_tile;
 		bool d_stretch;
 		bool d_filtering;
-
-		static Type& cls() { static Type ty; return ty; }
 	};
 
 }

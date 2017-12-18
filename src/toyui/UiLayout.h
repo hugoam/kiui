@@ -6,7 +6,7 @@
 #define TOY_UILAYOUT_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyobj/Object.h>
 #include <toyobj/Util/Colour.h>
 #include <toyobj/String/String.h>
@@ -17,40 +17,17 @@
 
 namespace toy
 {
-	using StyleInitializer = std::function<void(Styler&)>;
-
-	class TOY_UI_EXPORT Styler : public Object
+	class _refl_ TOY_UI_EXPORT Styler : public Object
 	{
 	public:
 		Styler(UiWindow& uiWindow);
-		~Styler();
 
-		void addInitializer(const StyleInitializer& initializer) { m_initializers.push_back(initializer); }
+		UiWindow& m_uiWindow;
+		std::map<string, Options> m_layout_definitions;
+		std::map<string, Options> m_skin_definitions;
 
 		void clear();
-		void reset();
-
-		void defaultLayout();
-
-		Style& styledef(Type& type);
-		Style& styledef(const string& name);
-
-		Style& style(Type& type);
-		Style& style(const string& name);
-
-		void initStyle(Type& type);
-		void prepareStyle(Style& style);
-
-		static Type& cls() { static Type ty; return ty; }
-
-	public:
-		UiWindow& m_uiWindow;
-
-	protected:
-		std::map<string, object_ptr<Style>> m_styledefs;
-		std::map<string, object_ptr<Style>> m_styles;
-
-		std::vector<StyleInitializer> m_initializers;
+		void setup();
 	};
 }
 

@@ -6,7 +6,7 @@
 #define TOY_GFXREWINDOW_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Render/RenderWindow.h>
 #include <toyui/Input/InputDispatcher.h>
 

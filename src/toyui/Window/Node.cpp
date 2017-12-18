@@ -13,8 +13,8 @@
 
 namespace toy
 {
-	Canvas::Canvas(Wedge& parent, const string& title, const Callback& contextTrigger)
-		: ScrollPlan(parent, cls())
+	Canvas::Canvas(const Params& params, const string& title, const Callback& contextTrigger)
+		: ScrollPlan({ params, &cls<Canvas>() })
 		, m_name(title)
 		, m_contextTrigger(contextTrigger)
 	{
@@ -46,9 +46,16 @@ namespace toy
 		return true;
 	}
 
+	bool Canvas::middleClick(MouseEvent& mouseEvent)
+	{
+		UNUSED(mouseEvent);
+		this->autoLayout();
+		return true;
+	}
+
 	void Canvas::autoLayout()
 	{
-		//if(!m_plan.frame().d_solver) return;
+		//if(!m_plan.frame().m_solver) return;
 		std::vector<Node*> nodes;
 		this->collectNodes(nodes);
 		this->layoutNodes(nodes);
@@ -56,15 +63,15 @@ namespace toy
 	
 	void Canvas::autoLayoutSelected()
 	{
-		//if(!m_plan.frame().d_solver) return;
+		//if(!m_plan.frame().m_solver) return;
 		this->layoutNodes(m_selection.store());
 	}
 
 	void Canvas::collectNodes(std::vector<Node*>& nodes)
 	{
-		m_plan.visit([&nodes](Widget& widget, bool&) {
-			if(&widget.m_type == &Node::cls())
-				nodes.push_back(&widget.as<Node>());
+		m_plan.visit([&](Widget& widget, bool&) {
+			if(is<Node>(widget))
+				nodes.push_back(&as<Node>(widget));
 		});
 	}
 
@@ -82,7 +89,7 @@ namespace toy
 
 		SolverVector solvers;
 
-		RowSolver line(m_plan.frame().d_solver.get(), &this->fetchStyle(Canvas::LayoutLine()).m_layout);
+		RowSolver line(m_plan.frame().m_solver.get(), &styles().layout_line.m_layout);
 		solvers.push_back(&line);
 
 		std::vector<RowSolver> columns; columns.reserve(nodes.size());
@@ -90,13 +97,13 @@ namespace toy
 
 		for(int i = 0; i < maxIndex + shift + 1; ++i)
 		{
-			columns.emplace_back(&line, &this->fetchStyle(Canvas::LayoutColumn()).m_layout);
+			columns.emplace_back(&line, &styles().layout_column.m_layout);
 			solvers.push_back(&columns.back());
 		}
 
 		for(Node* node : nodes)
 		{
-			elements.emplace_back(&columns[node->m_order + shift], &this->fetchStyle(Canvas::LayoutNode()).m_layout, &node->frame());
+			elements.emplace_back(&columns[node->m_order + shift], &styles().layout_node.m_layout, &node->frame());
 			elements.back().sync();
 			solvers.push_back(&elements.back());
 		}
@@ -114,30 +121,30 @@ namespace toy
 		return true;
 	}
 
-	NodeKnob::NodeKnob(Wedge& parent, const Colour& colour, Type& type)
-		: Item(parent, type)
+	NodeKnob::NodeKnob(const Params& params, const Colour& colour)
+		: Widget({ params, &cls<NodeKnob>() })
 		, m_colour(colour)
 	{}
 
 	bool NodeKnob::customDraw(Renderer& renderer)
 	{
 		InkStyle inkstyle;
-		inkstyle.m_backgroundColour = m_colour;
+		inkstyle.m_background_colour = m_colour;
 
 		float radius = 5.f;
-		renderer.pathCircle(m_frame->d_size.x / 2.f, m_frame->d_size.y / 2.f, radius);
+		renderer.pathCircle(m_frame->m_size.x / 2.f, m_frame->m_size.y / 2.f, radius);
 		renderer.fill(inkstyle, BoxFloat());
 
 		return true;
 	}
 
-	NodePlug::NodePlug(Wedge& parent, Node& node, const string& name, const string& icon, const Colour& colour, bool input, ConnectTrigger onConnect)
-		: Wedge(parent, cls())
+	NodePlug::NodePlug(const Params& params, Node& node, const string& name, const string& icon, const Colour& colour, bool input, ConnectTrigger onConnect)
+		: Wedge({ params, &cls<NodePlug>() })
 		, m_node(node)
 		, m_input(input)
-		, m_title(*this, name)
-		, m_icon(*this, icon)
-		, m_knob(*this, colour, input ? NodeKnob::cls() : NodeKnob::Output())
+		, m_title({ this }, name)
+		, m_icon({ this }, icon)
+		, m_knob({ this, input ? &Node::styles().knob : &Node::styles().knob_output }, colour)
 		, m_onConnect(onConnect)
 		, m_cableProxy(nullptr)
 	{
@@ -148,7 +155,7 @@ namespace toy
 	bool NodePlug::leftDragStart(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		m_connectionProxy = &m_node.plan().emplace<NodeKnob>(Colour::None, NodeKnob::Proxy());
+		m_connectionProxy = &m_node.plan().emplace_style<NodeKnob>(Node::styles().knob_proxy , Colour::None);
 		m_cableProxy = &m_node.plan().emplace<NodeCable>((m_input ? *m_connectionProxy : m_knob), (m_input ? m_knob : *m_connectionProxy));
 		return true;
 	}
@@ -197,8 +204,8 @@ namespace toy
 			}
 	}
 
-	NodeCable::NodeCable(Wedge& parent, NodeKnob& knobOut, NodeKnob& knobIn)
-		: Wedge(parent, cls())
+	NodeCable::NodeCable(const Params& params, NodeKnob& knobOut, NodeKnob& knobIn)
+		: Wedge({ params, &cls<NodeCable>() })
 		, m_knobOut(knobOut)
 		, m_knobIn(knobIn)
 	{
@@ -212,10 +219,10 @@ namespace toy
 		DimFloat relativeOut = m_knobOut.frame().derivePosition(DimFloat(), frameCanvas);
 		DimFloat relativeIn = m_knobIn.frame().derivePosition(DimFloat(), frameCanvas);
 
-		float x0 = relativeOut.x + m_knobOut.frame().d_size.x;
-		float y0 = relativeOut.y + m_knobOut.frame().d_size.y / 2;
+		float x0 = relativeOut.x + m_knobOut.frame().m_size.x;
+		float y0 = relativeOut.y + m_knobOut.frame().m_size.y / 2;
 		float x1 = relativeIn.x;
-		float y1 = relativeIn.y + m_knobIn.frame().d_size.y / 2;
+		float y1 = relativeIn.y + m_knobIn.frame().m_size.y / 2;
 
 		m_flipX = x1 > x0;
 		m_flipY = y1 > y0;
@@ -226,10 +233,10 @@ namespace toy
 
 	bool NodeCable::customDraw(Renderer& renderer)
 	{
-		float x0 = m_flipX ? 0.f : m_frame->d_size.x;
-		float y0 = m_flipY ? 0.f : m_frame->d_size.y;
-		float x1 = m_flipX ? m_frame->d_size.x : 0.f;
-		float y1 = m_flipY ? m_frame->d_size.y : 0.f;
+		float x0 = m_flipX ? 0.f : m_frame->m_size.x;
+		float y0 = m_flipY ? 0.f : m_frame->m_size.y;
+		float x1 = m_flipX ? m_frame->m_size.x : 0.f;
+		float y1 = m_flipY ? m_frame->m_size.y : 0.f;
 
 		Paint paint(m_knobOut.m_colour, m_knobIn.m_colour);
 		paint.m_width = 1.f;
@@ -239,20 +246,20 @@ namespace toy
 		return true;
 	}
 
-	NodeHeader::NodeHeader(Wedge& parent, Node& node)
-		: Wedge(parent, cls())
-		, m_title(*this, node.m_name)
-		, m_spacer(*this, Item::Spacer())
+	NodeHeader::NodeHeader(const Params& params, Node& node)
+		: Wedge({ params, &cls<NodeHeader>() })
+		, m_title({ this }, node.m_name)
+		, m_spacer({ this, &styles().spacer })
 	{}
 
-	Node::Node(Wedge& parent, const string& title, int order)
-		: Wedge(parent, cls(), LAYER)
+	Node::Node(const Params& params, const string& title, int order)
+		: Wedge({ params, &cls<Node>(), LAYER })
 		, m_name(title)
 		, m_order(order)
-		, m_inputs(*this, Node::Inputs())
-		, m_body(*this, Node::Body())
-		, m_header(m_body, *this)
-		, m_outputs(*this, Node::Outputs())
+		, m_inputs({ this, &styles().inputs })
+		, m_body({ this, &styles().body })
+		, m_header({ &m_body }, *this)
+		, m_outputs({ this, &styles().outputs })
 	{}
 
 	Canvas& Node::canvas()
@@ -275,17 +282,17 @@ namespace toy
 	void Node::updateCables()
 	{
 		for(Widget* widget : m_inputs.m_contents)
-			for(NodeCable* cable : widget->as<NodePlug>().m_cables)
+			for(NodeCable* cable : as<NodePlug>(*widget).m_cables)
 				cable->updateCable();
 
 		for(Widget* widget : m_outputs.m_contents)
-			for(NodeCable* cable : widget->as<NodePlug>().m_cables)
+			for(NodeCable* cable : as<NodePlug>(*widget).m_cables)
 				cable->updateCable();
 	}
 
 	void Node::select()
 	{
-		m_frame->as<Layer>().moveToTop();
+		as<Layer>(*m_frame).moveToTop();
 		this->enableState(SELECTED);
 	}
 

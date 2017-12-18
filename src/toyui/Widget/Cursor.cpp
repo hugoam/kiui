@@ -12,7 +12,7 @@
 namespace toy
 {
 	Cursor::Cursor(RootSheet& rootSheet)
-		: Wedge(rootSheet, cls(), LAYER)
+		: Wedge({ &rootSheet, &cls<Cursor>(), LAYER })
 		, m_hovered(&rootSheet)
 		, m_locked(false)
 		, m_tooltip(rootSheet, "")
@@ -37,7 +37,7 @@ namespace toy
 	void Cursor::tooltipOn()
 	{
 		m_tooltip.setContent(m_hovered->tooltip());
-		m_tooltip.frame().setPosition({ m_frame->d_position.x, m_frame->d_position.y + m_frame->d_size.y });
+		m_tooltip.frame().setPosition({ m_frame->d_position.x, m_frame->d_position.y + m_frame->m_size.y });
 		m_tooltip.show();
 	}
 
@@ -51,7 +51,7 @@ namespace toy
 	{
 		if(m_locked) return;
 		m_hovered = &widget;
-		this->setStyle(widget.m_style->m_skin.m_hoverCursor ? *widget.m_style->m_skin.m_hoverCursor : Cursor::cls(), false);
+		this->setStyle(widget.m_style->m_skin.m_hover_cursor ? *widget.m_style->m_skin.m_hover_cursor : styles().cursor, false);
 	}
 
 	void Cursor::unhover(Widget& widget)
@@ -63,17 +63,17 @@ namespace toy
 	void Cursor::unhover()
 	{
 		if(m_locked) return;
-		this->setStyle(Cursor::cls(), false);
+		this->setStyle(styles().cursor, false);
 		m_hovered = &this->rootSheet();
 	}
 
 	Tooltip::Tooltip(RootSheet& rootSheet, const string& label)
-		: Wedge(rootSheet, cls(), LAYER)
+		: Wedge({ &rootSheet, &cls<Tooltip>(), LAYER })
 	{
 		m_frame->setCaption(label);
 	}
 
-	Rectangle::Rectangle(Wedge& parent, Type& type)
-		: Wedge(parent, type)
+	Rectangle::Rectangle(const Params& params)
+		: Wedge({ params, &cls<Rectangle>() })
 	{}
 }

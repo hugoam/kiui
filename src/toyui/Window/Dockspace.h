@@ -6,8 +6,9 @@
 #define TOY_DOCKSPACE_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Widget/Sheet.h>
+#include <toyui/Widget/Cursor.h>
 #include <toyui/Button/Button.h>
 #include <toyui/Container/Tabber.h>
 #include <toyui/Solver/Grid.h>
@@ -17,7 +18,7 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Docksection : public Tabber
 	{
 	public:
-		Docksection(Wedge& parent, Dockline& dockline);
+		Docksection(const Params& params, Dockline& dockline);
 
 		Dockline* m_dockline;
 
@@ -28,17 +29,12 @@ namespace toy
 
 		Docksection& docktarget(Dimension dim, bool after);
 		Docksection& docktarget(const DimFloat& pos);
-
-		static Type& cls() { static Type ty("Docksection", Tabber::cls()); return ty; }
-
-		static Type& DockTab() { static Type ty("DockTab", Tab::cls()); return ty; }
-		static Type& Placeholder() { static Type ty("Placeholder", Wedge::Board()); return ty; }
 	};
 
 	class _refl_ TOY_UI_EXPORT Dockline : public GridSheet
 	{
 	public:
-		Dockline(Wedge& parent, Dockspace& dockspace, Dockline* dockline, Dimension dim);
+		Dockline(const Params& params, Dockspace& dockspace, Dockline* dockline, Dimension dim);
 
 		Docksection& insertSection(size_t index);
 		Docksection& divideSection(size_t index);
@@ -55,11 +51,6 @@ namespace toy
 
 		void resetSpans();
 
-		static Type& cls() { static Type ty("Dockline", GridSheet::cls()); return ty; }
-
-		static Type& DocklineX() { static Type ty("DocklineX", Dockline::cls()); return ty; }
-		static Type& DocklineY() { static Type ty("DocklineY", Dockline::cls()); return ty; }
-
 	public:
 		Dockspace& m_dockspace;
 		Docksection* m_docksection;
@@ -69,12 +60,23 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Dockspace : public Wedge
 	{
 	public:
-		Dockspace(Wedge& parent);
+		Dockspace(const Params& params);
 
 		Docksection& addSection(const GridIndex& dockid);
 		Window& addDockWindow(const string& name, const GridIndex& dockid, float span = 0.f);
-		
-		static Type& cls() { static Type ty("Dockspace", Wedge::Layout()); return ty; }
+
+		struct Styles
+		{
+			Style docktab = { "Docktab", Tabber::styles().tab };
+			Style placeholder = { "Placeholder", Widget::styles().board, Args{ { &InkStyle::m_background_colour, Colour::Blue } } };
+
+			Style dockline = { cls<Dockline>(), Widget::styles().gridsheet };
+			Style dockline_x = { "DocklineX", dockline, Args{ { &InkStyle::m_hover_cursor, &Cursor::styles().resize_x } } };
+			Style dockline_y = { "DocklineY", dockline, Args{ { &InkStyle::m_hover_cursor, &Cursor::styles().resize_y } } };
+
+			Style dockspace = { cls<Dockspace>(), Widget::styles().layout, Args{ { &Layout::m_opacity, OPAQUE },{ &Layout::m_spacing, DimFloat(6.f) } } };
+		};
+		static Styles& styles() { static Styles styles; return styles; }
 
 	protected:
 		Dockline m_mainLine;

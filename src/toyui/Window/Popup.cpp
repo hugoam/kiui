@@ -10,8 +10,8 @@
 
 namespace toy
 {
-	Popup::Popup(Wedge& parent, Callback onClose, bool open, Type& type)
-		: Wedge(parent, type, LAYER)
+	Popup::Popup(const Params& params, Callback onClose, bool open)
+		: Wedge({ params, &cls<Popup>(), LAYER })
 		, m_onClose(onClose)
 	{
 		DimFloat local = m_parent->frame().localPosition(this->rootSheet().m_mouse.m_lastPos);
@@ -37,7 +37,7 @@ namespace toy
 	void Popup::open(bool modal)
 	{
 		this->show();
-		this->frame().as<Layer>().moveToTop();
+		as<Layer>(this->frame()).moveToTop();
 		if(modal)
 			this->takeControl(CM_MODAL);
 	}

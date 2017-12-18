@@ -2,7 +2,6 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-
 #include <toyui/Config.h>
 #include <toyui/Gl/GlRenderer.h>
 
@@ -84,7 +83,7 @@ namespace toy
 			glDisable(GL_FRAMEBUFFER_SRGB);
 
 		// Update and render
-		glViewport(0, 0, target.m_layer.d_size.x, target.m_layer.d_size.y);
+		glViewport(0, 0, target.m_layer.m_size.x, target.m_layer.m_size.y);
 
 		if(m_clear)
 		{

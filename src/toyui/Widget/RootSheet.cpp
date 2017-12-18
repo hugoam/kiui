@@ -14,8 +14,8 @@
 
 namespace toy
 {
-	RootSheet::RootSheet(UiWindow& window, Type& type, Wedge* parent)
-		: Wedge(type, MASTER_LAYER, parent)
+	RootSheet::RootSheet(UiWindow& window, const Params& params)
+		: Wedge({ params, &cls<RootSheet>(), MASTER_LAYER })
 		, m_window(window)
 		, m_controller(*this)
 		, m_mouse(*this)
@@ -23,9 +23,9 @@ namespace toy
 		, m_cursor(*this)
 		, m_active(nullptr)
 	{
-		if(!parent)
+		if(!params.parent)
 		{
-			m_target = window.m_renderer->createRenderTarget(m_frame->as<Layer>());
+			m_target = window.m_renderer->createRenderTarget(as<Layer>(*m_frame));
 			this->updateStyle();
 		}
 	}

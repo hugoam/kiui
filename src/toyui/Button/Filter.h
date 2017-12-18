@@ -7,7 +7,7 @@
 
 /* toy */
 #include <toyobj/Type.h>
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Edit/TypeIn.h>
 
@@ -19,12 +19,10 @@ namespace toy
 		using Criteria = std::function<string(Widget&)>;
 
 	public:
-		FilterInput(Wedge& parent, Wedge& list, Criteria criteria = nullptr);
+		FilterInput(const Params& params, Wedge& list, Criteria criteria = nullptr);
 
 		void updateFilter(const string& filter);
 		bool fitsFilter(const string& filter, const string& value);
-
-		static Type& cls() { static Type ty("FilterInput", TypeIn::cls()); return ty; }
 
 	protected:
 		Wedge& m_list;

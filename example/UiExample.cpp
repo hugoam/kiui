@@ -34,24 +34,22 @@ namespace toy
 	class CustomElement : public Wedge
 	{
 	public:
-		CustomElement(Wedge& parent, const string& name, const string& gender)
-			: Wedge(parent, cls())
-			, checkbox(*this, nullptr, false)
-			, icon(*this, "(tbb/icon48)")
-			, stack(*this, Wedge::Stack())
-			, name(stack, name)
-			, gender(stack, gender)
-			, close(*this, "", [this](Widget&) { this->extract(); }, Window::CloseButton())
+		CustomElement(const Params& params, const string& name, const string& gender)
+			: Wedge({ params, &cls<CustomElement>() })
+			, checkbox({ this }, nullptr, false)
+			, icon({ this }, "(tbb/icon48)")
+			, stack({ this, &styles().stack })
+			, name({ &stack }, name)
+			, gender({ &stack }, gender)
+			, close({ this, &Window::styles().close_button }, "", [this](Widget&) { this->extract(); })
 		{}
 
 		Checkbox checkbox;
-		Item icon;
+		Widget icon;
 		Wedge stack;
 		Label name;
 		Label gender;
 		Button close;
-
-		static Type& cls() { static Type ty("CustomElement", Wedge::Row()); return ty; }
 	};
 
 	Wedge& createUiTestCustomList(Wedge& parent)
@@ -63,7 +61,7 @@ namespace toy
 		for(int i = 0; girl_names[i]; i++)
 			list.m_body.emplace<CustomElement>(girl_names[i], "Female");
 
-		parent.emplace<FilterInput>(list.m_body, [](Widget& widget) { return widget.as<CustomElement>().name.label(); });
+		parent.emplace<FilterInput>(list.m_body, [](Widget& widget) { return as<CustomElement>(widget).name.label(); });
 		return parent;
 	}
 
@@ -82,7 +80,7 @@ namespace toy
 
 	Wedge& createUiTestScrollList(Wedge& parent)
 	{
-		Wedge& sequence = parent.emplace<Wedge>(Wedge::Layout());
+		Wedge& sequence = parent.emplace_style<Wedge>(Widget::styles().layout);
 
 		ScrollSheet& list0 = sequence.emplace<ScrollSheet>();
 		for(int i = 0; i < 100; i++)
@@ -151,7 +149,7 @@ namespace toy
 
 	Wedge& createUiTestDockspace(Wedge& parent)
 	{
-		//MasterDockline::cls().layout().d_weights = { 0.2f, 0.6f, 0.2f };
+		//MasterDockline::style().m_layout.d_weights = { 0.2f, 0.6f, 0.2f };
 
 		Dockspace& dockspace = parent.emplace<Dockspace>();
 
@@ -172,8 +170,8 @@ namespace toy
 		Canvas& canvas = parent.emplace<Canvas>("Node Editor");
 
 		Toolbar& toolbar = parent.emplace<Toolbar>();
-		toolbar.emplace<ToolButton>("autolayout", [&canvas](Widget&) { canvas.autoLayout(); return false; });
-		toolbar.emplace<ToolButton>("autolayout selected", [&canvas](Widget&) { canvas.autoLayoutSelected(); return false; });
+		toolbar.emplace<ToolButton>("autolayout", [&](Widget&) { canvas.autoLayout(); return false; });
+		toolbar.emplace<ToolButton>("autolayout selected", [&](Widget&) { canvas.autoLayoutSelected(); return false; });
 
 		parent.swap(canvas.m_index, toolbar.m_index);
 
@@ -231,24 +229,24 @@ namespace toy
 
 		for(auto& r : contents)
 		{
-			Wedge& row = table0.emplace<Wedge>(Wedge::Row());
+			Wedge& row = table0.emplace_style<Wedge>(Widget::styles().row);
 			for(const string& name : r)
 				row.emplace<Label>(name);
 		}
 
 		Table& table1 = parent.emplace<Table>(StringVector({ "Column 0", "Column 1", "Column 3" }), std::vector<float>({ 0.33f, 0.33f, 0.33f }));
 
-		Wedge& labels = table1.emplace<Wedge>(Wedge::Row());
+		Wedge& labels = table1.emplace_style<Wedge>(Widget::styles().row);
 		for(const string& name : { "Hello", "kiUi", "World!" })
 			labels.emplace<Label>(name);
 
-		Wedge& buttons = table1.emplace<Wedge>(Wedge::Row());
+		Wedge& buttons = table1.emplace_style<Wedge>(Widget::styles().row);
 		for(const string& name : { "Banana", "Apple", "Corniflower" })
 			buttons.emplace<Button>(name);
 
 		table1.emplace<RadioSwitch>(StringVector({ "radio a", "radio b", "radio b" }));
 
-		Wedge& line0 = table1.emplace<Wedge>(Wedge::Row());
+		Wedge& line0 = table1.emplace_style<Wedge>(Widget::styles().row);
 
 		Expandbox& box0 = line0.emplace<Expandbox>(StringVector{ "Category A" });
 		box0.m_body.emplace<Label>("Blah blah blah");
@@ -262,17 +260,17 @@ namespace toy
 
 		Table& table2 = parent.emplace<Table>(StringVector({ "Left", "Right" }), std::vector<float>({ 0.5f, 0.5f }));
 
-		Wedge& line1 = table2.emplace<Wedge>(Wedge::Row());
+		Wedge& line1 = table2.emplace_style<Wedge>(Widget::styles().row);
 
 		line1.emplace<InputFloat>("Red", 0.05f);
 		line1.emplace<InputFloat>("Blue", 0.05f);
 
-		Wedge& line2 = table2.emplace<Wedge>(Wedge::Row());
+		Wedge& line2 = table2.emplace_style<Wedge>(Widget::styles().row);
 
 		line2.emplace<TypeIn>("The quick brown fox jumps over the lazy dog.");
 		line2.emplace<TypeIn>("The quick brown fox jumps over the lazy dog.");
 
-		Wedge& line3 = table2.emplace<Wedge>(Wedge::Row());
+		Wedge& line3 = table2.emplace_style<Wedge>(Widget::styles().row);
 
 		line3.emplace<Label>("Hello Left");
 		line3.emplace<Label>("Hello Right");
@@ -333,17 +331,17 @@ namespace toy
 		parent.emplace<Textbox>(multiline);
 		parent.emplace<SliderFloat>("Wrap width", AutoStat<float>(200.f, -20.f, 600.f, 0.1f), [](float) {});
 		
-		Wedge& line0 = parent.emplace<Wedge>(Wedge::Row());
-		line0.emplace<Item>("(bullet)");
+		Wedge& line0 = parent.emplace_style<Wedge>(Widget::styles().row);
+		line0.emplace<Widget>("(bullet)");
 		line0.emplace<Label>("Bullet point 1");
 
 		static string multiline2 = "Bullet point 2\nOn multiple lines";
-		Wedge& line1 = parent.emplace<Wedge>(Wedge::Row());
-		line1.emplace<Item>("(bullet)");
+		Wedge& line1 = parent.emplace_style<Wedge>(Widget::styles().row);
+		line1.emplace<Widget>("(bullet)");
 		line1.emplace<Textbox>(multiline2);
 
-		Wedge& line2 = parent.emplace<Wedge>(Wedge::Row());
-		line2.emplace<Item>("(bullet)");
+		Wedge& line2 = parent.emplace_style<Wedge>(Widget::styles().row);
+		line2.emplace<Widget>("(bullet)");
 		line2.emplace<Label>("Bullet point 3");
 
 		return parent;
@@ -407,31 +405,31 @@ namespace toy
 
 	Wedge& createUiTestInlineControls(Wedge& parent)
 	{
-		Wedge& line0 = parent.emplace<Wedge>(Wedge::Row());
+		Wedge& line0 = parent.emplace_style<Wedge>(Widget::styles().row);
 
 		line0.emplace<Label>("Hello");
 		line0.emplace<Label>("World");
 
-		Wedge& line1 = parent.emplace<Wedge>(Wedge::Row());
+		Wedge& line1 = parent.emplace_style<Wedge>(Widget::styles().row);
 
 		line1.emplace<Button>("Banana");
 		line1.emplace<Button>("Apple");
 		line1.emplace<Button>("Corniflower");
 
-		Wedge& line2 = parent.emplace<Wedge>(Wedge::Row());
+		Wedge& line2 = parent.emplace_style<Wedge>(Widget::styles().row);
 
 		line2.emplace<Label>("Small buttons");
 		line2.emplace<Button>("Like this one");
 		line2.emplace<Label>("can fit within a text block.");
 
-		Wedge& line3 = parent.emplace<Wedge>(Wedge::Row());
+		Wedge& line3 = parent.emplace_style<Wedge>(Widget::styles().row);
 
 		line3.emplace<InputBool>("My", true);
 		line3.emplace<InputBool>("Tailor", true);
 		line3.emplace<InputBool>("Is", true);
 		line3.emplace<InputBool>("Rich", true);
 
-		Wedge& line4 = parent.emplace<Wedge>(Wedge::Row());
+		Wedge& line4 = parent.emplace_style<Wedge>(Widget::styles().row);
 
 		line4.emplace<InputFloat>("X", 0.f);
 		line4.emplace<InputFloat>("Y", 0.f);
@@ -444,7 +442,7 @@ namespace toy
 	{
 		ProgressBar& bar = parent.emplace<ProgressBar>();
 		bar.setPercentage(0.57f);
-		parent.emplace<SliderFloat>("Set progress", AutoStat<float>(0.57f, 0.f, 1.f, 0.01f), [&bar](float val) { bar.setPercentage(val); });
+		parent.emplace<SliderFloat>("Set progress", AutoStat<float>(0.57f, 0.f, 1.f, 0.01f), [&](float val) { bar.setPercentage(val); });
 		return parent;
 	}
 
@@ -463,16 +461,16 @@ namespace toy
 
 		static string help = "This window is being created by the ShowTestWindow() function. Please refer to the code for programming reference.\n\nUser Guide:";
 		Expandbox& box0 = parent.emplace<Expandbox>(StringVector{ "Help" });
-		box0.m_body.emplace<Label>(help, Label::Text());
+		box0.m_body.emplace_style<Label>(Widget::styles().text, help);
 
 		Expandbox& box1 = parent.emplace<Expandbox>(StringVector{ "Window options" });
 
-		box1.m_body.emplace<InputBool>("titlebar", true, [&window](bool on) { on ? window.showTitlebar() : window.hideTitlebar(); }, true);
-		box1.m_body.emplace<InputBool>("movable", true, [&window](bool) { window.toggleMovable(); }, true);
-		box1.m_body.emplace<InputBool>("resizable", true, [&window](bool) { window.toggleResizable(); }, true);
-		box1.m_body.emplace<InputBool>("closable", true, [&window](bool) { window.toggleClosable(); }, true);
+		box1.m_body.emplace<InputBool>("titlebar", true, [&](bool on) { on ? window.showTitlebar() : window.hideTitlebar(); }, true);
+		box1.m_body.emplace<InputBool>("movable", true, [&](bool) { window.toggleMovable(); }, true);
+		box1.m_body.emplace<InputBool>("resizable", true, [&](bool) { window.toggleResizable(); }, true);
+		box1.m_body.emplace<InputBool>("closable", true, [&](bool) { window.toggleClosable(); }, true);
 
-		box1.m_body.emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha) { window.frame().d_inkstyle->m_backgroundColour.val.m_a = alpha; });
+		box1.m_body.emplace<SliderFloat>("fill alpha", AutoStat<float>(0.f, 0.f, 1.f, 0.1f), [&window](float alpha) { window.frame().d_inkstyle->m_background_colour.m_a = alpha; });
 
 		Expandbox& box2 = parent.emplace<Expandbox>(StringVector{ "Widgets" });
 		createUiTestControls(box2.m_body);
@@ -490,33 +488,24 @@ namespace toy
 		Renderer& renderer = *Caption::s_renderer;
 
 		Wedge& options = tooldock.addDock("Options").m_body;
-		options.emplace<InputText>("Debug draw filter", "", [&renderer](string value) { renderer.m_debugDrawFilter = value; });
-		options.emplace<InputBool>("Debug draw Frame", false, [&renderer](bool on) { renderer.m_debugDrawFrameRect = on; });
-		options.emplace<InputBool>("Debug draw Padding", false, [&renderer](bool on) { renderer.m_debugDrawPaddedRect = on; });
-		options.emplace<InputBool>("Debug draw Content", false, [&renderer](bool on) { renderer.m_debugDrawContentRect = on; });
-		options.emplace<InputBool>("Debug draw Clip", false, [&renderer](bool on) { renderer.m_debugDrawClipRect = on; });
+		options.emplace<InputText>("Debug draw filter", "", [&](string value) { renderer.m_debugDrawFilter = value; });
+		options.emplace<InputBool>("Debug draw Frame", false, [&](bool on) { renderer.m_debugDrawFrameRect = on; });
+		options.emplace<InputBool>("Debug draw Padding", false, [&](bool on) { renderer.m_debugDrawPaddedRect = on; });
+		options.emplace<InputBool>("Debug draw Content", false, [&](bool on) { renderer.m_debugDrawContentRect = on; });
+		options.emplace<InputBool>("Debug draw Clip", false, [&](bool on) { renderer.m_debugDrawClipRect = on; });
 
 		return tooldock;
 	}
 
 	void switchUiTheme(UiWindow& uiWindow, const string& name)
 	{
-		StyleParser parser(*uiWindow.m_styler);
+		string clean_name = toLower(replaceAll(name, " ", "_"));
+		if(name == "Default")
+			load_default_style_sheet(*uiWindow.m_styler);
+		else
+			load_style_sheet(*uiWindow.m_styler, uiWindow.m_resourcePath + "interface/styles/" + clean_name +".yml");
 
-		if(name == "Blendish")
-			parser.loadStyleSheet(uiWindow.m_resourcePath + "interface/styles/blendish.yml");
-		else if(name == "Blendish Dark")
-			parser.loadStyleSheet(uiWindow.m_resourcePath + "interface/styles/blendish_dark.yml");
-		else if(name == "TurboBadger")
-			parser.loadStyleSheet(uiWindow.m_resourcePath + "interface/styles/turbobadger.yml");
-		else if(name == "MyGui")
-			parser.loadStyleSheet(uiWindow.m_resourcePath + "interface/styles/mygui.yml");
-		else if(name == "Photoshop")
-			parser.loadStyleSheet(uiWindow.m_resourcePath + "interface/styles/photoshop.yml");
-		else if(name == "Default")
-			parser.loadDefaultStyle();
-
-		uiWindow.m_styler->style(CustomElement::cls()).m_layout.d_align = DimAlign(LEFT, CENTER);
+		//uiWindow.m_styler->style(CustomElement::style()).m_layout.d_align = Dim<Align>(LEFT, CENTER);
 	}
 
 	void selectUiTheme(Wedge& sheet, Widget& selected)
@@ -570,10 +559,11 @@ namespace toy
 	void createUiTest(Wedge& rootSheet)
 	{
 		switchUiTheme(rootSheet.uiWindow(), "Blendish Dark");
+		//switchUiTheme(rootSheet.uiWindow(), "Minimal");
 
-		Wedge& demoheader = rootSheet.emplace<Wedge>(Wedge::Header());
-		Wedge& demobody = rootSheet.emplace<Wedge>(Wedge::Board());
-		Wedge& samplebody = demobody.emplace<Wedge>(Wedge::Layout());
+		Wedge& demoheader = rootSheet.emplace_style<Wedge>(Widget::styles().header);
+		Wedge& demobody = rootSheet.emplace_style<Wedge>(Widget::styles().board);
+		Wedge& samplebody = demobody.emplace_style<Wedge>(Widget::styles().layout);
 		createUiDebugDock(demobody);
 
 		std::map<string, Sample>& samples = sampleMap();
@@ -584,7 +574,7 @@ namespace toy
 		
 		StringVector themes({ "Blendish", "Blendish Dark", "TurboBadger", "MyGui" });
 
-		auto pickUiSample = [&samplebody, &samples](Widget& selected)
+		auto pickUiSample = [&](Widget& selected)
 		{
 			samples[selected.label()](selected.label(), samplebody);
 		};
@@ -592,6 +582,6 @@ namespace toy
 		demoheader.emplace<Label>("Pick a demo sample : ");
 		demoheader.emplace<DropdownInput>(sampleNames, pickUiSample);
 		demoheader.emplace<Label>("Switch theme : ");
-		demoheader.emplace<DropdownInput>(themes, [&samplebody](Widget& selected) { selectUiTheme(samplebody, selected); });
+		demoheader.emplace<DropdownInput>(themes, [&](Widget& selected) { selectUiTheme(samplebody, selected); });
 	}
 }

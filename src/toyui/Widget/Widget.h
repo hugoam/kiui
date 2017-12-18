@@ -9,7 +9,8 @@
 #include <toyobj/Type.h>
 #include <toyobj/String/String.h>
 #include <toyobj/Util/Updatable.h>
-#include <toyui/Forward.h>
+#include <toyobj/Reflect/Member.h>
+#include <toyui/Types.h>
 #include <toyui/Frame/Frame.h>
 #include <toyui/Input/InputDispatcher.h>
 #include <toyui/Style/Style.h>
@@ -33,11 +34,42 @@ namespace toy
 		MODAL     = 1 << 8		// widget is modal in the control stack
 	};
 
+#ifdef TOY_WIDGET_STATES_CONVERT_IMPL
+	template <> inline void fromString(const string& str, WidgetStates& val)
+	{
+		std::vector<string> names = splitString(toUpper(str), "|");
+		for(const string& name : names)
+			val.value |= fromString<WidgetState>(name);
+	};
+
+	template <> inline void toString(const WidgetStates& val, string& str)
+	{
+		for(WidgetState state = FOCUSED; state < (1 << 9); state = static_cast<WidgetState>(state << 1))
+			if(val.value & state)
+				str += (str.empty() ? "" : "|") + toString<WidgetState>(state);
+	};
+#endif
+
 	class _refl_ TOY_UI_EXPORT Widget : public TypeObject, public InputAdapter
 	{
 	public:
-		Widget(Wedge& parent, Type& type = cls(), FrameType frameType = FRAME);
-		Widget(Type& type = cls(), FrameType frameType = FRAME, Wedge* parent = nullptr);
+		struct Params
+		{
+			Params(Wedge* parent = nullptr, Style* style = nullptr, FrameType frameType = FRAME)
+				: parent(parent), type(nullptr), style(style), frameType(frameType) {}
+			Params(const Params& params, Type* type = nullptr)
+				: parent(params.parent), type(params.type ? params.type : type), style(params.style), frameType(params.frameType) {}
+			Params(const Params& params, Type* type, FrameType frameType)
+				: parent(params.parent), type(params.type ? params.type : type), style(params.style), frameType(frameType) {}
+			Wedge* parent = nullptr;
+			Type* type = nullptr;
+			Style* style = nullptr;
+			FrameType frameType = FRAME;
+		};
+
+	public:
+		Widget(const Params& params = {});
+		Widget(const Params& params, const string& content);
 		~Widget();
 
 		inline Frame& frame() { return *m_frame; }
@@ -69,7 +101,7 @@ namespace toy
 		virtual void extract() { this->destroy(); }
 
 		template <class T>
-		T* findContainer() { Widget* widget = this->findContainer(T::cls()); return widget ? &widget->template as<T>() : nullptr; }
+		T* findContainer() { Widget* widget = this->findContainer(cls<T>()); return widget ? &as<T>(*widget) : nullptr; }
 
 		Widget* findContainer(Type& type);
 
@@ -78,11 +110,8 @@ namespace toy
 
 		void updateStyle();
 
-		void setStyle(Type& type, bool hard = true);
 		void setStyle(Style& style, bool hard = true);
 		void setStyle(Style* style) { this->setStyle(*style); }
-
-		Style& fetchStyle(Type& type);
 
 		void toggleState(WidgetState state);
 
@@ -120,8 +149,6 @@ namespace toy
 
 		using Callback = std::function<void(Widget&)>;
 
-		static Type& cls() { static Type ty("Widget"); return ty; }
-
 	public:
 		_attr_ Wedge* m_parent;
 		_attr_ Wedge* m_container;
@@ -130,20 +157,10 @@ namespace toy
 		/*_attr_*/ object_ptr<Frame> m_frame; // @todo make this a member, separate Layer, and separate caption and image (only for Items)
 		_attr_ WidgetState m_state;
 
-		Lref m_object;
-	};
+		Ref m_object;
 
-	class _refl_ TOY_UI_EXPORT Item : public Widget
-	{
-	public:
-		Item(Wedge& parent, Type& type = cls());
-		Item(Wedge& parent, const string& content, Type& type = cls());
-
-		static Type& Control() { static Type ty("Control", Item::cls()); return ty; }
-		static Type& Spacer() { static Type ty("Spacer", Widget::cls()); return ty; }
-		static Type& Filler() { static Type ty("Filler", Item::Spacer()); return ty; }
-
-		static Type& cls() { static Type ty("Item", Widget::cls()); return ty; }
+		static Styles& styles() { static Styles styles; return styles; }
+		static std::map<string, Style*> s_styles;
 	};
 }
 

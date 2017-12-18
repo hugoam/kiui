@@ -25,13 +25,14 @@ namespace toy
 
 	void WidgetStore::remove(Widget& widget)
 	{
-		m_wedge.destroy(widget);
+		m_wedge.remove(widget);
 		vector_remove_pt(m_contents, widget);
 	}
 
 	void WidgetStore::transfer(Widget& widget, Wedge& target)
 	{
-		m_wedge.transfer(widget, target);
+		m_wedge.remove(widget);
+		target.append(widget);
 		widget.m_container = &target;
 		vector_transfer_pt(m_contents, target.store().m_contents, widget);
 	}
@@ -39,17 +40,13 @@ namespace toy
 	void WidgetStore::clear()
 	{
 		for(auto& widget : reverse_adapt(m_contents))
-			m_wedge.destroy(*widget);
+			widget->destroyTree();
 
 		m_contents.clear();
 	}
 
-	Wedge::Wedge(Wedge& parent, Type& type, FrameType frameType)
-		: Widget(parent, type, frameType)
-	{}
-
-	Wedge::Wedge(Type& type, FrameType frameType, Wedge* parent)
-		: Widget(type, frameType, parent)
+	Wedge::Wedge(const Params& params)
+		: Widget({ params, &cls<Wedge>() })
 	{}
 
 	void Wedge::visit(const Visitor& visitor)
@@ -89,18 +86,6 @@ namespace toy
 		widget.unbind();
 	}
 
-	void Wedge::destroy(Widget& widget)
-	{
-		widget.destroyTree();
-		this->remove(widget);
-	}
-
-	void Wedge::transfer(Widget& widget, Wedge& target)
-	{
-		this->remove(widget);
-		target.append(widget);
-	}
-
 	void Wedge::move(size_t from, size_t to)
 	{
 		m_contents.insert(m_contents.begin() + to, m_contents[from]);
@@ -114,8 +99,8 @@ namespace toy
 		this->reindex(from < to ? from : to);
 	}
 
-	GridSheet::GridSheet(Wedge& parent, Dimension dim, Callback callback, Type& type)
-		: Wedge(parent, type)
+	GridSheet::GridSheet(const Params& params, Dimension dim, Callback callback)
+		: Wedge({ params, &cls<GridSheet>() })
 		, m_dim(dim)
 		, m_dragPrev(nullptr)
 		, m_dragNext(nullptr)
@@ -130,7 +115,7 @@ namespace toy
 		m_dragPrev = nullptr;
 		m_dragNext = nullptr;
 
-		for(auto& widget : this->contents())
+		for(auto& widget : this->m_contents)
 		{
 			if(widget->frame().d_position[m_dim] >= local[m_dim])
 			{

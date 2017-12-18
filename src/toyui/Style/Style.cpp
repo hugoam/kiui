@@ -2,9 +2,13 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
+#define TOY_WIDGET_STATES_CONVERT_IMPL
+
 #include <toyui/Config.h>
 #include <toyui/Style/Style.h>
 
+#include <toyobj/Reflect/Meta.h>
+#include <toyui/Generated/Meta.h>
 #include <toyobj/Iterable/Reverse.h>
 
 #include <toyui/Widget/Widget.h>
@@ -13,131 +17,84 @@
 
 namespace toy
 {
-	void InkStyle::prepare()
+	static void init_options(Ref object, Options& options)
 	{
-		if(m_base)
-			this->inherit(m_base.val->m_skin);
-
-		if(!m_backgroundColour.val.null() || !m_textColour.val.null() || !m_borderColour.val.null() || m_image || !m_imageSkin.val.null())
-			m_empty = false;
+		for(size_t i = 0; i < options.m_fields.size(); ++i)
+			if(!options.m_fields[i].none())
+				object.meta().m_members[i].set(object, options.m_fields[i]);
 	}
 
-	Style::Style(Type& type, Style* base)
-		: IdObject(cls())
-		, m_style(&type)
+	Style::Style(const string& name, Type* type, Style* base, Args args)
+		: m_style_type(type)
 		, m_base(base)
-		, m_name(type.m_name)
-		, m_layout()
-		, m_skin(this)
-		, m_subskins()
-		, m_ready(false)
-	{
-		this->index();
-	}
-
-	Style::Style(const string& name)
-		: IdObject(cls())
-		, m_style(nullptr)
-		, m_base(nullptr)
 		, m_name(name)
 		, m_layout()
-		, m_skin(this)
-		, m_subskins()
-		, m_ready(false)
+		, m_skins()
+		, m_defined(false)
 	{
-		this->index();
+		Widget::s_styles[name] = this;
+
+		if(base)
+			m_layout = base->m_layout;
+
+		init_members(&m_layout, args);
+		init_members(&m_skin, args);
 	}
 
-	Style::~Style()
-	{}
-
-	void Style::clear()
+	void Style::load(Style& style, StyleMap& layout_defs, StyleMap& skin_defs)
 	{
-		m_layout = LayoutStyle();
-		m_skin = InkStyle(this);
-		m_subskins.clear();
-		m_ready = false;
+		if(style.m_base)
+			this->load(*style.m_base, layout_defs, skin_defs);
+		
+		init_options(&m_layout, layout_defs[style.m_name]);
+		init_options(&m_skin, skin_defs[style.m_name]);
+
+		for(auto& kv : skin_defs)
+			if(kv.first.find(style.m_name + ":") == 0)
+			{
+				WidgetStates states = fromString<WidgetStates>(splitString(kv.first, ":")[1]);
+				InkStyle& skin = decline_skin(states);
+				init_options(&skin, skin_defs[style.m_name]);
+				init_options(&skin, skin_defs[kv.first]);
+			}
 	}
 
-	void Style::prepare(Style* definition)
+	void Style::load(StyleMap& layout_defs, StyleMap& skin_defs)
 	{
-		if(m_ready)
-			return;
-
-		if(definition)
-			this->define(*definition);
+		if(m_defined) return;
 
 		if(m_base)
-		{
-			this->inheritLayout(*m_base);
-			this->inheritSkin(*m_base);
-		}
+			m_base->load(layout_defs, skin_defs);
 
-		for(auto& subskin : m_subskins)
-			subskin.m_skin.inherit(m_skin);
+		if(m_name == "Header")
+			int i = 0;
+
+		printf("INFO: Loading style %s\n", m_name.c_str());
+		this->load(*this, layout_defs, skin_defs);
 
 		m_skin.prepare();
+		for(InkStyle& skin : m_skins)
+			skin.prepare();
 
-		for(auto& subskin : m_subskins)
-			subskin.m_skin.prepare();
-
-		m_ready = true;
+		m_defined = true;
 	}
 
-	void Style::define(Style& style)
+	InkStyle& Style::skin(WidgetState state)
 	{
-		this->copyLayout(style);
-		this->copySkin(style);
-	}
-
-	void Style::inheritLayout(Style& base)
-	{
-		m_layout.inherit(base.m_layout);
-	}
-
-	void Style::copyLayout(Style& base)
-	{
-		m_layout.copy(base.m_layout);
-	}
-
-	void Style::inheritSkin(Style& base)
-	{
-		m_skin.inherit(base.m_skin);
-
-		for(auto& subskin : base.m_subskins)
-			this->fetchSubskin(subskin.m_state).inherit(subskin.m_skin);
-	}
-
-	void Style::copySkin(Style& base)
-	{
-		m_skin.copy(base.m_skin);
-
-		for(auto& subskin : base.m_subskins)
-			this->fetchSubskin(subskin.m_state).copy(subskin.m_skin);
-	}
-
-	InkStyle& Style::subskin(WidgetState state)
-	{
-		for(SubSkin& skin : reverse_adapt(m_subskins))
+		for(InkStyle& skin : reverse_adapt(m_skins))
 			if((state & skin.m_state) == skin.m_state)
-				return skin.m_skin;
+				return skin;
 		return m_skin;
 	}
 
-	InkStyle& Style::fetchSubskin(WidgetState state)
+	InkStyle& Style::decline_skin(WidgetStates state)
 	{
-		for(SubSkin& skin : reverse_adapt(m_subskins))
-			if(state == skin.m_state)
-				return skin.m_skin;
+		for(InkStyle& skin : m_skins)
+			if(state.value == skin.m_state)
+				return skin;
 
-		// name = m_name + toString(state)
-		m_subskins.emplace_back(state, *this);
-		m_subskins.back().m_skin.copy(m_skin);
-		return m_subskins.back().m_skin;
-	}
-
-	InkStyle& Style::decline(WidgetState state)
-	{
-		return this->fetchSubskin(state);
+		m_skins.emplace_back(m_skin);
+		m_skins.back().m_state = static_cast<WidgetState>(state.value);
+		return m_skins.back();
 	}
 }

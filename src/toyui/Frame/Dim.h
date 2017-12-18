@@ -7,9 +7,9 @@
 
 /* toy */
 #include <toyobj/String/String.h>
-#include <toyobj/Type.h>
+#include <toyobj/Object.h>
 #include <toyobj/Util/Colour.h>
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 
 /* std */
 #include <array>
@@ -59,9 +59,9 @@ namespace toy
 	enum _refl_ FrameType : unsigned int
 	{
 		FRAME = 0,
-		LAYER = 2,
-		MASTER_LAYER = 3,
-		SPACE_LAYER = 4
+		LAYER = 1,
+		MASTER_LAYER = 2,
+		SPACE_LAYER = 3
 	};
 
 	enum _refl_ LayoutSolver : unsigned int
@@ -95,13 +95,14 @@ namespace toy
 		EXPAND
 	};
 
-	struct TOY_UI_EXPORT Space
+	struct _refl_ TOY_UI_EXPORT Space
 	{
-		void operator=(SpacePreset preset) { *this = Space::preset(preset); }
+		_attr_ Direction direction;
+		_attr_ Sizing sizingLength;
+		_attr_ Sizing sizingDepth;
 
-		Direction direction;
-		Sizing sizingLength;
-		Sizing sizingDepth;
+		Space(Direction dir, Sizing length, Sizing depth) : direction(dir), sizingLength(length), sizingDepth(depth) {}
+		Space(SpacePreset preset) { *this = Space::preset(preset); }
 
 		static Space preset(SpacePreset preset);
 	};
@@ -140,20 +141,10 @@ namespace toy
 	{
 	public:
 		Dim(T x, T y) : d_values{{ x, y }} {}
-		Dim(T val) : Dim(val, val) {}
 		Dim() : Dim(T(), T()) {}
-
-		bool null() const { return d_values[0] == T() && d_values[1] == T(); }
-
-		bool operator==(const Dim<T>& other) const { return (x == other.x) && (y == other.y); }
 
 		T operator[](size_t i) const { return d_values[i]; }
 		T& operator[](size_t i) { return d_values[i]; }
-
-		Dim operator+(const Dim& rhs) const { return Dim(this->x + rhs.x, this->y + rhs.y); }
-		Dim operator-(const Dim& rhs) const { return Dim(this->x - rhs.x, this->y - rhs.y); }
-		Dim operator*(const Dim& rhs) const { return Dim(this->x * rhs.x, this->y * rhs.y); }
-		Dim operator/(const Dim& rhs) const { return Dim(this->x / rhs.x, this->y / rhs.y); }
 
 	public:
 		union {
@@ -163,29 +154,57 @@ namespace toy
 		};
 	};
 
+#ifdef TOY_GENERATOR_SKIP_INCLUDES
+	template <> struct _refl_ _array_ _struct_ Dim<size_t> { _constr_ Dim<size_t>(size_t x, size_t y) {} _attr_ size_t x; _attr_ size_t y; };
+	template <> struct _refl_ _array_ _struct_ Dim<AutoLayout> { _constr_ Dim<AutoLayout>(AutoLayout x, AutoLayout y) {} _attr_ AutoLayout x; _attr_ AutoLayout y; };
+	template <> struct _refl_ _array_ _struct_ Dim<Sizing> { _constr_ Dim<Sizing>(Sizing x, Sizing y) {} _attr_ Sizing x; _attr_ Sizing y; };
+	template <> struct _refl_ _array_ _struct_ Dim<Align> { _constr_ Dim<Align>(Align x, Align y) {} _attr_ Align x; _attr_ Align y; };
+	template <> struct _refl_ _array_ _struct_ Dim<Pivot> { _constr_ Dim<Pivot>(Pivot x, Pivot y) {} _attr_ Pivot x; _attr_ Pivot y; };
+#else
 	// @todo add template reflection mechanism for these
-	using DimIndex = Dim<size_t>;
-	using DimFloat = Dim<float>;
-	using DimLayout = Dim<AutoLayout>;
-	using DimSizing = Dim<Sizing>;
-	using DimAlign = Dim<Align>;
-	using DimPivot = Dim<Pivot>;
+#endif
 
-	class _refl_ BoxFloat : public Struct
+	class _refl_ _struct_ _array_ DimFloat
 	{
 	public:
-		/*_constr_*/ BoxFloat(float x0, float y0, float x1, float y1) : d_values{{ x0, y0, x1, y1 }}, d_uniform(false), d_null(cnull()) {}
+		_constr_ DimFloat(float x, float y) : d_values{ { x, y } } {}
+		_constr_ DimFloat(float val) : DimFloat(val, val) {}
+		DimFloat() : DimFloat(float(), float()) {}
+
+		bool null() const { return d_values[0] == float() && d_values[1] == float(); }
+
+		bool operator==(const DimFloat& other) const { return (x == other.x) && (y == other.y); }
+
+		float operator[](size_t i) const { return d_values[i]; }
+		float& operator[](size_t i) { return d_values[i]; }
+
+		DimFloat operator+(const DimFloat& rhs) const { return { this->x + rhs.x, this->y + rhs.y }; }
+		DimFloat operator-(const DimFloat& rhs) const { return { this->x - rhs.x, this->y - rhs.y }; }
+		DimFloat operator*(const DimFloat& rhs) const { return { this->x * rhs.x, this->y * rhs.y }; }
+		DimFloat operator/(const DimFloat& rhs) const { return { this->x / rhs.x, this->y / rhs.y }; }
+
+	public:
+		union {
+			std::array<float, 2> d_values;
+			struct { _attr_ float x; _attr_ float y; };
+			struct { float w, h; };
+		};
+	};
+
+	class _refl_ _struct_ _array_ BoxFloat : public Struct
+	{
+	public:
+		_constr_ BoxFloat(float x0, float y0, float x1, float y1) : d_values{{ x0, y0, x1, y1 }}, d_null(cnull()) {}
+		_constr_ BoxFloat(float uniform) : BoxFloat(uniform, uniform, uniform, uniform) {}
+		BoxFloat() : BoxFloat(0.f) { d_null = true; }
 
 		BoxFloat(int x0, int y0, int x1, int y1) : BoxFloat(float(x0), float(y0), float(x1), float(y1)) {}
-		BoxFloat(float uniform) : BoxFloat(uniform, uniform, uniform, uniform) {}
-		BoxFloat() : BoxFloat(0.f) { d_null = true; }
 
 		float operator[](size_t i) const { return d_values[i]; }
 		float& operator[](size_t i) { d_null = false; return d_values[i]; }
 
 		void clear() { this->assign(0.f); d_null = true; }
 
-		bool uniform() const { return d_uniform; }
 		bool null() const { return d_null; }
 		bool cnull() const { return (x == 0.f && y == 0.f && w == 0.f && h == 0.f); }
 
@@ -199,18 +218,15 @@ namespace toy
 
 		float* pointer() { return &d_values[0]; }
 
-		DimFloat offset() const { return DimFloat{ this->x0, this->y0 }; }
+		DimFloat offset() const { return { this->x0, this->y0 }; }
 		DimFloat size() const { return DimFloat{ this->x0, this->y0 } + DimFloat{ this->x1, this->y1 }; }
-
-		static Type& cls() { static Type ty; return ty; }
 
 	public:
 		union {
 			std::array<float, 4> d_values;
 			struct { float x0, y0, x1, y1; };
-			struct { float x, y, w, h; };
+			struct { _attr_ float x; _attr_ float y; _attr_ float w; _attr_ float h; };
 		};
-		bool d_uniform;
 		bool d_null;
 	};
 }

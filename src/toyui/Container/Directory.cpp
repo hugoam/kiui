@@ -11,8 +11,8 @@
 
 namespace toy
 {
-	Dir::Dir(Wedge& parent, Directory& directory, const string& name)
-		: MultiButton(parent, { "(folder_20)" , name }, [this](Widget&) { this->open(); }, cls())
+	Dir::Dir(const Params& params, Directory& directory, const string& name)
+		: MultiButton({ params, &cls<Dir>() }, { "(folder_20)" , name }, [&](Widget&) { this->open(); })
 		, m_directory(directory)
 		, m_name(name)
 	{}
@@ -28,14 +28,14 @@ namespace toy
 			
 	}
 
-	File::File(Wedge& parent, Directory& directory, const string& name)
-		: MultiButton(parent, { "(file_20)", name }, nullptr, cls())
+	File::File(const Params& params, Directory& directory, const string& name)
+		: MultiButton({ params, &cls<File>() }, { "(file_20)", name }, nullptr)
 		, m_directory(directory)
 		, m_name(name)
 	{}
 
-	Directory::Directory(Wedge& parent, const string& path)
-		: Wedge(parent, cls())
+	Directory::Directory(const Params& params, const string& path)
+		: Wedge({ params, &cls<Directory>() })
 		, m_path(path)
 	{
 		this->update();
@@ -77,20 +77,20 @@ namespace toy
 		this->setLocation(m_path.substr(0, pos));
 	}
 
-	FileBrowser::FileBrowser(Wedge& parent, const string& path)
-		: Wedge(parent, cls())
+	FileBrowser::FileBrowser(const Params& params, const string& path)
+		: Wedge({ params, &cls<FileBrowser>() })
 		, m_path(path)
-		, m_directory(*this, m_path)
+		, m_directory({ this }, m_path)
 	{}
 
-	FileNode::FileNode(Wedge& parent, const string& name)
-		: TreeNode(parent, { "(file_20)", name }, true, nullptr, nullptr, cls())
+	FileNode::FileNode(const Params& params, const string& name)
+		: TreeNode({ params, &cls<FileNode>() }, { "(file_20)", name }, true, nullptr, nullptr)
 	{
 		m_toggle.enableState(DISABLED);
 	}
 
-	DirectoryNode::DirectoryNode(Wedge& parent, const string& path, const string& name, bool collapsed)
-		: TreeNode(parent, { "(folder_20)", name }, collapsed, nullptr, nullptr, cls())
+	DirectoryNode::DirectoryNode(const Params& params, const string& path, const string& name, bool collapsed)
+		: TreeNode({ params, &cls<DirectoryNode>() }, { "(folder_20)", name }, collapsed, nullptr, nullptr)
 		, m_path(path)
 	{}
 
@@ -99,8 +99,8 @@ namespace toy
 		Expandbox::expand();
 
 		for(Widget* widget : m_body.m_contents)
-			if(widget->isa<DirectoryNode>())
-				widget->as<DirectoryNode>().update();
+			if(is<DirectoryNode>(*widget))
+				as<DirectoryNode>(*widget).update();
 	}
 
 	void DirectoryNode::update()

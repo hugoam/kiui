@@ -10,15 +10,18 @@
 
 namespace toy
 {
-	Table::Table(Wedge& parent, StringVector columns, std::vector<float> weights)
-		: Wedge(parent, cls())
+	Table::Table(const Params& params, StringVector columns, std::vector<float> weights)
+		: Wedge({ params, &cls<Table>() })
 		, m_columns(columns)
 		, m_weights(weights)
-		, m_head(*this, DIM_X, [this](Frame& first, Frame& second) { this->resize(first, second); }, Table::Head())
+		, m_head({ this, &styles().table_head }, DIM_X, [this](Frame& first, Frame& second) { this->resize(first, second); })
 	{
+		if(m_weights.empty())
+			m_weights = std::vector<float>(columns.size(), 1.f);
+
 		for(size_t i = 0; i < m_columns.size(); ++i)
 		{
-			Wedge& header = m_head.emplace<Wedge>(Table::ColumnHeader());
+			Wedge& header = m_head.emplace_style<Wedge>(styles().column_header);
 			header.emplace<Label>(m_columns[i]);
 			header.frame().setSpanDim(DIM_X, m_weights[i]);
 		}
@@ -27,14 +30,14 @@ namespace toy
 	void Table::makeSolver()
 	{
 		Widget::makeSolver();
-		//m_frame->d_solver->as<TableSolver>().divide(m_weights);
+		//as<TableSolver>(*m_frame->m_solver).divide(m_weights);
 	}
 
 	void Table::resize(Frame& first, Frame& second)
 	{
-		m_weights[first.d_index[DIM_X]] = first.d_span.x;
-		m_weights[second.d_index[DIM_X]] = second.d_span.x;
-		m_frame->d_solver->as<TableSolver>().update(m_weights);
+		m_weights[first.d_index[DIM_X]] = first.m_span.x;
+		m_weights[second.d_index[DIM_X]] = second.m_span.x;
+		as<TableSolver>(*m_frame->m_solver).update(m_weights);
 		m_frame->markDirty(DIRTY_FORCE_LAYOUT);
 	}
 }

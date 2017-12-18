@@ -6,7 +6,7 @@
 #define TOY_WINDOW_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Container/ScrollSheet.h>
 #include <toyui/Widget/Cursor.h>
@@ -26,9 +26,6 @@ namespace toy
 		virtual bool leftDrag(MouseEvent& mouseEvent);
 		virtual bool leftDragEnd(MouseEvent& mouseEvent);
 
-		static Type& cls() { static Type ty("WindowHeader", Wedge::WrapControl()); return ty; }
-		static Type& Movable() { static Type ty("WindowMovableHeader", WindowHeader::cls()); return ty; }
-
 	protected:
 		Window& m_window;
 		string m_tooltip;
@@ -38,15 +35,13 @@ namespace toy
 		Button m_close;
 	};
 
-	class _refl_ TOY_UI_EXPORT WindowSizer : public Item
+	class _refl_ TOY_UI_EXPORT WindowSizer : public Widget
 	{
 	public:
-		WindowSizer(Wedge& parent, Window& window, Type& type, bool left);
+		WindowSizer(const Params& params, Window& window, bool left);
 
 		virtual bool leftDragStart(MouseEvent& mouseEvent);
 		virtual bool leftDrag(MouseEvent& mouseEvent);
-
-		static Type& cls() { static Type ty("WindowSizer", Item::Control()); return ty; }
 
 	protected:
 		Window& m_window;
@@ -58,12 +53,6 @@ namespace toy
 	public:
 		WindowFooter(Window& window);
 
-		static Type& cls() { static Type ty("WindowFooter", Wedge::WrapControl()); return ty; }
-
-		static Type& SizerLeft() { static Type ty("WindowSizerLeft", WindowSizer::cls()); return ty; }
-		static Type& SizerRight() { static Type ty("WindowSizerRight", WindowSizer::cls()); return ty; }
-
-	protected:
 		WindowSizer m_firstSizer;
 		WindowSizer m_secondSizer;
 	};
@@ -81,7 +70,7 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Window : public Wedge
 	{
 	public:
-		Window(Wedge& parent, const string& title, WindowState state = WINDOW_DEFAULT, const Callback& onClose = nullptr, Docksection* dock = nullptr, Type& type = cls());
+		Window(const Params& params, const string& title, WindowState state = WINDOW_DEFAULT, const Callback& onClose = nullptr, Docksection* dock = nullptr);
 
 		bool closable() { return (m_windowState & WINDOW_CLOSABLE) != 0; }
 		bool dockable() { return (m_windowState & WINDOW_DOCKABLE) != 0; }
@@ -110,13 +99,22 @@ namespace toy
 
 		void close();
 
-		static Type& cls() { static Type ty("Window", Wedge::Overlay()); return ty; }
+		struct Styles
+		{
+			Style window = { cls<Window>(), Widget::styles().overlay, Args{ { &Layout::m_space, BLOCK } } };
+			Style body = { "WindowBody", Widget::styles().wedge, Args{ { &Layout::m_clipping, CLIP } } };
+			Style close_button = { "CloseButton", Widget::styles().button, Args{ { &Layout::m_align, Dim<Align>{ RIGHT, CENTER } } } };
+			Style header = { cls<WindowHeader>(), Widget::styles().wrap_control };
+			Style header_movable = { "WindowHeaderMovable", header, Args{ { &InkStyle::m_hover_cursor, &Cursor::styles().move } } };
+			Style footer = { cls<WindowFooter>(), Widget::styles().wrap_control, Args{ /*{ &Layout::m_space, Space{ READING, WRAP, FIXED } }*/ } };
+			Style sizer = { cls<WindowSizer>(), Widget::styles().control, Args{ { &Layout::m_space, Space{ READING, WRAP, FIXED } } } };
+			Style sizer_left = { "WindowSizerLeft", sizer, Args{ { &InkStyle::m_hover_cursor, &Cursor::styles().resize_diag_left } } };
+			Style sizer_right = { "WindowSizerRight", sizer, Args{ { &InkStyle::m_hover_cursor, &Cursor::styles().resize_diag_right } } };
 
-		static Type& Body() { static Type ty("WindowBody", Wedge::cls()); return ty; }
-
-		static Type& DockWindow() { static Type ty("DockWindow", Window::cls()); return ty; }
-		static Type& WrapWindow() { static Type ty("WrapWindow", Window::cls()); return ty; }
-		static Type& CloseButton() { static Type ty("CloseButton", Button::cls()); return ty; }
+			Style dock_window = { "DockWindow", window, Args{ { &Layout::m_flow, FLOW },{ &Layout::m_space, SHEET } } };
+			Style wrap_window = { "WrapWindow", window, Args{ { &Layout::m_space, UNIT } } };
+		}; 
+		static Styles& styles() { static Styles styles; return styles; }
 
 	public:
 		string m_name;

@@ -7,7 +7,7 @@
 
 /* toy */
 #include <toyobj/Type.h>
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Container/ScrollSheet.h>
 
@@ -16,13 +16,11 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT SelectList : public ScrollSheet
 	{
 	public:
-		SelectList(Wedge& parent, Type& type = cls());
+		SelectList(const Params& params);
 
 		WrapButton& addChoice();
 
 		void selected(Widget& selected);
-
-		static Type& cls() { static Type ty("SelectList", ScrollSheet::cls()); return ty; }
 	};
 }
 

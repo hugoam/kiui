@@ -6,7 +6,7 @@
 #define TOY_TYPEIN_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Button/Button.h>
 
@@ -18,7 +18,7 @@ namespace toy
 		using Callback = std::function<string(const string&)>;
 
 	public:
-		TypeIn(Wedge& parent, const string& text, Callback callback = nullptr, bool wrap = false, Type& type = cls());
+		TypeIn(const Params& params, const string& text, Callback callback = nullptr, bool wrap = false);
 
 		const string& value() { return m_string; }
 
@@ -47,8 +47,6 @@ namespace toy
 
 		void moveCaretRight();
 		void moveCaretLeft();
-
-		static Type& cls() { static Type ty("TypeIn", Wedge::WrapControl()); return ty; }
 
 	protected:
 		string m_string;

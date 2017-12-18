@@ -9,8 +9,8 @@
 #include <toyobj/Object.h>
 #include <toyui/Input/KeyCode.h>
 #include <toyui/Input/InputDispatcher.h>
-#include <toyui/Style/Dim.h>
-#include <toyui/Forward.h>
+#include <toyui/Frame/Dim.h>
+#include <toyui/Types.h>
 
 #include <vector>
 #include <array>
@@ -21,8 +21,6 @@ namespace toy
 	{
 	public:
 		InputDevice(RootSheet& rootSheet);
-
-		static Type& cls() { static Type ty; return ty; }
 
 	public:
 		RootSheet& m_rootSheet;

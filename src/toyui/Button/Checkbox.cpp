@@ -7,7 +7,7 @@
 
 namespace toy
 {
-	Checkbox::Checkbox(Wedge& parent, Callback callback, bool on)
-		: Toggle(parent, callback, on, cls())
+	Checkbox::Checkbox(const Params& params, Callback callback, bool on)
+		: Toggle({ params, &cls<Checkbox>() }, callback, on)
 	{}
 }

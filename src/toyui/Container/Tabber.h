@@ -15,11 +15,9 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Tab : public Wedge
 	{
 	public:
-		Tab(Wedge& parent, Tabber& tabber, Button& header, bool active);
+		Tab(const Params& params, Tabber& tabber, Button& header, bool active);
 
 		virtual void extract() override;
-
-		static Type& cls() { static Type ty("Tab", Wedge::cls()); return ty; }
 
 	public:
 		Tabber& m_tabber;
@@ -30,7 +28,7 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Tabber : public Wedge
 	{
 	public:
-		Tabber(Wedge& parent, Type& type = cls(), bool downtabs = false);
+		Tabber(const Params& params, bool downtabs = false);
 
 		Tab& addTab(const string& name);
 		void removeTab(Tab& tab);
@@ -40,17 +38,22 @@ namespace toy
 		void showTab(Tab& tab);
 		void showTab(size_t index);
 
-		static Type& cls() { static Type ty("Tabber", Wedge::cls()); return ty; }
-
-		static Type& Head() { static Type ty("TabberHead", Wedge::Row()); return ty; }
-		static Type& Body() { static Type ty("TabberBody", Wedge::Sheet()); return ty; }
-		static Type& Header() { static Type ty("TabButton", Button::cls()); return ty; }
+		struct Styles
+		{
+			Style tab = { cls<Tab>(), Widget::styles().wedge, Args{ { &Layout::m_clipping, CLIP } } };
+			Style tab_button = { "TabHeader", Widget::styles().button };
+			Style tabber = { cls<Tabber>(), Widget::styles().wedge };
+			Style head = { "TabberHead", Widget::styles().row };
+			Style body = { "TabberBody", Widget::styles().sheet };
+		};
+		static Styles& styles() { static Styles styles; return styles; }
 
 	public:
 		Wedge m_headers;
 		Wedge m_tabs;
 		Tab* m_currentTab;
 		bool m_downTabs;
+		bool m_hideSingleHeader;
 	};
 }
 

@@ -6,7 +6,7 @@
 #define TOY_CHECKBOX_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Button/Button.h>
 
 namespace toy
@@ -14,9 +14,7 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Checkbox : public Toggle
 	{
 	public:
-		Checkbox(Wedge& parent, Callback callback, bool on);
-
-		static Type& cls() { static Type ty("Checkbox", Toggle::cls()); return ty; }
+		Checkbox(const Params& params, Callback callback, bool on);
 	};
 }
 

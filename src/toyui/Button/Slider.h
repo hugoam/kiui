@@ -6,7 +6,7 @@
 #define TOY_SLIDER_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Button/Button.h>
 
 namespace toy
@@ -14,7 +14,7 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Slider : public Wedge
 	{
 	public:
-		Slider(Wedge& parent, Dimension dim = DIM_X, const Callback& onUpdated = nullptr, bool relative = false, Type& type = cls());
+		Slider(const Params& params, Dimension dim = DIM_X, const Callback& onUpdated = nullptr, bool relative = false);
 
 		float val() { return m_val; }
 
@@ -35,16 +35,11 @@ namespace toy
 		virtual bool leftDrag(MouseEvent& mouseEvent);
 		virtual bool leftDragEnd(MouseEvent& mouseEvent);
 
-		static Type& cls() { static Type ty("Slider", Wedge::WrapControl()); return ty; }
-
-		static Type& Knob() { static Type ty("SliderKnob", Item::cls()); return ty; }
-		static Type& Display() { static Type ty("SliderDisplay", Label::cls()); return ty; }
-
 	public:
 		Dimension m_dim;
-		Item m_filler;
-		Item m_button;
-		Item m_spacer;
+		Widget m_filler;
+		Widget m_button;
+		Widget m_spacer;
 
 	protected:
 		float m_min;

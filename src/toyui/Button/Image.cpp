@@ -10,8 +10,8 @@
 
 namespace toy
 {
-	Figure::Figure(Wedge& parent, const Image256& source)
-		: Widget(parent, cls()) //, [this](Lref& value) { this->updateImage(); })
+	Figure::Figure(const Params& params, const Image256& source)
+		: Widget({ params, &cls<Figure>() }) //, [this](Var& value) { this->updateImage(); })
 		, m_source(source)
 		, m_image(nullptr)
 	{

@@ -1,3 +1,6 @@
+Warning: kiUi is currently in a hiatus pending the publication of a wider set of libraries which it will be part of
+Until then it is discouraged to try to use it
+
 kiUi [![Build Status](https://travis-ci.org/hugoam/kiui.svg?branch=master)](https://travis-ci.org/hugoam/kiui)
 ====
 

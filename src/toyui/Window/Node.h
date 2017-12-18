@@ -6,37 +6,32 @@
 #define TOY_NODE_H
 
 /* toy */
+#include <toyobj/Reflect/Member.h>
 #include <toyobj/Store/Array.h>
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Container/ScrollSheet.h>
 #include <toyui/Button/Button.h>
 
 namespace toy
 {
-	class TOY_UI_EXPORT NodeKnob : public Item
+	class _refl_ TOY_UI_EXPORT NodeKnob : public Widget
 	{
 	public:
-		NodeKnob(Wedge& parent, const Colour& colour = Colour::NeonGreen, Type& type = cls());
+		NodeKnob(const Params& params, const Colour& colour = Colour::NeonGreen);
 
 		bool customDraw(Renderer& renderer);
 
-		static Type& cls() { static Type ty("NodeKnob", Item::cls()); return ty; }
-
-		static Type& Output() { static Type ty("NodeKnobOutput", NodeKnob::cls()); return ty; }
-		static Type& Proxy() { static Type ty("NodeKnobProxy", NodeKnob::cls()); return ty; }
-
-	public:
 		Colour m_colour;
 	};
 
-	class TOY_UI_EXPORT NodePlug : public Wedge
+	class _refl_ TOY_UI_EXPORT NodePlug : public Wedge
 	{
 	public:
 		using ConnectTrigger = std::function<void(NodePlug&, NodePlug&)>;
 
 	public:
-		NodePlug(Wedge& parent, Node& node, const string& name, const string& icon, const Colour& colour, bool input, ConnectTrigger onConnect = ConnectTrigger());
+		NodePlug(const Params& params, Node& node, const string& name, const string& icon, const Colour& colour, bool input, ConnectTrigger onConnect = ConnectTrigger());
 	
 		virtual const string& tooltip() { return m_tooltip; }
 
@@ -47,14 +42,12 @@ namespace toy
 		NodeCable& connect(NodePlug& plugOut, bool notify = true);
 		void disconnect(NodePlug& plugOut);
 
-		static Type& cls() { static Type ty("NodePlug", Wedge::WrapControl()); return ty; }
-
 	public:
 		Node& m_node;
 		string m_tooltip;
 		bool m_input;
 		Label m_title;
-		Item m_icon;
+		Widget m_icon;
 		NodeKnob m_knob;
 
 		std::vector<NodeCable*> m_cables;
@@ -66,41 +59,37 @@ namespace toy
 		NodeCable* m_cableProxy;
 	};
 
-	class TOY_UI_EXPORT NodeCable : public Wedge
+	class _refl_ TOY_UI_EXPORT NodeCable : public Wedge
 	{
 	public:
-		NodeCable(Wedge& parent, NodeKnob& plugOut, NodeKnob& plugIn);
+		NodeCable(const Params& params, NodeKnob& plugOut, NodeKnob& plugIn);
 
 		void updateCable();
 
 		bool customDraw(Renderer& renderer);
 
-		static Type& cls() { static Type ty("NodeCable", Wedge::Decal()); return ty; }
-
 	public:
 		NodeKnob& m_knobOut;
 		NodeKnob& m_knobIn;
+
 	protected:
 		bool m_flipX;
 		bool m_flipY;
 	};
 
-	class TOY_UI_EXPORT NodeHeader : public Wedge
+	class _refl_ TOY_UI_EXPORT NodeHeader : public Wedge
 	{
 	public:
-		NodeHeader(Wedge& parent, Node& node);
+		NodeHeader(const Params& params, Node& node);
 
-		static Type& cls() { static Type ty("NodeHeader", Wedge::Row()); return ty; }
-
-	protected:
 		Label m_title;
-		Item m_spacer;
+		Widget m_spacer;
 	};
 
-	class TOY_UI_EXPORT Node : public Wedge
+	class _refl_ TOY_UI_EXPORT Node : public Wedge
 	{
 	public:
-		Node(Wedge& parent, const string& title, int order = 0);
+		Node(const Params& params, const string& title, int order = 0);
 
 		Canvas& canvas();
 		Wedge& plan();
@@ -120,12 +109,21 @@ namespace toy
 		NodePlug& addOutput(const string& name, const string& icon = "", const Colour& colour = Colour::NeonGreen);
 
 		NodePlug& addPlug(const string& name, const string& icon, const Colour& colour, bool input, NodePlug::ConnectTrigger onConnect = {});
-		
-		static Type& cls() { static Type ty("Node", Wedge::Overlay()); return ty; }
 
-		static Type& Inputs() { static Type ty("NodeIn", Wedge::Div()); return ty; }
-		static Type& Body() { static Type ty("NodeBody", Wedge::Sheet()); return ty; }
-		static Type& Outputs() { static Type ty("NodeOut", Wedge::Div()); return ty; }
+		struct Styles
+		{
+			Style node = { cls<Node>(), Widget::styles().overlay, Args{ { &Layout::m_space, Space{ READING, SHRINK, SHRINK } } } };
+			Style inputs = { "NodeInputs", Widget::styles().div };
+			Style body = { "NodeBody", Widget::styles().sheet };
+			Style outputs = { "NodeOutputs", Widget::styles().div };
+			Style knob = { cls<NodeKnob>(), Widget::styles().item, Args{ { &Layout::m_size, DimFloat{ 10.f, 22.f } } } };
+			Style knob_output = { "NodeKnobOutput", knob, Args{ { &Layout::m_align, Dim<Align>{ RIGHT, CENTER } } } };
+			Style knob_proxy = { "NodeKnobProxy", knob, Args{ { &Layout::m_flow, FREE } } };
+			Style plug = { cls<NodePlug>(), Widget::styles().wrap_control };
+			Style cable = { cls<NodeCable>(), Widget::styles().decal, Args{ { &Layout::m_space, BLOCK } } };
+			Style header = { cls<NodeHeader>(), Widget::styles().row };
+
+		}; static Styles& styles() { static Styles styles; return styles; }
 
 	public:
 		string m_name;
@@ -138,15 +136,16 @@ namespace toy
 		Wedge m_outputs;
 	};
 
-	class TOY_UI_EXPORT Canvas : public ScrollPlan, public StoreObserver<Node>
+	class _refl_ TOY_UI_EXPORT Canvas : public ScrollPlan, public StoreObserver<Node>
 	{
 	public:
-		Canvas(Wedge& parent, const string& title, const Callback& contextTrigger = nullptr);
+		Canvas(const Params& params, const string& title, const Callback& contextTrigger = nullptr);
 
 		Array<Node> m_selection;
 
 		virtual bool leftClick(MouseEvent& mouseEvent);
 		virtual bool rightClick(MouseEvent& mouseEvent);
+		virtual bool middleClick(MouseEvent& mouseEvent);
 
 		virtual bool leftDrag(MouseEvent& mouseEvent);
 
@@ -159,11 +158,15 @@ namespace toy
 		void handleAdd(Node& node);
 		void handleRemove(Node& node);
 
-		static Type& cls() { static Type ty("Canvas", ScrollSheet::cls()); return ty; }
+		struct Styles
+		{
+			Style canvas = { cls<Canvas>(), Widget::styles().scrollplan, Args{ { &Layout::m_space, BOARD },{ &Layout::m_opacity, OPAQUE },{ &Layout::m_clipping, CLIP } } };
 
-		static Type& LayoutLine() { static Type ty("CanvasLine", Item::cls()); return ty; }
-		static Type& LayoutColumn() { static Type ty("CanvasColumn", Item::cls()); return ty; }
-		static Type& LayoutNode() { static Type ty("CanvasNode", Item::cls()); return ty; }
+			Style layout_line = { "CanvasLayoutLine", Widget::styles().item, Args{ { &Layout::m_space, ITEM },{ &Layout::m_padding, BoxFloat(20.f) },{ &Layout::m_spacing, DimFloat(100.f) } } };
+			Style layout_column = { "CanvasLayoutColumn", Widget::styles().item, Args{ { &Layout::m_space, UNIT },{ &Layout::m_padding, BoxFloat(20.f) },{ &Layout::m_spacing, DimFloat(20.f) } } };
+			Style layout_node = { "CanvasLayoutNode", Widget::styles().item };
+		};
+		static Styles& styles() { static Styles styles; return styles; }
 
 	protected:
 		string m_name;

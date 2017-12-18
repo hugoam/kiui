@@ -10,23 +10,23 @@
 
 namespace toy
 {
-	static LayoutStyle& gridOverlayStyle()
+	static Layout& gridOverlayStyle()
 	{
-		static LayoutStyle style;
-		style.d_space = { READING, EXPAND, EXPAND };
-		style.d_flow = OVERLAY;
+		static Layout style;
+		style.m_space = { READING, EXPAND, EXPAND };
+		style.m_flow = OVERLAY;
 		return style;
 	}
 
-	static LayoutStyle& columnSolverStyle()
+	static Layout& columnSolverStyle()
 	{
-		static LayoutStyle style;
-		style.d_space = { PARAGRAPH, WRAP, WRAP };
-		style.d_layout = { AUTO_LAYOUT, NO_LAYOUT };
+		static Layout style;
+		style.m_space = { PARAGRAPH, WRAP, WRAP };
+		style.m_layout = { AUTO_LAYOUT, NO_LAYOUT };
 		return style;
 	}
 
-	TableSolver::TableSolver(FrameSolver* solver, LayoutStyle* layout, Frame* frame)
+	TableSolver::TableSolver(FrameSolver* solver, Layout* layout, Frame* frame)
 		: CustomSolver(solver, layout, frame)
 	{}
 
@@ -37,14 +37,14 @@ namespace toy
 		for(size_t i = 0; i < columns.size(); ++i)
 		{
 			m_solvers.emplace_back(make_unique<RowSolver>(m_solvers.front().get(), &columnSolverStyle()));
-			m_solvers.back()->d_span = { columns[i], 0.f };
+			m_solvers.back()->m_span = { columns[i], 0.f };
 		}
 	}
 
 	void TableSolver::update(const std::vector<float>& spans)
 	{
 		for(size_t i = 0; i < spans.size(); ++i)
-			m_solvers[1 + i]->d_span[d_depth] = spans[i];
+			m_solvers[1 + i]->m_span[d_depth] = spans[i];
 	}
 
 	FrameSolver& TableSolver::solver(FrameSolver& frame, Dimension dim)
@@ -64,13 +64,13 @@ namespace toy
 		: RowSolver(solver, nullptr)
 		, d_style()
 	{
-		d_style.d_space = space;
-		d_style.d_space.val.direction = READING;
+		d_style.m_space = space;
+		d_style.m_space.direction = READING;
 		FrameSolver::d_style = &d_style;
 		this->applySpace();
 	}
 
-	GridSolver::GridSolver(FrameSolver* solver, LayoutStyle* layout, Frame* frame)
+	GridSolver::GridSolver(FrameSolver* solver, Layout* layout, Frame* frame)
 		: CustomSolver(solver, layout, frame)
 	{}
 

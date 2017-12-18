@@ -7,7 +7,7 @@
 
 /* toy */
 #include <toyobj/Util/Timer.h>
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Widget/Sheet.h>
 
 namespace toy
@@ -16,16 +16,12 @@ namespace toy
 	{
 	public:
 		Tooltip(RootSheet& rootSheet, const string& label);
-
-		static Type& cls() { static Type ty("Tooltip", Wedge::Decal()); return ty; }
 	};
 
 	class _refl_ TOY_UI_EXPORT Rectangle : public Wedge
 	{
 	public:
-		Rectangle(Wedge& parent, Type& type = cls());
-
-		static Type& cls() { static Type ty("Rectangle", Wedge::Decal()); return ty; }
+		Rectangle(const Params& params);
 	};
 
 	class _refl_ TOY_UI_EXPORT Cursor : public Wedge
@@ -47,14 +43,17 @@ namespace toy
 		void tooltipOn();
 		void tooltipOff();
 
-		static Type& cls() { static Type ty("Cursor", Wedge::Decal()); return ty; }
-
-		static Type& ResizeX() { static Type ty("ResizeCursorX", Cursor::cls()); return ty; }
-		static Type& ResizeY() { static Type ty("ResizeCursorY", Cursor::cls()); return ty; }
-		static Type& Move() { static Type ty("MoveCursor", Cursor::cls()); return ty; }
-		static Type& ResizeDiagLeft() { static Type ty("ResizeCursorDiagLeft", Cursor::cls()); return ty; }
-		static Type& ResizeDiagRight() { static Type ty("ResizeCursorDiagRight", Cursor::cls()); return ty; }
-		static Type& Caret() { static Type ty("CaretCursor", Cursor::cls()); return ty; }
+		struct Styles
+		{
+			Style cursor = { cls<Cursor>(), Widget::styles().decal, Args{ { &Layout::m_zorder, -1 } } };
+			Style resize_x = { "CursorResizeX", cursor, Args{ { &InkStyle::m_padding, BoxFloat{ -10.f, -10.f, +10.f, +10.f } } } };
+			Style resize_y = { "CursorResizeY", cursor, Args{ { &InkStyle::m_padding, BoxFloat{ -10.f, -10.f, +10.f, +10.f } } } };
+			Style move = { "CursorMove", cursor, Args{ { &InkStyle::m_padding, BoxFloat{ -10.f, -10.f, +10.f, +10.f } } } };
+			Style resize_diag_left = { "CursorResizeDiagLeft", cursor, Args{ { &InkStyle::m_padding, BoxFloat{ -10.f, -10.f, +10.f, +10.f } } } };
+			Style resize_diag_right = { "CursorResizeDiagRight", cursor, Args{ { &InkStyle::m_padding, BoxFloat{ -10.f, -10.f, +10.f, +10.f } } } };
+			Style caret = { "CursorCaret", cursor, Args{ { &InkStyle::m_padding, BoxFloat{ -4.f, -9.f, +4.f, +9.f } } } };
+		};
+		static Styles& styles() { static Styles styles; return styles; }
 
 	protected:
 		Widget* m_hovered;

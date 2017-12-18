@@ -12,12 +12,12 @@
 
 namespace toy
 {
-	ScrollSheet::ScrollSheet(Wedge& parent, Type& type)
-		: Wedge(parent, type)
-		, m_scrollzone(*this, ScrollSheet::ScrollZone())
-		, m_body(m_scrollzone, ScrollSheet::ScrollSurface())
-		, m_scrollbarX(*this, m_scrollzone, m_body, DIM_X)
-		, m_scrollbarY(*this, m_scrollzone, m_body, DIM_Y)
+	ScrollSheet::ScrollSheet(const Params& params)
+		: Wedge({ params, &cls<ScrollSheet>() })
+		, m_scrollzone({ this, &styles().scroll_zone })
+		, m_body({ &m_scrollzone, &styles().scroll_surface })
+		, m_scrollbarX({ this }, m_scrollzone, m_body, DIM_X)
+		, m_scrollbarY({ this }, m_scrollzone, m_body, DIM_Y)
 	{
 		m_scrollzone.frame().d_index = { 0, 0 };
 		m_scrollbarX.frame().d_index = { 0, 1 };
@@ -28,7 +28,7 @@ namespace toy
 	{
 		Widget::makeSolver();
 
-		m_frame->d_solver->as<GridSolver>().divide({ Space::preset(BOARD), Space::preset(LINE) });
+		as<GridSolver>(*m_frame->m_solver).divide({ Space::preset(BOARD), Space::preset(LINE) });
 	}
 
 	void ScrollSheet::dirtyLayout()
@@ -45,12 +45,12 @@ namespace toy
 		return true;
 	}
 
-	ScrollPlan::ScrollPlan(Wedge& parent, Type& type)
-		: ScrollSheet(parent, type)
+	ScrollPlan::ScrollPlan(const Params& params)
+		: ScrollSheet({ params, &cls<ScrollPlan>() })
 		, m_plan(m_body)
 		, m_clamped(true)
 	{
-		m_plan.setStyle(ScrollPlan::Plan());
+		m_plan.setStyle(styles().scrollplan_surface);
 		this->updateBounds();
 	}
 
@@ -72,8 +72,8 @@ namespace toy
 			Frame& frame = widget->frame();
 			m_bounds.x0 = std::min(frame.d_position.x - margin, m_bounds.x);
 			m_bounds.y0 = std::min(frame.d_position.y - margin, m_bounds.y);
-			m_bounds.x1 = std::max(frame.d_position.x + frame.d_size.x + margin, m_bounds.w);
-			m_bounds.y1 = std::max(frame.d_position.y + frame.d_size.y + margin, m_bounds.h);
+			m_bounds.x1 = std::max(frame.d_position.x + frame.m_size.x + margin, m_bounds.w);
+			m_bounds.y1 = std::max(frame.d_position.y + frame.m_size.y + margin, m_bounds.h);
 		}
 
 		m_plan.frame().setSize({ m_bounds.x1 - m_bounds.x0, m_bounds.y1 - m_bounds.y0 });
@@ -94,7 +94,7 @@ namespace toy
 
 		if(m_clamped)
 		{
-			DimFloat minScale = m_scrollzone.frame().d_size / m_plan.frame().d_size;
+			DimFloat minScale = m_scrollzone.frame().m_size / m_plan.frame().m_size;
 			scale = std::max(scale, std::max(minScale.x, minScale.y));
 		}
 
@@ -115,12 +115,12 @@ namespace toy
 	void drawLines(const Frame& frame, Dimension dim, float frequency, InkStyle& style, Renderer& renderer)
 	{
 		float start = frequency;
-		for(float val = start; val < frame.d_size[dim]; val += frequency)
+		for(float val = start; val < frame.m_size[dim]; val += frequency)
 		{
 			if(dim == DIM_X)
-				renderer.pathLine(val, 0.f, val, frame.d_size.y);
+				renderer.pathLine(val, 0.f, val, frame.m_size.y);
 			else
-				renderer.pathLine(0.f, val, frame.d_size.x, val);
+				renderer.pathLine(0.f, val, frame.m_size.x, val);
 			renderer.stroke(style);
 		}
 	}
@@ -128,12 +128,12 @@ namespace toy
 	bool drawGrid(const Frame& frame, Renderer& renderer)
 	{
 		static InkStyle mainStyle;
-		mainStyle.m_borderWidth = 1.f;
-		mainStyle.m_borderColour = Colour(132 / 255.f, 132 / 255.f, 132 / 255.f, 1.f);
+		mainStyle.m_border_width = 1.f;
+		mainStyle.m_border_colour = Colour(132 / 255.f, 132 / 255.f, 132 / 255.f, 1.f);
 
 		static InkStyle secondaryStyle;
-		secondaryStyle.m_borderWidth = 1.f;
-		secondaryStyle.m_borderColour = Colour(34 / 255.f, 34 / 255.f, 34 / 255.f, 1.f);
+		secondaryStyle.m_border_width = 1.f;
+		secondaryStyle.m_border_colour = Colour(34 / 255.f, 34 / 255.f, 34 / 255.f, 1.f);
 
 		float mainFrequency = 100.f;
 		float secondaryFrequency = 20.f;

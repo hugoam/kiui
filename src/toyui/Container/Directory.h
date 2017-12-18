@@ -6,7 +6,7 @@
 #define TOY_DIRECTORY_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Button/Button.h>
 #include <toyui/Container/Tree.h>
@@ -18,11 +18,9 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Dir : public MultiButton
 	{
 	public:
-		Dir(Wedge& parent, Directory& directory, const string& name);
+		Dir(const Params& params, Directory& directory, const string& name);
 
 		void open();
-
-		static Type& cls() { static Type ty("Dir", MultiButton::cls()); return ty; }
 
 	protected:
 		Directory& m_directory;
@@ -32,9 +30,7 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT File : public MultiButton
 	{
 	public:
-		File(Wedge& parent, Directory& directory, const string& name);
-
-		static Type& cls() { static Type ty("File", MultiButton::cls()); return ty; }
+		File(const Params& params, Directory& directory, const string& name);
 
 	protected:
 		Directory& m_directory;
@@ -44,15 +40,13 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Directory : public Wedge
 	{
 	public:
-		Directory(Wedge& parent, const string& path);
+		Directory(const Params& params, const string& path);
 
 		void update();
 
 		void setLocation(const string& path);
 		void moveIn(const string& name);
 		void moveOut();
-
-		static Type& cls() { static Type ty("Directory", Wedge::cls()); return ty; }
 
 	protected:
 		string m_path;
@@ -61,9 +55,7 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT FileBrowser : public Wedge
 	{
 	public:
-		FileBrowser(Wedge& parent, const string& path);
-
-		static Type& cls() { static Type ty("FileBrowser", Wedge::cls()); return ty; }
+		FileBrowser(const Params& params, const string& path);
 
 	protected:
 		string m_path;
@@ -73,20 +65,16 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT FileNode : public TreeNode
 	{
 	public:
-		FileNode(Wedge& parent, const string& name);
-
-		static Type& cls() { static Type ty("FileNode", TreeNode::cls()); return ty; }
+		FileNode(const Params& params, const string& name);
 	};
 
 	class _refl_ TOY_UI_EXPORT DirectoryNode : public TreeNode
 	{
 	public:
-		DirectoryNode(Wedge& parent, const string& path, const string& name, bool collapsed);
+		DirectoryNode(const Params& params, const string& path, const string& name, bool collapsed);
 
 		void expand();
 		void update();
-
-		static Type& cls() { static Type ty("DirectoryNode", TreeNode::cls()); return ty; }
 
 	protected:
 		string m_path;

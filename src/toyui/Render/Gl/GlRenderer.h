@@ -6,7 +6,7 @@
 #define TOY_GLRENDERER_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Nano/NanoRenderer.h>
 
 namespace toy

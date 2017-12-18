@@ -8,17 +8,17 @@
 
 namespace toy
 {
-	Dropdown::Dropdown(Wedge& parent, Type& type)
-		: WrapButton(parent, [this](Widget&) { this->dropdown(true); }, type)
-		, m_header(*this, {}, nullptr, Head())
-		, m_toggle(*this, "", [this](Widget&) { this->dropdown(true); }, Toggle())
-		, m_list(*this, nullptr, false, List())
+	Dropdown::Dropdown(const Params& params)
+		: WrapButton({ params, &cls<Dropdown>() }, [this](Widget&) { this->dropdown(true); })
+		, m_header({ this, &styles().head }, {}, nullptr)
+		, m_toggle({ this, &styles().toggle }, "", [this](Widget&) { this->dropdown(true); })
+		, m_list({ this, &styles().list }, nullptr, false)
 	{}
 
 	MultiButton& Dropdown::addChoice(const StringVector& elements, const Callback& trigger)
 	{
-		Callback callback = [this, trigger](Widget& widget) { this->selected(widget.as<MultiButton>()); if(trigger) trigger(widget); };
-		return m_list.emplace<MultiButton>(elements, callback, Dropdown::Choice());
+		Callback callback = [this, trigger](Widget& widget) { this->selected(as<MultiButton>(widget)); if(trigger) trigger(widget); };
+		return m_list.emplace_style<MultiButton>(styles().choice , elements, callback);
 	}
 
 	void Dropdown::dropup()
@@ -37,8 +37,8 @@ namespace toy
 		this->dropup();
 	}
 
-	DropdownInput::DropdownInput(Wedge& parent, StringVector choices, const Callback& onSelected, Type& type)
-		: Dropdown(parent, type)
+	DropdownInput::DropdownInput(const Params& params, StringVector choices, const Callback& onSelected)
+		: Dropdown({ params, &cls<DropdownInput>() })
 		, m_onSelected(onSelected)
 		, m_selected(nullptr)
 	{

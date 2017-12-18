@@ -6,7 +6,7 @@
 #define TOY_GFXRECONTEXT_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/UiWindow.h>
 
 namespace Ogre

@@ -6,7 +6,7 @@
 #define TOY_TEXTBOX_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Edit/TypeIn.h>
 
 namespace toy
@@ -14,11 +14,8 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Textbox : public TypeIn
 	{
 	public:
-		Textbox(Wedge& parent, const string& text);
+		Textbox(const Params& params, const string& text);
 
-		static Type& cls() { static Type ty("Textbox", TypeIn::cls()); return ty; }
-
-	protected:
 		string m_string;
 	};
 }

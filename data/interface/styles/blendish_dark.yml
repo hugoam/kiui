@@ -25,7 +25,7 @@ Button :
     focused :
         background_colour : 0.65,0.65,0.65,1.0
         
-    pressed :
+    triggered :
         background_colour : 0.392,0.392,0.392,1
         topdown_gradient : -15,15
         
@@ -37,7 +37,7 @@ Toggle :
     focused :
         background_colour : 0.335,0.335,0.335,1.0
         
-    pressed :
+    triggered :
         topdown_gradient : -15,15
         
     activated :

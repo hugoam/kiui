@@ -13,7 +13,7 @@ namespace toy
 	class TOY_UI_EXPORT TableSolver : public CustomSolver
 	{
 	public:
-		TableSolver(FrameSolver* solver, LayoutStyle* layout, Frame* frame = nullptr);
+		TableSolver(FrameSolver* solver, Layout* layout, Frame* frame = nullptr);
 
 		void divide(const std::vector<float>& spans);
 		void update(const std::vector<float>& spans);
@@ -27,13 +27,13 @@ namespace toy
 	public:
 		LineSolver(FrameSolver* solver, Space space);
 
-		LayoutStyle d_style;
+		Layout d_style;
 	};
 
 	class TOY_UI_EXPORT GridSolver : public CustomSolver
 	{
 	public:
-		GridSolver(FrameSolver* solver, LayoutStyle* layout, Frame* frame = nullptr);
+		GridSolver(FrameSolver* solver, Layout* layout, Frame* frame = nullptr);
 
 		void divide(std::vector<Space> spaces);
 

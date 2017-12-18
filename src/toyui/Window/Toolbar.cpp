@@ -7,8 +7,8 @@
 
 namespace toy
 {
-	ToolButton::ToolButton(Wedge& parent, const string& icon, const Callback& trigger)
-		: DropdownInput(parent, {}, nullptr, cls())
+	ToolButton::ToolButton(const Params& params, const string& icon, const Callback& trigger)
+		: DropdownInput({ params, &cls<ToolButton>() }, {}, nullptr)
 	{
 		m_trigger = nullptr; // don't drop on left click
 		m_triggerAlt = [this](Widget&) { this->dropdown(true); }; // drop on right
@@ -28,12 +28,12 @@ namespace toy
 		this->disableState(ACTIVATED);
 	}
 
-	Tooldock::Tooldock(Wedge& parent)
-		: Wedge(parent, cls())//, GRID)
+	Tooldock::Tooldock(const Params& params)
+		: Wedge({ params, &cls<Tooldock>() })//, GRID)
 	{}
 
-	Toolbar::Toolbar(Wedge& parent)
-		: Wedge(parent, cls())
-		, m_mover(*this, Toolbar::Mover())
+	Toolbar::Toolbar(const Params& params)
+		: Wedge({ params, &cls<Toolbar>() })
+		, m_mover({ this, &styles().mover })
 	{}
 }

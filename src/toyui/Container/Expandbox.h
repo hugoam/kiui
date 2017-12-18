@@ -14,16 +14,19 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Expandbox : public Wedge
 	{
 	public:
-		Expandbox(Wedge& parent, const StringVector& elements, bool collapsed = false, Type& type = cls());
+		Expandbox(const Params& params, const StringVector& elements, bool collapsed = false);
 
 		virtual void expand();
 		virtual void collapse();
 
-		static Type& cls() { static Type ty("Expandbox", Wedge::Stack()); return ty; }
-
-		static Type& Header() { static Type ty("ExpandboxHeader", WrapButton::cls()); return ty; }
-		static Type& Switch() { static Type ty("ExpandboxToggle", Toggle::cls()); return ty; }
-		static Type& Body() { static Type ty("ExpandboxBody", Wedge::cls()); return ty; }
+		struct Styles
+		{
+			Style expandbox = { cls<Expandbox>(), Widget::styles().stack };
+			Style header = { "ExpandboxHeader", Widget::styles().wrap_button };
+			Style toggle = { "ExpandboxToggle", Widget::styles().toggle };
+			Style body = { "ExpandboxBody", Widget::styles().wedge, Args{ { &Layout::m_padding, BoxFloat{ 12.f, 2.f, 0.f, 2.f } },{ &Layout::m_spacing, DimFloat(6.f) } } };
+		};
+		static Styles& styles() { static Styles styles; return styles; }
 
 	public:
 		MultiButton m_header;

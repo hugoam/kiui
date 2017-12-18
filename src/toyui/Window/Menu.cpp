@@ -9,18 +9,15 @@
 
 namespace toy
 {
-	Menu::Menu(Wedge& parent, const string& label, bool submenu)
-		: Dropdown(parent, cls())
+	Menu::Menu(const Params& params, const string& label, bool submenu)
+		: Dropdown({ params, &cls<Menu>() })
 		, m_submenu(submenu)
 	{
-		m_list.setStyle(Menu::List());
-		if(submenu)
-			m_list.setStyle(Menu::SubList());
-
+		m_list.setStyle(submenu ? styles().sublist : styles().list);
 		m_header.reset({ label });
 	}
 
-	Menubar::Menubar(Wedge& parent)
-		: Wedge(parent, cls())
+	Menubar::Menubar(const Params& params)
+		: Wedge({ params, &cls<Menubar>() })
 	{}
 }

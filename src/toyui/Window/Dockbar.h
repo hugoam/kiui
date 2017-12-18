@@ -6,46 +6,47 @@
 #define TOY_DOCKBAR_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Button/Button.h>
 #include <toyui/Window/Window.h>
 
 namespace toy
 {
-	class TOY_UI_EXPORT Dockbox : public Window
+	class _refl_ TOY_UI_EXPORT Dockbox : public Window
 	{
 	public:
-		Dockbox(Wedge& parent, Dockbar& dockbar, const string& title, const string& icon);
+		Dockbox(const Params& params, Dockbar& dockbar, const string& title, const string& icon);
 
 		void toggle(bool open);
-
-		static Type& cls() { static Type ty("Dockbox", Window::cls()); return ty; }
 
 	public:
 		Dockbar& m_dockbar;
 		Toggle m_toggle;
 	};
 
-	class TOY_UI_EXPORT Docker : public Wedge
+	class _refl_ TOY_UI_EXPORT Docker : public Wedge
 	{
 	public:
-		Docker(Wedge& parent);
+		Docker(const Params& params);
 
-		static Type& cls() { static Type ty("Docker", Wedge::Row()); return ty; }
+		struct Styles
+		{
+			Style docker = { cls<Docker>(), Widget::styles().row, Args{ { &Layout::m_flow, ALIGN },{ &Layout::m_space, SPACER },{ &Layout::m_align, Dim<Align>{ LEFT, OUT_LEFT } } } };
+			Style dockbar = { cls<Dockbar>(), Widget::styles().div, Args{ { &Layout::m_align, Dim<Align>{ RIGHT, RIGHT } } } };
+			Style dockbar_toggle = { "DockbarToggle", Widget::styles().button };
+			Style dockbox = { cls<Dockbox>(), Window::styles().window, Args{ { &Layout::m_flow, FLOW },{ &Layout::m_space, Space{ PARAGRAPH, WRAP, FIXED } },{ &Layout::m_size, DimFloat{ 300.f, 0.f } } } };
+		};
+		static Styles& styles() { static Styles styles; return styles; }
 	};
 
-	class TOY_UI_EXPORT Dockbar : public Wedge
+	class _refl_ TOY_UI_EXPORT Dockbar : public Wedge
 	{
 	public:
-		Dockbar(Wedge& parent);
+		Dockbar(const Params& params);
 
 		Dockbox& addDock(const string& name, const string& icon);
 		Dockbox& addDock(const string& name);
-
-		static Type& cls() { static Type ty("Dockbar", Wedge::Div()); return ty; }
-
-		static Type& Toggle() { static Type ty("DockToggle", Button::cls()); return ty; }
 
 	protected:
 		Docker m_docker;

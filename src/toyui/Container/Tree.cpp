@@ -9,14 +9,14 @@
 
 namespace toy
 {
-	TreeNode::TreeNode(Wedge& parent, const StringVector& elements, bool collapsed, const Callback& onSelect, const Callback& onUnselect, Type& type)
-		: Expandbox(parent, elements, collapsed, type)
+	TreeNode::TreeNode(const Params& params, const StringVector& elements, bool collapsed, const Callback& onSelect, const Callback& onUnselect)
+		: Expandbox({ params, &cls<TreeNode>() }, elements, collapsed)
 		, m_onSelect(onSelect)
 		, m_onUnselect(onUnselect)
 	{
-		m_header.setStyle(TreeNode::Header());
-		m_toggle.setStyle(TreeNode::Switch());
-		m_body.setStyle(TreeNode::Body());
+		m_header.setStyle(styles().header);
+		m_toggle.setStyle(styles().toggle);
+		m_body.setStyle(styles().body);
 		
 		m_header.m_trigger = [this](Widget&) { this->findContainer<Tree>()->m_selection.select(*this); };
 		m_header.m_triggerShift = [this](Widget&) { this->findContainer<Tree>()->m_selection.swap(*this); };
@@ -34,8 +34,8 @@ namespace toy
 		m_onUnselect(*this);
 	}
 
-	Tree::Tree(Wedge& parent)
-		: Wedge(parent, cls())
+	Tree::Tree(const Params& params)
+		: Wedge({ params, &cls<Tree>() })
 		, m_rootNode(nullptr)
 	{
 		m_selection.observe(*this);
@@ -67,8 +67,8 @@ namespace toy
 	void Tree::collapse()
 	{
 		m_rootNode->visit([](Widget& widget, bool&) {
-			if(&widget.m_type == &TreeNode::cls())
-				widget.as<TreeNode>().collapse();
+			if(is<TreeNode>(widget))
+				as<TreeNode>(widget).collapse();
 		});
 	}
 }

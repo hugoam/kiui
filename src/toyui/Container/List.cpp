@@ -9,8 +9,8 @@
 
 namespace toy
 {
-	SelectList::SelectList(Wedge& parent, Type& type)
-		: ScrollSheet(parent, type)
+	SelectList::SelectList(const Params& params)
+		: ScrollSheet({ params, &cls<SelectList>() })
 	{}
 
 	WrapButton& SelectList::addChoice()

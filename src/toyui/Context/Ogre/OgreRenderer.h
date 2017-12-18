@@ -6,7 +6,7 @@
 #define TOY_GFXRERENDERER_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Render/Renderer.h>
 #include <toyui/Gl/GlRenderer.h>
 

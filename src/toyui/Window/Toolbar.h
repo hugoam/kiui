@@ -6,7 +6,7 @@
 #define TOY_TOOLBAR_H
 
 /* toy */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/Widget/Sheet.h>
 #include <toyui/Button/Button.h>
 #include <toyui/Button/Dropdown.h>
@@ -19,33 +19,33 @@ namespace toy
 		using Callback = std::function<void(ToolButton&)>;
 
 	public:
-		ToolButton(Wedge& parent, const string& icon, const Callback& trigger = nullptr);
+		ToolButton(const Params& params, const string& icon, const Callback& trigger = nullptr);
 
 		void activate();
 		void deactivate();
-
-		static Type& cls() { static Type ty("ToolButton", DropdownInput::cls()); return ty; }
 	};
 
 	class _refl_ TOY_UI_EXPORT Tooldock : public Wedge
 	{
 	public:
-		Tooldock(Wedge& parent);
-
-		static Type& cls() { static Type ty("Tooldock", Wedge::Div()); return ty; }
+		Tooldock(const Params& params);
 	};
 	
 	class _refl_ TOY_UI_EXPORT Toolbar : public Wedge
 	{
 	public:
-		Toolbar(Wedge& parent);
+		Toolbar(const Params& params);
 
-		static Type& cls() { static Type ty("Toolbar", Wedge::WrapControl()); return ty; }
+		Widget m_mover;
 
-		static Type& Mover() { static Type ty("ToolbarMover", Item::Control()); return ty; }
-
-	protected:
-		Item m_mover;
+		struct Styles
+		{
+			Style toolbutton = { cls<ToolButton>(), Dropdown::styles().dropdown_input };
+			Style tooldock = { cls<Tooldock>(), Widget::styles().div };
+			Style toolbar = { cls<Toolbar>(), Widget::styles().wrap_control, Args{ { &Layout::m_space, ITEM } } };
+			Style mover = { "ToolbarMover", Widget::styles().control };
+		};
+		static Styles& styles() { static Styles styles; return styles; }
 	};
 }
 

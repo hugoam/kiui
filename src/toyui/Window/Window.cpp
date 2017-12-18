@@ -13,16 +13,16 @@
 namespace toy
 {
 	WindowHeader::WindowHeader(Window& window)
-		: Wedge(window, cls())
+		: Wedge({ &window, &cls<WindowHeader>() })
 		, m_window(window)
-		, m_title(*this, m_window.m_name, Label::Title())
-		, m_close(*this, "", [&window](Widget&) { window.close(); }, Window::CloseButton())
+		, m_title({ this, &styles().title }, m_window.m_name)
+		, m_close({ this, &Window::styles().close_button }, "", [&](Widget&) { window.close(); })
 		, m_tooltip("Drag me")
 	{
 		if(!m_window.closable())
 			m_close.hide();
 		if(m_window.movable())
-			this->setStyle(WindowHeader::Movable());
+			this->setStyle(Window::styles().header_movable);
 	}
 
 	bool WindowHeader::leftClick(MouseEvent& mouseEvent)
@@ -41,7 +41,7 @@ namespace toy
 			m_window.undock();
 
 		m_window.frame().layer().moveToTop();
-		m_window.frame().layer().d_opacity = HOLLOW;
+		m_window.frame().layer().m_opacity = HOLLOW;
 		return true;
 	}
 
@@ -57,12 +57,12 @@ namespace toy
 		if(m_window.dockable())
 			m_window.dockAt(mouseEvent.pos);
 
-		m_window.frame().layer().d_opacity = OPAQUE;
+		m_window.frame().layer().m_opacity = OPAQUE;
 		return true;
 	}
 
-	WindowSizer::WindowSizer(Wedge& parent, Window& window, Type& type, bool left)
-		: Item(parent, type)
+	WindowSizer::WindowSizer(const Params& params, Window& window, bool left)
+		: Widget({ params, &cls<WindowSizer>() })
 		, m_window(window)
 		, m_resizeLeft(left)
 	{}
@@ -70,7 +70,7 @@ namespace toy
 	bool WindowSizer::leftDragStart(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		m_window.frame().as<Layer>().moveToTop();
+		as<Layer>(m_window.frame()).moveToTop();
 		return true;
 	}
 
@@ -80,37 +80,37 @@ namespace toy
 		if(m_resizeLeft)
 			m_window.frame().setPositionDim(DIM_X, m_window.frame().d_position.x + mouseEvent.delta.x);
 		if(m_resizeLeft)
-			m_window.frame().setSize({ std::max(50.f, m_window.frame().d_size.x - mouseEvent.delta.x), std::max(50.f, m_window.frame().d_size.y + mouseEvent.delta.y) });
+			m_window.frame().setSize({ std::max(50.f, m_window.frame().m_size.x - mouseEvent.delta.x), std::max(50.f, m_window.frame().m_size.y + mouseEvent.delta.y) });
 		else
-			m_window.frame().setSize({ std::max(50.f, m_window.frame().d_size.x + mouseEvent.delta.x), std::max(50.f, m_window.frame().d_size.y + mouseEvent.delta.y) });
+			m_window.frame().setSize({ std::max(50.f, m_window.frame().m_size.x + mouseEvent.delta.x), std::max(50.f, m_window.frame().m_size.y + mouseEvent.delta.y) });
 		return true;
 	}
 
 	WindowFooter::WindowFooter(Window& window)
-		: Wedge(window, cls())
-		, m_firstSizer(*this, window, WindowFooter::SizerLeft(), true)
-		, m_secondSizer(*this, window, WindowFooter::SizerRight(), false)
+		: Wedge({ &window, &cls<WindowFooter>() })
+		, m_firstSizer({ this, &Window::styles().sizer_left }, window, true)
+		, m_secondSizer({ this, &Window::styles().sizer_right }, window, false)
 	{}
 
-	Window::Window(Wedge& parent, const string& title, WindowState state, const Callback& onClose, Docksection* dock, Type& type)
-		: Wedge(parent, type, LAYER)
+	Window::Window(const Params& params, const string& title, WindowState state, const Callback& onClose, Docksection* dock)
+		: Wedge({ params, &cls<Window>(), LAYER })
 		, m_name(title)
 		, m_windowState(state)
 		, m_onClose(onClose)
 		, m_header(*this)
-		, m_body(*this, Window::Body())
+		, m_body({ this, &styles().body })
 		, m_footer(*this)
 		, m_dock(dock)
 	{
 		if(!this->sizable())
 			m_footer.hide();
 
-		if(&type == &Window::cls())
+		if(&m_type == &cls<Window>())
 		//if(!m_dock)
 			m_frame->setSize({ 480.f, 350.f });
 
 		if(!m_dock)
-			m_frame->setPosition((m_parent->frame().d_size - m_frame->d_size) / 2.f);
+			m_frame->setPosition((m_parent->frame().m_size - m_frame->m_size) / 2.f);
 		else
 			this->toggleDocked();
 	}
@@ -135,7 +135,7 @@ namespace toy
 	void Window::toggleMovable()
 	{
 		this->toggleWindowState(WINDOW_MOVABLE);
-		this->movable() ? m_header.setStyle(WindowHeader::Movable()) : m_header.setStyle(WindowHeader::cls());
+		this->movable() ? m_header.setStyle(styles().header_movable) : m_header.setStyle(styles().header);
 	}
 
 	void Window::toggleResizable()
@@ -177,14 +177,14 @@ namespace toy
 		m_dock = nullptr;
 
 		m_frame->setPosition(absolute);
-		m_frame->as<Layer>().moveToTop();
+		as<Layer>(*m_frame).moveToTop();
 
 		this->toggleDocked();
 	}
 
 	void Window::toggleDocked()
 	{
-		m_dock ? this->setStyle(Window::DockWindow()) : this->setStyle(Window::cls());
+		m_dock ? this->setStyle(styles().dock_window) : this->setStyle(styles().window);
 		//this->toggleMovable();
 		this->toggleHeader();
 		this->toggleResizable();
@@ -203,7 +203,7 @@ namespace toy
 	{
 		UNUSED(mouseEvent);
 		if(!m_dock)
-			m_frame->as<Layer>().moveToTop();
+			as<Layer>(*m_frame).moveToTop();
 		return true;
 	}
 
@@ -211,7 +211,7 @@ namespace toy
 	{
 		UNUSED(mouseEvent);
 		if(!m_dock)
-			m_frame->as<Layer>().moveToTop();
+			as<Layer>(*m_frame).moveToTop();
 		return true;
 	}
 }

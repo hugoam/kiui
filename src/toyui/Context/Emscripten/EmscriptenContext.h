@@ -6,7 +6,7 @@
 #define TOY_EM_CONTEXT_H
 
 /* toy Og */
-#include <toyui/Forward.h>
+#include <toyui/Types.h>
 #include <toyui/RenderWindow.h>
 #include <toyui/Frame/Renderer.h>
 #include <toyui/Input/InputDispatcher.h>
