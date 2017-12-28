@@ -84,13 +84,13 @@ namespace toy
 	{}
 
 	FileNode::FileNode(const Params& params, const string& name)
-		: TreeNode({ params, &cls<FileNode>() }, { "(file_20)", name }, true, nullptr, nullptr)
+		: TreeNode(params, { "(file_20)", name }, true, nullptr, nullptr)
 	{
 		m_toggle.enableState(DISABLED);
 	}
 
 	DirectoryNode::DirectoryNode(const Params& params, const string& path, const string& name, bool collapsed)
-		: TreeNode({ params, &cls<DirectoryNode>() }, { "(folder_20)", name }, collapsed, nullptr, nullptr)
+		: TreeNode(params, { "(folder_20)", name }, collapsed, nullptr, nullptr)
 		, m_path(path)
 	{}
 

@@ -20,7 +20,7 @@ namespace toy
 
 		void setImage(Image* image);
 
-		DimFloat contentSize() { return{ float(m_image->d_width), float(m_image->d_height) }; }
+		DimFloat contentSize() { return { float(m_image->d_width), float(m_image->d_height) }; }
 
 	public:
 		Frame& d_frame;

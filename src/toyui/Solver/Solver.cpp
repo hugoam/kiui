@@ -23,7 +23,8 @@ namespace toy
 		else if(preset == STACK)  return { PARAGRAPH,  SHRINK, WRAP };
 		else if(preset == DIV)    return { ORTHOGONAL, WRAP,   SHRINK };
 		else if(preset == SPACER) return { PARALLEL,   WRAP,   SHRINK };
-		else if(preset == BOARD)  return { PARAGRAPH,  EXPAND, EXPAND };
+		else if(preset == BOARD)  return { READING,  EXPAND, EXPAND };
+		else if(preset == LAYOUT) return { PARAGRAPH,  EXPAND, EXPAND };
 		else 					  return { PARAGRAPH,  WRAP,   WRAP };
 	}
 
@@ -114,9 +115,6 @@ namespace toy
 		printf("LAYOUT: %s size %i , %i\n", d_frame->d_style->m_name.c_str(), int(m_size.x), int(m_size.y));
 		d_frame->debugPrintDepth();
 		printf("        %s position %i , %i\n", d_frame->d_style->m_name.c_str(), int(d_position.x), int(d_position.y));
-		d_frame->debugPrintDepth();
-		printf("        %s direction %s , sizing x %s , sizing y %s\n", d_frame->d_style->m_name.c_str(),
-			toString(d_length).c_str(), toString(d_sizing[d_length]).c_str(), toString(d_sizing[d_depth]).c_str());
 #endif
 	}
 
@@ -211,7 +209,7 @@ namespace toy
 		else
 			frame.d_position[dim] = this->positionFree(frame, dim, space);
 
-		if(dim == d_length)
+		if(dim == d_length && frame.flow())
 			d_prev = &frame;
 	}
 

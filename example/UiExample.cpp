@@ -440,7 +440,7 @@ namespace toy
 
 	Wedge& createUiTestProgressDialog(Wedge& parent)
 	{
-		ProgressBar& bar = parent.emplace<ProgressBar>();
+		Fillbar& bar = parent.emplace<Fillbar>();
 		bar.setPercentage(0.57f);
 		parent.emplace<SliderFloat>("Set progress", AutoStat<float>(0.57f, 0.f, 1.f, 0.01f), [&](float val) { bar.setPercentage(val); });
 		return parent;
@@ -501,17 +501,11 @@ namespace toy
 	{
 		string clean_name = toLower(replaceAll(name, " ", "_"));
 		if(name == "Default")
-			load_default_style_sheet(*uiWindow.m_styler);
+			set_default_style_sheet(*uiWindow.m_styler);
 		else
-			load_style_sheet(*uiWindow.m_styler, uiWindow.m_resourcePath + "interface/styles/" + clean_name +".yml");
+			set_style_sheet(*uiWindow.m_styler, uiWindow.m_resourcePath + "interface/styles/" + clean_name +".yml");
 
 		//uiWindow.m_styler->style(CustomElement::style()).m_layout.d_align = Dim<Align>(LEFT, CENTER);
-	}
-
-	void selectUiTheme(Wedge& sheet, Widget& selected)
-	{
-		const string name = selected.label();
-		switchUiTheme(sheet.uiWindow(), name);
 	}
 
 	template <class T>
@@ -558,8 +552,7 @@ namespace toy
 
 	void createUiTest(Wedge& rootSheet)
 	{
-		switchUiTheme(rootSheet.uiWindow(), "Blendish Dark");
-		//switchUiTheme(rootSheet.uiWindow(), "Minimal");
+		switchUiTheme(rootSheet.uiWindow(), "Minimal");
 
 		Wedge& demoheader = rootSheet.emplace_style<Wedge>(Widget::styles().header);
 		Wedge& demobody = rootSheet.emplace_style<Wedge>(Widget::styles().board);
@@ -572,7 +565,7 @@ namespace toy
 		for(auto& kv : samples)
 			sampleNames.push_back(kv.first);
 		
-		StringVector themes({ "Blendish", "Blendish Dark", "TurboBadger", "MyGui" });
+		StringVector themes({ "Minimal", "Blendish Clear", "Blendish Dark", "TurboBadger", "MyGui" });
 
 		auto pickUiSample = [&](Widget& selected)
 		{
@@ -582,6 +575,6 @@ namespace toy
 		demoheader.emplace<Label>("Pick a demo sample : ");
 		demoheader.emplace<DropdownInput>(sampleNames, pickUiSample);
 		demoheader.emplace<Label>("Switch theme : ");
-		demoheader.emplace<DropdownInput>(themes, [&](Widget& selected) { selectUiTheme(samplebody, selected); });
+		demoheader.emplace<DropdownInput>(themes, [&](Widget& selected) { switchUiTheme(samplebody.uiWindow(), selected.label()); });
 	}
 }

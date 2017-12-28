@@ -18,14 +18,14 @@ namespace toy
 		using Callback = std::function<string(const string&)>;
 
 	public:
-		TypeIn(const Params& params, const string& text, Callback callback = nullptr, bool wrap = false);
+		TypeIn(const Params& params, string& text, Callback callback = nullptr, bool wrap = false);
 
-		const string& value() { return m_string; }
+		string& m_text;
 
 		virtual void active();
 		virtual void inactive();
 
-		void setString(const string& value);
+		void setText(const string& value);
 		void setAllowedChars(const string& chars);
 
 		void erase();
@@ -49,7 +49,6 @@ namespace toy
 		void moveCaretLeft();
 
 	protected:
-		string m_string;
 		string m_allowedChars;
 
 		size_t m_selectFirst;

@@ -14,9 +14,7 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Textbox : public TypeIn
 	{
 	public:
-		Textbox(const Params& params, const string& text);
-
-		string m_string;
+		Textbox(const Params& params, string& text);
 	};
 }
 

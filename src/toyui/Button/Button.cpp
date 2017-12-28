@@ -50,8 +50,9 @@ namespace toy
 		return this->clickAlt(mouseEvent);
 	}
 
-	MultiButton::MultiButton(const Params& params, const StringVector& elements, const Callback& trigger)
+	MultiButton::MultiButton(const Params& params, const StringVector& elements, const Callback& trigger, Style* item_style)
 		: WrapButton({ params, &cls<MultiButton>() }, trigger)
+		, m_item_style(item_style ? item_style : &styles().item)
 	{
 		this->reset(elements);
 	}
@@ -71,9 +72,9 @@ namespace toy
 		if(trigger)
 			m_trigger = trigger;
 
-		this->clear();
+		this->store().clear();
 		for(const string& value : elements)
-			this->emplace_style<Widget>(styles().item, value);
+			this->emplace_style<Widget>(*m_item_style, value);
 		m_elements = elements;
 	}
 

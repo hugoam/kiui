@@ -5,14 +5,10 @@
 #include <toyui/Config.h>
 #include <toyui/ImageAtlas.h>
 
-#include <toyobj/Util/Unique.h>
-#include <toyobj/String/String.h>
-
-#include <toyui/UiWindow.h>
-
 #include <RectPacking/Rect.h>
 #include <RectPacking/GuillotineBinPack.h>
 
+#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 namespace toy

@@ -7,13 +7,12 @@
 
 /* toy */
 #include <toyui/Types.h>
-#include <toyobj/Util/Unique.h>
-#include <toyui/Style/Style.h>
 
 namespace toy
 {
-	TOY_UI_EXPORT void load_default_style_sheet(Styler& styler);
 	TOY_UI_EXPORT void load_style_sheet(Styler& styler, const string& path);
+	TOY_UI_EXPORT void set_style_sheet(Styler& styler, const string& path);
+	TOY_UI_EXPORT void set_default_style_sheet(Styler& styler);
 }
 
 #endif // TOY_STYLEPARSER_H

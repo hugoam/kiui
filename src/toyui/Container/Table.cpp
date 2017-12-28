@@ -37,7 +37,7 @@ namespace toy
 	{
 		m_weights[first.d_index[DIM_X]] = first.m_span.x;
 		m_weights[second.d_index[DIM_X]] = second.m_span.x;
-		as<TableSolver>(*m_frame->m_solver).update(m_weights);
+		//as<TableSolver>(*m_frame->m_solver).update(m_weights);
 		m_frame->markDirty(DIRTY_FORCE_LAYOUT);
 	}
 }

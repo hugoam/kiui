@@ -3,7 +3,7 @@
 //  This notice and the license may not be removed or altered from any source distribution.
 
 #include <toyui/Config.h>
-#include <toyui/Button/ProgressBar.h>
+#include <toyui/Button/Fillbar.h>
 
 #include <toyobj/String/StringConvert.h>
 
@@ -14,8 +14,8 @@
 
 namespace toy
 {
-	ProgressBar::ProgressBar(const Params& params, Dimension dim)
-		: Wedge({ params, &cls<ProgressBar>() })
+	Fillbar::Fillbar(const Params& params, Dimension dim)
+		: Wedge({ params, &cls<Fillbar>() })
 		, m_dim(dim)
 		, m_filler({ this, &styles().filler })
 		, m_spacer({ this, &styles().spacer })
@@ -23,11 +23,11 @@ namespace toy
 		, m_percentage(0.f)
 	{}
 
-	void ProgressBar::setPercentage(float percentage)
+	void Fillbar::setPercentage(float percentage)
 	{
 		m_percentage = percentage;
 		m_filler.frame().setSpanDim(m_dim, percentage);
 		m_spacer.frame().setSpanDim(m_dim, 1.f - percentage);
-		m_display.frame().setCaption(toString(m_percentage) + "%");
+		m_display.frame().setCaption(to_string(m_percentage) + "%");
 	}
 }

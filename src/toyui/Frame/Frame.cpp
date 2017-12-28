@@ -20,7 +20,7 @@
 
 namespace toy
 {
-	template <> string toString<DirtyLayout>(const DirtyLayout& dirty) { if(dirty == CLEAN) return "CLEAN"; else if(dirty == DIRTY_REDRAW) return "DIRTY_REDRAW"; else if(dirty == DIRTY_PARENT) return "DIRTY_PARENT"; else if(dirty == DIRTY_LAYOUT) return "DIRTY_LAYOUT"; else if(dirty == DIRTY_FORCE_LAYOUT) return "DIRTY_FORCE_LAYOUT"; else /*if(dirty == DIRTY_STRUCTURE)*/ return "DIRTY_STRUCTURE"; }
+	template <> string to_string<DirtyLayout>(const DirtyLayout& dirty) { if(dirty == CLEAN) return "CLEAN"; else if(dirty == DIRTY_REDRAW) return "DIRTY_REDRAW"; else if(dirty == DIRTY_PARENT) return "DIRTY_PARENT"; else if(dirty == DIRTY_LAYOUT) return "DIRTY_LAYOUT"; else if(dirty == DIRTY_FORCE_LAYOUT) return "DIRTY_FORCE_LAYOUT"; else /*if(dirty == DIRTY_STRUCTURE)*/ return "DIRTY_STRUCTURE"; }
 
 	Frame::Frame(Widget& widget)
 		: UiRect()
@@ -119,6 +119,7 @@ namespace toy
 	void Frame::updateInkstyle(InkStyle& inkstyle)
 	{
 		if(d_inkstyle == &inkstyle) return;
+		//printf("INFO: Update inkstyle %s\n", inkstyle.m_name.c_str());
 		d_inkstyle = &inkstyle;
 		this->markDirty(DIRTY_REDRAW);
 
@@ -305,7 +306,7 @@ namespace toy
 			return;
 
 		//this->debugPrintDepth();
-		//printf(" >> %s %s\n", d_style->m_name.c_str(), toString(d_dirty).c_str());
+		//printf(" >> %s %s\n", d_style->m_name.c_str(), to_string(d_dirty).c_str());
 
 		if(d_dirty >= DIRTY_PARENT)
 		{

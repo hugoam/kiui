@@ -74,7 +74,7 @@ namespace toy
 			Style dockline_x = { "DocklineX", dockline, Args{ { &InkStyle::m_hover_cursor, &Cursor::styles().resize_x } } };
 			Style dockline_y = { "DocklineY", dockline, Args{ { &InkStyle::m_hover_cursor, &Cursor::styles().resize_y } } };
 
-			Style dockspace = { cls<Dockspace>(), Widget::styles().layout, Args{ { &Layout::m_opacity, OPAQUE },{ &Layout::m_spacing, DimFloat(6.f) } } };
+			Style dockspace = { cls<Dockspace>(), Widget::styles().layout, Args{ { &Layout::m_opacity, OPAQUE }, { &Layout::m_spacing, DimFloat(6.f) } } };
 		};
 		static Styles& styles() { static Styles styles; return styles; }
 

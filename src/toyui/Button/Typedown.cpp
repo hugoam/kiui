@@ -27,7 +27,7 @@ namespace toy
 		m_header.hide();
 		m_input.show();
 
-		m_input.setString(""); // m_header.label()
+		m_input.setText(""); // m_header.label()
 		m_input.selectCaret(0);
 		m_input.activate();
 	}

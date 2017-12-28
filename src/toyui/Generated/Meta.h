@@ -9,11 +9,7 @@
 #include <toyui/Types.h>
 
 #include <toyobj/Reflect/Meta.h>
-#include <toyobj/Reflect/Member.h>
-#include <toyobj/Reflect/Injector.h>
-#include <toyobj/Reflect/Method.h>
 #include <toyobj/Module/Module.h>
-#include <toyobj/Util/Unique.h>
 
 namespace toy
 {
@@ -59,6 +55,8 @@ namespace toy
 	template <> TOY_UI_EXPORT Type& cls<MemberPointer<BoxFloat>>() { static Type ty("MemberPointer<BoxFloat>"); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<MethodPointer<BoxFloat>>() { static Type ty("MethodPointer<BoxFloat>"); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Image>() { static Type ty("Image"); return ty; }
+	template <> TOY_UI_EXPORT Type& cls<MemberPointer<Image>>() { static Type ty("MemberPointer<Image>"); return ty; }
+	template <> TOY_UI_EXPORT Type& cls<MethodPointer<Image>>() { static Type ty("MethodPointer<Image>"); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<ImageSkin>() { static Type ty("ImageSkin"); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<MemberPointer<ImageSkin>>() { static Type ty("MemberPointer<ImageSkin>"); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<MethodPointer<ImageSkin>>() { static Type ty("MethodPointer<ImageSkin>"); return ty; }
@@ -81,8 +79,6 @@ namespace toy
 	template <> TOY_UI_EXPORT Type& cls<MemberPointer<Widget>>() { static Type ty("MemberPointer<Widget>"); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<MethodPointer<Widget>>() { static Type ty("MethodPointer<Widget>"); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<RenderTarget>() { static Type ty("RenderTarget"); return ty; }
-	template <> TOY_UI_EXPORT Type& cls<RenderSystem>() { static Type ty("RenderSystem"); return ty; }
-	template <> TOY_UI_EXPORT Type& cls<Context>() { static Type ty("Context"); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<UiWindow>() { static Type ty("UiWindow"); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Styler>() { static Type ty("Styler"); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Layer>() { static Type ty("Layer", cls<Frame>()); return ty; }
@@ -102,11 +98,18 @@ namespace toy
 	template <> TOY_UI_EXPORT Type& cls<WrapButton>() { static Type ty("WrapButton", cls<Wedge>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Slider>() { static Type ty("Slider", cls<Wedge>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Scrollbar>() { static Type ty("Scrollbar", cls<Wedge>()); return ty; }
+	template <> TOY_UI_EXPORT Type& cls<Fillbar>() { static Type ty("Fillbar", cls<Wedge>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Checkbox>() { static Type ty("Checkbox", cls<Toggle>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<ScrollSheet>() { static Type ty("ScrollSheet", cls<Wedge>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Popup>() { static Type ty("Popup", cls<Wedge>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<TypeIn>() { static Type ty("TypeIn", cls<Wedge>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<RadioSwitch>() { static Type ty("RadioSwitch", cls<Wedge>()); return ty; }
+	template <> TOY_UI_EXPORT Type& cls<SliderInput<float>>() { static Type ty("SliderInput<float>", cls<Wedge>()); return ty; }
+	template <> TOY_UI_EXPORT Type& cls<SliderInput<int>>() { static Type ty("SliderInput<int>", cls<Wedge>()); return ty; }
+	template <> TOY_UI_EXPORT Type& cls<NumberInput<unsigned int>>() { static Type ty("NumberInput<unsigned int>", cls<Wedge>()); return ty; }
+	template <> TOY_UI_EXPORT Type& cls<NumberInput<int>>() { static Type ty("NumberInput<int>", cls<Wedge>()); return ty; }
+	template <> TOY_UI_EXPORT Type& cls<NumberInput<float>>() { static Type ty("NumberInput<float>", cls<Wedge>()); return ty; }
+	template <> TOY_UI_EXPORT Type& cls<NumberInput<double>>() { static Type ty("NumberInput<double>", cls<Wedge>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Input<bool>>() { static Type ty("Input<bool>", cls<Wedge>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Input<Colour>>() { static Type ty("Input<Colour>", cls<Wedge>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Expandbox>() { static Type ty("Expandbox", cls<Wedge>()); return ty; }
@@ -120,7 +123,6 @@ namespace toy
 	template <> TOY_UI_EXPORT Type& cls<WindowHeader>() { static Type ty("WindowHeader", cls<Wedge>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<WindowFooter>() { static Type ty("WindowFooter", cls<Wedge>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Window>() { static Type ty("Window", cls<Wedge>()); return ty; }
-	template <> TOY_UI_EXPORT Type& cls<Docker>() { static Type ty("Docker", cls<Wedge>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Dockbar>() { static Type ty("Dockbar", cls<Wedge>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<NodePlug>() { static Type ty("NodePlug", cls<Wedge>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<NodeCable>() { static Type ty("NodeCable", cls<Wedge>()); return ty; }
@@ -133,7 +135,12 @@ namespace toy
 	template <> TOY_UI_EXPORT Type& cls<ScrollPlan>() { static Type ty("ScrollPlan", cls<ScrollSheet>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<SelectList>() { static Type ty("SelectList", cls<ScrollSheet>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Dropdown>() { static Type ty("Dropdown", cls<WrapButton>()); return ty; }
+	template <> TOY_UI_EXPORT Type& cls<FilterInput>() { static Type ty("FilterInput", cls<TypeIn>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Textbox>() { static Type ty("Textbox", cls<TypeIn>()); return ty; }
+	template <> TOY_UI_EXPORT Type& cls<Input<unsigned int>>() { static Type ty("Input<unsigned int>", cls<NumberInput<unsigned int>>()); return ty; }
+	template <> TOY_UI_EXPORT Type& cls<Input<int>>() { static Type ty("Input<int>", cls<NumberInput<int>>()); return ty; }
+	template <> TOY_UI_EXPORT Type& cls<Input<float>>() { static Type ty("Input<float>", cls<NumberInput<float>>()); return ty; }
+	template <> TOY_UI_EXPORT Type& cls<Input<double>>() { static Type ty("Input<double>", cls<NumberInput<double>>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Input<string>>() { static Type ty("Input<string>", cls<TypeIn>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<TreeNode>() { static Type ty("TreeNode", cls<Expandbox>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Docksection>() { static Type ty("Docksection", cls<Tabber>()); return ty; }
@@ -146,6 +153,7 @@ namespace toy
 	template <> TOY_UI_EXPORT Type& cls<DirectoryNode>() { static Type ty("DirectoryNode", cls<TreeNode>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Canvas>() { static Type ty("Canvas", cls<ScrollPlan>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<Menu>() { static Type ty("Menu", cls<Dropdown>()); return ty; }
+	template <> TOY_UI_EXPORT Type& cls<TypedownInput>() { static Type ty("TypedownInput", cls<DropdownInput>()); return ty; }
 	template <> TOY_UI_EXPORT Type& cls<ToolButton>() { static Type ty("ToolButton", cls<DropdownInput>()); return ty; }
 #endif
     
@@ -157,6 +165,7 @@ namespace toy
 	struct Reflection<Dimension> : public Meta
 	{
         string m_name = "Dimension";
+        size_t m_size = sizeof(Dimension);
         TypeClass m_typeClass = ENUM;
         std::vector<string> m_enumIds = { "DIM_X", "DIM_Y", "DIM_XX", "DIM_YY", "DIM_NULL" }; // std::array<string, 5>
 		std::vector<size_t> m_enumValues = { 0, 1, 2, 3, 4 }; // std::array<size_t, 5> 
@@ -168,6 +177,7 @@ namespace toy
 	struct Reflection<Direction> : public Meta
 	{
         string m_name = "Direction";
+        size_t m_size = sizeof(Direction);
         TypeClass m_typeClass = ENUM;
         std::vector<string> m_enumIds = { "DIRECTION_NONE", "READING", "PARAGRAPH", "PARALLEL", "ORTHOGONAL" }; // std::array<string, 5>
 		std::vector<size_t> m_enumValues = { 4, 0, 1, 2, 3 }; // std::array<size_t, 5> 
@@ -179,6 +189,7 @@ namespace toy
 	struct Reflection<Pivot> : public Meta
 	{
         string m_name = "Pivot";
+        size_t m_size = sizeof(Pivot);
         TypeClass m_typeClass = ENUM;
         std::vector<string> m_enumIds = { "FORWARD", "REVERSE" }; // std::array<string, 2>
 		std::vector<size_t> m_enumValues = { 0, 1 }; // std::array<size_t, 2> 
@@ -190,6 +201,7 @@ namespace toy
 	struct Reflection<Align> : public Meta
 	{
         string m_name = "Align";
+        size_t m_size = sizeof(Align);
         TypeClass m_typeClass = ENUM;
         std::vector<string> m_enumIds = { "LEFT", "CENTER", "RIGHT", "OUT_LEFT", "OUT_RIGHT" }; // std::array<string, 5>
 		std::vector<size_t> m_enumValues = { 0, 1, 2, 3, 4 }; // std::array<size_t, 5> 
@@ -201,6 +213,7 @@ namespace toy
 	struct Reflection<FrameType> : public Meta
 	{
         string m_name = "FrameType";
+        size_t m_size = sizeof(FrameType);
         TypeClass m_typeClass = ENUM;
         std::vector<string> m_enumIds = { "FRAME", "LAYER", "MASTER_LAYER", "SPACE_LAYER" }; // std::array<string, 4>
 		std::vector<size_t> m_enumValues = { 0, 1, 2, 3 }; // std::array<size_t, 4> 
@@ -212,6 +225,7 @@ namespace toy
 	struct Reflection<LayoutSolver> : public Meta
 	{
         string m_name = "LayoutSolver";
+        size_t m_size = sizeof(LayoutSolver);
         TypeClass m_typeClass = ENUM;
         std::vector<string> m_enumIds = { "FRAME_SOLVER", "ROW_SOLVER", "GRID_SOLVER", "TABLE_SOLVER" }; // std::array<string, 4>
 		std::vector<size_t> m_enumValues = { 0, 1, 2, 3 }; // std::array<size_t, 4> 
@@ -223,6 +237,7 @@ namespace toy
 	struct Reflection<AutoLayout> : public Meta
 	{
         string m_name = "AutoLayout";
+        size_t m_size = sizeof(AutoLayout);
         TypeClass m_typeClass = ENUM;
         std::vector<string> m_enumIds = { "NO_LAYOUT", "AUTO_SIZE", "AUTO_LAYOUT" }; // std::array<string, 3>
 		std::vector<size_t> m_enumValues = { 0, 1, 2 }; // std::array<size_t, 3> 
@@ -234,6 +249,7 @@ namespace toy
 	struct Reflection<Flow> : public Meta
 	{
         string m_name = "Flow";
+        size_t m_size = sizeof(Flow);
         TypeClass m_typeClass = ENUM;
         std::vector<string> m_enumIds = { "FLOW", "OVERLAY", "ALIGN", "FREE" }; // std::array<string, 4>
 		std::vector<size_t> m_enumValues = { 0, 1, 2, 3 }; // std::array<size_t, 4> 
@@ -245,6 +261,7 @@ namespace toy
 	struct Reflection<Sizing> : public Meta
 	{
         string m_name = "Sizing";
+        size_t m_size = sizeof(Sizing);
         TypeClass m_typeClass = ENUM;
         std::vector<string> m_enumIds = { "FIXED", "SHRINK", "WRAP", "EXPAND" }; // std::array<string, 4>
 		std::vector<size_t> m_enumValues = { 0, 1, 2, 3 }; // std::array<size_t, 4> 
@@ -256,9 +273,10 @@ namespace toy
 	struct Reflection<SpacePreset> : public Meta
 	{
         string m_name = "SpacePreset";
+        size_t m_size = sizeof(SpacePreset);
         TypeClass m_typeClass = ENUM;
-        std::vector<string> m_enumIds = { "SHEET", "FLEX", "ITEM", "UNIT", "BLOCK", "LINE", "STACK", "DIV", "SPACER", "BOARD" }; // std::array<string, 10>
-		std::vector<size_t> m_enumValues = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }; // std::array<size_t, 10> 
+        std::vector<string> m_enumIds = { "SHEET", "FLEX", "ITEM", "UNIT", "BLOCK", "LINE", "STACK", "DIV", "SPACER", "BOARD", "LAYOUT" }; // std::array<string, 11>
+		std::vector<size_t> m_enumValues = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }; // std::array<size_t, 11> 
         
         Reflection() : Meta(cls<SpacePreset>()) { this->initRefMethods<SpacePreset>(); this->initString<SpacePreset>(); this->setup(*this); }
     };
@@ -267,6 +285,7 @@ namespace toy
 	struct Reflection<Clipping> : public Meta
 	{
         string m_name = "Clipping";
+        size_t m_size = sizeof(Clipping);
         TypeClass m_typeClass = ENUM;
         std::vector<string> m_enumIds = { "NOCLIP", "CLIP" }; // std::array<string, 2>
 		std::vector<size_t> m_enumValues = { 0, 1 }; // std::array<size_t, 2> 
@@ -278,6 +297,7 @@ namespace toy
 	struct Reflection<Opacity> : public Meta
 	{
         string m_name = "Opacity";
+        size_t m_size = sizeof(Opacity);
         TypeClass m_typeClass = ENUM;
         std::vector<string> m_enumIds = { "OPAQUE", "CLEAR", "HOLLOW" }; // std::array<string, 3>
 		std::vector<size_t> m_enumValues = { 0, 1, 2 }; // std::array<size_t, 3> 
@@ -289,6 +309,7 @@ namespace toy
 	struct Reflection<WidgetState> : public Meta
 	{
         string m_name = "WidgetState";
+        size_t m_size = sizeof(WidgetState);
         TypeClass m_typeClass = ENUM;
         std::vector<string> m_enumIds = { "NOSTATE", "FOCUSED", "TRIGGERED", "ACTIVATED", "SELECTED", "DRAGGED", "DISABLED", "ACTIVE", "CONTROL", "MODAL" }; // std::array<string, 10>
 		std::vector<size_t> m_enumValues = { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 }; // std::array<size_t, 10> 
@@ -302,6 +323,7 @@ namespace toy
 	struct Reflection<std::vector<Widget*>> : public Meta
 	{
         string m_name = "std::vector<Widget*>";
+        size_t m_size = sizeof(std::vector<Widget*>);
         TypeClass m_typeClass = SEQUENCE;
         Type* m_content = &cls<Widget>();
         
@@ -318,6 +340,7 @@ namespace toy
 	struct Reflection<Space> : public Meta
 	{
         string m_name = "Space";
+        size_t m_size = sizeof(Space);
         TypeClass m_typeClass = OBJECT;
         bool m_serializable = false;
         struct {
@@ -336,6 +359,7 @@ namespace toy
 	struct Reflection<Dim<size_t>> : public Meta
 	{
         string m_name = "Dim<size_t>";
+        size_t m_size = sizeof(Dim<size_t>);
         TypeClass m_typeClass = STRUCT;
         bool m_serializable = false;
         struct {
@@ -345,9 +369,11 @@ namespace toy
         struct {
             ConstructorFunc construct_0 = [](Ref ref, Var* args) {  ref.val<Dim<size_t>>() = Dim<size_t>( args[0].val<size_t>(), args[1].val<size_t>() ); };
             Constructor constructor_0 = { cls<Dim<size_t>>(), construct_0, ParamVector({ Param("x", var(size_t()), false, INPUT_PARAM), Param("y", var(size_t()), false, INPUT_PARAM) }) };
+            ConstructorFunc construct_1 = [](Ref ref, Var* args) { UNUSED(args); ref.val<Dim<size_t>>() = Dim<size_t>(  ); };
+            Constructor constructor_1 = { cls<Dim<size_t>>(), construct_1, {} };
         } constructor;
         std::vector<Member> m_members = { member.x, member.y };
-        std::vector<Constructor> m_constructors = { constructor.constructor_0 };
+        std::vector<Constructor> m_constructors = { constructor.constructor_0, constructor.constructor_1 };
         
         Reflection() : Meta(cls<Dim<size_t>>()) { this->initRefMethods<Dim<size_t>>(); this->initString<Dim<size_t>>(); this->setup(*this); }
     };
@@ -358,6 +384,7 @@ namespace toy
 	struct Reflection<Dim<AutoLayout>> : public Meta
 	{
         string m_name = "Dim<AutoLayout>";
+        size_t m_size = sizeof(Dim<AutoLayout>);
         TypeClass m_typeClass = STRUCT;
         bool m_serializable = false;
         struct {
@@ -367,9 +394,11 @@ namespace toy
         struct {
             ConstructorFunc construct_0 = [](Ref ref, Var* args) {  ref.val<Dim<AutoLayout>>() = Dim<AutoLayout>( args[0].val<AutoLayout>(), args[1].val<AutoLayout>() ); };
             Constructor constructor_0 = { cls<Dim<AutoLayout>>(), construct_0, ParamVector({ Param("x", var(AutoLayout()), false, INPUT_PARAM), Param("y", var(AutoLayout()), false, INPUT_PARAM) }) };
+            ConstructorFunc construct_1 = [](Ref ref, Var* args) { UNUSED(args); ref.val<Dim<AutoLayout>>() = Dim<AutoLayout>(  ); };
+            Constructor constructor_1 = { cls<Dim<AutoLayout>>(), construct_1, {} };
         } constructor;
         std::vector<Member> m_members = { member.x, member.y };
-        std::vector<Constructor> m_constructors = { constructor.constructor_0 };
+        std::vector<Constructor> m_constructors = { constructor.constructor_0, constructor.constructor_1 };
         
         Reflection() : Meta(cls<Dim<AutoLayout>>()) { this->initRefMethods<Dim<AutoLayout>>(); this->initString<Dim<AutoLayout>>(); this->setup(*this); }
     };
@@ -380,6 +409,7 @@ namespace toy
 	struct Reflection<Dim<Sizing>> : public Meta
 	{
         string m_name = "Dim<Sizing>";
+        size_t m_size = sizeof(Dim<Sizing>);
         TypeClass m_typeClass = STRUCT;
         bool m_serializable = false;
         struct {
@@ -389,9 +419,11 @@ namespace toy
         struct {
             ConstructorFunc construct_0 = [](Ref ref, Var* args) {  ref.val<Dim<Sizing>>() = Dim<Sizing>( args[0].val<Sizing>(), args[1].val<Sizing>() ); };
             Constructor constructor_0 = { cls<Dim<Sizing>>(), construct_0, ParamVector({ Param("x", var(Sizing()), false, INPUT_PARAM), Param("y", var(Sizing()), false, INPUT_PARAM) }) };
+            ConstructorFunc construct_1 = [](Ref ref, Var* args) { UNUSED(args); ref.val<Dim<Sizing>>() = Dim<Sizing>(  ); };
+            Constructor constructor_1 = { cls<Dim<Sizing>>(), construct_1, {} };
         } constructor;
         std::vector<Member> m_members = { member.x, member.y };
-        std::vector<Constructor> m_constructors = { constructor.constructor_0 };
+        std::vector<Constructor> m_constructors = { constructor.constructor_0, constructor.constructor_1 };
         
         Reflection() : Meta(cls<Dim<Sizing>>()) { this->initRefMethods<Dim<Sizing>>(); this->initString<Dim<Sizing>>(); this->setup(*this); }
     };
@@ -402,6 +434,7 @@ namespace toy
 	struct Reflection<Dim<Align>> : public Meta
 	{
         string m_name = "Dim<Align>";
+        size_t m_size = sizeof(Dim<Align>);
         TypeClass m_typeClass = STRUCT;
         bool m_serializable = false;
         struct {
@@ -411,9 +444,11 @@ namespace toy
         struct {
             ConstructorFunc construct_0 = [](Ref ref, Var* args) {  ref.val<Dim<Align>>() = Dim<Align>( args[0].val<Align>(), args[1].val<Align>() ); };
             Constructor constructor_0 = { cls<Dim<Align>>(), construct_0, ParamVector({ Param("x", var(Align()), false, INPUT_PARAM), Param("y", var(Align()), false, INPUT_PARAM) }) };
+            ConstructorFunc construct_1 = [](Ref ref, Var* args) { UNUSED(args); ref.val<Dim<Align>>() = Dim<Align>(  ); };
+            Constructor constructor_1 = { cls<Dim<Align>>(), construct_1, {} };
         } constructor;
         std::vector<Member> m_members = { member.x, member.y };
-        std::vector<Constructor> m_constructors = { constructor.constructor_0 };
+        std::vector<Constructor> m_constructors = { constructor.constructor_0, constructor.constructor_1 };
         
         Reflection() : Meta(cls<Dim<Align>>()) { this->initRefMethods<Dim<Align>>(); this->initString<Dim<Align>>(); this->setup(*this); }
     };
@@ -424,6 +459,7 @@ namespace toy
 	struct Reflection<Dim<Pivot>> : public Meta
 	{
         string m_name = "Dim<Pivot>";
+        size_t m_size = sizeof(Dim<Pivot>);
         TypeClass m_typeClass = STRUCT;
         bool m_serializable = false;
         struct {
@@ -433,9 +469,11 @@ namespace toy
         struct {
             ConstructorFunc construct_0 = [](Ref ref, Var* args) {  ref.val<Dim<Pivot>>() = Dim<Pivot>( args[0].val<Pivot>(), args[1].val<Pivot>() ); };
             Constructor constructor_0 = { cls<Dim<Pivot>>(), construct_0, ParamVector({ Param("x", var(Pivot()), false, INPUT_PARAM), Param("y", var(Pivot()), false, INPUT_PARAM) }) };
+            ConstructorFunc construct_1 = [](Ref ref, Var* args) { UNUSED(args); ref.val<Dim<Pivot>>() = Dim<Pivot>(  ); };
+            Constructor constructor_1 = { cls<Dim<Pivot>>(), construct_1, {} };
         } constructor;
         std::vector<Member> m_members = { member.x, member.y };
-        std::vector<Constructor> m_constructors = { constructor.constructor_0 };
+        std::vector<Constructor> m_constructors = { constructor.constructor_0, constructor.constructor_1 };
         
         Reflection() : Meta(cls<Dim<Pivot>>()) { this->initRefMethods<Dim<Pivot>>(); this->initString<Dim<Pivot>>(); this->setup(*this); }
     };
@@ -446,6 +484,7 @@ namespace toy
 	struct Reflection<DimFloat> : public Meta
 	{
         string m_name = "DimFloat";
+        size_t m_size = sizeof(DimFloat);
         TypeClass m_typeClass = STRUCT;
         bool m_serializable = false;
         struct {
@@ -470,6 +509,7 @@ namespace toy
 	struct Reflection<BoxFloat> : public Meta
 	{
         string m_name = "BoxFloat";
+        size_t m_size = sizeof(BoxFloat);
         TypeClass m_typeClass = STRUCT;
         bool m_serializable = false;
         struct {
@@ -496,8 +536,14 @@ namespace toy
 	struct Reflection<Image> : public Meta
 	{
         string m_name = "Image";
+        size_t m_size = sizeof(Image);
         TypeClass m_typeClass = STRUCT;
         bool m_serializable = false;
+        struct {
+            Member d_name = { cls<Image>(), member_var(&Image::d_name), cls<string>(), "d_name", member_getter<string>(&Image::d_name), nullptr, MEMBER_VALUE };
+            Member d_path = { cls<Image>(), member_var(&Image::d_path), cls<string>(), "d_path", member_getter<string>(&Image::d_path), nullptr, MEMBER_VALUE };
+        } member;
+        std::vector<Member> m_members = { member.d_name, member.d_path };
         
         Reflection() : Meta(cls<Image>()) { this->initRefMethods<Image>(); this->setup(*this); }
     };
@@ -508,6 +554,7 @@ namespace toy
 	struct Reflection<ImageSkin> : public Meta
 	{
         string m_name = "ImageSkin";
+        size_t m_size = sizeof(ImageSkin);
         TypeClass m_typeClass = STRUCT;
         bool m_serializable = false;
         struct {
@@ -535,6 +582,7 @@ namespace toy
 	struct Reflection<Shadow> : public Meta
 	{
         string m_name = "Shadow";
+        size_t m_size = sizeof(Shadow);
         TypeClass m_typeClass = STRUCT;
         bool m_serializable = false;
         struct {
@@ -562,6 +610,7 @@ namespace toy
 	struct Reflection<Paint> : public Meta
 	{
         string m_name = "Paint";
+        size_t m_size = sizeof(Paint);
         TypeClass m_typeClass = STRUCT;
         bool m_serializable = false;
         
@@ -574,9 +623,11 @@ namespace toy
 	struct Reflection<Layout> : public Meta
 	{
         string m_name = "Layout";
+        size_t m_size = sizeof(Layout);
         TypeClass m_typeClass = STRUCT;
         bool m_serializable = false;
         struct {
+            Member m_name = { cls<Layout>(), member_var(&Layout::m_name), cls<string>(), "name", member_getter<string>(&Layout::m_name), member_setter<string>(&Layout::m_name), MEMBER_VALUE|MEMBER_MUTABLE };
             Member m_solver = { cls<Layout>(), member_var(&Layout::m_solver), cls<LayoutSolver>(), "solver", member_getter<LayoutSolver>(&Layout::m_solver), member_setter<LayoutSolver>(&Layout::m_solver), MEMBER_VALUE|MEMBER_MUTABLE };
             Member m_layout = { cls<Layout>(), member_var(&Layout::m_layout), cls<Dim<AutoLayout>>(), "layout", member_getter<Dim<AutoLayout>>(&Layout::m_layout), member_setter<Dim<AutoLayout>>(&Layout::m_layout), MEMBER_VALUE|MEMBER_MUTABLE };
             Member m_flow = { cls<Layout>(), member_var(&Layout::m_flow), cls<Flow>(), "flow", member_getter<Flow>(&Layout::m_flow), member_setter<Flow>(&Layout::m_flow), MEMBER_VALUE|MEMBER_MUTABLE };
@@ -593,7 +644,12 @@ namespace toy
             Member m_zorder = { cls<Layout>(), member_var(&Layout::m_zorder), cls<int>(), "zorder", member_getter<int>(&Layout::m_zorder), member_setter<int>(&Layout::m_zorder), MEMBER_VALUE|MEMBER_MUTABLE };
             Member m_updated = { cls<Layout>(), member_var(&Layout::m_updated), cls<uint32_t>(), "updated", member_getter<size_t>(&Layout::m_updated), member_setter<size_t>(&Layout::m_updated), MEMBER_VALUE|MEMBER_MUTABLE };
         } member;
-        std::vector<Member> m_members = { member.m_solver, member.m_layout, member.m_flow, member.m_space, member.m_clipping, member.m_opacity, member.m_align, member.m_span, member.m_size, member.m_padding, member.m_margin, member.m_spacing, member.m_pivot, member.m_zorder, member.m_updated };
+        struct {
+            ConstructorFunc construct_0 = [](Ref ref, Var* args) {  ref.val<Layout>() = Layout( args[0].val<string>() ); };
+            Constructor constructor_0 = { cls<Layout>(), construct_0, ParamVector({ Param("name", var(string()), false, INPUT_PARAM) }) };
+        } constructor;
+        std::vector<Member> m_members = { member.m_name, member.m_solver, member.m_layout, member.m_flow, member.m_space, member.m_clipping, member.m_opacity, member.m_align, member.m_span, member.m_size, member.m_padding, member.m_margin, member.m_spacing, member.m_pivot, member.m_zorder, member.m_updated };
+        std::vector<Constructor> m_constructors = { constructor.constructor_0 };
         
         Reflection() : Meta(cls<Layout>()) { this->initRefMethods<Layout>(); this->setup(*this); }
     };
@@ -604,9 +660,11 @@ namespace toy
 	struct Reflection<InkStyle> : public Meta
 	{
         string m_name = "InkStyle";
+        size_t m_size = sizeof(InkStyle);
         TypeClass m_typeClass = STRUCT;
         bool m_serializable = false;
         struct {
+            Member m_name = { cls<InkStyle>(), member_var(&InkStyle::m_name), cls<string>(), "name", member_getter<string>(&InkStyle::m_name), member_setter<string>(&InkStyle::m_name), MEMBER_VALUE|MEMBER_MUTABLE };
             Member m_empty = { cls<InkStyle>(), member_var(&InkStyle::m_empty), cls<bool>(), "empty", member_getter<bool>(&InkStyle::m_empty), member_setter<bool>(&InkStyle::m_empty), MEMBER_VALUE|MEMBER_MUTABLE };
             Member m_background_colour = { cls<InkStyle>(), member_var(&InkStyle::m_background_colour), cls<Colour>(), "background_colour", member_getter<Colour>(&InkStyle::m_background_colour), member_setter<Colour>(&InkStyle::m_background_colour), MEMBER_VALUE|MEMBER_MUTABLE };
             Member m_border_colour = { cls<InkStyle>(), member_var(&InkStyle::m_border_colour), cls<Colour>(), "border_colour", member_getter<Colour>(&InkStyle::m_border_colour), member_setter<Colour>(&InkStyle::m_border_colour), MEMBER_VALUE|MEMBER_MUTABLE };
@@ -633,10 +691,10 @@ namespace toy
             Member m_hover_cursor = { cls<InkStyle>(), member_var(&InkStyle::m_hover_cursor), cls<Style>(), "hover_cursor", member_getter<Style>(&InkStyle::m_hover_cursor), member_setter<Style*>(&InkStyle::m_hover_cursor), MEMBER_MUTABLE };
         } member;
         struct {
-            ConstructorFunc construct_0 = [](Ref ref, Var* args) { UNUSED(args); ref.val<InkStyle>() = InkStyle(  ); };
-            Constructor constructor_0 = { cls<InkStyle>(), construct_0, {} };
+            ConstructorFunc construct_0 = [](Ref ref, Var* args) {  ref.val<InkStyle>() = InkStyle( args[0].val<string>() ); };
+            Constructor constructor_0 = { cls<InkStyle>(), construct_0, ParamVector({ Param("name", var(string()), false, INPUT_PARAM) }) };
         } constructor;
-        std::vector<Member> m_members = { member.m_empty, member.m_background_colour, member.m_border_colour, member.m_image_colour, member.m_text_colour, member.m_text_font, member.m_text_size, member.m_text_break, member.m_text_wrap, member.m_border_width, member.m_corner_radius, member.m_weak_corners, member.m_padding, member.m_margin, member.m_align, member.m_linear_gradient, member.m_linear_gradient_dim, member.m_image, member.m_overlay, member.m_tile, member.m_image_skin, member.m_shadow, member.m_shadow_colour, member.m_hover_cursor };
+        std::vector<Member> m_members = { member.m_name, member.m_empty, member.m_background_colour, member.m_border_colour, member.m_image_colour, member.m_text_colour, member.m_text_font, member.m_text_size, member.m_text_break, member.m_text_wrap, member.m_border_width, member.m_corner_radius, member.m_weak_corners, member.m_padding, member.m_margin, member.m_align, member.m_linear_gradient, member.m_linear_gradient_dim, member.m_image, member.m_overlay, member.m_tile, member.m_image_skin, member.m_shadow, member.m_shadow_colour, member.m_hover_cursor };
         std::vector<Constructor> m_constructors = { constructor.constructor_0 };
         
         Reflection() : Meta(cls<InkStyle>()) { this->initRefMethods<InkStyle>(); this->setup(*this); }
@@ -648,6 +706,7 @@ namespace toy
 	struct Reflection<Style> : public Meta
 	{
         string m_name = "Style";
+        size_t m_size = sizeof(Style);
         TypeClass m_typeClass = STRUCT;
         bool m_serializable = false;
         struct {
@@ -668,6 +727,7 @@ namespace toy
 	struct Reflection<Caption> : public Meta
 	{
         string m_name = "Caption";
+        size_t m_size = sizeof(Caption);
         TypeClass m_typeClass = OBJECT;
         bool m_serializable = false;
         
@@ -680,6 +740,7 @@ namespace toy
 	struct Reflection<Frame> : public Meta
 	{
         string m_name = "Frame";
+        size_t m_size = sizeof(Frame);
         TypeClass m_typeClass = OBJECT;
         bool m_serializable = false;
         
@@ -692,6 +753,7 @@ namespace toy
 	struct Reflection<Widget> : public Meta
 	{
         string m_name = "Widget";
+        size_t m_size = sizeof(Widget);
         TypeClass m_typeClass = OBJECT;
         bool m_serializable = false;
         struct {
@@ -712,34 +774,11 @@ namespace toy
 	struct Reflection<RenderTarget> : public Meta
 	{
         string m_name = "RenderTarget";
+        size_t m_size = sizeof(RenderTarget);
         TypeClass m_typeClass = OBJECT;
         bool m_serializable = false;
         
         Reflection() : Meta(cls<RenderTarget>()) { this->setup(*this); }
-    };
-        
-    
-    // RenderSystem
-	template <>
-	struct Reflection<RenderSystem> : public Meta
-	{
-        string m_name = "RenderSystem";
-        TypeClass m_typeClass = OBJECT;
-        bool m_serializable = false;
-        
-        Reflection() : Meta(cls<RenderSystem>()) { this->setup(*this); }
-    };
-        
-    
-    // Context
-	template <>
-	struct Reflection<Context> : public Meta
-	{
-        string m_name = "Context";
-        TypeClass m_typeClass = OBJECT;
-        bool m_serializable = false;
-        
-        Reflection() : Meta(cls<Context>()) { this->setup(*this); }
     };
         
     
@@ -748,6 +787,7 @@ namespace toy
 	struct Reflection<UiWindow> : public Meta
 	{
         string m_name = "UiWindow";
+        size_t m_size = sizeof(UiWindow);
         TypeClass m_typeClass = OBJECT;
         bool m_serializable = false;
         
@@ -760,6 +800,7 @@ namespace toy
 	struct Reflection<Styler> : public Meta
 	{
         string m_name = "Styler";
+        size_t m_size = sizeof(Styler);
         TypeClass m_typeClass = OBJECT;
         bool m_serializable = false;
         
@@ -772,6 +813,7 @@ namespace toy
 	struct Reflection<Layer> : public Meta
 	{
         string m_name = "Layer";
+        size_t m_size = sizeof(Layer);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Frame>() };
         bool m_serializable = false;
@@ -785,6 +827,7 @@ namespace toy
 	struct Reflection<Wedge> : public Meta
 	{
         string m_name = "Wedge";
+        size_t m_size = sizeof(Wedge);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Widget>() };
         bool m_serializable = false;
@@ -802,6 +845,7 @@ namespace toy
 	struct Reflection<Label> : public Meta
 	{
         string m_name = "Label";
+        size_t m_size = sizeof(Label);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Widget>() };
         bool m_serializable = false;
@@ -815,6 +859,7 @@ namespace toy
 	struct Reflection<Button> : public Meta
 	{
         string m_name = "Button";
+        size_t m_size = sizeof(Button);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Widget>() };
         bool m_serializable = false;
@@ -828,6 +873,7 @@ namespace toy
 	struct Reflection<Toggle> : public Meta
 	{
         string m_name = "Toggle";
+        size_t m_size = sizeof(Toggle);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Widget>() };
         bool m_serializable = false;
@@ -841,6 +887,7 @@ namespace toy
 	struct Reflection<WindowSizer> : public Meta
 	{
         string m_name = "WindowSizer";
+        size_t m_size = sizeof(WindowSizer);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Widget>() };
         bool m_serializable = false;
@@ -854,6 +901,7 @@ namespace toy
 	struct Reflection<NodeKnob> : public Meta
 	{
         string m_name = "NodeKnob";
+        size_t m_size = sizeof(NodeKnob);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Widget>() };
         bool m_serializable = false;
@@ -867,6 +915,7 @@ namespace toy
 	struct Reflection<GridSheet> : public Meta
 	{
         string m_name = "GridSheet";
+        size_t m_size = sizeof(GridSheet);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -880,6 +929,7 @@ namespace toy
 	struct Reflection<Tooltip> : public Meta
 	{
         string m_name = "Tooltip";
+        size_t m_size = sizeof(Tooltip);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -893,6 +943,7 @@ namespace toy
 	struct Reflection<Rectangle> : public Meta
 	{
         string m_name = "Rectangle";
+        size_t m_size = sizeof(Rectangle);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -906,6 +957,7 @@ namespace toy
 	struct Reflection<Cursor> : public Meta
 	{
         string m_name = "Cursor";
+        size_t m_size = sizeof(Cursor);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -919,6 +971,7 @@ namespace toy
 	struct Reflection<RootSheet> : public Meta
 	{
         string m_name = "RootSheet";
+        size_t m_size = sizeof(RootSheet);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -932,6 +985,7 @@ namespace toy
 	struct Reflection<WrapButton> : public Meta
 	{
         string m_name = "WrapButton";
+        size_t m_size = sizeof(WrapButton);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -945,6 +999,7 @@ namespace toy
 	struct Reflection<Slider> : public Meta
 	{
         string m_name = "Slider";
+        size_t m_size = sizeof(Slider);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -958,6 +1013,7 @@ namespace toy
 	struct Reflection<Scrollbar> : public Meta
 	{
         string m_name = "Scrollbar";
+        size_t m_size = sizeof(Scrollbar);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -966,11 +1022,26 @@ namespace toy
     };
         
     
+    // Fillbar
+	template <>
+	struct Reflection<Fillbar> : public Meta
+	{
+        string m_name = "Fillbar";
+        size_t m_size = sizeof(Fillbar);
+        TypeClass m_typeClass = OBJECT;
+        std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
+        bool m_serializable = false;
+        
+        Reflection() : Meta(cls<Fillbar>()) { this->setup(*this); this->inherit(m_bases); }
+    };
+        
+    
     // Checkbox
 	template <>
 	struct Reflection<Checkbox> : public Meta
 	{
         string m_name = "Checkbox";
+        size_t m_size = sizeof(Checkbox);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Toggle>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -984,6 +1055,7 @@ namespace toy
 	struct Reflection<ScrollSheet> : public Meta
 	{
         string m_name = "ScrollSheet";
+        size_t m_size = sizeof(ScrollSheet);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -997,6 +1069,7 @@ namespace toy
 	struct Reflection<Popup> : public Meta
 	{
         string m_name = "Popup";
+        size_t m_size = sizeof(Popup);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1010,6 +1083,7 @@ namespace toy
 	struct Reflection<TypeIn> : public Meta
 	{
         string m_name = "TypeIn";
+        size_t m_size = sizeof(TypeIn);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1023,6 +1097,7 @@ namespace toy
 	struct Reflection<RadioSwitch> : public Meta
 	{
         string m_name = "RadioSwitch";
+        size_t m_size = sizeof(RadioSwitch);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1031,11 +1106,96 @@ namespace toy
     };
         
     
+    // SliderInput<float>
+	template <>
+	struct Reflection<SliderInput<float>> : public Meta
+	{
+        string m_name = "SliderInput<float>";
+        size_t m_size = sizeof(SliderInput<float>);
+        TypeClass m_typeClass = OBJECT;
+        std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
+        bool m_serializable = false;
+        
+        Reflection() : Meta(cls<SliderInput<float>>()) { this->setup(*this); this->inherit(m_bases); }
+    };
+        
+    
+    // SliderInput<int>
+	template <>
+	struct Reflection<SliderInput<int>> : public Meta
+	{
+        string m_name = "SliderInput<int>";
+        size_t m_size = sizeof(SliderInput<int>);
+        TypeClass m_typeClass = OBJECT;
+        std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
+        bool m_serializable = false;
+        
+        Reflection() : Meta(cls<SliderInput<int>>()) { this->setup(*this); this->inherit(m_bases); }
+    };
+        
+    
+    // NumberInput<unsigned int>
+	template <>
+	struct Reflection<NumberInput<unsigned int>> : public Meta
+	{
+        string m_name = "NumberInput<unsigned int>";
+        size_t m_size = sizeof(NumberInput<unsigned int>);
+        TypeClass m_typeClass = OBJECT;
+        std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
+        bool m_serializable = false;
+        
+        Reflection() : Meta(cls<NumberInput<unsigned int>>()) { this->setup(*this); this->inherit(m_bases); }
+    };
+        
+    
+    // NumberInput<int>
+	template <>
+	struct Reflection<NumberInput<int>> : public Meta
+	{
+        string m_name = "NumberInput<int>";
+        size_t m_size = sizeof(NumberInput<int>);
+        TypeClass m_typeClass = OBJECT;
+        std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
+        bool m_serializable = false;
+        
+        Reflection() : Meta(cls<NumberInput<int>>()) { this->setup(*this); this->inherit(m_bases); }
+    };
+        
+    
+    // NumberInput<float>
+	template <>
+	struct Reflection<NumberInput<float>> : public Meta
+	{
+        string m_name = "NumberInput<float>";
+        size_t m_size = sizeof(NumberInput<float>);
+        TypeClass m_typeClass = OBJECT;
+        std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
+        bool m_serializable = false;
+        
+        Reflection() : Meta(cls<NumberInput<float>>()) { this->setup(*this); this->inherit(m_bases); }
+    };
+        
+    
+    // NumberInput<double>
+	template <>
+	struct Reflection<NumberInput<double>> : public Meta
+	{
+        string m_name = "NumberInput<double>";
+        size_t m_size = sizeof(NumberInput<double>);
+        TypeClass m_typeClass = OBJECT;
+        std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
+        bool m_serializable = false;
+        
+        Reflection() : Meta(cls<NumberInput<double>>()) { this->setup(*this); this->inherit(m_bases); }
+    };
+        
+    
     // Input<bool>
 	template <>
 	struct Reflection<Input<bool>> : public Meta
 	{
         string m_name = "Input<bool>";
+        size_t m_size = sizeof(Input<bool>);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1049,6 +1209,7 @@ namespace toy
 	struct Reflection<Input<Colour>> : public Meta
 	{
         string m_name = "Input<Colour>";
+        size_t m_size = sizeof(Input<Colour>);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1062,6 +1223,7 @@ namespace toy
 	struct Reflection<Expandbox> : public Meta
 	{
         string m_name = "Expandbox";
+        size_t m_size = sizeof(Expandbox);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1075,6 +1237,7 @@ namespace toy
 	struct Reflection<Tree> : public Meta
 	{
         string m_name = "Tree";
+        size_t m_size = sizeof(Tree);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1088,6 +1251,7 @@ namespace toy
 	struct Reflection<Table> : public Meta
 	{
         string m_name = "Table";
+        size_t m_size = sizeof(Table);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1101,6 +1265,7 @@ namespace toy
 	struct Reflection<Tab> : public Meta
 	{
         string m_name = "Tab";
+        size_t m_size = sizeof(Tab);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1114,6 +1279,7 @@ namespace toy
 	struct Reflection<Tabber> : public Meta
 	{
         string m_name = "Tabber";
+        size_t m_size = sizeof(Tabber);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1127,6 +1293,7 @@ namespace toy
 	struct Reflection<Directory> : public Meta
 	{
         string m_name = "Directory";
+        size_t m_size = sizeof(Directory);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1140,6 +1307,7 @@ namespace toy
 	struct Reflection<FileBrowser> : public Meta
 	{
         string m_name = "FileBrowser";
+        size_t m_size = sizeof(FileBrowser);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1153,6 +1321,7 @@ namespace toy
 	struct Reflection<Dockspace> : public Meta
 	{
         string m_name = "Dockspace";
+        size_t m_size = sizeof(Dockspace);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1166,6 +1335,7 @@ namespace toy
 	struct Reflection<WindowHeader> : public Meta
 	{
         string m_name = "WindowHeader";
+        size_t m_size = sizeof(WindowHeader);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1179,6 +1349,7 @@ namespace toy
 	struct Reflection<WindowFooter> : public Meta
 	{
         string m_name = "WindowFooter";
+        size_t m_size = sizeof(WindowFooter);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1192,6 +1363,7 @@ namespace toy
 	struct Reflection<Window> : public Meta
 	{
         string m_name = "Window";
+        size_t m_size = sizeof(Window);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1200,24 +1372,12 @@ namespace toy
     };
         
     
-    // Docker
-	template <>
-	struct Reflection<Docker> : public Meta
-	{
-        string m_name = "Docker";
-        TypeClass m_typeClass = OBJECT;
-        std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
-        bool m_serializable = false;
-        
-        Reflection() : Meta(cls<Docker>()) { this->setup(*this); this->inherit(m_bases); }
-    };
-        
-    
     // Dockbar
 	template <>
 	struct Reflection<Dockbar> : public Meta
 	{
         string m_name = "Dockbar";
+        size_t m_size = sizeof(Dockbar);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1231,6 +1391,7 @@ namespace toy
 	struct Reflection<NodePlug> : public Meta
 	{
         string m_name = "NodePlug";
+        size_t m_size = sizeof(NodePlug);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1244,6 +1405,7 @@ namespace toy
 	struct Reflection<NodeCable> : public Meta
 	{
         string m_name = "NodeCable";
+        size_t m_size = sizeof(NodeCable);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1257,6 +1419,7 @@ namespace toy
 	struct Reflection<NodeHeader> : public Meta
 	{
         string m_name = "NodeHeader";
+        size_t m_size = sizeof(NodeHeader);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1270,6 +1433,7 @@ namespace toy
 	struct Reflection<Node> : public Meta
 	{
         string m_name = "Node";
+        size_t m_size = sizeof(Node);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1283,6 +1447,7 @@ namespace toy
 	struct Reflection<Menubar> : public Meta
 	{
         string m_name = "Menubar";
+        size_t m_size = sizeof(Menubar);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1296,6 +1461,7 @@ namespace toy
 	struct Reflection<Tooldock> : public Meta
 	{
         string m_name = "Tooldock";
+        size_t m_size = sizeof(Tooldock);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1309,6 +1475,7 @@ namespace toy
 	struct Reflection<Toolbar> : public Meta
 	{
         string m_name = "Toolbar";
+        size_t m_size = sizeof(Toolbar);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1322,6 +1489,7 @@ namespace toy
 	struct Reflection<MultiButton> : public Meta
 	{
         string m_name = "MultiButton";
+        size_t m_size = sizeof(MultiButton);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<WrapButton>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1335,6 +1503,7 @@ namespace toy
 	struct Reflection<ScrollPlan> : public Meta
 	{
         string m_name = "ScrollPlan";
+        size_t m_size = sizeof(ScrollPlan);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<ScrollSheet>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1348,6 +1517,7 @@ namespace toy
 	struct Reflection<SelectList> : public Meta
 	{
         string m_name = "SelectList";
+        size_t m_size = sizeof(SelectList);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<ScrollSheet>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1361,6 +1531,7 @@ namespace toy
 	struct Reflection<Dropdown> : public Meta
 	{
         string m_name = "Dropdown";
+        size_t m_size = sizeof(Dropdown);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<WrapButton>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1369,11 +1540,26 @@ namespace toy
     };
         
     
+    // FilterInput
+	template <>
+	struct Reflection<FilterInput> : public Meta
+	{
+        string m_name = "FilterInput";
+        size_t m_size = sizeof(FilterInput);
+        TypeClass m_typeClass = OBJECT;
+        std::vector<Type*> m_bases = { &cls<TypeIn>(), &cls<Wedge>(), &cls<Widget>() };
+        bool m_serializable = false;
+        
+        Reflection() : Meta(cls<FilterInput>()) { this->setup(*this); this->inherit(m_bases); }
+    };
+        
+    
     // Textbox
 	template <>
 	struct Reflection<Textbox> : public Meta
 	{
         string m_name = "Textbox";
+        size_t m_size = sizeof(Textbox);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<TypeIn>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1382,11 +1568,68 @@ namespace toy
     };
         
     
+    // Input<unsigned int>
+	template <>
+	struct Reflection<Input<unsigned int>> : public Meta
+	{
+        string m_name = "Input<unsigned int>";
+        size_t m_size = sizeof(Input<unsigned int>);
+        TypeClass m_typeClass = OBJECT;
+        std::vector<Type*> m_bases = { &cls<NumberInput<unsigned int>>(), &cls<Wedge>(), &cls<Widget>() };
+        bool m_serializable = false;
+        
+        Reflection() : Meta(cls<Input<unsigned int>>()) { this->setup(*this); this->inherit(m_bases); }
+    };
+        
+    
+    // Input<int>
+	template <>
+	struct Reflection<Input<int>> : public Meta
+	{
+        string m_name = "Input<int>";
+        size_t m_size = sizeof(Input<int>);
+        TypeClass m_typeClass = OBJECT;
+        std::vector<Type*> m_bases = { &cls<NumberInput<int>>(), &cls<Wedge>(), &cls<Widget>() };
+        bool m_serializable = false;
+        
+        Reflection() : Meta(cls<Input<int>>()) { this->setup(*this); this->inherit(m_bases); }
+    };
+        
+    
+    // Input<float>
+	template <>
+	struct Reflection<Input<float>> : public Meta
+	{
+        string m_name = "Input<float>";
+        size_t m_size = sizeof(Input<float>);
+        TypeClass m_typeClass = OBJECT;
+        std::vector<Type*> m_bases = { &cls<NumberInput<float>>(), &cls<Wedge>(), &cls<Widget>() };
+        bool m_serializable = false;
+        
+        Reflection() : Meta(cls<Input<float>>()) { this->setup(*this); this->inherit(m_bases); }
+    };
+        
+    
+    // Input<double>
+	template <>
+	struct Reflection<Input<double>> : public Meta
+	{
+        string m_name = "Input<double>";
+        size_t m_size = sizeof(Input<double>);
+        TypeClass m_typeClass = OBJECT;
+        std::vector<Type*> m_bases = { &cls<NumberInput<double>>(), &cls<Wedge>(), &cls<Widget>() };
+        bool m_serializable = false;
+        
+        Reflection() : Meta(cls<Input<double>>()) { this->setup(*this); this->inherit(m_bases); }
+    };
+        
+    
     // Input<string>
 	template <>
 	struct Reflection<Input<string>> : public Meta
 	{
         string m_name = "Input<string>";
+        size_t m_size = sizeof(Input<string>);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<TypeIn>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1400,6 +1643,7 @@ namespace toy
 	struct Reflection<TreeNode> : public Meta
 	{
         string m_name = "TreeNode";
+        size_t m_size = sizeof(TreeNode);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Expandbox>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1413,6 +1657,7 @@ namespace toy
 	struct Reflection<Docksection> : public Meta
 	{
         string m_name = "Docksection";
+        size_t m_size = sizeof(Docksection);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Tabber>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1426,6 +1671,7 @@ namespace toy
 	struct Reflection<Dockline> : public Meta
 	{
         string m_name = "Dockline";
+        size_t m_size = sizeof(Dockline);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<GridSheet>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1439,6 +1685,7 @@ namespace toy
 	struct Reflection<Dockbox> : public Meta
 	{
         string m_name = "Dockbox";
+        size_t m_size = sizeof(Dockbox);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Window>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1452,6 +1699,7 @@ namespace toy
 	struct Reflection<DropdownInput> : public Meta
 	{
         string m_name = "DropdownInput";
+        size_t m_size = sizeof(DropdownInput);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Dropdown>(), &cls<WrapButton>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1465,6 +1713,7 @@ namespace toy
 	struct Reflection<Dir> : public Meta
 	{
         string m_name = "Dir";
+        size_t m_size = sizeof(Dir);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<MultiButton>(), &cls<WrapButton>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1478,6 +1727,7 @@ namespace toy
 	struct Reflection<File> : public Meta
 	{
         string m_name = "File";
+        size_t m_size = sizeof(File);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<MultiButton>(), &cls<WrapButton>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1491,6 +1741,7 @@ namespace toy
 	struct Reflection<FileNode> : public Meta
 	{
         string m_name = "FileNode";
+        size_t m_size = sizeof(FileNode);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<TreeNode>(), &cls<Expandbox>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1504,6 +1755,7 @@ namespace toy
 	struct Reflection<DirectoryNode> : public Meta
 	{
         string m_name = "DirectoryNode";
+        size_t m_size = sizeof(DirectoryNode);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<TreeNode>(), &cls<Expandbox>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1517,6 +1769,7 @@ namespace toy
 	struct Reflection<Canvas> : public Meta
 	{
         string m_name = "Canvas";
+        size_t m_size = sizeof(Canvas);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<ScrollPlan>(), &cls<ScrollSheet>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1530,6 +1783,7 @@ namespace toy
 	struct Reflection<Menu> : public Meta
 	{
         string m_name = "Menu";
+        size_t m_size = sizeof(Menu);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<Dropdown>(), &cls<WrapButton>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1538,11 +1792,26 @@ namespace toy
     };
         
     
+    // TypedownInput
+	template <>
+	struct Reflection<TypedownInput> : public Meta
+	{
+        string m_name = "TypedownInput";
+        size_t m_size = sizeof(TypedownInput);
+        TypeClass m_typeClass = OBJECT;
+        std::vector<Type*> m_bases = { &cls<DropdownInput>(), &cls<Dropdown>(), &cls<WrapButton>(), &cls<Wedge>(), &cls<Widget>() };
+        bool m_serializable = false;
+        
+        Reflection() : Meta(cls<TypedownInput>()) { this->setup(*this); this->inherit(m_bases); }
+    };
+        
+    
     // ToolButton
 	template <>
 	struct Reflection<ToolButton> : public Meta
 	{
         string m_name = "ToolButton";
+        size_t m_size = sizeof(ToolButton);
         TypeClass m_typeClass = OBJECT;
         std::vector<Type*> m_bases = { &cls<DropdownInput>(), &cls<Dropdown>(), &cls<WrapButton>(), &cls<Wedge>(), &cls<Widget>() };
         bool m_serializable = false;
@@ -1552,67 +1821,77 @@ namespace toy
         
 
     
-    template <> inline void fromString(const string& str, Dimension& val) { val = static_cast<Dimension>(rfl<Dimension>().enumValue(str)); };
-    template <> inline void toString(const Dimension& val, string& str) { str = rfl<Dimension>().m_enumMap[val]; };
+    template <> inline void from_string(const string& str, Dimension& val) { val = static_cast<Dimension>(rfl<Dimension>().enumValue(str)); };
+    template <> inline void to_string(const Dimension& val, string& str) { str = rfl<Dimension>().m_enumMap[val]; };
     
-    template <> inline void fromString(const string& str, Direction& val) { val = static_cast<Direction>(rfl<Direction>().enumValue(str)); };
-    template <> inline void toString(const Direction& val, string& str) { str = rfl<Direction>().m_enumMap[val]; };
+    template <> inline void from_string(const string& str, Direction& val) { val = static_cast<Direction>(rfl<Direction>().enumValue(str)); };
+    template <> inline void to_string(const Direction& val, string& str) { str = rfl<Direction>().m_enumMap[val]; };
     
-    template <> inline void fromString(const string& str, Pivot& val) { val = static_cast<Pivot>(rfl<Pivot>().enumValue(str)); };
-    template <> inline void toString(const Pivot& val, string& str) { str = rfl<Pivot>().m_enumMap[val]; };
+    template <> inline void from_string(const string& str, Pivot& val) { val = static_cast<Pivot>(rfl<Pivot>().enumValue(str)); };
+    template <> inline void to_string(const Pivot& val, string& str) { str = rfl<Pivot>().m_enumMap[val]; };
     
-    template <> inline void fromString(const string& str, Align& val) { val = static_cast<Align>(rfl<Align>().enumValue(str)); };
-    template <> inline void toString(const Align& val, string& str) { str = rfl<Align>().m_enumMap[val]; };
+    template <> inline void from_string(const string& str, Align& val) { val = static_cast<Align>(rfl<Align>().enumValue(str)); };
+    template <> inline void to_string(const Align& val, string& str) { str = rfl<Align>().m_enumMap[val]; };
     
-    template <> inline void fromString(const string& str, FrameType& val) { val = static_cast<FrameType>(rfl<FrameType>().enumValue(str)); };
-    template <> inline void toString(const FrameType& val, string& str) { str = rfl<FrameType>().m_enumMap[val]; };
+    template <> inline void from_string(const string& str, FrameType& val) { val = static_cast<FrameType>(rfl<FrameType>().enumValue(str)); };
+    template <> inline void to_string(const FrameType& val, string& str) { str = rfl<FrameType>().m_enumMap[val]; };
     
-    template <> inline void fromString(const string& str, LayoutSolver& val) { val = static_cast<LayoutSolver>(rfl<LayoutSolver>().enumValue(str)); };
-    template <> inline void toString(const LayoutSolver& val, string& str) { str = rfl<LayoutSolver>().m_enumMap[val]; };
+    template <> inline void from_string(const string& str, LayoutSolver& val) { val = static_cast<LayoutSolver>(rfl<LayoutSolver>().enumValue(str)); };
+    template <> inline void to_string(const LayoutSolver& val, string& str) { str = rfl<LayoutSolver>().m_enumMap[val]; };
     
-    template <> inline void fromString(const string& str, AutoLayout& val) { val = static_cast<AutoLayout>(rfl<AutoLayout>().enumValue(str)); };
-    template <> inline void toString(const AutoLayout& val, string& str) { str = rfl<AutoLayout>().m_enumMap[val]; };
+    template <> inline void from_string(const string& str, AutoLayout& val) { val = static_cast<AutoLayout>(rfl<AutoLayout>().enumValue(str)); };
+    template <> inline void to_string(const AutoLayout& val, string& str) { str = rfl<AutoLayout>().m_enumMap[val]; };
     
-    template <> inline void fromString(const string& str, Flow& val) { val = static_cast<Flow>(rfl<Flow>().enumValue(str)); };
-    template <> inline void toString(const Flow& val, string& str) { str = rfl<Flow>().m_enumMap[val]; };
+    template <> inline void from_string(const string& str, Flow& val) { val = static_cast<Flow>(rfl<Flow>().enumValue(str)); };
+    template <> inline void to_string(const Flow& val, string& str) { str = rfl<Flow>().m_enumMap[val]; };
     
-    template <> inline void fromString(const string& str, Sizing& val) { val = static_cast<Sizing>(rfl<Sizing>().enumValue(str)); };
-    template <> inline void toString(const Sizing& val, string& str) { str = rfl<Sizing>().m_enumMap[val]; };
+    template <> inline void from_string(const string& str, Sizing& val) { val = static_cast<Sizing>(rfl<Sizing>().enumValue(str)); };
+    template <> inline void to_string(const Sizing& val, string& str) { str = rfl<Sizing>().m_enumMap[val]; };
     
-    template <> inline void fromString(const string& str, SpacePreset& val) { val = static_cast<SpacePreset>(rfl<SpacePreset>().enumValue(str)); };
-    template <> inline void toString(const SpacePreset& val, string& str) { str = rfl<SpacePreset>().m_enumMap[val]; };
+    template <> inline void from_string(const string& str, SpacePreset& val) { val = static_cast<SpacePreset>(rfl<SpacePreset>().enumValue(str)); };
+    template <> inline void to_string(const SpacePreset& val, string& str) { str = rfl<SpacePreset>().m_enumMap[val]; };
     
-    template <> inline void fromString(const string& str, Clipping& val) { val = static_cast<Clipping>(rfl<Clipping>().enumValue(str)); };
-    template <> inline void toString(const Clipping& val, string& str) { str = rfl<Clipping>().m_enumMap[val]; };
+    template <> inline void from_string(const string& str, Clipping& val) { val = static_cast<Clipping>(rfl<Clipping>().enumValue(str)); };
+    template <> inline void to_string(const Clipping& val, string& str) { str = rfl<Clipping>().m_enumMap[val]; };
     
-    template <> inline void fromString(const string& str, Opacity& val) { val = static_cast<Opacity>(rfl<Opacity>().enumValue(str)); };
-    template <> inline void toString(const Opacity& val, string& str) { str = rfl<Opacity>().m_enumMap[val]; };
+    template <> inline void from_string(const string& str, Opacity& val) { val = static_cast<Opacity>(rfl<Opacity>().enumValue(str)); };
+    template <> inline void to_string(const Opacity& val, string& str) { str = rfl<Opacity>().m_enumMap[val]; };
     
-    template <> inline void fromString(const string& str, WidgetState& val) { val = static_cast<WidgetState>(rfl<WidgetState>().enumValue(str)); };
-    template <> inline void toString(const WidgetState& val, string& str) { str = rfl<WidgetState>().m_enumMap[val]; };
+    template <> inline void from_string(const string& str, WidgetState& val) { val = static_cast<WidgetState>(rfl<WidgetState>().enumValue(str)); };
+    template <> inline void to_string(const WidgetState& val, string& str) { str = rfl<WidgetState>().m_enumMap[val]; };
     
     
         
-    template <> inline void fromString(const string& str, Dim<size_t>& val) { string_to_fixed_vector<Dim<size_t>, uint32_t>(str, val); };
-    template <> inline void toString(const Dim<size_t>& val, string& str) { fixed_vector_to_string<Dim<size_t>, 2>(val, str); };
+    template <> inline void from_string(const string& str, Dim<size_t>& val) { string_to_fixed_vector<Dim<size_t>, uint32_t>(str, val); };
+    template <> inline void to_string(const Dim<size_t>& val, string& str) { fixed_vector_to_string<Dim<size_t>, 2>(val, str); };
         
-    template <> inline void fromString(const string& str, Dim<AutoLayout>& val) { string_to_fixed_vector<Dim<AutoLayout>, AutoLayout>(str, val); };
-    template <> inline void toString(const Dim<AutoLayout>& val, string& str) { fixed_vector_to_string<Dim<AutoLayout>, 2>(val, str); };
+    template <> inline void from_string(const string& str, Dim<AutoLayout>& val) { string_to_fixed_vector<Dim<AutoLayout>, AutoLayout>(str, val); };
+    template <> inline void to_string(const Dim<AutoLayout>& val, string& str) { fixed_vector_to_string<Dim<AutoLayout>, 2>(val, str); };
         
-    template <> inline void fromString(const string& str, Dim<Sizing>& val) { string_to_fixed_vector<Dim<Sizing>, Sizing>(str, val); };
-    template <> inline void toString(const Dim<Sizing>& val, string& str) { fixed_vector_to_string<Dim<Sizing>, 2>(val, str); };
+    template <> inline void from_string(const string& str, Dim<Sizing>& val) { string_to_fixed_vector<Dim<Sizing>, Sizing>(str, val); };
+    template <> inline void to_string(const Dim<Sizing>& val, string& str) { fixed_vector_to_string<Dim<Sizing>, 2>(val, str); };
         
-    template <> inline void fromString(const string& str, Dim<Align>& val) { string_to_fixed_vector<Dim<Align>, Align>(str, val); };
-    template <> inline void toString(const Dim<Align>& val, string& str) { fixed_vector_to_string<Dim<Align>, 2>(val, str); };
+    template <> inline void from_string(const string& str, Dim<Align>& val) { string_to_fixed_vector<Dim<Align>, Align>(str, val); };
+    template <> inline void to_string(const Dim<Align>& val, string& str) { fixed_vector_to_string<Dim<Align>, 2>(val, str); };
         
-    template <> inline void fromString(const string& str, Dim<Pivot>& val) { string_to_fixed_vector<Dim<Pivot>, Pivot>(str, val); };
-    template <> inline void toString(const Dim<Pivot>& val, string& str) { fixed_vector_to_string<Dim<Pivot>, 2>(val, str); };
+    template <> inline void from_string(const string& str, Dim<Pivot>& val) { string_to_fixed_vector<Dim<Pivot>, Pivot>(str, val); };
+    template <> inline void to_string(const Dim<Pivot>& val, string& str) { fixed_vector_to_string<Dim<Pivot>, 2>(val, str); };
         
-    template <> inline void fromString(const string& str, DimFloat& val) { string_to_fixed_vector<DimFloat, float>(str, val); };
-    template <> inline void toString(const DimFloat& val, string& str) { fixed_vector_to_string<DimFloat, 2>(val, str); };
+    template <> inline void from_string(const string& str, DimFloat& val) { string_to_fixed_vector<DimFloat, float>(str, val); };
+    template <> inline void to_string(const DimFloat& val, string& str) { fixed_vector_to_string<DimFloat, 2>(val, str); };
         
-    template <> inline void fromString(const string& str, BoxFloat& val) { string_to_fixed_vector<BoxFloat, float>(str, val); };
-    template <> inline void toString(const BoxFloat& val, string& str) { fixed_vector_to_string<BoxFloat, 4>(val, str); };
+    template <> inline void from_string(const string& str, BoxFloat& val) { string_to_fixed_vector<BoxFloat, float>(str, val); };
+    template <> inline void to_string(const BoxFloat& val, string& str) { fixed_vector_to_string<BoxFloat, 4>(val, str); };
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         
@@ -1739,6 +2018,7 @@ namespace toy
         rfl<Toggle>();
         rfl<Slider>();
         rfl<Scrollbar>();
+        rfl<Fillbar>();
         rfl<Checkbox>();
         rfl<ScrollSheet>();
         rfl<ScrollPlan>();
@@ -1747,8 +2027,20 @@ namespace toy
         rfl<Dropdown>();
         rfl<DropdownInput>();
         rfl<TypeIn>();
+        rfl<FilterInput>();
+        rfl<TypedownInput>();
         rfl<RadioSwitch>();
         rfl<Textbox>();
+        rfl<SliderInput<float>>();
+        rfl<SliderInput<int>>();
+        rfl<NumberInput<unsigned int>>();
+        rfl<NumberInput<int>>();
+        rfl<NumberInput<float>>();
+        rfl<NumberInput<double>>();
+        rfl<Input<unsigned int>>();
+        rfl<Input<int>>();
+        rfl<Input<float>>();
+        rfl<Input<double>>();
         rfl<Input<bool>>();
         rfl<Input<string>>();
         rfl<Input<Colour>>();
@@ -1772,7 +2064,6 @@ namespace toy
         rfl<WindowFooter>();
         rfl<Window>();
         rfl<Dockbox>();
-        rfl<Docker>();
         rfl<Dockbar>();
         rfl<NodeKnob>();
         rfl<NodePlug>();
@@ -1786,8 +2077,6 @@ namespace toy
         rfl<Tooldock>();
         rfl<Toolbar>();
         rfl<RenderTarget>();
-        rfl<RenderSystem>();
-        rfl<Context>();
         rfl<UiWindow>();
         rfl<Styler>();
     
@@ -1837,6 +2126,7 @@ namespace toy
         module.m_types.push_back(&cls<Toggle>());
         module.m_types.push_back(&cls<Slider>());
         module.m_types.push_back(&cls<Scrollbar>());
+        module.m_types.push_back(&cls<Fillbar>());
         module.m_types.push_back(&cls<Checkbox>());
         module.m_types.push_back(&cls<ScrollSheet>());
         module.m_types.push_back(&cls<ScrollPlan>());
@@ -1845,8 +2135,20 @@ namespace toy
         module.m_types.push_back(&cls<Dropdown>());
         module.m_types.push_back(&cls<DropdownInput>());
         module.m_types.push_back(&cls<TypeIn>());
+        module.m_types.push_back(&cls<FilterInput>());
+        module.m_types.push_back(&cls<TypedownInput>());
         module.m_types.push_back(&cls<RadioSwitch>());
         module.m_types.push_back(&cls<Textbox>());
+        module.m_types.push_back(&cls<SliderInput<float>>());
+        module.m_types.push_back(&cls<SliderInput<int>>());
+        module.m_types.push_back(&cls<NumberInput<unsigned int>>());
+        module.m_types.push_back(&cls<NumberInput<int>>());
+        module.m_types.push_back(&cls<NumberInput<float>>());
+        module.m_types.push_back(&cls<NumberInput<double>>());
+        module.m_types.push_back(&cls<Input<unsigned int>>());
+        module.m_types.push_back(&cls<Input<int>>());
+        module.m_types.push_back(&cls<Input<float>>());
+        module.m_types.push_back(&cls<Input<double>>());
         module.m_types.push_back(&cls<Input<bool>>());
         module.m_types.push_back(&cls<Input<string>>());
         module.m_types.push_back(&cls<Input<Colour>>());
@@ -1870,7 +2172,6 @@ namespace toy
         module.m_types.push_back(&cls<WindowFooter>());
         module.m_types.push_back(&cls<Window>());
         module.m_types.push_back(&cls<Dockbox>());
-        module.m_types.push_back(&cls<Docker>());
         module.m_types.push_back(&cls<Dockbar>());
         module.m_types.push_back(&cls<NodeKnob>());
         module.m_types.push_back(&cls<NodePlug>());
@@ -1884,8 +2185,6 @@ namespace toy
         module.m_types.push_back(&cls<Tooldock>());
         module.m_types.push_back(&cls<Toolbar>());
         module.m_types.push_back(&cls<RenderTarget>());
-        module.m_types.push_back(&cls<RenderSystem>());
-        module.m_types.push_back(&cls<Context>());
         module.m_types.push_back(&cls<UiWindow>());
         module.m_types.push_back(&cls<Styler>());
     

@@ -25,21 +25,6 @@ namespace toy
 		Toggle m_toggle;
 	};
 
-	class _refl_ TOY_UI_EXPORT Docker : public Wedge
-	{
-	public:
-		Docker(const Params& params);
-
-		struct Styles
-		{
-			Style docker = { cls<Docker>(), Widget::styles().row, Args{ { &Layout::m_flow, ALIGN },{ &Layout::m_space, SPACER },{ &Layout::m_align, Dim<Align>{ LEFT, OUT_LEFT } } } };
-			Style dockbar = { cls<Dockbar>(), Widget::styles().div, Args{ { &Layout::m_align, Dim<Align>{ RIGHT, RIGHT } } } };
-			Style dockbar_toggle = { "DockbarToggle", Widget::styles().button };
-			Style dockbox = { cls<Dockbox>(), Window::styles().window, Args{ { &Layout::m_flow, FLOW },{ &Layout::m_space, Space{ PARAGRAPH, WRAP, FIXED } },{ &Layout::m_size, DimFloat{ 300.f, 0.f } } } };
-		};
-		static Styles& styles() { static Styles styles; return styles; }
-	};
-
 	class _refl_ TOY_UI_EXPORT Dockbar : public Wedge
 	{
 	public:
@@ -48,8 +33,17 @@ namespace toy
 		Dockbox& addDock(const string& name, const string& icon);
 		Dockbox& addDock(const string& name);
 
+		struct Styles
+		{
+			Style dockzone = { "Dockzone", Widget::styles().row, Args{ { &Layout::m_flow, ALIGN }, { &Layout::m_space, SPACER }, { &Layout::m_align, Dim<Align>{ LEFT, OUT_LEFT } } } };
+			Style dockbar = { cls<Dockbar>(), Widget::styles().div };
+			Style toggle = { "DockToggle", Widget::styles().toggle };
+			Style dockbox = { cls<Dockbox>(), Window::styles().window, Args{ { &Layout::m_flow, FLOW }, { &Layout::m_space, Space{ PARAGRAPH, WRAP, FIXED } }, { &Layout::m_size, DimFloat{ 300.f, 0.f } } } };
+		};
+		static Styles& styles() { static Styles styles; return styles; }
+
 	protected:
-		Docker m_docker;
+		Wedge m_dockzone;
 	};
 }
 

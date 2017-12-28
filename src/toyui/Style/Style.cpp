@@ -28,35 +28,28 @@ namespace toy
 		: m_style_type(type)
 		, m_base(base)
 		, m_name(name)
-		, m_layout()
-		, m_skins()
-		, m_defined(false)
+		, m_args(args)
 	{
 		Widget::s_styles[name] = this;
-
-		if(base)
-			m_layout = base->m_layout;
-
-		init_members(&m_layout, args);
-		init_members(&m_skin, args);
+		this->init();
 	}
 
-	void Style::load(Style& style, StyleMap& layout_defs, StyleMap& skin_defs)
+	void Style::init()
 	{
-		if(style.m_base)
-			this->load(*style.m_base, layout_defs, skin_defs);
-		
-		init_options(&m_layout, layout_defs[style.m_name]);
-		init_options(&m_skin, skin_defs[style.m_name]);
+		m_defined = false;
+		m_layout = { m_name };
+		m_skin = { m_name };
+		m_skins = {};
 
-		for(auto& kv : skin_defs)
-			if(kv.first.find(style.m_name + ":") == 0)
-			{
-				WidgetStates states = fromString<WidgetStates>(splitString(kv.first, ":")[1]);
-				InkStyle& skin = decline_skin(states);
-				init_options(&skin, skin_defs[style.m_name]);
-				init_options(&skin, skin_defs[kv.first]);
-			}
+		if(m_base)
+		{
+			m_base->init();
+			m_layout = m_base->m_layout;
+			m_layout.m_name = m_name;
+		}
+
+		set_members(&m_layout, m_args);
+		set_members(&m_skin, m_args);
 	}
 
 	void Style::load(StyleMap& layout_defs, StyleMap& skin_defs)
@@ -66,11 +59,8 @@ namespace toy
 		if(m_base)
 			m_base->load(layout_defs, skin_defs);
 
-		if(m_name == "Header")
-			int i = 0;
-
 		printf("INFO: Loading style %s\n", m_name.c_str());
-		this->load(*this, layout_defs, skin_defs);
+		this->define(*this, layout_defs, skin_defs);
 
 		m_skin.prepare();
 		for(InkStyle& skin : m_skins)
@@ -79,10 +69,33 @@ namespace toy
 		m_defined = true;
 	}
 
+	void Style::define(Style& style, StyleMap& layout_defs, StyleMap& skin_defs)
+	{
+		//if(style.m_base)
+		//	this->load(*style.m_base, layout_defs, skin_defs);
+		
+		init_options(&m_layout, layout_defs[style.m_name]);
+		init_options(&m_skin, skin_defs[style.m_name]);
+
+		for(auto& kv : skin_defs)
+			if(kv.first.find(style.m_name + ":") == 0)
+			{
+				WidgetStates states = from_string<WidgetStates>(splitString(kv.first, ":")[1]);
+				InkStyle& skin = decline_skin(states);
+				init_options(&skin, skin_defs[style.m_name]);
+				init_options(&skin, skin_defs[kv.first]);
+			}
+	}
+
 	InkStyle& Style::skin(WidgetState state)
 	{
+		// these two flags mess up the search and we never skin them anyway
+		state = static_cast<WidgetState>(state & ~(MODAL | CONTROL));
 		for(InkStyle& skin : reverse_adapt(m_skins))
-			if((state & skin.m_state) == skin.m_state)
+			if(state == skin.m_state) // exact match
+				return skin;
+		for(InkStyle& skin : reverse_adapt(m_skins))
+			if(state & skin.m_state) // partial match
 				return skin;
 		return m_skin;
 	}
@@ -94,6 +107,7 @@ namespace toy
 				return skin;
 
 		m_skins.emplace_back(m_skin);
+		m_skins.back().m_name = m_name + ":" + toLower(to_string(state));
 		m_skins.back().m_state = static_cast<WidgetState>(state.value);
 		return m_skins.back();
 	}

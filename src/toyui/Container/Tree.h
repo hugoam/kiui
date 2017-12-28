@@ -24,8 +24,8 @@ namespace toy
 		{
 			Style treenode = { cls<TreeNode>(), Expandbox::styles().expandbox };
 			Style header = { "TreeNodeHeader", Expandbox::styles().header };
-			Style toggle = { "TreeNodeHeader", Expandbox::styles().toggle };
-			Style body = { "TreeNodeHeader", Expandbox::styles().body, Args{ { &Layout::m_padding, BoxFloat{ 18.f, 0.f, 0.f, 0.f } },{ &Layout::m_spacing, DimFloat(0.f) } } };
+			Style toggle = { "TreeNodeToggle", Expandbox::styles().toggle };
+			Style body = { "TreeNodeBody", Expandbox::styles().body, Args{ { &Layout::m_padding, BoxFloat{ 18.f, 0.f, 0.f, 0.f } }, { &Layout::m_spacing, DimFloat(0.f) } } };
 		};
 		static Styles& styles() { static Styles styles; return styles; }
 

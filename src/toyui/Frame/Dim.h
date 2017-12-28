@@ -118,7 +118,8 @@ namespace toy
 		STACK,               // PARAGRAPH   direction, SHRINK length, WRAP   depth 
 		DIV,	             // ORTHOGONAL  direction, WRAP   length, SHRINK depth
 		SPACER,              // PARALLEL    direction, WRAP   length, SHRINK depth
-		BOARD                // PARAGRAPH   direction, EXPAND length, EXPAND depth
+		BOARD,               // READING     direction, EXPAND length, EXPAND depth
+		LAYOUT               // PARAGRAPH   direction, EXPAND length, EXPAND depth
 	};
 
 	extern Space SpacePresets[11];
@@ -140,8 +141,8 @@ namespace toy
 	class _refl_ Dim
 	{
 	public:
-		Dim(T x, T y) : d_values{{ x, y }} {}
-		Dim() : Dim(T(), T()) {}
+		_constr_ Dim(T x, T y) : d_values{{ x, y }} {}
+		_constr_ Dim() : Dim(T(), T()) {}
 
 		T operator[](size_t i) const { return d_values[i]; }
 		T& operator[](size_t i) { return d_values[i]; }
@@ -149,20 +150,16 @@ namespace toy
 	public:
 		union {
 			std::array<T, 2> d_values;
-			struct { T x, y; };
-			struct { T w, h; };
+			struct { _attr_ T x; _attr_ T y; };
+			struct { T w; T h; };
 		};
 	};
 
-#ifdef TOY_GENERATOR_SKIP_INCLUDES
-	template <> struct _refl_ _array_ _struct_ Dim<size_t> { _constr_ Dim<size_t>(size_t x, size_t y) {} _attr_ size_t x; _attr_ size_t y; };
-	template <> struct _refl_ _array_ _struct_ Dim<AutoLayout> { _constr_ Dim<AutoLayout>(AutoLayout x, AutoLayout y) {} _attr_ AutoLayout x; _attr_ AutoLayout y; };
-	template <> struct _refl_ _array_ _struct_ Dim<Sizing> { _constr_ Dim<Sizing>(Sizing x, Sizing y) {} _attr_ Sizing x; _attr_ Sizing y; };
-	template <> struct _refl_ _array_ _struct_ Dim<Align> { _constr_ Dim<Align>(Align x, Align y) {} _attr_ Align x; _attr_ Align y; };
-	template <> struct _refl_ _array_ _struct_ Dim<Pivot> { _constr_ Dim<Pivot>(Pivot x, Pivot y) {} _attr_ Pivot x; _attr_ Pivot y; };
-#else
-	// @todo add template reflection mechanism for these
-#endif
+	template class _refl_ _array_ _struct_ TOY_UI_EXPORT Dim<size_t>;
+	template class _refl_ _array_ _struct_ TOY_UI_EXPORT Dim<AutoLayout>;
+	template class _refl_ _array_ _struct_ TOY_UI_EXPORT Dim<Sizing>;
+	template class _refl_ _array_ _struct_ TOY_UI_EXPORT Dim<Align>;
+	template class _refl_ _array_ _struct_ TOY_UI_EXPORT Dim<Pivot>;
 
 	class _refl_ _struct_ _array_ DimFloat
 	{

@@ -25,15 +25,21 @@ namespace toy
 		Toolbar::styles();
 		Window::styles();
 		Dockspace::styles();
-		Docker::styles();
+		Dockbar::styles();
 		Canvas::styles();
 		Node::styles();
+		Directory::styles();
 	}
 
 	void Styler::clear()
 	{
 		m_layout_definitions = {};
 		m_skin_definitions = {};
+
+		for(auto& kv : Widget::s_styles)
+			kv.second->init();
+
+		Widget::styles().setup(m_uiWindow);
 	}
 
 	void Styler::setup()
@@ -52,7 +58,7 @@ namespace toy
 	void Styles::setup(UiWindow& uiWindow)
 	{
 		Widget::styles().scrollplan_surface.m_skin.m_customRenderer = &drawGrid;
-		
+
 		Cursor::styles().cursor.m_skin.m_image = &uiWindow.findImage("mousepointer");
 
 		Cursor::styles().resize_x.m_skin.m_image = &uiWindow.findImage("resize_h_20");
@@ -62,6 +68,12 @@ namespace toy
 		Cursor::styles().resize_diag_right.m_skin.m_image = &uiWindow.findImage("resize_diag_right_20");
 		Cursor::styles().caret.m_skin.m_image = &uiWindow.findImage("caret_white");
 
+		Scrollbar::styles().scroll_up.m_skin.m_image = &uiWindow.findImage("arrow_up_15");
+		Scrollbar::styles().scroll_down.m_skin.m_image = &uiWindow.findImage("arrow_down_15");
+		Scrollbar::styles().scroll_left.m_skin.m_image = &uiWindow.findImage("arrow_left_15");
+		Scrollbar::styles().scroll_right.m_skin.m_image = &uiWindow.findImage("arrow_right_15");
+
+		Window::styles().close_button.m_skin.m_image = &uiWindow.findImage("close_15");
 		Toolbar::styles().mover.m_skin.m_image = &uiWindow.findImage("handle");
 	}
 }

@@ -24,7 +24,7 @@ namespace toy
 			Style expandbox = { cls<Expandbox>(), Widget::styles().stack };
 			Style header = { "ExpandboxHeader", Widget::styles().wrap_button };
 			Style toggle = { "ExpandboxToggle", Widget::styles().toggle };
-			Style body = { "ExpandboxBody", Widget::styles().wedge, Args{ { &Layout::m_padding, BoxFloat{ 12.f, 2.f, 0.f, 2.f } },{ &Layout::m_spacing, DimFloat(6.f) } } };
+			Style body = { "ExpandboxBody", Widget::styles().stack, Args{ { &Layout::m_padding, BoxFloat{ 12.f, 2.f, 0.f, 2.f } }, { &Layout::m_spacing, DimFloat(6.f) } } };
 		};
 		static Styles& styles() { static Styles styles; return styles; }
 

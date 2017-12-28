@@ -10,9 +10,9 @@
 
 namespace toy
 {
-	TypeIn::TypeIn(const Params& params, const string& text, Callback callback, bool wrap)
+	TypeIn::TypeIn(const Params& params, string& text, Callback callback, bool wrap)
 		: Wedge({ params, &cls<TypeIn>() })
-		, m_string(text)
+		, m_text(text)
 		, m_label({ this }, text)
 		, m_caption(*m_label.frame().d_caption)
 		, m_callback(callback ? callback : [](const string& val) { return val; })
@@ -41,9 +41,9 @@ namespace toy
 		this->makeActive();
 	}
 
-	void TypeIn::setString(const string& value)
+	void TypeIn::setText(const string& value)
 	{
-		m_string = value;
+		m_text = value;
 		this->update();
 	}
 
@@ -59,12 +59,12 @@ namespace toy
 
 		if(m_caption.m_selectStart == m_caption.m_selectEnd)
 		{
-			m_string.erase(m_string.begin() + m_caption.m_selectStart - 1);
+			m_text.erase(m_text.begin() + m_caption.m_selectStart - 1);
 			this->moveCaretLeft();
 		}
 		else
 		{
-			m_string.erase(m_string.begin() + m_caption.m_selectStart, m_string.begin() + m_caption.m_selectEnd);
+			m_text.erase(m_text.begin() + m_caption.m_selectStart, m_text.begin() + m_caption.m_selectEnd);
 			this->selectCaret(m_caption.m_selectStart);
 		}
 
@@ -73,21 +73,21 @@ namespace toy
 
 	void TypeIn::insert(char c)
 	{
-		m_string.insert(m_string.begin() + m_caption.m_caret, c);
+		m_text.insert(m_text.begin() + m_caption.m_caret, c);
 		this->changed();
 		this->moveCaretRight();
 	}
 
 	void TypeIn::update()
 	{
-		m_caption.setText(m_string);
+		m_caption.setText(m_text);
 	}
 
 	void TypeIn::changed()
 	{
 		if(m_callback)
-			m_string = m_callback(m_string);
-		m_caption.setText(m_string);
+			m_text = m_callback(m_text);
+		m_caption.setText(m_text);
 	}
 
 	bool TypeIn::leftClick(MouseEvent& mouseEvent)
@@ -127,7 +127,7 @@ namespace toy
 			this->erase();
 		else if(keyEvent.c != 0 && (m_allowedChars.empty() || m_allowedChars.find(keyEvent.c) != string::npos))
 		{
-			if(keyEvent.c == '.' && m_string.find('.') != string::npos)
+			if(keyEvent.c == '.' && m_text.find('.') != string::npos)
 				return true;
 
 			this->insert(keyEvent.c);

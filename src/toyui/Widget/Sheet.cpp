@@ -40,7 +40,10 @@ namespace toy
 	void WidgetStore::clear()
 	{
 		for(auto& widget : reverse_adapt(m_contents))
+		{
 			widget->destroyTree();
+			m_wedge.remove(*widget);
+		}
 
 		m_contents.clear();
 	}

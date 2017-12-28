@@ -13,7 +13,7 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT FilterInput : public TypeIn
+	class _refl_ TOY_UI_EXPORT FilterInput : public TypeIn
 	{
 	public:
 		using Criteria = std::function<string(Widget&)>;
@@ -25,6 +25,7 @@ namespace toy
 		bool fitsFilter(const string& filter, const string& value);
 
 	protected:
+		string m_filter;
 		Wedge& m_list;
 		Criteria m_criteria;
 	};

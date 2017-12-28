@@ -25,13 +25,13 @@ namespace toy
 	void TreeNode::select()
 	{
 		this->enableState(SELECTED);
-		m_onSelect(*this);
+		if(m_onSelect) m_onSelect(*this);
 	}
 
 	void TreeNode::unselect()
 	{
 		this->disableState(SELECTED);
-		m_onUnselect(*this);
+		if(m_onUnselect) m_onUnselect(*this);
 	}
 
 	Tree::Tree(const Params& params)

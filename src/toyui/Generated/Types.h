@@ -49,6 +49,8 @@ namespace toy
 	template <> TOY_UI_EXPORT Type& cls<MemberPointer<BoxFloat>>();
 	template <> TOY_UI_EXPORT Type& cls<MethodPointer<BoxFloat>>();
     template <> TOY_UI_EXPORT Type& cls<Image>();
+	template <> TOY_UI_EXPORT Type& cls<MemberPointer<Image>>();
+	template <> TOY_UI_EXPORT Type& cls<MethodPointer<Image>>();
     template <> TOY_UI_EXPORT Type& cls<ImageSkin>();
 	template <> TOY_UI_EXPORT Type& cls<MemberPointer<ImageSkin>>();
 	template <> TOY_UI_EXPORT Type& cls<MethodPointer<ImageSkin>>();
@@ -71,8 +73,6 @@ namespace toy
 	template <> TOY_UI_EXPORT Type& cls<MemberPointer<Widget>>();
 	template <> TOY_UI_EXPORT Type& cls<MethodPointer<Widget>>();
     template <> TOY_UI_EXPORT Type& cls<RenderTarget>();
-    template <> TOY_UI_EXPORT Type& cls<RenderSystem>();
-    template <> TOY_UI_EXPORT Type& cls<Context>();
     template <> TOY_UI_EXPORT Type& cls<UiWindow>();
     template <> TOY_UI_EXPORT Type& cls<Styler>();
     template <> TOY_UI_EXPORT Type& cls<Layer>();
@@ -92,11 +92,18 @@ namespace toy
     template <> TOY_UI_EXPORT Type& cls<WrapButton>();
     template <> TOY_UI_EXPORT Type& cls<Slider>();
     template <> TOY_UI_EXPORT Type& cls<Scrollbar>();
+    template <> TOY_UI_EXPORT Type& cls<Fillbar>();
     template <> TOY_UI_EXPORT Type& cls<Checkbox>();
     template <> TOY_UI_EXPORT Type& cls<ScrollSheet>();
     template <> TOY_UI_EXPORT Type& cls<Popup>();
     template <> TOY_UI_EXPORT Type& cls<TypeIn>();
     template <> TOY_UI_EXPORT Type& cls<RadioSwitch>();
+    template <> TOY_UI_EXPORT Type& cls<SliderInput<float>>();
+    template <> TOY_UI_EXPORT Type& cls<SliderInput<int>>();
+    template <> TOY_UI_EXPORT Type& cls<NumberInput<unsigned int>>();
+    template <> TOY_UI_EXPORT Type& cls<NumberInput<int>>();
+    template <> TOY_UI_EXPORT Type& cls<NumberInput<float>>();
+    template <> TOY_UI_EXPORT Type& cls<NumberInput<double>>();
     template <> TOY_UI_EXPORT Type& cls<Input<bool>>();
     template <> TOY_UI_EXPORT Type& cls<Input<Colour>>();
     template <> TOY_UI_EXPORT Type& cls<Expandbox>();
@@ -110,7 +117,6 @@ namespace toy
     template <> TOY_UI_EXPORT Type& cls<WindowHeader>();
     template <> TOY_UI_EXPORT Type& cls<WindowFooter>();
     template <> TOY_UI_EXPORT Type& cls<Window>();
-    template <> TOY_UI_EXPORT Type& cls<Docker>();
     template <> TOY_UI_EXPORT Type& cls<Dockbar>();
     template <> TOY_UI_EXPORT Type& cls<NodePlug>();
     template <> TOY_UI_EXPORT Type& cls<NodeCable>();
@@ -123,7 +129,12 @@ namespace toy
     template <> TOY_UI_EXPORT Type& cls<ScrollPlan>();
     template <> TOY_UI_EXPORT Type& cls<SelectList>();
     template <> TOY_UI_EXPORT Type& cls<Dropdown>();
+    template <> TOY_UI_EXPORT Type& cls<FilterInput>();
     template <> TOY_UI_EXPORT Type& cls<Textbox>();
+    template <> TOY_UI_EXPORT Type& cls<Input<unsigned int>>();
+    template <> TOY_UI_EXPORT Type& cls<Input<int>>();
+    template <> TOY_UI_EXPORT Type& cls<Input<float>>();
+    template <> TOY_UI_EXPORT Type& cls<Input<double>>();
     template <> TOY_UI_EXPORT Type& cls<Input<string>>();
     template <> TOY_UI_EXPORT Type& cls<TreeNode>();
     template <> TOY_UI_EXPORT Type& cls<Docksection>();
@@ -136,6 +147,7 @@ namespace toy
     template <> TOY_UI_EXPORT Type& cls<DirectoryNode>();
     template <> TOY_UI_EXPORT Type& cls<Canvas>();
     template <> TOY_UI_EXPORT Type& cls<Menu>();
+    template <> TOY_UI_EXPORT Type& cls<TypedownInput>();
     template <> TOY_UI_EXPORT Type& cls<ToolButton>();
 }
 

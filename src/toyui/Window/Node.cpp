@@ -256,10 +256,11 @@ namespace toy
 		: Wedge({ params, &cls<Node>(), LAYER })
 		, m_name(title)
 		, m_order(order)
-		, m_inputs({ this, &styles().inputs })
-		, m_body({ this, &styles().body })
-		, m_header({ &m_body }, *this)
-		, m_outputs({ this, &styles().outputs })
+		, m_header({ this }, *this)
+		//, m_body({ this, &styles().body })
+		, m_plugs({ this, &styles().plugs })
+		, m_inputs({ &m_plugs, &styles().inputs})
+		, m_outputs({ &m_plugs, &styles().outputs })
 	{}
 
 	Canvas& Node::canvas()

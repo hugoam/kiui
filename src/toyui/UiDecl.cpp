@@ -7,11 +7,11 @@
 
 namespace toy
 {
-	void Modal::decl(UiNode& node)
+	void Modal::decl(Unode& unode)
 	{
 		Query& current_query = m_queries[m_current_step];
 		auto callback = [&](Var value) { current_query.m_result = value; current_query.m_done = true; };
-		node.subdecl(current_query.m_decl, callback);
+		unode.sub_decl(current_query.m_decl, callback);
 		if(current_query.m_done)
 			m_current_step++;
 		if(m_current_step == m_queries.size())

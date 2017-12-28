@@ -19,7 +19,8 @@ namespace toy
 
 	MultiButton& RadioSwitch::addChoice(const StringVector& elements)
 	{
-		MultiButton& choice = this->emplace_style<MultiButton>(styles().radio_choice , elements, [&](Widget& button) { this->activated(as<MultiButton>(button)); });
+		auto callback = [&](Widget& button) { this->activated(as<MultiButton>(button)); };
+		MultiButton& choice = this->emplace_style<MultiButton>(styles().radio_choice , elements, callback, &styles().radio_choice_item);
 		
 		if(m_contents.size() - 1 == m_activeIndex)
 		{

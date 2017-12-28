@@ -6,7 +6,7 @@
 #include <toyui/Context/Glfw/GlfwContext.h>
 
 #include <toyui/Input/InputDevice.h>
-#include <toyui/Gl/GlRenderer.h>
+#include <toyui/Backend/Gl/GlRenderer.h>
 
 #include <GLFW/glfw3.h>
 
@@ -185,7 +185,8 @@ namespace toy
 #ifdef TOY_RENDERER_BGFX
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 #else
-		glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		//glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 #endif
 
 #ifndef TOY_PLATFORM_WINDOWS
@@ -329,6 +330,7 @@ namespace toy
 		: Context(renderSystem, make_object<GlfwRenderWindow>(name, width, height, autoSwap), make_object<GlfwInputWindow>())
 	{}
 
+#ifdef TOY_RENDERER_GL
 	GlfwRenderSystem::GlfwRenderSystem(const string& resourcePath)
 		: RenderSystem(resourcePath, true)
 	{}
@@ -342,4 +344,5 @@ namespace toy
 	{
 		return make_object<GlRenderer>(m_resourcePath, true);
 	}
+#endif
 }

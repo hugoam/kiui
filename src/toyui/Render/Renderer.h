@@ -10,7 +10,6 @@
 #include <toyobj/Util/Timer.h>
 #include <toyui/Types.h>
 #include <toyui/Frame/Caption.h>
-#include <toyui/Style/ImageSkin.h>
 
 namespace toy
 {
@@ -40,7 +39,7 @@ namespace toy
 		void contentPos(Frame& frame, const BoxFloat& paddedRect, const DimFloat& size, Dimension dim, DimFloat& pos);
 		void drawContent(Frame& frame, const BoxFloat& rect, const BoxFloat& paddedRect, const BoxFloat& contentRect);
 		void drawBackground(Frame& frame, const BoxFloat& rect, const BoxFloat& paddedRect, const BoxFloat& contentRect);
-		void drawSkinImage(Frame& frame, ImageSkin::Section section, BoxFloat rect);
+		void drawSkinImage(Frame& frame, int section, BoxFloat rect);
 		void endDraw(Layer& layer, Frame& frame);
 
 		void logFPS();

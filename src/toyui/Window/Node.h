@@ -112,15 +112,16 @@ namespace toy
 
 		struct Styles
 		{
-			Style node = { cls<Node>(), Widget::styles().overlay, Args{ { &Layout::m_space, Space{ READING, SHRINK, SHRINK } } } };
-			Style inputs = { "NodeInputs", Widget::styles().div };
+			Style node = { cls<Node>(), Widget::styles().overlay, Args{ { &Layout::m_space, Space{ PARAGRAPH, SHRINK, SHRINK } } } };
 			Style body = { "NodeBody", Widget::styles().sheet };
-			Style outputs = { "NodeOutputs", Widget::styles().div };
-			Style knob = { cls<NodeKnob>(), Widget::styles().item, Args{ { &Layout::m_size, DimFloat{ 10.f, 22.f } } } };
-			Style knob_output = { "NodeKnobOutput", knob, Args{ { &Layout::m_align, Dim<Align>{ RIGHT, CENTER } } } };
+			Style plugs = { "NodePlugs", Widget::styles().sheet, Args{ { &Layout::m_space, Space{ READING, WRAP, WRAP } } } };
+			Style inputs = { "NodeInputs", Widget::styles().div };
+			Style outputs = { "NodeOutputs", Widget::styles().div, Args{ { &Layout::m_align, Dim<Align>{ RIGHT, CENTER } } } };
+			Style knob = { cls<NodeKnob>(), Widget::styles().item, Args{ { &Layout::m_size, DimFloat{ 10.f, 22.f } }, { &InkStyle::m_background_colour, Colour::White } } };
+			Style knob_output = { "NodeKnobOutput", knob, Args{ { &Layout::m_align, Dim<Align>{ RIGHT, CENTER } }, { &InkStyle::m_background_colour, Colour::White } } };
 			Style knob_proxy = { "NodeKnobProxy", knob, Args{ { &Layout::m_flow, FREE } } };
 			Style plug = { cls<NodePlug>(), Widget::styles().wrap_control };
-			Style cable = { cls<NodeCable>(), Widget::styles().decal, Args{ { &Layout::m_space, BLOCK } } };
+			Style cable = { cls<NodeCable>(), Widget::styles().decal, Args{ { &Layout::m_space, BLOCK }, { &InkStyle::m_background_colour, Colour::White } } };
 			Style header = { cls<NodeHeader>(), Widget::styles().row };
 
 		}; static Styles& styles() { static Styles styles; return styles; }
@@ -130,9 +131,10 @@ namespace toy
 		int m_order;
 
 	public:
-		Wedge m_inputs;
-		Wedge m_body;
 		NodeHeader m_header;
+		//Wedge m_body;
+		Wedge m_plugs;
+		Wedge m_inputs;
 		Wedge m_outputs;
 	};
 
@@ -160,10 +162,10 @@ namespace toy
 
 		struct Styles
 		{
-			Style canvas = { cls<Canvas>(), Widget::styles().scrollplan, Args{ { &Layout::m_space, BOARD },{ &Layout::m_opacity, OPAQUE },{ &Layout::m_clipping, CLIP } } };
+			Style canvas = { cls<Canvas>(), Widget::styles().scrollplan, Args{ { &Layout::m_space, LAYOUT }, { &Layout::m_opacity, OPAQUE }, { &Layout::m_clipping, CLIP } } };
 
-			Style layout_line = { "CanvasLayoutLine", Widget::styles().item, Args{ { &Layout::m_space, ITEM },{ &Layout::m_padding, BoxFloat(20.f) },{ &Layout::m_spacing, DimFloat(100.f) } } };
-			Style layout_column = { "CanvasLayoutColumn", Widget::styles().item, Args{ { &Layout::m_space, UNIT },{ &Layout::m_padding, BoxFloat(20.f) },{ &Layout::m_spacing, DimFloat(20.f) } } };
+			Style layout_line = { "CanvasLayoutLine", Widget::styles().item, Args{ { &Layout::m_space, ITEM }, { &Layout::m_padding, BoxFloat(20.f) }, { &Layout::m_spacing, DimFloat(100.f) } } };
+			Style layout_column = { "CanvasLayoutColumn", Widget::styles().item, Args{ { &Layout::m_space, UNIT }, { &Layout::m_padding, BoxFloat(20.f) }, { &Layout::m_spacing, DimFloat(20.f) } } };
 			Style layout_node = { "CanvasLayoutNode", Widget::styles().item };
 		};
 		static Styles& styles() { static Styles styles; return styles; }

@@ -111,7 +111,7 @@ namespace toy
 			Style sizer_left = { "WindowSizerLeft", sizer, Args{ { &InkStyle::m_hover_cursor, &Cursor::styles().resize_diag_left } } };
 			Style sizer_right = { "WindowSizerRight", sizer, Args{ { &InkStyle::m_hover_cursor, &Cursor::styles().resize_diag_right } } };
 
-			Style dock_window = { "DockWindow", window, Args{ { &Layout::m_flow, FLOW },{ &Layout::m_space, SHEET } } };
+			Style dock_window = { "DockWindow", window, Args{ { &Layout::m_flow, FLOW }, { &Layout::m_space, SHEET } } };
 			Style wrap_window = { "WrapWindow", window, Args{ { &Layout::m_space, UNIT } } };
 		}; 
 		static Styles& styles() { static Styles styles; return styles; }

@@ -63,6 +63,11 @@ namespace toy
 		return { parent.emplace_style<Wedge>(Widget::styles().sheet) };
 	}
 
+	inline Binding board(Wedge& parent)
+	{
+		return { parent.emplace_style<Wedge>(Widget::styles().board) };
+	}
+
 	inline Binding layout(Wedge& parent)
 	{
 		return { parent.emplace_style<Wedge>(Widget::styles().layout) };
@@ -72,12 +77,8 @@ namespace toy
 	{
 		Wedge& layout = parent.emplace_style<Wedge>(Widget::styles().layout);
 		layout.frame().setSpanDim(DIM_X, span);
+		layout.frame().setSpanDim(DIM_Y, span);
 		return { layout };
-	}
-
-	inline Binding board(Wedge& parent)
-	{
-		return{ parent.emplace_style<Wedge>(Widget::styles().board) };
 	}
 
 	inline Binding stack(Wedge& parent)
@@ -115,7 +116,7 @@ namespace toy
 	inline Binding table(Wedge& parent, const StringVector& elements, const std::vector<float>& spans, Style* style = nullptr)
 	{
 		Table& table = parent.emplace_style<Table>(*style, elements, spans);
-		return{ table, table };
+		return { table, table };
 	}
 
 	inline Binding toolbar(Wedge& parent, Style* style = nullptr)
@@ -135,7 +136,7 @@ namespace toy
 
 	inline Binding menubar(Wedge& parent, Style* style = nullptr)
 	{
-		return{ parent.emplace_style<Menubar>(*style) };
+		return { parent.emplace_style<Menubar>(*style) };
 	}
 
 	inline Binding tabber(Wedge& parent, Style* style = nullptr)
@@ -150,9 +151,15 @@ namespace toy
 		return { window, window.m_body };
 	}
 
+	inline Binding root_window(Wedge& parent, const string& name, const Callback& onClose = nullptr, Style* style = nullptr)
+	{
+		Window& window = parent.rootSheet().emplace_style<Window>(*style, name, WINDOW_DEFAULT, [onClose](Widget&) { onClose(); });
+		return { window, window.m_body };
+	}
+
 	inline Binding popup(Wedge& parent, const Callback& onClose, Style* style = nullptr)
 	{
-		return { parent.emplace_style<Popup>(*style, [&](Widget&) { onClose(); }) };
+		return { parent.emplace_style<Popup>(*style, [onClose](Widget&) { onClose(); }) };
 	}
 
 	inline Binding dockspace(Wedge& parent, Style* style = nullptr)
@@ -172,10 +179,10 @@ namespace toy
 	}
 
 
-	using QueryFunc = std::function<void(UiNode&, const std::function<void(Var)>&)>;
+	using QueryFunc = std::function<void(Unode&, const std::function<void(Var)>&)>;
 
 	template <class T_Value>
-	using TQueryFunc = std::function<void(UiNode&, const std::function<void(T_Value)>&)>;
+	using TQueryFunc = std::function<void(Unode&, const std::function<void(T_Value)>&)>;
 
 	struct Query
 	{
@@ -199,13 +206,13 @@ namespace toy
 		template <class T_Value>
 		void query(const TQueryFunc<T_Value>& decl)
 		{
-			m_queries.emplace_back([decl](UiNode& node, const std::function<void(Var)>& callback)
+			m_queries.emplace_back([decl](Unode& unode, const std::function<void(Var)>& callback)
 			{
-				decl(node, typed_func<T_Value>(callback));
+				decl(unode, typed_func<T_Value>(callback));
 			});
 		}
 
-		void decl(UiNode& node);
+		void decl(Unode& unode);
 		void done();
 
 		std::vector<Query> m_queries;
@@ -214,21 +221,19 @@ namespace toy
 	};
 
 
-	struct TOY_UI_EXPORT UiNode : Graph<UiNode>
+	struct TOY_UI_EXPORT Unode : Graph<Unode>
 	{
-		UiNode() : Graph() {}
-		UiNode(UiNode* parent, size_t index, uint64_t id) : Graph(parent, index, id), m_binding(parent->m_binding.body) {}
-		~UiNode() {}
-		
-		UiNode(UiNode&& other) = default;
-		UiNode& operator=(UiNode&& other) = default;
+		Unode() : Graph() {}
+		Unode(Unode* parent, uint32_t id) : Graph(parent, id), m_binding(parent->m_binding.body) {}
+		~Unode() { m_nodes.clear(); if(m_binding.widget) m_binding.widget->extract(); }
 
 		Binding m_binding;
-		int m_mode = 0;
 		string m_name;
-		std::function<Wedge&(Wedge&, UiNode&)> m_inserter;
+		std::function<Wedge&(Wedge&, Unode&)> m_inserter;
 
 		std::vector<Modal> m_modals;
+		
+		UiWindow& ui_window() { return root().m_binding.widget->uiWindow(); }
 
 		void pump()
 		{
@@ -236,16 +241,8 @@ namespace toy
 				modal.decl(*this);
 		}
 
-		void destroy()
-		{
-			for(auto& node : m_nodes)
-				node->destroy();
-			if(m_binding.widget)
-				m_binding.widget->extract();
-		}
-
 		template <class T_WidgetFunc, class... T_Args>
-		inline UiNode& widget(T_WidgetFunc func, T_Args&&... args)
+		inline Unode& widget(T_WidgetFunc func, T_Args&&... args)
 		{
 			if(m_binding.widget) return *this;
 			if(m_parent->m_inserter)
@@ -255,15 +252,22 @@ namespace toy
 			return *this;
 		}
 
+		template <class T_Widget, class T_WidgetFunc, class... T_Args>
+		inline T_Widget& widget(T_WidgetFunc func, T_Args&&... args)
+		{
+			this->widget(func, std::forward<T_Args>(args)...);
+			return as<T_Widget>(*m_binding.widget);
+		}
+
 		template <class T_Inserter>
-		inline UiNode& inserter(T_Inserter inserter)
+		inline Unode& inserter(T_Inserter inserter)
 		{
 			if(m_inserter) return *this;
 			m_inserter = inserter;
 			return *this;
 		}
 
-		inline UiNode& name(const string& name)
+		inline Unode& name(const string& name)
 		{
 			if(!m_name.empty()) return *this;
 			m_name = name;
@@ -271,22 +275,14 @@ namespace toy
 		}
 
 		template <class T_RefreshFunc, class... T_Args>
-		inline UiNode& refresh(T_RefreshFunc func, T_Args&&... args)
+		inline Unode& refresh(T_RefreshFunc func, T_Args&&... args)
 		{
 			func(m_binding, std::forward<T_Args>(args)...);
 			return *this;
 		}
 
-		template <class T_DeclFunc, class... T_Args>
-		inline UiNode& submode(int current_mode, int target_mode, T_DeclFunc func, T_Args&&... args)
-		{
-			if(current_mode == target_mode)
-				return subid(current_mode).decl(func, std::forward<T_Args>(args)...);
-			return *this;
-		}
-
 		template <class... T_Args>
-		inline UiNode& modal(const TQueryFunc<T_Args>&... funcs, const std::function<void(T_Args...)>& callback)
+		inline Unode& modal(const TQueryFunc<T_Args>&... funcs, const std::function<void(T_Args...)>& callback)
 		{
 			m_modals.emplace_back();
 			m_modals.back().init<T_Args...>(funcs..., callback);
@@ -294,9 +290,15 @@ namespace toy
 		}
 	};
 
-	inline Wedge& tabber_insert(Wedge& wedge, UiNode& child)
+	inline Wedge& tabber_insert(Wedge& wedge, Unode& child)
 	{
 		return as<Tabber>(wedge).addTab(child.m_name);
+	}
+
+	inline Wedge& root_insert(Wedge& wedge, Unode& child)
+	{
+		UNUSED(child);
+		return wedge.rootSheet();
 	}
 
 	struct TOY_UI_EXPORT TriggerState : public NodeState
@@ -304,10 +306,10 @@ namespace toy
 		bool m_active;
 	};
 
-	inline void trigger(UiNode& node, const string& name, Callback callback)
+	inline void trigger(Unode& unode, const string& name, Callback callback)
 	{
-		TriggerState& state = node.state<TriggerState>();
-		node.widget(button, name, [&](Widget&) { state.m_active = true; }, nullptr);
+		TriggerState& state = unode.state<TriggerState>();
+		unode.widget(button, name, [&](Widget&) { state.m_active = true; }, nullptr);
 		if(state.m_active)
 		{
 			state.m_active = false;

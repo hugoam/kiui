@@ -32,9 +32,10 @@ namespace toy
 			Style dropdown = { cls<Dropdown>(), Widget::styles().wrap_button };
 			Style toggle = { "DropdownToggle", Widget::styles().button };
 			Style head = { "DropdownHead", Widget::styles().multi_button };
-			Style list = { "DropdownList", Widget::styles().wedge, Args{ { &Layout::m_flow, ALIGN },{ &Layout::m_align, Dim<Align>{ LEFT, OUT_RIGHT } } } };
+			Style list = { "DropdownList", Widget::styles().wedge, Args{ { &Layout::m_flow, ALIGN }, { &Layout::m_align, Dim<Align>{ LEFT, OUT_RIGHT } } } };
 			Style choice = { "DropdownChoice", Widget::styles().multi_button };
 			Style dropdown_input = { cls<DropdownInput>(), dropdown };
+			Style typedown_input = { cls<TypedownInput>(), dropdown };
 		};
 		static Styles& styles() { static Styles styles; return styles; }
 

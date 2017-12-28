@@ -7,7 +7,6 @@
 
 /* toy */
 #include <toyui/Types.h>
-#include <toyobj/Util/Unique.h>
 #include <toyui/Image.h>
 
 #include <memory>

@@ -28,7 +28,7 @@ namespace toy
 	{
 		Widget::makeSolver();
 
-		as<GridSolver>(*m_frame->m_solver).divide({ Space::preset(BOARD), Space::preset(LINE) });
+		as<GridSolver>(*m_frame->m_solver).divide({ Space::preset(LAYOUT), Space::preset(LINE) });
 	}
 
 	void ScrollSheet::dirtyLayout()
@@ -129,14 +129,14 @@ namespace toy
 	{
 		static InkStyle mainStyle;
 		mainStyle.m_border_width = 1.f;
-		mainStyle.m_border_colour = Colour(132 / 255.f, 132 / 255.f, 132 / 255.f, 1.f);
+		mainStyle.m_border_colour = Colour(0.162f, 0.162f, 0.162f, 1.f);
 
 		static InkStyle secondaryStyle;
-		secondaryStyle.m_border_width = 1.f;
-		secondaryStyle.m_border_colour = Colour(34 / 255.f, 34 / 255.f, 34 / 255.f, 1.f);
+		secondaryStyle.m_border_width = 0.5f;
+		secondaryStyle.m_border_colour = Colour(0.094f, 0.094f, 0.094f, 1.f);
 
 		float mainFrequency = 100.f;
-		float secondaryFrequency = 20.f;
+		float secondaryFrequency = 20.0f;
 
 		drawLines(frame, DIM_X, mainFrequency, mainStyle, renderer);
 		drawLines(frame, DIM_Y, mainFrequency, mainStyle, renderer);

@@ -18,8 +18,10 @@
 	#include <toyui/Context/Ogre/OgreContext.h>
 #elif TOY_CONTEXT_WINDOWS
 	#include <toyui/Context/Windows/WindowsContext.h>
-#else
+#elif TOY_RENDERER_GL
 	#include <toyui/Context/Glfw/GlfwContext.h>
+#elif TOY_RENDERER_BGFX
+	#include <toyui/Context/Bgfx/BgfxContext.h>
 #endif
 
 #ifndef TOYUI_RESOURCE_PATH
@@ -35,8 +37,10 @@ int main(int argc, char *argv[])
 	renderSystem.init();
 #elif TOY_CONTEXT_WINDOWS
 	toy::WinRenderSystem renderSystem(TOYUI_RESOURCE_PATH);
-#else
+#elif TOY_RENDERER_GL
 	toy::GlfwRenderSystem renderSystem(TOYUI_RESOURCE_PATH);
+#elif TOY_RENDERER_BGFX
+	toy::BgfxSystem renderSystem(TOYUI_RESOURCE_PATH);
 #endif
 
 	toy::UiWindow uiwindow(renderSystem, "kiUi demo", 1200, 800, false);
@@ -51,7 +55,7 @@ int main(int argc, char *argv[])
 	bool pursue = true;
 	while(pursue)
 	{
-#if defined TOY_RENDERER_OGRE
+#if defined TOY_RENDERER_OGRE || defined TOY_RENDERER_BGFX
 		renderSystem.nextFrame();
 #endif
 		pursue = uiwindow.nextFrame();

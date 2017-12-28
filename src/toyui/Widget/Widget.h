@@ -35,18 +35,18 @@ namespace toy
 	};
 
 #ifdef TOY_WIDGET_STATES_CONVERT_IMPL
-	template <> inline void fromString(const string& str, WidgetStates& val)
+	template <> inline void from_string(const string& str, WidgetStates& val)
 	{
 		std::vector<string> names = splitString(toUpper(str), "|");
 		for(const string& name : names)
-			val.value |= fromString<WidgetState>(name);
+			val.value |= from_string<WidgetState>(name);
 	};
 
-	template <> inline void toString(const WidgetStates& val, string& str)
+	template <> inline void to_string(const WidgetStates& val, string& str)
 	{
 		for(WidgetState state = FOCUSED; state < (1 << 9); state = static_cast<WidgetState>(state << 1))
 			if(val.value & state)
-				str += (str.empty() ? "" : "|") + toString<WidgetState>(state);
+				str += (str.empty() ? "" : "|") + to_string<WidgetState>(state);
 	};
 #endif
 
@@ -57,8 +57,8 @@ namespace toy
 		{
 			Params(Wedge* parent = nullptr, Style* style = nullptr, FrameType frameType = FRAME)
 				: parent(parent), type(nullptr), style(style), frameType(frameType) {}
-			Params(const Params& params, Type* type = nullptr)
-				: parent(params.parent), type(params.type ? params.type : type), style(params.style), frameType(params.frameType) {}
+			Params(const Params& params, Type* type = nullptr, Style* style = nullptr)
+				: parent(params.parent), type(params.type ? params.type : type), style(params.style ? params.style : style), frameType(params.frameType) {}
 			Params(const Params& params, Type* type, FrameType frameType)
 				: parent(params.parent), type(params.type ? params.type : type), style(params.style), frameType(frameType) {}
 			Wedge* parent = nullptr;

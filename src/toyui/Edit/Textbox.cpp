@@ -15,7 +15,7 @@
 
 namespace toy
 {
-	Textbox::Textbox(const Params& params, const string& text)
+	Textbox::Textbox(const Params& params, string& text)
 		: TypeIn({ params, &cls<Textbox>() }, text, nullptr, true)
 	{}
 }

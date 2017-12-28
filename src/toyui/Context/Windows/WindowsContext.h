@@ -8,9 +8,7 @@
 
 /* toy */
 #include <toyui/Types.h>
-#include <toyui/Render/RenderWindow.h>
-#include <toyui/Input/InputDispatcher.h>
-#include <toyui/UiWindow.h>
+#include <toyui/Render/Context.h>
 
 #include <windows.h>
 

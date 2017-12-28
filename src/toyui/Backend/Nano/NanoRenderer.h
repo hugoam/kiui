@@ -11,7 +11,7 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT NanoRenderer : public Renderer
+	class TOY_UI_NANO_EXPORT NanoRenderer : public Renderer
 	{
 	public:
 		NanoRenderer(const string& resourcePath);
@@ -68,12 +68,11 @@ namespace toy
 		virtual void strokeGradient(const Paint& paint, const DimFloat& start, const DimFloat& end) final;
 
 		virtual void fillText(const string& text, const BoxFloat& rect, InkStyle& skin, TextRow& row) final;
-
 		virtual void breakText(const string& text, const DimFloat& space, InkStyle& skin, std::vector<TextRow>& textRows) final;
-		virtual void breakTextLine(const BoxFloat& rect, TextRow& textRow) final;
 
-		virtual void breakTextWidth(const char* string, const char* end, const BoxFloat& rect, InkStyle& skin, TextRow& textRow) final;
-		virtual void breakTextReturns(const char* string, const char* end, const BoxFloat& rect, InkStyle& skin, TextRow& textRow) final;
+		void breakTextLine(const BoxFloat& rect, TextRow& textRow);
+		void breakTextWidth(const char* string, const char* end, const BoxFloat& rect, InkStyle& skin, TextRow& textRow);
+		void breakTextReturns(const char* string, const char* end, const BoxFloat& rect, InkStyle& skin, TextRow& textRow);
 
 		virtual float textLineHeight(InkStyle& skin) final;
 		virtual float textSize(const string& text, Dimension dim, InkStyle& skin) final;

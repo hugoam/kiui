@@ -20,18 +20,14 @@ namespace toy
 		open ? this->show() : this->hide();
 	}
 
-	Docker::Docker(const Params& params)
-		: Wedge({ params, &cls<Docker>() })
-	{}
-
 	Dockbar::Dockbar(const Params& params)
 		: Wedge({ params, &cls<Dockbar>() })
-		, m_docker(Params{ this })
+		, m_dockzone({ this, &styles().dockzone })
 	{}
 
 	Dockbox& Dockbar::addDock(const string& name, const string& icon)
 	{
-		Dockbox& dockbox = m_docker.emplace<Dockbox>(*this, name, icon);
+		Dockbox& dockbox = m_dockzone.emplace<Dockbox>(*this, name, icon);
 		//dockbox.m_body.enableWrap();
 		dockbox.hide();
 		return dockbox;

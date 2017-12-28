@@ -12,10 +12,10 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT ProgressBar : public Wedge
+	class _refl_ TOY_UI_EXPORT Fillbar : public Wedge
 	{
 	public:
-		ProgressBar(const Params& params, Dimension dim = DIM_X);
+		Fillbar(const Params& params, Dimension dim = DIM_X);
 
 		void setPercentage(float percentage);
 

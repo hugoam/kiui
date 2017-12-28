@@ -33,7 +33,7 @@ namespace toy
 	{}
 
 	Toolbar::Toolbar(const Params& params)
-		: Wedge({ params, &cls<Toolbar>() })
+		: Wedge({ params, &cls<Toolbar>(), is<Tooldock>(*params.parent) ? &styles().toolbar_wrap : &styles().toolbar })
 		, m_mover({ this, &styles().mover })
 	{}
 }

@@ -106,7 +106,6 @@ namespace toy
 			m_footer.hide();
 
 		if(&m_type == &cls<Window>())
-		//if(!m_dock)
 			m_frame->setSize({ 480.f, 350.f });
 
 		if(!m_dock)
@@ -186,7 +185,7 @@ namespace toy
 	{
 		m_dock ? this->setStyle(styles().dock_window) : this->setStyle(styles().window);
 		//this->toggleMovable();
-		this->toggleHeader();
+		//this->toggleHeader();
 		this->toggleResizable();
 	}
 

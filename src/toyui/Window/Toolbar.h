@@ -42,7 +42,8 @@ namespace toy
 		{
 			Style toolbutton = { cls<ToolButton>(), Dropdown::styles().dropdown_input };
 			Style tooldock = { cls<Tooldock>(), Widget::styles().div };
-			Style toolbar = { cls<Toolbar>(), Widget::styles().wrap_control, Args{ { &Layout::m_space, ITEM } } };
+			Style toolbar = { cls<Toolbar>(), Widget::styles().wrap_control };
+			Style toolbar_wrap = { cls<Toolbar>(), toolbar, Args{ { &Layout::m_space, ITEM } } };
 			Style mover = { "ToolbarMover", Widget::styles().control };
 		};
 		static Styles& styles() { static Styles styles; return styles; }

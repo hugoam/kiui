@@ -2,36 +2,24 @@
 //  This software is provided 'as-is' under the zlib License, see the LICENSE.txt file.
 //  This notice and the license may not be removed or altered from any source distribution.
 
-#ifndef TOY_GLRENDERER_H
-#define TOY_GLRENDERER_H
+#ifndef TOY_BGFX_UI_RENDERER_H
+#define TOY_BGFX_UI_RENDERER_H
 
 /* toy */
 #include <toyui/Types.h>
-#include <toyui/Nano/NanoRenderer.h>
+#include <toyui/Backend/Nano/NanoRenderer.h>
 
 namespace toy
 {
-	class TOY_UI_EXPORT GlRenderer : public NanoRenderer
+	class TOY_UI_BGFX_EXPORT BgfxUiRenderer : public NanoRenderer
 	{
 	public:
-		GlRenderer(const string& resourcePath, bool clear);
-		~GlRenderer();
+		BgfxUiRenderer(const string& resourcePath);
 
 		// init
 		virtual void setupContext();
 		virtual void releaseContext();
-
-		virtual void render(RenderTarget& target);
-
-	protected:
-		void initGlew();
-
-	protected:
-		bool m_clear;
 	};
-
-
-
 }
 
-#endif
+#endif // TOY_BGFX_UI_RENDERER_H

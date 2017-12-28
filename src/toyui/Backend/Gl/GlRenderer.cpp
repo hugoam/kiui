@@ -3,7 +3,7 @@
 //  This notice and the license may not be removed or altered from any source distribution.
 
 #include <toyui/Config.h>
-#include <toyui/Gl/GlRenderer.h>
+#include <toyui/Backend/Gl/GlRenderer.h>
 
 #include <toyui/Frame/Layer.h>
 
@@ -28,9 +28,6 @@ namespace toy
 	GlRenderer::GlRenderer(const string& resourcePath, bool clear)
 		: NanoRenderer(resourcePath)
 		, m_clear(clear)
-	{}
-
-	GlRenderer::~GlRenderer()
 	{}
 
 	void GlRenderer::setupContext()

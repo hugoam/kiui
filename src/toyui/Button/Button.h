@@ -79,9 +79,10 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT MultiButton : public WrapButton
 	{
 	public:
-		MultiButton(const Params& params, const StringVector& elements = {}, const Callback& trigger = nullptr);
+		MultiButton(const Params& params, const StringVector& elements = {}, const Callback& trigger = nullptr, Style* item_style = nullptr);
 
 		std::vector<string> m_elements;
+		Style* m_item_style;
 
 		void reset(Button& button);
 		void reset(MultiButton& button);

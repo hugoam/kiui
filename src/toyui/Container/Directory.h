@@ -48,6 +48,13 @@ namespace toy
 		void moveIn(const string& name);
 		void moveOut();
 
+		struct Styles
+		{
+			Style dir = { cls<Dir>(), Wedge::styles().multi_button };
+			Style file = { cls<File>(), Wedge::styles().multi_button };
+		};
+		static Styles& styles() { static Styles styles; return styles; }
+
 	protected:
 		string m_path;
 	};

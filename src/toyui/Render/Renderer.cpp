@@ -265,7 +265,7 @@ namespace toy
 			this->drawImage(*inkstyle.m_tile, rect);
 	}
 
-	void Renderer::drawSkinImage(Frame& frame, ImageSkin::Section section, BoxFloat rect)
+	void Renderer::drawSkinImage(Frame& frame, int section, BoxFloat rect)
 	{
 		ImageSkin& imageSkin = frame.d_inkstyle->m_image_skin;
 		rect.x = rect.x - imageSkin.m_margin;

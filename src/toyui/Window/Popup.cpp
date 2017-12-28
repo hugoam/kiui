@@ -10,7 +10,7 @@
 
 namespace toy
 {
-	Popup::Popup(const Params& params, Callback onClose, bool open)
+	Popup::Popup(const Params& params, const Callback& onClose, bool open)
 		: Wedge({ params, &cls<Popup>(), LAYER })
 		, m_onClose(onClose)
 	{

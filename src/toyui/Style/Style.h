@@ -27,13 +27,11 @@ namespace toy
 	{
 	public:
 		_constr_ Shadow(float xpos, float ypos, float blur, float spread, Colour colour = Colour::AlphaBlack)
-			: Struct()
-			, d_xpos(xpos), d_ypos(ypos), d_blur(blur), d_spread(spread), d_radius(spread + blur), d_colour(colour), d_null(false)
+			: d_xpos(xpos), d_ypos(ypos), d_blur(blur), d_spread(spread), d_radius(spread + blur), d_colour(colour), d_null(false)
 		{}
 
 		_constr_ Shadow()
-			: Struct()
-			, d_null(true)
+			: d_null(true)
 		{}
 
 		_attr_ _mut_ float d_xpos;
@@ -78,13 +76,13 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Layout : public Struct
 	{
 	public:
-		Layout()
-			: Struct()
-			, m_solver(FRAME_SOLVER) , m_layout(Dim<AutoLayout>(AUTO_LAYOUT, AUTO_LAYOUT)), m_flow(FLOW), m_space(Space::preset(SHEET))
+		_constr_ Layout(const string& name = "")
+			: m_name(name), m_solver(FRAME_SOLVER), m_layout(Dim<AutoLayout>(AUTO_LAYOUT, AUTO_LAYOUT)), m_flow(FLOW), m_space(Space::preset(SHEET))
 			, m_clipping(NOCLIP), m_opacity(CLEAR), m_align(Dim<Align>(LEFT, LEFT))
 			, m_span(DimFloat(1.f, 1.f)), m_pivot(Dim<Pivot>(FORWARD, FORWARD)), m_zorder(0), m_updated(0)
 		{}
 
+		_attr_ _mut_ string m_name;
 		_attr_ _mut_ LayoutSolver m_solver;
 		_attr_ _mut_ Dim<AutoLayout> m_layout;
 		_attr_ _mut_ Flow m_flow;
@@ -106,12 +104,10 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT InkStyle : public Struct
 	{
 	public:
-		_constr_ InkStyle()
-			: Struct()
-			, m_empty(true), m_background_colour(Colour::None), m_border_colour(Colour::None), m_image_colour(Colour::None), m_text_colour(Colour::None)
+		_constr_ InkStyle(const string& name = "")
+			: m_name(name), m_empty(true), m_background_colour(Colour::None), m_border_colour(Colour::None), m_image_colour(Colour::None), m_text_colour(Colour::None)
 			, m_text_font("dejavu"), m_text_size(14.f), m_text_break(true), m_text_wrap(false)
-			, m_border_width(0.f), m_corner_radius(), m_weak_corners(false)
-			, m_padding(0.f), m_margin(0.f)
+			, m_border_width(0.f), m_corner_radius(), m_weak_corners(false), m_padding(0.f), m_margin(0.f)
 			, m_align(Dim<Align>(LEFT, LEFT)), m_linear_gradient(DimFloat(0.f, 0.f)), m_linear_gradient_dim(DIM_Y)
 			, m_image(nullptr), m_overlay(nullptr), m_tile(nullptr), m_hover_cursor(nullptr)
 		{}
@@ -122,6 +118,7 @@ namespace toy
 				m_empty = false;
 		}
 
+		_attr_ _mut_ string m_name;
 		_attr_ _mut_ bool m_empty;
 		_attr_ _mut_ Colour m_background_colour;
 		_attr_ _mut_ Colour m_border_colour;
@@ -162,8 +159,9 @@ namespace toy
 		Style(const string& name, Style& base, Args args = {}) : Style(name, nullptr, &base, args) {}
 		Style(Type& type, Style& base, Args args = {}) : Style(type.m_name, &type, &base, args) {}
 
-		void load(Style& level, StyleMap& layout_defs, StyleMap& skin_defs);
+		void init();
 		void load(StyleMap& layout_defs, StyleMap& skin_defs);
+		void define(Style& level, StyleMap& layout_defs, StyleMap& skin_defs);
 
 		InkStyle& skin(WidgetState state);
 		InkStyle& decline_skin(WidgetStates state);
@@ -175,6 +173,8 @@ namespace toy
 		_attr_ Layout m_layout;
 		_attr_ InkStyle m_skin;
 		std::vector<InkStyle> m_skins;
+
+		Args m_args;
 		bool m_defined;
 	};
 
@@ -186,10 +186,10 @@ namespace toy
 
 		Style widget = { "Widget", &cls<Widget>(), nullptr, Args{ { &Layout::m_solver, FRAME_SOLVER } } };
 		Style wedge = { cls<Wedge>(), widget, Args{ { &Layout::m_solver, ROW_SOLVER }, { &Layout::m_space, SHEET } } };
-		Style root_sheet = { cls<RootSheet>(), wedge, Args{ { &Layout::m_space, BOARD }, { &Layout::m_clipping, CLIP }, { &Layout::m_opacity, OPAQUE } } };
+		Style root_sheet = { cls<RootSheet>(), wedge, Args{ { &Layout::m_space, LAYOUT }, { &Layout::m_clipping, CLIP }, { &Layout::m_opacity, OPAQUE } } };
 
 		Style item = { "Item", widget, Args{ { &Layout::m_space, BLOCK }, { &Layout::m_align, Dim<Align>{ LEFT, CENTER } },
-										  { &InkStyle::m_empty, false }, { &InkStyle::m_text_colour, Colour::White }, { &InkStyle::m_padding, BoxFloat(2.f) } } };
+											 { &InkStyle::m_text_colour, Colour::White }, { &InkStyle::m_padding, BoxFloat(2.f) } } };
 		Style control = { "Control", item, Args{ { &Layout::m_opacity, OPAQUE } } };
 
 		Style spacer = { "Spacer", item, Args{ { &Layout::m_space, SPACER } } };
@@ -201,9 +201,9 @@ namespace toy
 		Style sheet = { "Sheet", wedge, Args{ { &Layout::m_space, SHEET } } };
 		Style list = { "List", wedge };
 		Style header = { "Header", row };
-		Style board = { "Board", wedge, Args{ { &Layout::m_space, Space{ READING, EXPAND, EXPAND } }, { &Layout::m_clipping, CLIP } } };
-		Style screen = { "Screen", wedge, Args{ { &Layout::m_flow, FREE }, { &Layout::m_space, BOARD } } };
-		Style layout = { "Layout", board, Args{ { &Layout::m_space, Space{ PARAGRAPH, EXPAND, EXPAND } } } };
+		Style board = { "Board", wedge, Args{ { &Layout::m_space, BOARD }, { &Layout::m_clipping, CLIP } } };
+		Style layout = { "Layout", board, Args{ { &Layout::m_space, LAYOUT } } };
+		Style screen = { "Screen", wedge, Args{ { &Layout::m_flow, FREE }, { &Layout::m_space, LAYOUT } } };
 		Style decal = { "Decal", wedge, Args{ { &Layout::m_flow, FREE }, { &Layout::m_space, BLOCK } } };
 		Style overlay = { "Overlay", wedge, Args{ { &Layout::m_flow, FREE }, { &Layout::m_space, UNIT }, { &Layout::m_opacity, OPAQUE } } };
 		Style gridsheet = { cls<GridSheet>(), wedge, Args{ { &Layout::m_opacity, OPAQUE }, { &Layout::m_spacing, DimFloat(5.f) } } };
@@ -224,22 +224,27 @@ namespace toy
 		Style rectangle = { cls<Rectangle>(), decal, Args{ { &Layout::m_space, BLOCK }, { &InkStyle::m_border_width, 1.f }, { &InkStyle::m_border_colour, Colour::Cyan } } };
 
 		Style type_in = { cls<TypeIn>(), wrap_control, Args{ { &Layout::m_opacity, OPAQUE } } };
-		Style textbox = { cls<Textbox>(), type_in, Args{ { &Layout::m_space, BOARD }, { &InkStyle::m_text_wrap, true } } };
-		Style figure = { "Figure", item, Args{ { &InkStyle::m_empty, false} } };
+		Style textbox = { cls<Textbox>(), type_in, Args{ { &Layout::m_space, LAYOUT }, { &InkStyle::m_text_wrap, true } } };
+		Style caret = { "Caret", item, Args{ { &InkStyle::m_background_colour, Colour::White } } };
 
+		Style figure = { "Figure", item, Args{ { &InkStyle::m_empty, false} } };
+		
 		Style radio_switch = { cls<RadioSwitch>(), wrap_control };
 		Style radio_choice = { "RadioChoice", multi_button };
+		Style radio_choice_item = { "RadioChoiceItem", item };
 
 		Style slider = { cls<Slider>(), wrap_control, Args{ { &Layout::m_space, FLEX } } };
-		Style slider_knob = { "SliderKnob", item, Args{ { &Layout::m_flow, OVERLAY }, { &Layout::m_space, FLEX } } };
-		Style slider_display = { "SliderDisplay", label, Args{ { &Layout::m_flow, OVERLAY } } };
+		Style slider_knob = { "SliderKnob", item, Args{ /*{ &Layout::m_flow, OVERLAY }, { &Layout::m_space, FLEX }*/ } };
+		Style slider_display = { "SliderDisplay", label, Args{ { &Layout::m_flow, OVERLAY }, { &Layout::m_align, Dim<Align>{ CENTER, CENTER } } } };
 
-		Style progress_bar = { "ProgressBar", row };
+		Style progress_bar = { "Fillbar", row };
 
 		Style number_input = { "NumberInput", row };
 		Style slider_input = { "SliderInput", row };
-		Style color_input = { "ColorInput", row };
 		Style field_input = { "Field", wrap_control };
+		Style input_bool = { cls<Input<bool>>(), wedge, Args{ { &Layout::m_space, UNIT } } };
+		Style input_string = { cls<Input<string>>(), type_in };
+		Style input_color = { cls<Input<Colour>>(), row };
 
 		Style scrollsheet = { cls<ScrollSheet>(), wedge, Args{ { &Layout::m_solver, GRID_SOLVER }, { &Layout::m_opacity, OPAQUE } } };
 		Style scroll_zone = { "ScrollZone", layout, Args{ { &Layout::m_layout, Dim<AutoLayout>{ AUTO_SIZE, AUTO_SIZE } }, { &Layout::m_clipping, CLIP } } };
@@ -248,16 +253,12 @@ namespace toy
 		Style scrollplan = { cls<ScrollPlan>(), scrollsheet };
 		Style scrollplan_surface = { "ScrollplanSurface", sheet, Args{ { &Layout::m_space, BLOCK }/*, { &InkStyle::m_customRenderer, &drawGrid }*/ } };
 
-		Style table = { cls<Table>(), stack, Args{ { &Layout::m_solver, TABLE_SOLVER }, { &Layout::m_spacing, DimFloat(0.f, 2.f) } } };
+		Style table = { cls<Table>(), stack, Args{ /*{ &Layout::m_solver, TABLE_SOLVER },*/ { &Layout::m_spacing, DimFloat(0.f, 2.f) } } };
 		Style table_head = { "TableHead", gridsheet, Args{ { &Layout::m_space, DIV } } };
 		Style column_header = { "ColumnHeader", row, Args{ { &Layout::m_space, LINE } } };
 
 		Style popup = { cls<Popup>(), overlay, Args{ { &Layout::m_size, DimFloat{ 280.f, 350.f } } } };
 	};
-
-	// CONTROLS
-	//this->styledef(cls<Input<bool>>()). &Layout::m_space, ITEM;
-
 }
 
 #endif // TOY_STYLE_H

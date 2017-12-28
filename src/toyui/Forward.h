@@ -63,6 +63,8 @@ namespace toy
 	class Style;
 	class Layout;
 
+	struct TextRow;
+
 	class Caption;
 	class Icon;
 
@@ -107,15 +109,22 @@ namespace toy
 
 	class Slider;
 	class Scrollbar;
+	class Fillbar;
 
 	class ScrollSheet;
 	class ScrollPlan;
 
 	template <class T>
-	class StatSlider;
+	class SliderInput;
+
+	template <class T>
+	class NumberInput;
 
 	template <class T>
 	class Input;
+
+	template <class T_Val, class T_Input>
+	class InputField;
 
 	class Tab;
 	class Tabber;
@@ -196,7 +205,7 @@ namespace toy
 	class OgreContext;
 	class OgreRenderSystem;
 
-	struct UiNode;
+	struct Unode;
 }
 
 #endif // TOY_UIFORWARD_H

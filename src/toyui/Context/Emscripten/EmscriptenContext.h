@@ -7,11 +7,8 @@
 
 /* toy Og */
 #include <toyui/Types.h>
-#include <toyui/RenderWindow.h>
-#include <toyui/Frame/Renderer.h>
-#include <toyui/Input/InputDispatcher.h>
-#include <toyui/Gl/GlRenderer.h>
-#include <toyui/UiWindow.h>
+#include <toyui/Render/Context.h>
+#include <toyui/Backend/Gl/GlRenderer.h>
 
 #include <emscripten/emscripten.h>
 #include <emscripten/html5.h>

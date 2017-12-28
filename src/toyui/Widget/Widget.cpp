@@ -152,7 +152,8 @@ namespace toy
 	void Widget::updateStyle()
 	{
 		for(Type* type = &m_type; type && !m_style; type = type->m_base)
-			m_style = s_styles[type->m_name];
+			if(s_styles.find(type->m_name) != s_styles.end())
+				m_style = s_styles[type->m_name];
 		if(!m_style)
 			m_style = s_styles["Widget"];
 		m_frame->setStyle(*m_style);

@@ -6,13 +6,11 @@
 #define TOY_INPUTDISPATCHER_H
 
 /* toy */
-#include <toyobj/Type.h>
-#include <toyobj/Util/Unique.h>
+#include <toyobj/Object.h>
 #include <toyui/Types.h>
 #include <toyui/Input/KeyCode.h>
 
 #include <vector>
-#include <memory>
 
 namespace toy
 {

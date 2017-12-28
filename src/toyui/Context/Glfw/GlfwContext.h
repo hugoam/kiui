@@ -8,12 +8,12 @@
 /* toy */
 #include <toyui/Types.h>
 #include <toyui/Render/RenderWindow.h>
+#include <toyui/Render/Context.h>
 #include <toyui/Input/InputDispatcher.h>
-#include <toyui/UiWindow.h>
 
 namespace toy
 {
-	class GlfwRenderWindow : public RenderWindow
+	class TOY_CTX_GLFW_EXPORT GlfwRenderWindow : public RenderWindow
 	{
 	public:
 		GlfwRenderWindow(const string& name, int width, int height, bool autoSwap = true);
@@ -31,7 +31,7 @@ namespace toy
 		bool m_autoSwap;
 	};
 
-	class GlfwInputWindow : public InputWindow
+	class TOY_CTX_GLFW_EXPORT GlfwInputWindow : public InputWindow
 	{
 	public:
 		GlfwInputWindow();
@@ -59,12 +59,13 @@ namespace toy
 		Keyboard* m_keyboard;
 	};
 
-	class GlfwContext : public Context
+	class TOY_CTX_GLFW_EXPORT GlfwContext : public Context
 	{
 	public:
 		GlfwContext(RenderSystem& renderSystem, const string& name, int width, int height, bool fullScreen, bool autoSwap);
 	};
 
+#ifdef TOY_RENDERER_GL
 	class GlfwRenderSystem : public RenderSystem
 	{
 	public:
@@ -73,6 +74,7 @@ namespace toy
 		virtual object_ptr<Context> createContext(const string& name, int width, int height, bool fullScreen);
 		virtual object_ptr<Renderer> createRenderer(Context& context);
 	};
+#endif
 }
 
 #endif

@@ -28,7 +28,7 @@
 #include <toyui/Button/Image.h>
 #include <toyui/Button/Slider.h>
 #include <toyui/Button/Scrollbar.h>
-#include <toyui/Button/ProgressBar.h>
+#include <toyui/Button/Fillbar.h>
 #include <toyui/Button/Checkbox.h>
 #include <toyui/Button/Dropdown.h>
 #include <toyui/Button/Typedown.h>

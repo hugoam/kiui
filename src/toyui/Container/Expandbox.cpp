@@ -11,7 +11,7 @@ namespace toy
 {
 	Expandbox::Expandbox(const Params& params, const StringVector& elements, bool collapsed)
 		: Wedge({ params, &cls<Expandbox>() })
-		, m_header({ this, &styles().header}, {}, nullptr)
+		, m_header({ this, &styles().header }, {}, nullptr)
 		, m_toggle({ &m_header, &styles().toggle }, [this](Widget&, bool on) { on ? this->expand() : this->collapse(); }, !collapsed)
 		, m_body({ this, &styles().body })
 		, m_collapsed(collapsed)

@@ -12,7 +12,7 @@
 
 namespace toy
 {
-	class TOY_UI_EXPORT TypedownInput : public DropdownInput
+	class _refl_ TOY_UI_EXPORT TypedownInput : public DropdownInput
 	{
 	public:
 		TypedownInput(const Params& params, StringVector choices = {}, const Callback& callback = nullptr);

@@ -15,22 +15,13 @@ namespace toy
 	class _refl_ TOY_UI_EXPORT Image : public Struct
 	{
 	public:
-		Image(const string& name, const string& path, int width = 0, int height = 0)
-			: Struct()
-			, d_name(name), d_path(path), d_left(0), d_top(0), d_width(width), d_height(height)
+		Image(const string& name = "", const string& path = "", int width = 0, int height = 0)
+			: d_name(name), d_path(path), d_left(0), d_top(0), d_width(width), d_height(height)
 			, d_index(0), d_atlas(nullptr), d_tile(false), d_stretch(true), d_filtering(true)
 		{}
 
-		Image()
-			: Struct()
-			, d_name(), d_path(), d_left(0), d_top(0), d_width(0), d_height(0)
-			, d_index(0), d_atlas(nullptr), d_tile(false), d_stretch(true), d_filtering(true)
-		{}
-
-		bool null() const { return d_name.empty(); }
-
-		string d_name;
-		string d_path;
+		_attr_ string d_name;
+		_attr_ string d_path;
 		int d_left;
 		int d_top;
 		int d_width;

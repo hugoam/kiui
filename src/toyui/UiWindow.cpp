@@ -7,14 +7,10 @@
 
 #include <toyui/UiLayout.h>
 
-#include <toyobj/String/String.h>
-#include <toyobj/Util/Unique.h>
-
-#include <toyui/Widget/Widget.h>
-#include <toyui/Widget/Sheet.h>
 #include <toyui/Widget/RootSheet.h>
 
 #include <toyui/Frame/Frame.h>
+#include <toyui/Render/Context.h>
 #include <toyui/Render/Renderer.h>
 
 #include <toyui/Controller/Controller.h>
@@ -24,21 +20,6 @@
 
 namespace toy
 {
-	RenderSystem::RenderSystem(const string& resourcePath, bool manualRender)
-		: m_resourcePath(resourcePath)
-		, m_manualRender(manualRender)
-	{}
-
-	Context::Context(RenderSystem& renderSystem, object_ptr<RenderWindow> renderWindow, object_ptr<InputWindow> inputWindow)
-		: m_renderWindow(std::move(renderWindow))
-		, m_inputWindow(std::move(inputWindow))
-		, m_renderSystem(renderSystem)
-		, m_resourcePath(renderSystem.m_resourcePath)
-	{}
-
-	Context::~Context()
-	{}
-
 	void spritesInFolder(std::vector<object_ptr<Image>>& images, const string& path, const string& subfolder)
 	{
 		DIR* dir = opendir(path.c_str());

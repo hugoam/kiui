@@ -43,7 +43,7 @@ namespace toy
 			Style scroll_right = { "ScrollRight", Widget::styles().button };
 
 			Style scroller = { "Scroller", Widget::styles().slider, Args{ { &Layout::m_space, FLEX } } };
-			Style scroller_knob = { "ScrollerKnob", Widget::styles().slider_knob, Args{ { &Layout::m_flow, FLOW } } };
+			Style scroller_knob = { "ScrollerKnob", Widget::styles().slider_knob, Args{ { &Layout::m_space, FLEX } } };
 		};
 		static Styles& styles() { static Styles styles; return styles; }
 

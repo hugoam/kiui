@@ -14,13 +14,13 @@
 
 namespace toy
 {
-	struct TextGlyph
+	struct TOY_UI_EXPORT TextGlyph
 	{
 		const char* position;
 		BoxFloat rect;
 	};
 
-	struct TextRow
+	struct TOY_UI_EXPORT TextRow
 	{
 		const char* start;
 		const char* end;
@@ -40,7 +40,7 @@ namespace toy
 
 		void select(int caret, int start, int end);
 
-		DimFloat contentSize() { return{ width(), height() }; }
+		DimFloat contentSize() { return { width(), height() }; }
 		float height();
 		float width();
 
