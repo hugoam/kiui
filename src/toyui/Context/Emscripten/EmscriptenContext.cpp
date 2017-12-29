@@ -6,6 +6,7 @@
 #include <toyui/Context/Emscripten/EmscriptenContext.h>
 
 #include <toyui/UiWindow.h>
+#include <toyui/Input/InputDevice.h>
 
 #include <emscripten/emscripten.h>
 #include <emscripten/html5.h>
@@ -139,10 +140,6 @@ namespace toy
 		this->initContext();
 	}
 
-	EmRenderWindow::~EmRenderWindow()
-	{
-	}
-
 	void EmRenderWindow::initContext()
 	{
 		emscripten_set_canvas_size(m_width, m_height);
@@ -187,9 +184,8 @@ namespace toy
 		m_height = height;
 	}
 
-	EmInputWindow::EmInputWindow(EmRenderWindow& renderWindow)
+	EmInputWindow::EmInputWindow()
 		: InputWindow()
-		, m_renderWindow(renderWindow)
 	{
 		emscripten_set_mousemove_callback(0, this, true, [](int eventType, const EmscriptenMouseEvent* mouseEvent, void* window) { return EM_BOOL(static_cast<EmInputWindow*>(window)->injectMouseMove(*mouseEvent)); });
 
@@ -208,16 +204,13 @@ namespace toy
 		//glfwSetInputMode(m_glWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	}
 
-	EmInputWindow::~EmInputWindow()
-	{}
-
 	bool EmInputWindow::nextFrame()
 	{
 		//glfwPollEvents();
 		return true;
 	}
 
-	void EmInputWindow::initInput(Mouse& mouse, Keyboard& keyboard)
+	void EmInputWindow::initInput(RenderWindow& renderWindow, Mouse& mouse, Keyboard& keyboard)
 	{
 		m_mouse = &mouse;
 		m_keyboard = &keyboard;
@@ -233,21 +226,21 @@ namespace toy
 		m_mouseX = float(mouseEvent.canvasX);
 		m_mouseY = float(mouseEvent.canvasY);
 
-		float clampedX = std::max(0.f, std::min(float(m_renderWindow.width()), m_mouseX));
-		float clampedY = std::max(0.f, std::min(float(m_renderWindow.height()), m_mouseY));
+		float clampedX = std::max(0.f, std::min(float(m_renderWindow->m_width), m_mouseX));
+		float clampedY = std::max(0.f, std::min(float(m_renderWindow->m_height), m_mouseY));
 
-		m_mouse->dispatchMouseMoved(clampedX, clampedY, mouseEvent.movementX, mouseEvent.movementY);
+		m_mouse->dispatchMouseMoved({ clampedX, clampedY }); // , mouseEvent.movementX, mouseEvent.movementY
 	}
 
 	bool EmInputWindow::injectMouseDown(const EmscriptenMouseEvent& mouseEvent)
 	{
-		m_mouse->dispatchMousePressed(mouseEvent.canvasX, mouseEvent.canvasY, convertHtml5MouseButton(mouseEvent.button));
+		m_mouse->dispatchMousePressed({ float(mouseEvent.canvasX), float(mouseEvent.canvasY) }, convertHtml5MouseButton(mouseEvent.button));
 		return true;
 	}
 
 	bool EmInputWindow::injectMouseUp(const EmscriptenMouseEvent& mouseEvent)
 	{
-		m_mouse->dispatchMouseReleased(mouseEvent.canvasX, mouseEvent.canvasY, convertHtml5MouseButton(mouseEvent.button));
+		m_mouse->dispatchMouseReleased({ float(mouseEvent.canvasX),float(mouseEvent.canvasY) }, convertHtml5MouseButton(mouseEvent.button));
 		return true;
 	}
 
@@ -271,15 +264,12 @@ namespace toy
 
 	bool EmInputWindow::injectWheel(const EmscriptenWheelEvent& wheelEvent)
 	{
-		m_mouse->dispatchMouseWheeled(m_mouseX, m_mouseY, wheelEvent.deltaY);
+		m_mouse->dispatchMouseWheeled({ m_mouseX, m_mouseY }, wheelEvent.deltaY);
 	}
 
 	EmContext::EmContext(RenderSystem& renderSystem, const string& name, int width, int height, bool fullScreen)
-		: Context(renderSystem)
+		: Context(renderSystem, make_object<EmRenderWindow>(name, width, height), make_object<EmInputWindow>())
 	{
-		object_ptr<EmRenderWindow> renderWindow = make_object<EmRenderWindow>(name, width, height);
-		object_ptr<EmInputWindow> inputWindow = make_object<EmInputWindow>(*renderWindow);
-
-		this->init(std::move(renderWindow), std::move(inputWindow));
+		as<EmInputWindow>(*m_inputWindow).m_renderWindow = &as<EmRenderWindow>(*m_renderWindow);
 	}
 }

@@ -19,7 +19,6 @@ namespace toy
 	{
 	public:
 		EmRenderWindow(const string& name, int width, int height, bool autoSwap = true);
-		~EmRenderWindow();
 
 		void initContext();
 
@@ -33,12 +32,11 @@ namespace toy
 	class TOY_UI_EXPORT EmInputWindow : public InputWindow
 	{
 	public:
-		EmInputWindow(EmRenderWindow& renderWindow);
-		~EmInputWindow();
+		EmInputWindow();
 
-		void initInput(Mouse& mouse, Keyboard& keyboard);
+		virtual void initInput(RenderWindow& renderWindow, Mouse& mouse, Keyboard& keyboard) override;
 
-		bool nextFrame();
+		virtual bool nextFrame() override;
 
 		bool injectMouseMove(const EmscriptenMouseEvent& mouseEvent);
 
@@ -51,10 +49,10 @@ namespace toy
 		bool injectKeyDown(const EmscriptenKeyboardEvent& keyEvent);
 		bool injectKeyPress(const EmscriptenKeyboardEvent& keyEvent);
 
-		void resize(size_t width, size_t height);
+		virtual void resize(size_t width, size_t height) override;
 
-	protected:
-		EmRenderWindow& m_renderWindow;
+	public:
+		EmRenderWindow* m_renderWindow = nullptr;
 
 		float m_mouseX;
 		float m_mouseY;
@@ -73,17 +71,17 @@ namespace toy
 	{
 	public:
 		EmRenderSystem(const string& resourcePath)
-			: RenderSystem(resourcePath)
+			: RenderSystem(resourcePath, false)
 		{}
 
-		virtual unique_ptr<Context> createContext(const string& name, int width, int height, bool fullScreen)
+		virtual object_ptr<Context> createContext(const string& name, int width, int height, bool fullScreen)
 		{
-			return make_unique<EmContext>(*this, name, width, height, fullScreen);
+			return make_object<EmContext>(*this, name, width, height, fullScreen);
 		}
 
-		virtual unique_ptr<Renderer> createRenderer(Context& context)
+		virtual object_ptr<Renderer> createRenderer(Context& context)
 		{
-			return make_unique<GlRenderer>(m_resourcePath);
+			return make_object<GlRenderer>(m_resourcePath, true);
 		}
 	};
 }

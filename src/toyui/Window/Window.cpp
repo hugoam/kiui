@@ -13,7 +13,7 @@
 namespace toy
 {
 	WindowHeader::WindowHeader(Window& window)
-		: Wedge({ &window, &cls<WindowHeader>() })
+		: Wedge({ Params{ &window }, &cls<WindowHeader>() })
 		, m_window(window)
 		, m_title({ this, &styles().title }, m_window.m_name)
 		, m_close({ this, &Window::styles().close_button }, "", [&](Widget&) { window.close(); })
@@ -87,7 +87,7 @@ namespace toy
 	}
 
 	WindowFooter::WindowFooter(Window& window)
-		: Wedge({ &window, &cls<WindowFooter>() })
+		: Wedge({ Params{ &window }, &cls<WindowFooter>() })
 		, m_firstSizer({ this, &Window::styles().sizer_left }, window, true)
 		, m_secondSizer({ this, &Window::styles().sizer_right }, window, false)
 	{}

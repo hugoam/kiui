@@ -17,12 +17,12 @@ namespace toy
 {
 	void load_style(Styler& styler, const string& name, const json& json_style);
 
-	void from_json(const json& j, Colour& col)
+	static void from_json(const json& j, Colour& col)
 	{
 		col = { j[0], j[1], j[2], j[3] };
 	}
 
-	void to_json(json& j, const Colour& col)
+	static void to_json(json& j, const Colour& col)
 	{
 		j = { col.m_r, col.m_g, col.m_b, col.m_a };
 	}

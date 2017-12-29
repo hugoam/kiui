@@ -8,7 +8,7 @@
 #include <RectPacking/Rect.h>
 #include <RectPacking/GuillotineBinPack.h>
 
-#define STB_IMAGE_IMPLEMENTATION
+//#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 namespace toy

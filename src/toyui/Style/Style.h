@@ -8,6 +8,7 @@
 /* toy */
 #include <toyobj/Object.h>
 #include <toyobj/Indexer.h>
+#include <toyobj/Arg.h>
 #include <toyobj/Util/Colour.h>
 #include <toyobj/Util/NonCopy.h>
 #include <toyui/Types.h>
