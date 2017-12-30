@@ -23,7 +23,7 @@ namespace toy
 		, m_cursor(*this)
 		, m_active(nullptr)
 	{
-		if(!params.parent)
+		if(!params.m_parent)
 		{
 			m_target = window.m_renderer->createRenderTarget(as<Layer>(*m_frame));
 			this->updateStyle();
