@@ -164,7 +164,7 @@ namespace toy
 	class _refl_ _struct_ _array_ DimFloat
 	{
 	public:
-		_constr_ DimFloat(float x, float y) : d_values{ { x, y } } {}
+		_constr_ DimFloat(float a, float b) : d_values{ { a, b } } {}
 		_constr_ DimFloat(float val) : DimFloat(val, val) {}
 		DimFloat() : DimFloat(float(), float()) {}
 
@@ -191,7 +191,7 @@ namespace toy
 	class _refl_ _struct_ _array_ BoxFloat : public Struct
 	{
 	public:
-		_constr_ BoxFloat(float x0, float y0, float x1, float y1) : d_values{{ x0, y0, x1, y1 }}, d_null(cnull()) {}
+		_constr_ BoxFloat(float a, float b, float c, float d) : d_values{{ a, b, c, d }}, d_null(cnull()) {}
 		_constr_ BoxFloat(float uniform) : BoxFloat(uniform, uniform, uniform, uniform) {}
 		BoxFloat() : BoxFloat(0.f) { d_null = true; }
 

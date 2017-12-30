@@ -50,15 +50,15 @@ namespace toy
 
 	struct TOY_UI_EXPORT InputEvent
 	{
-		DeviceType deviceType;
-		EventType eventType;
-		bool consumed;
-		bool abort;
-		InputModifier modifiers;
+		DeviceType m_deviceType;
+		EventType m_eventType;
+		bool m_consumed;
+		bool m_abort;
+		InputModifier m_modifiers;
 
-		std::vector<Widget*> visited;
+		std::vector<Widget*> m_visited;
 
-		InputEvent(DeviceType deviceType, EventType eventType) : deviceType(deviceType), eventType(eventType), consumed(false), abort(false), modifiers(INPUT_NO_MOD) {}
+		InputEvent(DeviceType deviceType, EventType eventType) : m_deviceType(deviceType), m_eventType(eventType), m_consumed(false), m_abort(false), m_modifiers(INPUT_NO_MOD) {}
 		virtual ~InputEvent() {}
 
 		virtual void dispatch(RootSheet& rootSheet) { UNUSED(rootSheet); }

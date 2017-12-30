@@ -18,10 +18,10 @@ namespace toy
 
 	InputReceiver* InputAdapter::receiveEvent(InputEvent& inputEvent)
 	{
-		if(inputEvent.consumed)
+		if(inputEvent.m_consumed)
 			return this;
 
-		inputEvent.consumed = inputEvent.receive(*this);
+		inputEvent.m_consumed = inputEvent.receive(*this);
 		return this;
 	}
 
@@ -60,11 +60,11 @@ namespace toy
 
 		while(receiver && receiver != m_receiver)
 		{
-			if(!inputEvent.consumed)
+			if(!inputEvent.m_consumed)
 				consumer = receiver->receiveEvent(inputEvent);
 			else
 				receiver->receiveEvent(inputEvent);
-			if(inputEvent.abort) break;
+			if(inputEvent.m_abort) break;
 			receiver = receiver->propagateEvent(inputEvent);
 		}
 
@@ -73,7 +73,7 @@ namespace toy
 
 	InputReceiver* ControlNode::controlEvent(InputEvent& inputEvent)
 	{
-		if(m_controller && m_controller->controls(inputEvent.deviceType))
+		if(m_controller && m_controller->controls(inputEvent.m_deviceType))
 			return m_controller->controlEvent(inputEvent);
 
 		return m_receiver->controlEvent(inputEvent);
@@ -139,7 +139,7 @@ namespace toy
 	InputReceiver* ControlSwitch::controlEvent(InputEvent& inputEvent)
 	{
 		for(auto& channel : m_controllers)
-			if(channel->controls(inputEvent.deviceType))
+			if(channel->controls(inputEvent.m_deviceType))
 				return channel->controlEvent(inputEvent);
 
 		return m_receiver->controlEvent(inputEvent);

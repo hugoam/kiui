@@ -48,7 +48,7 @@ namespace toy
 		MousePressEvent(Mouse& mouse, DeviceType deviceType, DimFloat pos) : MouseEvent(mouse, deviceType, EVENT_PRESSED, pos) {}
 
 		virtual void dispatch(RootSheet& rootSheet) { rootSheet.m_mouse.dispatchMousePressed(m_pos, m_button); }
-		virtual bool receive(InputAdapter& receiver) { return receiver.mousePressed(*this); consumed = true; }
+		virtual bool receive(InputAdapter& receiver) { return receiver.mousePressed(*this); m_consumed = true; }
 	};
 
 	struct TOY_UI_EXPORT MouseReleaseEvent : public MouseEvent
@@ -71,11 +71,11 @@ namespace toy
 	{
 		MouseClickEvent(Mouse& mouse, DeviceType deviceType, MouseEvent& source) : MouseEvent(mouse, deviceType, EVENT_STROKED, source) {}
 		virtual bool receive(InputAdapter& receiver) {
-			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
+			if(m_deviceType == DEVICE_MOUSE_LEFT_BUTTON)
 				return receiver.leftClick(*this);
-			else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
+			else if(m_deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
 				return receiver.rightClick(*this);
-			else // if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
+			else // if(m_deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
 				return receiver.middleClick(*this);
 		}
 	};
@@ -85,11 +85,11 @@ namespace toy
 		MouseDragEvent(Mouse& mouse, DeviceType deviceType, MouseEvent& source) : MouseEvent(mouse, deviceType, EVENT_DRAGGED, source) {}
 
 		virtual bool receive(InputAdapter& receiver) {
-			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
+			if(m_deviceType == DEVICE_MOUSE_LEFT_BUTTON)
 				return receiver.leftDrag(*this);
-			else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
+			else if(m_deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
 				return receiver.rightDrag(*this);
-			else // if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
+			else // if(m_deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
 				return receiver.middleDrag(*this);
 		}
 	};
@@ -99,11 +99,11 @@ namespace toy
 		MouseDragStartEvent(Mouse& mouse, DeviceType deviceType, MouseEvent& source) : MouseEvent(mouse, deviceType, EVENT_DRAGGED_START, source) {}
 
 		virtual bool receive(InputAdapter& receiver) {
-			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
+			if(m_deviceType == DEVICE_MOUSE_LEFT_BUTTON)
 				return receiver.leftDragStart(*this);
-			else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
+			else if(m_deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
 				return receiver.rightDragStart(*this);
-			else // if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
+			else // if(m_deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
 				return receiver.middleDragStart(*this);
 		}
 	};
@@ -113,11 +113,11 @@ namespace toy
 		MouseDragEndEvent(Mouse& mouse, DeviceType deviceType, MouseEvent& source) : MouseEvent(mouse, deviceType, EVENT_DRAGGED_END, source) {}
 
 		virtual bool receive(InputAdapter& receiver) {
-			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
+			if(m_deviceType == DEVICE_MOUSE_LEFT_BUTTON)
 				return receiver.leftDragEnd(*this);
-			else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
+			else if(m_deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
 				return receiver.rightDragEnd(*this);
-			else // if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
+			else // if(m_deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
 				return receiver.middleDragEnd(*this);
 		}
 	};

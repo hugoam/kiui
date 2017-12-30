@@ -22,14 +22,14 @@ namespace toy
 
 	bool Popup::leftClick(MouseEvent& mouseEvent)
 	{
-		mouseEvent.abort = true;
+		mouseEvent.m_abort = true;
 		this->close();
 		return true;
 	}
 
 	bool Popup::rightClick(MouseEvent& mouseEvent)
 	{
-		mouseEvent.abort = true;
+		mouseEvent.m_abort = true;
 		this->close();
 		return true;
 	}

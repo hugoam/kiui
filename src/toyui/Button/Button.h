@@ -27,15 +27,15 @@ namespace toy
 		bool click(MouseEvent& mouseEvent)
 		{
 			if(!m_trigger) return false; m_trigger(m_widget);
-			mouseEvent.abort = true; // @kludge for buttons that cause destroying a widget
+			mouseEvent.m_abort = true; // @kludge for buttons that cause destroying a widget
 			return true; 
 		}
 
 		bool clickMods(MouseEvent& mouseEvent)
 		{
-			if(mouseEvent.modifiers & INPUT_CTRL)
+			if(mouseEvent.m_modifiers & INPUT_CTRL)
 				return this->clickCtrl(mouseEvent);
-			else if(mouseEvent.modifiers & INPUT_SHIFT)
+			else if(mouseEvent.m_modifiers & INPUT_SHIFT)
 				return this->clickShift(mouseEvent);
 			else
 				return this->click(mouseEvent);

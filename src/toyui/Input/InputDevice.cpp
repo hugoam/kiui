@@ -81,9 +81,9 @@ namespace toy
 		m_rootSheet.transformCoordinates(mouseEvent);
 		mouseEvent.m_delta = mouseEvent.m_pos - m_lastPos;
 		if(m_rootSheet.m_keyboard.m_shiftPressed)
-			mouseEvent.modifiers = static_cast<InputModifier>(mouseEvent.modifiers ^ INPUT_SHIFT);
+			mouseEvent.m_modifiers = static_cast<InputModifier>(mouseEvent.m_modifiers ^ INPUT_SHIFT);
 		if(m_rootSheet.m_keyboard.m_ctrlPressed)
-			mouseEvent.modifiers = static_cast<InputModifier>(mouseEvent.modifiers ^ INPUT_CTRL);
+			mouseEvent.m_modifiers = static_cast<InputModifier>(mouseEvent.m_modifiers ^ INPUT_CTRL);
 	}
 
 	void Mouse::dispatchMouseMoved(DimFloat pos)
@@ -95,7 +95,7 @@ namespace toy
 
 		m_rootFrame.dispatchEvent(mouseEvent);
 
-		this->mouseFocus(pos, mouseEvent.visited);
+		this->mouseFocus(pos, mouseEvent.m_visited);
 
 		for(MouseButton& button : m_buttons)
 			button.mouseMoved(mouseEvent);

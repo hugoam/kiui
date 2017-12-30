@@ -196,7 +196,7 @@ namespace toy
 
 	void Widget::transformEvent(InputEvent& inputEvent)
 	{
-		if(inputEvent.deviceType >= DEVICE_MOUSE)
+		if(inputEvent.m_deviceType >= DEVICE_MOUSE)
 		{
 			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
 			mouseEvent.m_relative = m_frame->localPosition(mouseEvent.m_pos);
@@ -210,7 +210,7 @@ namespace toy
 		if(m_controlGraph)
 			return m_controlGraph->controlEvent(inputEvent);
 
-		if(inputEvent.deviceType >= DEVICE_MOUSE)
+		if(inputEvent.m_deviceType >= DEVICE_MOUSE)
 		{
 			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
 			Widget* pinned = this->pinpoint(mouseEvent.m_relative);
@@ -222,10 +222,10 @@ namespace toy
 
 	InputReceiver* Widget::receiveEvent(InputEvent& inputEvent)
 	{
-		if(inputEvent.consumed)
+		if(inputEvent.m_consumed)
 			return this;
 
-		inputEvent.visited.push_back(this);
+		inputEvent.m_visited.push_back(this);
 
 		this->transformEvent(inputEvent);
 
