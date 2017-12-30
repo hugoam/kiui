@@ -40,8 +40,8 @@ namespace toy
 	bool ScrollSheet::mouseWheel(MouseEvent& mouseEvent)
 	{
 		UNUSED(mouseEvent);
-		m_scrollbarX.scroll(mouseEvent.delta.x);
-		m_scrollbarY.scroll(mouseEvent.delta.y);
+		m_scrollbarX.scroll(mouseEvent.m_delta.x);
+		m_scrollbarY.scroll(mouseEvent.m_delta.y);
 		return true;
 	}
 
@@ -81,7 +81,7 @@ namespace toy
 
 	bool ScrollPlan::middleDrag(MouseEvent& mouseEvent)
 	{
-		DimFloat pos = m_plan.frame().d_position + mouseEvent.delta;
+		DimFloat pos = m_plan.frame().d_position + mouseEvent.m_delta;
 		m_plan.frame().setPosition({ std::min(0.f, pos.x), std::min(0.f, pos.y) });
 		m_frame->markDirty(DIRTY_FORCE_LAYOUT);
 		return true;
@@ -89,7 +89,7 @@ namespace toy
 
 	bool ScrollPlan::mouseWheel(MouseEvent& mouseEvent)
 	{
-		float deltaScale = mouseEvent.deltaZ > 0.f ? 1.2f : 0.8333f;
+		float deltaScale = mouseEvent.m_deltaZ > 0.f ? 1.2f : 0.8333f;
 		float scale = m_plan.frame().d_scale * deltaScale;
 
 		if(m_clamped)
@@ -101,7 +101,7 @@ namespace toy
 		m_plan.frame().d_scale = scale;
 		m_frame->markDirty(DIRTY_FORCE_LAYOUT);
 
-		DimFloat offset = mouseEvent.relative - mouseEvent.relative * deltaScale;
+		DimFloat offset = mouseEvent.m_relative - mouseEvent.m_relative * deltaScale;
 		DimFloat pos = offset + m_plan.frame().d_position;
 
 		if(m_clamped)

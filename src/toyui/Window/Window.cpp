@@ -48,14 +48,14 @@ namespace toy
 	bool WindowHeader::leftDrag(MouseEvent& mouseEvent)
 	{
 		if(m_window.movable())
-			m_window.frame().setPosition(m_window.frame().d_position + mouseEvent.delta);
+			m_window.frame().setPosition(m_window.frame().d_position + mouseEvent.m_delta);
 		return true;
 	}
 
 	bool WindowHeader::leftDragEnd(MouseEvent& mouseEvent)
 	{
 		if(m_window.dockable())
-			m_window.dockAt(mouseEvent.pos);
+			m_window.dockAt(mouseEvent.m_pos);
 
 		m_window.frame().layer().m_opacity = OPAQUE;
 		return true;
@@ -78,11 +78,11 @@ namespace toy
 	{
 		UNUSED(mouseEvent);
 		if(m_resizeLeft)
-			m_window.frame().setPositionDim(DIM_X, m_window.frame().d_position.x + mouseEvent.delta.x);
+			m_window.frame().setPositionDim(DIM_X, m_window.frame().d_position.x + mouseEvent.m_delta.x);
 		if(m_resizeLeft)
-			m_window.frame().setSize({ std::max(50.f, m_window.frame().m_size.x - mouseEvent.delta.x), std::max(50.f, m_window.frame().m_size.y + mouseEvent.delta.y) });
+			m_window.frame().setSize({ std::max(50.f, m_window.frame().m_size.x - mouseEvent.m_delta.x), std::max(50.f, m_window.frame().m_size.y + mouseEvent.m_delta.y) });
 		else
-			m_window.frame().setSize({ std::max(50.f, m_window.frame().m_size.x + mouseEvent.delta.x), std::max(50.f, m_window.frame().m_size.y + mouseEvent.delta.y) });
+			m_window.frame().setSize({ std::max(50.f, m_window.frame().m_size.x + mouseEvent.m_delta.x), std::max(50.f, m_window.frame().m_size.y + mouseEvent.m_delta.y) });
 		return true;
 	}
 

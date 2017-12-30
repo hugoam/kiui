@@ -91,42 +91,42 @@ namespace toy
 
 	struct TOY_UI_EXPORT MouseEvent : public InputEvent
 	{
-		DimFloat pos;
-		DimFloat relative;
-		DimFloat delta;
-		float deltaZ;
-		DimFloat pressed;
+		DimFloat m_pos;
+		DimFloat m_relative;
+		DimFloat m_delta;
+		float m_deltaZ;
+		DimFloat m_pressed;
 
-		MouseButtonCode button;
+		MouseButtonCode m_button;
 
 		MouseEvent(Mouse& mouse, DeviceType deviceType, EventType eventType, DimFloat pos)
 			: InputEvent(deviceType, eventType)
-			, pos(pos), relative{ 0.f, 0.f }, delta{ 0.f, 0.f }, deltaZ(0.f), pressed{ 0.f, 0.f }, button(NO_BUTTON)
+			, m_pos(pos), m_relative{ 0.f, 0.f }, m_delta{ 0.f, 0.f }, m_deltaZ(0.f), m_pressed{ 0.f, 0.f }, m_button(NO_BUTTON)
 		{
 			mouse.transformMouseEvent(*this);
 
 			if(deviceType == DEVICE_MOUSE_LEFT_BUTTON)
-				button = LEFT_BUTTON;
+				m_button = LEFT_BUTTON;
 			else if(deviceType == DEVICE_MOUSE_RIGHT_BUTTON)
-				button = RIGHT_BUTTON;
+				m_button = RIGHT_BUTTON;
 			else if(deviceType == DEVICE_MOUSE_MIDDLE_BUTTON)
-				button = MIDDLE_BUTTON;
+				m_button = MIDDLE_BUTTON;
 		}
 
 		MouseEvent(Mouse& mouse, DeviceType deviceType, EventType eventType, MouseEvent& source)
 			: MouseEvent(mouse, deviceType, eventType, {})
 		{
-			this->pos = source.pos; this->relative = source.relative; this->delta = source.delta; this->pressed = source.pressed;
+			m_pos = source.m_pos; m_relative = source.m_relative; m_delta = source.m_delta; m_pressed = source.m_pressed;
 		}
 	};
 
 	struct TOY_UI_EXPORT KeyEvent : public InputEvent
 	{
-		KeyCode code;
-		char c;
+		KeyCode m_code;
+		char m_char;
 
 		KeyEvent(DeviceType deviceType, EventType eventType, KeyCode code, char c)
-			: InputEvent(deviceType, eventType), code(code), c(c)
+			: InputEvent(deviceType, eventType), m_code(code), m_char(c)
 		{}
 	};
 }

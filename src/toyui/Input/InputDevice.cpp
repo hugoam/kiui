@@ -79,7 +79,7 @@ namespace toy
 	void Mouse::transformMouseEvent(MouseEvent& mouseEvent)
 	{
 		m_rootSheet.transformCoordinates(mouseEvent);
-		mouseEvent.delta = mouseEvent.pos - m_lastPos;
+		mouseEvent.m_delta = mouseEvent.m_pos - m_lastPos;
 		if(m_rootSheet.m_keyboard.m_shiftPressed)
 			mouseEvent.modifiers = static_cast<InputModifier>(mouseEvent.modifiers ^ INPUT_SHIFT);
 		if(m_rootSheet.m_keyboard.m_ctrlPressed)
@@ -90,8 +90,8 @@ namespace toy
 	{
 		MouseMoveEvent mouseEvent(*this, pos);
 
-		m_lastPos = mouseEvent.pos;
-		m_rootSheet.m_cursor.setPosition(mouseEvent.pos);
+		m_lastPos = mouseEvent.m_pos;
+		m_rootSheet.m_cursor.setPosition(mouseEvent.m_pos);
 
 		m_rootFrame.dispatchEvent(mouseEvent);
 
@@ -136,7 +136,7 @@ namespace toy
 	void MouseButton::mouseMoved(MouseEvent& mouseEvent)
 	{
 		const float threshold = 3.f;
-		DimFloat delta = mouseEvent.pos - m_pressedPos;
+		DimFloat delta = mouseEvent.m_pos - m_pressedPos;
 
 		if(m_dragging)
 			this->dragMove(mouseEvent);
@@ -149,7 +149,7 @@ namespace toy
 		MousePressEvent mouseEvent(m_mouse, m_deviceType, pos);
 
 		m_pressed = m_rootFrame.dispatchEvent(mouseEvent);
-		m_pressedPos = mouseEvent.pos;
+		m_pressedPos = mouseEvent.m_pos;
 	}
 
 	void MouseButton::mouseReleased(DimFloat pos)
@@ -169,7 +169,7 @@ namespace toy
 	void MouseButton::dragStart(MouseEvent& mouseEvent)
 	{
 		MouseDragStartEvent dragEvent(m_mouse, m_deviceType, mouseEvent);
-		dragEvent.pressed = m_pressedPos;
+		dragEvent.m_pressed = m_pressedPos;
 		m_rootFrame.dispatchEvent(dragEvent, m_pressed);
 
 		this->dragMove(mouseEvent);
@@ -189,7 +189,7 @@ namespace toy
 	void MouseButton::dragMove(MouseEvent& mouseEvent)
 	{
 		MouseDragEvent dragEvent(m_mouse, m_deviceType, mouseEvent);
-		dragEvent.pressed = m_pressedPos;
+		dragEvent.m_pressed = m_pressedPos;
 		m_rootFrame.dispatchEvent(dragEvent, m_pressed);
 	}
 

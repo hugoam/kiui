@@ -30,7 +30,7 @@ namespace toy
 	{
 		float size = m_frame->m_size[m_dim];
 		float knob = m_button.frame().m_size[m_dim];
-		return std::min(size - knob, std::max(0.f, mouseEvent.relative[m_dim] + offset)) / size;
+		return std::min(size - knob, std::max(0.f, mouseEvent.m_relative[m_dim] + offset)) / size;
 	}
 
 	bool Slider::leftClick(MouseEvent& mouseEvent)
@@ -42,7 +42,7 @@ namespace toy
 
 	bool Slider::leftDragStart(MouseEvent& mouseEvent)
 	{
-		m_dragOffset = m_dragRelative ? mouseEvent.relative[m_dim] - m_filler.frame().m_size[m_dim] : 0.f;
+		m_dragOffset = m_dragRelative ? mouseEvent.m_relative[m_dim] - m_filler.frame().m_size[m_dim] : 0.f;
 		this->enableState(TRIGGERED);
 		m_button.enableState(TRIGGERED);
 		return true;

@@ -17,7 +17,7 @@ namespace toy
 
 	bool KeyInputFrame::keyUp(KeyEvent& keyEvent)
 	{
-		auto it = m_keyUpHandlers.find(keyEvent.code);
+		auto it = m_keyUpHandlers.find(keyEvent.m_code);
 		if(it != m_keyUpHandlers.end())
 		{
 			(*it).second();
@@ -28,7 +28,7 @@ namespace toy
 
 	bool KeyInputFrame::keyDown(KeyEvent& keyEvent)
 	{
-		auto it = m_keyDownHandlers.find(keyEvent.code);
+		auto it = m_keyDownHandlers.find(keyEvent.m_code);
 		if(it != m_keyDownHandlers.end())
 		{
 			(*it).second();
@@ -77,7 +77,7 @@ namespace toy
 		if(m_controlMode < CM_MODAL)
 			return false;
 
-		DimFloat local = m_inputWidget->frame().localPosition(mouseEvent.pos);
+		DimFloat local = m_inputWidget->frame().localPosition(mouseEvent.m_pos);
 		if(!m_inputWidget->frame().inside(local))
 			this->yield();
 

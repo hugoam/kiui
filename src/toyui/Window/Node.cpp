@@ -117,7 +117,7 @@ namespace toy
 	bool Canvas::leftDrag(MouseEvent& mouseEvent)
 	{
 		for(Node* node : m_selection.store())
-			node->moveNode(mouseEvent.delta);
+			node->moveNode(mouseEvent.m_delta);
 		return true;
 	}
 
@@ -162,7 +162,7 @@ namespace toy
 
 	bool NodePlug::leftDrag(MouseEvent& mouseEvent)
 	{
-		DimFloat local = m_node.plan().frame().localPosition(mouseEvent.pos);
+		DimFloat local = m_node.plan().frame().localPosition(mouseEvent.m_pos);
 		m_connectionProxy->frame().setPosition(local);
 		m_cableProxy->updateCable();
 		return true;
@@ -170,7 +170,7 @@ namespace toy
 
 	bool NodePlug::leftDragEnd(MouseEvent& mouseEvent)
 	{
-		Widget* target = this->rootSheet().pinpoint(mouseEvent.pos);
+		Widget* target = this->rootSheet().pinpoint(mouseEvent.m_pos);
 		NodePlug* plug = target->findContainer<NodePlug>();
 
 		if(plug && plug->m_input != m_input)

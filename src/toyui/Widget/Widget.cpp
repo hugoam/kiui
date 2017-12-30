@@ -199,7 +199,7 @@ namespace toy
 		if(inputEvent.deviceType >= DEVICE_MOUSE)
 		{
 			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
-			mouseEvent.relative = m_frame->localPosition(mouseEvent.pos);
+			mouseEvent.m_relative = m_frame->localPosition(mouseEvent.m_pos);
 		}
 	}
 
@@ -213,7 +213,7 @@ namespace toy
 		if(inputEvent.deviceType >= DEVICE_MOUSE)
 		{
 			MouseEvent& mouseEvent = static_cast<MouseEvent&>(inputEvent);
-			Widget* pinned = this->pinpoint(mouseEvent.relative);
+			Widget* pinned = this->pinpoint(mouseEvent.m_relative);
 			return (pinned && pinned != this) ? pinned->controlEvent(inputEvent) : this;
 		}
 

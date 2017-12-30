@@ -92,7 +92,7 @@ namespace toy
 
 	bool TypeIn::leftClick(MouseEvent& mouseEvent)
 	{
-		size_t index = m_caption.caretIndex(mouseEvent.relative);
+		size_t index = m_caption.caretIndex(mouseEvent.m_relative);
 		this->selectCaret(index);
 		this->activate();
 		return true;
@@ -100,7 +100,7 @@ namespace toy
 
 	bool TypeIn::leftDragStart(MouseEvent& mouseEvent)
 	{
-		size_t index = m_caption.caretIndex(mouseEvent.relative);
+		size_t index = m_caption.caretIndex(mouseEvent.m_relative);
 		this->selectFirst(index);
 		this->activate();
 		return true;
@@ -108,29 +108,29 @@ namespace toy
 
 	bool TypeIn::leftDrag(MouseEvent& mouseEvent)
 	{
-		size_t index = m_caption.caretIndex(mouseEvent.relative);
+		size_t index = m_caption.caretIndex(mouseEvent.m_relative);
 		this->selectSecond(index);
 		return true;
 	}
 
 	bool TypeIn::keyDown(KeyEvent& keyEvent)
 	{
-		if(keyEvent.code == KC_LEFT)
+		if(keyEvent.m_code == KC_LEFT)
 			this->moveCaretLeft();
-		else if(keyEvent.code == KC_RIGHT)
+		else if(keyEvent.m_code == KC_RIGHT)
 			this->moveCaretRight();
-		else if(keyEvent.code == KC_RETURN && (m_allowedChars.empty() || m_allowedChars.find('\n') != string::npos))
+		else if(keyEvent.m_code == KC_RETURN && (m_allowedChars.empty() || m_allowedChars.find('\n') != string::npos))
 			this->insert('\n');
-		else if(keyEvent.code == KC_ESCAPE)
+		else if(keyEvent.m_code == KC_ESCAPE)
 			this->yieldControl();
-		else if(keyEvent.code == KC_BACK)
+		else if(keyEvent.m_code == KC_BACK)
 			this->erase();
-		else if(keyEvent.c != 0 && (m_allowedChars.empty() || m_allowedChars.find(keyEvent.c) != string::npos))
+		else if(keyEvent.m_char != 0 && (m_allowedChars.empty() || m_allowedChars.find(keyEvent.m_char) != string::npos))
 		{
-			if(keyEvent.c == '.' && m_text.find('.') != string::npos)
+			if(keyEvent.m_char == '.' && m_text.find('.') != string::npos)
 				return true;
 
-			this->insert(keyEvent.c);
+			this->insert(keyEvent.m_char);
 		}
 
 		return true;

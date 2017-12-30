@@ -114,7 +114,7 @@ namespace toy
 	{
 		// we take the position BEFORE the mouse moved as a reference
 		
-		DimFloat local = m_frame->localPosition(mouseEvent.pressed);
+		DimFloat local = m_frame->localPosition(mouseEvent.m_pressed);
 		m_dragPrev = nullptr;
 		m_dragNext = nullptr;
 
@@ -136,7 +136,7 @@ namespace toy
 		if(!m_dragNext || !m_dragPrev)
 			return true;
 
-		m_frame->transferPixelSpan(*m_dragPrev, *m_dragNext, m_dim, mouseEvent.delta[m_dim]);
+		m_frame->transferPixelSpan(*m_dragPrev, *m_dragNext, m_dim, mouseEvent.m_delta[m_dim]);
 		if(m_onResize)
 			m_onResize(*m_dragPrev, *m_dragNext);
 		return true;

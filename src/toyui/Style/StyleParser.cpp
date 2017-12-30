@@ -61,7 +61,7 @@ namespace toy
 	FromJson style_unpacker(UiWindow& uiWindow)
 	{
 		FromJson unpacker;
-		unpacker.func<Image>([&](Ref ref, const json& json) -> Var
+		unpacker.function<Image>([&](Ref ref, const json& json) -> Var
 		{
 			return Ref(json == "null" ? (Image*) nullptr
 									  : &uiWindow.findImage(json));

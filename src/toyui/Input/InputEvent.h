@@ -15,7 +15,7 @@ namespace toy
 	{
 		KeyDownEvent(KeyCode code, char c) : KeyEvent(DEVICE_KEYBOARD, EVENT_PRESSED, code, c) {}
 
-		virtual void dispatch(RootSheet& rootSheet) { rootSheet.m_keyboard.dispatchKeyPressed(code, c); }
+		virtual void dispatch(RootSheet& rootSheet) { rootSheet.m_keyboard.dispatchKeyPressed(m_code, m_char); }
 		virtual bool receive(InputAdapter& receiver) { return receiver.keyDown(*this); }
 	};
 
@@ -23,7 +23,7 @@ namespace toy
 	{
 		KeyUpEvent(KeyCode code, char c) : KeyEvent(DEVICE_KEYBOARD, EVENT_RELEASED, code, c) {}
 
-		virtual void dispatch(RootSheet& rootSheet) { rootSheet.m_keyboard.dispatchKeyReleased(code, c); }
+		virtual void dispatch(RootSheet& rootSheet) { rootSheet.m_keyboard.dispatchKeyReleased(m_code, m_char); }
 		virtual bool receive(InputAdapter& receiver) { return receiver.keyUp(*this); }
 	};
 
@@ -31,7 +31,7 @@ namespace toy
 	{
 		KeyCharEvent(KeyCode code, char c) : KeyEvent(DEVICE_KEYBOARD, EVENT_STROKED, code, c) {}
 
-		//virtual void dispatch(RootSheet& rootSheet) { rootSheet.keyboard().dispatchKeyReleased(code, c); }
+		//virtual void dispatch(RootSheet& rootSheet) { rootSheet.keyboard().dispatchKeyReleased(m_code, m_char); }
 		virtual bool receive(InputAdapter& receiver) { return receiver.keyStroke(*this); }
 	};
 
@@ -39,7 +39,7 @@ namespace toy
 	{
 		MouseMoveEvent(Mouse& mouse, DimFloat pos) : MouseEvent(mouse, DEVICE_MOUSE, EVENT_MOVED, pos) {}
 
-		virtual void dispatch(RootSheet& rootSheet) { rootSheet.m_mouse.dispatchMouseMoved(pos); }
+		virtual void dispatch(RootSheet& rootSheet) { rootSheet.m_mouse.dispatchMouseMoved(m_pos); }
 		virtual bool receive(InputAdapter& receiver) { return receiver.mouseMoved(*this); }
 	};
 
@@ -47,7 +47,7 @@ namespace toy
 	{
 		MousePressEvent(Mouse& mouse, DeviceType deviceType, DimFloat pos) : MouseEvent(mouse, deviceType, EVENT_PRESSED, pos) {}
 
-		virtual void dispatch(RootSheet& rootSheet) { rootSheet.m_mouse.dispatchMousePressed(pos, button); }
+		virtual void dispatch(RootSheet& rootSheet) { rootSheet.m_mouse.dispatchMousePressed(m_pos, m_button); }
 		virtual bool receive(InputAdapter& receiver) { return receiver.mousePressed(*this); consumed = true; }
 	};
 
@@ -55,15 +55,15 @@ namespace toy
 	{
 		MouseReleaseEvent(Mouse& mouse, DeviceType deviceType, DimFloat pos) : MouseEvent(mouse, deviceType, EVENT_RELEASED, pos) {}
 
-		virtual void dispatch(RootSheet& rootSheet) { rootSheet.m_mouse.dispatchMouseReleased(pos, button); }
+		virtual void dispatch(RootSheet& rootSheet) { rootSheet.m_mouse.dispatchMouseReleased(m_pos, m_button); }
 		virtual bool receive(InputAdapter& receiver) { return receiver.mouseReleased(*this); }
 	};
 
 	struct TOY_UI_EXPORT MouseWheelEvent : public MouseEvent
 	{
-		MouseWheelEvent(Mouse& mouse, DimFloat pos, float amount) : MouseEvent(mouse, DEVICE_MOUSE_MIDDLE_BUTTON, EVENT_MOVED, pos) { deltaZ = amount; }
+		MouseWheelEvent(Mouse& mouse, DimFloat pos, float amount) : MouseEvent(mouse, DEVICE_MOUSE_MIDDLE_BUTTON, EVENT_MOVED, pos) { m_deltaZ = amount; }
 
-		virtual void dispatch(RootSheet& rootSheet) { rootSheet.m_mouse.dispatchMouseWheeled(pos, deltaZ); }
+		virtual void dispatch(RootSheet& rootSheet) { rootSheet.m_mouse.dispatchMouseWheeled(m_pos, m_deltaZ); }
 		virtual bool receive(InputAdapter& receiver) { return receiver.mouseWheel(*this); }
 	};
 
