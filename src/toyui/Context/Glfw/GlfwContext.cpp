@@ -186,7 +186,7 @@ namespace toy
 #ifdef TOY_RENDERER_BGFX
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 #else
-		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		//glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		//glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 #endif
 
