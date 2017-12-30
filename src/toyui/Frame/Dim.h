@@ -195,7 +195,7 @@ namespace toy
 		_constr_ BoxFloat(float uniform) : BoxFloat(uniform, uniform, uniform, uniform) {}
 		BoxFloat() : BoxFloat(0.f) { d_null = true; }
 
-		BoxFloat(int x0, int y0, int x1, int y1) : BoxFloat(float(x0), float(y0), float(x1), float(y1)) {}
+		BoxFloat(int a, int b, int c, int d) : BoxFloat(float(a), float(b), float(c), float(d)) {}
 
 		float operator[](size_t i) const { return d_values[i]; }
 		float& operator[](size_t i) { d_null = false; return d_values[i]; }
