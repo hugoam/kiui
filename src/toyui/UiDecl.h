@@ -211,7 +211,7 @@ namespace toy
 				decl(unode, typed_func<T_Value>(callback));
 			});
 		}
-
+		
 		void decl(Unode& unode);
 		void done();
 

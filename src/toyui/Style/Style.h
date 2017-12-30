@@ -28,7 +28,7 @@ namespace toy
 	{
 	public:
 		_constr_ Shadow(float xpos, float ypos, float blur, float spread, Colour colour = Colour::AlphaBlack)
-			: d_xpos(xpos), d_ypos(ypos), d_blur(blur), d_spread(spread), d_radius(spread + blur), d_colour(colour), d_null(false)
+			: d_xpos(xpos), d_ypos(ypos), d_blur(blur), d_spread(spread), d_colour(colour), d_null(false), d_radius(spread + blur)
 		{}
 
 		_constr_ Shadow()

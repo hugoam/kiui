@@ -244,7 +244,7 @@ namespace toy
 	public:
 		InputField(const Params& params, const string& label, const T_Val& value, typename T_Input::Callback callback = nullptr, bool reverse = false)
 			//: Wedge({ params, &cls<Field<T_Val, T_Input>>() })
-			: Wedge({ params.parent, &Widget::styles().row })
+			: Wedge({ params.m_parent, &Widget::styles().row })
 			, m_label({ this }, label)
 			, m_input({ this }, value, callback)
 		{
