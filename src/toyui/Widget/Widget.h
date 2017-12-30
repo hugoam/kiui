@@ -56,15 +56,15 @@ namespace toy
 		struct Params
 		{
 			Params(Wedge* parent = nullptr, Style* style = nullptr, FrameType frameType = FRAME)
-				: parent(parent), type(nullptr), style(style), frameType(frameType) {}
+				: m_parent(parent), m_type(nullptr), m_style(style), m_frameType(frameType) {}
 			Params(const Params& params, Type* type = nullptr, Style* style = nullptr)
-				: parent(params.parent), type(params.type ? params.type : type), style(params.style ? params.style : style), frameType(params.frameType) {}
+				: m_parent(params.m_parent), m_type(params.m_type ? params.m_type : type), m_style(params.m_style ? params.m_style : style), m_frameType(params.m_frameType) {}
 			Params(const Params& params, Type* type, FrameType frameType)
-				: parent(params.parent), type(params.type ? params.type : type), style(params.style), frameType(frameType) {}
-			Wedge* parent = nullptr;
-			Type* type = nullptr;
-			Style* style = nullptr;
-			FrameType frameType = FRAME;
+				: m_parent(params.m_parent), m_type(params.m_type ? params.m_type : type), m_style(params.m_style), m_frameType(frameType) {}
+			Wedge* m_parent = nullptr;
+			Type* m_type = nullptr;
+			Style* m_style = nullptr;
+			FrameType m_frameType = FRAME;
 		};
 
 	public:

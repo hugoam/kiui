@@ -19,17 +19,17 @@ namespace toy
 	std::map<string, Style*> Widget::s_styles;
 
 	Widget::Widget(const Params& params)
-		: TypeObject(params.type ? *params.type : cls<Widget>())
-		, m_parent(params.parent)
+		: TypeObject(params.m_type ? *params.m_type : cls<Widget>())
+		, m_parent(params.m_parent)
 		, m_container(nullptr)
-		, m_style(params.style)
+		, m_style(params.m_style)
 		, m_frame()
 		, m_state(NOSTATE)
 		, m_object()
 	{
-		if(params.frameType == MASTER_LAYER || params.frameType == LAYER)
-			m_frame = make_object<Layer>(as<Wedge>(*this), params.frameType);
-		else if(params.frameType == FRAME)
+		if(params.m_frameType == MASTER_LAYER || params.m_frameType == LAYER)
+			m_frame = make_object<Layer>(as<Wedge>(*this), params.m_frameType);
+		else if(params.m_frameType == FRAME)
 			m_frame = make_object<Frame>(*this);
 
 		if(m_parent)
