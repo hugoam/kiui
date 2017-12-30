@@ -141,7 +141,7 @@ namespace toy
 	class _refl_ Dim
 	{
 	public:
-		_constr_ Dim(T x, T y) : d_values{{ x, y }} {}
+		_constr_ Dim(T a, T b) : d_values{{ a, b }} {}
 		_constr_ Dim() : Dim(T(), T()) {}
 
 		T operator[](size_t i) const { return d_values[i]; }
