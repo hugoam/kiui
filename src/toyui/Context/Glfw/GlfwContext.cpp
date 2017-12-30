@@ -18,6 +18,7 @@
 
 #elif defined TOY_PLATFORM_LINUX
 	#define GLFW_EXPOSE_NATIVE_X11
+	#define GLFW_EXPOSE_NATIVE_GLX
 	#include <GLFW/glfw3native.h>
 #endif
 
