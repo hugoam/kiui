@@ -5,7 +5,7 @@ TL;DR - Made a new free and open-source UI library that gamedevs should know abo
 Show me the demo already ! Try it in the browser : [here](http://hugoam.github.io/kiui/livedemo/kiui.html)
 ![switching between styles at runtime](media/themes.gif?raw=true)
 Have a look at a few GIFs : [Themes](http://hugoam.github.io/kiui/media/styles.gif) [Dock Windows](http://hugoam.github.io/kiui/media/dockspace.gif)
-[Text Edit](http://hugoam.github.io/kiui/media/texteditx.gif) [Tweakin Style](http://hugoam.github.io/kiui/media/styling.gif) [Tweakin Some More] (http://hugoam.github.io/kiui/media/stylingbis.gif)
+[Text Edit](http://hugoam.github.io/kiui/media/texteditx.gif) [Tweakin Style](http://hugoam.github.io/kiui/media/styling.gif) [Tweakin Some More](http://hugoam.github.io/kiui/media/stylingbis.gif)
 Open-source ! [Github](https://github.com/hugoam/kiui)
 
 Why ?
