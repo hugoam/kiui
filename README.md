@@ -1,5 +1,5 @@
-Warning: kiUi is currently in a hiatus pending the publication of a wider set of libraries which it will be part of
-Until then it is discouraged to try to use it
+## Warning: kiUi became the ui component inside the [mud](https://github.com/hugoam/mud) library  
+**This repository just exists for history purposes but is not under active development anymore.**
 
 kiUi [![Build Status](https://travis-ci.org/hugoam/kiui.svg?branch=master)](https://travis-ci.org/hugoam/kiui)
 ====
